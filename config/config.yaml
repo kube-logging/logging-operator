@@ -1,0 +1,3 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: LoggingOperator
+projectName: logging-operator
