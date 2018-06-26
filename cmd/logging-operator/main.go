@@ -33,3 +33,23 @@ func main() {
 	sdk.Handle(stub.NewHandler())
 	sdk.Run(context.TODO())
 }
+
+func initFluentBit() {
+	// Create fluntBit daemonset
+	// Basic configuration and tagging
+	// TLS?
+	// Output?
+}
+
+func initFluentd() {
+	// Create fluentd services
+	// Possible options
+	//  replica: x
+	//  tag_rewrite config: ? it should be possible to give labels
+	//  input port
+	//  TLS?
+	//  monitoring
+	//    enabled:
+	//    port:
+	//    path:
+}

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: logging-operator
+  template:
+    metadata:
+      labels:
+        name: logging-operator
+    spec:
+      containers:
+        - name: logging-operator
+          image: banzaicloud/logging-operator
+          command:
+          - logging-operator
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
