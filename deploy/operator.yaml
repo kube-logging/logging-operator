@@ -17,7 +17,7 @@ spec:
           image: banzaicloud/logging-operator
           command:
           - logging-operator
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
               valueFrom:
