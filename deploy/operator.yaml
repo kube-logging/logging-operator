@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: logging-operator
-          image: banzaicloud/logging-operator
+          image: banzaicloud/logging-operator:dev
           command:
           - logging-operator
           imagePullPolicy: Always

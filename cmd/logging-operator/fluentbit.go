@@ -248,7 +248,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 								},
 								{
 									Name:      "config",
-									MountPath: "/fluent-bit/etc/fluent-bit.conf",
+									MountPath: "/fluent-bit/etc",
 								},
 								{
 									Name:      "positions",
