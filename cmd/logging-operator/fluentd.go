@@ -5,12 +5,39 @@ import (
     extensionv1 "k8s.io/api/extensions/v1beta1"
     "k8s.io/apimachinery/pkg/api/resource"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+    "k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func newFluentdRole() {
 
 }
-func newFluentdService() {
+func newFluentdService() *corev1.Service {
+    return &corev1.Service{
+        TypeMeta: metav1.TypeMeta{
+            Kind:       "Service",
+            APIVersion: "v1",
+        },
+        ObjectMeta: metav1.ObjectMeta{
+            Name:      "fluentd",
+            Namespace: "default",
+            Labels:    map[string]string {
+                "app": "fluentd",
+            },
+        },
+        Spec: corev1.ServiceSpec{
+            Ports:                    []corev1.ServicePort{
+                {
+                    Protocol:   corev1.ProtocolTCP,
+                    Port:       24240,
+                    TargetPort: intstr.IntOrString{IntVal: 24240},
+                },
+            },
+            Selector:    map[string]string{
+                "app": "fluentd",
+            },
+            Type:        "ClusterIP",
+        },
+    }
 
 }
 
@@ -18,8 +45,8 @@ func newFluentdService() {
 
 // TODO This has to be a Golang template with proper values gathered
 func newFluentdConfigmap() *corev1.ConfigMap {
-    config := `
-# Prevent fluentd from handling records containing its own logs. Otherwise
+    config :=
+`# Prevent fluentd from handling records containing its own logs. Otherwise
 # it can lead to an infinite loop, when error in sending one message generates
 # another message which also fails to be sent and so on.
 <match fluentd.**>
@@ -40,15 +67,12 @@ func newFluentdConfigmap() *corev1.ConfigMap {
 # Input plugin
 <source>
     @type   forward
-    port    24224
+    port    24240
     @log_level debug
 </source>
 
 <match kubernetes.**>
   @type rewrite_tag_filter
-  <rule>
-    tag clusterName.${tag}
-  </rule>
   <rule>
     key $.kubernetes.namespace_name
     pattern ^(.+)$
@@ -61,6 +85,9 @@ func newFluentdConfigmap() *corev1.ConfigMap {
   </rule>
 </match>
 
+<match **.kubernetes.**>
+  @type stdout
+</match>
 <match **>
     @type null
 </match>
@@ -105,7 +132,7 @@ func newFluentdPVC() *corev1.PersistentVolumeClaim {
             },
             Resources: corev1.ResourceRequirements{
                 Requests: corev1.ResourceList{
-                    "corev1.ResourceStorage": resource.MustParse("10G"),
+                    "storage": resource.MustParse("10G"),
                 },
             },
         },
@@ -187,13 +214,13 @@ func newFluentdDeployment() *extensionv1.Deployment {
                                     MountPath: "/fluentd/etc/conf.d",
                                 },
                                 {
-                                    Name:      "buffers",
+                                    Name:      "buffer",
                                     MountPath: "/buffers",
                                 },
                             },
                         },
                     },
-                    ServiceAccountName: "",
+                    //ServiceAccountName: "",
                 },
             },
         },

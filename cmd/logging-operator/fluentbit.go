@@ -104,7 +104,7 @@ func generateConfig(input fluentBitConfig) (*string, error) {
 
 [INPUT]
      Name             tail
-     Path             /var/log/pods/*/*.log
+     Path             /var/log/containers/*.log
      Parser           docker
      Tag              kubernetes.*
      Refresh_Interval 5
@@ -216,10 +216,10 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
                             },
                         },
                         {
-                            Name: "container-logs",
+                            Name: "varlogs",
                             VolumeSource: corev1.VolumeSource{
                                 HostPath: &corev1.HostPathVolumeSource{
-                                    Path: "/var/log/pods",
+                                    Path: "/var/log",
                                 },
                             },
                         },
@@ -265,10 +265,9 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
                                     MountPath: "/tail-db",
                                 },
                                 {
-                                    Name:      "container-logs",
+                                    Name:      "varlogs",
                                     ReadOnly:  true,
-                                    MountPath: "/var/log/pods",
-
+                                    MountPath: "/var/log/",
                                 },
                             },
                         },
