@@ -49,7 +49,7 @@ func initFluentBit() {
 	sdk.Create(newServiceAccount(cfg))
 	sdk.Create(newClusterRole(cfg))
 	sdk.Create(newClusterRoleBinding(cfg))
-	cfgMap, _ := newFluentBitConifg(cfg)
+	cfgMap, _ := newFluentBitConfig(cfg)
 	sdk.Create(cfgMap)
 	sdk.Create(newFluentBitDaemonSet(cfg))
 }
