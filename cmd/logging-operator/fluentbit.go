@@ -92,42 +92,42 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 // What inputs we neeed? This need to be Templated or Struct generated
 func generateConfig(input fluentBitConfig) (*string, error) {
     output := new(bytes.Buffer)
-    text := `
-    [SERVICE]
-        Flush        1
-        Daemon       Off
-        Log_Level    info
-        Parsers_File parsers.conf
-        HTTP_Server  On
-        HTTP_Listen  0.0.0.0
-        HTTP_Port    {{ .Monitor.Port }}
+    text :=
+`[SERVICE]
+     Flush        1
+     Daemon       Off
+     Log_Level    info
+     Parsers_File parsers.conf
+     HTTP_Server  On
+     HTTP_Listen  0.0.0.0
+     HTTP_Port    {{ .Monitor.Port }}
 
-    [INPUT]
-        Name             tail
-        Path             /var/log/pods/*/*.log
-        Parser           docker
-        Tag              kubernetes.*
-        Refresh_Interval 5
-        Mem_Buf_Limit    5MB
-        Skip_Long_Lines  On
-        DB               /tail-db/tail-containers-state.db
-        DB.Sync          Normal
+[INPUT]
+     Name             tail
+     Path             /var/log/pods/*/*.log
+     Parser           docker
+     Tag              kubernetes.*
+     Refresh_Interval 5
+     Mem_Buf_Limit    5MB
+     Skip_Long_Lines  On
+     DB               /tail-db/tail-containers-state.db
+     DB.Sync          Normal
 
-    [FILTER]
-        Name                kubernetes
-        Match               kubernetes.*
-        Kube_URL            https://kubernetes.default.svc:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Merge_Log           On
+[FILTER]
+     Name                kubernetes
+     Match               kubernetes.*
+     Kube_URL            https://kubernetes.default.svc:443
+     Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+     Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+     Merge_Log           On
 
-    [OUTPUT]
-        Name          forward
-        Match         *
-        Host          fluentd.default.svc
-        Port          24240
-        Retry_Limit   False
-`
+[OUTPUT]
+     Name          forward
+     Match         *
+     Host          fluentd.default.svc
+     Port          24240
+     Retry_Limit   False`
+
     tmpl, err := template.New("test").Parse(text)
     if err != nil {
         return nil, err
@@ -219,7 +219,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
                             Name: "container-logs",
                             VolumeSource: corev1.VolumeSource{
                                 HostPath: &corev1.HostPathVolumeSource{
-                                    Path: "var/log/pods",
+                                    Path: "/var/log/pods",
                                 },
                             },
                         },
@@ -263,6 +263,12 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
                                 {
                                     Name:      "positions",
                                     MountPath: "/tail-db",
+                                },
+                                {
+                                    Name:      "container-logs",
+                                    ReadOnly:  true,
+                                    MountPath: "/var/log/pods",
+
                                 },
                             },
                         },
