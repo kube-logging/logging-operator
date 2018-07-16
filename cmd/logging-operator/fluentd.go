@@ -45,15 +45,7 @@ func newFluentdService() *corev1.Service {
 
 // TODO This has to be a Golang template with proper values gathered
 func newFluentdConfigmap() *corev1.ConfigMap {
-	config :=
-		`# Prevent fluentd from handling records containing its own logs. Otherwise
-# it can lead to an infinite loop, when error in sending one message generates
-# another message which also fails to be sent and so on.
-<match fluentd.**>
-    @type null
-</match>
-
-# Prometheus monitoring
+	config := `# Prometheus monitoring
 <source>
     @type prometheus
 </source>
@@ -70,6 +62,17 @@ func newFluentdConfigmap() *corev1.ConfigMap {
     port    24240
     @log_level debug
 </source>
+
+# Prevent fluentd from handling records containing its own logs. Otherwise
+# it can lead to an infinite loop, when error in sending one message generates
+# another message which also fails to be sent and so on.
+<match **.fluentd**>
+    @type null
+</match>
+
+<match **.fluent-bit**>
+    @type null
+</match>
 
 <match kubernetes.**>
   @type rewrite_tag_filter
