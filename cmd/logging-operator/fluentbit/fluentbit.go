@@ -1,4 +1,4 @@
-package main
+package fluentbit
 
 import (
 	"bytes"
@@ -7,7 +7,20 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"text/template"
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
 )
+
+func InitFluentBit() {
+	cfg := &fluentBitDeploymentConfig{
+		Namespace: "default",
+	}
+	sdk.Create(newServiceAccount(cfg))
+	sdk.Create(newClusterRole(cfg))
+	sdk.Create(newClusterRoleBinding(cfg))
+	cfgMap, _ := newFluentBitConfig(cfg)
+	sdk.Create(cfgMap)
+	sdk.Create(newFluentBitDaemonSet(cfg))
+}
 
 var labels = map[string]string{
 	"app": "fluent-bit",

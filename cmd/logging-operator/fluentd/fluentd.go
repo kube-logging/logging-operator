@@ -1,4 +1,4 @@
-package main
+package fluentd
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -6,7 +6,29 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+    "github.com/operator-framework/operator-sdk/pkg/sdk"
 )
+
+var labels = map[string]string{
+	"app": "fluentd",
+}
+
+func InitFluentd() {
+    sdk.Create(newFluentdConfigmap())
+    sdk.Create(newFluentdPVC())
+    sdk.Create(newFluentdDeployment())
+    sdk.Create(newFluentdService())
+    // Create fluentd services
+    // Possible options
+    //  replica: x
+    //  tag_rewrite config: ? it should be possible to give labels
+    //  input port
+    //  TLS?
+    //  monitoring
+    //    enabled:
+    //    port:
+    //    path:
+}
 
 func newFluentdRole() {
 

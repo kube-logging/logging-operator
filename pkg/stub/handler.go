@@ -6,6 +6,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
+    "k8s.io/api/core/v1"
 )
 
 func NewHandler() sdk.Handler {
@@ -16,12 +17,13 @@ type Handler struct {
 	// Fill me
 }
 
-func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
+func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
-		logrus.Info("New CRD arrived %#v", o)
+		logrus.Infof("New CRD arrived %#v", o)
+    case *v1.ConfigMap:
 	}
-	return nil
+	return
 }
 
 //
