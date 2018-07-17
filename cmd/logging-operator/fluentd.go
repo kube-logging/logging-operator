@@ -79,16 +79,20 @@ func newFluentdConfigmap() *corev1.ConfigMap {
   <rule>
     key $.kubernetes.namespace_name
     pattern ^(.+)$
-    tag $1.${tag}
-  </rule>
-  <rule>
-    key $.kubernetes.labels.app_label
-    pattern ^(.+)$
-    tag $1.${tag}
+    tag $1.${tag_parts[0]}
   </rule>
 </match>
 
-<match **.kubernetes.**>
+<match *.kubernetes.**>
+  @type rewrite_tag_filter
+  <rule>
+    key $.kubernetes.labels.app
+    pattern ^(.+)$
+    tag $1.${tag_parts[0]}.${tag_parts[1]}
+  </rule>
+</match>
+
+<match **.kubernetes>
   @type stdout
 </match>
 <match **>
