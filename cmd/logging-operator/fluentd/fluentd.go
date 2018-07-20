@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
     "github.com/operator-framework/operator-sdk/pkg/sdk"
+    "github.com/sirupsen/logrus"
 )
 
 var labels = map[string]string{
@@ -28,6 +29,25 @@ func InitFluentd() {
     //    enabled:
     //    port:
     //    path:
+}
+
+func CheckConfigExistence(name string) bool {
+    configMap := &corev1.ConfigMap{
+        TypeMeta: metav1.TypeMeta{
+            Kind:       "ConfigMap",
+            APIVersion: "v1",
+        },
+        ObjectMeta: metav1.ObjectMeta{
+            Name:            name,
+            Namespace:       "default",
+        },
+    }
+    if err := sdk.Get(configMap); err != nil {
+        logrus.Infof("ConfigMap %s does not exists!", name)
+        return false
+    }
+    logrus.Infof("ConfigMap %s exists", name)
+    return true
 }
 
 func newFluentdRole() {

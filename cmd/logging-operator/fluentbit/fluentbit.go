@@ -8,18 +8,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"text/template"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/spf13/viper"
+	"github.com/sirupsen/logrus"
 )
 
+// TODO handle errors comming from sdk.Create
 func InitFluentBit() {
+	logrus.Info("Deploying fluent-bit")
 	cfg := &fluentBitDeploymentConfig{
 		Namespace: "default",
 	}
-	sdk.Create(newServiceAccount(cfg))
-	sdk.Create(newClusterRole(cfg))
-	sdk.Create(newClusterRoleBinding(cfg))
+	if viper.GetBool("logging-operator.rbac") {
+		sdk.Create(newServiceAccount(cfg))
+		sdk.Create(newClusterRole(cfg))
+		sdk.Create(newClusterRoleBinding(cfg))
+	}
 	cfgMap, _ := newFluentBitConfig(cfg)
 	sdk.Create(cfgMap)
 	sdk.Create(newFluentBitDaemonSet(cfg))
+	logrus.Info("Fluent-bit deployed successfully")
 }
 
 var labels = map[string]string{
@@ -105,41 +112,7 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 // What inputs we neeed? This need to be Templated or Struct generated
 func generateConfig(input fluentBitConfig) (*string, error) {
 	output := new(bytes.Buffer)
-	text :=
-		`[SERVICE]
-     Flush        1
-     Daemon       Off
-     Log_Level    info
-     Parsers_File parsers.conf
-     HTTP_Server  On
-     HTTP_Listen  0.0.0.0
-     HTTP_Port    {{ .Monitor.Port }}
-
-[INPUT]
-     Name             tail
-     Path             /var/log/containers/*.log
-     Parser           docker
-     Tag              kubernetes.*
-     Refresh_Interval 5
-     Mem_Buf_Limit    5MB
-     Skip_Long_Lines  On
-     DB               /tail-db/tail-containers-state.db
-     DB.Sync          Normal
-
-[FILTER]
-     Name                kubernetes
-     Match               kubernetes.*
-     Kube_URL            https://kubernetes.default.svc:443
-     Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-     Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-     Merge_Log           On
-
-[OUTPUT]
-     Name          forward
-     Match         *
-     Host          fluentd.default.svc
-     Port          24240
-     Retry_Limit   False`
+	text := viper.GetString("fluent-bit.config")
 
 	tmpl, err := template.New("test").Parse(text)
 	if err != nil {
@@ -181,11 +154,27 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 	return configMap, nil
 }
 
+func CheckIfDeamonSetExist() bool {
+	fluentbitDaemonSet := &extensionv1.DaemonSet{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "DaemonSet",
+			APIVersion: "extensions/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels:    labels,
+			Namespace: "default",
+		},
+	}
+	if err := sdk.Get(fluentbitDaemonSet); err != nil {
+		logrus.Info("FluentBit DaemonSet does not exists!")
+		return false
+	}
+	logrus.Info("FluentBit DaemonSet already exists!")
+	return true
+}
+
 // TODO the options should come from the operator configuration
 func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet {
-	labels := map[string]string{
-		"app": "fluent-bit",
-	}
 	return &extensionv1.DaemonSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "DaemonSet",

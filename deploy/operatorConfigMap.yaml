@@ -1,0 +1,107 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "logging-operator-config"
+  labels:
+    app:  "logging-operator"
+data:
+  config.toml: |-
+    # This is the example config for the logging operator
+
+    [logging-operator]
+    rbac = false
+
+
+    [fluent-bit]
+    enabled = true
+    config ="""[SERVICE]
+       Flush        1
+       Daemon       Off
+       Log_Level    info
+       Parsers_File parsers.conf
+       HTTP_Server  On
+       HTTP_Listen  0.0.0.0
+       HTTP_Port    {{ .Monitor.Port }}
+
+    [INPUT]
+       Name             tail
+       Path             /var/log/containers/*.log
+       Parser           docker
+       Tag              kubernetes.*
+       Refresh_Interval 5
+       Mem_Buf_Limit    5MB
+       Skip_Long_Lines  On
+       DB               /tail-db/tail-containers-state.db
+       DB.Sync          Normal
+
+    [FILTER]
+       Name                kubernetes
+       Match               kubernetes.*
+       Kube_URL            https://kubernetes.default.svc:443
+       Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+       Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+       Merge_Log           On
+
+    [OUTPUT]
+       Name          forward
+       Match         *
+       Host          fluentd.default.svc
+       Port          24240
+       Retry_Limit   False"""
+
+    [fluentd]
+    enabled = true
+    config ="""
+            # Prometheus monitoring
+            <source>
+                @type prometheus
+            </source>
+            <source>
+                @type prometheus_monitor
+            </source>
+            <source>
+                @type prometheus_output_monitor
+            </source>
+
+            # Input plugin
+            <source>
+                @type   forward
+                port    24240
+                @log_level debug
+            </source>
+
+            # Prevent fluentd from handling records containing its own logs. Otherwise
+            # it can lead to an infinite loop, when error in sending one message generates
+            # another message which also fails to be sent and so on.
+            <match **.fluentd**>
+                @type null
+            </match>
+
+            <match **.fluent-bit**>
+                @type null
+            </match>
+
+            <match kubernetes.**>
+              @type rewrite_tag_filter
+              <rule>
+                key $.kubernetes.namespace_name
+                pattern ^(.+)$
+                tag $1.${tag_parts[0]}
+              </rule>
+            </match>
+
+            <match *.kubernetes.**>
+              @type rewrite_tag_filter
+              <rule>
+                key $.kubernetes.labels.app
+                pattern ^(.+)$
+                tag $1.${tag_parts[0]}.${tag_parts[1]}
+              </rule>
+            </match>
+
+            <match **.kubernetes>
+              @type stdout
+            </match>
+            <match **>
+                @type null
+            </match>"""

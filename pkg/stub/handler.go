@@ -7,6 +7,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
     "k8s.io/api/core/v1"
+    "github.com/banzaicloud/logging-operator/cmd/logging-operator/config"
 )
 
 func NewHandler() sdk.Handler {
@@ -22,6 +23,22 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	case *v1alpha1.LoggingOperator:
 		logrus.Infof("New CRD arrived %#v", o)
     case *v1.ConfigMap:
+        // Ignore the delete event since the garbage collector will clean up all secondary resources for the CR
+        // All secondary resources must have the CR set as their OwnerReference for this to be the case
+        if event.Deleted {
+            logrus.Info("Inside deleted event")
+            return nil
+        }
+        if o.Labels["app"] == "fluentd" {
+            logrus.Info("Fluentd config modified")
+        }
+        if o.Labels["app"] == "fluent-bit" {
+            logrus.Info("Fluent-bit config modified")
+        }
+        if o.Labels["app"] == "logging-operator" {
+            logrus.Info("Logging operator config modified")
+            config.ConfigureOperator()
+        }
 	}
 	return
 }

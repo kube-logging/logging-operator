@@ -10,8 +10,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"os"
-    "github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentbit"
-    "github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentd"
 )
 
 func printVersion(namespace string) {
@@ -36,11 +34,8 @@ func main() {
 
 	ns := os.Getenv(operatorNamespace)
 	printVersion(ns)
-
-	logrus.Info("Deploy fluent-bit")
-	fluentbit.InitFluentBit()
-	logrus.Info("Deploy fluentd")
-	fluentd.InitFluentd()
+	//logrus.Info("Deploy fluentd")
+	//fluentd.InitFluentd()
 	resyncPeriod := 0
 	logrus.Infof("Watching %s, %s, %s, %d", operatorResource, kind, ns, resyncPeriod)
 	sdk.Watch(operatorResource, kind, ns, resyncPeriod)
