@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
     "github.com/operator-framework/operator-sdk/pkg/sdk"
     "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var labels = map[string]string{
@@ -15,6 +16,8 @@ var labels = map[string]string{
 }
 
 func InitFluentd() {
+	if viper.GetBool("logging-operator.rbac") {
+	}
     sdk.Create(newFluentdConfigmap())
     sdk.Create(newFluentdPVC())
     sdk.Create(newFluentdDeployment())
@@ -31,23 +34,23 @@ func InitFluentd() {
     //    path:
 }
 
-func CheckConfigExistence(name string) bool {
-    configMap := &corev1.ConfigMap{
-        TypeMeta: metav1.TypeMeta{
-            Kind:       "ConfigMap",
-            APIVersion: "v1",
-        },
-        ObjectMeta: metav1.ObjectMeta{
-            Name:            name,
-            Namespace:       "default",
-        },
-    }
-    if err := sdk.Get(configMap); err != nil {
-        logrus.Infof("ConfigMap %s does not exists!", name)
-        return false
-    }
-    logrus.Infof("ConfigMap %s exists", name)
-    return true
+func CheckIfDeploymentSetExist() bool {
+	fluentdDeployment := &extensionv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "extensions/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels:    labels,
+			Namespace: "default",
+		},
+	}
+	if err := sdk.Get(fluentdDeployment); err != nil {
+		logrus.Info("Fluentd Deployment does not exists!")
+		return false
+	}
+	logrus.Info("Fluentd Deployment already exists!")
+	return true
 }
 
 func newFluentdRole() {
@@ -87,60 +90,7 @@ func newFluentdService() *corev1.Service {
 
 // TODO This has to be a Golang template with proper values gathered
 func newFluentdConfigmap() *corev1.ConfigMap {
-	config := `# Prometheus monitoring
-<source>
-    @type prometheus
-</source>
-<source>
-    @type prometheus_monitor
-</source>
-<source>
-    @type prometheus_output_monitor
-</source>
-
-# Input plugin
-<source>
-    @type   forward
-    port    24240
-    @log_level debug
-</source>
-
-# Prevent fluentd from handling records containing its own logs. Otherwise
-# it can lead to an infinite loop, when error in sending one message generates
-# another message which also fails to be sent and so on.
-<match **.fluentd**>
-    @type null
-</match>
-
-<match **.fluent-bit**>
-    @type null
-</match>
-
-<match kubernetes.**>
-  @type rewrite_tag_filter
-  <rule>
-    key $.kubernetes.namespace_name
-    pattern ^(.+)$
-    tag $1.${tag_parts[0]}
-  </rule>
-</match>
-
-<match *.kubernetes.**>
-  @type rewrite_tag_filter
-  <rule>
-    key $.kubernetes.labels.app
-    pattern ^(.+)$
-    tag $1.${tag_parts[0]}.${tag_parts[1]}
-  </rule>
-</match>
-
-<match **.kubernetes>
-  @type stdout
-</match>
-<match **>
-    @type null
-</match>
-`
+	config := viper.GetString("fluentd.config")
 	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ConfigMap",
@@ -153,7 +103,7 @@ func newFluentdConfigmap() *corev1.ConfigMap {
 		},
 
 		Data: map[string]string{
-			"example.conf": config,
+			"fluentd.conf": config,
 		},
 	}
 	return configMap

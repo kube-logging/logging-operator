@@ -4,6 +4,7 @@ import (
     "github.com/spf13/viper"
     "github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentbit"
     "github.com/sirupsen/logrus"
+    "github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentd"
 )
 //Initialize the configuration
 func init() {
@@ -17,7 +18,10 @@ func init() {
 }
 
 func ConfigureOperator() {
-    if viper.GetBool("fluent-bit.enabled") && !fluentbit.CheckIfDeamonSetExist(){
+   if viper.GetBool("fluent-bit.enabled") && !fluentbit.CheckIfDeamonSetExist(){
         fluentbit.InitFluentBit()
+   }
+   if viper.GetBool("fluentd.enabled") && !fluentd.CheckIfDeploymentSetExist(){
+       fluentd.InitFluentd()
    }
 }
