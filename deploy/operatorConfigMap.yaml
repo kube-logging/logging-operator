@@ -10,10 +10,11 @@ data:
 
     [logging-operator]
     rbac = false
-
+    namespace = "default"
 
     [fluent-bit]
     enabled = true
+    namespace = "default"
     config ="""[SERVICE]
        Flush        1
        Daemon       Off
@@ -51,6 +52,7 @@ data:
 
     [fluentd]
     enabled = true
+    namespace = "default"
     config ="""
             # Prometheus monitoring
             <source>

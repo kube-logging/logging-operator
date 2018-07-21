@@ -14,19 +14,21 @@ import (
 
 // TODO handle errors comming from sdk.Create
 func InitFluentBit() {
-	logrus.Info("Deploying fluent-bit")
-	cfg := &fluentBitDeploymentConfig{
-		Namespace: "default",
+	if !checkIfDeamonSetExist() {
+		logrus.Info("Deploying fluent-bit")
+		cfg := &fluentBitDeploymentConfig{
+			Namespace: "default",
+		}
+		if viper.GetBool("logging-operator.rbac") {
+			sdk.Create(newServiceAccount(cfg))
+			sdk.Create(newClusterRole(cfg))
+			sdk.Create(newClusterRoleBinding(cfg))
+		}
+		cfgMap, _ := newFluentBitConfig(cfg)
+		sdk.Create(cfgMap)
+		sdk.Create(newFluentBitDaemonSet(cfg))
+		logrus.Info("Fluent-bit deployed successfully")
 	}
-	if viper.GetBool("logging-operator.rbac") {
-		sdk.Create(newServiceAccount(cfg))
-		sdk.Create(newClusterRole(cfg))
-		sdk.Create(newClusterRoleBinding(cfg))
-	}
-	cfgMap, _ := newFluentBitConfig(cfg)
-	sdk.Create(cfgMap)
-	sdk.Create(newFluentBitDaemonSet(cfg))
-	logrus.Info("Fluent-bit deployed successfully")
 }
 
 var labels = map[string]string{
@@ -154,7 +156,7 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 	return configMap, nil
 }
 
-func CheckIfDeamonSetExist() bool {
+func checkIfDeamonSetExist() bool {
 	fluentbitDaemonSet := &extensionv1.DaemonSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "DaemonSet",
@@ -173,7 +175,7 @@ func CheckIfDeamonSetExist() bool {
 	return true
 }
 
-// TODO the options should come from the operator configuration
+// TODO in case of rbac add created serviceAccount name
 func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet {
 	return &extensionv1.DaemonSet{
 		TypeMeta: metav1.TypeMeta{

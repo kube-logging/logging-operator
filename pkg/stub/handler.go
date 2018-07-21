@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
     "k8s.io/api/core/v1"
     "github.com/banzaicloud/logging-operator/cmd/logging-operator/config"
+	"github.com/spf13/viper"
 )
 
 func NewHandler() sdk.Handler {
@@ -37,6 +38,12 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
         }
         if o.Labels["app"] == "logging-operator" {
             logrus.Info("Logging operator config modified")
+			// Read in config every time when the kubernetes loggigng operatort configmap changed
+			err := viper.ReadInConfig()
+			if err != nil {
+				logrus.Errorf("Error during reading config file : %s", err)
+				return err
+			}
             config.ConfigureOperator()
         }
 	}

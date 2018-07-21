@@ -34,8 +34,6 @@ func main() {
 
 	ns := os.Getenv(operatorNamespace)
 	printVersion(ns)
-	//logrus.Info("Deploy fluentd")
-	//fluentd.InitFluentd()
 	resyncPeriod := 0
 	logrus.Infof("Watching %s, %s, %s, %d", operatorResource, kind, ns, resyncPeriod)
 	sdk.Watch(operatorResource, kind, ns, resyncPeriod)

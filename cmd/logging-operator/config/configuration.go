@@ -7,21 +7,22 @@ import (
     "github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentd"
 )
 //Initialize the configuration
+
 func init() {
     logrus.Info("Initializing configuration")
     viper.AddConfigPath("/logging-operator/config/")
     viper.SetConfigName("config")
-    err := viper.ReadInConfig()
-    if err != nil {
-        logrus.Errorf("Error during reading in config file : %s", err)
-    }
 }
 
 func ConfigureOperator() {
-   if viper.GetBool("fluent-bit.enabled") && !fluentbit.CheckIfDeamonSetExist(){
+   if viper.GetBool("fluent-bit.enabled") {
         fluentbit.InitFluentBit()
    }
-   if viper.GetBool("fluentd.enabled") && !fluentd.CheckIfDeploymentSetExist(){
-       fluentd.InitFluentd()
+   if viper.GetBool("fluentd.enabled") {
+       fluentdDeployment := &fluentd.FluentdDeployment{
+           Namespace: viper.GetString("fluentd.namespace"),
+           Labels: map[string]string{"app": "fluentd",},
+       }
+       fluentd.InitFluentd(fluentdDeployment)
    }
 }
