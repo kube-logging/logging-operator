@@ -14,11 +14,12 @@ import (
 
 // TODO handle errors comming from sdk.Create
 func InitFluentBit() {
-	if !checkIfDeamonSetExist() {
+	cfg := &fluentBitDeploymentConfig{
+		Namespace: "default",
+		Labels: map[string]string{"app": "fluent-bit",},
+	}
+	if !checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deploying fluent-bit")
-		cfg := &fluentBitDeploymentConfig{
-			Namespace: "default",
-		}
 		if viper.GetBool("logging-operator.rbac") {
 			sdk.Create(newServiceAccount(cfg))
 			sdk.Create(newClusterRole(cfg))
@@ -31,13 +32,9 @@ func InitFluentBit() {
 	}
 }
 
-var labels = map[string]string{
-	"app": "fluent-bit",
-}
-
 type fluentBitDeploymentConfig struct {
 	Namespace string
-	Replicas  int32
+	Labels    map[string]string
 }
 
 type fluentBitConfig struct {
@@ -54,7 +51,7 @@ func newServiceAccount(cr *fluentBitDeploymentConfig) *corev1.ServiceAccount {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "logging",
 			Namespace: cr.Namespace,
-			Labels:    labels,
+			Labels:    cr.Labels,
 		},
 	}
 }
@@ -68,7 +65,7 @@ func newClusterRole(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRole {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "LoggingRole",
 			Namespace: cr.Namespace,
-			Labels:    labels,
+			Labels:    cr.Labels,
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -94,7 +91,7 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "logging",
 			Namespace: cr.Namespace,
-			Labels:    labels,
+			Labels:    cr.Labels,
 		},
 		Subjects: []rbacv1.Subject{
 			{
@@ -146,7 +143,7 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluent-bit-config",
 			Namespace: cr.Namespace,
-			Labels:    labels,
+			Labels:    cr.Labels,
 		},
 
 		Data: map[string]string{
@@ -156,15 +153,15 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 	return configMap, nil
 }
 
-func checkIfDeamonSetExist() bool {
+func checkIfDeamonSetExist(cr *fluentBitDeploymentConfig) bool {
 	fluentbitDaemonSet := &extensionv1.DaemonSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "DaemonSet",
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Labels:    labels,
-			Namespace: "default",
+			Labels:    cr.Labels,
+			Namespace: cr.Namespace,
 		},
 	}
 	if err := sdk.Get(fluentbitDaemonSet); err != nil {
@@ -185,13 +182,13 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluent-bit",
 			Namespace: cr.Namespace,
-			Labels:    labels,
+			Labels:    cr.Labels,
 		},
 		Spec: extensionv1.DaemonSetSpec{
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:   "fluent-bit",
-					Labels: labels,
+					Labels: cr.Labels,
 					// TODO Move annotations to configuration
 					Annotations: map[string]string{
 						"prometheus.io/scrape": "true",

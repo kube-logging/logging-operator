@@ -19,10 +19,6 @@ func ConfigureOperator() {
         fluentbit.InitFluentBit()
    }
    if viper.GetBool("fluentd.enabled") {
-       fluentdDeployment := &fluentd.FluentdDeployment{
-           Namespace: viper.GetString("fluentd.namespace"),
-           Labels: map[string]string{"app": "fluentd",},
-       }
-       fluentd.InitFluentd(fluentdDeployment)
+       fluentd.InitFluentd()
    }
 }

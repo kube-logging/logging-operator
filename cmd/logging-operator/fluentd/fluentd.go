@@ -11,19 +11,24 @@ import (
 	"github.com/spf13/viper"
 )
 
-type FluentdDeployment struct {
+type fluentdDeploymentConfig struct {
 	Namespace string
+	Replicas  int32
 	Labels    map[string]string
 }
 
-func InitFluentd(fluentd *FluentdDeployment) {
-	if !fluentd.checkIfDeploymentExist() {
+func InitFluentd() {
+	fdc := &fluentdDeploymentConfig{
+		Namespace: viper.GetString("fluentd.namespace"),
+		Labels: map[string]string{"app": "fluentd",},
+	}
+	if !checkIfDeploymentExist(fdc) {
 		if viper.GetBool("logging-operator.rbac") {
 		}
-		sdk.Create(fluentd.newFluentdConfigmap())
-		sdk.Create(fluentd.newFluentdPVC())
-		sdk.Create(fluentd.newFluentdDeployment())
-		sdk.Create(fluentd.newFluentdService())
+		sdk.Create(newFluentdConfigmap(fdc))
+		sdk.Create(newFluentdPVC(fdc))
+		sdk.Create(newFluentdDeployment(fdc))
+		sdk.Create(newFluentdService(fdc))
 	}
     // Create fluentd services
     // Possible options
@@ -37,15 +42,15 @@ func InitFluentd(fluentd *FluentdDeployment) {
     //    path:
 }
 
-func (d *FluentdDeployment)checkIfDeploymentExist() bool {
+func checkIfDeploymentExist(fdc *fluentdDeploymentConfig) bool {
 	fluentdDeployment := &extensionv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Labels:    d.Labels,
-			Namespace: d.Namespace,
+			Labels:    fdc.Labels,
+			Namespace: fdc.Namespace,
 		},
 	}
 	if err := sdk.Get(fluentdDeployment); err != nil {
@@ -59,7 +64,7 @@ func (d *FluentdDeployment)checkIfDeploymentExist() bool {
 func newFluentdRole() {
 
 }
-func (d *FluentdDeployment)newFluentdService() *corev1.Service {
+func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 	return &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -67,8 +72,8 @@ func (d *FluentdDeployment)newFluentdService() *corev1.Service {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluentd",
-			Namespace: d.Namespace,
-			Labels: d.Labels,
+			Namespace: fdc.Namespace,
+			Labels: fdc.Labels,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
@@ -88,7 +93,7 @@ func (d *FluentdDeployment)newFluentdService() *corev1.Service {
 }
 
 // TODO This has to be a Golang template with proper values gathered
-func (d *FluentdDeployment)newFluentdConfigmap() *corev1.ConfigMap {
+func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 	config := viper.GetString("fluentd.config")
 	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
@@ -97,8 +102,8 @@ func (d *FluentdDeployment)newFluentdConfigmap() *corev1.ConfigMap {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluentd-config",
-			Namespace: d.Namespace,
-			Labels:    d.Labels,
+			Namespace: fdc.Namespace,
+			Labels:    fdc.Labels,
 		},
 
 		Data: map[string]string{
@@ -108,7 +113,7 @@ func (d *FluentdDeployment)newFluentdConfigmap() *corev1.ConfigMap {
 	return configMap
 }
 
-func (d *FluentdDeployment)newFluentdPVC() *corev1.PersistentVolumeClaim {
+func newFluentdPVC(fdc *fluentdDeploymentConfig) *corev1.PersistentVolumeClaim {
 	return &corev1.PersistentVolumeClaim{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PersistentVolumeClaim",
@@ -116,8 +121,8 @@ func (d *FluentdDeployment)newFluentdPVC() *corev1.PersistentVolumeClaim {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluentd-buffer",
-			Namespace: d.Namespace,
-			Labels:    d.Labels,
+			Namespace: fdc.Namespace,
+			Labels:    fdc.Labels,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{
@@ -133,7 +138,7 @@ func (d *FluentdDeployment)newFluentdPVC() *corev1.PersistentVolumeClaim {
 }
 
 // TODO in case of rbac add created serviceAccount name
-func (d *FluentdDeployment)newFluentdDeployment() *extensionv1.Deployment {
+func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment {
 	var replicas int32 = 1
 	return &extensionv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -142,15 +147,15 @@ func (d *FluentdDeployment)newFluentdDeployment() *extensionv1.Deployment {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluentd",
-			Namespace: d.Namespace,
-			Labels:    d.Labels,
+			Namespace: fdc.Namespace,
+			Labels:    fdc.Labels,
 		},
 		Spec: extensionv1.DeploymentSpec{
 			Replicas: &replicas,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:   "fluentd",
-					Labels: d.Labels,
+					Labels: fdc.Labels,
 					// TODO Move annotations to configuration
 					Annotations: map[string]string{
 						"prometheus.io/scrape": "true",
