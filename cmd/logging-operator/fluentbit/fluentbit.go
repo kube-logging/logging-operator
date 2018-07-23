@@ -12,13 +12,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var config *fluentBitDeploymentConfig
+
+func initConfig() *fluentBitDeploymentConfig {
+	if config == nil {
+		config = &fluentBitDeploymentConfig{
+			Name:      "fluent-bit",
+			Namespace: viper.GetString("fluent-bit.namespace"),
+			Labels:    map[string]string{"app": "fluent-bit",},
+		}
+	}
+	return config
+}
+
 // TODO handle errors comming from sdk.Create
 func InitFluentBit() {
-	cfg := &fluentBitDeploymentConfig{
-		Name:	   "fluent-bit",
-		Namespace: "default",
-		Labels: map[string]string{"app": "fluent-bit",},
-	}
+	cfg := initConfig()
 	if !checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deploying fluent-bit")
 		if viper.GetBool("logging-operator.rbac") {
@@ -33,6 +42,28 @@ func InitFluentBit() {
 			logrus.Error(err)
 		}
 		logrus.Info("Fluent-bit deployed successfully")
+	}
+}
+
+func DeleteFluentBit() {
+	cfg := initConfig()
+	if checkIfDeamonSetExist(cfg) {
+		logrus.Info("Deleting fluent-bit")
+		if viper.GetBool("logging-operator.rbac") {
+			sdk.Delete(newServiceAccount(cfg))
+			sdk.Delete(newClusterRole(cfg))
+			sdk.Delete(newClusterRoleBinding(cfg))
+		}
+		cfgMap, _ := newFluentBitConfig(cfg)
+		sdk.Delete(cfgMap)
+		foregroundDeletion := metav1.DeletePropagationForeground
+		err := sdk.Delete(newFluentBitDaemonSet(cfg), sdk.WithDeleteOptions(&metav1.DeleteOptions{
+			PropagationPolicy: &foregroundDeletion,
+		}))
+		if err != nil {
+			logrus.Error(err)
+		}
+		logrus.Info("Fluent-bit deleted successfully")
 	}
 }
 
