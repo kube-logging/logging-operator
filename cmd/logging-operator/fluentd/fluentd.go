@@ -12,6 +12,7 @@ import (
 )
 
 type fluentdDeploymentConfig struct {
+	Name      string
 	Namespace string
 	Replicas  int32
 	Labels    map[string]string
@@ -19,6 +20,7 @@ type fluentdDeploymentConfig struct {
 
 func InitFluentd() {
 	fdc := &fluentdDeploymentConfig{
+		Name:      "fluentd",
 		Namespace: viper.GetString("fluentd.namespace"),
 		Labels: map[string]string{"app": "fluentd",},
 	}
@@ -27,8 +29,12 @@ func InitFluentd() {
 		}
 		sdk.Create(newFluentdConfigmap(fdc))
 		sdk.Create(newFluentdPVC(fdc))
-		sdk.Create(newFluentdDeployment(fdc))
+		err := sdk.Create(newFluentdDeployment(fdc))
+		if err != nil {
+			logrus.Error(err)
+		}
 		sdk.Create(newFluentdService(fdc))
+		logrus.Info("Fluentd Deployment initialized!")
 	}
     // Create fluentd services
     // Possible options
@@ -49,12 +55,14 @@ func checkIfDeploymentExist(fdc *fluentdDeploymentConfig) bool {
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
+			Name:      fdc.Name,
 			Labels:    fdc.Labels,
 			Namespace: fdc.Namespace,
 		},
 	}
 	if err := sdk.Get(fluentdDeployment); err != nil {
 		logrus.Info("Fluentd Deployment does not exists!")
+		logrus.Error(err)
 		return false
 	}
 	logrus.Info("Fluentd Deployment already exists!")
@@ -71,7 +79,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "fluentd",
+			Name:      fdc.Name,
 			Namespace: fdc.Namespace,
 			Labels: fdc.Labels,
 		},
@@ -146,7 +154,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "fluentd",
+			Name:      fdc.Name,
 			Namespace: fdc.Namespace,
 			Labels:    fdc.Labels,
 		},
@@ -154,7 +162,6 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 			Replicas: &replicas,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:   "fluentd",
 					Labels: fdc.Labels,
 					// TODO Move annotations to configuration
 					Annotations: map[string]string{

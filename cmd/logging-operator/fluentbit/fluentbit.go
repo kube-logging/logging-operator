@@ -15,6 +15,7 @@ import (
 // TODO handle errors comming from sdk.Create
 func InitFluentBit() {
 	cfg := &fluentBitDeploymentConfig{
+		Name:	   "fluent-bit",
 		Namespace: "default",
 		Labels: map[string]string{"app": "fluent-bit",},
 	}
@@ -27,12 +28,16 @@ func InitFluentBit() {
 		}
 		cfgMap, _ := newFluentBitConfig(cfg)
 		sdk.Create(cfgMap)
-		sdk.Create(newFluentBitDaemonSet(cfg))
+		err := sdk.Create(newFluentBitDaemonSet(cfg))
+		if err != nil {
+			logrus.Error(err)
+		}
 		logrus.Info("Fluent-bit deployed successfully")
 	}
 }
 
 type fluentBitDeploymentConfig struct {
+	Name      string
 	Namespace string
 	Labels    map[string]string
 }
@@ -160,12 +165,14 @@ func checkIfDeamonSetExist(cr *fluentBitDeploymentConfig) bool {
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.Name,
 			Labels:    cr.Labels,
 			Namespace: cr.Namespace,
 		},
 	}
 	if err := sdk.Get(fluentbitDaemonSet); err != nil {
 		logrus.Info("FluentBit DaemonSet does not exists!")
+		logrus.Error(err)
 		return false
 	}
 	logrus.Info("FluentBit DaemonSet already exists!")
@@ -180,14 +187,13 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "fluent-bit",
+			Name:      cr.Name,
 			Namespace: cr.Namespace,
 			Labels:    cr.Labels,
 		},
 		Spec: extensionv1.DaemonSetSpec{
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:   "fluent-bit",
 					Labels: cr.Labels,
 					// TODO Move annotations to configuration
 					Annotations: map[string]string{
