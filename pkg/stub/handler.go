@@ -20,29 +20,6 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
 		logrus.Infof("New CRD arrived %#v", o)
-    //case *v1.ConfigMap:
-    //    // Ignore the delete event since the garbage collector will clean up all secondary resources for the CR
-    //    // All secondary resources must have the CR set as their OwnerReference for this to be the case
-    //    if event.Deleted {
-    //        logrus.Info("Inside deleted event")
-    //        return nil
-    //    }
-    //    if o.Labels["app"] == "fluentd" {
-    //        logrus.Info("Fluentd config modified")
-    //    }
-    //    if o.Labels["app"] == "fluent-bit" {
-    //        logrus.Info("Fluent-bit config modified")
-    //    }
-    //    if o.Labels["app"] == "logging-operator" {
-    //        logrus.Info("Logging operator config modified")
-		//	// Read in config every time when the kubernetes logging operator configmap changed
-		//	err := viper.ReadInConfig()
-		//	if err != nil {
-		//		logrus.Errorf("Error during reading config file : %s", err)
-		//		return err
-		//	}
-    //        config.ConfigureOperator()
-    //    }
 	}
 	return
 }

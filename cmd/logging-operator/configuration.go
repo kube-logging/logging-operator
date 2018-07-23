@@ -79,6 +79,6 @@ func configureOperator() {
        logrus.Info("Trying to init fluentd")
        fluentd.InitFluentd()
    } else if !viper.GetBool("fluentd.enabled") {
-
+       fluentd.DeleteFluentd()
    }
 }

@@ -18,12 +18,21 @@ type fluentdDeploymentConfig struct {
 	Labels    map[string]string
 }
 
-func InitFluentd() {
-	fdc := &fluentdDeploymentConfig{
-		Name:      "fluentd",
-		Namespace: viper.GetString("fluentd.namespace"),
-		Labels: map[string]string{"app": "fluentd",},
+var config *fluentdDeploymentConfig
+
+func initConfig() *fluentdDeploymentConfig {
+	if config == nil {
+		config = &fluentdDeploymentConfig{
+			Name:      "fluentd",
+			Namespace: viper.GetString("fluentd.namespace"),
+			Labels: map[string]string{"app": "fluentd",},
+		}
 	}
+	return config
+}
+
+func InitFluentd() {
+	fdc := initConfig()
 	if !checkIfDeploymentExist(fdc) {
 		if viper.GetBool("logging-operator.rbac") {
 		}
@@ -46,6 +55,26 @@ func InitFluentd() {
     //    enabled:
     //    port:
     //    path:
+}
+
+func DeleteFluentd() {
+	fdc := initConfig()
+	if checkIfDeploymentExist(fdc) {
+		logrus.Info("Deleting fluentd")
+		if viper.GetBool("logging-operator.rbac") {
+		}
+		sdk.Delete(newFluentdConfigmap(fdc))
+		sdk.Delete(newFluentdPVC(fdc))
+		sdk.Delete(newFluentdService(fdc))
+		foregroundDeletion := metav1.DeletePropagationForeground
+		err := sdk.Delete(newFluentdDeployment(fdc), sdk.WithDeleteOptions(&metav1.DeleteOptions{
+			PropagationPolicy: &foregroundDeletion,
+		}))
+		if err != nil {
+			logrus.Error(err)
+		}
+		logrus.Info("Fluentd Deployment deleted!")
+	}
 }
 
 func checkIfDeploymentExist(fdc *fluentdDeploymentConfig) bool {
