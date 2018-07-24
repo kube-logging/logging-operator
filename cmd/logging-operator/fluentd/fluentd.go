@@ -1,6 +1,7 @@
 package fluentd
 
 import (
+	"github.com/banzaicloud/logging-operator/cmd/logging-operator/sdkdecorator"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -38,13 +39,10 @@ func InitFluentd() {
 	if !checkIfDeploymentExist(fdc) {
 		if viper.GetBool("logging-operator.rbac") {
 		}
-		sdk.Create(newFluentdConfigmap(fdc))
-		sdk.Create(newFluentdPVC(fdc))
-		err := sdk.Create(newFluentdDeployment(fdc))
-		if err != nil {
-			logrus.Error(err)
-		}
-		sdk.Create(newFluentdService(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdConfigmap(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdPVC(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdDeployment(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdService(fdc))
 		logrus.Info("Fluentd Deployment initialized!")
 	}
 	// Create fluentd services
@@ -66,16 +64,15 @@ func DeleteFluentd() {
 		logrus.Info("Deleting fluentd")
 		if viper.GetBool("logging-operator.rbac") {
 		}
-		sdk.Delete(newFluentdConfigmap(fdc))
-		sdk.Delete(newFluentdPVC(fdc))
-		sdk.Delete(newFluentdService(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdConfigmap(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdConfigmap(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdPVC(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdService(fdc))
 		foregroundDeletion := metav1.DeletePropagationForeground
-		err := sdk.Delete(newFluentdDeployment(fdc), sdk.WithDeleteOptions(&metav1.DeleteOptions{
-			PropagationPolicy: &foregroundDeletion,
-		}))
-		if err != nil {
-			logrus.Error(err)
-		}
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdDeployment(fdc),
+			sdk.WithDeleteOptions(&metav1.DeleteOptions{
+				PropagationPolicy: &foregroundDeletion,
+			}))
 		logrus.Info("Fluentd Deployment deleted!")
 	}
 }
