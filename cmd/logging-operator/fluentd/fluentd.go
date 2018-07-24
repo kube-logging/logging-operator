@@ -25,7 +25,8 @@ func initConfig() *fluentdDeploymentConfig {
 		config = &fluentdDeploymentConfig{
 			Name:      "fluentd",
 			Namespace: viper.GetString("fluentd.namespace"),
-			Labels: map[string]string{"app": "fluentd",},
+			Replicas:  1,
+			Labels:    map[string]string{"app": "fluentd",},
 		}
 	}
 	return config
@@ -120,9 +121,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector: map[string]string{
-				"app": "fluentd",
-			},
+			Selector: fdc.Labels,
 			Type: "ClusterIP",
 		},
 	}
@@ -176,7 +175,6 @@ func newFluentdPVC(fdc *fluentdDeploymentConfig) *corev1.PersistentVolumeClaim {
 
 // TODO in case of rbac add created serviceAccount name
 func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment {
-	var replicas int32 = 1
 	return &extensionv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
@@ -188,7 +186,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 			Labels:    fdc.Labels,
 		},
 		Spec: extensionv1.DeploymentSpec{
-			Replicas: &replicas,
+			Replicas: &fdc.Replicas,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: fdc.Labels,
