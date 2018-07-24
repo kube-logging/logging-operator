@@ -37,3 +37,12 @@ required = [
   # The version rule is used for a specific release and the master branch for in between releases.
   branch = "master"
   # version = "=v0.0.5"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.0.2"
+
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
