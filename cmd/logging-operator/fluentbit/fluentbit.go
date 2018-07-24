@@ -25,7 +25,7 @@ func initConfig() *fluentBitDeploymentConfig {
 	return config
 }
 
-// TODO handle errors comming from sdk.Create
+// TODO handle errors coming from sdk.Create
 func InitFluentBit() {
 	cfg := initConfig()
 	if !checkIfDeamonSetExist(cfg) {
