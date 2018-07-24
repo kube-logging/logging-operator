@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx
+data:
+  # Adding new entries here will make them appear as files in the deployment.
+  # Please update k8s.io/k8s.io/README.md when you update this file
+  nginx.conf: |
+  server {
+    listen 80;
+
+    sendfile on;
+
+    default_type application/octet-stream;
+
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_disable      "MSIE [1-6]\.";
+    gzip_min_length   256;
+    gzip_vary         on;
+    gzip_proxied      expired no-cache no-store private auth;
+    gzip_types        text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+    gzip_comp_level   9;
+
+    root /usr/share/nginx/html;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+    location /301 {
+        return 301 'gangnam style!';
+    }
+    location /302 {
+        return 302 'gangnam style!';
+    }
+
+    location /400 {
+        return 400 'gangnam style!';
+    }
+    location /401 {
+        return 401 'gangnam style!';
+    }
+    location /402 {
+        return 402 'gangnam style!';
+    }
+    location /403 {
+        return 403 'gangnam style!';
+    }
+
+    location /500 {
+        return 500 'gangnam style!';
+    }
+    location /501 {
+        return 501 'gangnam style!';
+    }
+    location /502 {
+        return 502 'gangnam style!';
+    }
+    location /503 {
+        return 503 'gangnam style!';
+    }
+  }

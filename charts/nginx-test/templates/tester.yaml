@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-tester
+data:
+  nginx.conf: |-
+#!/bin/bash
+
+cleanup ()
+{
+    exit 0
+}
+
+trap cleanup SIGINT SIGTERM
+
+arr[0]="200"
+arr[1]="501"
+arr[2]="301"
+arr[3]="302"
+arr[4]="400"
+arr[5]="401"
+arr[6]="402"
+arr[6]="403"
+arr[6]="404"
+arr[7]="500"
+arr[8]="501"
+arr[9]="502"
+arr[10]="503"
+arr[11]=""
+
+while $i -lt 100; do
+    num=`awk -v min=10 -v max=50 'BEGIN{srand(); print int(min+rand()*(max-min+1))}'`
+    rand=$[ $RANDOM % 8 ]
+    url=${arr[$rand]}
+    echo "Number: "$num" with status url: /"$url
+    /usr/bin/ab -q -S -d -n $num -c $1/$url > /dev/null
+done
