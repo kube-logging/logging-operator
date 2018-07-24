@@ -1,14 +1,14 @@
 package fluentd
 
 import (
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	corev1 "k8s.io/api/core/v1"
 	extensionv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-    "github.com/operator-framework/operator-sdk/pkg/sdk"
-    "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 type fluentdDeploymentConfig struct {
@@ -26,7 +26,7 @@ func initConfig() *fluentdDeploymentConfig {
 			Name:      "fluentd",
 			Namespace: viper.GetString("fluentd.namespace"),
 			Replicas:  1,
-			Labels:    map[string]string{"app": "fluentd",},
+			Labels:    map[string]string{"app": "fluentd"},
 		}
 	}
 	return config
@@ -46,16 +46,16 @@ func InitFluentd() {
 		sdk.Create(newFluentdService(fdc))
 		logrus.Info("Fluentd Deployment initialized!")
 	}
-    // Create fluentd services
-    // Possible options
-    //  replica: x
-    //  tag_rewrite config: ? it should be possible to give Labels
-    //  input port
-    //  TLS?
-    //  monitoring
-    //    enabled:
-    //    port:
-    //    path:
+	// Create fluentd services
+	// Possible options
+	//  replica: x
+	//  tag_rewrite config: ? it should be possible to give Labels
+	//  input port
+	//  TLS?
+	//  monitoring
+	//    enabled:
+	//    port:
+	//    path:
 }
 
 func DeleteFluentd() {
@@ -111,7 +111,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fdc.Name,
 			Namespace: fdc.Namespace,
-			Labels: fdc.Labels,
+			Labels:    fdc.Labels,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
@@ -122,7 +122,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 				},
 			},
 			Selector: fdc.Labels,
-			Type: "ClusterIP",
+			Type:     "ClusterIP",
 		},
 	}
 

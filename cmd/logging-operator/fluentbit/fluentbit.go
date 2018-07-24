@@ -2,14 +2,14 @@ package fluentbit
 
 import (
 	"bytes"
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	corev1 "k8s.io/api/core/v1"
 	extensionv1 "k8s.io/api/extensions/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"text/template"
-	"github.com/operator-framework/operator-sdk/pkg/sdk"
-	"github.com/spf13/viper"
-	"github.com/sirupsen/logrus"
 )
 
 var config *fluentBitDeploymentConfig
@@ -19,7 +19,7 @@ func initConfig() *fluentBitDeploymentConfig {
 		config = &fluentBitDeploymentConfig{
 			Name:      "fluent-bit",
 			Namespace: viper.GetString("fluent-bit.namespace"),
-			Labels:    map[string]string{"app": "fluent-bit",},
+			Labels:    map[string]string{"app": "fluent-bit"},
 		}
 	}
 	return config

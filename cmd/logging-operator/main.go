@@ -26,10 +26,10 @@ func getConfiguration() *operatorConfig {
 func main() {
 
 	const (
-		operatorNamespace =  "OPERATOR_NAMESPACE"
-		operatorResource  =  "logging.banzaicloud.com/v1alpha1"
-		configMap         =  "ConfigMap"
-		kind              =  "LoggingOperator"
+		operatorNamespace = "OPERATOR_NAMESPACE"
+		operatorResource  = "logging.banzaicloud.com/v1alpha1"
+		configMap         = "ConfigMap"
+		kind              = "LoggingOperator"
 	)
 
 	ns := os.Getenv(operatorNamespace)
