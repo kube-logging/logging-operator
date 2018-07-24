@@ -25,7 +25,8 @@ func initConfig() *fluentBitDeploymentConfig {
 	return config
 }
 
-// TODO handle errors comming from sdk.Create
+// InitFluentBit initialize fluent-bit
+// TODO handle errors coming from sdk.Create
 func InitFluentBit() {
 	cfg := initConfig()
 	if !checkIfDeamonSetExist(cfg) {
@@ -37,8 +38,8 @@ func InitFluentBit() {
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
 		if err != nil {
-		    logrus.Error(err)
-        }
+			logrus.Error(err)
+		}
 		sdk.Create(cfgMap)
 		err = sdk.Create(newFluentBitDaemonSet(cfg))
 		if err != nil {
@@ -48,6 +49,7 @@ func InitFluentBit() {
 	}
 }
 
+// DeleteFluentBit deletes fluent-bit if it exists
 func DeleteFluentBit() {
 	cfg := initConfig()
 	if checkIfDeamonSetExist(cfg) {
@@ -58,9 +60,9 @@ func DeleteFluentBit() {
 			sdk.Delete(newClusterRoleBinding(cfg))
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
-        if err != nil {
-            logrus.Error(err)
-        }
+		if err != nil {
+			logrus.Error(err)
+		}
 		sdk.Delete(cfgMap)
 		foregroundDeletion := metav1.DeletePropagationForeground
 		err = sdk.Delete(newFluentBitDaemonSet(cfg), sdk.WithDeleteOptions(&metav1.DeleteOptions{
