@@ -23,3 +23,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+          volumeMounts:
+          - mountPath: /logging-operator/config
+            name: config
+      volumes:
+      - configMap:
+          name: logging-operator-config
+        name: config

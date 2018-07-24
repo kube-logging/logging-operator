@@ -27,52 +27,19 @@ func main() {
 
 	const (
 		operatorNamespace = "OPERATOR_NAMESPACE"
-		resource          = "logging.banzaicloud.com/v1alpha1"
+		operatorResource  = "logging.banzaicloud.com/v1alpha1"
+		configMap         = "ConfigMap"
 		kind              = "LoggingOperator"
 	)
 
 	ns := os.Getenv(operatorNamespace)
 	printVersion(ns)
-
-	logrus.Info("Deploy fluent-bit")
-	initFluentBit()
-	logrus.Info("Deploy fluentd")
-	initFluentd()
-	resyncPeriod := 5
-	logrus.Infof("Watching %s, %s, %s, %d", resource, kind, ns, resyncPeriod)
-	sdk.Watch(resource, kind, ns, resyncPeriod)
+	resyncPeriod := 0
+	logrus.Infof("Watching %s, %s, %s, %d", operatorResource, kind, ns, resyncPeriod)
+	sdk.Watch(operatorResource, kind, ns, resyncPeriod)
 	sdk.Handle(stub.NewHandler())
 	sdk.Run(context.TODO())
 }
 
 type operatorConfig struct {
-}
-
-func initFluentBit() {
-	cfg := &fluentBitDeploymentConfig{
-		Namespace: "default",
-	}
-	sdk.Create(newServiceAccount(cfg))
-	sdk.Create(newClusterRole(cfg))
-	sdk.Create(newClusterRoleBinding(cfg))
-	cfgMap, _ := newFluentBitConfig(cfg)
-	sdk.Create(cfgMap)
-	sdk.Create(newFluentBitDaemonSet(cfg))
-}
-
-func initFluentd() {
-	sdk.Create(newFluentdConfigmap())
-	sdk.Create(newFluentdPVC())
-	sdk.Create(newFluentdDeployment())
-	sdk.Create(newFluentdService())
-	// Create fluentd services
-	// Possible options
-	//  replica: x
-	//  tag_rewrite config: ? it should be possible to give labels
-	//  input port
-	//  TLS?
-	//  monitoring
-	//    enabled:
-	//    port:
-	//    path:
 }
