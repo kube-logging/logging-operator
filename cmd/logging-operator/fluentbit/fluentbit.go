@@ -2,6 +2,7 @@ package fluentbit
 
 import (
 	"bytes"
+	"github.com/banzaicloud/logging-operator/cmd/logging-operator/sdkdecorator"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -26,25 +27,21 @@ func initConfig() *fluentBitDeploymentConfig {
 }
 
 // InitFluentBit initialize fluent-bit
-// TODO handle errors coming from sdk.Create
 func InitFluentBit() {
 	cfg := initConfig()
 	if !checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deploying fluent-bit")
 		if viper.GetBool("logging-operator.rbac") {
-			sdk.Create(newServiceAccount(cfg))
-			sdk.Create(newClusterRole(cfg))
-			sdk.Create(newClusterRoleBinding(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newServiceAccount(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newClusterRole(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newClusterRoleBinding(cfg))
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
 		if err != nil {
 			logrus.Error(err)
 		}
-		sdk.Create(cfgMap)
-		err = sdk.Create(newFluentBitDaemonSet(cfg))
-		if err != nil {
-			logrus.Error(err)
-		}
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(cfgMap)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentBitDaemonSet(cfg))
 		logrus.Info("Fluent-bit deployed successfully")
 	}
 }
@@ -55,22 +52,20 @@ func DeleteFluentBit() {
 	if checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deleting fluent-bit")
 		if viper.GetBool("logging-operator.rbac") {
-			sdk.Delete(newServiceAccount(cfg))
-			sdk.Delete(newClusterRole(cfg))
-			sdk.Delete(newClusterRoleBinding(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newServiceAccount(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newClusterRole(cfg))
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newClusterRoleBinding(cfg))
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
 		if err != nil {
 			logrus.Error(err)
 		}
-		sdk.Delete(cfgMap)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(cfgMap)
 		foregroundDeletion := metav1.DeletePropagationForeground
-		err = sdk.Delete(newFluentBitDaemonSet(cfg), sdk.WithDeleteOptions(&metav1.DeleteOptions{
-			PropagationPolicy: &foregroundDeletion,
-		}))
-		if err != nil {
-			logrus.Error(err)
-		}
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentBitDaemonSet(cfg),
+			sdk.WithDeleteOptions(&metav1.DeleteOptions{
+				PropagationPolicy: &foregroundDeletion,
+			}))
 		logrus.Info("Fluent-bit deleted successfully")
 	}
 }
