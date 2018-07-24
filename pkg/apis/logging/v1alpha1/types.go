@@ -20,10 +20,12 @@ type LoggingOperator struct {
 	Spec              LoggingOperatorSpec   `json:"spec"`
 	Status            LoggingOperatorStatus `json:"status,omitempty"`
 }
+
 // LoggingOperatorSpec holds the spec for the operator
 type LoggingOperatorSpec struct {
 	// Fill me
 }
+
 // LoggingOperatorStatus holds the status info for the operator
 type LoggingOperatorStatus struct {
 	// Fill me
