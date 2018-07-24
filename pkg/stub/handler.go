@@ -8,14 +8,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// NewHandler creates a new Handler struct
 func NewHandler() sdk.Handler {
 	return &Handler{}
 }
 
+// Handler struct
 type Handler struct {
 	// Fill me
 }
 
+// Handle every event set up by the watcher
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
@@ -53,12 +56,14 @@ type outputS3 struct {
 	Parameters Parameters
 }
 
+// Parameters struct
 type Parameters struct {
 	Name      string
 	ValueFrom ValueFrom
 	Value     string
 }
 
+// ValueFrom struct
 type ValueFrom struct {
 	SecretKeyRef kubernetesSecret
 }

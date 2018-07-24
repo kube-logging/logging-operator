@@ -32,6 +32,7 @@ func initConfig() *fluentdDeploymentConfig {
 	return config
 }
 
+// InitFluentd initialize fluentd
 func InitFluentd() {
 	fdc := initConfig()
 	if !checkIfDeploymentExist(fdc) {
@@ -58,6 +59,7 @@ func InitFluentd() {
 	//    path:
 }
 
+// DeleteFluentd deletes fluentd if exists
 func DeleteFluentd() {
 	fdc := initConfig()
 	if checkIfDeploymentExist(fdc) {

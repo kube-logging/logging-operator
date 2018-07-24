@@ -25,6 +25,7 @@ func initConfig() *fluentBitDeploymentConfig {
 	return config
 }
 
+// InitFluentBit initialize fluent-bit
 // TODO handle errors coming from sdk.Create
 func InitFluentBit() {
 	cfg := initConfig()
@@ -48,6 +49,7 @@ func InitFluentBit() {
 	}
 }
 
+// DeleteFluentBit deletes fluent-bit if it exists
 func DeleteFluentBit() {
 	cfg := initConfig()
 	if checkIfDeamonSetExist(cfg) {
