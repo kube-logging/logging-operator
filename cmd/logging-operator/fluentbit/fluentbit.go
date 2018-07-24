@@ -37,8 +37,8 @@ func InitFluentBit() {
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
 		if err != nil {
-		    logrus.Error(err)
-        }
+			logrus.Error(err)
+		}
 		sdk.Create(cfgMap)
 		err = sdk.Create(newFluentBitDaemonSet(cfg))
 		if err != nil {
@@ -58,9 +58,9 @@ func DeleteFluentBit() {
 			sdk.Delete(newClusterRoleBinding(cfg))
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
-        if err != nil {
-            logrus.Error(err)
-        }
+		if err != nil {
+			logrus.Error(err)
+		}
 		sdk.Delete(cfgMap)
 		foregroundDeletion := metav1.DeletePropagationForeground
 		err = sdk.Delete(newFluentBitDaemonSet(cfg), sdk.WithDeleteOptions(&metav1.DeleteOptions{

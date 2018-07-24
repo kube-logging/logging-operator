@@ -1,0 +1,47 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+
+    working_directory: /go/src/github.com/banzaicloud/logging-operator
+    steps:
+      - checkout
+      - run:
+          name: Run dep ensure if necessary
+          command: |
+            if [[ `git diff HEAD^ Gopkg.* vendor/` ]]; then
+              dep ensure -v
+            fi
+      - run:
+          name: Unwind vendor
+          command: |
+              rm -rf vendor/
+              git reset --hard
+      - run:
+          name: Build
+          command:
+              make build
+      - run:
+          name: Run go vet
+          command:
+              make vet
+      - run:
+          name: Run fmt
+          command:
+              make check-fmt
+      - run:
+          name: Run golint
+          command:
+              make lint
+      - run:
+          name: Run misspell
+          command:
+              make check-misspell
+      - run:
+          name: Run ineffassign
+          command:
+              make ineffassign
