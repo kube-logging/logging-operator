@@ -28,7 +28,6 @@ func main() {
 	const (
 		operatorNamespace = "OPERATOR_NAMESPACE"
 		operatorResource  = "logging.banzaicloud.com/v1alpha1"
-		configMap         = "ConfigMap"
 		kind              = "LoggingOperator"
 	)
 
