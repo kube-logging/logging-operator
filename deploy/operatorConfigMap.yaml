@@ -48,6 +48,12 @@ data:
        Match         *
        Host          fluentd.default.svc
        Port          24240
+       tls           On
+       tls.verify    Off
+       tls.ca_file   /fluent-bit/tls/ca.crt.pem
+       tls.crt_file  /fluent-bit/tls/client.crt.pem
+       tls.key_file  /fluent-bit/tls/client.key.pem
+       Shared_Key    {{ .TLS.SharedKey }}
        Retry_Limit   False"""
 
     [fluentd]
@@ -70,6 +76,17 @@ data:
                 @type   forward
                 port    24240
                 @log_level debug
+                <security>
+                  self_hostname fluentd
+                  shared_key {{ .TLS.SharedKey }}
+                </security>
+                <transport tls>
+                  version                TLSv1_2
+                  ca_path                /fluentd/etc/tls/ca.crt.pem
+                  cert_path              /fluentd/etc/tls/server.crt.pem
+                  private_key_path       /fluentd/etc/tls/server.key.pem
+                  client_cert_auth       true
+                </transport>
             </source>
 
             # Prevent fluentd from handling records containing its own logs. Otherwise

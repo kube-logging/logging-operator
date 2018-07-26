@@ -77,6 +77,7 @@ type fluentBitDeploymentConfig struct {
 }
 
 type fluentBitConfig struct {
+	TLS     map[string]string
 	Monitor map[string]string
 	Output  map[string]string
 }
@@ -147,7 +148,6 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 	}
 }
 
-// What inputs we neeed? This need to be Templated or Struct generated
 func generateConfig(input fluentBitConfig) (*string, error) {
 	output := new(bytes.Buffer)
 	text := viper.GetString("fluent-bit.config")
@@ -166,6 +166,9 @@ func generateConfig(input fluentBitConfig) (*string, error) {
 
 func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error) {
 	input := fluentBitConfig{
+		TLS: map[string]string{
+			"SharedKey": "foobar",
+		},
 		Monitor: map[string]string{
 			"Port": "2020",
 		},
@@ -270,6 +273,14 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						},
+						{
+							Name: "fluent-tls",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: "fluent-bit-tls",
+								},
+							},
+						},
 					},
 					Containers: []corev1.Container{
 						{
@@ -309,6 +320,10 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 									Name:      "varlogs",
 									ReadOnly:  true,
 									MountPath: "/var/log/",
+								},
+								{
+									Name:      "fluent-tls",
+									MountPath: "/fluent-bit/tls/",
 								},
 							},
 						},

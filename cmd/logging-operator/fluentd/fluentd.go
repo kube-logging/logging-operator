@@ -1,6 +1,7 @@
 package fluentd
 
 import (
+	"bytes"
 	"github.com/banzaicloud/logging-operator/cmd/logging-operator/sdkdecorator"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
@@ -10,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"text/template"
 )
 
 type fluentdDeploymentConfig struct {
@@ -17,6 +19,10 @@ type fluentdDeploymentConfig struct {
 	Namespace string
 	Replicas  int32
 	Labels    map[string]string
+}
+
+type fluentdConfig struct {
+	TLS map[string]string
 }
 
 var config *fluentdDeploymentConfig
@@ -127,9 +133,34 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 
 }
 
+func generateConfig(input fluentdConfig) (*string, error) {
+	output := new(bytes.Buffer)
+	text := viper.GetString("fluentd.config")
+
+	tmpl, err := template.New("test").Parse(text)
+	if err != nil {
+		return nil, err
+	}
+	err = tmpl.Execute(output, input)
+	if err != nil {
+		return nil, err
+	}
+	outputString := output.String()
+	return &outputString, nil
+}
+
 // TODO This has to be a Golang template with proper values gathered
 func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
-	config := viper.GetString("fluentd.config")
+	input := fluentdConfig{
+		TLS: map[string]string{
+			"SharedKey": "foobar",
+		},
+	}
+	config, err := generateConfig(input)
+	if err != nil {
+		logrus.Errorf("Error during generating config %v", err)
+		return nil
+	}
 	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ConfigMap",
@@ -142,7 +173,7 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 		},
 
 		Data: map[string]string{
-			"fluentd.conf": config,
+			"fluentd.conf": *config,
 		},
 	}
 	return configMap
@@ -217,6 +248,14 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								},
 							},
 						},
+						{
+							Name: "fluentd-tls",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: "fluentd-tls",
+								},
+							},
+						},
 					},
 					Containers: []corev1.Container{
 						{
@@ -230,7 +269,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								},
 								{
 									Name:          "fluent-input",
-									ContainerPort: 24224,
+									ContainerPort: 24240,
 									Protocol:      "TCP",
 								},
 							},
@@ -243,6 +282,10 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								{
 									Name:      "buffer",
 									MountPath: "/buffers",
+								},
+								{
+									Name:      "fluentd-tls",
+									MountPath: "/fluentd/etc/tls/",
 								},
 							},
 						},
