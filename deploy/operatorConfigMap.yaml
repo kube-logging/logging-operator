@@ -15,6 +15,7 @@ data:
     [fluent-bit]
     enabled = true
     namespace = "default"
+    tls_enabled = true
     config ="""[SERVICE]
        Flush        1
        Daemon       Off
@@ -48,17 +49,20 @@ data:
        Match         *
        Host          fluentd.default.svc
        Port          24240
+       {{ if .TLS.Enabled }}
        tls           On
        tls.verify    Off
        tls.ca_file   /fluent-bit/tls/ca.crt.pem
        tls.crt_file  /fluent-bit/tls/client.crt.pem
        tls.key_file  /fluent-bit/tls/client.key.pem
        Shared_Key    {{ .TLS.SharedKey }}
+       {{- end }}
        Retry_Limit   False"""
 
     [fluentd]
     enabled = true
     namespace = "default"
+    tls_enabled = true
     config ="""
             # Prometheus monitoring
             <source>
@@ -76,6 +80,7 @@ data:
                 @type   forward
                 port    24240
                 @log_level debug
+                {{ if .TLS.Enabled }}
                 <security>
                   self_hostname fluentd
                   shared_key {{ .TLS.SharedKey }}
@@ -87,6 +92,7 @@ data:
                   private_key_path       /fluentd/etc/tls/server.key.pem
                   client_cert_auth       true
                 </transport>
+                {{- end }}
             </source>
 
             # Prevent fluentd from handling records containing its own logs. Otherwise

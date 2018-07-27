@@ -77,7 +77,10 @@ type fluentBitDeploymentConfig struct {
 }
 
 type fluentBitConfig struct {
-	TLS     map[string]string
+	TLS struct {
+		Enabled   bool
+		SharedKey string
+	}
 	Monitor map[string]string
 	Output  map[string]string
 }
@@ -166,8 +169,12 @@ func generateConfig(input fluentBitConfig) (*string, error) {
 
 func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error) {
 	input := fluentBitConfig{
-		TLS: map[string]string{
-			"SharedKey": "foobar",
+		TLS: struct {
+			Enabled   bool
+			SharedKey string
+		}{
+			Enabled:   viper.GetBool("fluent-bit.enabled"),
+			SharedKey: "foobar",
 		},
 		Monitor: map[string]string{
 			"Port": "2020",
