@@ -22,7 +22,10 @@ type fluentdDeploymentConfig struct {
 }
 
 type fluentdConfig struct {
-	TLS map[string]string
+	TLS struct {
+		Enabled   bool
+		SharedKey string
+	}
 }
 
 var config *fluentdDeploymentConfig
@@ -149,11 +152,14 @@ func generateConfig(input fluentdConfig) (*string, error) {
 	return &outputString, nil
 }
 
-// TODO This has to be a Golang template with proper values gathered
 func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 	input := fluentdConfig{
-		TLS: map[string]string{
-			"SharedKey": "foobar",
+		TLS: struct {
+			Enabled   bool
+			SharedKey string
+		}{
+			Enabled:   viper.GetBool("fluentd.tls_enabled"),
+			SharedKey: "foobar",
 		},
 	}
 	config, err := generateConfig(input)
