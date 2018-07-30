@@ -52,9 +52,9 @@ data:
        {{ if .TLS.Enabled }}
        tls           On
        tls.verify    Off
-       tls.ca_file   /fluent-bit/tls/ca.crt.pem
-       tls.crt_file  /fluent-bit/tls/client.crt.pem
-       tls.key_file  /fluent-bit/tls/client.key.pem
+       tls.ca_file   /fluent-bit/tls/caCert
+       tls.crt_file  /fluent-bit/tls/clientCert
+       tls.key_file  /fluent-bit/tls/clientKey
        Shared_Key    {{ .TLS.SharedKey }}
        {{- end }}
        Retry_Limit   False"""
@@ -91,9 +91,9 @@ data:
                 </security>
                 <transport tls>
                   version                TLSv1_2
-                  ca_path                /fluentd/etc/tls/ca.crt.pem
-                  cert_path              /fluentd/etc/tls/server.crt.pem
-                  private_key_path       /fluentd/etc/tls/server.key.pem
+                  ca_path                /fluentd/etc/tls/caCert
+                  cert_path              /fluentd/etc/tls/serverCert
+                  private_key_path       /fluentd/etc/tls/serverKey
                   client_cert_auth       true
                 </transport>
                 {{- end }}
