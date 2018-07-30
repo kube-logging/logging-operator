@@ -172,6 +172,23 @@ func newFluentdPVC(fdc *fluentdDeploymentConfig) *corev1.PersistentVolumeClaim {
 	}
 }
 
+func newConfigMapReloader() *corev1.Container {
+	return &corev1.Container{
+		Name:  "config-reloader",
+		Image: "jimmidyson/configmap-reload:v0.2.2",
+		Args: []string{
+			"-volume-dir=/fluentd/etc/conf.d",
+			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
+		},
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      "config",
+				MountPath: "/fluentd/etc/conf.d",
+			},
+		},
+	}
+}
+
 // TODO in case of rbac add created serviceAccount name
 func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment {
 	return &extensionv1.Deployment{
@@ -246,6 +263,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								},
 							},
 						},
+						*newConfigMapReloader(),
 					},
 					//ServiceAccountName: "",
 				},

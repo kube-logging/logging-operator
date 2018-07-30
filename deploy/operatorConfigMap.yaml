@@ -54,6 +54,10 @@ data:
     enabled = true
     namespace = "default"
     config ="""
+            # Enable RPC endpoint (this allows to trigger config reload without restart)
+            <system>
+              rpc_endpoint 127.0.0.1:24444
+            </system>
             # Prometheus monitoring
             <source>
                 @type prometheus
