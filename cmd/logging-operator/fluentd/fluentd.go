@@ -275,7 +275,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 							Name: "fluentd-tls",
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: "fluentd-tls",
+									SecretName: "tls-for-logging-operator",
 								},
 							},
 						},
@@ -308,7 +308,18 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								},
 								{
 									Name:      "fluentd-tls",
-									MountPath: "/fluentd/etc/tls/",
+									MountPath: "/fluentd/etc/tls/caCert",
+									SubPath:   "caCert",
+								},
+								{
+									Name:      "fluentd-tls",
+									MountPath: "/fluentd/etc/tls/serverCert",
+									SubPath:   "serverCert",
+								},
+								{
+									Name:      "fluentd-tls",
+									MountPath: "/fluentd/etc/tls/serverKey",
+									SubPath:   "serverKey",
 								},
 							},
 						},

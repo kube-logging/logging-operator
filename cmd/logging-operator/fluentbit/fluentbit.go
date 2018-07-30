@@ -284,7 +284,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 							Name: "fluent-tls",
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: "fluent-bit-tls",
+									SecretName: "tls-for-logging-operator",
 								},
 							},
 						},
@@ -330,7 +330,18 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 								},
 								{
 									Name:      "fluent-tls",
-									MountPath: "/fluent-bit/tls/",
+									MountPath: "/fluent-bit/tls/caCert",
+									SubPath:   "caCert",
+								},
+								{
+									Name:      "fluent-tls",
+									MountPath: "/fluent-bit/tls/clientCert",
+									SubPath:   "clientCert",
+								},
+								{
+									Name:      "fluent-tls",
+									MountPath: "/fluent-bit/tls/clientKey",
+									SubPath:   "clientKey",
 								},
 							},
 						},
