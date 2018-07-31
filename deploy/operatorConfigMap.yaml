@@ -63,7 +63,12 @@ data:
     enabled = true
     namespace = "default"
     tls_enabled = true
-    config ="""
+    default = """
+            # include other config files
+            @include /fluentd/etc/input.conf
+            @include /fluentd/etc/app_config/*
+            @include /fluentd/etc/devnull.conf"""
+    input = """
             # Enable RPC endpoint (this allows to trigger config reload without restart)
             <system>
               rpc_endpoint 127.0.0.1:24444
@@ -126,11 +131,8 @@ data:
                 pattern ^(.+)$
                 tag $1.${tag_parts[0]}.${tag_parts[1]}
               </rule>
-            </match>
-
-            <match **.kubernetes>
-              @type stdout
-            </match>
+            </match>"""
+    devnull ="""
             <match **>
                 @type null
             </match>"""
