@@ -49,6 +49,7 @@ func InitFluentd() {
 		if viper.GetBool("logging-operator.rbac") {
 		}
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdConfigmap(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdAppConfigMap(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdPVC(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdDeployment(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdService(fdc))
@@ -74,7 +75,7 @@ func DeleteFluentd() {
 		if viper.GetBool("logging-operator.rbac") {
 		}
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdConfigmap(fdc))
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdConfigmap(fdc))
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdAppConfigMap(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdPVC(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdService(fdc))
 		foregroundDeletion := metav1.DeletePropagationForeground
@@ -138,7 +139,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 
 func generateConfig(input fluentdConfig) (*string, error) {
 	output := new(bytes.Buffer)
-	text := viper.GetString("fluentd.config")
+	text := viper.GetString("fluentd.input")
 
 	tmpl, err := template.New("test").Parse(text)
 	if err != nil {
@@ -152,6 +153,20 @@ func generateConfig(input fluentdConfig) (*string, error) {
 	return &outputString, nil
 }
 
+func newFluentdAppConfigMap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
+	return &corev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "fluentd-app-config",
+			Namespace: fdc.Namespace,
+			Labels:    fdc.Labels,
+		},
+	}
+}
+
 func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 	input := fluentdConfig{
 		TLS: struct {
@@ -162,7 +177,7 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 			SharedKey: "foobar",
 		},
 	}
-	config, err := generateConfig(input)
+	inputConfig, err := generateConfig(input)
 	if err != nil {
 		logrus.Errorf("Error during generating config %v", err)
 		return nil
@@ -179,7 +194,9 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 		},
 
 		Data: map[string]string{
-			"fluentd.conf": *config,
+			"fluentd.conf": viper.GetString("fluentd.default"),
+			"input.conf":   *inputConfig,
+			"devnull.conf": viper.GetString("fluentd.devnull"),
 		},
 	}
 	return configMap
@@ -263,6 +280,16 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 							},
 						},
 						{
+							Name: "app-config",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "fluentd-app-config",
+									},
+								},
+							},
+						},
+						{
 							Name: "buffer",
 							VolumeSource: corev1.VolumeSource{
 								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
@@ -300,7 +327,22 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "config",
-									MountPath: "/fluentd/etc/conf.d",
+									MountPath: "/fluentd/etc/fluent.conf",
+									SubPath:   "fluentd.conf",
+								},
+								{
+									Name:      "config",
+									MountPath: "/fluentd/etc/input.conf",
+									SubPath:   "input.conf",
+								},
+								{
+									Name:      "config",
+									MountPath: "/fluentd/etc/devnull.conf",
+									SubPath:   "devnull.conf",
+								},
+								{
+									Name:      "app-config",
+									MountPath: "/fluentd/etc/app_config/",
 								},
 								{
 									Name:      "buffer",
