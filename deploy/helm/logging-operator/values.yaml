@@ -1,0 +1,13 @@
+loggingoperator:
+  rbac: false
+  namespace: default
+
+fluentbit:
+  enabled: true
+  namespace: default
+  tls_enabled: true
+
+fluentd:
+  enabled: true
+  namespace: default
+  tls_enabled: true
