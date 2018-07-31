@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-logging-operator"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: "{{ .Release.Name }}-logging-operator"
+  template:
+    metadata:
+      labels:
+        name: "{{ .Release.Name }}-logging-operator"
+    spec:
+      containers:
+      - name: "{{ .Release.Name }}-logging-operator"
+        image: banzaicloud/logging-operator:latest
+        command:
+        - logging-operator
+        imagePullPolicy: Always
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - mountPath: /logging-operator/config
+          name: config
+      volumes:
+      - configMap:
+          name: "{{ .Release.Name }}-logging-operator-config"
+        name: config
