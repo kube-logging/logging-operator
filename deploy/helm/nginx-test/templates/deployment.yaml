@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nginx-test.fullname" . }}
+  labels:
+    app: {{ template "nginx-test.name" . }}
+    chart: {{ template "nginx-test.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "nginx-test.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "nginx-test.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+        - name: {{ .Chart.Name }}-script
+          image: ubuntu:latest
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash"]
+          args:
+            - "/etc/scripts/script.sh"
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+            - name: script
+              mountPath: /etc/scripts/
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+        - name: script
+          configMap:
+            name: script
