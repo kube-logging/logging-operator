@@ -63,7 +63,6 @@ spec:
       timeFormat: '%d/%b/%Y:%H:%M:%S %z'
   output:
     - s3:
-        name: adasd
         parameters:
           - name: aws_key_id
             valueFrom:
