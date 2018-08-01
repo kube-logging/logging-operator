@@ -1,10 +1,10 @@
 package v1alpha1
 
 import (
-	"testing"
-	"k8s.io/apimachinery/pkg/util/yaml"
 	"encoding/json"
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/yaml"
+	"testing"
 )
 
 var rawData = []byte(`
@@ -39,7 +39,6 @@ spec:
           - name: s3_region
             value: ap-northeast-1
 `)
-
 
 func TestExampleCRD(t *testing.T) {
 	output := LoggingOperator{}
