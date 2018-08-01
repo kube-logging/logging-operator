@@ -3,7 +3,7 @@ package stub
 import (
 	"context"
 
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
+	"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -70,7 +70,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 		logrus.Info("Applying filter")
 		values := filter.GetMap()
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := v1alpha1.RenderParser(values)
+		config, err := filter.Render()
 		if err != nil {
 			logrus.Error("Error in rendering template.")
 			return "", ""
@@ -82,7 +82,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 	for _, output := range crd.Spec.Output {
 		values := output.S3.GetMap()
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := v1alpha1.RenderS3(values)
+		config, err := output.S3.Render()
 		if err != nil {
 			logrus.Info("Error in rendering template.")
 			return "", ""

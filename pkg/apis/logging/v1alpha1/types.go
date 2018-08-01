@@ -39,10 +39,12 @@ type LoggingOperatorStatus struct {
 	// Fill me
 }
 
+// Input this determines the log origin
 type Input struct {
 	Label map[string]string `json:"label"`
 }
 
+// Filter defines the filter plugins used by fluentd
 // Todo validation to Format (Regexp) and TimeFormat
 type Filter struct {
 	Type       string `json:"type"`
@@ -50,6 +52,33 @@ type Filter struct {
 	TimeFormat string `json:"timeFormat"`
 }
 
+// filterTemplate for generating filters
+// now only parse supported and tested
+var filterTemplate = `
+<filter {{ .pattern }}.** >
+  @type {{ .type }}
+  format {{ .format }}
+  time_format {{ .timeFormat }}
+  key_name message
+</filter>
+`
+
+// Render the fluentd configuration for filter
+func (f *Filter) Render() (string, error) {
+	t := template.New("filterTemplate")
+	t, err := t.Parse(filterTemplate)
+	if err != nil {
+		return "", err
+	}
+	tpl := new(bytes.Buffer)
+	err = t.Execute(tpl, f.GetMap())
+	if err != nil {
+		return "", err
+	}
+	return tpl.String(), nil
+}
+
+// Output defines the output plugins used by fluentd
 type Output struct {
 	S3 *outputS3 `json:"s3"`
 }
@@ -59,20 +88,7 @@ type outputS3 struct {
 	Parameters []Parameter `json:"parameters"`
 }
 
-type Parameter struct {
-	Name      string     `json:"name"`
-	ValueFrom *ValueFrom `json:"valueFrom"`
-	Value     string     `json:"value"`
-}
-
-func (o *Filter) GetMap() map[string]string {
-	params := map[string]string{}
-	params["type"] = o.Type
-	params["format"] = o.Format
-	params["timeFormat"] = o.TimeFormat
-	return params
-}
-
+// GetMap get values from child Parameters
 func (o *outputS3) GetMap() map[string]string {
 	params := map[string]string{}
 	for _, p := range o.Parameters {
@@ -89,42 +105,7 @@ func (o *outputS3) GetMap() map[string]string {
 	return params
 }
 
-type ValueFrom struct {
-	SecretKeyRef KubernetesSecret `json:"secretKeyRef"`
-}
-
-func (vf *ValueFrom) GetValue() (string, error) {
-	return vf.SecretKeyRef.GetValue()
-}
-
-type KubernetesSecret struct {
-	Name string `json:"name"`
-	Key  string `json:"key"`
-}
-
-func (ks KubernetesSecret) GetValue() (string, error) {
-	secret := corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Secret",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
-			Name:      ks.Name,
-		},
-	}
-	err := sdk.Get(&secret)
-	if err != nil {
-		return "", err
-	}
-	value, ok := secret.Data[ks.Key]
-	if !ok {
-		return "", fmt.Errorf("key %q not found in secret %q ", ks.Key, ks.Name)
-	}
-	return string(value), nil
-}
-
-// S3 Go template to generate configuration
+// s3Template S3 Go template to generate configuration
 var s3Template = `
 <match {{ .pattern }}.** >
   @type s3
@@ -152,39 +133,72 @@ var s3Template = `
 </match>
 `
 
-func RenderS3(values map[string]string) (string, error) {
+// Render is parsing the template and generate fluentd config
+func (o *outputS3) Render() (string, error) {
 	t := template.New("s3Template")
 	t, err := t.Parse(s3Template)
 	if err != nil {
 		return "", err
 	}
 	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, values)
+	err = t.Execute(tpl, o.GetMap())
 	if err != nil {
 		return "", err
 	}
 	return tpl.String(), nil
 }
 
-var filterTemplate = `
-<filter {{ .pattern }}.** >
-  @type {{ .type }}
-  format {{ .format }}
-  time_format {{ .timeFormat }}
-  key_name message
-</filter>
-`
+// Parameter generic parameter type to handle values from different sources
+type Parameter struct {
+	Name      string     `json:"name"`
+	ValueFrom *ValueFrom `json:"valueFrom"`
+	Value     string     `json:"value"`
+}
 
-func RenderParser(values map[string]string) (string, error) {
-	t := template.New("filterTemplate")
-	t, err := t.Parse(filterTemplate)
+// GetMap for filter template values
+func (f *Filter) GetMap() map[string]string {
+	params := map[string]string{}
+	params["type"] = f.Type
+	params["format"] = f.Format
+	params["timeFormat"] = f.TimeFormat
+	return params
+}
+
+// ValueFrom generic type to determine value origin
+type ValueFrom struct {
+	SecretKeyRef KubernetesSecret `json:"secretKeyRef"`
+}
+
+// GetValue handles the different origin of ValueFrom
+func (vf *ValueFrom) GetValue() (string, error) {
+	return vf.SecretKeyRef.GetValue()
+}
+
+// KubernetesSecret is a ValueFrom type
+type KubernetesSecret struct {
+	Name string `json:"name"`
+	Key  string `json:"key"`
+}
+
+// GetValue implement GetValue interface
+func (ks KubernetesSecret) GetValue() (string, error) {
+	secret := corev1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+			Name:      ks.Name,
+		},
+	}
+	err := sdk.Get(&secret)
 	if err != nil {
 		return "", err
 	}
-	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, values)
-	if err != nil {
-		return "", err
+	value, ok := secret.Data[ks.Key]
+	if !ok {
+		return "", fmt.Errorf("key %q not found in secret %q ", ks.Key, ks.Name)
 	}
-	return tpl.String(), nil
+	return string(value), nil
 }
