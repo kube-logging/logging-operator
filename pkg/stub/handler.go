@@ -25,7 +25,7 @@ type Handler struct {
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
-		logrus.Info("New CRD arrived %#v", o)
+		logrus.Infof("New CRD arrived %#v", o)
 		logrus.Info("Generating configuration.")
 		name, config := generateFluentdConfig(o)
 		if config != "" && name != "" {
