@@ -15,6 +15,7 @@ This is the first version of this operator to showcase our plans of handling log
 ## Installing the operator
 
 ```
+helm repo add  banzai-stable http://kubernetes-charts.banzaicloud.com/branch/master
 helm install banzai-stable/logging-operator
 ```
 
