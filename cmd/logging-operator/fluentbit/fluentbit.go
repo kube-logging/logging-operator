@@ -153,9 +153,7 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 
 func generateConfig(input fluentBitConfig) (*string, error) {
 	output := new(bytes.Buffer)
-	text := viper.GetString("fluent-bit.config")
-
-	tmpl, err := template.New("test").Parse(text)
+	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
 	if err != nil {
 		return nil, err
 	}

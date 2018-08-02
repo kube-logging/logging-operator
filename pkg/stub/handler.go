@@ -24,6 +24,9 @@ type Handler struct {
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
+		if event.Deleted {
+			deleteFromConfigMap(o.Spec.Input.Label["app"])
+		}
 		logrus.Infof("New CRD arrived %#v", o)
 		logrus.Info("Generating configuration.")
 		name, config := generateFluentdConfig(o)
@@ -32,6 +35,31 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 		}
 	}
 	return
+}
+
+func deleteFromConfigMap(name string) {
+	configMap := &corev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "app-config",
+			Namespace: "default",
+		},
+	}
+	err := sdk.Get(configMap)
+	if err != nil {
+		logrus.Error(err)
+	}
+	if configMap.Data == nil {
+		configMap.Data = map[string]string{}
+	}
+	delete(configMap.Data, name+".conf")
+	err = sdk.Update(configMap)
+	if err != nil {
+		logrus.Error(err)
+	}
 }
 
 func updateConfigMap(name, config string) {
@@ -52,7 +80,7 @@ func updateConfigMap(name, config string) {
 	if configMap.Data == nil {
 		configMap.Data = map[string]string{}
 	}
-	configMap.Data[name] = config
+	configMap.Data[name+".conf"] = config
 	err = sdk.Update(configMap)
 	if err != nil {
 		logrus.Error(err)

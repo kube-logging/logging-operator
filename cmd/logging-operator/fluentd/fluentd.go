@@ -139,9 +139,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 
 func generateConfig(input fluentdConfig) (*string, error) {
 	output := new(bytes.Buffer)
-	text := viper.GetString("fluentd.input")
-
-	tmpl, err := template.New("test").Parse(text)
+	tmpl, err := template.New("test").Parse(fluentdInputTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -194,9 +192,9 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 		},
 
 		Data: map[string]string{
-			"fluentd.conf": viper.GetString("fluentd.default"),
+			"fluentd.conf": fluentdDefaultTemplate,
 			"input.conf":   *inputConfig,
-			"devnull.conf": viper.GetString("fluentd.devnull"),
+			"devnull.conf": fluentdOutputTemplate,
 		},
 	}
 	return configMap
@@ -237,7 +235,7 @@ func newConfigMapReloader() *corev1.Container {
 		VolumeMounts: []corev1.VolumeMount{
 			{
 				Name:      "config",
-				MountPath: "/fluentd/etc/conf.d",
+				MountPath: "/fluentd/etc",
 			},
 		},
 	}
