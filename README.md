@@ -1,14 +1,15 @@
 # logging-operator
+
 Logging operator for Kubernetes based on Fluentd and Fluent-bit
 
 ## What is this operator for?
 
-This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within it's charts.
+This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within it's charts. The operator does the rest.
 
 
 ## Projact status: Alpha
 
-This is the first version of this operator to demonstrate our plans handling logs on Kubernetes. This version includes only basic configuration that will expand quickly.
+This is the first version of this operator to showcase our plans of handling logs on Kubernetes. This version includes only basic configuration that will expand quickly. Stay tuned.
 
 
 ## Installing the operator
