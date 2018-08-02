@@ -59,7 +59,7 @@ var filterTemplate = `
   @type {{ .type }}
   format {{ .format }}
   time_format {{ .timeFormat }}
-  key_name message
+  key_name log
 </filter>
 `
 
@@ -122,7 +122,7 @@ var s3Template = `
   # need to specify tag for ${tag} and time for %Y/%m/%d in <buffer> argument.
   <buffer tag,time>
     @type file
-    path /var/log/fluent/s3
+    path /buffers/s3
     timekey 3600 # 1 hour partition
     timekey_wait 10m
     timekey_use_utc true # use utc
