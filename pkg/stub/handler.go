@@ -26,6 +26,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	case *v1alpha1.LoggingOperator:
 		if event.Deleted {
 			deleteFromConfigMap(o.Spec.Input.Label["app"])
+			return
 		}
 		logrus.Infof("New CRD arrived %#v", o)
 		logrus.Info("Generating configuration.")
