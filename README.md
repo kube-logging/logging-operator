@@ -87,5 +87,5 @@ spec:
 If you just want to try out use our `nginx` example
 
 ```
-helm install ./nginx-example
+helm install ./deploy/helm/nginx-test
 ```
