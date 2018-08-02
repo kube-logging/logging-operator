@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
         - name: logging-operator
-          image: banzaicloud/logging-operator:dev
+          image: banzaicloud/logging-operator:latest
           command:
           - logging-operator
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: WATCH_NAMESPACE
               valueFrom:
