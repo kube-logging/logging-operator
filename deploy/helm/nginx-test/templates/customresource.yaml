@@ -1,0 +1,30 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "LoggingOperator"
+metadata:
+  name: "nginx-logging"
+spec:
+  input:
+    label:
+      app: nginx-test
+  filter:
+  - type: parser
+    format: |
+      /^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$/
+    timeFormat: '%d/%b/%Y:%H:%M:%S %z'
+  output:
+  - s3:
+      parameters:
+      - name: aws_key_id
+        valueFrom:
+          secretKeyRef:
+            name: loggings3
+            key: awsAccessKeyId
+      - name: aws_sec_key
+        valueFrom:
+          secretKeyRef:
+            name: loggings3
+            key: awsSecretAccesKey
+      - name: s3_bucket
+        value: banzailoggingtest
+      - name: s3_region
+        value: eu-west-1
