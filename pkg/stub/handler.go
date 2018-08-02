@@ -44,7 +44,7 @@ func deleteFromConfigMap(name string) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app-config",
+			Name:      "fluentd-app-config",
 			Namespace: "default",
 		},
 	}
@@ -69,7 +69,7 @@ func updateConfigMap(name, config string) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app-config",
+			Name:      "fluentd-app-config",
 			Namespace: "default",
 		},
 	}
