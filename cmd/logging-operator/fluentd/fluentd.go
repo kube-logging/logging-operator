@@ -230,12 +230,17 @@ func newConfigMapReloader() *corev1.Container {
 		Image: "jimmidyson/configmap-reload:v0.2.2",
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
+			"-volume-dir=/fluentd/etc/app_config/",
 			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
 		},
 		VolumeMounts: []corev1.VolumeMount{
 			{
 				Name:      "config",
 				MountPath: "/fluentd/etc",
+			},
+			{
+				Name:      "app-config",
+				MountPath: "/fluentd/etc/app_config/",
 			},
 		},
 	}
@@ -362,6 +367,19 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 				},
 				Spec: corev1.PodSpec{
 					Volumes: generateVolume(),
+					InitContainers: []corev1.Container{
+						{
+							Name:    "volume-mount-hack",
+							Image:   "busybox",
+							Command: []string{"sh", "-c", "chmod -R 777 /buffers"},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "buffer",
+									MountPath: "/buffers",
+								},
+							},
+						},
+					},
 					Containers: []corev1.Container{
 						{
 							Name:  "fluentd",
