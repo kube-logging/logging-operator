@@ -64,14 +64,14 @@ var filterTemplate = `
 `
 
 // Render the fluentd configuration for filter
-func (f *Filter) Render() (string, error) {
+func (f *Filter) Render(values map[string]string) (string, error) {
 	t := template.New("filterTemplate")
 	t, err := t.Parse(filterTemplate)
 	if err != nil {
 		return "", err
 	}
 	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, f.GetMap())
+	err = t.Execute(tpl, values)
 	if err != nil {
 		return "", err
 	}
@@ -134,14 +134,14 @@ var s3Template = `
 `
 
 // Render is parsing the template and generate fluentd config
-func (o *outputS3) Render() (string, error) {
+func (o *outputS3) Render(values map[string]string) (string, error) {
 	t := template.New("s3Template")
 	t, err := t.Parse(s3Template)
 	if err != nil {
 		return "", err
 	}
 	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, o.GetMap())
+	err = t.Execute(tpl, values)
 	if err != nil {
 		return "", err
 	}

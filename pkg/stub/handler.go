@@ -98,7 +98,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 		logrus.Info("Applying filter")
 		values := filter.GetMap()
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := filter.Render()
+		config, err := filter.Render(values)
 		if err != nil {
 			logrus.Error("Error in rendering template.")
 			return "", ""
@@ -110,7 +110,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 	for _, output := range crd.Spec.Output {
 		values := output.S3.GetMap()
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := output.S3.Render()
+		config, err := output.S3.Render(values)
 		if err != nil {
 			logrus.Info("Error in rendering template.")
 			return "", ""
