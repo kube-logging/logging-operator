@@ -171,7 +171,7 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 			Enabled   bool
 			SharedKey string
 		}{
-			Enabled:   viper.GetBool("fluent-bit.enabled"),
+			Enabled:   viper.GetBool("fluent-bit.tls_enabled"),
 			SharedKey: "foobar",
 		},
 		Monitor: map[string]string{
@@ -220,6 +220,99 @@ func checkIfDeamonSetExist(cr *fluentBitDeploymentConfig) bool {
 	logrus.Info("FluentBit DaemonSet already exists!")
 	return true
 }
+func generateVolumeMounts() (v []corev1.VolumeMount) {
+	v = []corev1.VolumeMount{
+		{
+			Name:      "varlibcontainers",
+			ReadOnly:  true,
+			MountPath: "/var/lib/docker/containers",
+		},
+		{
+			Name:      "config",
+			MountPath: "/fluent-bit/etc/fluent-bit.conf",
+			SubPath:   "fluent-bit.conf",
+		},
+		{
+			Name:      "positions",
+			MountPath: "/tail-db",
+		},
+		{
+			Name:      "varlogs",
+			ReadOnly:  true,
+			MountPath: "/var/log/",
+		},
+	}
+	if viper.GetBool("fluent-bit.tls_enabled") {
+		tlsRelatedVolume := []corev1.VolumeMount{
+			{
+				Name:      "fluent-tls",
+				MountPath: "/fluent-bit/tls/caCert",
+				SubPath:   "caCert",
+			},
+			{
+				Name:      "fluent-tls",
+				MountPath: "/fluent-bit/tls/clientCert",
+				SubPath:   "clientCert",
+			},
+			{
+				Name:      "fluent-tls",
+				MountPath: "/fluent-bit/tls/clientKey",
+				SubPath:   "clientKey",
+			},
+		}
+		v = append(v, tlsRelatedVolume...)
+	}
+	return
+}
+
+func generateVolume() (v []corev1.Volume) {
+	v = []corev1.Volume{
+		{
+			Name: "varlibcontainers",
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: "/var/lib/docker/containers",
+				},
+			},
+		},
+		{
+			Name: "config",
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: "fluent-bit-config",
+					},
+				},
+			},
+		},
+		{
+			Name: "varlogs",
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: "/var/log",
+				},
+			},
+		},
+		{
+			Name: "positions",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		},
+	}
+	if viper.GetBool("fluent-bit.tls_enabled") {
+		tlsRelatedVolume := corev1.Volume{
+			Name: "fluent-tls",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: "tls-for-logging-operator",
+				},
+			},
+		}
+		v = append(v, tlsRelatedVolume)
+	}
+	return
+}
 
 // TODO in case of rbac add created serviceAccount name
 func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet {
@@ -245,48 +338,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 					},
 				},
 				Spec: corev1.PodSpec{
-					Volumes: []corev1.Volume{
-						{
-							Name: "varlibcontainers",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/var/lib/docker/containers",
-								},
-							},
-						},
-						{
-							Name: "config",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "fluent-bit-config",
-									},
-								},
-							},
-						},
-						{
-							Name: "varlogs",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/var/log",
-								},
-							},
-						},
-						{
-							Name: "positions",
-							VolumeSource: corev1.VolumeSource{
-								EmptyDir: &corev1.EmptyDirVolumeSource{},
-							},
-						},
-						{
-							Name: "fluent-tls",
-							VolumeSource: corev1.VolumeSource{
-								Secret: &corev1.SecretVolumeSource{
-									SecretName: "tls-for-logging-operator",
-								},
-							},
-						},
-					},
+					Volumes: generateVolume(),
 					Containers: []corev1.Container{
 						{
 							// TODO move to configuration
@@ -306,42 +358,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 								Limits:   nil,
 								Requests: nil,
 							},
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "varlibcontainers",
-									ReadOnly:  true,
-									MountPath: "/var/lib/docker/containers",
-								},
-								{
-									Name:      "config",
-									MountPath: "/fluent-bit/etc/fluent-bit.conf",
-									SubPath:   "fluent-bit.conf",
-								},
-								{
-									Name:      "positions",
-									MountPath: "/tail-db",
-								},
-								{
-									Name:      "varlogs",
-									ReadOnly:  true,
-									MountPath: "/var/log/",
-								},
-								{
-									Name:      "fluent-tls",
-									MountPath: "/fluent-bit/tls/caCert",
-									SubPath:   "caCert",
-								},
-								{
-									Name:      "fluent-tls",
-									MountPath: "/fluent-bit/tls/clientCert",
-									SubPath:   "clientCert",
-								},
-								{
-									Name:      "fluent-tls",
-									MountPath: "/fluent-bit/tls/clientKey",
-									SubPath:   "clientKey",
-								},
-							},
+							VolumeMounts: generateVolumeMounts(),
 						},
 					},
 				},

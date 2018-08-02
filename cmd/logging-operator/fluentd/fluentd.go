@@ -229,7 +229,7 @@ func newConfigMapReloader() *corev1.Container {
 		Name:  "config-reloader",
 		Image: "jimmidyson/configmap-reload:v0.2.2",
 		Args: []string{
-			"-volume-dir=/fluentd/etc/conf.d",
+			"-volume-dir=/fluentd/etc",
 			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
 		},
 		VolumeMounts: []corev1.VolumeMount{
@@ -239,6 +239,101 @@ func newConfigMapReloader() *corev1.Container {
 			},
 		},
 	}
+}
+
+func generateVolumeMounts() (v []corev1.VolumeMount) {
+	v = []corev1.VolumeMount{
+		{
+			Name:      "config",
+			MountPath: "/fluentd/etc/fluent.conf",
+			SubPath:   "fluentd.conf",
+		},
+		{
+			Name:      "config",
+			MountPath: "/fluentd/etc/input.conf",
+			SubPath:   "input.conf",
+		},
+		{
+			Name:      "config",
+			MountPath: "/fluentd/etc/devnull.conf",
+			SubPath:   "devnull.conf",
+		},
+		{
+			Name:      "app-config",
+			MountPath: "/fluentd/etc/app_config/",
+		},
+		{
+			Name:      "buffer",
+			MountPath: "/buffers",
+		},
+	}
+	if viper.GetBool("fluentd.tls_enabled") {
+		tlsRelatedVolume := []corev1.VolumeMount{
+			{
+				Name:      "fluentd-tls",
+				MountPath: "/fluentd/etc/tls/caCert",
+				SubPath:   "caCert",
+			},
+			{
+				Name:      "fluentd-tls",
+				MountPath: "/fluentd/etc/tls/serverCert",
+				SubPath:   "serverCert",
+			},
+			{
+				Name:      "fluentd-tls",
+				MountPath: "/fluentd/etc/tls/serverKey",
+				SubPath:   "serverKey",
+			},
+		}
+		v = append(v, tlsRelatedVolume...)
+	}
+	return
+}
+
+func generateVolume() (v []corev1.Volume) {
+	v = []corev1.Volume{
+		{
+			Name: "config",
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: "fluentd-config",
+					},
+				},
+			},
+		},
+		{
+			Name: "app-config",
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: "fluentd-app-config",
+					},
+				},
+			},
+		},
+		{
+			Name: "buffer",
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: "fluentd-buffer",
+					ReadOnly:  false,
+				},
+			},
+		},
+	}
+	if viper.GetBool("fluentd.tls_enabled") {
+		tlsRelatedVolume := corev1.Volume{
+			Name: "fluentd-tls",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: "tls-for-logging-operator",
+				},
+			},
+		}
+		v = append(v, tlsRelatedVolume)
+	}
+	return
 }
 
 // TODO in case of rbac add created serviceAccount name
@@ -266,45 +361,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 					},
 				},
 				Spec: corev1.PodSpec{
-					Volumes: []corev1.Volume{
-						{
-							Name: "config",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "fluentd-config",
-									},
-								},
-							},
-						},
-						{
-							Name: "app-config",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "fluentd-app-config",
-									},
-								},
-							},
-						},
-						{
-							Name: "buffer",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: "fluentd-buffer",
-									ReadOnly:  false,
-								},
-							},
-						},
-						{
-							Name: "fluentd-tls",
-							VolumeSource: corev1.VolumeSource{
-								Secret: &corev1.SecretVolumeSource{
-									SecretName: "tls-for-logging-operator",
-								},
-							},
-						},
-					},
+					Volumes: generateVolume(),
 					Containers: []corev1.Container{
 						{
 							Name:  "fluentd",
@@ -322,46 +379,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 								},
 							},
 
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "config",
-									MountPath: "/fluentd/etc/fluent.conf",
-									SubPath:   "fluentd.conf",
-								},
-								{
-									Name:      "config",
-									MountPath: "/fluentd/etc/input.conf",
-									SubPath:   "input.conf",
-								},
-								{
-									Name:      "config",
-									MountPath: "/fluentd/etc/devnull.conf",
-									SubPath:   "devnull.conf",
-								},
-								{
-									Name:      "app-config",
-									MountPath: "/fluentd/etc/app_config/",
-								},
-								{
-									Name:      "buffer",
-									MountPath: "/buffers",
-								},
-								{
-									Name:      "fluentd-tls",
-									MountPath: "/fluentd/etc/tls/caCert",
-									SubPath:   "caCert",
-								},
-								{
-									Name:      "fluentd-tls",
-									MountPath: "/fluentd/etc/tls/serverCert",
-									SubPath:   "serverCert",
-								},
-								{
-									Name:      "fluentd-tls",
-									MountPath: "/fluentd/etc/tls/serverKey",
-									SubPath:   "serverKey",
-								},
-							},
+							VolumeMounts: generateVolumeMounts(),
 						},
 						*newConfigMapReloader(),
 					},
