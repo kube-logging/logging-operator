@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"bytes"
 	"fmt"
+	"github.com/banzaicloud/logging-operator/pkg/plugins"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -30,8 +31,8 @@ type LoggingOperator struct {
 // LoggingOperatorSpec holds the spec for the operator
 type LoggingOperatorSpec struct {
 	Input  Input    `json:"input"`
-	Filter []Filter `json:"filter"`
-	Output []Output `json:"output"`
+	Filter []Plugin `json:"filter"`
+	Output []Plugin `json:"output"`
 }
 
 // LoggingOperatorStatus holds the status info for the operator
@@ -44,104 +45,31 @@ type Input struct {
 	Label map[string]string `json:"label"`
 }
 
-// Filter defines the filter plugins used by fluentd
-// Todo validation to Format (Regexp) and TimeFormat
-type Filter struct {
-	Type       string `json:"type"`
-	Format     string `json:"format"`
-	TimeFormat string `json:"timeFormat"`
-}
-
-// filterTemplate for generating filters
-// now only parse supported and tested
-var filterTemplate = `
-<filter {{ .pattern }}.** >
-  @type {{ .type }}
-  format {{ .format }}
-  time_format {{ .timeFormat }}
-  key_name log
-</filter>
-`
-
-// Render the fluentd configuration for filter
-func (f *Filter) Render(values map[string]string) (string, error) {
-	t := template.New("filterTemplate")
-	t, err := t.Parse(filterTemplate)
-	if err != nil {
-		return "", err
-	}
-	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, values)
-	if err != nil {
-		return "", err
-	}
-	return tpl.String(), nil
-}
-
-// Output defines the output plugins used by fluentd
-type Output struct {
-	S3 *outputS3 `json:"s3"`
-}
-
-type outputS3 struct {
+// Plugin struct for fluentd plugins
+type Plugin struct {
+	Type       string      `json:"type"`
 	Name       string      `json:"name"`
 	Parameters []Parameter `json:"parameters"`
 }
 
-// GetMap get values from child Parameters
-func (o *outputS3) GetMap() map[string]string {
-	params := map[string]string{}
-	for _, p := range o.Parameters {
-		if p.ValueFrom != nil {
-			value, err := p.ValueFrom.GetValue()
-			if err != nil {
-				logrus.Errorf("error getting value for %q: %s", p.Name, err.Error())
-			}
-			params[p.Name] = value
-		} else {
-			params[p.Name] = p.Value
-		}
+// RenderPlugin general Plugin renderer
+func RenderPlugin(plugin Plugin, baseMap map[string]string) (string, error) {
+	rawTemplate, err := plugins.GetTemplate(plugin.Type)
+	if err != nil {
+		return "", err
 	}
-	return params
-}
+	for _, param := range plugin.Parameters {
+		k, v := param.GetValue()
+		baseMap[k] = v
+	}
 
-// s3Template S3 Go template to generate configuration
-var s3Template = `
-<match {{ .pattern }}.** >
-  @type s3
-
-  aws_key_id {{ .aws_key_id }}
-  aws_sec_key {{ .aws_sec_key }}
-  s3_bucket {{ .s3_bucket }}
-  s3_region {{ .s3_region }}
-
-  path logs/${tag}/%Y/%m/%d/
-  s3_object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
-
-  # if you want to use ${tag} or %Y/%m/%d/ like syntax in path / s3_object_key_format,
-  # need to specify tag for ${tag} and time for %Y/%m/%d in <buffer> argument.
-  <buffer tag,time>
-    @type file
-    path /buffers/s3
-    timekey 3600 # 1 hour partition
-    timekey_wait 10m
-    timekey_use_utc true # use utc
-  </buffer>
-  <format>
-    @type json
-  </format>
-</match>
-`
-
-// Render is parsing the template and generate fluentd config
-func (o *outputS3) Render(values map[string]string) (string, error) {
-	t := template.New("s3Template")
-	t, err := t.Parse(s3Template)
+	t := template.New("PluginTemplate")
+	t, err = t.Parse(rawTemplate)
 	if err != nil {
 		return "", err
 	}
 	tpl := new(bytes.Buffer)
-	err = t.Execute(tpl, values)
+	err = t.Execute(tpl, baseMap)
 	if err != nil {
 		return "", err
 	}
@@ -155,13 +83,17 @@ type Parameter struct {
 	Value     string     `json:"value"`
 }
 
-// GetMap for filter template values
-func (f *Filter) GetMap() map[string]string {
-	params := map[string]string{}
-	params["type"] = f.Type
-	params["format"] = f.Format
-	params["timeFormat"] = f.TimeFormat
-	return params
+// GetValue for a Parameter
+func (p Parameter) GetValue() (string, string) {
+	if p.ValueFrom != nil {
+		value, error := p.ValueFrom.GetValue()
+		if error != nil {
+			logrus.Error(error)
+			return "", ""
+		}
+		return p.Name, value
+	}
+	return p.Name, p.Value
 }
 
 // ValueFrom generic type to determine value origin
