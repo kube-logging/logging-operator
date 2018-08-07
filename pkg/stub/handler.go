@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
+	"github.com/banzaicloud/logging-operator/pkg/plugins"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -91,17 +92,18 @@ func updateConfigMap(name, config string) {
 //
 func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 	var finalConfig string
-	// Create pattern for match
-	baseMap := map[string]string{}
-	baseMap["pattern"] = crd.Spec.Input.Label["app"]
 	// Generate filters
 	for _, filter := range crd.Spec.Filter {
 		logrus.Info("Applying filter")
-		values := filter.GetMap()
-		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := filter.Render(values)
+		values, err := plugins.GetDefaultValues(filter.Type)
 		if err != nil {
-			logrus.Error("Error in rendering template.")
+			logrus.Infof("Error in rendering template: %s", err)
+			return "", ""
+		}
+		values["pattern"] = crd.Spec.Input.Label["app"]
+		config, err := v1alpha1.RenderPlugin(filter, values)
+		if err != nil {
+			logrus.Infof("Error in rendering template: %s", err)
 			return "", ""
 		}
 		finalConfig += config
@@ -109,15 +111,19 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 
 	// Generate output
 	for _, output := range crd.Spec.Output {
-		values := output.S3.GetMap()
-		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := output.S3.Render(values)
+		values, err := plugins.GetDefaultValues(output.Type)
 		if err != nil {
-			logrus.Info("Error in rendering template.")
+			logrus.Infof("Error in rendering template: %s", err)
+			return "", ""
+		}
+		values["pattern"] = crd.Spec.Input.Label["app"]
+		config, err := v1alpha1.RenderPlugin(output, values)
+		if err != nil {
+			logrus.Infof("Error in rendering template: %s", err)
 			return "", ""
 		}
 		finalConfig += config
 	}
-	return baseMap["pattern"], finalConfig
+	return crd.Name, finalConfig
 
 }
