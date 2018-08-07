@@ -1,6 +1,6 @@
 # logging-operator
 
-Logging operator for Kubernetes based on Fluentd and Fluent-bit
+Logging operator for Kubernetes based on Fluentd and Fluent-bit. For more details please follow up with this [post](https://banzaicloud.com/blog/k8s-logging-operator/).
 
 ## What is this operator for?
 
