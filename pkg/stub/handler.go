@@ -93,7 +93,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 	var finalConfig string
 	// Create pattern for match
 	baseMap := map[string]string{}
-	baseMap["pattern"] = crd.Spec.Input.Label["app"]
+	baseMap["pattern"] = crd.Name
 	// Generate filters
 	for _, filter := range crd.Spec.Filter {
 		logrus.Info("Applying filter")
