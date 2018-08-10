@@ -58,28 +58,31 @@ spec:
     label:
       app: nginx
   filter:
-    - type: parse
-      format: |
-        /^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$/
-
-      timeFormat: '%d/%b/%Y:%H:%M:%S %z'
+    - type: parser
+      name: parser-nginx
+      parameters:
+        - name: format
+          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$/'
+        - name: timeFormat
+          value: "%d/%b/%Y:%H:%M:%S %z"
   output:
-    - s3:
-        parameters:
-          - name: aws_key_id
-            valueFrom:
-              secretKeyRef:
-                name: loggings3
-                key: awsAccessKeyId
-          - name: aws_sec_key
-            valueFrom:
-              secretKeyRef:
-                name: loggings3
-                key: awsSecretAccesKey
-          - name: s3_bucket
-            value: logging-bucket
-          - name: s3_region
-            value: ap-northeast-1
+    - type: s3
+      name: outputS3
+      parameters:
+        - name: aws_key_id
+          valueFrom:
+            secretKeyRef:
+              name: loggings3
+              key: awsAccessKeyId
+        - name: aws_sec_key
+          valueFrom:
+            secretKeyRef:
+              name: loggings3
+              key: awsSecretAccesKey
+        - name: s3_bucket
+          value: logging-bucket
+        - name: s3_region
+          value: ap-northeast-1
 ```
 
 ## AllInOne example
