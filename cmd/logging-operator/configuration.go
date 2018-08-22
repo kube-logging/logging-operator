@@ -15,6 +15,8 @@ const configFile = "/logging-operator/config/config.toml"
 
 func init() {
 	logrus.Info("Initializing configuration")
+	viper.SetDefault("tls.enabled", false)
+	viper.SetDefault("tls.sharedKey", "Thei6pahshubajee")
 	go handleConfigChanges()
 }
 
