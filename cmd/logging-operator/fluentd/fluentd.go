@@ -171,8 +171,8 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 			Enabled   bool
 			SharedKey string
 		}{
-			Enabled:   viper.GetBool("fluentd.tls_enabled"),
-			SharedKey: "foobar",
+			Enabled:   viper.GetBool("tls.enabled"),
+			SharedKey: viper.GetString("tls.sharedKey"),
 		},
 	}
 	inputConfig, err := generateConfig(input)
@@ -230,7 +230,7 @@ func newConfigMapReloader() *corev1.Container {
 		Image: "jimmidyson/configmap-reload:v0.2.2",
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
-			"-volume-dir=/fluentd/etc/app_config/",
+			"-volume-dir=/fluentd/app-config/",
 			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
 		},
 		VolumeMounts: []corev1.VolumeMount{
@@ -240,7 +240,7 @@ func newConfigMapReloader() *corev1.Container {
 			},
 			{
 				Name:      "app-config",
-				MountPath: "/fluentd/etc/app_config/",
+				MountPath: "/fluentd/app-config/",
 			},
 		},
 	}
@@ -250,44 +250,22 @@ func generateVolumeMounts() (v []corev1.VolumeMount) {
 	v = []corev1.VolumeMount{
 		{
 			Name:      "config",
-			MountPath: "/fluentd/etc/fluent.conf",
-			SubPath:   "fluentd.conf",
-		},
-		{
-			Name:      "config",
-			MountPath: "/fluentd/etc/input.conf",
-			SubPath:   "input.conf",
-		},
-		{
-			Name:      "config",
-			MountPath: "/fluentd/etc/devnull.conf",
-			SubPath:   "devnull.conf",
+			MountPath: "/fluentd/etc/",
 		},
 		{
 			Name:      "app-config",
-			MountPath: "/fluentd/etc/app_config/",
+			MountPath: "/fluentd/app-config/",
 		},
 		{
 			Name:      "buffer",
 			MountPath: "/buffers",
 		},
 	}
-	if viper.GetBool("fluentd.tls_enabled") {
+	if viper.GetBool("tls.enabled") {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluentd-tls",
-				MountPath: "/fluentd/etc/tls/caCert",
-				SubPath:   "caCert",
-			},
-			{
-				Name:      "fluentd-tls",
-				MountPath: "/fluentd/etc/tls/serverCert",
-				SubPath:   "serverCert",
-			},
-			{
-				Name:      "fluentd-tls",
-				MountPath: "/fluentd/etc/tls/serverKey",
-				SubPath:   "serverKey",
+				MountPath: "/fluentd/etc/tls/",
 			},
 		}
 		v = append(v, tlsRelatedVolume...)
@@ -327,12 +305,12 @@ func generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	if viper.GetBool("fluentd.tls_enabled") {
+	if viper.GetBool("tls.enabled") {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: "tls-for-logging-operator",
+					SecretName: viper.GetString("tls.secretName"),
 				},
 			},
 		}
