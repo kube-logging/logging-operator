@@ -171,8 +171,8 @@ func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error
 			Enabled   bool
 			SharedKey string
 		}{
-			Enabled:   viper.GetBool("fluent-bit.tls_enabled"),
-			SharedKey: "foobar",
+			Enabled:   viper.GetBool("tls.enabled"),
+			SharedKey: viper.GetString("tls.sharedKey"),
 		},
 		Monitor: map[string]string{
 			"Port": "2020",
@@ -242,7 +242,7 @@ func generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/var/log/",
 		},
 	}
-	if viper.GetBool("fluent-bit.tls_enabled") {
+	if viper.GetBool("tls_enabled") {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-tls",
@@ -300,12 +300,12 @@ func generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	if viper.GetBool("fluent-bit.tls_enabled") {
+	if viper.GetBool("tls.enabled") {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluent-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: "tls-for-logging-operator",
+					SecretName: viper.GetString("tls.secretName"),
 				},
 			},
 		}
