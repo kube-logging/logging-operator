@@ -242,7 +242,7 @@ func generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/var/log/",
 		},
 	}
-	if viper.GetBool("tls_enabled") {
+	if viper.GetBool("tls.enabled") {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-tls",
