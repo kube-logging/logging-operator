@@ -26,7 +26,6 @@ var fluentdInputTemplate = `
 <source>
     @type   forward
     port    24240
-    @log_level debug
     {{ if .TLS.Enabled }}
     <security>
       self_hostname fluentd
