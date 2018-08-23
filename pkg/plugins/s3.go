@@ -20,6 +20,7 @@ const S3Template = `
   aws_sec_key {{ .aws_sec_key }}
   s3_bucket {{ .s3_bucket }}
   s3_region {{ .s3_region }}
+  store_as gzip_command
 
   path logs/${tag}/%Y/%m/%d/
   s3_object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
