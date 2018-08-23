@@ -32,7 +32,7 @@ var fluentBitConfigTemplate = `
 [OUTPUT]
     Name          forward
     Match         *
-    Host          fluentd.default.svc
+    Host          fluentd.{{ .Namespace }}.svc
     Port          24240
     {{ if .TLS.Enabled }}
     tls           On

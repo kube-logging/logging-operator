@@ -77,7 +77,8 @@ type fluentBitDeploymentConfig struct {
 }
 
 type fluentBitConfig struct {
-	TLS struct {
+	Namespace string
+	TLS       struct {
 		Enabled   bool
 		SharedKey string
 	}
@@ -167,6 +168,7 @@ func generateConfig(input fluentBitConfig) (*string, error) {
 
 func newFluentBitConfig(cr *fluentBitDeploymentConfig) (*corev1.ConfigMap, error) {
 	input := fluentBitConfig{
+		Namespace: cr.Namespace,
 		TLS: struct {
 			Enabled   bool
 			SharedKey string
