@@ -2,6 +2,7 @@ package fluentd
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/banzaicloud/logging-operator/cmd/logging-operator/sdkdecorator"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
@@ -55,16 +56,6 @@ func InitFluentd() {
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdService(fdc))
 		logrus.Info("Fluentd Deployment initialized!")
 	}
-	// Create fluentd services
-	// Possible options
-	//  replica: x
-	//  tag_rewrite config: ? it should be possible to give Labels
-	//  input port
-	//  TLS?
-	//  monitoring
-	//    enabled:
-	//    port:
-	//    path:
 }
 
 // DeleteFluentd deletes fluentd if exists
@@ -147,7 +138,7 @@ func generateConfig(input fluentdConfig) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	outputString := output.String()
+	outputString := fmt.Sprint(output.String())
 	return &outputString, nil
 }
 
@@ -192,7 +183,7 @@ func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
 		},
 
 		Data: map[string]string{
-			"fluentd.conf": fluentdDefaultTemplate,
+			"fluent.conf":  fluentdDefaultTemplate,
 			"input.conf":   *inputConfig,
 			"devnull.conf": fluentdOutputTemplate,
 		},
@@ -265,7 +256,7 @@ func generateVolumeMounts() (v []corev1.VolumeMount) {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluentd-tls",
-				MountPath: "/fluentd/etc/tls/",
+				MountPath: "/fluentd/tls/",
 			},
 		}
 		v = append(v, tlsRelatedVolume...)
