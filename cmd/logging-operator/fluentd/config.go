@@ -3,7 +3,7 @@ package fluentd
 var fluentdDefaultTemplate = `
 # include other config files
 @include /fluentd/etc/input.conf
-@include /fluentd/etc/app_config/*
+@include /fluentd/app-config/*
 @include /fluentd/etc/devnull.conf
 `
 var fluentdInputTemplate = `
@@ -34,9 +34,9 @@ var fluentdInputTemplate = `
     </security>
     <transport tls>
       version                TLSv1_2
-      ca_path                /fluentd/etc/tls/caCert
-      cert_path              /fluentd/etc/tls/serverCert
-      private_key_path       /fluentd/etc/tls/serverKey
+      ca_path                /fluentd/tls/caCert
+      cert_path              /fluentd/tls/serverCert
+      private_key_path       /fluentd/tls/serverKey
       client_cert_auth       true
     </transport>
     {{- end }}

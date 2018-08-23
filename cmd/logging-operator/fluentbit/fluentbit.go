@@ -103,7 +103,7 @@ func newClusterRole(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ClusterRole",
-			APIVersion: "v1",
+			APIVersion: "rbac.authorization.k8s.io/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "LoggingRole",
@@ -129,7 +129,7 @@ func newClusterRoleBinding(cr *fluentBitDeploymentConfig) *rbacv1.ClusterRoleBin
 	return &rbacv1.ClusterRoleBinding{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ClusterRoleBinding",
-			APIVersion: "v1",
+			APIVersion: "rbac.authorization.k8s.io/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "logging",
@@ -338,7 +338,8 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 					},
 				},
 				Spec: corev1.PodSpec{
-					Volumes: generateVolume(),
+					ServiceAccountName: "logging",
+					Volumes:            generateVolume(),
 					Containers: []corev1.Container{
 						{
 							// TODO move to configuration
