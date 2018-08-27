@@ -14,6 +14,7 @@ var fluentdInputTemplate = `
 # Prometheus monitoring
 <source>
     @type prometheus
+    port 25000
 </source>
 <source>
     @type prometheus_monitor
