@@ -335,7 +335,7 @@ func newFluentBitDaemonSet(cr *fluentBitDeploymentConfig) *extensionv1.DaemonSet
 					// TODO Move annotations to configuration
 					Annotations: map[string]string{
 						"prometheus.io/scrape": "true",
-						"prometheus.io/path":   "/metrics",
+						"prometheus.io/path":   "/api/v1/metrics/prometheus",
 						"prometheus.io/port":   "2020",
 					},
 				},
