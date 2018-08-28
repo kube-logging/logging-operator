@@ -2,7 +2,7 @@ package stub
 
 import (
 	"context"
-
+	"github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 	"github.com/banzaicloud/logging-operator/pkg/plugins"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
@@ -33,7 +33,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 		logrus.Info("Generating configuration.")
 		name, config := generateFluentdConfig(o)
 		if config != "" && name != "" {
-			updateConfigMap(name, config)
+			fluentd.CreateOrUpdateAppConfig(name, config)
 		}
 	}
 	return
@@ -58,31 +58,6 @@ func deleteFromConfigMap(name string) {
 		configMap.Data = map[string]string{}
 	}
 	delete(configMap.Data, name+".conf")
-	err = sdk.Update(configMap)
-	if err != nil {
-		logrus.Error(err)
-	}
-}
-
-func updateConfigMap(name, config string) {
-	configMap := &corev1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "fluentd-app-config",
-			Namespace: "default",
-		},
-	}
-	err := sdk.Get(configMap)
-	if err != nil {
-		logrus.Error(err)
-	}
-	if configMap.Data == nil {
-		configMap.Data = map[string]string{}
-	}
-	configMap.Data[name+".conf"] = config
 	err = sdk.Update(configMap)
 	if err != nil {
 		logrus.Error(err)
