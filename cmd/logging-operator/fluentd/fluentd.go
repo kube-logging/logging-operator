@@ -9,9 +9,11 @@ import (
 	"github.com/spf13/viper"
 	corev1 "k8s.io/api/core/v1"
 	extensionv1 "k8s.io/api/extensions/v1beta1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sync"
 	"text/template"
 )
 
@@ -30,6 +32,7 @@ type fluentdConfig struct {
 }
 
 var config *fluentdDeploymentConfig
+var ConfigLock sync.Mutex
 
 func initConfig() *fluentdDeploymentConfig {
 	if config == nil {
@@ -50,7 +53,7 @@ func InitFluentd() {
 		if viper.GetBool("logging-operator.rbac") {
 		}
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdConfigmap(fdc))
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdAppConfigMap(fdc))
+		CreateOrUpdateAppConfig("", "")
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdPVC(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdDeployment(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdService(fdc))
@@ -66,7 +69,7 @@ func DeleteFluentd() {
 		if viper.GetBool("logging-operator.rbac") {
 		}
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdConfigmap(fdc))
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdAppConfigMap(fdc))
+		DeleteAppConfig()
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdPVC(fdc))
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(newFluentdService(fdc))
 		foregroundDeletion := metav1.DeletePropagationForeground
@@ -142,17 +145,61 @@ func generateConfig(input fluentdConfig) (*string, error) {
 	return &outputString, nil
 }
 
-func newFluentdAppConfigMap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
-	return &corev1.ConfigMap{
+func DeleteAppConfig() {
+	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ConfigMap",
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fluentd-app-config",
-			Namespace: fdc.Namespace,
-			Labels:    fdc.Labels,
+			Namespace: config.Namespace,
+			Labels:    config.Labels,
 		},
+	}
+	sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(configMap)
+}
+
+func CreateOrUpdateAppConfig(name string, appConfig string) {
+	configMap := &corev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "fluentd-app-config",
+			Namespace: config.Namespace,
+			Labels:    config.Labels,
+		},
+	}
+	// Lock for shared fluentd config resource
+	ConfigLock.Lock()
+	defer ConfigLock.Unlock()
+	err := sdk.Get(configMap)
+	if err != nil && !apierrors.IsNotFound(err) {
+		// Something unexpected happened
+		logrus.Error(err)
+		return
+	}
+	// Do the changes
+	if configMap.Data == nil {
+		configMap.Data = map[string]string{}
+	}
+	if name != "" && appConfig != "" {
+		configMap.Data[name+".conf"] = appConfig
+	}
+	// The resource not Found so we create it
+	if err != nil {
+		err = sdk.Create(configMap)
+		if err != nil {
+			logrus.Error(err)
+		}
+		return
+	}
+	// No error we go for update
+	err = sdk.Update(configMap)
+	if err != nil {
+		logrus.Error(err)
 	}
 }
 
