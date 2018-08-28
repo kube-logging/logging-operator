@@ -32,6 +32,8 @@ type fluentdConfig struct {
 }
 
 var config *fluentdDeploymentConfig
+
+// ConfigLock used for AppConfig
 var ConfigLock sync.Mutex
 
 func initConfig() *fluentdDeploymentConfig {
@@ -145,6 +147,7 @@ func generateConfig(input fluentdConfig) (*string, error) {
 	return &outputString, nil
 }
 
+// DeleteAppConfig thread safe config management
 func DeleteAppConfig() {
 	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
@@ -157,9 +160,12 @@ func DeleteAppConfig() {
 			Labels:    config.Labels,
 		},
 	}
+	ConfigLock.Lock()
+	defer ConfigLock.Unlock()
 	sdkdecorator.CallSdkFunctionWithLogging(sdk.Delete)(configMap)
 }
 
+// CreateOrUpdateAppConfig idempotent thread safe config management
 func CreateOrUpdateAppConfig(name string, appConfig string) {
 	configMap := &corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
