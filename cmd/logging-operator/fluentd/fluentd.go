@@ -196,17 +196,11 @@ func CreateOrUpdateAppConfig(name string, appConfig string) {
 	}
 	// The resource not Found so we create it
 	if err != nil {
-		err = sdk.Create(configMap)
-		if err != nil {
-			logrus.Error(err)
-		}
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(configMap)
 		return
 	}
 	// No error we go for update
-	err = sdk.Update(configMap)
-	if err != nil {
-		logrus.Error(err)
-	}
+	sdkdecorator.CallSdkFunctionWithLogging(sdk.Update)(configMap)
 }
 
 func newFluentdConfigmap(fdc *fluentdDeploymentConfig) *corev1.ConfigMap {
