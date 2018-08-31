@@ -3,7 +3,7 @@ package plugins
 // GCSOutput CRD name
 const GCSOutput = "gcs"
 
-// GCSDefaultValues for Amazaon S3 output plugin
+// GCSDefaultValues for Google Cloud Storage output plugin
 var GCSDefaultValues = map[string]string{
 	"bufferTimeKey":  "3600",
 	"bufferTimeWait": "10m",
@@ -11,7 +11,7 @@ var GCSDefaultValues = map[string]string{
 	"format":         "json",
 }
 
-// GCSTemplate for Amazaon S3 output plugin
+// GCSTemplate for Google Cloud Storage output plugin
 const GCSTemplate = `
 <match {{ .pattern }}.**>
   @type gcs
