@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"bytes"
 	"fmt"
+	"github.com/Masterminds/sprig"
 	"github.com/banzaicloud/logging-operator/pkg/plugins"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
@@ -63,7 +64,7 @@ func RenderPlugin(plugin Plugin, baseMap map[string]string) (string, error) {
 		baseMap[k] = v
 	}
 
-	t := template.New("PluginTemplate")
+	t := template.New("PluginTemplate").Funcs(sprig.TxtFuncMap())
 	t, err = t.Parse(rawTemplate)
 	if err != nil {
 		return "", err

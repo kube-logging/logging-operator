@@ -37,5 +37,4 @@ const S3Template = `
   <format>
     @type json
   </format>
-</match>
-`
+</match>`
