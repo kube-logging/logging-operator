@@ -26,6 +26,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 	switch o := event.Object.(type) {
 	case *v1alpha1.LoggingOperator:
 		if event.Deleted {
+			logrus.Infof("Delete CRD: %s", o.Name)
 			deleteFromConfigMap(o.Spec.Input.Label["app"])
 			return
 		}

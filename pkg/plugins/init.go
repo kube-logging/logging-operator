@@ -1,6 +1,9 @@
 package plugins
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/sirupsen/logrus"
+)
 
 // Plugin register map
 var pluginRegister = map[string]Plugin{}
@@ -13,6 +16,7 @@ type Plugin struct {
 
 // RegisterPlugin to use in CRD file
 func RegisterPlugin(name string, template string, values map[string]string) {
+	logrus.Infof("Registering plugin: %s", name)
 	pluginRegister[name] = Plugin{Template: template, DefaultValues: values}
 }
 
@@ -39,5 +43,6 @@ func GetTemplate(name string) (string, error) {
 // Register plugins
 func init() {
 	RegisterPlugin(S3Output, S3Template, S3DefaultValues)
+	RegisterPlugin(GCSOutput, GCSTemplate, GCSDefaultValues)
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
 }
