@@ -17,7 +17,7 @@ const GCSTemplate = `
   @type gcs
 
   project {{ .project }}
-  credentialsJson {{ .credentials }}
+  credentialsJson { "private_key": {{ toJson .private_key }}, "client_email": "{{ .client_email }}" }
   bucket {{ .bucket }}
   object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
   path logs/${tag}/%Y/%m/%d/
