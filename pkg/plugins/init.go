@@ -44,5 +44,6 @@ func GetTemplate(name string) (string, error) {
 func init() {
 	RegisterPlugin(S3Output, S3Template, S3DefaultValues)
 	RegisterPlugin(GCSOutput, GCSTemplate, GCSDefaultValues)
+	RegisterPlugin(AzureOutput, AzureTemplate, AzureDefaultValues)
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
 }
