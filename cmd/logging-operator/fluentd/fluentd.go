@@ -399,7 +399,7 @@ func newFluentdDeployment(fdc *fluentdDeploymentConfig) *extensionv1.Deployment 
 					Containers: []corev1.Container{
 						{
 							Name:  "fluentd",
-							Image: "banzaicloud/fluentd:v1.1.2",
+							Image: "banzaicloud/fluentd:v1.1.3",
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "monitor",

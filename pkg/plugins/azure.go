@@ -17,7 +17,7 @@ const AzureTemplate = `
   @type azurestorage
 
   azure_storage_account    {{ .storageAccountName }}
-  azure_storage_access_key {{ .storageAccountName }}
+  azure_storage_access_key {{ .storageAccountKey }}
   azure_container          {{ .bucket }}
   azure_storage_type       blob
   store_as                 gzip
