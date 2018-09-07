@@ -255,7 +255,7 @@ func newFluentdPVC(fdc *fluentdDeploymentConfig) *corev1.PersistentVolumeClaim {
 			},
 			Resources: corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
-					"storage": resource.MustParse("10G"),
+					"storage": resource.MustParse("21G"),
 				},
 			},
 		},
