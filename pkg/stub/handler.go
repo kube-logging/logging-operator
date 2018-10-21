@@ -12,13 +12,15 @@ import (
 )
 
 // NewHandler creates a new Handler struct
-func NewHandler() sdk.Handler {
-	return &Handler{}
+func NewHandler(namepsace string) sdk.Handler {
+	return &Handler{
+		NameSpace: namepsace,
+	}
 }
 
 // Handler struct
 type Handler struct {
-	// Fill me
+	NameSpace string
 }
 
 // Handle every event set up by the watcher
@@ -32,7 +34,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) (err error) {
 		}
 		logrus.Infof("New CRD arrived %#v", o)
 		logrus.Info("Generating configuration.")
-		name, config := generateFluentdConfig(o)
+		name, config := generateFluentdConfig(o, h.NameSpace)
 		if config != "" && name != "" {
 			fluentd.CreateOrUpdateAppConfig(name, config)
 		}
@@ -66,7 +68,7 @@ func deleteFromConfigMap(name string) {
 }
 
 //
-func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
+func generateFluentdConfig(crd *v1alpha1.LoggingOperator, namespace string) (string, string) {
 	var finalConfig string
 	// Generate filters
 	for _, filter := range crd.Spec.Filter {
@@ -77,7 +79,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 			return "", ""
 		}
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := v1alpha1.RenderPlugin(filter, values)
+		config, err := v1alpha1.RenderPlugin(filter, values, namespace)
 		if err != nil {
 			logrus.Infof("Error in rendering template: %s", err)
 			return "", ""
@@ -93,7 +95,7 @@ func generateFluentdConfig(crd *v1alpha1.LoggingOperator) (string, string) {
 			return "", ""
 		}
 		values["pattern"] = crd.Spec.Input.Label["app"]
-		config, err := v1alpha1.RenderPlugin(output, values)
+		config, err := v1alpha1.RenderPlugin(output, values, namespace)
 		if err != nil {
 			logrus.Infof("Error in rendering template: %s", err)
 			return "", ""
