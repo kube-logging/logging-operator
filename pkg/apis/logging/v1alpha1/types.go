@@ -54,13 +54,13 @@ type Plugin struct {
 }
 
 // RenderPlugin general Plugin renderer
-func RenderPlugin(plugin Plugin, baseMap map[string]string) (string, error) {
+func RenderPlugin(plugin Plugin, baseMap map[string]string, namespace string) (string, error) {
 	rawTemplate, err := plugins.GetTemplate(plugin.Type)
 	if err != nil {
 		return "", err
 	}
 	for _, param := range plugin.Parameters {
-		k, v := param.GetValue()
+		k, v := param.GetValue(namespace)
 		baseMap[k] = v
 	}
 
@@ -85,9 +85,9 @@ type Parameter struct {
 }
 
 // GetValue for a Parameter
-func (p Parameter) GetValue() (string, string) {
+func (p Parameter) GetValue(namespace string) (string, string) {
 	if p.ValueFrom != nil {
-		value, error := p.ValueFrom.GetValue()
+		value, error := p.ValueFrom.GetValue(namespace)
 		if error != nil {
 			logrus.Error(error)
 			return "", ""
@@ -103,27 +103,31 @@ type ValueFrom struct {
 }
 
 // GetValue handles the different origin of ValueFrom
-func (vf *ValueFrom) GetValue() (string, error) {
-	return vf.SecretKeyRef.GetValue()
+func (vf *ValueFrom) GetValue(namespace string) (string, error) {
+	return vf.SecretKeyRef.GetValue(namespace)
 }
 
 // KubernetesSecret is a ValueFrom type
 type KubernetesSecret struct {
-	Name string `json:"name"`
-	Key  string `json:"key"`
+	Name      string `json:"name"`
+	Key       string `json:"key"`
+	Namespace string `json:"namespace"`
 }
 
 // GetValue implement GetValue interface
-func (ks KubernetesSecret) GetValue() (string, error) {
+func (ks KubernetesSecret) GetValue(namespace string) (string, error) {
 	secret := corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
+			Namespace: namespace,
 			Name:      ks.Name,
 		},
+	}
+	if ks.Namespace != "" {
+		secret.ObjectMeta.Namespace = ks.Namespace
 	}
 	err := sdk.Get(&secret)
 	if err != nil {
@@ -131,7 +135,7 @@ func (ks KubernetesSecret) GetValue() (string, error) {
 	}
 	value, ok := secret.Data[ks.Key]
 	if !ok {
-		return "", fmt.Errorf("key %q not found in secret %q ", ks.Key, ks.Name)
+		return "", fmt.Errorf("key %q not found in secret %q in namespace %q", ks.Key, secret.ObjectMeta.Name, secret.ObjectMeta.Namespace)
 	}
 	return string(value), nil
 }

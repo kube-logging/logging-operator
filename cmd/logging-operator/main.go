@@ -9,6 +9,7 @@ import (
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"os"
 )
 
@@ -26,7 +27,7 @@ func getConfiguration() *operatorConfig {
 func main() {
 
 	const (
-		operatorNamespace = "OPERATOR_NAMESPACE"
+		operatorNamespace = "WATCH_NAMESPACE"
 		operatorResource  = "logging.banzaicloud.com/v1alpha1"
 		kind              = "LoggingOperator"
 	)
@@ -36,7 +37,11 @@ func main() {
 	resyncPeriod := 0
 	logrus.Infof("Watching %s, %s, %s, %d", operatorResource, kind, ns, resyncPeriod)
 	sdk.Watch(operatorResource, kind, ns, resyncPeriod)
-	sdk.Handle(stub.NewHandler())
+	err := viper.BindEnv("kubernetesNamespace", "KUBERNETES_NAMESPACE")
+	if err != nil {
+		logrus.Error(err)
+	}
+	sdk.Handle(stub.NewHandler(viper.GetString("kubernetesNamespace")))
 	sdk.Run(context.TODO())
 }
 
