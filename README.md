@@ -4,10 +4,10 @@ Logging operator for Kubernetes based on Fluentd and Fluent-bit. For more detail
 
 ## What is this operator for?
 
-This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within it's charts. The operator does the rest.
+This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
 
-## Projact status: Alpha
+## Project status: Alpha
 
 This is the first version of this operator to showcase our plans of handling logs on Kubernetes. This version includes only basic configuration that will expand quickly. Stay tuned.
 
@@ -21,11 +21,11 @@ helm install banzai-stable/logging-operator
 
 ## Example
 
-The following example shows what you need to provide for proper log shipping.
+The following steps set up an example configuration for sending nginx logs to S3.
 
 ### Create Secret
 
-Create a secret file with valid input
+Create a manifest file for the AWS access key:
 
 ```
 apiVersion: v1
@@ -38,15 +38,15 @@ data:
   awsSecretAccesKey: <base64encoded>
 ```
 
-Create secret with kubectl
+Submit the secret with kubectl:
 
 ```
 kubectl apply -f secret.yaml
 ```
 
-### CustomResourceDefinitions
+### Create LoggingOperator resource
 
-This is an example how-to define log definition for an application
+Create a manifest that defines that you want to parse the nginx logs with the specified regular expressions on the standard output of pods with the `app: nginx` label, and store them in the given S3 bucket.
 
 ```
 apiVersion: "logging.banzaicloud.com/v1alpha1"
@@ -85,9 +85,9 @@ spec:
           value: ap-northeast-1
 ```
 
-## AllInOne example
+## All in one example
 
-If you just want to try out use our `nginx` example
+If you just want to try the logging operator, install the operator and use our `nginx` example:
 
 ```
 helm install ./deploy/helm/nginx-test
