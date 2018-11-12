@@ -8,7 +8,6 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 
-	"fmt"
 	"github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentbit"
 	"github.com/banzaicloud/logging-operator/cmd/logging-operator/fluentd"
 	"github.com/sirupsen/logrus"
@@ -47,19 +46,17 @@ func main() {
 	logrus.Infof("Gettint current environment: ns: %q pod: %q", podNamespace, podName)
 	pod, err := GetSelf(podName, podNamespace)
 	if err != nil {
-		fmt.Errorf("Error: %s", err.Error())
+		logrus.Error(err.Error())
 	}
 	obj, err := GetDeployment(pod, pod.Namespace)
 	if err != nil {
-		fmt.Errorf("Error: %s", err.Error())
+		logrus.Error(err.Error())
 	}
-
 	deploymentLabels := obj.GetLabels()
 	GlobalLabels["chart"] = deploymentLabels["chart"]
 	GlobalLabels["release"] = deploymentLabels["release"]
 	fluentd.OwnerDeployment = obj
 	fluentbit.OwnerDeployment = obj
-	logrus.Infof("%#v", obj)
 	ns := os.Getenv(operatorNamespace)
 	printVersion(ns)
 	resyncPeriod := 0
