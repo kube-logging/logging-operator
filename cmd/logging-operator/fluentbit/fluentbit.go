@@ -10,45 +10,63 @@ import (
 	extensionv1 "k8s.io/api/extensions/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"text/template"
 )
 
+var OwnerDeployment metav1.Object
 var config *fluentBitDeploymentConfig
 
-func initConfig() *fluentBitDeploymentConfig {
+func initConfig(labels map[string]string) *fluentBitDeploymentConfig {
 	if config == nil {
 		config = &fluentBitDeploymentConfig{
 			Name:      "fluent-bit",
 			Namespace: viper.GetString("fluent-bit.namespace"),
-			Labels:    map[string]string{"app": "fluent-bit"},
+			Labels:    labels,
 		}
+		config.Labels["app"] = "fluent-bit"
 	}
 	return config
 }
 
 // InitFluentBit initialize fluent-bit
-func InitFluentBit() {
-	cfg := initConfig()
+func InitFluentBit(labels map[string]string) {
+	cfg := initConfig(labels)
 	if !checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deploying fluent-bit")
 		if viper.GetBool("logging-operator.rbac") {
-			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newServiceAccount(cfg))
-			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newClusterRole(cfg))
-			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newClusterRoleBinding(cfg))
+			sa := newServiceAccount(cfg)
+			err := controllerutil.SetControllerReference(OwnerDeployment, sa, scheme.Scheme)
+			logrus.Error(err)
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(sa)
+			cr := newClusterRole(cfg)
+			err = controllerutil.SetControllerReference(OwnerDeployment, cr, scheme.Scheme)
+			logrus.Error(err)
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(cr)
+			crb := newClusterRoleBinding(cfg)
+			err = controllerutil.SetControllerReference(OwnerDeployment, crb, scheme.Scheme)
+			logrus.Error(err)
+			sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(crb)
 		}
 		cfgMap, err := newFluentBitConfig(cfg)
 		if err != nil {
 			logrus.Error(err)
 		}
+		err = controllerutil.SetControllerReference(OwnerDeployment, cfgMap, scheme.Scheme)
+		logrus.Error(err)
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(cfgMap)
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentBitDaemonSet(cfg))
+		ds := newFluentBitDaemonSet(cfg)
+		err = controllerutil.SetControllerReference(OwnerDeployment, ds, scheme.Scheme)
+		logrus.Error(err)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(ds)
 		logrus.Info("Fluent-bit deployed successfully")
 	}
 }
 
 // DeleteFluentBit deletes fluent-bit if it exists
-func DeleteFluentBit() {
-	cfg := initConfig()
+func DeleteFluentBit(labels map[string]string) {
+	cfg := initConfig(labels)
 	if checkIfDeamonSetExist(cfg) {
 		logrus.Info("Deleting fluent-bit")
 		if viper.GetBool("logging-operator.rbac") {
