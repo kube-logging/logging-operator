@@ -36,6 +36,8 @@ type fluentdConfig struct {
 }
 
 var config *fluentdDeploymentConfig
+
+// OwnerDeployment for created objects
 var OwnerDeployment metav1.Object
 
 // ConfigLock used for AppConfig

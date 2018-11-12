@@ -27,6 +27,7 @@ func getConfiguration() *operatorConfig {
 	return &operatorConfig{}
 }
 
+// GlobalLabels to use with generated deployments
 var GlobalLabels = map[string]string{
 	"chart":   "",
 	"release": "",

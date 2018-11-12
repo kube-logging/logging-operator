@@ -8,6 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// ErrorCodes
 var (
 	ErrorNoParent    = errors.New("ErrorNoParent")
 	ErrorUnknownKind = errors.New("ErrorUnknownKind")
@@ -32,6 +33,7 @@ func GetSelf(name, namespace string) (*corev1.Pod, error) {
 	return podObject, nil
 }
 
+// GetDeployment of a running Pod
 func GetDeployment(pod *corev1.Pod, namespace string) (metav1.Object, error) {
 	rs, err := GetParent(pod, namespace)
 	if err != nil {
@@ -44,6 +46,7 @@ func GetDeployment(pod *corev1.Pod, namespace string) (metav1.Object, error) {
 	return deployment, nil
 }
 
+// GetParent return an object parent
 func GetParent(obj metav1.Object, namespace string) (metav1.Object, error) {
 	parent := metav1.GetControllerOf(obj)
 	if parent != nil {
@@ -52,7 +55,7 @@ func GetParent(obj metav1.Object, namespace string) (metav1.Object, error) {
 	return nil, ErrorNoParent
 }
 
-// reference *metav1.OwnerReference
+// GetObjectFromOwnerReference get parent from OwnerReference
 func GetObjectFromOwnerReference(owner *metav1.OwnerReference, namespace string) (metav1.Object, error) {
 	switch owner.Kind {
 	case "Pod":

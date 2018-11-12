@@ -13,6 +13,7 @@ import (
 //Initialize the configuration
 const configFile = "/logging-operator/config/config.toml"
 
+// Init the configuration
 func Init() {
 	logrus.Info("Initializing configuration")
 	viper.SetDefault("tls.enabled", false)

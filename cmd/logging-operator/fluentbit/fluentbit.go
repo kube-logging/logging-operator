@@ -15,6 +15,7 @@ import (
 	"text/template"
 )
 
+// OwnerDeployment of the daemonset
 var OwnerDeployment metav1.Object
 var config *fluentBitDeploymentConfig
 
