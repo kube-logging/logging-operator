@@ -13,15 +13,19 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sync"
 	"text/template"
 )
 
 type fluentdDeploymentConfig struct {
-	Name      string
-	Namespace string
-	Replicas  int32
-	Labels    map[string]string
+	Name        string
+	Namespace   string
+	Replicas    int32
+	Labels      map[string]string
+	ReleaseName string
 }
 
 type fluentdConfig struct {
@@ -33,39 +37,61 @@ type fluentdConfig struct {
 
 var config *fluentdDeploymentConfig
 
+// OwnerDeployment for created objects
+var OwnerDeployment metav1.Object
+
 // ConfigLock used for AppConfig
 var ConfigLock sync.Mutex
 
-func initConfig() *fluentdDeploymentConfig {
+func initConfig(labels map[string]string) *fluentdDeploymentConfig {
+	name := "fluentd"
+	if labels["release"] != "" {
+		name = labels["release"] + "-flluentd"
+	}
 	if config == nil {
 		config = &fluentdDeploymentConfig{
-			Name:      "fluentd",
+			Name:      name,
 			Namespace: viper.GetString("fluentd.namespace"),
 			Replicas:  1,
-			Labels:    map[string]string{"app": "fluentd"},
+			Labels:    labels,
 		}
+		config.Labels["app"] = "fluentd"
 	}
 	return config
 }
 
 // InitFluentd initialize fluentd
-func InitFluentd() {
-	fdc := initConfig()
+func InitFluentd(labels map[string]string) {
+	fdc := initConfig(labels)
 	if !checkIfDeploymentExist(fdc) {
 		if viper.GetBool("logging-operator.rbac") {
 		}
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdConfigmap(fdc))
+		// Create configmap
+		configMap := newFluentdConfigmap(fdc)
+		err := controllerutil.SetControllerReference(OwnerDeployment, configMap, scheme.Scheme)
+		logrus.Error(err)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(configMap)
+
 		CreateOrUpdateAppConfig("", "")
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdPVC(fdc))
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdDeployment(fdc))
-		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(newFluentdService(fdc))
+
+		deployment := newFluentdDeployment(fdc)
+		err = controllerutil.SetControllerReference(OwnerDeployment, deployment, scheme.Scheme)
+		logrus.Error(err)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(deployment)
+
+		service := newFluentdService(fdc)
+		err = controllerutil.SetControllerReference(OwnerDeployment, service, scheme.Scheme)
+		logrus.Error(err)
+		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(service)
+
 		logrus.Info("Fluentd Deployment initialized!")
 	}
 }
 
 // DeleteFluentd deletes fluentd if exists
-func DeleteFluentd() {
-	fdc := initConfig()
+func DeleteFluentd(labels map[string]string) {
+	fdc := initConfig(labels)
 	if checkIfDeploymentExist(fdc) {
 		logrus.Info("Deleting fluentd")
 		if viper.GetBool("logging-operator.rbac") {
@@ -104,9 +130,6 @@ func checkIfDeploymentExist(fdc *fluentdDeploymentConfig) bool {
 	return true
 }
 
-func newFluentdRole() {
-
-}
 func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 	return &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
@@ -196,6 +219,8 @@ func CreateOrUpdateAppConfig(name string, appConfig string) {
 	}
 	// The resource not Found so we create it
 	if err != nil {
+		err = controllerutil.SetControllerReference(OwnerDeployment, configMap, scheme.Scheme)
+		logrus.Error(err)
 		sdkdecorator.CallSdkFunctionWithLogging(sdk.Create)(configMap)
 		return
 	}
