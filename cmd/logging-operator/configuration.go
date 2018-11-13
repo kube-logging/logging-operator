@@ -13,7 +13,8 @@ import (
 //Initialize the configuration
 const configFile = "/logging-operator/config/config.toml"
 
-func init() {
+// Init the configuration
+func Init() {
 	logrus.Info("Initializing configuration")
 	viper.SetDefault("tls.enabled", false)
 	viper.SetDefault("tls.sharedKey", "Thei6pahshubajee")
@@ -73,15 +74,15 @@ func handleConfigChanges() {
 func configureOperator() {
 	if viper.GetBool("fluent-bit.enabled") {
 		logrus.Info("Trying to init fluent-bit")
-		fluentbit.InitFluentBit()
+		fluentbit.InitFluentBit(GlobalLabels)
 	} else if !viper.GetBool("fluent-bit.enabled") {
 		logrus.Info("Deleting fluent-bit DaemonSet...")
-		fluentbit.DeleteFluentBit()
+		fluentbit.DeleteFluentBit(GlobalLabels)
 	}
 	if viper.GetBool("fluentd.enabled") {
 		logrus.Info("Trying to init fluentd")
-		fluentd.InitFluentd()
+		fluentd.InitFluentd(GlobalLabels)
 	} else if !viper.GetBool("fluentd.enabled") {
-		fluentd.DeleteFluentd()
+		fluentd.DeleteFluentd(GlobalLabels)
 	}
 }

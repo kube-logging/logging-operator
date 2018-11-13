@@ -50,3 +50,7 @@ required = [
 [[constraint]]
   name = "github.com/Masterminds/sprig"
   version = "2.15.0"
+
+[[constraint]]
+  name = "sigs.k8s.io/controller-runtime"
+  version = "0.1.1"
