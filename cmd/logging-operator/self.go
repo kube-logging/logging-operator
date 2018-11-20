@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -91,7 +92,7 @@ func GetObjectFromOwnerReference(owner *metav1.OwnerReference, namespace string)
 		}
 		return obj, nil
 	case "Deployment":
-		obj := &v1beta1.Deployment{
+		obj := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       owner.Kind,
 				APIVersion: owner.APIVersion,
