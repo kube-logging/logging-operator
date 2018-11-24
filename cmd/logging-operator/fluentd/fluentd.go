@@ -46,7 +46,7 @@ var ConfigLock sync.Mutex
 func initConfig(labels map[string]string) *fluentdDeploymentConfig {
 	name := "fluentd"
 	if labels["release"] != "" {
-		name = labels["release"] + "-flluentd"
+		name = labels["release"] + "-fluentd"
 	}
 	if config == nil {
 		config = &fluentdDeploymentConfig{
@@ -137,7 +137,7 @@ func newFluentdService(fdc *fluentdDeploymentConfig) *corev1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fdc.Name,
+			Name:      "fluentd",
 			Namespace: fdc.Namespace,
 			Labels:    fdc.Labels,
 		},
