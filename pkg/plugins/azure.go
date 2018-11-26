@@ -3,7 +3,7 @@ package plugins
 // AzureOutput CRD name
 const AzureOutput = "azure"
 
-// AzureDefaultValues for Google Cloud Storage output plugin
+// AzureDefaultValues for Azure ObjectStore output plugin
 var AzureDefaultValues = map[string]string{
 	"bufferTimeKey":  "3600",
 	"bufferTimeWait": "10m",
@@ -11,7 +11,7 @@ var AzureDefaultValues = map[string]string{
 	"format":         "json",
 }
 
-// AzureTemplate for Google Cloud Storage output plugin
+// AzureTemplate for Azure ObjectStore output plugin
 const AzureTemplate = `
 <match {{ .pattern }}.**>
   @type azurestorage
