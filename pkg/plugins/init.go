@@ -45,5 +45,6 @@ func init() {
 	RegisterPlugin(S3Output, S3Template, S3DefaultValues)
 	RegisterPlugin(GCSOutput, GCSTemplate, GCSDefaultValues)
 	RegisterPlugin(AzureOutput, AzureTemplate, AzureDefaultValues)
+	RegisterPlugin(AlibabaOutput, AlibabaTemplate, AlibabaDefaultValues)
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
 }
