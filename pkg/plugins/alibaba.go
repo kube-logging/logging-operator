@@ -22,7 +22,7 @@ const AlibabaTemplate = `
   oss_object_key_format "%{time_slice}/%{host}-%{uuid}.%{file_ext}"
 
   buffer_path /buffers/ali
-  buffer_chunk_limit 256m
+  buffer_chunk_limit 1m
   time_slice_format %Y%m%d
   time_slice_wait 10m
 </match>`
