@@ -69,4 +69,5 @@ func init() {
 	RegisterPlugin(AzureOutput, AzureTemplate, AzureDefaultValues)
 	RegisterPlugin(AlibabaOutput, AlibabaTemplate, AlibabaDefaultValues)
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
+	RegisterPlugin(ElasticsearchOutput, ElasticsearchTemplate, ElasticsearchDefaultValues)
 }
