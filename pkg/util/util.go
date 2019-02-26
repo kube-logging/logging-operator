@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package version
+package util
 
-var (
-	Version = "0.0.1"
-)
+func MergeLabels(l map[string]string, l2 map[string]string) map[string]string {
+	for lKey, lValue := range l2 {
+		l[lKey] = lValue
+	}
+	return l
+}
+
+func IntPointer(i int32) *int32 {
+	return &i
+}

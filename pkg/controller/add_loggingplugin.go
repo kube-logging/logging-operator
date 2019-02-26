@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package version
+package controller
 
-var (
-	Version = "0.0.1"
+import (
+	"github.com/banzaicloud/logging-operator/pkg/controller/loggingplugin"
 )
+
+func init() {
+	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
+	AddToManagerFuncs = append(AddToManagerFuncs, loggingplugin.Add)
+}

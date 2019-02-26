@@ -19,9 +19,6 @@ vendor: bin/dep ## Install dependencies
 build: vendor
 	@go build $(PKGS)
 
-vet:
-	@go vet -composites=false ./...
-
 check-fmt:
 	PKGS="${GOFILES_NOVENDOR}" GOFMT="gofmt" ./scripts/fmt-check.sh
 

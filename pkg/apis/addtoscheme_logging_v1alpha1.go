@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package version
+package apis
 
-var (
-	Version = "0.0.1"
+import (
+	"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 )
+
+func init() {
+	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
+	AddToSchemes = append(AddToSchemes, v1alpha1.SchemeBuilder.AddToScheme)
+}

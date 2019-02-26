@@ -1,0 +1,28 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: LoggingPlugin
+metadata:
+  name: example-loggingplugin
+  labels:
+    release: test
+spec:
+  input:
+    label:
+      app: "*"
+  output:
+    - type: s3
+      name: outputS3
+      parameters:
+        - name: aws_key_id
+          valueFrom:
+            secretKeyRef:
+              name: ""
+              key: ""
+        - name: aws_sec_key
+          valueFrom:
+            secretKeyRef:
+              name: ""
+              key: ""
+        - name: s3_bucket
+          value: ""
+        - name: s3_region
+          value: ""
