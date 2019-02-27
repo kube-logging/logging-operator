@@ -21,6 +21,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// PluginsObjectMeta creates an objectMeta for resource plugin
 func PluginsObjectMeta(name string, labels map[string]string, plugin *loggingv1alpha1.LoggingPlugin) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
@@ -38,6 +39,7 @@ func PluginsObjectMeta(name string, labels map[string]string, plugin *loggingv1a
 	return o
 }
 
+// FluentdObjectMeta creates an objectMeta for resource fluentd
 func FluentdObjectMeta(name string, labels map[string]string, fluentd *loggingv1alpha1.Fluentd) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
@@ -55,6 +57,7 @@ func FluentdObjectMeta(name string, labels map[string]string, fluentd *loggingv1
 	return o
 }
 
+// FluentbitObjectMeta creates an objectMeta for resource fluentbit
 func FluentbitObjectMeta(name string, labels map[string]string, fluentbit *loggingv1alpha1.Fluentbit) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
@@ -71,6 +74,8 @@ func FluentbitObjectMeta(name string, labels map[string]string, fluentbit *loggi
 	}
 	return o
 }
+
+// FluentbitObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
 func FluentbitObjectMetaClusterScope(name string, labels map[string]string, fluentbit *loggingv1alpha1.Fluentbit) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:   name,

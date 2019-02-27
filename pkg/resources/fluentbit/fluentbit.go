@@ -37,10 +37,12 @@ var labelSelector = map[string]string{
 	"app": "fluent-bit",
 }
 
+// Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	resources.FluentbitReconciler
 }
 
+// New creates a new Fluentbit reconciler
 func New(client client.Client, fluentbit *loggingv1alpha1.Fluentbit) *Reconciler {
 	return &Reconciler{
 		FluentbitReconciler: resources.FluentbitReconciler{
@@ -50,6 +52,7 @@ func New(client client.Client, fluentbit *loggingv1alpha1.Fluentbit) *Reconciler
 	}
 }
 
+// Reconcile reconciles the fluentBit resource
 func (r *Reconciler) Reconcile(log logr.Logger) error {
 	for _, res := range []resources.Resource{
 		r.serviceAccount,

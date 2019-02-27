@@ -31,6 +31,7 @@ import (
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// Reconcile reconciles various kubernetes types
 func Reconcile(log logr.Logger, client runtimeClient.Client, desired runtime.Object) error {
 	log = log.WithValues("type", reflect.TypeOf(desired))
 	var current = desired.DeepCopyObject()

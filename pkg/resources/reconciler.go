@@ -23,25 +23,31 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// PluginReconciler reconciler struct for plugin
 type PluginReconciler struct {
 	Client client.Client
 	Plugin *loggingv1alpha1.LoggingPlugin
 }
 
+// FluentdReconciler reconciler struct for fluentd
 type FluentdReconciler struct {
 	Client  client.Client
 	Fluentd *loggingv1alpha1.Fluentd
 }
 
+// FluentbitReconciler reconciler struct for fluentbit
 type FluentbitReconciler struct {
 	Client    client.Client
 	Fluentbit *loggingv1alpha1.Fluentbit
 }
 
+// ComponentReconciler reconciler interface
 type ComponentReconciler interface {
 	Reconcile(log logr.Logger) error
 }
 
+// Resource redeclaration of function with return type kubernetes Object
 type Resource func() runtime.Object
 
+// ResourceVariation redeclaration of function with parameter and return type kubernetes Object
 type ResourceVariation func(t string) runtime.Object

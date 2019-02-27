@@ -33,10 +33,12 @@ var labelSelector = map[string]string{
 	"app": "fluentd",
 }
 
+// Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	resources.PluginReconciler
 }
 
+// New creates a new Plugin reconciler
 func New(client client.Client, plugin *loggingv1alpha1.LoggingPlugin) *Reconciler {
 	return &Reconciler{
 		PluginReconciler: resources.PluginReconciler{
@@ -46,6 +48,7 @@ func New(client client.Client, plugin *loggingv1alpha1.LoggingPlugin) *Reconcile
 	}
 }
 
+// Reconcile reconciles the plugin resource
 func (r *Reconciler) Reconcile(log logr.Logger) error {
 	for _, res := range []resources.Resource{
 		r.appConfigMap,

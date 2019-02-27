@@ -33,6 +33,7 @@ type FluentbitSpec struct {
 	TLS       FluentbitTLS `json:"tls"`
 }
 
+// FluentbitTLS defines the TLS configs
 type FluentbitTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName"`

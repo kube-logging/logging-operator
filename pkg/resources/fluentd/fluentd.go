@@ -36,10 +36,12 @@ var labelSelector = map[string]string{
 	"app": "fluentd",
 }
 
+// Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	resources.FluentdReconciler
 }
 
+// New creates a new Fluentd reconciler
 func New(client client.Client, fluentd *loggingv1alpha1.Fluentd) *Reconciler {
 	return &Reconciler{
 		FluentdReconciler: resources.FluentdReconciler{
@@ -48,6 +50,8 @@ func New(client client.Client, fluentd *loggingv1alpha1.Fluentd) *Reconciler {
 		},
 	}
 }
+
+// Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile(log logr.Logger) error {
 	for _, res := range []resources.Resource{
 		r.configMap,
