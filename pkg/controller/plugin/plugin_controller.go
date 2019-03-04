@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package loggingplugin
+package plugin
 
 import (
 	"context"
@@ -34,14 +34,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("controller_loggingplugin")
+var log = logf.Log.WithName("controller_plugin")
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
 * business logic.  Delete these comments after modifying this file.*
  */
 
-// Add creates a new LoggingPlugin Controller and adds it to the Manager. The Manager will set fields on the Controller
+// Add creates a new Plugin Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
@@ -49,19 +49,19 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileLoggingPlugin{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	return &ReconcilePlugin{client: mgr.GetClient(), scheme: mgr.GetScheme()}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
 func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
-	c, err := controller.New("loggingplugin-controller", mgr, controller.Options{Reconciler: r})
+	c, err := controller.New("plugin-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
 
-	// Watch for changes to primary resource LoggingPlugin
-	err = c.Watch(&source.Kind{Type: &loggingv1alpha1.LoggingPlugin{}}, &handler.EnqueueRequestForObject{})
+	// Watch for changes to primary resource Plugin
+	err = c.Watch(&source.Kind{Type: &loggingv1alpha1.Plugin{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -69,27 +69,27 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
-var _ reconcile.Reconciler = &ReconcileLoggingPlugin{}
+var _ reconcile.Reconciler = &ReconcilePlugin{}
 
-// ReconcileLoggingPlugin reconciles a LoggingPlugin object
-type ReconcileLoggingPlugin struct {
+// ReconcilePlugin reconciles a Plugin object
+type ReconcilePlugin struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client client.Client
 	scheme *runtime.Scheme
 }
 
-// Reconcile reads that state of the cluster for a LoggingPlugin object and makes changes based on the state read
-// and what is in the LoggingPlugin.Spec
+// Reconcile reads that state of the cluster for a Plugin object and makes changes based on the state read
+// and what is in the Plugin.Spec
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *ReconcileLoggingPlugin) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+func (r *ReconcilePlugin) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling LoggingPlugin")
+	reqLogger.Info("Reconciling Plugin")
 
-	// Fetch the LoggingPlugin instance
-	instance := &loggingv1alpha1.LoggingPlugin{}
+	// Fetch the Plugin instance
+	instance := &loggingv1alpha1.Plugin{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {

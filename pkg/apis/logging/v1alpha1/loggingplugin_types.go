@@ -29,15 +29,15 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// LoggingPluginSpec defines the desired state of LoggingPlugin
+// PluginSpec defines the desired state of Plugin
 // +k8s:openapi-gen=true
-type LoggingPluginSpec struct {
+type PluginSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	Input  Input    `json:"input,omitempty"`
-	Filter []Plugin `json:"filter,omitempty"`
-	Output []Plugin `json:"output,omitempty"`
+	Input  Input     `json:"input,omitempty"`
+	Filter []FPlugin `json:"filter,omitempty"`
+	Output []FPlugin `json:"output,omitempty"`
 }
 
 // Input this determines the log origin
@@ -45,8 +45,8 @@ type Input struct {
 	Label map[string]string `json:"label"`
 }
 
-// Plugin struct for fluentd plugins
-type Plugin struct {
+// FPlugin struct for fluentd plugins
+type FPlugin struct {
 	Type       string      `json:"type"`
 	Name       string      `json:"name"`
 	Parameters []Parameter `json:"parameters,omitempty"`
@@ -106,9 +106,9 @@ func (ks KubernetesSecret) GetValue(namespace string, client client.Client) (str
 	return string(value), nil
 }
 
-// LoggingPluginStatus defines the observed state of LoggingPlugin
+// PluginStatus defines the observed state of Plugin
 // +k8s:openapi-gen=true
-type LoggingPluginStatus struct {
+type PluginStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
@@ -116,25 +116,25 @@ type LoggingPluginStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// LoggingPlugin is the Schema for the loggingplugins API
+// Plugin is the Schema for the Plugin API
 // +k8s:openapi-gen=true
-type LoggingPlugin struct {
+type Plugin struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   LoggingPluginSpec   `json:"spec,omitempty"`
-	Status LoggingPluginStatus `json:"status,omitempty"`
+	Spec   PluginSpec   `json:"spec,omitempty"`
+	Status PluginStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// LoggingPluginList contains a list of LoggingPlugin
-type LoggingPluginList struct {
+// PluginList contains a list of Plugin
+type PluginList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []LoggingPlugin `json:"items"`
+	Items           []Plugin `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&LoggingPlugin{}, &LoggingPluginList{})
+	SchemeBuilder.Register(&Plugin{}, &PluginList{})
 }

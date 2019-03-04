@@ -17,10 +17,10 @@
 package controller
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/controller/loggingplugin"
+	"github.com/banzaicloud/logging-operator/pkg/controller/plugin"
 )
 
 func init() {
 	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
-	AddToManagerFuncs = append(AddToManagerFuncs, loggingplugin.Add)
+	AddToManagerFuncs = append(AddToManagerFuncs, plugin.Add)
 }

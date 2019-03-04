@@ -13,15 +13,15 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Fluentbit":           schema_pkg_apis_logging_v1alpha1_Fluentbit(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitSpec":       schema_pkg_apis_logging_v1alpha1_FluentbitSpec(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitStatus":     schema_pkg_apis_logging_v1alpha1_FluentbitStatus(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Fluentd":             schema_pkg_apis_logging_v1alpha1_Fluentd(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdSpec":         schema_pkg_apis_logging_v1alpha1_FluentdSpec(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdStatus":       schema_pkg_apis_logging_v1alpha1_FluentdStatus(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPlugin":       schema_pkg_apis_logging_v1alpha1_LoggingPlugin(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginSpec":   schema_pkg_apis_logging_v1alpha1_LoggingPluginSpec(ref),
-		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginStatus": schema_pkg_apis_logging_v1alpha1_LoggingPluginStatus(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Fluentbit":       schema_pkg_apis_logging_v1alpha1_Fluentbit(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitSpec":   schema_pkg_apis_logging_v1alpha1_FluentbitSpec(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitStatus": schema_pkg_apis_logging_v1alpha1_FluentbitStatus(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Fluentd":         schema_pkg_apis_logging_v1alpha1_Fluentd(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdSpec":     schema_pkg_apis_logging_v1alpha1_FluentdSpec(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdStatus":   schema_pkg_apis_logging_v1alpha1_FluentdStatus(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Plugin":          schema_pkg_apis_logging_v1alpha1_Plugin(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginSpec":      schema_pkg_apis_logging_v1alpha1_PluginSpec(ref),
+		"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginStatus":    schema_pkg_apis_logging_v1alpha1_PluginStatus(ref),
 	}
 }
 
@@ -159,11 +159,11 @@ func schema_pkg_apis_logging_v1alpha1_FluentdStatus(ref common.ReferenceCallback
 	}
 }
 
-func schema_pkg_apis_logging_v1alpha1_LoggingPlugin(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_logging_v1alpha1_Plugin(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LoggingPlugin is the Schema for the loggingplugins API",
+				Description: "Plugin is the Schema for the plugins API",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -186,27 +186,27 @@ func schema_pkg_apis_logging_v1alpha1_LoggingPlugin(ref common.ReferenceCallback
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginSpec"),
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginStatus"),
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginSpec", "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.LoggingPluginStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginSpec", "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.PluginStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_logging_v1alpha1_LoggingPluginSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_logging_v1alpha1_PluginSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LoggingPluginSpec defines the desired state of LoggingPlugin",
+				Description: "PluginSpec defines the desired state of Plugin",
 				Properties:  map[string]spec.Schema{},
 			},
 		},
@@ -214,11 +214,11 @@ func schema_pkg_apis_logging_v1alpha1_LoggingPluginSpec(ref common.ReferenceCall
 	}
 }
 
-func schema_pkg_apis_logging_v1alpha1_LoggingPluginStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_logging_v1alpha1_PluginStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LoggingPluginStatus defines the observed state of LoggingPlugin",
+				Description: "PluginStatus defines the observed state of Plugin",
 				Properties:  map[string]spec.Schema{},
 			},
 		},

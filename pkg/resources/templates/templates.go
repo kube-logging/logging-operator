@@ -22,7 +22,7 @@ import (
 )
 
 // PluginsObjectMeta creates an objectMeta for resource plugin
-func PluginsObjectMeta(name string, labels map[string]string, plugin *loggingv1alpha1.LoggingPlugin) metav1.ObjectMeta {
+func PluginsObjectMeta(name string, labels map[string]string, plugin *loggingv1alpha1.Plugin) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
 		Namespace: plugin.Namespace,

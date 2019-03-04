@@ -26,7 +26,7 @@ import (
 // PluginReconciler reconciler struct for plugin
 type PluginReconciler struct {
 	Client client.Client
-	Plugin *loggingv1alpha1.LoggingPlugin
+	Plugin *loggingv1alpha1.Plugin
 }
 
 // FluentdReconciler reconciler struct for fluentd

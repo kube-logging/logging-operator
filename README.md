@@ -27,7 +27,14 @@ kubectl create -f deploy/clusterrole_bindig.yaml
 kubectl create -f deploy/service_account.yaml
 
 # Create the Operator
-kubeclt create -f deploy/operator.yaml
+kubectl create -f deploy/operator.yaml
+
+# Create the fluent-bit daemonset by submiting a fluent-bit CR
+kubectl create -f deploy/crd/logging_v1alpha1_fluentbit_cr.yaml
+
+# Create the fluentd deployment by submitting a fluentd CR
+kubectl create -f deploy/crd/logging_v1alpha1_fluentd_cr.yaml
+
 ```
 
 ## Example

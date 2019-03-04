@@ -29,7 +29,7 @@ import (
 	"text/template"
 )
 
-func generateFluentdConfig(plugin *loggingv1alpha1.LoggingPlugin, client client.Client) (string, string) {
+func generateFluentdConfig(plugin *loggingv1alpha1.Plugin, client client.Client) (string, string) {
 	var finalConfig string
 	// Generate filters
 	for _, filter := range plugin.Spec.Filter {
@@ -67,8 +67,8 @@ func generateFluentdConfig(plugin *loggingv1alpha1.LoggingPlugin, client client.
 
 }
 
-// RenderPlugin general Plugin renderer
-func renderPlugin(plugin loggingv1alpha1.Plugin, baseMap map[string]string, namespace string, client client.Client) (string, error) {
+// RenderPlugin general FPlugin renderer
+func renderPlugin(plugin loggingv1alpha1.FPlugin, baseMap map[string]string, namespace string, client client.Client) (string, error) {
 	rawTemplate, err := GetTemplate(plugin.Type)
 	if err != nil {
 		return "", err

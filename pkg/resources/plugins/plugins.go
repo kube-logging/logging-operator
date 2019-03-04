@@ -38,8 +38,8 @@ type Reconciler struct {
 	resources.PluginReconciler
 }
 
-// New creates a new Plugin reconciler
-func New(client client.Client, plugin *loggingv1alpha1.LoggingPlugin) *Reconciler {
+// New creates a new FPlugin reconciler
+func New(client client.Client, plugin *loggingv1alpha1.Plugin) *Reconciler {
 	return &Reconciler{
 		PluginReconciler: resources.PluginReconciler{
 			Client: client,
