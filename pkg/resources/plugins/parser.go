@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package version
+package plugins
 
-// Version the operators version
-var (
-	Version = "0.0.1"
-)
+// ParserFilter CRD name
+const ParserFilter = "parser"
+
+// ParserFilterDefaultValues for parser plugin
+var ParserFilterDefaultValues = map[string]string{
+	"keyName": "log",
+}
+
+// ParserFilterTemplate for parser plugin
+const ParserFilterTemplate = `
+<filter {{ .pattern }}.** >
+  @type parser
+  format {{ .format }}
+  time_format {{ .timeFormat }}
+  key_name {{ .keyName }}
+</filter>
+`

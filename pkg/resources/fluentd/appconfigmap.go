@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package version
+package fluentd
 
-// Version the operators version
-var (
-	Version = "0.0.1"
+import (
+	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/banzaicloud/logging-operator/pkg/util"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
+
+func (r *Reconciler) appconfigMap() runtime.Object {
+	return &corev1.ConfigMap{
+		ObjectMeta: templates.FluentdObjectMeta(appConfigMapName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
+		Data:       map[string]string{},
+	}
+}

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package version
+package controller
 
-// Version the operators version
-var (
-	Version = "0.0.1"
+import (
+	"github.com/banzaicloud/logging-operator/pkg/controller/fluentbit"
 )
+
+func init() {
+	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
+	AddToManagerFuncs = append(AddToManagerFuncs, fluentbit.Add)
+}

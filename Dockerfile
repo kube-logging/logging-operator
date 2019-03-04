@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine as golang
+FROM golang:1.11-alpine as golang
 
 ADD . /go/src/github.com/banzaicloud/logging-operator
 WORKDIR /go/src/github.com/banzaicloud/logging-operator

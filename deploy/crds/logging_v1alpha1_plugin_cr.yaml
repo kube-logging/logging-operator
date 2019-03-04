@@ -1,0 +1,31 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Plugin
+metadata:
+  name: example-plugin
+  labels:
+    release: test
+spec:
+  input:
+    label:
+      app: "*"
+  output:
+    - type: gcs
+      name: outputGCS
+      parameters:
+        - name: project
+          valueFrom:
+            secretKeyRef:
+              name: ""
+              key: ""
+        - name: client_email
+          valueFrom:
+            secretKeyRef:
+              name: ""
+              key: ""
+        - name: private_key
+          valueFrom:
+            secretKeyRef:
+              name: ""
+              key: ""
+        - name: bucket
+          value: ""

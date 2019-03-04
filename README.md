@@ -16,8 +16,25 @@ This operator helps you to pack together logging information with your applicati
 ## Installing the operator
 
 ```
-helm repo add  banzai-stable http://kubernetes-charts.banzaicloud.com/branch/master
-helm install banzai-stable/logging-operator
+# Create all the CRDs used by the Operator
+kubectl create -f deploy/crds/logging_v1alpha1_plugin_crd.yaml
+kubectl create -f deploy/crds/logging_v1alpha1_fluentbit_crd.yaml
+kubectl create -f deploy/crds/logging_v1alpha1_fluentd_crd.yaml
+
+# If RBAC enabled create the required resources
+kubectl create -f deploy/clusterrole.yaml 
+kubectl create -f deploy/clusterrole_bindig.yaml
+kubectl create -f deploy/service_account.yaml
+
+# Create the Operator
+kubectl create -f deploy/operator.yaml
+
+# Create the fluent-bit daemonset by submiting a fluent-bit CR
+kubectl create -f deploy/crd/logging_v1alpha1_fluentbit_cr.yaml
+
+# Create the fluentd deployment by submitting a fluentd CR
+kubectl create -f deploy/crd/logging_v1alpha1_fluentd_cr.yaml
+
 ```
 
 ## Example
@@ -51,7 +68,7 @@ Create a manifest that defines that you want to parse the nginx logs with the sp
 
 ```
 apiVersion: "logging.banzaicloud.com/v1alpha1"
-kind: "LoggingOperator"
+kind: "Plugin"
 metadata:
   name: "nginx-logging"
 spec:
@@ -84,14 +101,6 @@ spec:
           value: logging-bucket
         - name: s3_region
           value: ap-northeast-1
-```
-
-## All in one example
-
-If you just want to try the logging operator, install the operator and use our `nginx` example:
-
-```
-helm install ./deploy/helm/nginx-test
 ```
 
 ## Contributing

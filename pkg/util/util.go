@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package version
+package util
 
-// Version the operators version
-var (
-	Version = "0.0.1"
-)
+// MergeLabels merges two map[string]string map
+func MergeLabels(l map[string]string, l2 map[string]string) map[string]string {
+	for lKey, lValue := range l2 {
+		l[lKey] = lValue
+	}
+	return l
+}
+
+// IntPointer converts int32 to *int32
+func IntPointer(i int32) *int32 {
+	return &i
+}
