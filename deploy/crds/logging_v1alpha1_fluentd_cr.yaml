@@ -1,0 +1,10 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Fluentd
+metadata:
+  name: example-fluentd
+  labels:
+    release: test
+spec:
+  namespace: default
+  tls:
+    enabled: false

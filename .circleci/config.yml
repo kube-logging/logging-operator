@@ -5,7 +5,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
 
     working_directory: /go/src/github.com/banzaicloud/logging-operator
     steps:
@@ -25,10 +25,6 @@ jobs:
           name: Build
           command:
               make build
-      - run:
-          name: Run go vet
-          command:
-              make vet
       - run:
           name: Run fmt
           command:
