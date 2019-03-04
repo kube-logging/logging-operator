@@ -1,5 +1,5 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: logging-operator
@@ -14,8 +14,20 @@ rules:
   - events
   - configmaps
   - secrets
+  - serviceaccounts
   verbs:
   - '*'
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - list
+  - get
+  - create
+  - update
+  - watch
 - apiGroups:
   - ""
   resources:
