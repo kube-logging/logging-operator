@@ -31,7 +31,7 @@ func main() {
 		data.WriteString("## Variables\n")
 		data.WriteString("| Variable name | Default | Applied function |\n")
 		data.WriteString(fmt.Sprintf("|---|---|---|\n"))
-		for _, item := range ListTemplFields(t) {
+		for _, item := range listTemplateFields(t) {
 			regExp, err := regexp.Compile(`{{(?P<Function>\w*)?\s*.(?P<Variable>.*)}}`)
 			if err != nil {
 				panic(err)
@@ -55,7 +55,7 @@ func main() {
 	}
 }
 
-func ListTemplFields(t *template.Template) []string {
+func listTemplateFields(t *template.Template) []string {
 	return listNodeFields(t.Tree.Root, nil)
 }
 

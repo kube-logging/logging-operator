@@ -18,6 +18,7 @@ package plugins
 
 import (
 	"fmt"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,7 +31,7 @@ type Plugin struct {
 	DefaultValues map[string]string
 }
 
-// GetPlugins
+// GetAll returns the plugin registry
 func GetAll() map[string]Plugin {
 	return pluginRegister
 }
