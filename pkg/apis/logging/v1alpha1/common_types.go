@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package fluentd
+package v1alpha1
 
-import (
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-)
-
-func (r *Reconciler) pvc() runtime.Object {
-	return &corev1.PersistentVolumeClaim{
-		ObjectMeta: templates.FluentdObjectMeta(persistentVolumeName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
-		Spec:       r.Fluentd.Spec.FluentdPvcSpec,
-	}
+// ImageSpec struct hold information about image specification
+type ImageSpec struct {
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+	PullPolicy string `json:"pullPolicy"`
 }

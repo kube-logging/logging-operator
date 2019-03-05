@@ -26,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) deployment() runtime.Object {
 	deploymentName := "fluentd"
 	if r.Fluentd.Labels["release"] != "" {
@@ -42,21 +41,17 @@ func (r *Reconciler) deployment() runtime.Object {
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: util.MergeLabels(r.Fluentd.Labels, labelSelector),
-					// TODO Move annotations to configuration
-					Annotations: map[string]string{
-						"prometheus.io/scrape": "true",
-						"prometheus.io/path":   "/metrics",
-						"prometheus.io/port":   "25000",
-					},
+					Labels:      util.MergeLabels(r.Fluentd.Labels, labelSelector),
+					Annotations: r.Fluentd.Spec.Annotations,
 				},
 				Spec: corev1.PodSpec{
 					Volumes: generateVolume(r.Fluentd),
 					InitContainers: []corev1.Container{
 						{
-							Name:    "volume-mount-hack",
-							Image:   "busybox",
-							Command: []string{"sh", "-c", "chmod -R 777 /buffers"},
+							Name:            "volume-mount-hack",
+							Image:           r.Fluentd.Spec.VolumeModImage.Repository + ":" + r.Fluentd.Spec.VolumeModImage.Tag,
+							ImagePullPolicy: corev1.PullPolicy(r.Fluentd.Spec.VolumeModImage.PullPolicy),
+							Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "buffer",
@@ -67,12 +62,13 @@ func (r *Reconciler) deployment() runtime.Object {
 					},
 					Containers: []corev1.Container{
 						{
-							Name:  "fluentd",
-							Image: "banzaicloud/fluentd:v1.1.4",
+							Name:            "fluentd",
+							Image:           r.Fluentd.Spec.Image.Repository + ":" + r.Fluentd.Spec.Image.Tag,
+							ImagePullPolicy: corev1.PullPolicy(r.Fluentd.Spec.Image.PullPolicy),
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "monitor",
-									ContainerPort: 25000,
+									ContainerPort: r.Fluentd.Spec.GetPrometheusPortFromAnnotation(),
 									Protocol:      "TCP",
 								},
 								{
@@ -83,20 +79,21 @@ func (r *Reconciler) deployment() runtime.Object {
 							},
 
 							VolumeMounts: generateVolumeMounts(r.Fluentd),
+							Resources:    r.Fluentd.Spec.Resources,
 						},
-						*newConfigMapReloader(),
+						*newConfigMapReloader(r.Fluentd.Spec.ConfigReloaderImage),
 					},
-					//ServiceAccountName: "",
 				},
 			},
 		},
 	}
 }
 
-func newConfigMapReloader() *corev1.Container {
+func newConfigMapReloader(spec loggingv1alpha1.ImageSpec) *corev1.Container {
 	return &corev1.Container{
-		Name:  "config-reloader",
-		Image: "jimmidyson/configmap-reload:v0.2.2",
+		Name:            "config-reloader",
+		ImagePullPolicy: corev1.PullPolicy(spec.PullPolicy),
+		Image:           spec.Repository + ":" + spec.Tag,
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
 			"-volume-dir=/fluentd/app-config/",

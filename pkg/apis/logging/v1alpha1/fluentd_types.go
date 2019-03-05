@@ -17,6 +17,9 @@
 package v1alpha1
 
 import (
+	"strconv"
+
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -29,8 +32,14 @@ type FluentdSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	Namespace string     `json:"namespace"`
-	TLS       FluentdTLS `json:"tls"`
+	Namespace           string                           `json:"namespace"`
+	Annotations         map[string]string                `json:"annotations"`
+	TLS                 FluentdTLS                       `json:"tls"`
+	Image               ImageSpec                        `json:"image"`
+	FluentdPvcSpec      corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec"`
+	VolumeModImage      ImageSpec                        `json:"volumeModImage"`
+	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage"`
+	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
 }
 
 // FluentdTLS defines the TLS configs
@@ -67,6 +76,15 @@ type FluentdList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Fluentd `json:"items"`
+}
+
+// GetPrometheusPortFromAnnotation gets the port value from annotation
+func (spec FluentdSpec) GetPrometheusPortFromAnnotation() int32 {
+	port, err := strconv.ParseInt(spec.Annotations["prometheus.io/port"], 10, 32)
+	if err != nil {
+		panic(err)
+	}
+	return int32(port)
 }
 
 func init() {

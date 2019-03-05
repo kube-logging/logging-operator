@@ -35,6 +35,12 @@ type fluentBitConfig struct {
 }
 
 func (r *Reconciler) configMap() runtime.Object {
+	var monitorConfig map[string]string
+	if _, ok := r.Fluentbit.Spec.Annotations["prometheus.io/port"]; ok {
+		monitorConfig = map[string]string{
+			"Port": r.Fluentbit.Spec.Annotations["prometheus.io/port"],
+		}
+	}
 	input := fluentBitConfig{
 		Namespace: r.Fluentbit.Namespace,
 		TLS: struct {
@@ -44,9 +50,7 @@ func (r *Reconciler) configMap() runtime.Object {
 			Enabled:   r.Fluentbit.Spec.TLS.Enabled,
 			SharedKey: r.Fluentbit.Spec.TLS.SharedKey,
 		},
-		Monitor: map[string]string{
-			"Port": "2020",
-		},
+		Monitor: monitorConfig,
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: templates.FluentbitObjectMeta(fluentbitConfigMapName, r.Fluentbit.Labels, r.Fluentbit),
