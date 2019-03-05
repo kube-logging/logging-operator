@@ -1,3 +1,9 @@
+[![Docker Automated build](https://img.shields.io/docker/automated/banzaicloud/logging-operator.svg)](https://hub.docker.com/r/banzaicloud/logging-operator/)
+[![CircleCI](https://circleci.com/gh/banzaicloud/logging-operator.svg?style=shield)](https://circleci.com/gh/banzaicloud/logging-operator)
+[![Go Report Card](https://goreportcard.com/badge/github.com/banzaicloud/logging-operator)](https://goreportcard.com/report/github.com/banzaicloud/logging-operator)
+![license](http://img.shields.io/badge/license-Apache%20v2-orange.svg)
+
+
 # logging-operator
 
 Logging operator for Kubernetes based on Fluentd and Fluent-bit. For more details please follow up with this [post](https://banzaicloud.com/blog/k8s-logging-operator/).
