@@ -23,17 +23,17 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentd_crd.yaml
 
 # If RBAC enabled create the required resources
 kubectl create -f deploy/clusterrole.yaml 
-kubectl create -f deploy/clusterrole_bindig.yaml
+kubectl create -f deploy/clusterrole_binding.yaml
 kubectl create -f deploy/service_account.yaml
 
 # Create the Operator
 kubectl create -f deploy/operator.yaml
 
 # Create the fluent-bit daemonset by submiting a fluent-bit CR
-kubectl create -f deploy/crd/logging_v1alpha1_fluentbit_cr.yaml
+kubectl create -f deploy/crds/logging_v1alpha1_fluentbit_cr.yaml
 
 # Create the fluentd deployment by submitting a fluentd CR
-kubectl create -f deploy/crd/logging_v1alpha1_fluentd_cr.yaml
+kubectl create -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
 
 ```
 
@@ -71,6 +71,8 @@ apiVersion: "logging.banzaicloud.com/v1alpha1"
 kind: "Plugin"
 metadata:
   name: "nginx-logging"
+  labels:
+    release: test
 spec:
   input:
     label:
