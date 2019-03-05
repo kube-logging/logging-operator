@@ -30,6 +30,11 @@ type Plugin struct {
 	DefaultValues map[string]string
 }
 
+// GetPlugins
+func GetAll() map[string]Plugin {
+	return pluginRegister
+}
+
 // RegisterPlugin to use in CRD file
 func RegisterPlugin(name string, template string, values map[string]string) {
 	logrus.Infof("Registering plugin: %s", name)
