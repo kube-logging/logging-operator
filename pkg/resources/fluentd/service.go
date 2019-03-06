@@ -36,7 +36,7 @@ func (r *Reconciler) service() runtime.Object {
 				},
 			},
 			Selector: labelSelector,
-			Type:     "ClusterIP",
+			Type:     corev1.ServiceTypeClusterIP,
 		},
 	}
 }

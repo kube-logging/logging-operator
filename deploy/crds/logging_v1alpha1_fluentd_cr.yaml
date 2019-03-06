@@ -6,5 +6,28 @@ metadata:
     release: test
 spec:
   namespace: default
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path:   "/metrics"
+    prometheus.io/port:   "25000"
   tls:
     enabled: false
+  image:
+    tag: "v1.1.4"
+    repository: "banzaicloud/fluentd"
+    pullPolicy: "IfNotPresent"
+  volumeModImage:
+    tag: "latest"
+    repository: "busybox"
+    pullPolicy: "IfNotPresent"
+  configReloaderImage:
+    tag: "v0.2.2"
+    repository: "jimmidyson/configmap-reload"
+    pullPolicy: "IfNotPresent"
+  resources: {}
+  fluentdPvcSpec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 21Gi
