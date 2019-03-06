@@ -18,6 +18,9 @@ package util
 
 // MergeLabels merges two map[string]string map
 func MergeLabels(l map[string]string, l2 map[string]string) map[string]string {
+	if len(l) == 0 {
+		l = map[string]string{}
+	}
 	for lKey, lValue := range l2 {
 		l[lKey] = lValue
 	}

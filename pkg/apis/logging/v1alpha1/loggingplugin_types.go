@@ -62,8 +62,8 @@ type Parameter struct {
 // GetValue for a Parameter
 func (p Parameter) GetValue(namespace string, client client.Client) (string, string) {
 	if p.ValueFrom != nil {
-		value, error := p.ValueFrom.GetValue(namespace, client)
-		if error != nil {
+		value, err := p.ValueFrom.GetValue(namespace, client)
+		if err != nil {
 			return "", ""
 		}
 		return p.Name, value
