@@ -1,4 +1,6 @@
-
+VERSION := $(shell git describe --abbrev=0 --tags)
+DOCKER_IMAGE = banzaicloud/logging-operator
+DOCKER_TAG ?= ${VERSION}
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./client/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
@@ -55,3 +57,6 @@ ifndef INEFFASSIGN_CMD
 	go get -u github.com/gordonklaus/ineffassign
 endif
 
+.PHONY: docker
+docker: ## Build Docker image
+	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f Dockerfile .
