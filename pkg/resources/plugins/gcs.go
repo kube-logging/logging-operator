@@ -21,10 +21,15 @@ const GCSOutput = "gcs"
 
 // GCSDefaultValues for Google Cloud Storage output plugin
 var GCSDefaultValues = map[string]string{
-	"bufferTimeKey":  "3600",
-	"bufferTimeWait": "10m",
-	"bufferPath":     "/buffers/gcs",
-	"format":         "json",
+	"bufferTimeKey":     "3600",
+	"bufferTimeWait":    "10m",
+	"bufferPath":        "/buffers/gcs",
+	"object_key_format": "%{path}%{time_slice}_%{index}.%{file_extension}",
+	"path":              "logs/${tag}/%Y/%m/%d/",
+	"timekey":           "1h",
+	"timekey_wait":      "10m",
+	"timekey_use_utc":   "true",
+	"format":            "json",
 }
 
 // GCSTemplate for Google Cloud Storage output plugin
@@ -35,20 +40,20 @@ const GCSTemplate = `
   project {{ .project }}
   credentialsJson { "private_key": {{ toJson .private_key }}, "client_email": "{{ .client_email }}" }
   bucket {{ .bucket }}
-  object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
-  path logs/${tag}/%Y/%m/%d/
+  object_key_format {{ .object_key_format }}
+  path  {{ .path }}
 
   # if you want to use ${tag} or %Y/%m/%d/ like syntax in path / object_key_format,
   # need to specify tag for ${tag} and time for %Y/%m/%d in <buffer> argument.
   <buffer tag,time>
     @type file
-    path /buffers/gcs
-    timekey 1h # 1 hour partition
-    timekey_wait 10m
-    timekey_use_utc true # use utc
+    path {{ .bufferPath }}
+    timekey {{ .timekey }}
+    timekey_wait {{ .timekey_wait }}
+    timekey_use_utc {{ .timekey_use_utc }}
   </buffer>
 
   <format>
-    @type json
+    @type {{ .format }}
   </format>
 </match>`
