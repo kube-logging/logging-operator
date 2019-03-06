@@ -18,7 +18,7 @@ package k8sutil
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/go-logr/logr"
@@ -52,11 +52,14 @@ func Reconcile(log logr.Logger, client runtimeClient.Client, desired runtime.Obj
 	if err == nil {
 		switch desired.(type) {
 		default:
-			return emperror.With(errors.New("unexpected resource type"), "type", reflect.TypeOf(desired))
+			return emperror.With(fmt.Errorf("unexpected resource type %s", reflect.TypeOf(desired)))
 		case *corev1.ServiceAccount:
 			sa := desired.(*corev1.ServiceAccount)
 			sa.ResourceVersion = current.(*corev1.ServiceAccount).ResourceVersion
 			desired = sa
+		case *corev1.PersistentVolumeClaim:
+			log.Info("Could not update PersistentVolumeClaim yet")
+			desired = current
 		case *rbacv1.ClusterRole:
 			cr := desired.(*rbacv1.ClusterRole)
 			cr.ResourceVersion = current.(*rbacv1.ClusterRole).ResourceVersion
