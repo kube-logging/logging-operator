@@ -20,7 +20,6 @@ func main() {
 	for name, plugin := range pluginMap {
 		var data bytes.Buffer
 		data.WriteString(fmt.Sprintf("# Plugin %s\n", name))
-		//for k,v := range plugin.DefaultValues {
 		t := template.New("PluginTemplate").Funcs(sprig.TxtFuncMap())
 		t, err := t.Parse(plugin.Template)
 		if err != nil {
