@@ -28,43 +28,37 @@ import (
 
 // TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) daemonSet() runtime.Object {
+
+	var containerPorts []corev1.ContainerPort
+
+	if _, ok := r.Fluentbit.Spec.Annotations["prometheus.io/port"]; ok {
+		containerPorts = append(containerPorts, corev1.ContainerPort{
+			Name:          "monitor",
+			ContainerPort: r.Fluentbit.Spec.GetPrometheusPortFromAnnotation(),
+			Protocol:      corev1.ProtocolTCP,
+		})
+	}
+
 	return &appsv1.DaemonSet{
 		ObjectMeta: templates.FluentbitObjectMeta(fluentbitDeaemonSetName, util.MergeLabels(r.Fluentbit.Labels, labelSelector), r.Fluentbit),
 		Spec: appsv1.DaemonSetSpec{
 			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Fluentbit.Labels, labelSelector)},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: util.MergeLabels(r.Fluentbit.Labels, labelSelector),
-					// TODO Move annotations to configuration
-					Annotations: map[string]string{
-						"prometheus.io/scrape": "true",
-						"prometheus.io/path":   "/api/v1/metrics/prometheus",
-						"prometheus.io/port":   "2020",
-					},
+					Labels:      util.MergeLabels(r.Fluentbit.Labels, labelSelector),
+					Annotations: r.Fluentbit.Spec.Annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName: "logging",
+					ServiceAccountName: serviceAccountName,
 					Volumes:            generateVolume(r.Fluentbit),
 					Containers: []corev1.Container{
 						{
-							// TODO move to configuration
-							Name:  "fluent-bit",
-							Image: "fluent/fluent-bit:latest",
-							// TODO get from config translate to const
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							Ports: []corev1.ContainerPort{
-								{
-									Name:          "monitor",
-									ContainerPort: 2020,
-									Protocol:      "TCP",
-								},
-							},
-							// TODO Get this from config
-							Resources: corev1.ResourceRequirements{
-								Limits:   nil,
-								Requests: nil,
-							},
-							VolumeMounts: generateVolumeMounts(r.Fluentbit),
+							Name:            "fluent-bit",
+							Image:           r.Fluentbit.Spec.Image.Repository + ":" + r.Fluentbit.Spec.Image.Tag,
+							ImagePullPolicy: corev1.PullPolicy(r.Fluentbit.Spec.Image.PullPolicy),
+							Ports:           containerPorts,
+							Resources:       r.Fluentbit.Spec.Resources,
+							VolumeMounts:    generateVolumeMounts(r.Fluentbit),
 						},
 					},
 				},

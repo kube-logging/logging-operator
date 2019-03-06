@@ -73,10 +73,48 @@ func schema_pkg_apis_logging_v1alpha1_FluentbitSpec(ref common.ReferenceCallback
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "FluentbitSpec defines the desired state of Fluentbit",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"annotations": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec"),
+						},
+					},
+					"tls": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitTLS"),
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.ResourceRequirements"),
+						},
+					},
+				},
+				Required: []string{"namespace", "annotations", "image", "tls"},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentbitTLS", "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec", "k8s.io/api/core/v1.ResourceRequirements"},
 	}
 }
 
@@ -140,10 +178,63 @@ func schema_pkg_apis_logging_v1alpha1_FluentdSpec(ref common.ReferenceCallback) 
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "FluentdSpec defines the desired state of Fluentd",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"annotations": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"tls": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdTLS"),
+						},
+					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec"),
+						},
+					},
+					"fluentdPvcSpec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.PersistentVolumeClaimSpec"),
+						},
+					},
+					"volumeModImage": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec"),
+						},
+					},
+					"configReloaderImage": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec"),
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.ResourceRequirements"),
+						},
+					},
+				},
+				Required: []string{"namespace", "annotations", "tls", "image", "fluentdPvcSpec", "volumeModImage", "configReloaderImage"},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FluentdTLS", "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.ImageSpec", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements"},
 	}
 }
 
@@ -163,7 +254,7 @@ func schema_pkg_apis_logging_v1alpha1_Plugin(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Plugin is the Schema for the plugins API",
+				Description: "Plugin is the Schema for the Plugin API",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -207,10 +298,42 @@ func schema_pkg_apis_logging_v1alpha1_PluginSpec(ref common.ReferenceCallback) c
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "PluginSpec defines the desired state of Plugin",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"input": {
+						SchemaProps: spec.SchemaProps{
+							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Ref:         ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Input"),
+						},
+					},
+					"filter": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FPlugin"),
+									},
+								},
+							},
+						},
+					},
+					"output": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FPlugin"),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.FPlugin", "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1.Input"},
 	}
 }
 

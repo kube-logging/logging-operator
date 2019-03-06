@@ -6,5 +6,14 @@ metadata:
     release: test
 spec:
   namespace: default
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path:   "/api/v1/metrics/prometheus"
+    prometheus.io/port:   "2020"
   tls:
     enabled: false
+  image:
+    tag: "latest"
+    repository: "fluent/fluent-bit"
+    pullPolicy: "IfNotPresent"
+  resources: {}
