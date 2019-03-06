@@ -25,8 +25,9 @@ import (
 
 // PluginReconciler reconciler struct for plugin
 type PluginReconciler struct {
-	Client client.Client
-	Plugin *loggingv1alpha1.Plugin
+	Client     client.Client
+	Namespace  string
+	PluginList *loggingv1alpha1.PluginList
 }
 
 // FluentdReconciler reconciler struct for fluentd
@@ -51,3 +52,6 @@ type Resource func() runtime.Object
 
 // ResourceVariation redeclaration of function with parameter and return type kubernetes Object
 type ResourceVariation func(t string) runtime.Object
+
+// ResourceWithLog redeclaration of function with logging parameter and return type kubernetes Object
+type ResourceWithLog func(log logr.Logger) runtime.Object

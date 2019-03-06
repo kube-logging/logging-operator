@@ -22,19 +22,11 @@ import (
 )
 
 // PluginsObjectMeta creates an objectMeta for resource plugin
-func PluginsObjectMeta(name string, labels map[string]string, plugin *loggingv1alpha1.Plugin) metav1.ObjectMeta {
+func PluginsObjectMeta(name string, labels map[string]string, namespace string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
-		Namespace: plugin.Namespace,
+		Namespace: namespace,
 		Labels:    labels,
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: plugin.APIVersion,
-				Kind:       plugin.Kind,
-				Name:       plugin.Name,
-				UID:        plugin.UID,
-			},
-		},
 	}
 	return o
 }

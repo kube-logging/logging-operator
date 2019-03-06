@@ -18,12 +18,12 @@ package plugin
 
 import (
 	"context"
+
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/resources/plugins"
 
 	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -89,20 +89,15 @@ func (r *ReconcilePlugin) Reconcile(request reconcile.Request) (reconcile.Result
 	reqLogger.Info("Reconciling Plugin")
 
 	// Fetch the Plugin instance
-	instance := &loggingv1alpha1.Plugin{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	instanceList := &loggingv1alpha1.PluginList{}
+
+	err := r.client.List(context.TODO(), client.InNamespace(request.Namespace), instanceList)
 	if err != nil {
-		if errors.IsNotFound(err) {
-			// Request object not found, could have been deleted after reconcile request.
-			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
-			return reconcile.Result{}, nil
-		}
-		// Error reading the object - requeue the request.
 		return reconcile.Result{}, err
 	}
+
 	reconcilers := []resources.ComponentReconciler{
-		plugins.New(r.client, instance),
+		plugins.New(r.client, instanceList, request.Namespace),
 	}
 
 	for _, rec := range reconcilers {

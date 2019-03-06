@@ -18,6 +18,8 @@ package plugins
 
 import (
 	"bytes"
+	"text/template"
+
 	"github.com/Masterminds/sprig"
 	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
@@ -26,14 +28,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"text/template"
 )
 
 func generateFluentdConfig(plugin *loggingv1alpha1.Plugin, client client.Client) (string, string) {
 	var finalConfig string
 	// Generate filters
 	for _, filter := range plugin.Spec.Filter {
-		logrus.Info("Applying filter")
 		values, err := GetDefaultValues(filter.Type)
 		if err != nil {
 			logrus.Infof("Error in rendering template: %s", err)
@@ -92,15 +92,19 @@ func renderPlugin(plugin loggingv1alpha1.FPlugin, baseMap map[string]string, nam
 }
 
 func (r *Reconciler) appConfigMap() runtime.Object {
-	name, data := generateFluentdConfig(r.Plugin, r.Client)
-	if name != "" {
-		name = name + ".conf"
+	appConfigData := map[string]string{}
+	labels := map[string]string{}
+	for _, plugin := range r.PluginList.Items {
+		labels = util.MergeLabels(labels, plugin.Labels)
+		name, data := generateFluentdConfig(&plugin, r.Client)
+		if name != "" {
+			name = name + ".conf"
+		}
+		appConfigData[name] = data
 	}
 
 	return &corev1.ConfigMap{
-		ObjectMeta: templates.PluginsObjectMeta(appConfigMapName, util.MergeLabels(r.Plugin.Labels, labelSelector), r.Plugin),
-		Data: map[string]string{
-			name: data,
-		},
+		ObjectMeta: templates.PluginsObjectMeta(appConfigMapName, util.MergeLabels(map[string]string{}, labelSelector), r.Namespace),
+		Data:       appConfigData,
 	}
 }
