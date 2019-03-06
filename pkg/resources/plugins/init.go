@@ -18,6 +18,7 @@ package plugins
 
 import (
 	"fmt"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,6 +29,11 @@ var pluginRegister = map[string]Plugin{}
 type Plugin struct {
 	Template      string
 	DefaultValues map[string]string
+}
+
+// GetAll returns the plugin registry
+func GetAll() map[string]Plugin {
+	return pluginRegister
 }
 
 // RegisterPlugin to use in CRD file

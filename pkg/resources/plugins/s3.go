@@ -21,10 +21,12 @@ const S3Output = "s3"
 
 // S3DefaultValues for Amazaon S3 output plugin
 var S3DefaultValues = map[string]string{
-	"bufferTimeKey":  "3600",
-	"bufferTimeWait": "10m",
-	"bufferPath":     "/buffers/s3",
-	"format":         "json",
+	"bufferTimeKey":        "3600",
+	"bufferTimeWait":       "10m",
+	"bufferPath":           "/buffers/s3",
+	"format":               "json",
+	"timekey_use_utc":      "true",
+	"s3_object_key_format": "%{path}%{time_slice}_%{index}.%{file_extension}",
 }
 
 // S3Template for Amazaon S3 output plugin
@@ -39,18 +41,18 @@ const S3Template = `
   store_as gzip_command
 
   path logs/${tag}/%Y/%m/%d/
-  s3_object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
+  s3_object_key_format {{ .s3_object_key_format }}
 
   # if you want to use ${tag} or %Y/%m/%d/ like syntax in path / s3_object_key_format,
   # need to specify tag for ${tag} and time for %Y/%m/%d in <buffer> argument.
   <buffer tag,time>
     @type file
-    path /buffers/s3
-    timekey 3600 # 1 hour partition
-    timekey_wait 10m
-    timekey_use_utc true # use utc
+    path {{ .bufferPath }}
+    timekey {{ .bufferTimeKey }}
+    timekey_wait {{ .bufferTimeWait }}
+    timekey_use_utc {{ .timekey_use_utc }}
   </buffer>
   <format>
-    @type json
+    @type {{ .format }}
   </format>
 </match>`

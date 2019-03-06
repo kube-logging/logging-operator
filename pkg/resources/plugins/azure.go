@@ -21,10 +21,16 @@ const AzureOutput = "azure"
 
 // AzureDefaultValues for Azure ObjectStore output plugin
 var AzureDefaultValues = map[string]string{
-	"bufferTimeKey":  "3600",
-	"bufferTimeWait": "10m",
-	"bufferPath":     "/buffers/azure",
-	"format":         "json",
+	"bufferTimeKey":           "3600",
+	"bufferTimeWait":          "10m",
+	"bufferPath":              "/buffers/azure",
+	"format":                  "json",
+	"timekey":                 "1h",
+	"timekey_wait":            "10m",
+	"timekey_use_utc":         "true",
+	"time_slice_format":       "%Y%m%d-%H",
+	"azure_object_key_format": "%{path}%{time_slice}_%{index}.%{file_extension}",
+	"path":                    "logs/${tag}/%Y/%m/%d/",
 }
 
 // AzureTemplate for Azure ObjectStore output plugin
@@ -38,20 +44,20 @@ const AzureTemplate = `
   azure_storage_type       blob
   store_as                 gzip
   auto_create_container    true
-  azure_object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
-  path logs/${tag}/%Y/%m/%d/
-  time_slice_format        %Y%m%d-%H
+  azure_object_key_format {{ .azure_object_key_format }}
+  path {{ .path }}
+  time_slice_format {{ .time_slice_format }}  
   # if you want to use ${tag} or %Y/%m/%d/ like syntax in path / object_key_format,
   # need to specify tag for ${tag} and time for %Y/%m/%d in <buffer> argument.
   <buffer tag,time>
     @type file
-    path /buffers/azure
-    timekey 1h # 1 hour partition
-    timekey_wait 10m
-    timekey_use_utc true # use utc
+    path {{ .bufferPath }}
+    timekey {{ .timekey }}
+    timekey_wait {{ .timekey_wait }}
+    timekey_use_utc {{ .timekey_use_utc }}
   </buffer>
 
   <format>
-    @type json
+    @type {{ .format }}
   </format>
 </match>`
