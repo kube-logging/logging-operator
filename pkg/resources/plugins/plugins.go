@@ -39,11 +39,12 @@ type Reconciler struct {
 }
 
 // New creates a new FPlugin reconciler
-func New(client client.Client, plugin *loggingv1alpha1.Plugin) *Reconciler {
+func New(client client.Client, pluginList *loggingv1alpha1.PluginList, namespace string) *Reconciler {
 	return &Reconciler{
 		PluginReconciler: resources.PluginReconciler{
-			Client: client,
-			Plugin: plugin,
+			Client:     client,
+			Namespace:  namespace,
+			PluginList: pluginList,
 		},
 	}
 }
