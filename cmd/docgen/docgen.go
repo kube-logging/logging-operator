@@ -21,7 +21,6 @@ func main() {
 		var data bytes.Buffer
 		data.WriteString(fmt.Sprintf("# Plugin %s\n", name))
 		//for k,v := range plugin.DefaultValues {
-		//	fmt.Printf("Default values: %s - %s\n",k,v)
 		//}
 		t := template.New("PluginTemplate").Funcs(sprig.TxtFuncMap())
 		t, err := t.Parse(plugin.Template)
