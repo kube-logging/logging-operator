@@ -16,7 +16,7 @@ spec:
       containers:
         - name: logging-operator
           # Replace this with the built image name
-          image: banzaicloud/logging-operator:0.1.0
+          image: banzaicloud/logging-operator:0.1.1
           command:
           - logging-operator
           imagePullPolicy: IfNotPresent
