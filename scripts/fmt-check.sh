@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # gofmt
 bad_files=$(echo $PKGS | xargs $GOFMT -l)
 if [[ -n "${bad_files}" ]]; then
