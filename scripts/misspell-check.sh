@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # misspell
 bad_files=$(echo $PKGS | xargs $MISSPELL)
 echo $bad_files
