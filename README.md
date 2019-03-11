@@ -138,6 +138,37 @@ spec:
 If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
 
 
+
+## Example with helm chart
+The following steps set up an example configuration for sending nginx logs to S3.
+
+### Add BanzaiCloud chart reposiroy:
+```bash
+$ helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
+$ helm repo update
+```
+
+### Install logging-operator chart
+```bash
+$ helm install banzaicloud-stable/logging-operator
+```
+
+
+### Install S3 Plugin chart
+```bash
+$ helm install  \
+--set bucketName=<Mybucket> \
+--set region=<S3_REGION> \
+--set secret.secretName=<SECRET_NAME> \
+--set secret.awsSecretKey=<AWS_SECRET_ACCESS_KEY> \
+--set secret.awsAccessKey=<AWS_ACCESS_KEY_ID> \
+banzaicloud-stable/s3-output
+```
+
+> There is **no** need to encode base64 these values.  
+
+
+
 ## Contributing
 
 If you find this project useful here's how you can help:
