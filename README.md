@@ -14,11 +14,11 @@
   </a>
 
   <a href="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator">
-    <img src="https://goreportcard.com/report/github.com/banzaicloud/logging-operator" alt="Go Report Card">
+    <img src="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator" alt="Go Report Card">
   </a>
 
   <a href="https://github.com/banzaicloud/logging-operator/">
-    <img src="ttp://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
+    <img src="https://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
   </a>
 
 </p>
