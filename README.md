@@ -1,11 +1,25 @@
 <p align="center"><img src="docs/img/logo.png" width="260"></p>
 <p align="center">
 
-[![Docker Automated build](https://img.shields.io/docker/automated/banzaicloud/logging-operator.svg)](https://hub.docker.com/r/banzaicloud/logging-operator/)
-![Docker Pulls](https://img.shields.io/docker/pulls/banzaicloud/logging-operator.svg?style=shield)
-[![CircleCI](https://circleci.com/gh/banzaicloud/logging-operator.svg?style=shield)](https://circleci.com/gh/banzaicloud/logging-operator)
-[![Go Report Card](https://goreportcard.com/badge/github.com/banzaicloud/logging-operator)](https://goreportcard.com/report/github.com/banzaicloud/logging-operator)
-![license](http://img.shields.io/badge/license-Apache%20v2-orange.svg)
+  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
+    <img src="https://img.shields.io/docker/automated/banzaicloud/logging-operator.svg" alt="Docker Automated build">
+  </a>
+
+  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
+    <img src="https://img.shields.io/docker/pulls/banzaicloud/logging-operator.svg?style=shield" alt="Docker Pulls">
+  </a>
+
+  <a href="https://circleci.com/gh/banzaicloud/logging-operator">
+    <img src="https://circleci.com/gh/banzaicloud/logging-operator.svg?style=shield" alt="CircleCI">
+  </a>
+
+  <a href="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator">
+    <img src="https://goreportcard.com/report/github.com/banzaicloud/logging-operator" alt="Go Report Card">
+  </a>
+
+  <a href="https://github.com/banzaicloud/logging-operator/">
+    <img src="ttp://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
+  </a>
 
 </p>
 
