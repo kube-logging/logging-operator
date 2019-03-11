@@ -67,6 +67,8 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
 
 The following steps set up an example configuration for sending nginx logs to S3.
 
+<p align="center"><img src="docs/img/s3_example.png" width="660"></p>
+
 ### Create Secret
 
 Create a manifest file for the AWS access key:
