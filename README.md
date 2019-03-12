@@ -135,7 +135,7 @@ spec:
 
 ## Troubleshooting
 
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the BanzaiCloud's Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
 
 
 ## Contributing
