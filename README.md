@@ -39,7 +39,7 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
-<p align="center"><img src="docs/img/s3_example.png" width="660"></p>
+<p align="center"><img src="docs/img/log_helm.gif" width="660"></p>
 
 ## Example with helm chart
 The following steps set up an example configuration for sending nginx logs to S3.
