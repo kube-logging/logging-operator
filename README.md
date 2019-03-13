@@ -39,24 +39,25 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
+<p align="center"><img src="docs/img/s3_example.png" width="660"></p>
 
 ## Example with helm chart
 The following steps set up an example configuration for sending nginx logs to S3.
-<p align="center"><img src="docs/img/s3_example.png" width="660"></p>
 
-### Add BanzaiCloud chart reposiroy:
+
+#### Add BanzaiCloud chart reposiroy:
 ```bash
 $ helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
 $ helm repo update
 ```
 
-### Install logging-operator chart
+#### Install logging-operator chart
 ```bash
 $ helm install banzaicloud-stable/logging-operator
 ```
 
 
-### Install S3 output Plugin chart
+#### Install S3 output Plugin chart
 ```bash
 $ helm install  \
 --set bucketName='<Mybucket>' \
@@ -68,14 +69,14 @@ banzaicloud-stable/s3-output
 
 > There is **no** need to encode base64 these values.  
 
-### Install Nginx Demo app 
+#### Install Nginx Demo app 
 ```bash
 $ helm install banzaicloud-stable/nginx-logging-demo
 ```
 
 
 
-## Installing the operator from kubernetes manifest
+## Example from kubernetes manifests
 
 ```
 # Create all the CRDs used by the Operator
