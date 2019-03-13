@@ -74,7 +74,7 @@ banzaicloud-stable/s3-output
 $ helm install banzaicloud-stable/nginx-logging-demo
 ```
 
-
+<script id="asciicast-uYYTNWoLv0Yup9xjkWeyHwbjU" src="https://asciinema.org/a/uYYTNWoLv0Yup9xjkWeyHwbjU.js" async></script>
 
 ## Example from kubernetes manifests
 
