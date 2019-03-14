@@ -45,7 +45,7 @@ This operator helps you to pack together logging information with your applicati
 The following steps set up an example configuration for sending nginx logs to S3.
 
 
-#### Add BanzaiCloud chart reposiroy:
+#### Add BanzaiCloud chart repository:
 ```bash
 $ helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
 $ helm repo update
