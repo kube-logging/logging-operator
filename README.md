@@ -39,7 +39,46 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
-## Installing the operator
+<p align="center"><img src="docs/img/log_helm.gif" width="660"></p>
+
+## Example with helm chart
+The following steps set up an example configuration for sending nginx logs to S3.
+
+
+#### Add BanzaiCloud chart repository:
+```bash
+$ helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
+$ helm repo update
+```
+
+#### Install logging-operator chart
+```bash
+$ helm install banzaicloud-stable/logging-operator
+```
+
+
+#### Install S3 output Plugin chart
+```bash
+$ helm install  \
+--set bucketName='<Mybucket>' \
+--set region='<S3_REGION>' \
+--set secret.awsAccessValue='<AWS_ACCESS_KEY_ID>' \
+--set secret.awsSecretValue='<AWS_SECRET_ACCESS_KEY>' \
+banzaicloud-stable/s3-output
+```
+
+> There is **no** need to encode base64 these values.  
+
+#### Install Nginx Demo app 
+```bash
+$ helm install banzaicloud-stable/nginx-logging-demo
+```
+
+<p align="center">
+<a href="https://asciinema.org/a/uYYTNWoLv0Yup9xjkWeyHwbjU" target="_blank"><img src="https://asciinema.org/a/uYYTNWoLv0Yup9xjkWeyHwbjU.svg" /></a>
+</p>
+
+## Example from kubernetes manifests
 
 ```
 # Create all the CRDs used by the Operator
@@ -63,11 +102,6 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
 
 ```
 
-## Example
-
-The following steps set up an example configuration for sending nginx logs to S3.
-
-<p align="center"><img src="docs/img/s3_example.png" width="660"></p>
 
 ### Create Secret
 
@@ -110,7 +144,7 @@ spec:
       name: parser-nginx
       parameters:
         - name: format
-          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$/'
+          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$/'
         - name: timeFormat
           value: "%d/%b/%Y:%H:%M:%S %z"
   output:
@@ -136,6 +170,7 @@ spec:
 ## Troubleshooting
 
 If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+
 
 
 ## Contributing
