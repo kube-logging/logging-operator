@@ -19,13 +19,13 @@ vendor: bin/dep ## Install dependencies
 	bin/dep ensure -v -vendor-only
 
 build: vendor
-	@go build $(PKGS)
+	go build -v $(PKGS)
 
 check-fmt:
 	PKGS="${GOFILES_NOVENDOR}" GOFMT="gofmt" ./scripts/fmt-check.sh
 
 fmt:
-	@gofmt -w ${GOFILES_NOVENDOR}
+	gofmt -w ${GOFILES_NOVENDOR}
 
 lint: install-golint
 	golint -min_confidence 0.9 -set_exit_status $(PKGS)
