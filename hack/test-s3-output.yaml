@@ -1,0 +1,26 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "Plugin"
+metadata:
+  name: "logging-operator"
+spec:
+  input:
+    label:
+      app: "*"
+  output:
+    - type: s3
+      name: outputS3
+      parameters:
+        - name: aws_key_id
+          value: minio_access_key
+        - name: aws_sec_key
+          value: minio_secret_key
+        - name: s3_bucket
+          value: logs
+        - name: s3_region
+          value: test_region
+        - name: s3_endpoint
+          value: "http://minio-service.default.svc.cluster.local:9000"
+        - name: bufferTimeKey
+          value: "10"
+        - name: bufferTimeWait
+          value: "0"
