@@ -38,6 +38,10 @@ const S3Template = `
   aws_sec_key {{ .aws_sec_key }}
   s3_bucket {{ .s3_bucket }}
   s3_region {{ .s3_region }}
+  {{- if .s3_endpoint }}
+  s3_endpoint {{ .s3_endpoint }}
+  force_path_style true   # This prevents AWS SDK from breaking endpoint URL
+  {{- end }}
   store_as gzip_command
 
   path logs/${tag}/%Y/%m/%d/

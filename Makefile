@@ -1,4 +1,6 @@
-
+VERSION := $(shell git describe --abbrev=0 --tags)
+DOCKER_IMAGE = banzaicloud/logging-operator
+DOCKER_TAG ?= ${VERSION}
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./client/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
@@ -17,13 +19,13 @@ vendor: bin/dep ## Install dependencies
 	bin/dep ensure -v -vendor-only
 
 build: vendor
-	@go build $(PKGS)
+	go build -v $(PKGS)
 
 check-fmt:
 	PKGS="${GOFILES_NOVENDOR}" GOFMT="gofmt" ./scripts/fmt-check.sh
 
 fmt:
-	@gofmt -w ${GOFILES_NOVENDOR}
+	gofmt -w ${GOFILES_NOVENDOR}
 
 lint: install-golint
 	golint -min_confidence 0.9 -set_exit_status $(PKGS)
@@ -55,3 +57,6 @@ ifndef INEFFASSIGN_CMD
 	go get -u github.com/gordonklaus/ineffassign
 endif
 
+.PHONY: docker
+docker: ## Build Docker image
+	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f Dockerfile .
