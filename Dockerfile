@@ -1,12 +1,14 @@
 FROM golang:1.11-alpine as golang
 
-ADD . /go/src/github.com/banzaicloud/logging-operator
-WORKDIR /go/src/github.com/banzaicloud/logging-operator
-
 RUN apk add --update --no-cache ca-certificates curl git make
 RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure -v -vendor-only
 
+ADD Gopkg.toml /go/src/github.com/banzaicloud/logging-operator/Gopkg.toml
+ADD Gopkg.lock /go/src/github.com/banzaicloud/logging-operator/Gopkg.lock
+
+WORKDIR /go/src/github.com/banzaicloud/logging-operator
+RUN dep ensure -v -vendor-only
+ADD . /go/src/github.com/banzaicloud/logging-operator
 RUN go install ./cmd/manager
 
 

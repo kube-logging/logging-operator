@@ -1,0 +1,22 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "Plugin"
+metadata:
+  name: "istio-ingressgateway"
+spec:
+  input:
+    label:
+      app: "istio-ingressgateway"
+  output:
+    - type: "elasticsearch"
+      name: "istio-ingressgateway"
+      parameters:
+        - name: host
+          value: "elasticsearch.monitoring.svc.cluster.local"
+        - name: port
+          value: "9200"
+        - name: schema
+          value: "http"
+        - name: logstashPrefix
+          value: "istio-ingressgateway"
+        - name: bufferPath
+          value: "/buffers/istio-ingressgateway"
