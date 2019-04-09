@@ -7,6 +7,7 @@
 | host | - |  |
 | port | - |  |
 | scheme | scheme |  |
+| sslVerify | true |  |
 | logstashFormat | true |  |
 | logstashPrefix | logstash |  |
 | bufferPath | /buffers/elasticsearch |  |
@@ -29,13 +30,16 @@
   host {{ .host }}
   port {{ .port }}
   scheme  {{ .scheme }}
+  {{- if .sslVerify }}
+  ssl_verify {{ .sslVerify }}
+  {{- end}}
   logstash_format {{ .logstashFormat }}
   logstash_prefix {{ .logstashPrefix }}
   reconnect_on_error true
   {{- if .user }}
   user {{ .user }}
   {{- end}}
-  {{- if .password }}
+  {{- if .password }} 
   password {{ .password }}
   {{- end}}
   <buffer tag, time>

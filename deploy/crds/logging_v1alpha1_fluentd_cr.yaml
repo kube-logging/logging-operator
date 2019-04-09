@@ -13,7 +13,7 @@ spec:
   tls:
     enabled: false
   image:
-    tag: "v1.1.4"
+    tag: "v1.4"
     repository: "banzaicloud/fluentd"
     pullPolicy: "IfNotPresent"
   volumeModImage:
