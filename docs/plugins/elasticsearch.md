@@ -39,7 +39,7 @@
   {{- if .user }}
   user {{ .user }}
   {{- end}}
-  {{- if .password }} 
+  {{- if .password }}
   password {{ .password }}
   {{- end}}
   <buffer tag, time>
