@@ -8,6 +8,7 @@
 | port | - |  |
 | scheme | scheme |  |
 | sslVerify | true |  |
+| sslVersion | TLSv1_2 |  |
 | logstashFormat | true |  |
 | logstashPrefix | logstash |  |
 | bufferPath | /buffers/elasticsearch |  |
@@ -32,6 +33,9 @@
   scheme  {{ .scheme }}
   {{- if .sslVerify }}
   ssl_verify {{ .sslVerify }}
+  {{- end}}
+  {{- if .sslVersion }}
+  ssl_version {{ .sslVersion }}
   {{- end}}
   logstash_format {{ .logstashFormat }}
   logstash_prefix {{ .logstashPrefix }}
