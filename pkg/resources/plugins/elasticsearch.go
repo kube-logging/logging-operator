@@ -10,6 +10,8 @@ var ElasticsearchDefaultValues = map[string]string{
 	"logstashFormat":     "true",
 	"logstashPrefix":     "logstash",
 	"scheme":             "scheme",
+	"sslVerify":          "true",
+	"sslVersion":         "TLSv1_2",
 	"chunkLimit":         "2M",
 	"queueLimit":         "8",
 	"timekey":            "1h",
@@ -33,6 +35,12 @@ const ElasticsearchTemplate = `
   host {{ .host }}
   port {{ .port }}
   scheme  {{ .scheme }}
+  {{- if .sslVerify }}
+  ssl_verify {{ .sslVerify }}
+  {{- end}}
+  {{- if .sslVersion }}
+  ssl_version {{ .sslVersion }}
+  {{- end}}
   logstash_format {{ .logstashFormat }}
   logstash_prefix {{ .logstashPrefix }}
   reconnect_on_error true
