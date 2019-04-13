@@ -14,7 +14,7 @@ spec:
           value: "elasticsearch.monitoring.svc.cluster.local"
         - name: port
           value: "9200"
-        - name: schema
+        - name: scheme
           value: "http"
         - name: logstashPrefix
           value: "istio-ingressgateway"
