@@ -35,6 +35,32 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
    </a>
  </p>
 
+---
+
+## Contents
+- [What is this operator for?](#what-is-this-operator-for)
+- [Examples](https://github.com/banzaicloud/logging-operator/tree/es_docs/example)
+  - [S3 Output](#example-with-helm-chart)
+  - [Elasticsearch Output](#example-logging-operator-with-elasticsearch-operator)
+- [Plugins](https://github.com/banzaicloud/logging-operator/tree/es_docs/docs/plugins)
+  - [Alibaba](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/alibaba.md)
+  - [Azure](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/azure.md)
+  - [Elasticsearch](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/elasticsearch.md)
+  - [Google Storage](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/gcs.md)
+  - [Amazon S3](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/s3.md)
+  - [Parser](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/parser.md)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Blogs](https://banzaicloud.com/tags/logging/)
+  - [Centralized logging on Kubernetes automated
+](https://banzaicloud.com/blog/k8s-logging-operator/)
+  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
+  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
+  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
+- [License](#license)
+
+---
+
 ## What is this operator for?
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
@@ -163,6 +189,43 @@ spec:
         - name: s3_region
           value: ap-northeast-1
 ```
+
+---
+
+## Example Logging-operator with Elasticsearch Operator
+<p align="center"><img src="docs/img/lll.png" width="240"></p>
+<p align="center"><img src="docs/img/ll_es.gif" width="660"></p>
+
+
+#### Add operator chart repository:
+```bash
+$ helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
+$ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+$ helm repo update
+```
+
+#### Install operators
+```bash
+$ helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
+$ helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
+$ helm install --name loggingo banzaicloud-stable/logging-operator
+```
+> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator) 
+
+#### Install Nginx Demo chart
+```bash
+$ helm install banzaicloud-stable/nginx-logging-es-demo
+```
+
+#### Forward cerebro & kibana dashboards
+```bash
+$ kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
+$ kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
+```
+
+[![asciicast](https://asciinema.org/a/9EcfIzlUQJSjJdopEh5HCU7OT.svg)](https://asciinema.org/a/9EcfIzlUQJSjJdopEh5HCU7OT)
+
+
 
 ## Troubleshooting
 
