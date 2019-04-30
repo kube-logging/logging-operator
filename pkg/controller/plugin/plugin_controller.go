@@ -91,7 +91,7 @@ func (r *ReconcilePlugin) Reconcile(request reconcile.Request) (reconcile.Result
 	// Fetch the Plugin instance
 	instanceList := &loggingv1alpha1.PluginList{}
 
-	err := r.client.List(context.TODO(), client.InNamespace(request.Namespace), instanceList)
+	err := r.client.List(context.TODO(), client.MatchingLabels(map[string]string{}), instanceList)
 	if err != nil {
 		return reconcile.Result{}, err
 	}

@@ -49,7 +49,11 @@ func GetDefaultValues(name string) (map[string]string, error) {
 	if !ok {
 		err = fmt.Errorf("plugin %q not found", name)
 	}
-	return value.DefaultValues, err
+	newMap := make(map[string]string)
+	for k, v := range value.DefaultValues {
+		newMap[k] = v
+	}
+	return newMap, err
 }
 
 // GetTemplate get template string by name
