@@ -18,6 +18,8 @@ package plugins
 
 import (
 	"bytes"
+	"context"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
@@ -29,6 +31,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+var log = logf.Log.WithName("plugins.configmap")
 
 func generateFluentdConfig(plugin *loggingv1alpha1.Plugin, client client.Client) (string, string) {
 	var finalConfig string
@@ -102,9 +106,28 @@ func (r *Reconciler) appConfigMap() runtime.Object {
 		}
 		appConfigData[name] = data
 	}
+	pluginConfigMapNamespace := r.Namespace
+	cmLog := log.WithValues("pluginConfigMapNamespace", pluginConfigMapNamespace)
+	fluentdList := loggingv1alpha1.FluentdList{}
+	err := r.Client.List(context.TODO(), client.MatchingLabels(map[string]string{}), &fluentdList)
+	if err != nil {
+		cmLog.Error(err, "Reconciler query failed.")
+	}
 
+	if len(fluentdList.Items) > 0 {
+		cmLog = log.WithValues("pluginConfigMapNamespace", pluginConfigMapNamespace, "FluentdNamespace", fluentdList.Items[0].Namespace)
+		cmLog.Info("Check Fluentd Namespace")
+		if pluginConfigMapNamespace != fluentdList.Items[0].Namespace {
+			pluginConfigMapNamespace = fluentdList.Items[0].Namespace
+			cmLog = log.WithValues("pluginConfigMapNamespace", pluginConfigMapNamespace)
+			cmLog.Info("Plugin ConfigMap Namespace Updated")
+
+		}
+	} else {
+		log.Info("The is no Fluentd resource available")
+	}
 	return &corev1.ConfigMap{
-		ObjectMeta: templates.PluginsObjectMeta(appConfigMapName, util.MergeLabels(map[string]string{}, labelSelector), r.Namespace),
+		ObjectMeta: templates.PluginsObjectMeta(appConfigMapName, util.MergeLabels(map[string]string{}, labelSelector), pluginConfigMapNamespace),
 		Data:       appConfigData,
 	}
 }
