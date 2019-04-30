@@ -50,8 +50,8 @@ func GetDefaultValues(name string) (map[string]string, error) {
 		err = fmt.Errorf("plugin %q not found", name)
 	}
 	newMap := make(map[string]string)
-	for k,v := range value.DefaultValues {
-  		newMap[k] = v
+	for k, v := range value.DefaultValues {
+		newMap[k] = v
 	}
 	return newMap, err
 }
