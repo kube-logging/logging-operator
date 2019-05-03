@@ -34,8 +34,24 @@ const S3Template = `
 <match {{ .pattern }}.** >
   @type s3
 
+  {{- if .role_arn }}
+  <assume_role_credentials>
+    role_arn {{ .role_arn }}
+    role_session_name {{ .role_session_name }}
+  </assume_role_credentials>
+  {{- end }}
+
+  {{- if .instance_profile_ip_address }}
+  <instance_profile_credentials>
+    ip_address {{ .instance_profile_ip_address }}
+    port {{ .instance_profile_port }}
+  </instance_profile_credentials>
+  {{- end }}
+
+  {{- if .aws_key_id }}
   aws_key_id {{ .aws_key_id }}
   aws_sec_key {{ .aws_sec_key }}
+  {{- end }}
   s3_bucket {{ .s3_bucket }}
   s3_region {{ .s3_region }}
   {{- if .s3_endpoint }}
