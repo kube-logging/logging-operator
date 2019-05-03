@@ -83,13 +83,14 @@ $ helm install banzaicloud-stable/logging-operator
 ```
 
 
-#### Install S3 output Plugin chart
+#### Install S3 output Plugin chart with Aws Credential Access
 ```bash
 $ helm install  \
 --set bucketName='<Mybucket>' \
 --set region='<S3_REGION>' \
---set secret.awsAccessValue='<AWS_ACCESS_KEY_ID>' \
---set secret.awsSecretValue='<AWS_SECRET_ACCESS_KEY>' \
+--set awsCredentialsAccess.enabled=true \
+--set awsCredentialsAccess.secret.awsAccessValue='<AWS_ACCESS_KEY_ID>' \
+--set awsCredentialsAccess.secret.awsSecretValue='<AWS_SECRET_ACCESS_KEY>' \
 banzaicloud-stable/s3-output
 ```
 
