@@ -88,6 +88,7 @@ $ helm install banzaicloud-stable/logging-operator
 $ helm install  \
 --set bucketName='<Mybucket>' \
 --set region='<S3_REGION>' \
+--set endpoint='<S3_ENDPOINT>' \
 --set awsCredentialsAccess.enabled=true \
 --set awsCredentialsAccess.secret.awsAccessValue='<AWS_ACCESS_KEY_ID>' \
 --set awsCredentialsAccess.secret.awsSecretValue='<AWS_SECRET_ACCESS_KEY>' \
@@ -96,7 +97,7 @@ banzaicloud-stable/s3-output
 
 > There is **no** need to encode base64 these values.  
 
-#### Install Nginx Demo app 
+#### Install Nginx Demo app
 ```bash
 $ helm install banzaicloud-stable/nginx-logging-demo
 ```
@@ -111,7 +112,7 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentbit_crd.yaml
 kubectl create -f deploy/crds/logging_v1alpha1_fluentd_crd.yaml
 
 # If RBAC enabled create the required resources
-kubectl create -f deploy/clusterrole.yaml 
+kubectl create -f deploy/clusterrole.yaml
 kubectl create -f deploy/clusterrole_binding.yaml
 kubectl create -f deploy/service_account.yaml
 
@@ -189,6 +190,8 @@ spec:
           value: logging-bucket
         - name: s3_region
           value: ap-northeast-1
+        - name: s3_endpoint
+          value: https://s3.amazonaws.com
 ```
 
 ---
@@ -211,7 +214,7 @@ $ helm install --name elasticsearch-operator es-operator/elasticsearch-operator 
 $ helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
 $ helm install --name loggingo banzaicloud-stable/logging-operator
 ```
-> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator) 
+> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
 
 #### Install Nginx Demo chart
 ```bash
