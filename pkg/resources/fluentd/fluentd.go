@@ -26,10 +26,13 @@ import (
 )
 
 const (
-	configMapName        = "fluentd-config"
-	persistentVolumeName = "fluentd-buffer"
-	serviceName          = "fluentd"
-	appConfigMapName     = "fluentd-app-config"
+	configMapName          = "fluentd-config"
+	persistentVolumeName   = "fluentd-buffer"
+	serviceName            = "fluentd"
+	appConfigMapName       = "fluentd-app-config"
+	serviceAccountName     = "logging-fluentd"
+	clusterRoleBindingName = "logging-fluentd"
+	clusterRoleName        = "logging-role-fluentd"
 )
 
 var labelSelector = map[string]string{
@@ -54,6 +57,9 @@ func New(client client.Client, fluentd *loggingv1alpha1.Fluentd) *Reconciler {
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile(log logr.Logger) error {
 	for _, res := range []resources.Resource{
+		r.serviceAccount,
+		r.clusterRole,
+		r.clusterRoleBinding,
 		r.configMap,
 		r.appconfigMap,
 		r.pvc,
