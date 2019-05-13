@@ -49,6 +49,23 @@ func FluentdObjectMeta(name string, labels map[string]string, fluentd *loggingv1
 	return o
 }
 
+// FluentdObjectMetaClusterScope creates an objectMeta for resource fluentd
+func FluentdObjectMetaClusterScope(name string, labels map[string]string, fluentd *loggingv1alpha1.Fluentd) metav1.ObjectMeta {
+	o := metav1.ObjectMeta{
+		Name:   name,
+		Labels: labels,
+		OwnerReferences: []metav1.OwnerReference{
+			{
+				APIVersion: fluentd.APIVersion,
+				Kind:       fluentd.Kind,
+				Name:       fluentd.Name,
+				UID:        fluentd.UID,
+			},
+		},
+	}
+	return o
+}
+
 // FluentbitObjectMeta creates an objectMeta for resource fluentbit
 func FluentbitObjectMeta(name string, labels map[string]string, fluentbit *loggingv1alpha1.Fluentbit) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
