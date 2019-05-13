@@ -8,7 +8,8 @@ BUCKET='minio/logs'
 function main()
 {
     helm_deploy_logging_operator
-
+    helm_deploy_logging_operator_fluent
+    
     apply_s3_output
     mc_pod="$(get_mc_pod_name)"
     wait_for_log_files "${mc_pod}" 300
@@ -23,6 +24,15 @@ function helm_deploy_logging_operator()
         --set image.tag='local' \
         banzaicloud-stable/logging-operator
 }
+
+function helm_deploy_logging_operator_fluent()
+{
+    helm install \
+        --wait \
+        --name logging-operator-fluent \
+        banzaicloud-stable/logging-operator-fluent
+}
+
 
 function apply_s3_output()
 {
