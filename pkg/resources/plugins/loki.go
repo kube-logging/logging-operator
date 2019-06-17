@@ -26,18 +26,21 @@ var LokiDefaultValues = map[string]string{
 	"password":     "",
 	"extraLabels":     "",
 	"flushInterval":             "10s",
-	"bufferChunkLimit":          "1m",
+	"chunkLimitSize":          "1m",
+	"flushAtShutdown":          "true",
 }
 
 // LokiTemplate for Loki output plugin
 const LokiTemplate = `
 <match {{ .pattern }}.**>
-  @type loki
+  @type kubernetes_loki
   url {{ .url }}
   username {{ .username }}
   password {{ .password }}
   extra_labels {{ .extraLabels }}
-  flush_interval {{ .flushInterval }}
-  flush_at_shutdown true
-  buffer_chunk_limit  {{ .bufferChunkLimit }}
+  <buffer>
+    flush_interval {{ .flushInterval }}
+    chunk_limit_size {{ .chunkLimitSize }}
+    flush_at_shutdown {{ .flushAtShutdown }}
+  </buffer>
 </match>`

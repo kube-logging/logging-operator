@@ -5,7 +5,7 @@ metadata:
 spec:
   input:
     label:
-      app: "loki-demo"
+      app: "nginx-logging-demo"
   output:
     - type: "loki"
       name: "loki-demo"
