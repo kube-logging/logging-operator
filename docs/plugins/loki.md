@@ -7,19 +7,21 @@
 | username | - |  |
 | password | - |  |
 | extra_labels | - |  |
-| flush_interval | 10s |  |
-| flush_at_shutdown | true |  |
-| buffer_chunk_limit | 1m |  |
+| flushInterval | 10s |  |
+| chunkLimitSize | 1m |  |
+| flushAtShutdown | true |  |
 ## Plugin template
 ```
 <match {{ .pattern }}.**>
-  @type loki
+  @type kubernetes_loki
   url {{ .url }}
   username {{ .username }}
   password {{ .password }}
   extra_labels {{ .extraLabels }}
-  flush_interval {{ .flushInterval }}
-  flush_at_shutdown true
-  buffer_chunk_limit  {{ .bufferChunkLimit }}
+  <buffer>
+    flush_interval {{ .flushInterval }}
+    chunk_limit_size {{ .chunkLimitSize }}
+    flush_at_shutdown {{ .flushAtShutdown }}
+  </buffer>
 </match>
 ```

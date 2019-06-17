@@ -41,6 +41,7 @@ var fluentBitConfigTemplate = `
     Name                kubernetes
     Match               kubernetes.*
     Kube_URL            https://kubernetes.default.svc:443
+	Kube_Tag_Prefix     kubernetes.var.log.containers.
     Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
     Merge_Log           On
