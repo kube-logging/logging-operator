@@ -28,6 +28,26 @@
 
 Logging operator for Kubernetes based on Fluentd and Fluent-bit. For more details please follow up with this [post](https://banzaicloud.com/blog/k8s-logging-operator/).
 
+
+## What is this operator for?
+
+This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
+
+<p align="center"><img src="docs/img/loggingo_flow.png" width="660"></p>
+
+### Motivation
+
+The logging operator automates the deployment and configuration of a Kubernetes logging pipeline. Under the hood the operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters and transfer logs to multiple outputs. The whole flow can be defined in a single custom resource. Your logs will always be transferred on authenticated and encrypted channels.
+
+##### Blogs
+  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
+  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
+  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
+  - [Centralized logging on Kubernetes automated](https://banzaicloud.com/blog/k8s-logging-operator/)
+  - [And more...](https://banzaicloud.com/tags/logging/)
+
+
+
 Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) platform, a Cloud Native application and devops platform that natively supports multi- and hybrid-cloud deployments with multiple authentication backends. Check out the developer beta:
  <p align="center">
    <a href="https://beta.banzaicloud.io">
@@ -38,36 +58,19 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 ---
 
 ## Contents
-- [What is this operator for?](#what-is-this-operator-for)
-- [Examples](https://github.com/banzaicloud/logging-operator/tree/es_docs/example)
-  - [S3 Output](#example-with-helm-chart)
-  - [Elasticsearch Output](#example-logging-operator-with-elasticsearch-operator)
-- [Plugins](https://github.com/banzaicloud/logging-operator/tree/es_docs/docs/plugins)
-  - [Alibaba](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/alibaba.md)
-  - [Azure](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/azure.md)
-  - [Elasticsearch](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/elasticsearch.md)
-  - [Google Storage](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/gcs.md)
-  - [Amazon S3](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/s3.md)
-  - [Parser](https://github.com/banzaicloud/logging-operator/blob/es_docs/docs/plugins/parser.md)
+- Installation
+  - [Deploy with Helm](#deploying-with-helm-chart)
+  - [Deploy with Manifest](#deploying-with-kubernetes-manifest)
+- [Supported Plugins](#supported-plugins)
+- Examples
+  - [S3 Output](./docs/examples/s3.md)
+  - [Elasticsearch Output](./docs/examples/es.md)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
-- [Blogs](https://banzaicloud.com/tags/logging/)
-  - [Centralized logging on Kubernetes automated
-](https://banzaicloud.com/blog/k8s-logging-operator/)
-  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
-  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
-  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
-- [License](#license)
-
 ---
 
-## What is this operator for?
 
-This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
-
-<p align="center"><img src="docs/img/loggingo_flow.png" width="660"></p>
-
-## Example with helm chart
+## Deploying with helm chart
 The following steps set up an example configuration for sending nginx logs to S3.
 
 
@@ -82,28 +85,15 @@ $ helm repo update
 $ helm install banzaicloud-stable/logging-operator
 ```
 
-
-#### Install S3 output Plugin chart with Aws Credential Access
+#### Install FluentD, FluentBit CRs from chart
 ```bash
-$ helm install  \
---set bucketName='<Mybucket>' \
---set region='<S3_REGION>' \
---set endpoint='<S3_ENDPOINT>' \
---set awsCredentialsAccess.enabled=true \
---set awsCredentialsAccess.secret.awsAccessValue='<AWS_ACCESS_KEY_ID>' \
---set awsCredentialsAccess.secret.awsSecretValue='<AWS_SECRET_ACCESS_KEY>' \
-banzaicloud-stable/s3-output
+$ helm install banzaicloud-stable/logging-operator-fluent
 ```
+<p align="center"><img src="docs/img/log_helm.gif" width="660"></p>
 
-> There is **no** need to encode base64 these values.  
+---
 
-#### Install Nginx Demo app
-```bash
-$ helm install banzaicloud-stable/nginx-logging-demo
-```
-
-
-## Example from kubernetes manifests
+## Deploying with Kubernetes Manifest
 
 ```
 # Create all the CRDs used by the Operator
@@ -127,109 +117,19 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
 
 ```
 
-
-### Create Secret
-
-Create a manifest file for the AWS access key:
-
-```
-apiVersion: v1
-kind: Secret
-metadata:
-  name: loggings3
-type: Opaque
-data:
-  awsAccessKeyId: <base64encoded>
-  awsSecretAccesKey: <base64encoded>
-```
-
-Submit the secret with kubectl:
-
-```
-kubectl apply -f secret.yaml
-```
-
-### Create LoggingOperator resource
-
-Create a manifest that defines that you want to parse the nginx logs with the specified regular expressions on the standard output of pods with the `app: nginx` label, and store them in the given S3 bucket.
-
-```
-apiVersion: "logging.banzaicloud.com/v1alpha1"
-kind: "Plugin"
-metadata:
-  name: "nginx-logging"
-  labels:
-    release: test
-spec:
-  input:
-    label:
-      app: nginx
-  filter:
-    - type: parser
-      name: parser-nginx
-      parameters:
-        - name: format
-          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$/'
-        - name: timeFormat
-          value: "%d/%b/%Y:%H:%M:%S %z"
-  output:
-    - type: s3
-      name: outputS3
-      parameters:
-        - name: aws_key_id
-          valueFrom:
-            secretKeyRef:
-              name: loggings3
-              key: awsAccessKeyId
-        - name: aws_sec_key
-          valueFrom:
-            secretKeyRef:
-              name: loggings3
-              key: awsSecretAccesKey
-        - name: s3_bucket
-          value: logging-bucket
-        - name: s3_region
-          value: ap-northeast-1
-        - name: s3_endpoint
-          value: https://s3.amazonaws.com
-```
-
+## Supported Plugins
+| Name                                            |  Type  |                                Description                                | Status  | Version                                                                                  |
+|-------------------------------------------------|:------:|:-------------------------------------------------------------------------:|---------|------------------------------------------------------------------------------------------|
+| [Alibaba](./docs/plugins/alibaba.md)            | Output | Store logs the Alibaba Cloud Object Storage Service                       |    GA   | [0.0.2](https://github.com/jicong/fluent-plugin-oss)                                     |
+| [Amazon S3](./docs/plugins/s3.md)               | Output | Store logs in Amazon S3                                                   |    GA   | [1.1.10](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.1.10)                |
+| [Azure](./docs/plugins/azure.md)                | Output | Store logs in Azure Storega                                               |    GA   | [0.1.1](https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0)          |
+| [Google Storage](./docs/plugins/gcs.md)         | Output | Store logs in Google Cloud Storage                                        |    GA   | [0.4.0.beta1](https://github.com/banzaicloud/fluent-plugin-gcs) |
+| [Grafana Loki](./docs/plugins/loki.md)          | Output | Transfer logs to Loki                                                     | Testing | [0.2](https://github.com/banzaicloud/fluent-plugin-kubernetes-loki/releases/tag/v0.2)    |
+| [ElasticSearch](./docs/plugins/parser.md)       | Output | Send your logs to Elasticsearch                                           |    GA   | [3.5.2](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.5.2)         |
+| [HDFS](https://docs.fluentd.org/output/webhdfs) | Output | Fluentd output plugin to write data into Hadoop HDFS over WebHDFS/HttpFs. |    GA   | [1.2.3](https://github.com/fluent/fluent-plugin-webhdfs/releases/tag/v1.2.3)             |
+| Kubernetes Metadata Filter                      | Filter | Filter plugin to add Kubernetes metadata                                  |    GA   | [2.2.0](https://github.com/fabric8io/fluent-plugin-kubernetes_metadata_filter)           |
+| [Parser](./docs/plugins/parser.md)              | Parser | Parse logs with parser plugin                                             |    GA   |                                                                                          |
 ---
-
-## Example Logging-operator with Elasticsearch Operator
-<p align="center"><img src="docs/img/lll.png" width="240"></p>
-<p align="center"><img src="docs/img/ll_es.gif" width="660"></p>
-
-
-#### Add operator chart repository:
-```bash
-$ helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
-$ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-$ helm repo update
-```
-
-#### Install operators
-```bash
-$ helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-$ helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
-$ helm install --name loggingo banzaicloud-stable/logging-operator
-```
-> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
-
-#### Install Nginx Demo chart
-```bash
-$ helm install banzaicloud-stable/nginx-logging-es-demo
-```
-
-#### Forward cerebro & kibana dashboards
-```bash
-$ kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
-$ kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
-```
-
-[![asciicast](https://asciinema.org/a/9EcfIzlUQJSjJdopEh5HCU7OT.svg)](https://asciinema.org/a/9EcfIzlUQJSjJdopEh5HCU7OT)
-
-
 
 ## Troubleshooting
 
