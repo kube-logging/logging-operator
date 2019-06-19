@@ -1,0 +1,24 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "Plugin"
+metadata:
+  name: "loki-demo"
+spec:
+  input:
+    label:
+      app: "nginx-logging-demo"
+  output:
+    - type: "loki"
+      name: "loki-demo"
+      parameters:
+        - name: url
+          value: "http://loki:3100"
+        - name: username
+          value: ""
+        - name: password
+          value: ""
+        - name: extraLabels
+          value: "{\"env\":\"dev\"}"
+        - name: flushInterval
+          value: "10s"
+        - name: bufferChunkLimit
+          value: "1m"

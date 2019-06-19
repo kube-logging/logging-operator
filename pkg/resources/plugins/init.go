@@ -74,4 +74,5 @@ func init() {
 	RegisterPlugin(AlibabaOutput, AlibabaTemplate, AlibabaDefaultValues)
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
 	RegisterPlugin(ElasticsearchOutput, ElasticsearchTemplate, ElasticsearchDefaultValues)
+	RegisterPlugin(LokiOutput, LokiTemplate, LokiDefaultValues)
 }
