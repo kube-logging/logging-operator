@@ -6,7 +6,7 @@
 | url | - | loki url |
 | username | - |  |
 | password | - |  |
-| extra_labels | - |  |
+| extraLabels | - |  |
 | flushInterval | 10s |  |
 | chunkLimitSize | 1m |  |
 | flushAtShutdown | true |  |
