@@ -21,13 +21,13 @@ const LokiOutput = "loki"
 
 // LokiDefaultValues for Loki output plugin
 var LokiDefaultValues = map[string]string{
-	"url":         "",
-	"username":           "",
-	"password":     "",
+	"url":             "",
+	"username":        "",
+	"password":        "",
 	"extraLabels":     "",
-	"flushInterval":             "10s",
-	"chunkLimitSize":          "1m",
-	"flushAtShutdown":          "true",
+	"flushInterval":   "10s",
+	"chunkLimitSize":  "1m",
+	"flushAtShutdown": "true",
 }
 
 // LokiTemplate for Loki output plugin
