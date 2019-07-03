@@ -1,0 +1,23 @@
+{{- if .Values.fluentbit.enabled }}
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Fluentbit
+metadata:
+  name: {{ template "logging-operator-fluent.fullname" . }}-fluentbit
+  labels:
+    app.kubernetes.io/name: {{ include "logging-operator-fluent.name" . }}
+    helm.sh/chart: {{ include "logging-operator-fluent.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  namespace: {{ default .Release.Namespace .Values.watchNamespace }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path:   "/api/v1/metrics/prometheus"
+    prometheus.io/port:   "2020"
+  image: {{ toYaml .Values.fluentbit.image | nindent 4 }}
+  resources: {}
+  tls:
+    enabled: {{ .Values.tls.enabled }}
+    secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
+    sharedKey: {{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) | b64enc | quote }}
+{{ end }}

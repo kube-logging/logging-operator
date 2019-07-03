@@ -1,0 +1,41 @@
+# Default values for logging-operator-fluent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+tls:
+  enabled: false
+  secretName: ""
+  sharedKey: ""
+
+fluentbit:
+  enabled: true
+  namespace: ""
+  image:
+    tag: "latest"
+    repository: "fluent/fluent-bit"
+    pullPolicy: "IfNotPresent"
+
+fluentd:
+  enabled: true
+  namespace: ""
+  image:
+    tag: "v1.5.0"
+    repository: "banzaicloud/fluentd"
+    pullPolicy: "IfNotPresent"
+  volumeModImage:
+    tag: "latest"
+    repository: "busybox"
+    pullPolicy: "IfNotPresent"
+  configReloaderImage:
+    tag: "v0.2.2"
+    repository: "jimmidyson/configmap-reload"
+    pullPolicy: "IfNotPresent"
+  fluentdPvcSpec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 21Gi
+
+psp:
+  enabled: false
