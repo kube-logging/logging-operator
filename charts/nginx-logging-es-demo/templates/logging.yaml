@@ -1,0 +1,37 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "Plugin"
+metadata:
+  name: {{ include "nginx-logging-es-demo.fullname" . }}
+  labels:
+    app: {{ include "nginx-logging-es-demo.name" . }}
+    chart: {{ include "nginx-logging-es-demo.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  input:
+    label:
+      app: {{ include "nginx-logging-es-demo.name" . }}
+
+  output:
+    - type: "elasticsearch"
+      name:  {{ include "nginx-logging-es-demo.name" . }}
+      parameters:
+        - name: host
+          value: "elasticsearch-elasticsearch-cluster"
+        - name: port
+          value: "9200"
+        - name: scheme
+          value: "https"
+        - name: sslVerify
+          value: "false"
+        - name: sslVersion
+          value: "TLSv1_2"
+
+  filter:
+    - type: parser
+      name: parser-nginx
+      parameters:
+        - name: format
+          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$/'
+        - name: timeFormat
+          value: "%d/%b/%Y:%H:%M:%S %z"

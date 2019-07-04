@@ -1,0 +1,26 @@
+{{- if .Values.fluentd.enabled }}
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Fluentd
+metadata:
+  name: {{ template "logging-operator-fluent.fullname" . }}-fluentd
+  labels:
+    app.kubernetes.io/name: {{ include "logging-operator-fluent.name" . }}
+    helm.sh/chart: {{ include "logging-operator-fluent.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  namespace: {{ default .Release.Namespace .Values.watchNamespace }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path:   "/metrics"
+    prometheus.io/port:   "25000"
+  image: {{ toYaml .Values.fluentd.image | nindent 4 }}
+  volumeModImage: {{ toYaml .Values.fluentd.volumeModImage | nindent 4 }}
+  configReloaderImage: {{ toYaml .Values.fluentd.configReloaderImage | nindent 4 }}
+  resources: {}
+  fluentdPvcSpec: {{ toYaml .Values.fluentd.fluentdPvcSpec | nindent 4 }}
+  tls:
+    enabled: {{ .Values.tls.enabled }}
+    secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
+    sharedKey: {{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) | b64enc | quote }}
+{{ end }}
