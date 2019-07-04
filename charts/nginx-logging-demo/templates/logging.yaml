@@ -1,0 +1,21 @@
+apiVersion: "logging.banzaicloud.com/v1alpha1"
+kind: "Plugin"
+metadata:
+  name: {{ include "nginx-logging-demo.fullname" . }}
+  labels:
+    app: {{ include "nginx-logging-demo.name" . }}
+    chart: {{ include "nginx-logging-demo.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  input:
+    label:
+      app: {{ include "nginx-logging-demo.name" . }}
+  filter:
+    - type: parser
+      name: parser-nginx
+      parameters:
+        - name: format
+          value: '/^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$/'
+        - name: timeFormat
+          value: "%d/%b/%Y:%H:%M:%S %z"
