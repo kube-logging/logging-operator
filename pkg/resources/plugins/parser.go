@@ -21,8 +21,9 @@ const ParserFilter = "parser"
 
 // ParserFilterDefaultValues for parser plugin
 var ParserFilterDefaultValues = map[string]string{
-	"keyName":     "log",
-	"reserveData": "false",
+	"keyName":            "log",
+	"reserveData":        "true",
+	"removeKeyNameField": "true",
 }
 
 // ParserFilterTemplate for parser plugin
@@ -33,5 +34,6 @@ const ParserFilterTemplate = `
   time_format {{ .timeFormat }}
   key_name {{ .keyName }}
   reserve_data {{ .reserveData }}
+  remove_key_name_field {{ .removeKeyNameField }}
 </filter>
 `
