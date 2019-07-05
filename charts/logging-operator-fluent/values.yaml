@@ -11,7 +11,7 @@ fluentbit:
   enabled: true
   namespace: ""
   image:
-    tag: "latest"
+    tag: "1.1.3"
     repository: "fluent/fluent-bit"
     pullPolicy: "IfNotPresent"
 
