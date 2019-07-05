@@ -127,7 +127,6 @@ kubectl create -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
 | [Grafana Loki](./docs/plugins/loki.md)          | Output | Transfer logs to Loki                                                     | Testing | [0.2](https://github.com/banzaicloud/fluent-plugin-kubernetes-loki/releases/tag/v0.2)    |
 | [ElasticSearch](./docs/plugins/parser.md)       | Output | Send your logs to Elasticsearch                                           |    GA   | [3.5.2](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.5.2)         |
 | [HDFS](https://docs.fluentd.org/output/webhdfs) | Output | Fluentd output plugin to write data into Hadoop HDFS over WebHDFS/HttpFs. |    GA   | [1.2.3](https://github.com/fluent/fluent-plugin-webhdfs/releases/tag/v1.2.3)             |
-| Kubernetes Metadata Filter                      | Filter | Filter plugin to add Kubernetes metadata                                  |    GA   | [2.2.0](https://github.com/fabric8io/fluent-plugin-kubernetes_metadata_filter)           |
 | [Parser](./docs/plugins/parser.md)              | Parser | Parse logs with parser plugin                                             |    GA   |                                                                                          |
 ---
 

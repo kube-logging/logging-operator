@@ -15,7 +15,8 @@ $ helm repo update
 ```bash
 $ helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
 $ helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
-$ helm install --name loggingo banzaicloud-stable/logging-operator
+$ helm install --name logging banzaicloud-stable/logging-operator
+$ helm install --name fluent banzaicloud-stable/logging-operator-fluent
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
 
