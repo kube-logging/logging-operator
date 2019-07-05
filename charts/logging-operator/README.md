@@ -45,7 +45,7 @@ The following tables lists the configurable parameters of the logging-operator c
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `image.repository`                                  | Container image repository                             | `banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `0.1.7`                        |
+| `image.tag`                                         | Container image tag                                    | `0.2.1`                        |
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
@@ -92,7 +92,7 @@ $ helm install banzaicloud-stable/logging-operator-fluent
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
 | `fluentd.namespace`                                 | Specified fluentd installation namespace               | same as operator namespace     |
-| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.1.4`                       |
+| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.5.0`                       |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `banzaicloud/fluentd`          |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                          | `IfNotPresent`                 |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag             | `latest`                       |
