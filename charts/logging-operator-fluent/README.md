@@ -33,7 +33,7 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
 | `fluentd.namespace`                                 | Specified fluentd installation namespace               | same as operator namespace     |
-| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.1.4`                       |
+| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.5.0`                       |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `banzaicloud/fluentd`          |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                          | `IfNotPresent`                 |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag             | `latest`                       |
