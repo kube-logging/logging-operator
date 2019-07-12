@@ -58,7 +58,20 @@ func listTemplateFields(t *template.Template) []string {
 
 func listNodeFields(node parse.Node, res []string) []string {
 	if node.Type() == parse.NodeAction {
-		res = append(res, node.String())
+		if !contains(node.String(), res) {
+			res = append(res, node.String())
+		}
+	}
+
+	if ifn, ok := node.(*parse.IfNode); ok {
+		for _, n := range ifn.List.Nodes {
+			res = listNodeFields(n, res)
+		}
+		if ifn.ElseList != nil {
+			for _, n := range ifn.ElseList.Nodes {
+				res = listNodeFields(n, res)
+			}
+		}
 	}
 
 	if ln, ok := node.(*parse.ListNode); ok {
@@ -67,4 +80,13 @@ func listNodeFields(node parse.Node, res []string) []string {
 		}
 	}
 	return res
+}
+
+func contains(s string, sl []string) bool {
+	for _, i := range sl {
+		if i == s {
+			return true
+		}
+	}
+	return false
 }
