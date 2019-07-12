@@ -23,4 +23,3 @@ const StdOutputTemplate = `
 <match {{ .pattern }}.** >
   @type stdout
 </match>`
-

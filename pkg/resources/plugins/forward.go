@@ -60,4 +60,3 @@ const ForwardOutputTemplate = `
     overflow_action block
   </buffer>
 </match>`
-
