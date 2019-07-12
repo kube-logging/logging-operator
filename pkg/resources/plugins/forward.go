@@ -32,12 +32,26 @@ var ForwardOutputDefaultValues = map[string]string{
 	"flush_interval":     "5s",
 	"flush_thread_count": "2",
 	"retry_forever":      "true",
+	"tlsSharedKey":       "",               // enables tls and must match with the shared key on the remote side
+	"clientHostname":     "fluentd.client", // this must be different from the hostname on the remote side
 }
 
 // ForwardOutputTemplate for the ForwardOutput plugin
 const ForwardOutputTemplate = `
 <match {{ .pattern }}.** >
   @type forward
+
+  {{ if not (eq .tlsSharedKey "") -}}
+  transport tls
+  tls_version TLSv1_2
+  tls_cert_path                /fluentd/tls/caCert
+  tls_client_cert_path         /fluentd/tls/clientCert
+  tls_client_private_key_path  /fluentd/tls/clientKey
+  <security>
+    self_hostname           {{ .clientHostname }}
+    shared_key              {{ .tlsSharedKey }}
+  </security>
+  {{ end -}}
 
   <server>
     name {{ .name }}

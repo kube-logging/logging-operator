@@ -3,6 +3,8 @@
 | Variable name | Default | Applied function |
 |---|---|---|
 | pattern | - |  |
+| clientHostname | fluentd.client |  |
+| tlsSharedKey |  |  |
 | name | target |  |
 | host | - |  |
 | port | - |  |
@@ -20,6 +22,18 @@
 ```
 <match {{ .pattern }}.** >
   @type forward
+
+  {{ if not (eq .tlsSharedKey "") -}}
+  transport tls
+  tls_version TLSv1_2
+  tls_cert_path                /fluentd/tls/caCert
+  tls_client_cert_path         /fluentd/tls/clientCert
+  tls_client_private_key_path  /fluentd/tls/clientKey
+  <security>
+    self_hostname           {{ .clientHostname }}
+    shared_key              {{ .tlsSharedKey }}
+  </security>
+  {{ end -}}
 
   <server>
     name {{ .name }}
