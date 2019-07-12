@@ -1,0 +1,11 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Plugin
+metadata:
+  name: stdout
+spec:
+  input:
+    label:
+      app: "*"
+  output:
+    - type: stdout
+      name: stdout
