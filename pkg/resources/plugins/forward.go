@@ -16,9 +16,10 @@
 
 package plugins
 
-// Plugin name
+// ForwardOutput plugin name
 const ForwardOutput = "forward"
 
+// ForwardOutputDefaultValues default values for the plugin
 var ForwardOutputDefaultValues = map[string]string{
 	"name":               "target",
 	"bufferPath":         "/buffers/forward",
@@ -33,6 +34,7 @@ var ForwardOutputDefaultValues = map[string]string{
 	"retry_forever":      "true",
 }
 
+// ForwardOutputTemplate for the ForwardOutput plugin
 const ForwardOutputTemplate = `
 <match {{ .pattern }}.** >
   @type forward
