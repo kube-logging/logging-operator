@@ -16,9 +16,10 @@
 
 package plugins
 
-// Plugin name
+// StdOutput plugin name
 const StdOutput = "stdout"
 
+// StdOutputTemplate for the StdOutput plugin
 const StdOutputTemplate = `
 <match {{ .pattern }}.** >
   @type stdout
