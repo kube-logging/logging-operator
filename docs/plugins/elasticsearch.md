@@ -11,6 +11,7 @@
 | sslVersion | TLSv1_2 |  |
 | logstashFormat | true |  |
 | logstashPrefix | logstash |  |
+| log_es_400_reason | false |  |
 | bufferPath | /buffers/elasticsearch |  |
 | timekey | 1h |  |
 | timekey_wait | 10m |  |
@@ -46,6 +47,7 @@
   {{- if .password }}
   password {{ .password }}
   {{- end}}
+  log_es_400_reason {{ .log_es_400_reason }}
   <buffer tag, time>
     @type file
     path {{ .bufferPath }}
