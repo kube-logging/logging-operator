@@ -59,47 +59,25 @@ helm upgrade --install logging-operator-source charts/logging-operator-fluent \
   --set tls.secretName=fluentd-tls \
   --set tls.sharedKey=example
 
-# setup the tls forwarder with a shared key that matches with the existing key set up by the chart
-cat <<EOT | kubectl apply -f-
-apiVersion: logging.banzaicloud.com/v1alpha1
-kind: Plugin
-metadata:
-  name: forward
-spec:
-  input:
-    label:
-      app: "*"
-  output:
-    - type: forward
-      name: forward
-      parameters:
-        - name: host
-          value: "fluentd.target.svc"
-        - name: port
-          value: "24240"
-        - name: name
-          value: target
-        - name: tlsSharedKey
-          value: ZXhhbXBsZQ==
-EOT
+# install the demo app that writes logs
+helm upgrade --install nginx-logging-demo charts/nginx-logging-demo \
+  --set forwarding.enabled=true \
+  --set forwarding.tlsSharedKey=example \
+  --set forwarding.targetHost=fluentd.target.svc \
+  --set forwarding.targetPort=24240
 
 # start the operator to reconcile the desired state on the source namespace
 # stop it once it created all resources successfully
 WATCH_NAMESPACE=source go run cmd/manager/main.go
 
-
 # both fluent-bit and fluentd should be successfully rolled out
 kubectl rollout status daemonset fluent-bit-daemon
 kubectl rollout status deployment fluentd
-
-# install an app that writes logs
-helm template charts/nginx-logging-demo -x templates/deployment.yaml | kubectl apply -f- 
+ 
 ```
 
 
-Go back to the target and check the logs
+Watch the logs as they arrive to the target cluster
 ```
-# check the logs by tailing our fluentd instance
-kubens target
-kubetail fluentd
+kubetail -n target
 ```

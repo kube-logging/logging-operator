@@ -4,55 +4,53 @@ kubectl create ns source
 kubectl create ns target
 ```
 
+To test local changes we can install the operator requirements through the chart but we will start the operator 
+locally watching different namespaces.
+```
+helm upgrade --install logging-operator charts/logging-operator --set replicaCount=0
+```
+
+Setup the `target` namespace
+```
+kubens target
+
+# create the fluentd resource
+helm upgrade --install logging-operator-target charts/logging-operator-fluent \
+  --set fluentbit.enabled=false
+
+# send everything to stdout for for this simple demonstration
+kubectl apply -f example/stdout.yaml
+
+# start the operator to reconcile the desired state on the target namespace
+# stop it once it created all resources successfully
+WATCH_NAMESPACE=target go run cmd/manager/main.go
+
+kubectl rollout status deployment fluentd
+```
+
 Setup the `source` namespace to collect logs and forward to `target` 
-> use https://github.com/ahmetb/kubectx to switch namespaces
 ```
 kubens source
 
-# RBAC
-kubectl apply -f deploy/clusterrole.yaml \
-  -f deploy/clusterrole_binding.yaml \
-  -f deploy/service_account.yaml
+# create the fluentd resource
+helm upgrade --install logging-operator-source charts/logging-operator-fluent
 
-# CRDs
-kubectl apply -f deploy/crds/logging_v1alpha1_fluentbit_crd.yaml \
-  -f deploy/crds/logging_v1alpha1_fluentd_crd.yaml \
-  -f deploy/crds/logging_v1alpha1_plugin_crd.yaml
+# install the demo app that writes logs
+helm upgrade --install nginx-logging-demo charts/nginx-logging-demo \
+  --set forwarding.enabled=true \
+  --set forwarding.targetHost=fluentd.target.svc \
+  --set forwarding.targetPort=24240
 
-# CRs
-kubectl apply -f deploy/crds/logging_v1alpha1_fluentbit_cr.yaml \
-  -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
-
-# setup the forwarder
-kubectl apply -f example/cluster_forward.yaml
-  
-# start the operator locally to reconcile all the resources 
-# (in a few seconds it finishes creating all resources then we can stop it)
+# start the operator to reconcile the desired state on the source namespace
+# stop it once it created all resources successfully
 WATCH_NAMESPACE=source go run cmd/manager/main.go
 
 # both fluent-bit and fluentd should be successfully rolled out
 kubectl rollout status daemonset fluent-bit-daemon
-kubectl rollout status deployment test-fluentd
-
-# install an app that writes logs
-helm template charts/nginx-logging-demo -x templates/deployment.yaml | kubectl apply -f- 
+kubectl rollout status deployment fluentd
 ```
 
-Setup the `target` namespace
-> use https://github.com/johanhaleby/kubetail to tail logs
+Watch the logs as they arrive to the target cluster
 ```
-kubens target
-
-# create the fluentd deployment
-kubectl apply -f deploy/crds/logging_v1alpha1_fluentd_cr.yaml
-
-# send everything to stdout for checking the forwarded logs
-kubectl apply -f example/stdout.yaml
-
-WATCH_NAMESPACE=target go run cmd/manager/main.go
-
-kubectl rollout status deployment test-fluentd
-
-# check the logs by tailing our fluentd instance
-kubetail test-fluentd
+kubetail -n target
 ```
