@@ -23,6 +23,7 @@ var ElasticsearchDefaultValues = map[string]string{
 	"retry_forever":      "true",
 	"user":               "",
 	"password":           "",
+	"log_es_400_reason":  "false",
 }
 
 // ElasticsearchTemplate for Elasticsearch output plugin
@@ -50,6 +51,7 @@ const ElasticsearchTemplate = `
   {{- if .password }}
   password {{ .password }}
   {{- end}}
+  log_es_400_reason {{ .log_es_400_reason }}
   <buffer tag, time>
     @type file
     path {{ .bufferPath }}
