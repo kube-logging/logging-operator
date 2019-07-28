@@ -8,6 +8,7 @@
 | keyName | log |  |
 | reserveData | true |  |
 | removeKeyNameField | log |  |
+| replaceInvalidSequence | false |  |
 ## Plugin template
 ```
 <filter {{ .pattern }}.** >
@@ -17,6 +18,7 @@
   key_name {{ .keyName }}
   reserve_data {{ .reserveData }}
   remove_key_name_field {{ .removeKeyNameField }}
+  replace_invalid_sequence {{ .replaceInvalidSequence }}
 </filter>
 
 ```
