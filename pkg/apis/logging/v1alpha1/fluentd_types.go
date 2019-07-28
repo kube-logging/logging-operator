@@ -40,6 +40,7 @@ type FluentdSpec struct {
 	VolumeModImage      ImageSpec                        `json:"volumeModImage"`
 	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage"`
 	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
+	ServiceType         corev1.ServiceType               `json:"serviceType,omitempty"`
 }
 
 // FluentdTLS defines the TLS configs
@@ -85,6 +86,14 @@ func (spec FluentdSpec) GetPrometheusPortFromAnnotation() int32 {
 		panic(err)
 	}
 	return int32(port)
+}
+
+// GetServiceType gets the service type if set or ClusterIP as the default
+func (spec FluentdSpec) GetServiceType() corev1.ServiceType {
+	if spec.ServiceType == "" {
+		return corev1.ServiceTypeClusterIP
+	}
+	return spec.ServiceType
 }
 
 func init() {

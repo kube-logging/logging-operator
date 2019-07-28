@@ -36,7 +36,7 @@ func (r *Reconciler) service() runtime.Object {
 				},
 			},
 			Selector: labelSelector,
-			Type:     corev1.ServiceTypeClusterIP,
+			Type:     r.Fluentd.Spec.GetServiceType(),
 		},
 	}
 }
