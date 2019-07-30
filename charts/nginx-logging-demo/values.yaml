@@ -30,6 +30,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+forwarding:
+  enabled: false
+  # will use the the existing tls secret used by the fluentd input
+  #tlsSharedKey: example
+  #targetHost: fluentd.target.svc
+  #targetPort: 24240
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

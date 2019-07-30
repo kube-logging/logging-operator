@@ -60,3 +60,7 @@ endif
 .PHONY: docker
 docker: ## Build Docker image
 	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f Dockerfile .
+
+.PHONY: docs
+docs:
+	go run cmd/docgen/docgen.go
