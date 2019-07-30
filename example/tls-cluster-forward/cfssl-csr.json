@@ -1,0 +1,14 @@
+{
+  "CN": "fluentd",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "HU",
+      "O": "banzaicloud"
+    }
+  ],
+  "Hosts": ["fluentd.source.svc", "fluentd.target.svc", "fluentd.default.svc"]
+}

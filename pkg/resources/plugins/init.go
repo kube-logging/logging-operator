@@ -75,4 +75,6 @@ func init() {
 	RegisterPlugin(ParserFilter, ParserFilterTemplate, ParserFilterDefaultValues)
 	RegisterPlugin(ElasticsearchOutput, ElasticsearchTemplate, ElasticsearchDefaultValues)
 	RegisterPlugin(LokiOutput, LokiTemplate, LokiDefaultValues)
+	RegisterPlugin(ForwardOutput, ForwardOutputTemplate, ForwardOutputDefaultValues)
+	RegisterPlugin(StdOutput, StdOutputTemplate, make(map[string]string))
 }

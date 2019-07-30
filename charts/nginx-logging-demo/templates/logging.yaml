@@ -11,6 +11,22 @@ spec:
   input:
     label:
       app: {{ include "nginx-logging-demo.name" . }}
+{{- if .Values.forwarding.enabled }}
+  output:
+    - type: forward
+      name: forward
+      parameters:
+        - name: host
+          value: {{ .Values.forwarding.targetHost | quote }}
+        - name: port
+          value: {{ .Values.forwarding.targetPort | quote }}
+        - name: name
+          value: {{ .Values.forwarding.targetHost | quote }}
+{{- if .Values.forwarding.tlsSharedKey }}
+        - name: tlsSharedKey
+          value: {{ .Values.forwarding.tlsSharedKey | b64enc | quote }}
+{{- end }}
+{{- end }}
   filter:
     - type: parser
       name: parser-nginx

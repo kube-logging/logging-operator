@@ -1,20 +1,14 @@
-# Plugin elasticsearch
+# Plugin forward
 ## Variables
 | Variable name | Default | Applied function |
 |---|---|---|
 | pattern | - |  |
-| logLevel | info |  |
+| clientHostname | fluentd.client |  |
+| tlsSharedKey |  |  |
+| name | target |  |
 | host | - |  |
 | port | - |  |
-| scheme | scheme |  |
-| sslVerify | true |  |
-| sslVersion | TLSv1_2 |  |
-| logstashFormat | true |  |
-| logstashPrefix | logstash |  |
-| user |  |  |
-| password |  |  |
-| log_es_400_reason | false |  |
-| bufferPath | /buffers/elasticsearch |  |
+| bufferPath | /buffers/forward |  |
 | timekey | 1h |  |
 | timekey_wait | 10m |  |
 | timekey_use_utc | true |  |
@@ -26,30 +20,27 @@
 | queueLimit | 8 |  |
 ## Plugin template
 ```
-<match {{ .pattern }}.**>
-  @type elasticsearch
-  @log_level {{ .logLevel }}
-  include_tag_key true
-  type_name fluentd
-  host {{ .host }}
-  port {{ .port }}
-  scheme  {{ .scheme }}
-  {{- if .sslVerify }}
-  ssl_verify {{ .sslVerify }}
-  {{- end}}
-  {{- if .sslVersion }}
-  ssl_version {{ .sslVersion }}
-  {{- end}}
-  logstash_format {{ .logstashFormat }}
-  logstash_prefix {{ .logstashPrefix }}
-  reconnect_on_error true
-  {{- if .user }}
-  user {{ .user }}
-  {{- end}}
-  {{- if .password }}
-  password {{ .password }}
-  {{- end}}
-  log_es_400_reason {{ .log_es_400_reason }}
+<match {{ .pattern }}.** >
+  @type forward
+
+  {{ if not (eq .tlsSharedKey "") -}}
+  transport tls
+  tls_version TLSv1_2
+  tls_cert_path                /fluentd/tls/caCert
+  tls_client_cert_path         /fluentd/tls/clientCert
+  tls_client_private_key_path  /fluentd/tls/clientKey
+  <security>
+    self_hostname           {{ .clientHostname }}
+    shared_key              {{ .tlsSharedKey }}
+  </security>
+  {{ end -}}
+
+  <server>
+    name {{ .name }}
+    host {{ .host }}
+    port {{ .port }}
+  </server>
+
   <buffer tag, time>
     @type file
     path {{ .bufferPath }}

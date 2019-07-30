@@ -1,0 +1,18 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Plugin
+metadata:
+  name: forward
+spec:
+  input:
+    label:
+      app: "*"
+  output:
+    - type: forward
+      name: forward
+      parameters:
+        - name: host
+          value: "fluentd.target.svc"
+        - name: port
+          value: "24240"
+        - name: name
+          value: target

@@ -23,4 +23,5 @@ spec:
     enabled: {{ .Values.tls.enabled }}
     secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
     sharedKey: {{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) | b64enc | quote }}
+  serviceType: {{ .Values.fluentd.serviceType | default "ClusterIP" | quote }}
 {{ end }}
