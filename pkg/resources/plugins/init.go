@@ -79,4 +79,5 @@ func init() {
 	RegisterPlugin(StdOutput, StdOutputTemplate, make(map[string]string))
 	RegisterPlugin(SplunkTcpOutput, SplunkTcpTemplate, SplunkTcpDefaultValues)
 	RegisterPlugin(SplunkHecOutput, SplunkHecTemplate, SplunkHecDefaultValues)
+	RegisterPlugin(CustomOutput, CustomTemplate, CustomDefaultValues)
 }

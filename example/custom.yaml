@@ -1,0 +1,46 @@
+apiVersion: logging.banzaicloud.com/v1alpha1
+kind: Plugin
+metadata:
+  name: custom-output
+  namespace: monitoring
+spec:
+  input:
+    label:
+      app: example-app
+  output:
+  - name:  example-app
+    parameters:
+    - name: type
+      value: copy
+    - name: output
+      value: |
+        <store>
+          @type splunk_hec
+          host example.com
+          port 8088
+          token example-token
+          default_source fluentd
+          index_key access-logs
+          use_fluentd_time true
+          sourcetype _json
+          <buffer tag, time>
+            @type file
+            path /buffers/access-logs
+            timekey 1h
+            timekey_wait 10m
+            timekey_use_utc true
+            flush_mode interval
+            retry_type exponential_backoff
+            flush_thread_count 2
+            flush_interval 5s
+            retry_forever true
+            retry_max_interval 30
+            chunk_limit_size 2M
+            queue_limit_length 8
+            overflow_action block
+          </buffer>
+        </store>
+        <store>
+          @type stdout
+        </store>
+    type: custom

@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.9
 
 ENV OPERATOR=/usr/local/bin/logging-operator \
     USER_UID=1001 \
