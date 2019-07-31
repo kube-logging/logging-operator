@@ -77,4 +77,6 @@ func init() {
 	RegisterPlugin(LokiOutput, LokiTemplate, LokiDefaultValues)
 	RegisterPlugin(ForwardOutput, ForwardOutputTemplate, ForwardOutputDefaultValues)
 	RegisterPlugin(StdOutput, StdOutputTemplate, make(map[string]string))
+	RegisterPlugin(SplunkTcpOutput, SplunkTcpTemplate, SplunkTcpDefaultValues)
+	RegisterPlugin(SplunkHecOutput, SplunkHecTemplate, SplunkHecDefaultValues)
 }

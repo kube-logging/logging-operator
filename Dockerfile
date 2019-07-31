@@ -12,7 +12,7 @@ ADD . /go/src/github.com/banzaicloud/logging-operator
 RUN go install ./cmd/manager
 
 
-FROM alpine:3.8
+FROM alpine:3.9
 
 RUN apk add --no-cache ca-certificates
 
