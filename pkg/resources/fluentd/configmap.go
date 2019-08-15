@@ -47,7 +47,7 @@ func (r *Reconciler) configMap() runtime.Object {
 		ObjectMeta: templates.FluentdObjectMeta(configMapName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
 		Data: map[string]string{
 			"fluent.conf":  fluentdDefaultTemplate,
-			"input.conf":   generateConfig(input),
+			"input.conf":   fluentdInputTemplate,
 			"devnull.conf": fluentdOutputTemplate,
 		},
 	}
