@@ -20,7 +20,7 @@ var fluentBitConfigTemplate = `
 [SERVICE]
     Flush        1
     Daemon       Off
-    Log_Level    info
+    Log_Level    debug
     Parsers_File parsers.conf
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
@@ -46,6 +46,12 @@ var fluentBitConfigTemplate = `
     Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
     Merge_Log           On
 
+[FILTER]
+    Name    lua
+    Match   kube.*
+    script  /fluent-bit/etc/functions.lua
+    call    dedot
+
 [OUTPUT]
     Name          forward
     Match         *
@@ -60,4 +66,27 @@ var fluentBitConfigTemplate = `
     Shared_Key    {{ .TLS.SharedKey }}
     {{- end }}
     Retry_Limit   False
+`
+var fluentBitLuaFunctionsTemplate = `
+function dedot(tag, timestamp, record)
+    if record["kubernetes"] == nil then
+        return 0, 0, 0
+    end
+    dedot_keys(record["kubernetes"]["annotations"])
+    dedot_keys(record["kubernetes"]["labels"])
+    return 1, timestamp, record
+end
+
+function dedot_keys(map)
+    if map == nil then
+        return
+    end
+    for k, v in pairs(map) do
+        dedotted = string.gsub(k, "%.", "_")
+        if k ~= dedotted then
+            map[dedotted] = v
+            map[k] = nil
+        end
+    end
+end
 `

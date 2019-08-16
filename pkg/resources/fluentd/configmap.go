@@ -34,21 +34,21 @@ type fluentdConfig struct {
 }
 
 func (r *Reconciler) configMap() runtime.Object {
-/*	input := fluentdConfig{
- *		TLS: struct {
- *			Enabled   bool
- *			SharedKey string
- *		}{
- *			Enabled:   r.Fluentd.Spec.TLS.Enabled,
- *			SharedKey: r.Fluentd.Spec.TLS.SharedKey,
- *		},
- *	}
- */
+	input := fluentdConfig{
+		TLS: struct {
+			Enabled   bool
+			SharedKey string
+		}{
+			Enabled:   r.Fluentd.Spec.TLS.Enabled,
+			SharedKey: r.Fluentd.Spec.TLS.SharedKey,
+		},
+	}
+
 	return &corev1.ConfigMap{
 		ObjectMeta: templates.FluentdObjectMeta(configMapName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
 		Data: map[string]string{
 			"fluent.conf":  fluentdDefaultTemplate,
-			"input.conf":   fluentdInputTemplate,
+			"input.conf":   generateConfig(input),
 			"devnull.conf": fluentdOutputTemplate,
 		},
 	}
@@ -67,3 +67,6 @@ func generateConfig(input fluentdConfig) string {
 	outputString := fmt.Sprint(output.String())
 	return outputString
 }
+
+/*			"input.conf":   fluentdInputTemplate,
+ */

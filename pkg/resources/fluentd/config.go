@@ -69,10 +69,6 @@ var fluentdInputTemplate = `
     @type null
 </match>
 
-<match **.kubernetes.labels.app**>
-    @type null
-</match>
-
 <match kubernetes.**>
   @type rewrite_tag_filter
   <rule>
