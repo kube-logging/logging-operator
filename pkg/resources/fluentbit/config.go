@@ -20,7 +20,7 @@ var fluentBitConfigTemplate = `
 [SERVICE]
     Flush        1
     Daemon       Off
-    Log_Level    debug
+    Log_Level    info
     Parsers_File parsers.conf
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
