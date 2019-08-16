@@ -43,7 +43,6 @@ func (r *Reconciler) configMap() runtime.Object {
 			SharedKey: r.Fluentd.Spec.TLS.SharedKey,
 		},
 	}
-
 	return &corev1.ConfigMap{
 		ObjectMeta: templates.FluentdObjectMeta(configMapName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
 		Data: map[string]string{
@@ -68,5 +67,3 @@ func generateConfig(input fluentdConfig) string {
 	return outputString
 }
 
-/*			"input.conf":   fluentdInputTemplate,
- */
