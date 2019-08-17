@@ -80,11 +80,6 @@ func generateVolumeMounts(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volu
 			SubPath:   "fluent-bit.conf",
 		},
 		{
-			Name:      "config",
-			MountPath: "/fluent-bit/etc/functions.lua",
-			SubPath:   "functions.lua",
-		},
-		{
 			Name:      "positions",
 			MountPath: "/tail-db",
 		},

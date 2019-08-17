@@ -56,7 +56,6 @@ func (r *Reconciler) configMap() runtime.Object {
 		ObjectMeta: templates.FluentbitObjectMeta(fluentbitConfigMapName, r.Fluentbit.Labels, r.Fluentbit),
 		Data: map[string]string{
 			"fluent-bit.conf": generateConfig(input),
-			"functions.lua":   fluentBitLuaFunctionsTemplate,
 		},
 	}
 }
