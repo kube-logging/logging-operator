@@ -69,6 +69,13 @@ var fluentdInputTemplate = `
     @type null
 </match>
 
+<filter **.kubernetes.**>
+  @type dedot
+  de_dot true
+  de_dot_separator _
+  de_dot_nested true
+</filter>
+
 <match kubernetes.**>
   @type rewrite_tag_filter
   <rule>
