@@ -19,6 +19,9 @@ spec:
   configReloaderImage: {{ toYaml .Values.fluentd.configReloaderImage | nindent 4 }}
   resources: {}
   fluentdPvcSpec: {{ toYaml .Values.fluentd.fluentdPvcSpec | nindent 4 }}
+  {{- if .Values.fluentd.tolerations }}
+  tolerations: {{ toYaml .Values.fluentd.tolerations | nindent 4 }}
+  {{- end }}
   tls:
     enabled: {{ .Values.tls.enabled }}
     secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
