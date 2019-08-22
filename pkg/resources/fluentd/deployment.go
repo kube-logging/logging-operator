@@ -83,6 +83,7 @@ func (r *Reconciler) deployment() runtime.Object {
 						},
 						*newConfigMapReloader(r.Fluentd.Spec.ConfigReloaderImage),
 					},
+					Tolerations: r.Fluentd.Spec.Tolerations,
 				},
 			},
 		},
