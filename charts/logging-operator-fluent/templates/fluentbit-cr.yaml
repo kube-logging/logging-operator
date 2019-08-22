@@ -16,6 +16,9 @@ spec:
     prometheus.io/port:   "2020"
   image: {{ toYaml .Values.fluentbit.image | nindent 4 }}
   resources: {}
+  {{- if .Values.fluentbit.tolerations }}
+  tolerations: {{ toYaml .Values.fluentbit.tolerations | nindent 4 }}
+  {{- end }}
   tls:
     enabled: {{ .Values.tls.enabled }}
     secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
