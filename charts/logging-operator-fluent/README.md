@@ -31,6 +31,7 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentbit.image.tag`                               | Fluentbit container image tag                          | `1.1.3`                       |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`            |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
+| `fluentbit.tolerations`                             | Fluentbit tolerations                                  | `nil`                          |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
 | `fluentd.namespace`                                 | Specified fluentd installation namespace               | same as operator namespace     |
 | `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.5.0`                       |
@@ -44,4 +45,5 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentd.configReloaderImage.pullPolicy`            | Fluentd configReloaderImage container pull policy      | `IfNotPresent`                 |
 | `fluentd.fluentdPvcSpec.accessModes`                | Fluentd persistence volume access modes                | `[ReadWriteOnce]`              |
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                        | `21Gi`                         |
+| `fluentd.tolerations`                               | Fluentd tolerations                                    | `nil`                          |
 | `psp.enabled`                                       | Install PodSecurityPolicy                              | `false`                        |
