@@ -27,6 +27,7 @@ var S3DefaultValues = map[string]string{
 	"format":               "json",
 	"timekey_use_utc":      "true",
 	"s3_object_key_format": "%{path}%{time_slice}_%{index}.%{file_extension}",
+	"path":                 "logs/${tag}/%Y/%m/%d/",
 }
 
 // S3Template for Amazaon S3 output plugin
@@ -60,7 +61,7 @@ const S3Template = `
   {{- end }}
   store_as gzip_command
 
-  path logs/${tag}/%Y/%m/%d/
+  path {{ .path }}
   s3_object_key_format {{ .s3_object_key_format }}
 
   # if you want to use ${tag} or %Y/%m/%d/ like syntax in path / s3_object_key_format,
