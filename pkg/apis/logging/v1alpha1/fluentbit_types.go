@@ -37,6 +37,7 @@ type FluentbitSpec struct {
 	Image       ImageSpec                   `json:"image"`
 	TLS         FluentbitTLS                `json:"tls"`
 	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
+	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
 }
 
 // FluentbitTLS defines the TLS configs

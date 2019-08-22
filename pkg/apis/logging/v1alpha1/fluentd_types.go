@@ -41,6 +41,7 @@ type FluentdSpec struct {
 	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage"`
 	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
 	ServiceType         corev1.ServiceType               `json:"serviceType,omitempty"`
+	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
 }
 
 // FluentdTLS defines the TLS configs
