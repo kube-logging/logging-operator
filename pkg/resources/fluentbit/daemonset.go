@@ -61,6 +61,7 @@ func (r *Reconciler) daemonSet() runtime.Object {
 							VolumeMounts:    generateVolumeMounts(r.Fluentbit),
 						},
 					},
+					Tolerations: r.Fluentbit.Spec.Tolerations,
 				},
 			},
 		},
