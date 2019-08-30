@@ -94,18 +94,7 @@ func generateVolumeMounts(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volu
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-tls",
-				MountPath: "/fluent-bit/tls/caCert",
-				SubPath:   "caCert",
-			},
-			{
-				Name:      "fluent-tls",
-				MountPath: "/fluent-bit/tls/clientCert",
-				SubPath:   "clientCert",
-			},
-			{
-				Name:      "fluent-tls",
-				MountPath: "/fluent-bit/tls/clientKey",
-				SubPath:   "clientKey",
+				MountPath: "/fluent-bit/tls",
 			},
 		}
 		v = append(v, tlsRelatedVolume...)

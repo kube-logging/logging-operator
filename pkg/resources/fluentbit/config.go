@@ -54,9 +54,9 @@ var fluentBitConfigTemplate = `
     {{ if .TLS.Enabled }}
     tls           On
     tls.verify    Off
-    tls.ca_file   /fluent-bit/tls/caCert
-    tls.crt_file  /fluent-bit/tls/clientCert
-    tls.key_file  /fluent-bit/tls/clientKey
+    tls.ca_file   {{ .TLS.CACertFile }}
+    tls.crt_file  {{ .TLS.CertFile }}
+    tls.key_file  {{ .TLS.KeyFile }}
     Shared_Key    {{ .TLS.SharedKey }}
     {{- end }}
     Retry_Limit   False
