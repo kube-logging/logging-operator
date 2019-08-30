@@ -26,23 +26,33 @@ import (
 	"text/template"
 )
 
+type fluentdTLSConfig struct {
+	Enabled    bool
+	SharedKey  string
+	CACertFile string
+	CertFile   string
+	KeyFile    string
+}
+
 type fluentdConfig struct {
-	TLS struct {
-		Enabled   bool
-		SharedKey string
-	}
+	TLS fluentdTLSConfig
 }
 
 func (r *Reconciler) configMap() runtime.Object {
-	input := fluentdConfig{
-		TLS: struct {
-			Enabled   bool
-			SharedKey string
-		}{
-			Enabled:   r.Fluentd.Spec.TLS.Enabled,
-			SharedKey: r.Fluentd.Spec.TLS.SharedKey,
-		},
+	tlsConfig := fluentdTLSConfig{
+		Enabled:   r.Fluentd.Spec.TLS.Enabled,
+		SharedKey: r.Fluentd.Spec.TLS.SharedKey,
 	}
+	if r.Fluentd.Spec.TLS.SecretType == "tls" {
+		tlsConfig.CertFile = "/fluentd/tls/tls.crt"
+		tlsConfig.KeyFile = "/fluentd/tls/tls.key"
+		tlsConfig.CACertFile = "/fluentd/tls/ca.crt"
+	} else {
+		tlsConfig.CertFile = "/fluentd/tls/serverCert"
+		tlsConfig.KeyFile = "/fluentd/tls/serverKey"
+		tlsConfig.CACertFile = "/fluentd/tls/caCert"
+	}
+	input := fluentdConfig{TLS: tlsConfig}
 	return &corev1.ConfigMap{
 		ObjectMeta: templates.FluentdObjectMeta(configMapName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
 		Data: map[string]string{

@@ -15,6 +15,7 @@ fluentbit:
     tag: "1.1.3"
     repository: "fluent/fluent-bit"
     pullPolicy: "IfNotPresent"
+  tlsSecret: ""
 
 fluentd:
   enabled: true
@@ -38,6 +39,7 @@ fluentd:
     resources:
       requests:
         storage: 21Gi
+  tlsSecret: ""
 
 psp:
   enabled: false

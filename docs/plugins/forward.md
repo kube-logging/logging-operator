@@ -5,6 +5,9 @@
 | pattern | - |  |
 | clientHostname | fluentd.client |  |
 | tlsSharedKey |  |  |
+| tlsCACertFilel | fluentd/tls/caCert |  |
+| tlsCertFile | fluentd/tls/clientCert |  |
+| tlsKeyFile | /fluentd/tls/clientKey |  |
 | name | target |  |
 | host | - |  |
 | port | - |  |
@@ -26,9 +29,9 @@
   {{ if not (eq .tlsSharedKey "") -}}
   transport tls
   tls_version TLSv1_2
-  tls_cert_path                /fluentd/tls/caCert
-  tls_client_cert_path         /fluentd/tls/clientCert
-  tls_client_private_key_path  /fluentd/tls/clientKey
+  tls_cert_path                {{ .tlsCACertFile }}
+  tls_client_cert_path         {{ .tlsCertFile }}
+  tls_client_private_key_path  {{ .tlsKeyFile }}
   <security>
     self_hostname           {{ .clientHostname }}
     shared_key              {{ .tlsSharedKey }}

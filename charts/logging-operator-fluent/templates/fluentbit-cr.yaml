@@ -1,4 +1,5 @@
 {{- if .Values.fluentbit.enabled }}
+{{ $fluentbitUseGenericSecret := or .Values.tls.secretName (not .Values.fluentbit.tlsSecret ) }}
 apiVersion: logging.banzaicloud.com/v1alpha1
 kind: Fluentbit
 metadata:
@@ -21,6 +22,12 @@ spec:
   {{- end }}
   tls:
     enabled: {{ .Values.tls.enabled }}
+{{- if $fluentbitUseGenericSecret }}
     secretName: {{ .Values.tls.secretName | default (include "logging-operator-fluent.fullname" .) }}
+    secretType: generic
+{{- else }}
+    secretName: {{ .Values.fluentbit.tlsSecret }}
+    secretType: tls
+{{- end }}
     sharedKey: {{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) | b64enc | quote }}
 {{ end }}

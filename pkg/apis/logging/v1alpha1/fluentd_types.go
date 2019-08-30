@@ -48,6 +48,7 @@ type FluentdSpec struct {
 type FluentdTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName"`
+	SecretType string `json:"secretType,omitempty"`
 	SharedKey  string `json:"sharedKey"`
 }
 

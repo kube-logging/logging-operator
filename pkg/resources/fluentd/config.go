@@ -50,9 +50,9 @@ var fluentdInputTemplate = `
     </security>
     <transport tls>
       version                TLSv1_2
-      ca_path                /fluentd/tls/caCert
-      cert_path              /fluentd/tls/serverCert
-      private_key_path       /fluentd/tls/serverKey
+      ca_path                {{ .TLS.CACertFile }}
+      cert_path              {{ .TLS.CertFile }}
+      private_key_path       {{ .TLS.KeyFile }}
       client_cert_auth       true
     </transport>
     {{- end }}
