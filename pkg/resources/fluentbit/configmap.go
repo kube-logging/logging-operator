@@ -24,14 +24,19 @@ import (
 	"text/template"
 )
 
+type fluentbitTLSConfig struct {
+	Enabled    bool
+	SharedKey  string
+	CACertFile string
+	CertFile   string
+	KeyFile    string
+}
+
 type fluentBitConfig struct {
 	Namespace string
-	TLS       struct {
-		Enabled   bool
-		SharedKey string
-	}
-	Monitor map[string]string
-	Output  map[string]string
+	TLS       fluentbitTLSConfig
+	Monitor   map[string]string
+	Output    map[string]string
 }
 
 func (r *Reconciler) configMap() runtime.Object {
@@ -41,16 +46,23 @@ func (r *Reconciler) configMap() runtime.Object {
 			"Port": r.Fluentbit.Spec.Annotations["prometheus.io/port"],
 		}
 	}
+	tlsConfig := fluentbitTLSConfig{
+		Enabled:   r.Fluentbit.Spec.TLS.Enabled,
+		SharedKey: r.Fluentbit.Spec.TLS.SharedKey,
+	}
+	if r.Fluentbit.Spec.TLS.SecretType == "tls" {
+		tlsConfig.CertFile = "/fluent-bit/tls/tls.crt"
+		tlsConfig.KeyFile = "/fluent-bit/tls/tls.key"
+		tlsConfig.CACertFile = "/fluent-bit/tls/ca.crt"
+	} else {
+		tlsConfig.CertFile = "/fluent-bit/tls/clientCert"
+		tlsConfig.KeyFile = "/fluent-bit/tls/clientKey"
+		tlsConfig.CACertFile = "/fluent-bit/tls/caCert"
+	}
 	input := fluentBitConfig{
 		Namespace: r.Fluentbit.Namespace,
-		TLS: struct {
-			Enabled   bool
-			SharedKey string
-		}{
-			Enabled:   r.Fluentbit.Spec.TLS.Enabled,
-			SharedKey: r.Fluentbit.Spec.TLS.SharedKey,
-		},
-		Monitor: monitorConfig,
+		TLS:       tlsConfig,
+		Monitor:   monitorConfig,
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: templates.FluentbitObjectMeta(fluentbitConfigMapName, r.Fluentbit.Labels, r.Fluentbit),
