@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package fluentbit
 
@@ -22,9 +20,11 @@ var fluentBitConfigTemplate = `
     Daemon       Off
     Log_Level    info
     Parsers_File parsers.conf
+{{- if .Monitor.Port }}
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
     HTTP_Port    {{ .Monitor.Port }}
+{{- end }}
 
 [INPUT]
     Name             tail
@@ -49,14 +49,14 @@ var fluentBitConfigTemplate = `
 [OUTPUT]
     Name          forward
     Match         *
-    Host          fluentd.{{ .Namespace }}.svc
-    Port          24240
+    Host          {{ .TargetHost }}
+    Port          {{ .TargetPort }}
     {{ if .TLS.Enabled }}
     tls           On
     tls.verify    Off
-    tls.ca_file   {{ .TLS.CACertFile }}
-    tls.crt_file  {{ .TLS.CertFile }}
-    tls.key_file  {{ .TLS.KeyFile }}
+    tls.ca_file   /fluent-bit/tls/ca.crt
+    tls.crt_file  /fluent-bit/tls/tls.crt
+    tls.key_file  /fluent-bit/tls/tls.key
     Shared_Key    {{ .TLS.SharedKey }}
     {{- end }}
     Retry_Limit   False

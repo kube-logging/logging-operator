@@ -20,90 +20,73 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:
+  - apiGroups:
+      - logging.banzaicloud.com
+    resources:
+      - loggings
+      - flows
+      - clusterflows
+      - outputs
+      - clusteroutputs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - logging.banzaicloud.com
+    resources:
+      - loggings/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - ""
+      - apps
+      - batch
+      - extensions
+      - policy
+      - rbac.authorization.k8s.io
+    resources:
+      - namespaces
+      - nodes
+      - persistentvolumeclaims
+      - pods
+      - services
+      - resourcequotas
+      - replicationcontrollers
+      - limitranges
+      - persistentvolumeclaims
+      - persistentvolumes
+      - endpoints
+      - secrets
+      - configmaps
+      - serviceaccounts
+      - roles
+      - rolebindings
+      - clusterroles
+      - clusterrolebindings
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+      - jobs
+    verbs:
+      - "*"
+  {{- if .Values.rbac.psp.enabled }}
 - apiGroups:
-  - logging.banzaicloud.com
+    - extensions
   resources:
-  - plugins
-  - fluentds
-  - fluentbits
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  - apps
-  - autoscaling
-  - batch
-  - extensions
-  - policy
-  - rbac.authorization.k8s.io
-  resources:
-  - namespaces
-  - nodes
-  - persistentvolumeclaims
-  - pods
-  - services
-  - resourcequotas
-  - replicationcontrollers
-  - limitranges
-  - persistentvolumeclaims
-  - persistentvolumes
-  - endpoints
-  - secrets
-  - configmaps
-  - serviceaccounts
-  - clusterroles
-  - clusterrolebindings
-  verbs:
-  - "*"
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  verbs:
-  - "*"
-- apiGroups:
-  - extensions
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  verbs:
-  - "*"
-- apiGroups:
-  - apps
-  resources:
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - list
-  - watch
-{{- if .Values.rbac.psp.enabled }}
-- apiGroups:
-  - extensions
-  resources:
-  - podsecuritypolicies
+    - podsecuritypolicies
   resourceNames:
-  - psp.logging-operator
+    - psp.logging-operator
   verbs:
-  - use
-{{- end }}
+    - use
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -115,12 +98,12 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 subjects:
-- kind: ServiceAccount
-  name: {{ template "logging-operator.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: {{ template "logging-operator.fullname" . }}
+    namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: {{ template "logging-operator.fullname" . }}
 
-{{- end }}
+  {{- end }}

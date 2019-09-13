@@ -1,0 +1,10 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Flow
+metadata:
+  name: flow-sample
+  namespace: default
+spec:
+  outputRefs:
+    - s3-output-sample 
+  selectors:
+    app: nginx

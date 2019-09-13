@@ -1,0 +1,11 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Logging
+metadata:
+  name: defaultlogging
+spec:
+  fluentd: {
+    disablePvc: true
+  }
+  fluentbit: {}
+  controlNamespace: default
+

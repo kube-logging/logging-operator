@@ -1,0 +1,25 @@
+version: "2"
+domain: banzaicloud.com
+repo: github.com/banzaicloud/logging-operator
+resources:
+- group: logging
+  version: v1alpha2
+  kind: Fluentbit
+- group: logging
+  version: v1alpha2
+  kind: Fluentd
+- group: logging
+  version: v1alpha2
+  kind: Flow
+- group: logging
+  version: v1alpha2
+  kind: ClusterFlow
+- group: logging
+  version: v1alpha2
+  kind: Output
+- group: logging
+  version: v1alpha2
+  kind: ClusterOutput
+- group: logging
+  version: v1alpha2
+  kind: Logging
