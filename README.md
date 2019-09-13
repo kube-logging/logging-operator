@@ -68,7 +68,7 @@ Available custom resources:
 
 The detailed CRD documentation can be found [here](/docs/crds.md).
 
-<p align="center"><img src="docs/img/logging-operator-v2-architecture.png" width="660"></p>
+<p align="center"><img src="docs/img/logging-operator-v2-architecture.png" ></p>
 
 *connection between custom resources*
 
@@ -115,6 +115,7 @@ For complete list of supported plugins pleas checkl the [plugins index](/docs/pl
 | [Google Storage](./docs/plugins/outputs/gcs.md)          | Output | Store logs in Google Cloud Storage                                        |    GA   | [0.4.0.beta1](https://github.com/banzaicloud/fluent-plugin-gcs)                          |
 | [Grafana Loki](./docs/plugins/outputs/loki.md)           | Output | Transfer logs to Loki                                                     | Testing | [0.2](https://github.com/banzaicloud/fluent-plugin-kubernetes-loki/releases/tag/v0.2)    |
 | [ElasticSearch](./docs/plugins/outputs/elasticsearch.md) | Output | Send your logs to Elasticsearch                                           |    GA   | [3.5.2](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.5.2)         |
+| [Sumologic](./docs/plugins/outputs/sumologic.md) | Output | Send your logs to Sumologic                                           |    GA   | [1.5.0](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.5.0)         |
 | [Tag Normaliser](./docs/plugins/filters/tagnormaliser.md) | Parser | Normalise tags for outputs                                                |    GA   |                                                                                          |
 | [Parser](./docs/plugins/filters/parser.md)                | Parser | Parse logs with parser plugin                                             |    GA   |                                                                                          |
 
