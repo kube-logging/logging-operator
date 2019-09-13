@@ -1,0 +1,19 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Output
+metadata:
+  name: gcs-output-sample
+spec:
+  gcs:
+    credentials_json:
+      valueFrom:
+        secretKeyRef:
+          name: gcs-secret
+          key: credentials.json
+    project: logging-example
+    bucket: banzai-log-test
+    path: logs/${tag}/%Y/%m/%d/
+    buffer:
+      path: /tmp/buffer
+      timekey: 1m
+      timekey_wait: 10s
+      timekey_use_utc: true

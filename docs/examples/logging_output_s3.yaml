@@ -1,0 +1,26 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Output
+metadata:
+  name: s3-output-sample
+spec:
+  s3:
+    aws_key_id:
+      valueFrom:
+        secretKeyRef:
+          name: s3-secret
+          key: awsAccessKeyId
+    aws_sec_key:
+      valueFrom:
+        secretKeyRef:
+          name: s3-secret
+          key: awsSecretAccesKey
+    s3_bucket: example-logging-bucket
+    s3_region: eu-central-1
+    path: logs/${tag}/%Y/%m/%d/
+    buffer:
+      path: /tmp/buffer
+      timekey: 1m
+      timekey_wait: 10s
+      timekey_use_utc: true
+    format:
+      type: json

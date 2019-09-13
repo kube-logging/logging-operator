@@ -6,39 +6,18 @@ replicaCount: 1
 
 image:
   repository: banzaicloud/logging-operator
-  tag: 0.2.2
+  tag: 2.0.0
   pullPolicy: IfNotPresent
 
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# Namespace to watch fot LoggingOperator CRD
-watchNamespace: ""
-
-grafana:
-  dashboard:
-    enabled: true
-
-
-## Role Based Access
-## Ref: https://kubernetes.io/docs/admin/authorization/rbac/
-##
-rbac:
-  enabled: true
-  ## Pod Security Policy
-  ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
-  ##
-  psp:
-    enabled: false
-
-## Define resources requests and limits for single Pods.
-## ref: https://kubernetes.io/docs/user-guide/compute-resources/
-## We usually recommend not to specify default resources and to leave this as a conscious
-## choice for the user. This also increases chances charts run on environments with little
-## resources, such as Minikube. If you do want to specify resources, uncomment the following
-## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-##
 resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
@@ -46,46 +25,24 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-
-## Define which Nodes the Pods are scheduled on.
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
 nodeSelector: {}
 
-
-## If specified, the pod's tolerations.
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
 tolerations: []
-# - key: "key"
-#   operator: "Equal"
-#   value: "value"
-#   effect: "NoSchedule"
 
-## Assign the Logging operator to run on specific nodes
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-##
 affinity: {}
-# requiredDuringSchedulingIgnoredDuringExecution:
-#   nodeSelectorTerms:
-#   - matchExpressions:
-#     - key: kubernetes.io/e2e-az-name
-#       operator: In
-#       values:
-#       - e2e-az1
-#       - e2e-az2
 
+http:
+  # http listen port number
+  port: 8080
+  # Service definition for query http service
+  service:
+    type: ClusterIP
+    # Annotations to query http service
+    annotations: {}
+    # Labels to query http service
+    labels: {}
 
-## SecurityContext holds pod-level security attributes and common container settings.
-## This defaults to non root user with uid 1000 and gid 2000.	*v1.PodSecurityContext	false
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-podSecurityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  fsGroup: 2000
-securityContext:
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  # capabilities:
-  #   drop: ["ALL"]
+rbac:
+  enabled: true
+  psp:
+    enabled: false

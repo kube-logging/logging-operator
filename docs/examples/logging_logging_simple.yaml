@@ -1,0 +1,9 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Logging
+metadata:
+  name: default-logging-simple
+  namespace: logging
+spec:
+  fluentd: {}
+  fluentbit: {}
+  controlNamespace: logging

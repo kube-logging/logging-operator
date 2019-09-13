@@ -1,0 +1,18 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Flow
+metadata:
+  name: flow-sample
+  namespace: default
+spec:
+  filters:
+    - parse:
+        key_name: log
+        remove_key_name_field: true
+        parsers:
+          - type: nginx
+    - tag_normaliser:
+        format: ${namespace_name}.${pod_name}.${container_name}
+  outputRefs:
+    - s3-output
+  selectors:
+    app: nginx

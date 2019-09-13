@@ -1,23 +1,20 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package fluentbit
 
 import (
-	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/apis/logging/v1alpha1"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
@@ -31,44 +28,46 @@ func (r *Reconciler) daemonSet() runtime.Object {
 
 	var containerPorts []corev1.ContainerPort
 
-	if _, ok := r.Fluentbit.Spec.Annotations["prometheus.io/port"]; ok {
+	if _, ok := r.Logging.Spec.FluentbitSpec.Annotations["prometheus.io/port"]; ok {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: r.Fluentbit.Spec.GetPrometheusPortFromAnnotation(),
+			ContainerPort: r.Logging.Spec.FluentbitSpec.GetPrometheusPortFromAnnotation(),
 			Protocol:      corev1.ProtocolTCP,
 		})
 	}
 
+	labels := util.MergeLabels(r.Logging.Labels, labelSelector)
+
 	return &appsv1.DaemonSet{
-		ObjectMeta: templates.FluentbitObjectMeta(fluentbitDeaemonSetName, util.MergeLabels(r.Fluentbit.Labels, labelSelector), r.Fluentbit),
+		ObjectMeta: templates.FluentbitObjectMeta(
+			r.Logging.QualifiedName(fluentbitDaemonSetName), labels, r.Logging),
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Fluentbit.Labels, labelSelector)},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, labelSelector)},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels:      util.MergeLabels(r.Fluentbit.Labels, labelSelector),
-					Annotations: r.Fluentbit.Spec.Annotations,
+					Labels:      labels,
+					Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName: serviceAccountName,
-					Volumes:            generateVolume(r.Fluentbit),
+					ServiceAccountName: r.Logging.QualifiedName(serviceAccountName),
+					Volumes:            r.generateVolume(),
 					Containers: []corev1.Container{
 						{
 							Name:            "fluent-bit",
-							Image:           r.Fluentbit.Spec.Image.Repository + ":" + r.Fluentbit.Spec.Image.Tag,
-							ImagePullPolicy: corev1.PullPolicy(r.Fluentbit.Spec.Image.PullPolicy),
+							Image:           r.Logging.Spec.FluentbitSpec.Image.Repository + ":" + r.Logging.Spec.FluentbitSpec.Image.Tag,
+							ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
 							Ports:           containerPorts,
-							Resources:       r.Fluentbit.Spec.Resources,
-							VolumeMounts:    generateVolumeMounts(r.Fluentbit),
+							Resources:       r.Logging.Spec.FluentbitSpec.Resources,
+							VolumeMounts:    r.generateVolumeMounts(),
 						},
 					},
-					Tolerations: r.Fluentbit.Spec.Tolerations,
 				},
 			},
 		},
 	}
 }
 
-func generateVolumeMounts(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.VolumeMount) {
+func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 	v = []corev1.VolumeMount{
 		{
 			Name:      "varlibcontainers",
@@ -90,11 +89,11 @@ func generateVolumeMounts(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volu
 			MountPath: "/var/log/",
 		},
 	}
-	if fluentbit.Spec.TLS.Enabled {
+	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
-				Name:      "fluent-tls",
-				MountPath: "/fluent-bit/tls",
+				Name:      "fluent-bit-tls",
+				MountPath: "/fluent-bit/tls/",
 			},
 		}
 		v = append(v, tlsRelatedVolume...)
@@ -102,7 +101,7 @@ func generateVolumeMounts(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volu
 	return
 }
 
-func generateVolume(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volume) {
+func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
 			Name: "varlibcontainers",
@@ -115,9 +114,13 @@ func generateVolume(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volume) {
 		{
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "fluent-bit-config",
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: r.Logging.QualifiedName(fluentBitSecretConfigName),
+					Items: []corev1.KeyToPath{
+						{
+							Key:  "fluent-bit.conf",
+							Path: "fluent-bit.conf",
+						},
 					},
 				},
 			},
@@ -137,12 +140,12 @@ func generateVolume(fluentbit *loggingv1alpha1.Fluentbit) (v []corev1.Volume) {
 			},
 		},
 	}
-	if fluentbit.Spec.TLS.Enabled {
+	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
-			Name: "fluent-tls",
+			Name: "fluent-bit-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: fluentbit.Spec.TLS.SecretName,
+					SecretName: r.Logging.Spec.FluentbitSpec.TLS.SecretName,
 				},
 			},
 		}
