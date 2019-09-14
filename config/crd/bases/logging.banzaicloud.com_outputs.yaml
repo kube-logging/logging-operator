@@ -524,7 +524,7 @@ spec:
                 port:
                   description: 'You can specify Elasticsearch port by this parameter.(default:
                     9200)'
-                  type: string
+                  type: integer
                 prefer_oj_serializer:
                   description: 'With default behavior, Elasticsearch client uses Yajl
                     as JSON encoder/decoder. Oj is the alternative high performance
@@ -580,8 +580,15 @@ spec:
                     exist in input event.
                   type: string
                 scheme:
-                  description: 'Scheme for HTTP Basic authentication.(default: true)'
+                  description: 'Connection scheme (default: http)'
+                  type: string
+                ssl_verify:
+                  description: 'Skip ssl verification (default: true)'
                   type: boolean
+                ssl_version:
+                  description: If you want to configure SSL/TLS version, you can specify
+                    ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
+                  type: string
                 tag_key:
                   description: 'This will add the Fluentd tag in the JSON record.(default:
                     tag)'
