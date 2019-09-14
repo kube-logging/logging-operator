@@ -12,7 +12,7 @@ type ElasticsearchOutput struct {
 	// You can specify Elasticsearch host by this parameter. (default:localhost)
 	Host string `json:"host,omitempty"`
 	// You can specify Elasticsearch port by this parameter.(default: 9200)
-	Port string `json:"port,omitempty"`
+	Port int `json:"port,omitempty"`
 	// You can specify multiple Elasticsearch hosts with separator ",". If you specify hosts option, host and port options are ignored.
 	Hosts string `json:"hosts,omitempty"`
 	// User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+}
@@ -22,8 +22,12 @@ type ElasticsearchOutput struct {
 	Password *secret.Secret `json:"password,omitempty"`
 	// Path for HTTP Basic authentication.
 	Path string `json:"path,omitempty"`
-	// Scheme for HTTP Basic authentication.(default: true)
-	Scheme bool `json:"scheme,omitempty"`
+	// Connection scheme (default: http)
+	Scheme string `json:"scheme,omitempty"`
+	// Skip ssl verification (default: true)
+	SslVerify bool `json:"ssl_verify,omitempty"`
+	// If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
+	SslVersion string `json:"ssl_version,omitempty"`
 	// Enable Logstash log format.(default: false)
 	LogstashFormat bool `json:"logstash_format,omitempty"`
 	// Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.
