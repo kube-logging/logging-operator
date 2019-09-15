@@ -97,7 +97,7 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 			if hook, ok := s.ConversionHooks[converterName]; ok {
 				convertedValue, err := hook(val.Interface())
 				if err != nil {
-					err = errors.Combine(err, errors.Errorf(
+					multierror = errors.Combine(err, errors.Errorf(
 						"failed to convert field `%s` with converter %s", name, converterName))
 				} else {
 					v = reflect.ValueOf(convertedValue)

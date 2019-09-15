@@ -19,6 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
 	Selectors  map[string]string `json:"selectors"`
 	Filters    []Filter          `json:"filters,omitempty"`
@@ -26,6 +27,7 @@ type FlowSpec struct {
 	OutputRefs []string          `json:"outputRefs"`
 }
 
+// Filter definition for FlowSpec
 type Filter struct {
 	StdOut        *filter.StdOutFilterConfig `json:"stdout,omitempty"`
 	Parser        *filter.ParserConfig       `json:"parser,omitempty"`
@@ -39,8 +41,9 @@ type FlowStatus struct {
 }
 
 // +kubebuilder:object:root=true
-
 // +kubebuilder:printcolumn:name="Logging",type=string,JSONPath=`.spec.loggingRef`
+
+// Flow Kubernetes object
 type Flow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

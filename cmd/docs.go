@@ -35,40 +35,40 @@ import (
 
 var log logr.Logger
 
-type Doc struct {
+type doc struct {
 	Name     string
 	Content  string
 	Type     string
 	RootNode *ast.File
 }
 
-func (d *Doc) Append(line string) {
+func (d *doc) append(line string) {
 	d.Content = d.Content + line + "\n"
 }
 
-func (d *Doc) CheckNodes(n ast.Node) bool {
+func (d *doc) checkNodes(n ast.Node) bool {
 	generic, ok := n.(*ast.GenDecl)
 	if ok {
 		typeName, ok := generic.Specs[0].(*ast.TypeSpec)
 		if ok {
 			_, ok := typeName.Type.(*ast.InterfaceType)
 			if ok && typeName.Name.Name == "_doc" {
-				d.Append(fmt.Sprintf("# %s", getTypeName(generic, d.Name)))
-				d.Append("## Overview")
-				d.Append(getTypeDocs(generic))
-				d.Append("## Configuration")
+				d.append(fmt.Sprintf("# %s", getTypeName(generic, d.Name)))
+				d.append("## Overview")
+				d.append(getTypeDocs(generic))
+				d.append("## Configuration")
 			}
 			structure, ok := typeName.Type.(*ast.StructType)
 			if ok {
-				d.Append(fmt.Sprintf("### %s", getTypeName(generic, typeName.Name.Name)))
+				d.append(fmt.Sprintf("### %s", getTypeName(generic, typeName.Name.Name)))
 				if getTypeDocs(generic) != "" {
-					d.Append(fmt.Sprintf("#### %s", getTypeDocs(generic)))
+					d.append(fmt.Sprintf("#### %s", getTypeDocs(generic)))
 				}
-				d.Append("| Variable Name | Type | Required | Default | Description |")
-				d.Append("|---|---|---|---|---|")
+				d.append("| Variable Name | Type | Required | Default | Description |")
+				d.append("|---|---|---|---|---|")
 				for _, item := range structure.Fields.List {
 					name, com, def, required := getValuesFromItem(item)
-					d.Append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, normaliseType(item.Type), required, def, com))
+					d.append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, normaliseType(item.Type), required, def, com))
 				}
 			}
 
@@ -88,17 +88,17 @@ func normaliseType(fieldType ast.Expr) string {
 	return typeNameBuf.String()
 }
 
-func (d *Doc) Generate() {
+func (d *doc) generate() {
 	if d.RootNode != nil {
-		ast.Inspect(d.RootNode, d.CheckNodes)
+		ast.Inspect(d.RootNode, d.checkNodes)
 		log.Info("DocumentRoot not present skipping parse")
 	}
-	directory := fmt.Sprintf("./%s/%s/", DocsPath, d.Type)
+	directory := fmt.Sprintf("./%s/%s/", docsPath, d.Type)
 	err := os.MkdirAll(directory, os.ModePerm)
 	if err != nil {
 		log.Error(err, "Md file create error %s", err.Error())
 	}
-	filepath := fmt.Sprintf("./%s/%s/%s.md", DocsPath, d.Type, d.Name)
+	filepath := fmt.Sprintf("./%s/%s/%s.md", docsPath, d.Type, d.Name)
 	f, err := os.Create(filepath)
 	if err != nil {
 		log.Error(err, "Md file create error %s", err.Error())
@@ -111,21 +111,21 @@ func (d *Doc) Generate() {
 	}
 }
 
-var PluginDirs = map[string]string{
+var pluginDirs = map[string]string{
 	"filters": "./pkg/model/filter/",
 	"outputs": "./pkg/model/output/",
 }
 
-var DocsPath = "docs/plugins"
+var docsPath = "docs/plugins"
 
-type Plugin struct {
+type plugin struct {
 	Name              string
 	Type              string
 	SourcePath        string
 	DocumentationPath string
 }
 
-type Plugins []Plugin
+type plugins []plugin
 
 var ignoredPluginsList = []string{
 	"null",
@@ -136,33 +136,33 @@ func main() {
 	verboseLogging := true
 	ctrl.SetLogger(zap.Logger(verboseLogging))
 	log = ctrl.Log.WithName("docs").WithName("main")
-	//log.Info("Plugin Directories:", "packageDir", packageDir)
+	//log.Info("plugin Directories:", "packageDir", packageDir)
 
-	fileList, err := GetPlugins(PluginDirs)
+	fileList, err := getPlugins(pluginDirs)
 	if err != nil {
 		log.Error(err, "Directory check error.")
 	}
 	for _, file := range fileList {
-		log.Info("Plugin", "Name", file.SourcePath)
-		document := GetDocumentParser(file)
-		document.Generate()
+		log.Info("plugin", "Name", file.SourcePath)
+		document := getDocumentParser(file)
+		document.generate()
 	}
 
-	index := Doc{
+	index := doc{
 		Name: "index",
 	}
-	index.Append("## Table of Contents\n\n")
-	for pluginType := range PluginDirs {
-		index.Append(fmt.Sprintf("### %s\n", pluginType))
+	index.append("## Table of Contents\n\n")
+	for pluginType := range pluginDirs {
+		index.append(fmt.Sprintf("### %s\n", pluginType))
 		for _, plugin := range fileList {
 			if plugin.Type == pluginType {
-				index.Append(fmt.Sprintf("- [%s](%s)", plugin.Name, plugin.DocumentationPath))
+				index.append(fmt.Sprintf("- [%s](%s)", plugin.Name, plugin.DocumentationPath))
 			}
 		}
-		index.Append("\n")
+		index.append("\n")
 	}
 
-	index.Generate()
+	index.generate()
 
 }
 
@@ -232,25 +232,25 @@ func getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
 	required = formatRequired(!strings.Contains(getPrefixedLine(tag, `json:\"(.*)\"`), "omitempty"))
 	if tagResult != "" {
 		return nameResult, getLink(commentWithDefault), tagResult, required
-	} else {
-		result := getPrefixedLine(commentWithDefault, `\(default:(.*)\)`)
-		if result != "" {
-			ignore := fmt.Sprintf("(default:%s)", result)
-			comment = strings.Replace(commentWithDefault, ignore, "", 1)
-			return nameResult, comment, getLink(result), required
-		}
-
-		return nameResult, getLink(commentWithDefault), "-", required
 	}
+	result := getPrefixedLine(commentWithDefault, `\(default:(.*)\)`)
+	if result != "" {
+		ignore := fmt.Sprintf("(default:%s)", result)
+		comment = strings.Replace(commentWithDefault, ignore, "", 1)
+		return nameResult, comment, getLink(result), required
+	}
+
+	return nameResult, getLink(commentWithDefault), "-", required
+
 }
 
-func GetDocumentParser(file Plugin) *Doc {
+func getDocumentParser(file plugin) *doc {
 	fileSet := token.NewFileSet()
 	node, err := parser.ParseFile(fileSet, file.SourcePath, nil, parser.ParseComments)
 	if err != nil {
 		log.Error(err, "Error!")
 	}
-	newDoc := &Doc{
+	newDoc := &doc{
 		Name:     file.Name,
 		RootNode: node,
 		Type:     file.Type,
@@ -258,8 +258,8 @@ func GetDocumentParser(file Plugin) *Doc {
 	return newDoc
 }
 
-func GetPlugins(PluginDirs map[string]string) (Plugins, error) {
-	var PluginList Plugins
+func getPlugins(PluginDirs map[string]string) (plugins, error) {
+	var PluginList plugins
 	for pluginType, path := range PluginDirs {
 		files, err := ioutil.ReadDir(path)
 		if err != nil {
@@ -273,7 +273,7 @@ func GetPlugins(PluginDirs map[string]string) (Plugins, error) {
 			if filepath.Ext(file.Name()) == ".go" && getPluginWhiteList(fname) {
 				fullPath := path + file.Name()
 				filepath := fmt.Sprintf("./%s/%s.md", pluginType, fname)
-				PluginList = append(PluginList, Plugin{Name: fname, SourcePath: fullPath, DocumentationPath: filepath, Type: pluginType})
+				PluginList = append(PluginList, plugin{Name: fname, SourcePath: fullPath, DocumentationPath: filepath, Type: pluginType})
 			}
 		}
 	}

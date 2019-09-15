@@ -63,6 +63,7 @@ type LoggingList struct {
 	Items           []Logging `json:"items"`
 }
 
+// SetDefaults fill empty attributes
 func (l *Logging) SetDefaults() *Logging {
 	copy := l.DeepCopy()
 	if !copy.Spec.FlowConfigCheckDisabled && copy.Status.ConfigCheckResults == nil {
@@ -165,10 +166,12 @@ func (l *Logging) SetDefaults() *Logging {
 	return copy
 }
 
+// QualifiedName is the "logging-resource" name combined
 func (l *Logging) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", l.Name, name)
 }
 
+// QualifiedNamespacedName is the "namespace-logging-resource" name combined
 func (l *Logging) QualifiedNamespacedName(name string) string {
 	return fmt.Sprintf("%s-%s-%s", l.Spec.ControlNamespace, l.Name, name)
 }
