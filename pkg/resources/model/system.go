@@ -17,6 +17,7 @@ package model
 import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/pkg/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
@@ -50,14 +51,14 @@ func NewLoggingResources(logging *v1alpha2.Logging, client client.Reader, logger
 func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	forwardInput := input.NewForwardInputConfig()
 	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
-		forwardInput.Transport = &input.Transport{
+		forwardInput.Transport = &common.Transport{
 			Version:        "TLSv1_2",
 			CaPath:         "/fluentd/tls/ca.crt",
 			CertPath:       "/fluentd/tls/tls.crt",
 			PrivateKeyPath: "/fluentd/tls/tls.key",
 			ClientCertAuth: true,
 		}
-		forwardInput.Security = &input.Security{
+		forwardInput.Security = &common.Security{
 			SelfHostname: "fluentd",
 			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
