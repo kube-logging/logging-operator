@@ -147,7 +147,7 @@ type S3InstanceProfileCredentials struct {
 }
 
 // +kubebuilder:object:generate=true
-// +docName:"Shared Credentials
+// +docName:"Shared Credentials"
 // shared_credentials
 type S3SharedCredentials struct {
 	// Profile name. Default to 'default' or ENV['AWS_PROFILE']
