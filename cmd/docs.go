@@ -114,6 +114,7 @@ func (d *doc) generate() {
 var pluginDirs = map[string]string{
 	"filters": "./pkg/model/filter/",
 	"outputs": "./pkg/model/output/",
+	"common":  "./pkg/model/common/",
 }
 
 var docsPath = "docs/plugins"
