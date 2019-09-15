@@ -35,6 +35,16 @@ This operator helps you to pack together logging information with your applicati
 
 <p align="center"><img src="docs/img/logging_operator_flow.png" width="660"></p>
 
+### Feature highlights
+
+- Namespace isolation
+- Native Kubernetes label selectors
+- Secure communication (TLS)
+- Configuration validation
+- Multiple flow support (multiply logs for different transformations)
+- Multiple [output](docs/plugins/outputs) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
+- Multiple logging system support (multiple fluentd, fluent-bit deployment on the same cluster)
+
 ### Motivation
 
 The logging operator automates the deployment and configuration of a Kubernetes logging pipeline. Under the hood the operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters and transfer logs to multiple outputs. Your logs will always be transferred on authenticated and encrypted channels.
