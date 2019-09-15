@@ -3,11 +3,13 @@ package output
 import (
 	"github.com/banzaicloud/logging-operator/pkg/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
+	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
 
 // +kubebuilder:object:generate=true
 type ForwardOutput struct {
 	// Server definitions at least one is required
+	// +docLink:"Server,#Fluentd-Server"
 	FluentdServers []FluentdServer `json:"servers"`
 	// Change the protocol to at-least-once. The plugin waits the ack from destination's in_forward plugin.
 	RequireAckResponse bool `json:"require_ack_response,omitempty"`
@@ -69,9 +71,52 @@ type ForwardOutput struct {
 	Security *common.Security `json:"security,omitempty"`
 	// Verify that a connection can be made with one of out_forward nodes at the time of startup. (default: false)
 	VerifyConnectionAtStartup bool `json:"verify_connection_at_startup,omitempty"`
+	// +docLink:"Buffer,./buffer.md"
+	Buffer *Buffer `json:"buffer,omitempty"`
+}
+
+func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+	forward := &types.OutputPlugin{
+		PluginMeta: types.PluginMeta{
+			Type:      "forward",
+			Directive: "match",
+			Tag:       "**",
+		},
+	}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(f); err != nil {
+		return nil, err
+	} else {
+		forward.Params = params
+	}
+	if f.Buffer != nil {
+		if buffer, err := f.Buffer.ToDirective(secretLoader); err != nil {
+			return nil, err
+		} else {
+			forward.SubDirectives = append(forward.SubDirectives, buffer)
+		}
+	}
+	if f.Security != nil {
+		if format, err := f.Security.ToDirective(secretLoader); err != nil {
+			return nil, err
+		} else {
+			forward.SubDirectives = append(forward.SubDirectives, format)
+		}
+	}
+	if len(f.FluentdServers) > 0 {
+		for _, server := range f.FluentdServers {
+			if serv, err := server.ToDirective(secretLoader); err != nil {
+				return nil, err
+			} else {
+				forward.SubDirectives = append(forward.SubDirectives, serv)
+			}
+		}
+	}
+	return forward, nil
 }
 
 // +kubebuilder:object:generate=true
+// +docName:"Fluentd Server"
+// server
 type FluentdServer struct {
 	// The IP address or host name of the server.
 	Host string `json:"host"`
@@ -89,4 +134,10 @@ type FluentdServer struct {
 	Standby bool `json:"standby,omitempty"`
 	// The load balancing weight. If the weight of one server is 20 and the weight of the other server is 30, events are sent in a 2:3 ratio. (default: 60).
 	Weight int `json:"weight,omitempty"`
+}
+
+func (f *FluentdServer) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+	return types.NewFlatDirective(types.PluginMeta{
+		Directive: "server",
+	}, f, secretLoader)
 }
