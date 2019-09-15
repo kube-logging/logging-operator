@@ -662,6 +662,8 @@ spec:
                   description: 'The write_operation can be any of: (index,create,update,upsert)(default:
                     index)'
                   type: string
+              required:
+              - ssl_verify
               type: object
             enabledNamespaces:
               items:

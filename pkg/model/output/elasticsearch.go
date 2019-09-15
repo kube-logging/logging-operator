@@ -25,7 +25,7 @@ type ElasticsearchOutput struct {
 	// Connection scheme (default: http)
 	Scheme string `json:"scheme,omitempty"`
 	// Skip ssl verification (default: true)
-	SslVerify bool `json:"ssl_verify,omitempty"`
+	SslVerify bool `json:"ssl_verify" plugin:"default:true"`
 	// If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
 	SslVersion string `json:"ssl_version,omitempty"`
 	// Enable Logstash log format.(default: false)
