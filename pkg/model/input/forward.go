@@ -15,6 +15,7 @@
 package input
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
@@ -22,10 +23,10 @@ import (
 // +kubebuilder:object:generate=true
 
 type ForwardInputConfig struct {
-	Port      string     `json:"port,omitempty" plugin:"default:24240"`
-	Bind      string     `json:"bind,omitempty" plugin:"default:0.0.0.0"`
-	Transport *Transport `json:"transport,omitempty"`
-	Security  *Security  `json:"security,omitempty"`
+	Port      string            `json:"port,omitempty" plugin:"default:24240"`
+	Bind      string            `json:"bind,omitempty" plugin:"default:0.0.0.0"`
+	Transport *common.Transport `json:"transport,omitempty"`
+	Security  *common.Security  `json:"security,omitempty"`
 }
 
 func NewForwardInputConfig() *ForwardInputConfig {

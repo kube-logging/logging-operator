@@ -28,7 +28,8 @@ type OutputSpec struct {
 	OSSOutput           *output.OSSOutput           `json:"oss,omitempty"`
 	ElasticsearchOutput *output.ElasticsearchOutput `json:"elasticsearch,omitempty"`
 	LokiOutput          *output.LokiOutput          `json:"loki,omitempty"`
-	SumologicOutput     *output.SumologicOutput     `json:"sumologic"`
+	SumologicOutput     *output.SumologicOutput     `json:"sumologic,omitempty"`
+	ForwardOutput       *output.ForwardOutput       `json:"forward,omitempty"`
 	NullOutputConfig    *output.NullOutputConfig    `json:"nullout,omitempty"`
 }
 
