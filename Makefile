@@ -7,6 +7,12 @@ IMG ?= controller:latest
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
 KUBEBUILDER_VERSION = 2.0.0
+VERSION := $(shell git describe --abbrev=0 --tags)
+DOCKER_IMAGE = banzaicloud/logging-operator
+DOCKER_TAG ?= ${VERSION}
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./client/*")
+GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/model/filter/*"  -not -path "./pkg/model/output/*"  -not -path "./pkg/model/input/*")
+PKGS=$(shell go list ./... | grep -v /vendor)
 
 export PATH := $(PWD)/bin:$(PATH)
 
@@ -16,6 +22,38 @@ all: manager
 .PHONY: docs
 docs:
 	go run cmd/docs.go
+check-fmt:
+	PKGS="${GOFILES_NOVENDOR}" GOFMT="gofmt" ./scripts/fmt-check.sh
+
+lint: install-golint
+	golint -min_confidence 0.9 -set_exit_status $(GOFILES_NOPLUGINS)
+
+install-golint:
+	GOLINT_CMD=$(shell command -v golint 2> /dev/null)
+ifndef GOLINT_CMD
+	go get golang.org/x/lint/golint
+endif
+
+check-misspell: install-misspell
+	PKGS="${GOFILES_NOVENDOR}" MISSPELL="misspell" ./scripts/misspell-check.sh
+
+misspell: install-misspell
+	misspell -w ${GOFILES_NOVENDOR}
+
+install-misspell:
+	MISSPELL_CMD=$(shell command -v misspell 2> /dev/null)
+ifndef MISSPELL_CMD
+	go get -u github.com/client9/misspell/cmd/misspell
+endif
+
+ineffassign: install-ineffassign
+	ineffassign ${GOFILES_NOVENDOR}
+
+install-ineffassign:
+	INEFFASSIGN_CMD=$(shell command -v ineffassign 2> /dev/null)
+ifndef INEFFASSIGN_CMD
+	go get -u github.com/gordonklaus/ineffassign
+endif
 
 # Run tests
 test: generate fmt vet manifests bin/kubebuilder

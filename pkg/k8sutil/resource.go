@@ -28,11 +28,13 @@ import (
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// GenericResourceReconciler generic resource reconciler
 type GenericResourceReconciler struct {
 	Log    logr.Logger
 	Client runtimeClient.Client
 }
 
+// NewReconciler returns GenericResourceReconciler
 func NewReconciler(client runtimeClient.Client, log logr.Logger) *GenericResourceReconciler {
 	return &GenericResourceReconciler{
 		Log:    log,

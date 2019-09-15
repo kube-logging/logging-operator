@@ -49,6 +49,7 @@ type LoggingReconciler struct {
 // +kubebuilder:rbac:groups=logging.banzaicloud.com,resources=loggings,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.com,resources=loggings/status,verbs=get;update;patch
 
+// Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	log := r.Log.WithValues("logging", req.NamespacedName)
@@ -125,6 +126,7 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Loggin
 	return output.String(), nil
 }
 
+// SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
 	clusterOutputSource := &source.Kind{Type: &loggingv1alpha2.ClusterOutput{}}
 	clusterFlowSource := &source.Kind{Type: &loggingv1alpha2.ClusterFlow{}}
@@ -190,6 +192,7 @@ func reconcileRequestsForLoggingRef(loggingList *loggingv1alpha2.LoggingList, lo
 	return filtered
 }
 
+// FluentdWatches for fluentd statefulset
 func FluentdWatches(builder *ctrl.Builder) *ctrl.Builder {
 	return builder.
 		Owns(&corev1.ConfigMap{}).
@@ -200,6 +203,7 @@ func FluentdWatches(builder *ctrl.Builder) *ctrl.Builder {
 		Owns(&corev1.ServiceAccount{})
 }
 
+// FluentbitWatches for fluent-bit daemonset
 func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
 	return builder.
 		Owns(&corev1.ConfigMap{}).
@@ -209,6 +213,7 @@ func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
 		Owns(&corev1.ServiceAccount{})
 }
 
+// GetResources collect all resources referenced by logging resource
 func (r *LoggingReconciler) GetResources(logging *loggingv1alpha2.Logging) (*model.LoggingResources, error) {
 	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
 	var err error
