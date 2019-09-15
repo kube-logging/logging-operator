@@ -59,6 +59,10 @@ jobs:
           name: Run ineffassign
           command: |
             make ineffassign
+      - run:
+          name: Build manager
+          command: |
+            make manager
 
       #- run:
       #    name: Setup kubectl
