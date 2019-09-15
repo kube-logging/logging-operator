@@ -7,6 +7,7 @@ require (
 	github.com/MakeNowJust/heredoc v0.0.0-20171113091838-e9091a26100e
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/k8s-objectmatcher v1.0.0
+	github.com/client9/misspell v0.3.4 // indirect
 	github.com/go-logr/logr v0.1.0
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/goph/emperror v0.17.2
