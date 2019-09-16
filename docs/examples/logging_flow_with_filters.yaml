@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   filters:
-    - parse:
+    - parser:
         key_name: log
         remove_key_name_field: true
         parsers:

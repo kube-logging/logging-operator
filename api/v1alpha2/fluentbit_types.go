@@ -30,6 +30,7 @@ type FluentbitSpec struct {
 	TargetHost  string                      `json:"targetHost,omitempty"`
 	TargetPort  int32                       `json:"targetPort,omitempty"`
 	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
+	Parser      string                      `json:"parser"`
 }
 
 // +kubebuilder:object:generate=true
