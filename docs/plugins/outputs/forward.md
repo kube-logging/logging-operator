@@ -18,7 +18,7 @@
 | tls_version | string | No |  TLSv1_2 | The default version of TLS transport. [TLSv1_1, TLSv1_2] <br> |
 | tls_ciphers | string | No |  ALL:!aNULL:!eNULL:!SSLv2 | The cipher configuration of TLS transport. <br> |
 | tls_insecure_mode | bool | No |  false | Skip all verification of certificates or not. <br> |
-| tls_allow_self_signed_cert | bool | No | - | Allow self signed certificates or not. (deafult: false)<br> |
+| tls_allow_self_signed_cert | bool | No |  false | Allow self signed certificates or not. <br> |
 | tls_verify_hostname | bool | No |  true | Verify hostname of servers and certificates or not in TLS transport. <br> |
 | tls_cert_path | string | No | - | The additional CA certificate path for TLS.<br> |
 | tls_client_cert_path | string | No | - | The client certificate path for TLS<br> |
@@ -28,7 +28,7 @@
 | tls_cert_logical_store_name | string | No | - | The certificate logical store name on Windows system certstore. This parameter is for Windows only.<br> |
 | tls_cert_use_enterprise_store | bool | No | - | Enable to use certificate enterprise store on Windows system certstore. This parameter is for Windows only.<br> |
 | keepalive | bool | No |  false | Enable keepalive connection. <br> |
-| keepalive_timeout | int | No | - | Expired time of keepalive. Default value is nil, which means to keep connection as long as possible. (deafult: 0)<br> |
+| keepalive_timeout | int | No |  0 | Expired time of keepalive. Default value is nil, which means to keep connection as long as possible. <br> |
 | security | *common.Security | No | - | [Security](/docs/plugins/common/security.md)<br> |
 | verify_connection_at_startup | bool | No |  false | Verify that a connection can be made with one of out_forward nodes at the time of startup. <br> |
 | buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
