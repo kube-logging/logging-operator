@@ -29,7 +29,7 @@ var fluentBitConfigTemplate = `
 [INPUT]
     Name             tail
     Path             /var/log/containers/*.log
-    Parser           docker
+    Parser           {{ .Parser }}
     Tag              kubernetes.*
     Refresh_Interval 5
     Mem_Buf_Limit    5MB

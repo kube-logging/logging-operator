@@ -35,6 +35,7 @@ type fluentBitConfig struct {
 	Output     map[string]string
 	TargetHost string
 	TargetPort int32
+	Parser     string
 }
 
 func (r *Reconciler) configSecret() runtime.Object {
@@ -56,6 +57,11 @@ func (r *Reconciler) configSecret() runtime.Object {
 		Monitor:    monitorConfig,
 		TargetHost: fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
 		TargetPort: r.Logging.Spec.FluentdSpec.Port,
+	}
+	if r.Logging.Spec.FluentbitSpec.Parser != "" {
+		input.Parser = r.Logging.Spec.FluentbitSpec.Parser
+	} else {
+		input.Parser = "cri"
 	}
 	if r.Logging.Spec.FluentbitSpec.TargetHost != "" {
 		input.TargetHost = r.Logging.Spec.FluentbitSpec.TargetHost

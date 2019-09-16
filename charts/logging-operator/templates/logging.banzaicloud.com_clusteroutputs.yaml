@@ -30,6 +30,7 @@ spec:
         metadata:
           type: object
         spec:
+          description: ClusterOutputSpec contains Kubernetes spec for CLusterOutput
           properties:
             azurestorage:
               properties:
@@ -854,7 +855,8 @@ spec:
                 format:
                   properties:
                     type:
-                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value'
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
                       enum:
                       - out_file
                       - json
@@ -1344,7 +1346,8 @@ spec:
                 format:
                   properties:
                     type:
-                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value'
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
                       enum:
                       - out_file
                       - json
@@ -1649,7 +1652,8 @@ spec:
                 format:
                   properties:
                     type:
-                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value'
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
                       enum:
                       - out_file
                       - json
@@ -1775,6 +1779,89 @@ spec:
               required:
               - s3_bucket
               type: object
+            sumologic:
+              properties:
+                add_timestamp:
+                  description: 'Add timestamp (or timestamp_key) field to logs before
+                    sending to sumologic (default: true)'
+                  type: boolean
+                data_type:
+                  description: 'The type of data that will be sent to Sumo Logic,
+                    either logs or metrics (default: logs)'
+                  type: string
+                disable_cookies:
+                  description: 'Option to disable cookies on the HTTP Client. (default:
+                    false)'
+                  type: boolean
+                endpoint:
+                  description: SumoLogic HTTP Collector URL
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                log_format:
+                  description: 'Format to post logs into Sumo. (default: json)'
+                  type: string
+                log_key:
+                  description: 'Used to specify the key when merging json or sending
+                    logs in text format (default: message)'
+                  type: string
+                metric_data_format:
+                  description: 'The format of metrics you will be sending, either
+                    graphite or carbon2 or prometheus (default: graphite)'
+                  type: string
+                open_timeout:
+                  description: 'Set timeout seconds to wait until connection is opened.
+                    (default: 60)'
+                  type: integer
+                proxy_uri:
+                  description: Add the uri of the proxy environment if present.
+                  type: string
+                source_category:
+                  description: 'Set _sourceCategory metadata field within SumoLogic
+                    (default: nil)'
+                  type: string
+                source_host:
+                  description: 'Set _sourceHost metadata field within SumoLogic (default:
+                    nil)'
+                  type: string
+                source_name:
+                  description: Set _sourceName metadata field within SumoLogic - overrides
+                    source_name_key (default is nil)
+                  type: string
+                source_name_key:
+                  description: 'Set as source::path_key''s value so that the source_name
+                    can be extracted from Fluentd''s buffer (default: source_name)'
+                  type: string
+                timestamp_key:
+                  description: 'Field name when add_timestamp is on (default: timestamp)'
+                  type: string
+                verify_ssl:
+                  description: 'Verify ssl certificate. (default: true)'
+                  type: boolean
+              required:
+              - endpoint
+              - source_name
+              type: object
+          required:
+          - sumologic
           type: object
         status:
           description: OutputStatus defines the observed state of Output

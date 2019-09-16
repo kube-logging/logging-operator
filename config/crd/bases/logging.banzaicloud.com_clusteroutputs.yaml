@@ -30,6 +30,7 @@ spec:
         metadata:
           type: object
         spec:
+          description: ClusterOutputSpec contains Kubernetes spec for CLusterOutput
           properties:
             azurestorage:
               properties:

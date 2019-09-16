@@ -20,6 +20,7 @@ spec:
   subresources: {}
   validation:
     openAPIV3Schema:
+      description: Flow Kubernetes object
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,9 +35,11 @@ spec:
         metadata:
           type: object
         spec:
+          description: FlowSpec is the Kubernetes spec for Flows
           properties:
             filters:
               items:
+                description: Filter definition for FlowSpec
                 properties:
                   parser:
                     description: https://docs.fluentd.org/filter/parser

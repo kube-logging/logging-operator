@@ -34,6 +34,7 @@ spec:
           properties:
             filters:
               items:
+                description: Filter definition for FlowSpec
                 properties:
                   parser:
                     description: https://docs.fluentd.org/filter/parser
