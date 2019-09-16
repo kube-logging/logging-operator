@@ -607,6 +607,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.SumologicOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ForwardOutput != nil {
+		in, out := &in.ForwardOutput, &out.ForwardOutput
+		*out = new(output.ForwardOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.NullOutputConfig != nil {
 		in, out := &in.NullOutputConfig, &out.NullOutputConfig
 		*out = new(output.NullOutputConfig)
