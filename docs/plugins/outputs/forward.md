@@ -39,7 +39,7 @@
 |---|---|---|---|---|
 | host | string | Yes | - | The IP address or host name of the server.<br> |
 | name | string | No | - | The name of the server. Used for logging and certificate verification in TLS transport (when host is address).<br> |
-| port | string | No |  24224 | The port number of the host. Note that both TCP packets (event stream) and UDP packets (heartbeat message) are sent to this port. <br> |
+| port | int | No |  24224 | The port number of the host. Note that both TCP packets (event stream) and UDP packets (heartbeat message) are sent to this port. <br> |
 | shared_key | *secret.Secret | No | - | The shared key per server.<br> |
 | username | *secret.Secret | No | - | The username for authentication.<br> |
 | password | *secret.Secret | No | - | The password for authentication.<br> |

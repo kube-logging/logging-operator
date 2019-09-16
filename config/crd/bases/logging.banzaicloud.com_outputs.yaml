@@ -929,7 +929,7 @@ spec:
                         description: 'The port number of the host. Note that both
                           TCP packets (event stream) and UDP packets (heartbeat message)
                           are sent to this port. (default: 24224)'
-                        type: string
+                        type: integer
                       shared_key:
                         description: The shared key per server.
                         properties:
