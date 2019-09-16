@@ -123,7 +123,7 @@ type FluentdServer struct {
 	// The name of the server. Used for logging and certificate verification in TLS transport (when host is address).
 	Name string `json:"name,omitempty"`
 	// The port number of the host. Note that both TCP packets (event stream) and UDP packets (heartbeat message) are sent to this port. (default: 24224)
-	Port string `json:"port,omitempty"`
+	Port int `json:"port,omitempty"`
 	// The shared key per server.
 	SharedKey *secret.Secret `json:"shared_key,omitempty"`
 	// The username for authentication.

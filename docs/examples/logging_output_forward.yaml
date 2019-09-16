@@ -1,0 +1,14 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Output
+metadata:
+  name: forward-output-sample
+spec:
+  forward:
+    servers:
+    - host: fluent-public.input.io
+      port: "24240"
+    buffer:
+      path: /tmp/buffer
+      timekey: 1m
+      timekey_wait: 10s
+      timekey_use_utc: true
