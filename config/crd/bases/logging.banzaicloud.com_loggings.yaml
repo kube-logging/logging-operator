@@ -61,6 +61,8 @@ spec:
                   - repository
                   - tag
                   type: object
+                parser:
+                  type: string
                 resources:
                   description: ResourceRequirements describes the compute resource
                     requirements.
@@ -98,6 +100,8 @@ spec:
                   - enabled
                   - secretName
                   type: object
+              required:
+              - parser
               type: object
             fluentd:
               description: FluentdSpec defines the desired state of Fluentd
