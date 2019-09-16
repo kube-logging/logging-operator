@@ -45,7 +45,7 @@ type ForwardOutput struct {
 	TlsCiphers string `json:"tls_ciphers,omitempty"`
 	// Skip all verification of certificates or not. (default: false)
 	TlsInsecureMode bool `json:"tls_insecure_mode,omitempty"`
-	// Allow self signed certificates or not. (deafult: false)
+	// Allow self signed certificates or not. (default: false)
 	TlsAllowSelfSignedCert bool `json:"tls_allow_self_signed_cert,omitempty"`
 	// Verify hostname of servers and certificates or not in TLS transport. (default: true)
 	TlsVerifyHostname bool `json:"tls_verify_hostname,omitempty"`
@@ -65,7 +65,7 @@ type ForwardOutput struct {
 	TlsCertUseEnterpriseStore bool `json:"tls_cert_use_enterprise_store,omitempty"`
 	// Enable keepalive connection. (default: false)
 	Keepalive bool `json:"keepalive,omitempty"`
-	// Expired time of keepalive. Default value is nil, which means to keep connection as long as possible. (deafult: 0)
+	// Expired time of keepalive. Default value is nil, which means to keep connection as long as possible. (default: 0)
 	KeepaliveTimeout int `json:"keepalive_timeout,omitempty"`
 	// +docLink:"Security,/docs/plugins/common/security.md"
 	Security *common.Security `json:"security,omitempty"`
