@@ -10,7 +10,7 @@
 | password | *secret.Secret | No | - | Password for HTTP Basic authentication.<br>[Secret](./secret.md)<br> |
 | path | string | No | - | Path for HTTP Basic authentication.<br> |
 | scheme | string | No |  http | Connection scheme <br> |
-| ssl_verify | bool | No |  true | Skip ssl verification <br> |
+| ssl_verify | bool | Yes | true | Skip ssl verification (default: true)<br> |
 | ssl_version | string | No | - | If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]<br> |
 | logstash_format | bool | No |  false | Enable Logstash log format.<br> |
 | include_timestamp | bool | No | - | Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.<br> |
