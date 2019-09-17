@@ -100,8 +100,6 @@ spec:
                   - enabled
                   - secretName
                   type: object
-              required:
-              - parser
               type: object
             fluentd:
               description: FluentdSpec defines the desired state of Fluentd
