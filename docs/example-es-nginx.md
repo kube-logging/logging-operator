@@ -1,4 +1,6 @@
-# Store Nginx Access Logs to ElasticSearch with Logging Operagor
+<p align="center"><img src="./img/les.png" width="240"></p>
+
+# Store Nginx Access Logs in ElasticSearch with Logging Operator
 
 
 #### Add operator chart repository:
