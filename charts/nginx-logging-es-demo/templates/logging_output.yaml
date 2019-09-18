@@ -1,8 +1,8 @@
 apiVersion: logging.banzaicloud.com/v1alpha2
-kind: ClusterOutput
+kind: Output
 metadata:
   name: {{ include "nginx-logging-es-demo.fullname" . }}-es-output
-  namespace: logging-system
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ include "nginx-logging-es-demo.name" . }}
     chart: {{ include "nginx-logging-es-demo.chart" . }}
@@ -10,7 +10,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   elasticsearch:
-    host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+    host: elasticsearch-elasticsearch-cluster.{{ .Release.Namespace }}.svc.cluster.local
     port: 9200
     scheme: https
     ssl_verify: false
