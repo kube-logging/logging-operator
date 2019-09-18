@@ -20,12 +20,12 @@ require (
 	golang.org/x/lint v0.0.0-20190909230951-414d861bb4ac // indirect
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7
 	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect
-	golang.org/x/text v0.3.2 // indirect
-	gopkg.in/yaml.v2 v2.2.2 // indirect
 	k8s.io/api v0.0.0-20190528154508-67ef80593b24
 	k8s.io/apimachinery v0.0.0-20190528154326-e59c2fb0a8e5
 	k8s.io/client-go v11.0.1-0.20190516230509-ae8359b20417+incompatible
 	sigs.k8s.io/controller-runtime v0.2.0
+	sigs.k8s.io/controller-tools v0.2.1 // indirect
+	sigs.k8s.io/kind v0.5.1 // indirect
 )
 
 replace (

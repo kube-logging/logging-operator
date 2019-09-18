@@ -33,6 +33,8 @@ type FluentdSpec struct {
 	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage,omitempty"`
 	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
 	Port                int32                            `json:"port,omitempty"`
+	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
+	NodeSelector        map[string]string                `json:"nodeSelector,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

@@ -31,6 +31,7 @@ type FluentbitSpec struct {
 	TargetPort  int32                       `json:"targetPort,omitempty"`
 	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
 	Parser      string                      `json:"parser,omitempty"`
+	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
