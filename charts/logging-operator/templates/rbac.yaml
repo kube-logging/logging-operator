@@ -78,14 +78,14 @@ rules:
     verbs:
       - "*"
   {{- if .Values.rbac.psp.enabled }}
-- apiGroups:
-    - extensions
-  resources:
-    - podsecuritypolicies
-  resourceNames:
-    - psp.logging-operator
-  verbs:
-    - use
+  - apiGroups:
+      - extensions
+    resources:
+      - podsecuritypolicies
+    resourceNames:
+      - psp.logging-operator
+    verbs:
+      - use
   {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
