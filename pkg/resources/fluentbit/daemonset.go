@@ -51,6 +51,7 @@ func (r *Reconciler) daemonSet() runtime.Object {
 				Spec: corev1.PodSpec{
 					ServiceAccountName: r.Logging.QualifiedName(serviceAccountName),
 					Volumes:            r.generateVolume(),
+					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
 					Containers: []corev1.Container{
 						{
 							Name:            "fluent-bit",
