@@ -1,3 +1,5 @@
+<p align="center"><img src="./img/les.png" width="240"></p>
+
 # Save all logs to ElasticSearch
 
 

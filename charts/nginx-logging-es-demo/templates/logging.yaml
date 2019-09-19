@@ -1,0 +1,8 @@
+apiVersion: logging.banzaicloud.com/v1alpha2
+kind: Logging
+metadata:
+  name: {{ include "nginx-logging-es-demo.fullname" . }}-logging
+spec:
+  fluentd: {}
+  fluentbit: {}
+  controlNamespace: {{ .Release.Namespace }}
