@@ -1,4 +1,4 @@
-<p align="center"><img src="./img/nle.png" width="240"></p>
+<p align="center"><img src="./img/nle.png" width="340"></p>
 
 # Store Nginx Access Logs in ElasticSearch with Logging Operator
 
