@@ -26,7 +26,7 @@ helm install --name logging banzaicloud-stable/logging-operator
 
 ### Nginx App + Logging Definition
 ```bash
-helm install --name logging banzaicloud-stable/nginx-logging-es-demo
+helm install --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
 ```
 
 ## Install from manifest
@@ -118,6 +118,26 @@ spec:
         image: nginx:latest
         ports:
         - containerPort: 80
+          name: http
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
 EOF
 ```
 
