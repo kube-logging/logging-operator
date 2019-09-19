@@ -79,7 +79,7 @@ apiVersion: logging.banzaicloud.com/v1alpha2
 kind: Flow
 metadata:
   name: es-flow
-  namespace: dafault
+  namespace: default
 spec:
   filters:
     - tag_normaliser: {}
