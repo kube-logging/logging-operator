@@ -31,7 +31,7 @@ helm install --name logging banzaicloud-stable/nginx-logging-es-demo
 
 ## Install from manifest
 
-##Create `logging` resource
+#### Create `logging` resource
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.com/v1alpha2
@@ -41,14 +41,14 @@ metadata:
 spec:
   fluentd: {}
   fluentbit: {}
-  controlNamespace: logging-system
+  controlNamespace: default
 EOF
 ```
 
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-###Create an ElasticSearch output definition 
+#### Create an ElasticSearch output definition 
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.com/v1alpha2
@@ -72,14 +72,14 @@ EOF
 ```
 > Note: For production set-up we recommend using longer `timekey` interval to avoid generating too many object.
 
-Create `flow` resource
+#### Create `flow` resource
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.com/v1alpha2
 kind: Flow
 metadata:
   name: es-flow
-  namespace: logging-system
+  namespace: dafault
 spec:
   filters:
     - tag_normaliser: {}
@@ -96,7 +96,7 @@ spec:
 EOF
 ```
 
-Install nginx deployment
+#### Install nginx deployment
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1 
@@ -115,7 +115,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.7.9
+        image: nginx:latest
         ports:
         - containerPort: 80
 EOF
