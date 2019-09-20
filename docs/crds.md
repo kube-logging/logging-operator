@@ -3,11 +3,11 @@
 This document contains the detailed information about the CRDs logging-operator uses.
 
 Available CRDs:
-- [loggings.logging.banzaicloud.com](/config/crd/bases/logging.banzaicloud.com_loggings.yaml)
-- [outputs.logging.banzaicloud.com](/config/crd/bases/logging.banzaicloud.com_outputs.yaml)
-- [flows.logging.banzaicloud.com](/config/crd/bases/logging.banzaicloud.com_flows.yaml)
-- [clusteroutputs.logging.banzaicloud.com](/config/crd/bases/logging.banzaicloud.com_clusteroutputs.yaml)
-- [clusterflows.logging.banzaicloud.com](/config/crd/bases/logging.banzaicloud.com_clusterflows.yaml)
+- [loggings.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_loggings.yaml)
+- [outputs.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_outputs.yaml)
+- [flows.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_flows.yaml)
+- [clusteroutputs.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_clusteroutputs.yaml)
+- [clusterflows.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_clusterflows.yaml)
 
 > You can find example yamls  [here](/docs/examples)
 
@@ -35,7 +35,7 @@ kubectl create ns logging
 
 **`logging` plain example** 
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -48,7 +48,7 @@ spec:
 
 **`logging` with filtered namespaces** 
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-namespaced
@@ -88,7 +88,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 
 **`logging` with custom fluentd pvc** 
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -119,7 +119,7 @@ spec:
  
 **`logging` with custom fluent-bit annotations** 
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -144,7 +144,7 @@ Override default images
 
 **`logging` with custom fluentd image** 
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -172,7 +172,7 @@ Define TLS certificate secret
 
 **`logging` setup with TLS**
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-tls
@@ -211,7 +211,7 @@ The supported `Output` plugins are documented [here](./plugins/outputs)
 
 **`output` s3 example**
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
   name: s3-output-sample
@@ -256,7 +256,7 @@ Flows define a `logging flow` that defines the `filters` and `outputs`.
 
 *`flow` example with filters and output in the `default` namespace*
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
   name: flow-sample
