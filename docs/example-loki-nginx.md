@@ -2,19 +2,30 @@
 
 # Store Nginx Access Logs in Grafana Loki with Logging Operator
 
+<p align="center"><img src="./img/nginx-loki.png" width="900"></p>
 
-#### Add operator chart repository:
+### Add operator chart repository:
 ```bash
 helm repo add loki https://grafana.github.io/loki/charts
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
-## Install Grafana with Loki
+### Install Loki
 ```bash
-helm install --name loki loki loki/loki-stack
+helm install --name loki loki/loki
 ```
 > [Grafana Loki Documentation](https://github.com/grafana/loki/tree/master/production/helm)
+### Install Grafana
+```bash
+helm install --name grafana stable/grafana \
+ --set "datasources.datasources\\.yaml.apiVersion=1" \
+ --set "datasources.datasources\\.yaml.datasources[0].name=Loki" \
+ --set "datasources.datasources\\.yaml.datasources[0].type=loki" \
+ --set "datasources.datasources\\.yaml.datasources[0].url=http://loki:3100" \
+ --set "datasources.datasources\\.yaml.datasources[0].access=proxy"
+```
+
 
 ## Install with Helm 
 ### Logging Operator
@@ -43,7 +54,6 @@ spec:
   controlNamespace: default
 EOF
 ```
-
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
@@ -57,11 +67,7 @@ metadata:
   namespace: default
 spec:
   loki:
-    host: loki.default.svc.cluster.local
-    port: 9200
-    scheme: https
-    ssl_verify: false
-    ssl_version: TLSv1_2
+    url: http://loki:3100
     buffer:
       path: /tmp/buffer
       timekey: 1m
@@ -77,7 +83,7 @@ cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.com/v1alpha2
 kind: Flow
 metadata:
-  name: es-flow
+  name: loki-flow
   namespace: default
 spec:
   filters:
@@ -91,7 +97,7 @@ spec:
   selectors:
     app: nginx
   outputRefs:
-    - es-output
+    - loki-output
 EOF
 ```
 
@@ -140,10 +146,18 @@ spec:
 EOF
 ```
 
-#### Forward Grafa Dashboard
+### Grafana Dashboard
+
+#### Get Grafana login credantials
 ```bash
-kubectl port-forward svc/loki-grafana 3000:80
+kubectl get secrets grafana -o json | jq '.data | map_values(@base64d)'
 ```
+
+#### Forward Grafana Service
+```bash
+kubectl port-forward svc/grafana 3000:80
+```
+[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
 <p align="center"><img src="./img/loki1.png" width="660"></p>
 
 
