@@ -16,6 +16,7 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -
 GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/model/filter/*"  -not -path "./pkg/model/output/*"  -not -path "./pkg/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
+export KUBEBUILDER_ASSETS := $(PWD)/bin
 export PATH := $(PWD)/bin:$(PATH)
 
 all: manager
@@ -78,6 +79,7 @@ bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 # Run tests
 test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
+	@which etcd
 	kubebuilder version
 	go test ./api/... ./controllers/... ./pkg/... -coverprofile cover.out
 
