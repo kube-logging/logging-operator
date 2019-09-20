@@ -15,7 +15,7 @@
 package fluentbit
 
 import (
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/go-logr/logr"
@@ -38,12 +38,12 @@ var labelSelector = map[string]string{
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1alpha2.Logging
+	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1alpha2.Logging) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: k8sutil.NewReconciler(client, logger),

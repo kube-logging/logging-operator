@@ -14,8 +14,8 @@
 
 // Package v1alpha2 contains API Schema definitions for the logging v1alpha2 API group
 // +kubebuilder:object:generate=true
-// +groupName=logging.banzaicloud.com
-package v1alpha2
+// +groupName=logging.banzaicloud.io
+package v1beta1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -24,7 +24,7 @@ import (
 
 var (
 	// GroupVersion is group version used to register these objects
-	GroupVersion = schema.GroupVersion{Group: "logging.banzaicloud.com", Version: "v1alpha2"}
+	GroupVersion = schema.GroupVersion{Group: "logging.banzaicloud.io", Version: "v1beta1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
