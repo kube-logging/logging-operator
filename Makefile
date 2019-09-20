@@ -65,7 +65,7 @@ ifeq (${OS}, Darwin)
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_darwin_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
 endif
 ifeq (${OS}, Linux)
-	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64.tar.gz | tar xvz - -C bin
+	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64.tar.gz | tar -C bin -xzv
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
 endif
 
