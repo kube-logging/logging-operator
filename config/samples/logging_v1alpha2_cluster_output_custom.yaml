@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   name: control
 ---
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: output-custom-cluster
