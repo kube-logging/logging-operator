@@ -2,15 +2,16 @@
 
 # Store Nginx Access Logs in ElasticSearch with Logging Operator
 
+<p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
 
-#### Add operator chart repository:
+### Add operator chart repository:
 ```bash
 helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
-## Install ElasticSearch with operator
+### Install ElasticSearch with operator
 ```bash
 helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
 helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
