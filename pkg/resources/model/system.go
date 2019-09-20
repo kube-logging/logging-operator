@@ -16,7 +16,7 @@ package model
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
@@ -29,22 +29,22 @@ import (
 type LoggingResources struct {
 	client         client.Reader
 	logger         logr.Logger
-	logging        *v1alpha2.Logging
-	Outputs        []v1alpha2.Output
-	Flows          []v1alpha2.Flow
-	ClusterOutputs []v1alpha2.ClusterOutput
-	ClusterFlows   []v1alpha2.ClusterFlow
+	logging        *v1beta1.Logging
+	Outputs        []v1beta1.Output
+	Flows          []v1beta1.Flow
+	ClusterOutputs []v1beta1.ClusterOutput
+	ClusterFlows   []v1beta1.ClusterFlow
 }
 
-func NewLoggingResources(logging *v1alpha2.Logging, client client.Reader, logger logr.Logger) *LoggingResources {
+func NewLoggingResources(logging *v1beta1.Logging, client client.Reader, logger logr.Logger) *LoggingResources {
 	return &LoggingResources{
 		client:         client,
 		logger:         logger,
 		logging:        logging,
-		Outputs:        make([]v1alpha2.Output, 0),
-		ClusterOutputs: make([]v1alpha2.ClusterOutput, 0),
-		Flows:          make([]v1alpha2.Flow, 0),
-		ClusterFlows:   make([]v1alpha2.ClusterFlow, 0),
+		Outputs:        make([]v1beta1.Output, 0),
+		ClusterOutputs: make([]v1beta1.ClusterOutput, 0),
+		Flows:          make([]v1beta1.Flow, 0),
+		ClusterFlows:   make([]v1beta1.ClusterFlow, 0),
 	}
 }
 
@@ -80,7 +80,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		}
 	}
 	for _, flowCr := range l.ClusterFlows {
-		flow, err := l.CreateFlowFromCustomResource(v1alpha2.Flow{
+		flow, err := l.CreateFlowFromCustomResource(v1beta1.Flow{
 			TypeMeta:   flowCr.TypeMeta,
 			ObjectMeta: flowCr.ObjectMeta,
 			Spec:       flowCr.Spec,
@@ -101,7 +101,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	return system, nil
 }
 
-func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1alpha2.Flow, namespace string) (*types.Flow, error) {
+func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespace string) (*types.Flow, error) {
 	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
 	if err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ FindOutputForAllRefs:
 	return flow, multierr
 }
 
-func isEnabled(namespace string, output v1alpha2.ClusterOutputSpec) bool {
+func isEnabled(namespace string, output v1beta1.ClusterOutputSpec) bool {
 	for _, enabledNs := range output.EnabledNamespaces {
 		if enabledNs == namespace {
 			return true

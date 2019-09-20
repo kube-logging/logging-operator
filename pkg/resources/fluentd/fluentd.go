@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/go-logr/logr"
@@ -46,12 +46,12 @@ var labelSelector = map[string]string{
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1alpha2.Logging
+	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
 	config *string
 }
 
-func New(client client.Client, log logr.Logger, logging *v1alpha2.Logging, config *string) *Reconciler {
+func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: k8sutil.NewReconciler(client, log),

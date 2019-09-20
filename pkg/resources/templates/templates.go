@@ -15,13 +15,13 @@
 package templates
 
 import (
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // FluentbitObjectMeta creates an objectMeta for resource fluentbit
-func FluentbitObjectMeta(name string, labels map[string]string, logging *v1alpha2.Logging) metav1.ObjectMeta {
+func FluentbitObjectMeta(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
 		Namespace: logging.Spec.ControlNamespace,
@@ -40,7 +40,7 @@ func FluentbitObjectMeta(name string, labels map[string]string, logging *v1alpha
 }
 
 // FluentbitObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
-func FluentbitObjectMetaClusterScope(name string, labels map[string]string, logging *v1alpha2.Logging) metav1.ObjectMeta {
+func FluentbitObjectMetaClusterScope(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:   name,
 		Labels: labels,
@@ -58,7 +58,7 @@ func FluentbitObjectMetaClusterScope(name string, labels map[string]string, logg
 }
 
 // FluentdObjectMeta creates an objectMeta for resource fluentd
-func FluentdObjectMeta(name string, labels map[string]string, logging *v1alpha2.Logging) metav1.ObjectMeta {
+func FluentdObjectMeta(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      name,
 		Namespace: logging.Spec.ControlNamespace,

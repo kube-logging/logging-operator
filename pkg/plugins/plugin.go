@@ -18,7 +18,7 @@ import (
 	"reflect"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
@@ -27,7 +27,7 @@ type DirectiveConverter interface {
 	ToDirective(secret.SecretLoader) (types.Directive, error)
 }
 
-func CreateOutput(outputSpec v1alpha2.OutputSpec, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateOutput(outputSpec v1beta1.OutputSpec, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(outputSpec)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -47,7 +47,7 @@ func CreateOutput(outputSpec v1alpha2.OutputSpec, secretLoader secret.SecretLoad
 	}
 }
 
-func CreateFilter(filter v1alpha2.Filter, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
