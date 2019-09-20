@@ -21,7 +21,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:
   - apiGroups:
-      - logging.banzaicloud.com
+      - logging.banzaicloud.io
     resources:
       - loggings
       - flows
@@ -37,7 +37,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - logging.banzaicloud.com
+      - logging.banzaicloud.io
     resources:
       - loggings/status
     verbs:

@@ -36,7 +36,7 @@ kubectl create ns logging
 Create `logging` resource
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -54,7 +54,7 @@ Create an ElasticSearch output definition
 
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: es-output
@@ -80,7 +80,7 @@ The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.
 
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterFlow
 metadata:
   name: es-flow

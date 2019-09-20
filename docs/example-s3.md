@@ -16,7 +16,7 @@ kubectl apply -f logging.yaml
 ```
 *logging.yaml*
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -60,7 +60,7 @@ kubectl apply -f clusteroutput.yaml
 ```
 *clusteroutput.yaml*
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: s3-output
@@ -96,7 +96,7 @@ kubectl apply -f clusterflow.yaml
 ```
 *clusterflow.yaml*
 ```yaml
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterFlow
 metadata:
   name: all-log-to-s3
