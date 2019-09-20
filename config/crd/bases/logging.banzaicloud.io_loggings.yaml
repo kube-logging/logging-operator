@@ -4,9 +4,9 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
-  name: loggings.logging.banzaicloud.com
+  name: loggings.logging.banzaicloud.io
 spec:
-  group: logging.banzaicloud.com
+  group: logging.banzaicloud.io
   names:
     kind: Logging
     listKind: LoggingList
@@ -292,6 +292,10 @@ spec:
                   - repository
                   - tag
                   type: object
+                nodeSelector:
+                  additionalProperties:
+                    type: string
+                  type: object
                 port:
                   format: int32
                   type: integer
@@ -327,6 +331,45 @@ spec:
                   - enabled
                   - secretName
                   type: object
+                tolerations:
+                  items:
+                    description: The pod this Toleration is attached to tolerates
+                      any taint that matches the triple <key,value,effect> using the
+                      matching operator <operator>.
+                    properties:
+                      effect:
+                        description: Effect indicates the taint effect to match. Empty
+                          means match all taint effects. When specified, allowed values
+                          are NoSchedule, PreferNoSchedule and NoExecute.
+                        type: string
+                      key:
+                        description: Key is the taint key that the toleration applies
+                          to. Empty means match all taint keys. If the key is empty,
+                          operator must be Exists; this combination means to match
+                          all values and all keys.
+                        type: string
+                      operator:
+                        description: Operator represents a key's relationship to the
+                          value. Valid operators are Exists and Equal. Defaults to
+                          Equal. Exists is equivalent to wildcard for value, so that
+                          a pod can tolerate all taints of a particular category.
+                        type: string
+                      tolerationSeconds:
+                        description: TolerationSeconds represents the period of time
+                          the toleration (which must be of effect NoExecute, otherwise
+                          this field is ignored) tolerates the taint. By default,
+                          it is not set, which means tolerate the taint forever (do
+                          not evict). Zero and negative values will be treated as
+                          0 (evict immediately) by the system.
+                        format: int64
+                        type: integer
+                      value:
+                        description: Value is the taint value the toleration matches
+                          to. If the operator is Exists, the value should be empty,
+                          otherwise just a regular string.
+                        type: string
+                    type: object
+                  type: array
                 volumeModImage:
                   description: ImageSpec struct hold information about image specification
                   properties:
@@ -360,9 +403,9 @@ spec:
               type: object
           type: object
       type: object
-  version: v1alpha2
+  version: v1beta1
   versions:
-  - name: v1alpha2
+  - name: v1beta1
     served: true
     storage: true
 status:

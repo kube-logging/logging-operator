@@ -22,7 +22,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/pborman/uuid"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -78,7 +78,7 @@ func beforeSuite() error {
 		return fmt.Errorf("failed to start testenv, config is nil")
 	}
 
-	err = v1alpha2.AddToScheme(scheme.Scheme)
+	err = v1beta1.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return err
 	}

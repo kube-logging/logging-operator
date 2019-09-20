@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
@@ -54,13 +54,13 @@ func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
@@ -87,24 +87,24 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -126,24 +126,24 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			LoggingRef: "nonexistent",
 			Selectors: map[string]string{
 				"a": "b",
@@ -166,34 +166,34 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	output := &v1alpha2.Output{
+	output := &v1beta1.Output{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-output",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.OutputSpec{
+		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -215,36 +215,36 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	output := &v1alpha2.ClusterOutput{
+	output := &v1beta1.ClusterOutput{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-cluster-output",
 			Namespace: controlNamespace,
 		},
-		Spec: v1alpha2.ClusterOutputSpec{
-			OutputSpec: v1alpha2.OutputSpec{
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: output.NewNullOutputConfig(),
 			},
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -265,34 +265,34 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	output := &v1alpha2.Output{
+	output := &v1beta1.Output{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-output",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.OutputSpec{
+		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
 	}
 
-	flow := &v1alpha2.ClusterFlow{
+	flow := &v1beta1.ClusterFlow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: controlNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -327,36 +327,36 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			LoggingRef:              "someloggingref",
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	output := &v1alpha2.Output{
+	output := &v1beta1.Output{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-output",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.OutputSpec{
+		Spec: v1beta1.OutputSpec{
 			LoggingRef:       "someloggingref",
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			LoggingRef: "someloggingref",
 			Selectors: map[string]string{
 				"a": "b",
@@ -378,24 +378,24 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
+		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -429,24 +429,24 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
-	logging := &v1alpha2.Logging{
+	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "test",
 		},
-		Spec: v1alpha2.LoggingSpec{
-			FluentdSpec:             &v1alpha2.FluentdSpec{},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
 			WatchNamespaces:         []string{testNamespace},
 			ControlNamespace:        controlNamespace,
 		},
 	}
 
-	output := &v1alpha2.Output{
+	output := &v1beta1.Output{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-output",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.OutputSpec{
+		Spec: v1beta1.OutputSpec{
 			S3OutputConfig: &output.S3OutputConfig{
 				AwsAccessKey: &secret.Secret{
 					ValueFrom: &secret.ValueFrom{
@@ -460,12 +460,12 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 			},
 		},
 	}
-	flow := &v1alpha2.Flow{
+	flow := &v1beta1.Flow{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test-flow",
 			Namespace: testNamespace,
 		},
-		Spec: v1alpha2.FlowSpec{
+		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},

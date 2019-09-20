@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1alpha2
+package v1beta1
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -26,10 +26,10 @@ import (
 // These tests are written in BDD-style using Ginkgo framework. Refer to
 // http://onsi.github.io/ginkgo to learn more.
 
-var _ = Describe("ClusterOutput", func() {
+var _ = Describe("Output", func() {
 	var (
 		key              types.NamespacedName
-		created, fetched *ClusterOutput
+		created, fetched *Output
 	)
 
 	BeforeEach(func() {
@@ -50,19 +50,17 @@ var _ = Describe("ClusterOutput", func() {
 
 			key = types.NamespacedName{
 				Name:      "foo",
-				Namespace: "foo",
+				Namespace: "default",
 			}
-			created = &ClusterOutput{
+			created = &Output{
 				TypeMeta: metav1.TypeMeta{},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
-					Namespace: "foo",
+					Namespace: "default",
 				},
-				Spec: ClusterOutputSpec{
-					OutputSpec: OutputSpec{
-						S3OutputConfig:   nil,
-						NullOutputConfig: nil,
-					},
+				Spec: OutputSpec{
+					S3OutputConfig:   nil,
+					NullOutputConfig: nil,
 				},
 				Status: OutputStatus{},
 			}
@@ -70,7 +68,7 @@ var _ = Describe("ClusterOutput", func() {
 			By("creating an API obj")
 			Expect(k8sClient.Create(context.TODO(), created)).To(Succeed())
 
-			fetched = &ClusterOutput{}
+			fetched = &Output{}
 			Expect(k8sClient.Get(context.TODO(), key, fetched)).To(Succeed())
 			Expect(fetched).To(Equal(created))
 

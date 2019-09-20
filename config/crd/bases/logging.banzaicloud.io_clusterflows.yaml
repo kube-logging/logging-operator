@@ -4,23 +4,18 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
-  name: flows.logging.banzaicloud.com
+  name: clusterflows.logging.banzaicloud.io
 spec:
-  additionalPrinterColumns:
-  - JSONPath: .spec.loggingRef
-    name: Logging
-    type: string
-  group: logging.banzaicloud.com
+  group: logging.banzaicloud.io
   names:
-    kind: Flow
-    listKind: FlowList
-    plural: flows
-    singular: flow
+    kind: ClusterFlow
+    listKind: ClusterFlowList
+    plural: clusterflows
+    singular: clusterflow
   scope: ""
-  subresources: {}
   validation:
     openAPIV3Schema:
-      description: Flow Kubernetes object
+      description: ClusterFlow is the Schema for the clusterflows API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -35,7 +30,7 @@ spec:
         metadata:
           type: object
         spec:
-          description: FlowSpec is the Kubernetes spec for Flows
+          description: Name of the logging cluster to be attached
           properties:
             filters:
               items:
@@ -132,9 +127,9 @@ spec:
           description: FlowStatus defines the observed state of Flow
           type: object
       type: object
-  version: v1alpha2
+  version: v1beta1
   versions:
-  - name: v1alpha2
+  - name: v1beta1
     served: true
     storage: true
 status:
