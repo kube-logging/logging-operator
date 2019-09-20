@@ -29,7 +29,6 @@ jobs:
 
     steps:
       - checkout
-
       - run:
           name: Setup golang
           command: |
@@ -39,31 +38,30 @@ jobs:
               "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" \
             && sudo tar -C /usr/local -xzf go.linux-amd64.tar.gz
             echo 'export PATH="$GOPATH/bin:$PATH"' >> "${BASH_ENV}"
-
       - run:
           name: Run fmt
           command: |
             make check-fmt
-
       - run:
           name: Run golint
           command: |
             make lint
-
       - run:
           name: Run misspell
           command: |
             make check-misspell
-
       - run:
           name: Run ineffassign
           command: |
             make ineffassign
       - run:
-          name: Build manager
+          name: Check generators for unwanted diffs
           command: |
-            make manager
-
+            make check-diff
+      - run:
+          name: Test
+          command: |
+            make test
       #- run:
       #    name: Setup kubectl
       #    command: |

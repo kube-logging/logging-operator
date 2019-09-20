@@ -115,6 +115,10 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
+check-diff:
+	$(MAKE) generate manifests docs
+	git diff --exit-code
+
 bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder bin/kubebuilder
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kube-apiserver bin/kube-apiserver
@@ -123,6 +127,11 @@ bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 
 bin/kubebuilder_${KUBEBUILDER_VERSION}:
 	@mkdir -p bin
+ifeq (${OS}, Darwin)
 	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_darwin_amd64.tar.gz | tar xvz - -C bin
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_darwin_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
-#todo implement for linux (CI)
+endif
+ifeq (${OS}, Linux)
+	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64.tar.gz | tar xvz - -C bin
+	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
+endif
