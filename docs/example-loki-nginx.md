@@ -1,22 +1,31 @@
-<p align="center"><img src="./img/nle.png" width="340"></p>
+<p align="center"><img src="./img/nll.png" width="340"></p>
 
-# Store Nginx Access Logs in ElasticSearch with Logging Operator
+# Store Nginx Access Logs in Grafana Loki with Logging Operator
 
-<p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
+<p align="center"><img src="./img/nginx-loki.png" width="900"></p>
 
 ### Add operator chart repository:
 ```bash
-helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
+helm repo add loki https://grafana.github.io/loki/charts
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
-### Install ElasticSearch with operator
+### Install Loki
 ```bash
-helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
+helm install --name loki loki/loki
 ```
-> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
+> [Grafana Loki Documentation](https://github.com/grafana/loki/tree/master/production/helm)
+### Install Grafana
+```bash
+helm install --name grafana stable/grafana \
+ --set "datasources.datasources\\.yaml.apiVersion=1" \
+ --set "datasources.datasources\\.yaml.datasources[0].name=Loki" \
+ --set "datasources.datasources\\.yaml.datasources[0].type=loki" \
+ --set "datasources.datasources\\.yaml.datasources[0].url=http://loki:3100" \
+ --set "datasources.datasources\\.yaml.datasources[0].access=proxy"
+```
+
 
 ## Install with Helm 
 ### Logging Operator
@@ -27,7 +36,7 @@ helm install --name logging banzaicloud-stable/logging-operator
 
 ### Nginx App + Logging Definition
 ```bash
-helm install --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
+helm install --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
 ```
 
 ## Install from manifest
@@ -45,25 +54,20 @@ spec:
   controlNamespace: default
 EOF
 ```
-
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-#### Create an ElasticSearch output definition 
+#### Create an Loki output definition 
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
-  name: es-output
+  name: loki-output
   namespace: default
 spec:
-  elasticsearch:
-    host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
-    port: 9200
-    scheme: https
-    ssl_verify: false
-    ssl_version: TLSv1_2
+  loki:
+    url: http://loki:3100
     buffer:
       path: /tmp/buffer
       timekey: 1m
@@ -79,7 +83,7 @@ cat <<EOF | kubectl apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
-  name: es-flow
+  name: loki-flow
   namespace: default
 spec:
   filters:
@@ -93,7 +97,7 @@ spec:
   selectors:
     app: nginx
   outputRefs:
-    - es-output
+    - loki-output
 EOF
 ```
 
@@ -142,22 +146,18 @@ spec:
 EOF
 ```
 
-#### Forward Cerebro Dashboard
+### Grafana Dashboard
+
+#### Get Grafana login credantials
 ```bash
-kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
+kubectl get secrets grafana -o json | jq '.data | map_values(@base64d)'
 ```
-[Dashboard URL: http://localhost:9001](http://localhost:9001)
 
-<p align="center"><img src="./img/es_cerb.png" width="660"></p>
-
-
-
-#### Forward Kibana Dashboard
+#### Forward Grafana Service
 ```bash
-kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
+kubectl port-forward svc/grafana 3000:80
 ```
-[Dashboard URL: https://localhost:5601](https://localhost:5601)
-
-<p align="center"><img src="./img/es_kibana.png" width="660"></p>
+[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
+<p align="center"><img src="./img/loki1.png" width="660"></p>
 
 
