@@ -44,7 +44,7 @@ helm install --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
 #### Create `logging` resource
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
@@ -60,7 +60,7 @@ EOF
 #### Create an Loki output definition 
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
   name: loki-output
@@ -80,7 +80,7 @@ EOF
 #### Create `flow` resource
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
   name: loki-flow
