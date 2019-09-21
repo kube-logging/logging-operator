@@ -1,4 +1,4 @@
-apiVersion: logging.banzaicloud.com/v1alpha2
+apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
   name: s3-output-sample
@@ -18,7 +18,6 @@ spec:
     s3_region: eu-central-1
     path: logs/${tag}/%Y/%m/%d/
     buffer:
-      path: /tmp/buffer
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true

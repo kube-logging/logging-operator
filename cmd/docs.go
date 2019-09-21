@@ -111,10 +111,15 @@ func (d *doc) generate() {
 	}
 }
 
-var pluginDirs = map[string]string{
-	"filters": "./pkg/model/filter/",
-	"outputs": "./pkg/model/output/",
-	"common":  "./pkg/model/common/",
+type PluginDir struct {
+	Type string
+	Path string
+}
+
+var pluginDirs = []PluginDir{
+	{"filters", "./pkg/model/filter/"},
+	{"outputs", "./pkg/model/output/"},
+	{"common", "./pkg/model/common/"},
 }
 
 var docsPath = "docs/plugins"
@@ -153,10 +158,10 @@ func main() {
 		Name: "index",
 	}
 	index.append("## Table of Contents\n\n")
-	for pluginType := range pluginDirs {
-		index.append(fmt.Sprintf("### %s\n", pluginType))
+	for _, p := range pluginDirs {
+		index.append(fmt.Sprintf("### %s\n", p.Type))
 		for _, plugin := range fileList {
-			if plugin.Type == pluginType {
+			if plugin.Type == p.Type {
 				index.append(fmt.Sprintf("- [%s](%s)", plugin.Name, plugin.DocumentationPath))
 			}
 		}
@@ -259,22 +264,22 @@ func getDocumentParser(file plugin) *doc {
 	return newDoc
 }
 
-func getPlugins(PluginDirs map[string]string) (plugins, error) {
+func getPlugins(PluginDirs []PluginDir) (plugins, error) {
 	var PluginList plugins
-	for pluginType, path := range PluginDirs {
-		files, err := ioutil.ReadDir(path)
+	for _, p := range PluginDirs {
+		files, err := ioutil.ReadDir(p.Path)
 		if err != nil {
 			log.Error(err, err.Error())
 			return nil, err
 		}
-
 		for _, file := range files {
 			log.V(2).Info("fileListGenerator", "filename", "file")
 			fname := strings.Replace(file.Name(), ".go", "", 1)
 			if filepath.Ext(file.Name()) == ".go" && getPluginWhiteList(fname) {
-				fullPath := path + file.Name()
-				filepath := fmt.Sprintf("./%s/%s.md", pluginType, fname)
-				PluginList = append(PluginList, plugin{Name: fname, SourcePath: fullPath, DocumentationPath: filepath, Type: pluginType})
+				fullPath := p.Path + file.Name()
+				filepath := fmt.Sprintf("./%s/%s.md", p.Type, fname)
+				PluginList = append(PluginList, plugin{
+					Name: fname, SourcePath: fullPath, DocumentationPath: filepath, Type: p.Type})
 			}
 		}
 	}

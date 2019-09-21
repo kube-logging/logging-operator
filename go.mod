@@ -10,7 +10,9 @@ require (
 	github.com/client9/misspell v0.3.4 // indirect
 	github.com/go-logr/logr v0.1.0
 	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/goph/emperror v0.17.2
+	github.com/gordonklaus/ineffassign v0.0.0-20190601041439-ed7b1b5ee0f8 // indirect
 	github.com/iancoleman/orderedmap v0.0.0-20190318233801-ac98e3ecb4b0
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
@@ -23,9 +25,9 @@ require (
 	k8s.io/api v0.0.0-20190528154508-67ef80593b24
 	k8s.io/apimachinery v0.0.0-20190528154326-e59c2fb0a8e5
 	k8s.io/client-go v11.0.1-0.20190516230509-ae8359b20417+incompatible
+	k8s.io/klog v0.3.3 // indirect
 	sigs.k8s.io/controller-runtime v0.2.0
 	sigs.k8s.io/controller-tools v0.2.1 // indirect
-	sigs.k8s.io/kind v0.5.1 // indirect
 )
 
 replace (

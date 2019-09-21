@@ -18,7 +18,7 @@ import (
 	"flag"
 	"os"
 
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1alpha2"
+	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"

@@ -7,7 +7,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - logging.banzaicloud.com
+  - logging.banzaicloud.io
   resources:
   - loggings
   verbs:
@@ -19,7 +19,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - logging.banzaicloud.com
+  - logging.banzaicloud.io
   resources:
   - loggings/status
   verbs:

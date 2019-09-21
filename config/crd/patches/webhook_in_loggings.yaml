@@ -3,7 +3,7 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: loggings.logging.banzaicloud.com
+  name: loggings.logging.banzaicloud.io
 spec:
   conversion:
     strategy: Webhook

@@ -3,7 +3,7 @@
 |---|---|---|---|---|
 | type | string | No | - | Fluentd core bundles memory and file plugins. 3rd party plugins are also available when installed.<br> |
 | tags | string | No |  tag,time | When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags. <br> |
-| path | string | No | - | The path where buffer chunks are stored. The '*' is replaced with random characters. This parameter is required.<br> |
+| path | string | No | /buffers/default.*.buffer | The path where buffer chunks are stored. The '*' is replaced with random characters. This parameter is required.<br> |
 | chunk_limit_size | string | No | - | The max size of each chunks: events will be written into chunks until the size of chunks become this size<br> |
 | chunk_limit_records | int | No | - | The max number of events that each chunks can store in it<br> |
 | total_limit_size | string | No | - | The size limitation of this buffer plugin instance. Once the total size of stored buffer reached this threshold, all append operations will fail with error (and data will be lost)<br> |

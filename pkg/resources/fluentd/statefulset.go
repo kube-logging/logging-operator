@@ -15,7 +15,7 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/api/v1alpha2"
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
@@ -98,7 +98,7 @@ func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	return meta
 }
 
-func newConfigMapReloader(spec v1alpha2.ImageSpec) *corev1.Container {
+func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
 	return &corev1.Container{
 		Name:            "config-reloader",
 		ImagePullPolicy: corev1.PullPolicy(spec.PullPolicy),
@@ -121,7 +121,7 @@ func newConfigMapReloader(spec v1alpha2.ImageSpec) *corev1.Container {
 	}
 }
 
-func generatePorts(spec *v1alpha2.FluentdSpec) []corev1.ContainerPort {
+func generatePorts(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
 	ports := []corev1.ContainerPort{
 		{
 			Name:          "fluent-input",

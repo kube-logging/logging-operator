@@ -37,7 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1alpha2"
+	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1beta1"
 )
 
 // LoggingReconciler reconciles a Logging object
@@ -46,8 +46,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.com,resources=loggings,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.com,resources=loggings/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status,verbs=get;update;patch
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
