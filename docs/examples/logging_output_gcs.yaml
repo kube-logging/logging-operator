@@ -13,7 +13,6 @@ spec:
     bucket: banzai-log-test
     path: logs/${tag}/%Y/%m/%d/
     buffer:
-      path: /tmp/buffer
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true

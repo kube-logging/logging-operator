@@ -17,7 +17,6 @@ spec:
     azure_container: example-azure-container
     path: logs/${tag}/%Y/%m/%d/
     buffer:
-      path: /tmp/buffer
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true
