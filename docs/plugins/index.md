@@ -1,6 +1,13 @@
 ## Table of Contents
 
 
+### filters
+
+- [parser](./filters/parser.md)
+- [stdout](./filters/stdout.md)
+- [tagnormaliser](./filters/tagnormaliser.md)
+
+
 ### outputs
 
 - [azurestore](./outputs/azurestore.md)
@@ -20,12 +27,5 @@
 
 - [security](./common/security.md)
 - [transport](./common/transport.md)
-
-
-### filters
-
-- [parser](./filters/parser.md)
-- [stdout](./filters/stdout.md)
-- [tagnormaliser](./filters/tagnormaliser.md)
 
 
