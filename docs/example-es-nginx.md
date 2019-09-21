@@ -146,6 +146,8 @@ EOF
 ```bash
 kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
 ```
+[Dashboard URL: http://localhost:9001](http://localhost:9001)
+
 <p align="center"><img src="./img/es_cerb.png" width="660"></p>
 
 
@@ -154,6 +156,8 @@ kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
 ```bash
 kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
 ```
+[Dashboard URL: https://localhost:5601](https://localhost:5601)
+
 <p align="center"><img src="./img/es_kibana.png" width="660"></p>
 
 
