@@ -1,0 +1,18 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "nginx-logging-loki-demo.fullname" . }}-loki-output
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "nginx-logging-loki-demo.name" . }}
+    chart: {{ include "nginx-logging-loki-demo.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  loki:
+    url: http://loki:3100
+    buffer:
+      path: /tmp/buffer
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true

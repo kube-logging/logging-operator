@@ -1,0 +1,12 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: customlogging
+spec:
+  loggingRef: customref
+  fluentd: {
+    disablePvc: true
+  }
+  watchNamespaces: ["custom"]
+  controlNamespace: control
+

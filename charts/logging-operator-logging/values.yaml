@@ -1,0 +1,35 @@
+# Default values for logging-operator-logging.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Reference name of the logging deployment
+loggingRef: ""
+# Disable configuration check before deploy
+flowConfigCheckDisabled: false
+# Use static configuration instead of generated config.
+flowConfigOverride:	""
+
+# Fluent-bit configurations
+fluentbit: {}
+# Fluentd configurations
+fluentd: {}
+#  fluentdPvcSpec:
+#    accessModes:
+#      - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: 40Gi
+#    storageClassName: fast
+
+# Enable secure connection between fluentd and fluent-bit
+tls:
+  enabled: true
+  # Shared key for fluentd authentication
+  sharedKey: ""
+  fluentbitSecretName: ""
+  fluentdSecretName: ""
+
+# Limit namespaces from where to read Flow and Output specs
+watchNamespaces: []
+# Control namespace that contains ClusterOutput and ClusterFlow resources
+controlNamespace: ""

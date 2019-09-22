@@ -12,7 +12,7 @@ $ helm install banzaicloud-stable/logging-operator
 
 ## Introduction
 
-This chart bootstraps an [Logging Operator](https://github.com/banzaicloud/banzai-charts/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps an [Logging Operator](https://github.com/banzaicloud/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -45,12 +45,11 @@ The following tables lists the configurable parameters of the logging-operator c
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `image.repository`                                  | Container image repository                             | `banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `0.2.2`                        |
+| `image.tag`                                         | Container image tag                                    | `2.0.0`                        |
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
 | `watchNamespace`                                    | Namespace to watch fot LoggingOperator CRD             | ``                             |
-| `grafana.dashboard.enabled`                         | Install grafana logging-operator dashboard             | `true`                         |
 | `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                         |
 | `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.              | `false`                        |
 | `affinity`                                          | Node Affinity                                          | `{}`                           |
@@ -68,31 +67,46 @@ $ helm install --name my-release -f values.yaml banzaicloud-stable/logging-opera
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
-## Installing Fluentd and Fluent-bit
+## Installing Fluentd and Fluent-bit via logging
 
-The previous chart does **not** install Fluentd or Fluent-bit custom resource. To install them please use the [Logging Operator Fluent](https://github.com/banzaicloud/banzai-charts/logging-operator-fluent) chart.
+The previous chart does **not** install `logging` resource to deploy Fluentd and Fluent-bit on luster. To install them please use the [Logging Operator Logging](https://github.com/banzaicloud/logging-operator/tree/master/charts/logging-operator-logging) chart.
 
 ## tl;dr:
 
 ```bash
 $ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 $ helm repo update
-$ helm install banzaicloud-stable/logging-operator-fluent
+$ helm install banzaicloud-stable/logging-operator-logging
 ```
+
+## Configuration
+
+The following tables lists the configurable parameters of the logging-operator-logging chart and their default values.
+## tl;dr:
+
+```bash
+$ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+$ helm repo update
+$ helm install banzaicloud-stable/logging-operator-logging
+```
+
+## Configuration
+
+The following tables lists the configurable parameters of the logging-operator-logging chart and their default values.
 
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `tls.enabled`                                       | Enabled TLS communication between components           | true                           |
-| `tls.secretName`                                    | Specified secret name, which contain tls certs         | This will overwrite automatic Helm certificate generation. |
+| `tls.fluentdSecretName`                                    | Specified secret name, which contain tls certs         | This will overwrite automatic Helm certificate generation. |
+| `tls.fluentbitSecretName`                                    | Specified secret name, which contain tls certs         | This will overwrite automatic Helm certificate generation. |
 | `tls.sharedKey`                                     | Shared key between nodes (fluentd-fluentbit)           | [autogenerated]                |
 | `fluentbit.enabled`                                 | Install fluent-bit                                     | true                           |
 | `fluentbit.namespace`                               | Specified fluentbit installation namespace             | same as operator namespace     |
-| `fluentbit.image.tag`                               | Fluentbit container image tag                          | `1.1.3`                       |
+| `fluentbit.image.tag`                               | Fluentbit container image tag                          | `1.1.3`                        |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`            |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
-| `fluentd.namespace`                                 | Specified fluentd installation namespace               | same as operator namespace     |
-| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.5.0`                       |
+| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.6.3-alpine`                |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `banzaicloud/fluentd`          |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                          | `IfNotPresent`                 |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag             | `latest`                       |
@@ -103,3 +117,4 @@ $ helm install banzaicloud-stable/logging-operator-fluent
 | `fluentd.configReloaderImage.pullPolicy`            | Fluentd configReloaderImage container pull policy      | `IfNotPresent`                 |
 | `fluentd.fluentdPvcSpec.accessModes`                | Fluentd persistence volume access modes                | `[ReadWriteOnce]`              |
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                        | `21Gi`                         |
+| `fluentd.fluentdPvcSpec.resources.storageClassName` | Fluentd persistence volume storageclass                | `"""`                          |

@@ -1,0 +1,22 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "nginx-logging-es-demo.fullname" . }}-es-output
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "nginx-logging-es-demo.name" . }}
+    chart: {{ include "nginx-logging-es-demo.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  elasticsearch:
+    host: elasticsearch-elasticsearch-cluster.{{ .Release.Namespace }}.svc.cluster.local
+    port: 9200
+    scheme: https
+    ssl_verify: false
+    ssl_version: TLSv1_2
+    buffer:
+      path: /tmp/buffer
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true

@@ -1,0 +1,2274 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: clusteroutputs.logging.banzaicloud.io
+spec:
+  group: logging.banzaicloud.io
+  names:
+    kind: ClusterOutput
+    listKind: ClusterOutputList
+    plural: clusteroutputs
+    singular: clusteroutput
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      description: ClusterOutput is the Schema for the clusteroutputs API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: ClusterOutputSpec contains Kubernetes spec for CLusterOutput
+          properties:
+            azurestorage:
+              properties:
+                auto_create_container:
+                  description: 'Automatically create container if not exists(default:
+                    true)'
+                  type: boolean
+                azure_container:
+                  description: Your azure storage container
+                  type: string
+                azure_object_key_format:
+                  description: 'Object key format (default: %{path}%{time_slice}_%{index}.%{file_extension})'
+                  type: string
+                azure_storage_access_key:
+                  description: Your azure storage access key
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                azure_storage_account:
+                  description: Your azure storage account
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                azure_storage_type:
+                  description: 'Azure storage type currently only "blob" supported
+                    (default: blob)'
+                  type: string
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                format:
+                  description: 'Compat format type: out_file, json, ltsv (default:
+                    out_file)'
+                  type: string
+                path:
+                  description: Path prefix of the files on Azure
+                  type: string
+                store_as:
+                  description: 'Store as: gzip, json, text, lzo, lzma2 (default: gzip)'
+                  type: string
+              required:
+              - azure_container
+              - azure_storage_access_key
+              - azure_storage_account
+              type: object
+            elasticsearch:
+              description: Send your logs to Elasticsearch
+              properties:
+                application_name:
+                  description: 'Specify the application name for the rollover index
+                    to be created.(default: default)'
+                  type: string
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                content_type:
+                  description: 'With content_type application/x-ndjson, elasticsearch
+                    plugin adds application/x-ndjson as Content-Type in payload. (default:
+                    application/json)'
+                  type: string
+                customize_template:
+                  description: Specify the string and its value to be replaced in
+                    form of hash. Can contain multiple key value pair that would be
+                    replaced in the specified template_file. This setting only creates
+                    template and to add rollover index please check the rollover_index
+                    configuration.
+                  type: string
+                deflector_alias:
+                  description: Specify the deflector alias which would be assigned
+                    to the rollover index created. This is useful in case of using
+                    the Elasticsearch rollover API
+                  type: string
+                fail_on_putting_template_retry_exceed:
+                  description: 'Indicates whether to fail when max_retry_putting_template
+                    is exceeded. If you have multiple output plugin, you could use
+                    this property to do not fail on fluentd statup.(default: true)'
+                  type: boolean
+                host:
+                  description: You can specify Elasticsearch host by this parameter.
+                    (default:localhost)
+                  type: string
+                hosts:
+                  description: You can specify multiple Elasticsearch hosts with separator
+                    ",". If you specify hosts option, host and port options are ignored.
+                  type: string
+                http_backend:
+                  description: 'With http_backend typhoeus, elasticsearch plugin uses
+                    typhoeus faraday http backend. Typhoeus can handle HTTP keepalive.
+                    (default: excon)'
+                  type: string
+                id_key:
+                  description: https://github.com/uken/fluent-plugin-elasticsearch#id_key
+                  type: string
+                include_index_in_url:
+                  description: With this option set to true, Fluentd manifests the
+                    index name in the request URL (rather than in the request body).
+                    You can use this option to enforce an URL-based access control.
+                  type: boolean
+                include_tag_key:
+                  description: 'This will add the Fluentd tag in the JSON record.(default:
+                    false)'
+                  type: boolean
+                include_timestamp:
+                  description: Adds a @timestamp field to the log, following all settings
+                    logstash_format does, except without the restrictions on index_name.
+                    This allows one to log to an alias in Elasticsearch and utilize
+                    the rollover API.
+                  type: boolean
+                index_date_pattern:
+                  description: 'Specify this to override the index date pattern for
+                    creating a rollover index.(default: now/d)'
+                  type: string
+                index_prefix:
+                  description: Specify the index prefix for the rollover index to
+                    be created.
+                  type: string
+                logstash_dateformat:
+                  description: 'Set the Logstash date format.(default: %Y.%m.%d)'
+                  type: string
+                logstash_format:
+                  description: 'Enable Logstash log format.(default: false)'
+                  type: boolean
+                logstash_prefix:
+                  description: 'Set the Logstash prefix.(default: true)'
+                  type: string
+                logstash_prefix_separator:
+                  description: 'Set the Logstash prefix separator.(default: -)'
+                  type: string
+                max_retry_get_es_version:
+                  description: 'You can specify times of retry obtaining Elasticsearch
+                    version.(default: 15)'
+                  type: string
+                max_retry_putting_template:
+                  description: 'You can specify times of retry putting template.(default:
+                    10)'
+                  type: string
+                password:
+                  description: Password for HTTP Basic authentication.
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                path:
+                  description: Path for HTTP Basic authentication.
+                  type: string
+                pipeline:
+                  description: This param is to set a pipeline id of your elasticsearch
+                    to be added into the request, you can configure ingest node.
+                  type: string
+                port:
+                  description: 'You can specify Elasticsearch port by this parameter.(default:
+                    9200)'
+                  type: integer
+                prefer_oj_serializer:
+                  description: 'With default behavior, Elasticsearch client uses Yajl
+                    as JSON encoder/decoder. Oj is the alternative high performance
+                    JSON encoder/decoder. When this parameter sets as true, Elasticsearch
+                    client uses Oj as JSON encoder/decoder. (default: fqlse)'
+                  type: boolean
+                reconnect_on_error:
+                  description: 'Indicates that the plugin should reset connection
+                    on any error (reconnect on next send). By default it will reconnect
+                    only on "host unreachable exceptions". We recommended to set this
+                    true in the presence of elasticsearch shield.(default: false)'
+                  type: boolean
+                reload_connections:
+                  description: 'You can tune how the elasticsearch-transport host
+                    reloading feature works.(default: true)'
+                  type: boolean
+                reload_on_failure:
+                  description: 'Indicates that the elasticsearch-transport will try
+                    to reload the nodes addresses if there is a failure while making
+                    the request, this can be useful to quickly remove a dead node
+                    from the list of addresses.(default: false)'
+                  type: boolean
+                remove_keys_on_update:
+                  description: Remove keys on update will not update the configured
+                    keys in elasticsearch when a record is being updated. This setting
+                    only has any effect if the write operation is update or upsert.
+                  type: string
+                remove_keys_on_update_key:
+                  description: This setting allows remove_keys_on_update to be configured
+                    with a key in each record, in much the same way as target_index_key
+                    works.
+                  type: string
+                request_timeout:
+                  description: 'You can specify HTTP request timeout.(default: 5s)'
+                  type: string
+                resurrect_after:
+                  description: 'You can set in the elasticsearch-transport how often
+                    dead connections from the elasticsearch-transport''s pool will
+                    be resurrected.(default: 60s)'
+                  type: string
+                retry_tag:
+                  description: This setting allows custom routing of messages in response
+                    to bulk request failures. The default behavior is to emit failed
+                    records using the same tag that was provided.
+                  type: string
+                rollover_index:
+                  description: 'Specify this as true when an index with rollover capability
+                    needs to be created.(default: false) https://github.com/uken/fluent-plugin-elasticsearch#rollover_index'
+                  type: boolean
+                routing_key:
+                  description: Similar to parent_key config, will add _routing into
+                    elasticsearch command if routing_key is set and the field does
+                    exist in input event.
+                  type: string
+                scheme:
+                  description: 'Connection scheme (default: http)'
+                  type: string
+                ssl_verify:
+                  description: 'Skip ssl verification (default: true)'
+                  type: boolean
+                ssl_version:
+                  description: If you want to configure SSL/TLS version, you can specify
+                    ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
+                  type: string
+                tag_key:
+                  description: 'This will add the Fluentd tag in the JSON record.(default:
+                    tag)'
+                  type: string
+                target_index_key:
+                  description: Tell this plugin to find the index name to write to
+                    in the record under this key in preference to other mechanisms.
+                    Key can be specified as path to nested record using dot ('.')
+                    as a separator. https://github.com/uken/fluent-plugin-elasticsearch#target_index_key
+                  type: string
+                target_type_key:
+                  description: 'Similar to target_index_key config, find the type
+                    name to write to in the record under this key (or nested record).
+                    If key not found in record - fallback to type_name.(default: true)'
+                  type: string
+                template_file:
+                  description: The path to the file containing the template to install.
+                  type: string
+                template_name:
+                  description: The name of the template to define. If a template by
+                    the name given is already present, it will be left unchanged,
+                    unless template_overwrite is set, in which case the template will
+                    be updated.
+                  type: string
+                template_overwrite:
+                  description: 'Always update the template, even if it already exists.(default:
+                    false)'
+                  type: boolean
+                templates:
+                  description: Specify index templates in form of hash. Can contain
+                    multiple templates.
+                  type: string
+                time_key:
+                  description: By default, when inserting records in Logstash format,
+                    @timestamp is dynamically created with the time at log ingestion.
+                    If you'd like to use a custom time, include an @timestamp with
+                    your record.
+                  type: string
+                time_key_format:
+                  description: The format of the time stamp field (@timestamp or what
+                    you specify with time_key). This parameter only has an effect
+                    when logstash_format is true as it only affects the name of the
+                    index we write to.
+                  type: string
+                time_parse_error_tag:
+                  description: With logstash_format true, elasticsearch plugin parses
+                    timestamp field for generating index name. If the record has invalid
+                    timestamp value, this plugin emits an error event to @ERROR label
+                    with time_parse_error_tag configured tag.
+                  type: string
+                time_precision:
+                  description: Should the record not include a time_key, define the
+                    degree of sub-second time precision to preserve from the time
+                    portion of the routed event.
+                  type: string
+                user:
+                  description: User for HTTP Basic authentication. This plugin will
+                    escape required URL encoded characters within %{} placeholders.
+                    e.g. %{demo+}
+                  type: string
+                utc_index:
+                  description: 'By default, the records inserted into index logstash-YYMMDD
+                    with UTC (Coordinated Universal Time). This option allows to use
+                    local time if you describe utc_index to false.(default: true)'
+                  type: boolean
+                with_transporter_log:
+                  description: 'This is debugging purpose option to enable to obtain
+                    transporter layer log. (default: false)'
+                  type: boolean
+                write_operation:
+                  description: 'The write_operation can be any of: (index,create,update,upsert)(default:
+                    index)'
+                  type: string
+              required:
+              - ssl_verify
+              type: object
+            enabledNamespaces:
+              items:
+                type: string
+              type: array
+            forward:
+              properties:
+                ack_response_timeout:
+                  description: 'This option is used when require_ack_response is true.
+                    This default value is based on popular tcp_syn_retries. (default:
+                    190)'
+                  type: integer
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                connect_timeout:
+                  description: The timeout time for socket connect. When the connection
+                    timed out during establishment, Errno::ETIMEDOUT is raised.
+                  type: integer
+                dns_round_robin:
+                  description: Enable client-side DNS round robin. Uniform randomly
+                    pick an IP address to send data when a hostname has several IP
+                    addresses. `heartbeat_type udp` is not available with `dns_round_robin
+                    true`. Use `heartbeat_type tcp` or `heartbeat_type none`.
+                  type: boolean
+                expire_dns_cache:
+                  description: 'Set TTL to expire DNS cache in seconds. Set 0 not
+                    to use DNS Cache. (defult: 0)'
+                  type: integer
+                hard_timeout:
+                  description: 'The hard timeout used to detect server failure. The
+                    default value is equal to the send_timeout parameter. (default:
+                    60)'
+                  type: integer
+                heartbeat_interval:
+                  description: 'The interval of the heartbeat packer. (default: 1)'
+                  type: integer
+                heartbeat_type:
+                  description: The transport protocol to use for heartbeats. Set "none"
+                    to disable heartbeat. [transport, tcp, udp, none]
+                  type: string
+                ignore_network_errors_at_startup:
+                  description: Ignore DNS resolution and errors at startup time.
+                  type: boolean
+                keepalive:
+                  description: 'Enable keepalive connection. (default: false)'
+                  type: boolean
+                keepalive_timeout:
+                  description: 'Expired time of keepalive. Default value is nil, which
+                    means to keep connection as long as possible. (default: 0)'
+                  type: integer
+                phi_failure_detector:
+                  description: 'Use the "Phi accrual failure detector" to detect server
+                    failure. (default: true)'
+                  type: boolean
+                phi_threshold:
+                  description: 'The threshold parameter used to detect server faults.
+                    (default: 16) `phi_threshold` is deeply related to `heartbeat_interval`.
+                    If you are using longer `heartbeat_interval`, please use the larger
+                    `phi_threshold`. Otherwise you will see frequent detachments of
+                    destination servers. The default value 16 is tuned for `heartbeat_interval`
+                    1s.'
+                  type: integer
+                recover_wait:
+                  description: 'The wait time before accepting a server fault recovery.
+                    (default: 10)'
+                  type: integer
+                require_ack_response:
+                  description: Change the protocol to at-least-once. The plugin waits
+                    the ack from destination's in_forward plugin.
+                  type: boolean
+                security:
+                  properties:
+                    allow_anonymous_source:
+                      description: Allow anonymous source. <client> sections are required
+                        if disabled.
+                      type: boolean
+                    self_hostname:
+                      description: Hostname
+                      type: string
+                    shared_key:
+                      description: Shared key for authentication.
+                      type: string
+                    user_auth:
+                      description: If true, use user based authentication.
+                      type: boolean
+                  required:
+                  - self_hostname
+                  - shared_key
+                  type: object
+                send_timeout:
+                  description: 'The timeout time when sending event logs. (default:
+                    60)'
+                  type: integer
+                servers:
+                  description: Server definitions at least one is required
+                  items:
+                    description: server
+                    properties:
+                      host:
+                        description: The IP address or host name of the server.
+                        type: string
+                      name:
+                        description: The name of the server. Used for logging and
+                          certificate verification in TLS transport (when host is
+                          address).
+                        type: string
+                      password:
+                        description: The password for authentication.
+                        properties:
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
+                        required:
+                        - valueFrom
+                        type: object
+                      port:
+                        description: 'The port number of the host. Note that both
+                          TCP packets (event stream) and UDP packets (heartbeat message)
+                          are sent to this port. (default: 24224)'
+                        type: integer
+                      shared_key:
+                        description: The shared key per server.
+                        properties:
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
+                        required:
+                        - valueFrom
+                        type: object
+                      standby:
+                        description: Marks a node as the standby node for an Active-Standby
+                          model between Fluentd nodes. When an active node goes down,
+                          the standby node is promoted to an active node. The standby
+                          node is not used by the out_forward plugin until then.
+                        type: boolean
+                      username:
+                        description: The username for authentication.
+                        properties:
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
+                        required:
+                        - valueFrom
+                        type: object
+                      weight:
+                        description: 'The load balancing weight. If the weight of
+                          one server is 20 and the weight of the other server is 30,
+                          events are sent in a 2:3 ratio. (default: 60).'
+                        type: integer
+                    required:
+                    - host
+                    type: object
+                  type: array
+                tls_allow_self_signed_cert:
+                  description: 'Allow self signed certificates or not. (default: false)'
+                  type: boolean
+                tls_cert_logical_store_name:
+                  description: The certificate logical store name on Windows system
+                    certstore. This parameter is for Windows only.
+                  type: string
+                tls_cert_path:
+                  description: The additional CA certificate path for TLS.
+                  type: string
+                tls_cert_thumbprint:
+                  description: The certificate thumbprint for searching from Windows
+                    system certstore This parameter is for Windows only.
+                  type: string
+                tls_cert_use_enterprise_store:
+                  description: Enable to use certificate enterprise store on Windows
+                    system certstore. This parameter is for Windows only.
+                  type: boolean
+                tls_ciphers:
+                  description: 'The cipher configuration of TLS transport. (default:
+                    ALL:!aNULL:!eNULL:!SSLv2)'
+                  type: string
+                tls_client_cert_path:
+                  description: The client certificate path for TLS
+                  type: string
+                tls_client_private_key_passphrase:
+                  description: The client private key passphrase for TLS.
+                  type: string
+                tls_client_private_key_path:
+                  description: The client private key path for TLS.
+                  type: string
+                tls_insecure_mode:
+                  description: 'Skip all verification of certificates or not. (default:
+                    false)'
+                  type: boolean
+                tls_verify_hostname:
+                  description: 'Verify hostname of servers and certificates or not
+                    in TLS transport. (default: true)'
+                  type: boolean
+                tls_version:
+                  description: 'The default version of TLS transport. [TLSv1_1, TLSv1_2]
+                    (default: TLSv1_2)'
+                  type: string
+                verify_connection_at_startup:
+                  description: 'Verify that a connection can be made with one of out_forward
+                    nodes at the time of startup. (default: false)'
+                  type: boolean
+              required:
+              - servers
+              type: object
+            gcs:
+              properties:
+                acl:
+                  description: 'Permission for the object in GCS: auth_read owner_full
+                    owner_read private project_private public_read'
+                  type: string
+                auto_create_bucket:
+                  description: 'Create GCS bucket if it does not exists (default:
+                    true)'
+                  type: boolean
+                bucket:
+                  description: Name of a GCS bucket
+                  type: string
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                client_retries:
+                  description: Number of times to retry requests on server error
+                  type: integer
+                client_timeout:
+                  description: Default timeout to use in requests
+                  type: integer
+                credentials_json:
+                  description: GCS service account credentials in JSON format
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                encryption_key:
+                  description: Customer-supplied, AES-256 encryption key
+                  type: string
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
+                hex_random_length:
+                  description: 'Max length of `%{hex_random}` placeholder(4-16) (default:
+                    4)'
+                  type: integer
+                keyfile:
+                  description: Path of GCS service account credentials JSON file
+                  type: string
+                object_key_format:
+                  description: 'Format of GCS object keys (default: %{path}%{time_slice}_%{index}.%{file_extension})'
+                  type: string
+                object_metadata:
+                  description: User provided web-safe keys and arbitrary string values
+                    that will returned with requests for the file as "x-goog-meta-"
+                    response headers.
+                  items:
+                    properties:
+                      key:
+                        description: Key
+                        type: string
+                      value:
+                        description: Value
+                        type: string
+                    required:
+                    - key
+                    - value
+                    type: object
+                  type: array
+                overwrite:
+                  description: 'Overwrite already existing path (default: false)'
+                  type: boolean
+                path:
+                  description: Path prefix of the files on GCS
+                  type: string
+                project:
+                  description: Project identifier for GCS
+                  type: string
+                storage_class:
+                  description: 'Storage class of the file: dra nearline coldline multi_regional
+                    regional standard'
+                  type: string
+                store_as:
+                  description: 'Archive format on GCS: gzip json text (default: gzip)'
+                  type: string
+                transcoding:
+                  description: Enable the decompressive form of transcoding
+                  type: boolean
+              required:
+              - bucket
+              - project
+              type: object
+            loggingRef:
+              type: string
+            loki:
+              description: Fluentd output plugin to ship logs to a Loki server.
+              properties:
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                extra_labels:
+                  description: 'Set of labels to include with every Loki stream.(default:
+                    nil)'
+                  type: boolean
+                password:
+                  description: Specify password if the Loki server requires authentication.
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                tenant:
+                  description: Loki is a multi-tenant log storage platform and all
+                    requests sent must include a tenant.
+                  type: string
+                url:
+                  description: The url of the Loki server to send logs to. (default:https://logs-us-west1.grafana.net)
+                  type: string
+                username:
+                  description: Specify a username if the Loki server requires authentication.
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+              type: object
+            nullout:
+              type: object
+            oss:
+              properties:
+                aaccess_key_secret:
+                  description: Your access secret key
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                access_key_id:
+                  description: Your access key id
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                auto_create_bucket:
+                  description: 'desc ''Create OSS bucket if it does not exists (default:
+                    false)'
+                  type: boolean
+                bucket:
+                  description: Your bucket name
+                  type: string
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                check_bucket:
+                  description: 'Check bucket if exists or not (default: true)'
+                  type: boolean
+                check_object:
+                  description: 'Check object before creation (default: true)'
+                  type: boolean
+                download_crc_enable:
+                  description: 'Download crc enabled (default: true)'
+                  type: boolean
+                endpoint:
+                  description: OSS endpoint to connect to'
+                  type: string
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
+                hex_random_length:
+                  description: 'The length of `%{hex_random}` placeholder(4-16) (default:
+                    4)'
+                  type: integer
+                index_format:
+                  description: '`sprintf` format for `%{index}` (default: %d)'
+                  type: string
+                key_format:
+                  description: 'The format of OSS object keys (default: %{path}/%{time_slice}_%{index}_%{thread_id}.%{file_extension})'
+                  type: string
+                open_timeout:
+                  description: 'Timeout for open connections (default: 10)'
+                  type: integer
+                oss_sdk_log_dir:
+                  description: 'OSS SDK log directory (default: /var/log/td-agent)'
+                  type: string
+                overwrite:
+                  description: 'Overwrite already existing path (default: false)'
+                  type: boolean
+                path:
+                  description: 'Path prefix of the files on OSS (default: fluent/logs)'
+                  type: string
+                read_timeout:
+                  description: 'Timeout for read response (default: 120)'
+                  type: integer
+                store_as:
+                  description: 'Archive format on OSS: gzip, json, text, lzo, lzma2
+                    (default: gzip)'
+                  type: string
+                upload_crc_enable:
+                  description: 'Upload crc enabled (default: true)'
+                  type: boolean
+                warn_for_delay:
+                  description: Given a threshold to treat events as delay, output
+                    warning logs if delayed events were put into OSS
+                  type: string
+              required:
+              - aaccess_key_secret
+              - access_key_id
+              - bucket
+              - endpoint
+              type: object
+            s3:
+              properties:
+                acl:
+                  description: Permission for the object in S3
+                  type: string
+                assume_role_credentials:
+                  description: assume_role_credentials
+                  properties:
+                    duration_seconds:
+                      description: The duration, in seconds, of the role session (900-3600)
+                      type: string
+                    external_id:
+                      description: A unique identifier that is used by third parties
+                        when assuming roles in their customers' accounts.
+                      type: string
+                    policy:
+                      description: An IAM policy in JSON format
+                      type: string
+                    role_arn:
+                      description: The Amazon Resource Name (ARN) of the role to assume
+                      type: string
+                    role_session_name:
+                      description: An identifier for the assumed role session
+                      type: string
+                  required:
+                  - role_arn
+                  - role_session_name
+                  type: object
+                auto_create_bucket:
+                  description: Create S3 bucket if it does not exists
+                  type: string
+                aws_iam_retries:
+                  description: The number of attempts to load instance profile credentials
+                    from the EC2 metadata service using IAM role
+                  type: string
+                aws_key_id:
+                  description: AWS access key id
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                aws_sec_key:
+                  description: AWS secret key.
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: The path where buffer chunks are stored. The '*'
+                        is replaced with random characters. This parameter is required.
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  required:
+                  - timekey
+                  type: object
+                check_apikey_on_start:
+                  description: Check AWS key on start
+                  type: string
+                check_bucket:
+                  description: Check bucket if exists or not
+                  type: string
+                check_object:
+                  description: Check object before creation
+                  type: string
+                compute_checksums:
+                  description: AWS SDK uses MD5 for API request/response by default
+                  type: string
+                enable_transfer_acceleration:
+                  description: 'If true, S3 Transfer Acceleration will be enabled
+                    for uploads. IMPORTANT: You must first enable this feature on
+                    your destination S3 bucket'
+                  type: string
+                force_path_style:
+                  description: If true, the bucket name is always left in the request
+                    URI and never moved to the host as a sub-domain
+                  type: string
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
+                grant_full_control:
+                  description: Allows grantee READ, READ_ACP, and WRITE_ACP permissions
+                    on the object
+                  type: string
+                grant_read:
+                  description: Allows grantee to read the object data and its metadata
+                  type: string
+                grant_read_acp:
+                  description: Allows grantee to read the object ACL
+                  type: string
+                grant_write_acp:
+                  description: Allows grantee to write the ACL for the applicable
+                    object
+                  type: string
+                hex_random_length:
+                  description: The length of `%{hex_random}` placeholder(4-16)
+                  type: string
+                index_format:
+                  description: '`sprintf` format for `%{index}`'
+                  type: string
+                instance_profile_credentials:
+                  description: instance_profile_credentials
+                  properties:
+                    http_open_timeout:
+                      description: Number of seconds to wait for the connection to
+                        open
+                      type: string
+                    http_read_timeout:
+                      description: Number of seconds to wait for one block to be read
+                      type: string
+                    ip_address:
+                      description: IP address (default:169.254.169.254)
+                      type: string
+                    port:
+                      description: Port number (default:80)
+                      type: string
+                    retries:
+                      description: Number of times to retry when retrieving credentials
+                      type: string
+                  type: object
+                overwrite:
+                  description: Overwrite already existing path
+                  type: string
+                path:
+                  description: Path prefix of the files on S3
+                  type: string
+                proxy_uri:
+                  description: URI of proxy environment
+                  type: string
+                s3_bucket:
+                  description: S3 bucket name
+                  type: string
+                s3_endpoint:
+                  description: Custom S3 endpoint (like minio)
+                  type: string
+                s3_metadata:
+                  description: Arbitrary S3 metadata headers to set for the object
+                  type: string
+                s3_object_key_format:
+                  description: 'The format of S3 object keys (default: %{path}%{time_slice}_%{index}.%{file_extension})'
+                  type: string
+                s3_region:
+                  description: S3 region name
+                  type: string
+                shared_credentials:
+                  description: shared_credentials
+                  properties:
+                    path:
+                      description: 'Path to the shared file. (default: $HOME/.aws/credentials)'
+                      type: string
+                    profile_name:
+                      description: Profile name. Default to 'default' or ENV['AWS_PROFILE']
+                      type: string
+                  type: object
+                signature_version:
+                  description: Signature version for API Request (s3,v4)
+                  type: string
+                sse_customer_algorithm:
+                  description: Specifies the algorithm to use to when encrypting the
+                    object
+                  type: string
+                sse_customer_key:
+                  description: Specifies the customer-provided encryption key for
+                    Amazon S3 to use in encrypting data
+                  type: string
+                sse_customer_key_md5:
+                  description: Specifies the 128-bit MD5 digest of the encryption
+                    key according to RFC 1321
+                  type: string
+                ssekms_key_id:
+                  description: Specifies the AWS KMS key ID to use for object encryption
+                  type: string
+                ssl_verify_peer:
+                  description: If false, the certificate of endpoint will not be verified
+                  type: string
+                storage_class:
+                  description: The type of storage to use for the object(STANDARD,REDUCED_REDUNDANCY,STANDARD_IA)
+                  type: string
+                store_as:
+                  description: Archive format on S3
+                  type: string
+                use_bundled_cert:
+                  description: Use aws-sdk-ruby bundled cert
+                  type: string
+                use_server_side_encryption:
+                  description: The Server-side encryption algorithm used when storing
+                    this object in S3 (AES256, aws:kms)
+                  type: string
+                warn_for_delay:
+                  description: Given a threshold to treat events as delay, output
+                    warning logs if delayed events were put into s3
+                  type: string
+              required:
+              - s3_bucket
+              type: object
+            sumologic:
+              properties:
+                add_timestamp:
+                  description: 'Add timestamp (or timestamp_key) field to logs before
+                    sending to sumologic (default: true)'
+                  type: boolean
+                data_type:
+                  description: 'The type of data that will be sent to Sumo Logic,
+                    either logs or metrics (default: logs)'
+                  type: string
+                disable_cookies:
+                  description: 'Option to disable cookies on the HTTP Client. (default:
+                    false)'
+                  type: boolean
+                endpoint:
+                  description: SumoLogic HTTP Collector URL
+                  properties:
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  required:
+                  - valueFrom
+                  type: object
+                log_format:
+                  description: 'Format to post logs into Sumo. (default: json)'
+                  type: string
+                log_key:
+                  description: 'Used to specify the key when merging json or sending
+                    logs in text format (default: message)'
+                  type: string
+                metric_data_format:
+                  description: 'The format of metrics you will be sending, either
+                    graphite or carbon2 or prometheus (default: graphite)'
+                  type: string
+                open_timeout:
+                  description: 'Set timeout seconds to wait until connection is opened.
+                    (default: 60)'
+                  type: integer
+                proxy_uri:
+                  description: Add the uri of the proxy environment if present.
+                  type: string
+                source_category:
+                  description: 'Set _sourceCategory metadata field within SumoLogic
+                    (default: nil)'
+                  type: string
+                source_host:
+                  description: 'Set _sourceHost metadata field within SumoLogic (default:
+                    nil)'
+                  type: string
+                source_name:
+                  description: Set _sourceName metadata field within SumoLogic - overrides
+                    source_name_key (default is nil)
+                  type: string
+                source_name_key:
+                  description: 'Set as source::path_key''s value so that the source_name
+                    can be extracted from Fluentd''s buffer (default: source_name)'
+                  type: string
+                timestamp_key:
+                  description: 'Field name when add_timestamp is on (default: timestamp)'
+                  type: string
+                verify_ssl:
+                  description: 'Verify ssl certificate. (default: true)'
+                  type: boolean
+              required:
+              - endpoint
+              - source_name
+              type: object
+          type: object
+        status:
+          description: OutputStatus defines the observed state of Output
+          type: object
+      required:
+      - spec
+      type: object
+  version: v1beta1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

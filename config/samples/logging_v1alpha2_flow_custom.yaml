@@ -1,0 +1,14 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: flow-custom
+  namespace: custom
+spec:
+  loggingRef: customref
+  selectors:
+    sampleKey: customValue
+  filters:
+    - stdout: {}
+  outputRefs:
+    - "output-custom"
+    - "output-custom-cluster"
