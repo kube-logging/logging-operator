@@ -1,0 +1,14 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: sumologic-output-sample
+spec:
+  sumologic:
+    endpoint:
+      valueFrom:
+        secretKeyRef:
+          name: sumologic
+          key: endpoint
+    log_format: json
+    source_category: prod/someapp/logs
+    source_name: AppA

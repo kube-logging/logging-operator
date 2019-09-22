@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: custom
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: flow-sample
+spec:
+  selectors:
+    sampleKey: sampleValue
+  filters:
+    - stdout: {}
+  outputRefs:
+    - "output-sample"

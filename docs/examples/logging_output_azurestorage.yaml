@@ -1,0 +1,22 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: azure-output-sample
+spec:
+  azurestorage:
+    azure_storage_account:
+      valueFrom:
+        secretKeyRef:
+          name: azurestorage-secret
+          key: azureStorageAccount
+    azure_storage_access_key:
+      valueFrom:
+        secretKeyRef:
+          name: azurestorage-secret
+          key: azureStorageAccessKey
+    azure_container: example-azure-container
+    path: logs/${tag}/%Y/%m/%d/
+    buffer:
+      timekey: 1m
+      timekey_wait: 10s
+      timekey_use_utc: true

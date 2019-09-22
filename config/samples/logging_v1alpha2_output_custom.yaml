@@ -1,0 +1,8 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: output-custom
+  namespace: custom
+spec:
+  loggingRef: customref
+  nullout: {}

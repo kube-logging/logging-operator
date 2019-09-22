@@ -1,0 +1,23 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: {{ include "nginx-logging-es-demo.fullname" . }}-es-flow
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "nginx-logging-es-demo.name" . }}
+    chart: {{ include "nginx-logging-es-demo.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  filters:
+    - tag_normaliser: {}
+    - parser:
+        key_name: message
+        remove_key_name_field: true
+        reserve_data: true
+        parsers:
+          - type: nginx
+  selectors:
+    app: {{ include "nginx-logging-es-demo.name" . }}
+  outputRefs:
+    - {{ include "nginx-logging-es-demo.fullname" . }}-es-output

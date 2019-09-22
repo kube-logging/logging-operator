@@ -26,6 +26,6 @@ spec:
   seLinux:
     rule: RunAsAny
   volumes:
-  - secret
-  - configMap
+    - secret
+    - configMap
 {{ end }}

@@ -1,0 +1,18 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-tls
+  namespace: logging
+spec:
+  fluentd:
+    disablePvc: true
+    tls:
+      enabled: true
+      secretName: fluentd-tls
+      sharedKey: asdadas
+  fluentbit:
+    tls:
+      enabled: true
+      secretName: fluentbit-tls
+      sharedKey: asdadas
+  controlNamespace: logging
