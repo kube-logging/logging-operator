@@ -2,7 +2,7 @@
 
 set -eufo pipefail
 
-SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
+SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BUCKET='minio/logs'
 
 function main()
@@ -22,7 +22,7 @@ function helm_deploy_logging_operator()
         --wait \
         --name logging-operator \
         --set image.tag='local' \
-        banzaicloud-stable/logging-operator
+        charts/logging-operator
 }
 
 function helm_deploy_logging_operator_fluent()
@@ -30,7 +30,7 @@ function helm_deploy_logging_operator_fluent()
     helm install \
         --wait \
         --name logging-operator-fluent \
-        banzaicloud-stable/logging-operator-fluent
+        charts/logging-operator-fluent
 }
 
 
