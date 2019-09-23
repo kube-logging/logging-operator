@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/img/logging.svg" width="260"></p>
+<p align="center"><img src="docs/img/lo.svg" width="260"></p>
 <p align="center">
 
   <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
