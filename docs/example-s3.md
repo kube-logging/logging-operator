@@ -6,7 +6,7 @@ Before you start [install logging-operator](/README.md#deploying-with-helm-chart
 
 Create a namespace for logging
 ```bash
-kubectl create ns logging
+kubectl create ns logging-system
 ```
 > You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
 

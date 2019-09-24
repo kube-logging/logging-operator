@@ -9,26 +9,88 @@ orbs:
 
 jobs:
   build:
-    machine:
-      image: circleci/classic:201808-01
-      docker_layer_caching: true
+    docker:
+      - image: circleci/golang:1.13
 
+    steps:
+      - checkout
+
+      - run:
+          name: Run fmt
+          command: |
+            make check-fmt
+
+      - run:
+          name: Run golint
+          command: |
+            make lint
+
+      - run:
+          name: Run misspell
+          command: |
+            make check-misspell
+
+      - run:
+          name: Run ineffassign
+          command: |
+            make ineffassign
+
+      - run:
+          name: Check generators for unwanted diffs
+          command: |
+            make check-diff
+
+      - run:
+          name: Test
+          command: |
+            make test
+
+  e2e-test:
+    machine:
+      image: ubuntu-1604:201903-01
+      docker_layer_caching: true
     environment:
       GO_VERSION: '1.13'
-      K8S_VERSION: 'v1.12.0'
+      K8S_VERSION: 'v1.15.4'
       VAULT_VERSION: '1.0.0'
       KUBECONFIG: '/home/circleci/.kube/config'
-      MINIKUBE_VERSION: 'v0.31.0'
+      MINIKUBE_VERSION: 'v1.4.0'
       MINIKUBE_WANTUPDATENOTIFICATION: 'false'
       MINIKUBE_WANTREPORTERRORPROMPT: 'false'
       MINIKUBE_HOME: '/home/circleci'
       CHANGE_MINIKUBE_NONE_USER: 'true'
       GOPATH: '/home/circleci/go'
-
-    working_directory: /home/circleci/go/src/github.com/banzaicloud/logging-operator
-
     steps:
+      - run:
+          name: Setup minikube
+          command: |
+            curl -Lo minikube https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_VERSION}/minikube-linux-amd64 \
+            && chmod +x minikube \
+            && sudo mv minikube /usr/local/bin/
+
+      - run:
+          name: Start minikube
+          background: true
+          command: |
+            sudo -E minikube start --vm-driver=none --cpus 2 --memory 4096 --kubernetes-version=${K8S_VERSION}
+
+      - run:
+          name: Setup kubectl
+          command: |
+            curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl \
+            && chmod +x kubectl \
+            && sudo mv kubectl /usr/local/bin/
+
+            mkdir -p ${HOME}/.kube
+            touch ${HOME}/.kube/config
+
       - checkout
+      - run:
+          name: Create go directory
+          command: |
+            sudo mkdir /go
+            sudo chmod 777 /go
+
       - run:
           name: Setup golang
           command: |
@@ -38,109 +100,76 @@ jobs:
               "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" \
             && sudo tar -C /usr/local -xzf go.linux-amd64.tar.gz
             echo 'export PATH="$GOPATH/bin:$PATH"' >> "${BASH_ENV}"
+            rm go.linux-amd64.tar.gz
+
       - run:
-          name: Run fmt
+          name: Build docker image
           command: |
-            make check-fmt
+            make docker-build IMG='controller:local'
+
       - run:
-          name: Run golint
+          name: Wait for minikube
           command: |
-            make lint
+            timeout 180s bash \<<EOT
+              set -o pipefail
+              function is_ready()
+              {
+                kubectl get nodes -o json \
+                  | jq '.items[].status.conditions[] | select(.type=="Ready" and .status=="True")'
+              }
+
+              until is_ready
+              do
+                sleep 1
+              done
+            EOT
+
       - run:
-          name: Run misspell
+          name: Setup helm
           command: |
-            make check-misspell
+            curl -L https://git.io/get_helm.sh | bash
+            helm init
+            helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com/
+
       - run:
-          name: Run ineffassign
+          name: Create logging namespace
           command: |
-            make ineffassign
+            kubectl create namespace logging
+
       - run:
-          name: Check generators for unwanted diffs
+          name: Start Minio
           command: |
-            make check-diff
+            kubectl create -f hack/minio.yaml
+            kubectl wait --namespace logging --for=condition=available deployment/minio-deployment --timeout=120s
+            minio="$(kubectl get pod --namespace logging -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
+            kubectl wait --namespace logging --for=condition=Ready pod "${minio}" --timeout=120s
+
+      - run:
+          name: Setup minio cli
+          command: |
+            kubectl create -f hack/minio-mc.yaml
+            kubectl wait --namespace logging --for=condition=available deployment/minio-mc-deployment --timeout=120s
+            mc_pod="$(kubectl get pod --namespace logging -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}')"
+            kubectl wait --namespace logging --for=condition=Ready pod "${mc_pod}" --timeout=120s
+            kubectl exec --namespace logging "${mc_pod}" -- \
+              mc config host add minio \
+                'http://minio-service.logging.svc.cluster.local:9000' \
+                'minio_access_key' \
+                'minio_secret_key'
+
       - run:
           name: Test
           command: |
-            make test
-      #- run:
-      #    name: Setup kubectl
-      #    command: |
-      #      curl \
-      #        -Lo kubectl \
-      #        "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl" \
-      #      && chmod +x kubectl \
-      #      && sudo mv kubectl /usr/local/bin/
-      #      mkdir -p "${HOME}/.kube"
-      #      touch "${HOME}/.kube/config"
-#
-      #- run:
-      #    name: Setup minikube
-      #    command: |
-      #      curl \
-      #        -Lo minikube \
-      #        "https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_VERSION}/minikube-linux-amd64" \
-      #      && chmod +x minikube \
-      #      && sudo mv minikube /usr/local/bin/
-#
-      #- run:
-      #    name: Start minikube
-      #    command: |
-      #      sudo -E minikube start --vm-driver=none --cpus 2 --memory 4096 --kubernetes-version="${K8S_VERSION}"
-#
-      #- run:
-      #    name: Install Helm
-      #    command: |
-      #      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
-      #      chmod 700 get_helm.sh
-      #      ./get_helm.sh
-#
-      #      helm init
-      #      helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
-      #      helm repo update
-#
-      #- run:
-      #    name: Start Minio
-      #    command: |
-      #      kubectl create -f hack/minio.yaml
-      #      kubectl wait --for=condition=available deployment/minio-deployment --timeout=120s
-      #      minio="$(kubectl get pod -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
-      #      kubectl wait --for=condition=Ready pod "${minio}" --timeout=120s
-#
-      #- run:
-      #    name: Setup minio cli
-      #    command: |
-      #      kubectl create -f hack/minio-mc.yaml
-      #      kubectl wait --for=condition=available deployment/minio-mc-deployment --timeout=120s
-      #      mc_pod="$(kubectl get pod -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}')"
-      #      kubectl wait --for=condition=Ready pod "${mc_pod}" --timeout=120s
-      #      kubectl exec "${mc_pod}" -- \
-      #        mc config host add minio \
-      #          'http://minio-service.default.svc.cluster.local:9000' \
-      #          'minio_access_key' \
-      #          'minio_secret_key'
-#
-      #- run:
-      #    name: Create test bucket
-      #    command: |
-      #      mc_pod="$(kubectl get pod -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}')"
-      #      kubectl exec "${mc_pod}" -- \
-      #        mc mb --region 'test_region' minio/logs
-#
-      #- run:
-      #    name: Build docker image
-      #    command: |
-      #      make docker DOCKER_TAG=local
-#
-      #- run:
-      #    name: Test
-      #    command: |
-      #      hack/test.sh
+            hack/test.sh
 
 workflows:
   version: 2
   build:
     jobs:
       - build
+      - e2e-test:
+          requires:
+            - build
   helm-chart:
     jobs:
       - helm/lint-chart:
