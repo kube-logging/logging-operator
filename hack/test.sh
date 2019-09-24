@@ -36,7 +36,11 @@ function helm_deploy_logging_operator()
 
 function configure_logging()
 {
-    kubectl apply -f "${SCRIPT_PATH}/logging.yaml"
+    helm install \
+        --wait \
+        --namespace logging \
+        --name 'logging-operator-logging-tls' \
+        "${SCRIPT_PATH}/../charts/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
     kubectl apply -f "${SCRIPT_PATH}/clusterflow.yaml"
 }
