@@ -116,6 +116,40 @@ spec:
                     required:
                     - key_name
                     type: object
+                  record_transformer:
+                    properties:
+                      auto_typecast:
+                        description: 'Use original value type. (default: true)'
+                        type: boolean
+                      enable_ruby:
+                        description: 'When set to true, the full Ruby syntax is enabled
+                          in the ${...} expression. (default: false)'
+                        type: boolean
+                      keep_keys:
+                        description: A comma-delimited list of keys to keep.
+                        type: string
+                      records:
+                        description: 'Add records docs at: https://docs.fluentd.org/filter/record_transformer
+                          Records are represented as maps: `key: value`'
+                        items:
+                          additionalProperties:
+                            type: string
+                          description: Parameters inside record directives are considered
+                            to be new key-value pairs
+                          type: object
+                        type: array
+                      remove_keys:
+                        description: A comma-delimited list of keys to delete
+                        type: string
+                      renew_record:
+                        description: 'Create new Hash to transform incoming data (default:
+                          false)'
+                        type: boolean
+                      renew_time_key:
+                        description: Specify field name of the record to overwrite
+                          the time of events. Its value must be unix time.
+                        type: string
+                    type: object
                   stdout:
                     type: object
                   tag_normaliser:

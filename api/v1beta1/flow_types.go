@@ -29,10 +29,11 @@ type FlowSpec struct {
 
 // Filter definition for FlowSpec
 type Filter struct {
-	StdOut        *filter.StdOutFilterConfig `json:"stdout,omitempty"`
-	Parser        *filter.ParserConfig       `json:"parser,omitempty"`
-	TagNormaliser *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
-	Dedot         *filter.DedotFilterConfig  `json:"dedot,omitempty"`
+	StdOut            *filter.StdOutFilterConfig `json:"stdout,omitempty"`
+	Parser            *filter.ParserConfig       `json:"parser,omitempty"`
+	TagNormaliser     *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
+	Dedot             *filter.DedotFilterConfig  `json:"dedot,omitempty"`
+	RecordTransformer *filter.RecordTransformer  `json:"record_transformer,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
