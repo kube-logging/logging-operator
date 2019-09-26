@@ -1,0 +1,142 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: flows.logging.banzaicloud.io
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.loggingRef
+    name: Logging
+    type: string
+  group: logging.banzaicloud.io
+  names:
+    kind: Flow
+    listKind: FlowList
+    plural: flows
+    singular: flow
+  scope: ""
+  subresources: {}
+  validation:
+    openAPIV3Schema:
+      description: Flow Kubernetes object
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: FlowSpec is the Kubernetes spec for Flows
+          properties:
+            filters:
+              items:
+                description: Filter definition for FlowSpec
+                properties:
+                  parser:
+                    description: https://docs.fluentd.org/filter/parser
+                    properties:
+                      emit_invalid_record_to_error:
+                        description: 'Emit invalid record to @ERROR label. Invalid
+                          cases are: key not exist, format is not matched, unexpected
+                          error'
+                        type: boolean
+                      hash_value_fiel:
+                        description: Store parsed values as a hash value in a field.
+                        type: string
+                      inject_key_prefix:
+                        description: Store parsed values with specified key name prefix.
+                        type: string
+                      key_name:
+                        description: Specify field name in the record to parse.
+                        type: string
+                      parsers:
+                        items:
+                          properties:
+                            estimate_current_event:
+                              description: If true, use Fluent::EventTime.now(current
+                                time) as a timestamp when time_key is specified.
+                              type: boolean
+                            expression:
+                              description: Regexp expression to evaluate
+                              type: string
+                            keep_time_key:
+                              description: If true, keep time field in the record.
+                              type: boolean
+                            null_empty_string:
+                              description: If true, empty string field is replaced
+                                with nil
+                              type: boolean
+                            null_value_pattern:
+                              description: ' Specify null value pattern.'
+                              type: string
+                            time_key:
+                              description: Specify time field for event time. If the
+                                event doesn't have this field, current time is used.
+                              type: string
+                            type:
+                              description: 'Parse type: apache2, apache_error, nginx,
+                                syslog, csv, tsv, ltsv, json, multiline, none'
+                              type: string
+                          type: object
+                        type: array
+                      remove_key_name_field:
+                        description: Remove key_name field when parsing is succeeded
+                        type: boolean
+                      replace_invalid_sequence:
+                        description: If true, invalid string is replaced with safe
+                          characters and re-parse it.
+                        type: boolean
+                      reserve_data:
+                        description: Keep original key-value pair in parsed result.
+                        type: boolean
+                      reserve_time:
+                        description: Keep original event time in parsed result.
+                        type: boolean
+                    required:
+                    - key_name
+                    type: object
+                  stdout:
+                    type: object
+                  tag_normaliser:
+                    properties:
+                      format:
+                        description: Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)
+                        type: string
+                    type: object
+                type: object
+              type: array
+            loggingRef:
+              type: string
+            outputRefs:
+              items:
+                type: string
+              type: array
+            selectors:
+              additionalProperties:
+                type: string
+              type: object
+          required:
+          - outputRefs
+          - selectors
+          type: object
+        status:
+          description: FlowStatus defines the observed state of Flow
+          type: object
+      type: object
+  version: v1beta1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
