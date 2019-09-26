@@ -14,7 +14,11 @@ spec:
     spec:
       containers:
         - name: logging-operator
+<<<<<<< HEAD
           image: "banzaicloud/logging-operator:2.1.1"
+=======
+          image: "banzaicloud/logging-operator:2.1.0"
+>>>>>>> Add ES params
           imagePullPolicy: IfNotPresent
           resources:
             {}
