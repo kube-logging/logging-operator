@@ -50,7 +50,7 @@ This operator helps you to pack together logging information with your applicati
 The logging operator automates the deployment and configuration of a Kubernetes logging pipeline. Under the hood the operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters and transfer logs to multiple outputs. Your logs will always be transferred on authenticated and encrypted channels.
 
 ##### Blogs
-  - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/) (soon)
+  - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/)
 
 ##### Blogs (general logging and operator v1)
   - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)

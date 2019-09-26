@@ -75,7 +75,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: logging-operator
-    namespace: default
+    namespace: logging
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

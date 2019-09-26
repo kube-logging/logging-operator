@@ -5,23 +5,23 @@
 
 #### Add operator chart repository:
 ```bash
-$ helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
-$ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-$ helm repo update
+helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo update
 ```
 
 ## Install ElasticSearch with operator
 ```bash
-$ helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-$ helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
+helm install --namespace logging --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
+helm install --namespace logging --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
 
 
 #### Forward cerebro & kibana dashboards
 ```bash
-$ kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
-$ kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
+kubectl -n logging port-forward svc/cerebro-elasticsearch-cluster 9001:80
+kubectl -n logging port-forward svc/kibana-elasticsearch-cluster 5601:80
 ```
 
 
@@ -35,7 +35,7 @@ kubectl create ns logging
 
 Create `logging` resource
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -43,7 +43,7 @@ metadata:
 spec:
   fluentd: {}
   fluentbit: {}
-  controlNamespace: logging-system
+  controlNamespace: logging
 EOF
 ```
 
@@ -53,12 +53,12 @@ EOF
 Create an ElasticSearch output definition 
 
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: es-output
-  namespace: logging-system
+  namespace: logging
 spec:
   elasticsearch:
     host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
@@ -79,12 +79,12 @@ EOF
 The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to ElasticSearch.
 
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterFlow
 metadata:
   name: es-flow
-  namespace: logging-system
+  namespace: logging
 spec:
   filters:
     - tag_normaliser: {}
