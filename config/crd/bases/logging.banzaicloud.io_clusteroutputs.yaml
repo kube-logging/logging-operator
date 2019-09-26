@@ -410,10 +410,20 @@ spec:
                   required:
                   - timekey
                   type: object
+                bulk_message_request_threshold:
+                  description: 'Configure bulk_message request splitting threshold
+                    size. Default value is 20MB. (20 * 1024 * 1024) If you specify
+                    this size as negative number, bulk_message request splitting feature
+                    will be disabled. (default: 20MB)'
+                  type: string
                 content_type:
                   description: 'With content_type application/x-ndjson, elasticsearch
                     plugin adds application/x-ndjson as Content-Type in payload. (default:
                     application/json)'
+                  type: string
+                custom_headers:
+                  description: 'This parameter adds additional headers to request.
+                    Example: {"token":"secret"} (default: {})'
                   type: string
                 customize_template:
                   description: Specify the string and its value to be replaced in
@@ -422,16 +432,36 @@ spec:
                     template and to add rollover index please check the rollover_index
                     configuration.
                   type: string
+                default_elasticsearch_version:
+                  description: This parameter changes that ES plugin assumes default
+                    Elasticsearch version. The default value is 5.
+                  type: string
                 deflector_alias:
                   description: Specify the deflector alias which would be assigned
                     to the rollover index created. This is useful in case of using
                     the Elasticsearch rollover API
                   type: string
+                exception_backup:
+                  description: 'Indicates whether to backup chunk when ignore exception
+                    occurs. (default: true)'
+                  type: boolean
                 fail_on_putting_template_retry_exceed:
                   description: 'Indicates whether to fail when max_retry_putting_template
                     is exceeded. If you have multiple output plugin, you could use
                     this property to do not fail on fluentd statup.(default: true)'
                   type: boolean
+                flatten_hashes:
+                  description: 'Elasticsearch will complain if you send object and
+                    concrete values to the same field. For example, you might have
+                    logs that look this, from different places: {"people" => 100}
+                    {"people" => {"some" => "thing"}} The second log line will be
+                    rejected by the Elasticsearch parser because objects and concrete
+                    values can''t live in the same field. To combat this, you can
+                    enable hash flattening.'
+                  type: boolean
+                flatten_hashes_separator:
+                  description: Flatten separator
+                  type: string
                 host:
                   description: You can specify Elasticsearch host by this parameter.
                     (default:localhost)
@@ -447,6 +477,16 @@ spec:
                   type: string
                 id_key:
                   description: https://github.com/uken/fluent-plugin-elasticsearch#id_key
+                  type: string
+                ignore_exceptions:
+                  description: A list of exception that will be ignored - when the
+                    exception occurs the chunk will be discarded and the buffer retry
+                    mechanism won't be called. It is possible also to specify classes
+                    at higher level in the hierarchy. For example `ignore_exceptions
+                    ["Elasticsearch::Transport::Transport::ServerError"]` will match
+                    all subclasses of ServerError - Elasticsearch::Transport::Transport::Errors::BadRequest,
+                    Elasticsearch::Transport::Transport::Errors::ServiceUnavailable,
+                    etc.
                   type: string
                 include_index_in_url:
                   description: With this option set to true, Fluentd manifests the
@@ -471,6 +511,14 @@ spec:
                   description: Specify the index prefix for the rollover index to
                     be created.
                   type: string
+                log_es_400_reason:
+                  description: 'By default, the error logger won''t record the reason
+                    for a 400 error from the Elasticsearch API unless you set log_level
+                    to debug. However, this results in a lot of log spam, which isn''t
+                    desirable if all you want is the 400 error reasons. You can set
+                    this true to capture the 400 error reasons without all the other
+                    debug logs. (default: false)'
+                  type: boolean
                 logstash_dateformat:
                   description: 'Set the Logstash date format.(default: %Y.%m.%d)'
                   type: string
@@ -589,6 +637,12 @@ spec:
                   description: If you want to configure SSL/TLS version, you can specify
                     ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
                   type: string
+                suppress_doc_wrap:
+                  description: 'By default, record body is wrapped by ''doc''. This
+                    behavior can not handle update script requests. You can set this
+                    to suppress doc wrapping and allow record body to be untouched.
+                    (default: false)'
+                  type: boolean
                 tag_key:
                   description: 'This will add the Fluentd tag in the JSON record.(default:
                     tag)'
@@ -644,6 +698,16 @@ spec:
                     degree of sub-second time precision to preserve from the time
                     portion of the routed event.
                   type: string
+                unrecoverable_error_types:
+                  description: Default unrecoverable_error_types parameter is set
+                    up strictly. Because es_rejected_execution_exception is caused
+                    by exceeding Elasticsearch's thread pool capacity. Advanced users
+                    can increase its capacity, but normal users should follow default
+                    behavior. If you want to increase it and forcibly retrying bulk
+                    request, please consider to change unrecoverable_error_types parameter
+                    from default value. Change default value of thread_pool.bulk.queue_size
+                    in elasticsearch.yml)
+                  type: string
                 user:
                   description: User for HTTP Basic authentication. This plugin will
                     escape required URL encoded characters within %{} placeholders.
@@ -653,6 +717,20 @@ spec:
                   description: 'By default, the records inserted into index logstash-YYMMDD
                     with UTC (Coordinated Universal Time). This option allows to use
                     local time if you describe utc_index to false.(default: true)'
+                  type: boolean
+                validate_client_version:
+                  description: 'When you use mismatched Elasticsearch server and client
+                    libraries, fluent-plugin-elasticsearch cannot send data into Elasticsearch.
+                    (default: false)'
+                  type: boolean
+                verify_es_version_at_startup:
+                  description: 'Because Elasticsearch plugin should change behavior
+                    each of Elasticsearch major versions. For example, Elasticsearch
+                    6 starts to prohibit multiple type_names in one index, and Elasticsearch
+                    7 will handle only _doc type_name in index. If you want to disable
+                    to verify Elasticsearch version at start up, set it as false.
+                    When using the following configuration, ES plugin intends to communicate
+                    into Elasticsearch 6. (default: true)'
                   type: boolean
                 with_transporter_log:
                   description: 'This is debugging purpose option to enable to obtain
