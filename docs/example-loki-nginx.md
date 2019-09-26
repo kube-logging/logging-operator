@@ -13,12 +13,12 @@ helm repo update
 
 ### Install Loki
 ```bash
-helm install --name loki loki/loki
+helm install --namespace logging --name loki loki/loki
 ```
 > [Grafana Loki Documentation](https://github.com/grafana/loki/tree/master/production/helm)
 ### Install Grafana
 ```bash
-helm install --name grafana stable/grafana \
+helm install --namespace logging --name grafana stable/grafana \
  --set "datasources.datasources\\.yaml.apiVersion=1" \
  --set "datasources.datasources\\.yaml.datasources[0].name=Loki" \
  --set "datasources.datasources\\.yaml.datasources[0].type=loki" \
@@ -30,20 +30,20 @@ helm install --name grafana stable/grafana \
 ## Install with Helm 
 ### Logging Operator
 ```bash
-helm install --name logging banzaicloud-stable/logging-operator
+helm install --namespace logging --name logging banzaicloud-stable/logging-operator
 ```
 > You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
 
 ### Nginx App + Logging Definition
 ```bash
-helm install --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
+helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
 ```
 
 ## Install from manifest
 
 #### Create `logging` resource
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -51,7 +51,7 @@ metadata:
 spec:
   fluentd: {}
   fluentbit: {}
-  controlNamespace: default
+  controlNamespace: logging
 EOF
 ```
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
@@ -59,12 +59,11 @@ EOF
 
 #### Create an Loki output definition 
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
   name: loki-output
-  namespace: default
 spec:
   loki:
     url: http://loki:3100
@@ -79,12 +78,11 @@ EOF
 
 #### Create `flow` resource
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
   name: loki-flow
-  namespace: default
 spec:
   filters:
     - tag_normaliser: {}
@@ -103,7 +101,7 @@ EOF
 
 #### Install nginx deployment
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -150,12 +148,12 @@ EOF
 
 #### Get Grafana login credantials
 ```bash
-kubectl get secrets grafana -o json | jq '.data | map_values(@base64d)'
+kubectl -n logging get secrets grafana -o json | jq '.data | map_values(@base64d)'
 ```
 
 #### Forward Grafana Service
 ```bash
-kubectl port-forward svc/grafana 3000:80
+kubectl -n logging port-forward svc/grafana 3000:80
 ```
 [Gradana Dashboard: http://localhost:3000](http://localhost:3000)
 <p align="center"><img src="./img/loki1.png" width="660"></p>
