@@ -30,6 +30,7 @@ type OutputSpec struct {
 	LokiOutput          *output.LokiOutput          `json:"loki,omitempty"`
 	SumologicOutput     *output.SumologicOutput     `json:"sumologic,omitempty"`
 	ForwardOutput       *output.ForwardOutput       `json:"forward,omitempty"`
+	FileOutput          *output.FileOutputConfig    `json:"file,omitempty"`
 	NullOutputConfig    *output.NullOutputConfig    `json:"nullout,omitempty"`
 }
 

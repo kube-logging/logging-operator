@@ -3,6 +3,7 @@
 
 ### filters
 
+- [dedot](./filters/dedot.md)
 - [parser](./filters/parser.md)
 - [stdout](./filters/stdout.md)
 - [tagnormaliser](./filters/tagnormaliser.md)

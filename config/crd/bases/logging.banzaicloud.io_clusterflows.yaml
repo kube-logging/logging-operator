@@ -36,6 +36,18 @@ spec:
               items:
                 description: Filter definition for FlowSpec
                 properties:
+                  dedot:
+                    description: More info at https://github.com/lunardial/fluent-plugin-dedot_filter
+                    properties:
+                      de_dot_nested:
+                        description: Will cause the plugin to recurse through nested
+                          structures (hashes and arrays), and remove dots in those
+                          key-names too.
+                        type: boolean
+                      de_dot_separator:
+                        description: Separator (default:_)
+                        type: string
+                    type: object
                   parser:
                     description: https://docs.fluentd.org/filter/parser
                     properties:
