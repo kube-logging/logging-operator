@@ -13,8 +13,8 @@ helm repo update
 
 ### Install ElasticSearch with operator
 ```bash
-helm install --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-helm install --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
+helm install --namespace logging --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
+helm install --namespace logging --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
 
@@ -27,14 +27,14 @@ helm install --name logging banzaicloud-stable/logging-operator
 
 ### Nginx App + Logging Definition
 ```bash
-helm install --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
+helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
 ```
 
 ## Install from manifest
 
 #### Create `logging` resource
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -42,7 +42,7 @@ metadata:
 spec:
   fluentd: {}
   fluentbit: {}
-  controlNamespace: default
+  controlNamespace: logging
 EOF
 ```
 
@@ -51,15 +51,14 @@ EOF
 
 #### Create an ElasticSearch output definition 
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
   name: es-output
-  namespace: default
 spec:
   elasticsearch:
-    host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+    host: elasticsearch-elasticsearch-cluster.logging.svc.cluster.local
     port: 9200
     scheme: https
     ssl_verify: false
@@ -75,12 +74,11 @@ EOF
 
 #### Create `flow` resource
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
   name: es-flow
-  namespace: default
 spec:
   filters:
     - tag_normaliser: {}
@@ -99,7 +97,7 @@ EOF
 
 #### Install nginx deployment
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -144,7 +142,7 @@ EOF
 
 #### Forward Cerebro Dashboard
 ```bash
-kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
+kubectl -n logging port-forward svc/cerebro-elasticsearch-cluster 9001:80
 ```
 [Dashboard URL: http://localhost:9001](http://localhost:9001)
 
@@ -154,7 +152,7 @@ kubectl port-forward svc/cerebro-elasticsearch-cluster 9001:80
 
 #### Forward Kibana Dashboard
 ```bash
-kubectl port-forward svc/kibana-elasticsearch-cluster 5601:80
+kubectl -n logging port-forward svc/kibana-elasticsearch-cluster 5601:80
 ```
 [Dashboard URL: https://localhost:5601](https://localhost:5601)
 

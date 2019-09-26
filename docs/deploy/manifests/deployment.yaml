@@ -18,8 +18,4 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             {}
-
-          ports:
-            - name: http
-              containerPort: 8080
       serviceAccountName: logging-operator
