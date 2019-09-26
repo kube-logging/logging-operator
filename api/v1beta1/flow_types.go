@@ -32,6 +32,7 @@ type Filter struct {
 	StdOut        *filter.StdOutFilterConfig `json:"stdout,omitempty"`
 	Parser        *filter.ParserConfig       `json:"parser,omitempty"`
 	TagNormaliser *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
+	Dedot         *filter.DedotFilterConfig  `json:"dedot,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
