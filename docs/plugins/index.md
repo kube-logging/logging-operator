@@ -5,6 +5,7 @@
 
 - [dedot](./filters/dedot.md)
 - [parser](./filters/parser.md)
+- [record_transformer](./filters/record_transformer.md)
 - [stdout](./filters/stdout.md)
 - [tagnormaliser](./filters/tagnormaliser.md)
 
