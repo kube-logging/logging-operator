@@ -8,12 +8,12 @@
 git clone git@github.com:banzaicloud/logging-operator.git
 ```
 
-### Navigate to the nginx-data-www folder 
+### Navigate to the `logging-operator` folder 
 ```bash
 cd logging-operator
 ```
 
-### Now, let’s create a Namespace called “logging” to work in: 
+### Create a controlNamespace named “logging”: 
 ```bash
 kubectl create ns logging
 ```
@@ -37,6 +37,7 @@ kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_outputs.y
 kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
+---
 
 <p align="center"><img src="../img/helm.svg" width="150"></p>
 <p align="center">

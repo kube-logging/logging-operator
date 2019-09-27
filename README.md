@@ -86,7 +86,8 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 
 ## Contents
 - Installation
-  - [Deploy with Helm](#deploying-with-helm-chart)
+  - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
+  - [Deploy with Kuberenetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 - [Supported Plugins](#supported-plugins)
 - Examples
   - [S3 Output](./docs/example-s3.md)
@@ -97,23 +98,6 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 - [Contributing](#contributing)
 ---
 
-
-## Deploying with helm chart
-The following steps set up an example configuration for sending nginx logs to S3.
-
-
-#### Add BanzaiCloud chart repository:
-```bash
-$ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-$ helm repo update
-```
-
-#### Install logging-operator chart
-```bash
-$ helm install banzaicloud-stable/logging-operator
-```
-
----
 
 ## Supported Plugins
 
