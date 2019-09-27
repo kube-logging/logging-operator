@@ -19,7 +19,7 @@ kubectl create ns logging
 ```
 
 ### Create ServiceAccount and install cluster roles
-``bash
+```bash
 kubectl -n logging create -f ./docs/deploy/manifests/rbac.yaml
 ```
 
