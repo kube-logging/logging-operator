@@ -37,3 +37,16 @@ kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_outputs.y
 kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
+# Deploy logging-operator with Helm
+
+### Add operator chart repository:
+```bash
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo update
+```
+
+### Logging Operator
+```bash
+helm install --namespace logging --name logging banzaicloud-stable/logging-operator
+```
+> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
