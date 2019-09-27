@@ -665,6 +665,13 @@ spec:
               required:
               - ssl_verify
               type: object
+            file:
+              properties:
+                path:
+                  type: string
+              required:
+              - path
+              type: object
             forward:
               properties:
                 ack_response_timeout:
