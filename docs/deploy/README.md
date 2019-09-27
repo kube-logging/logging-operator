@@ -37,6 +37,7 @@ kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_outputs.y
 kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
+---
 
 <p align="center"><img src="../img/helm.svg" width="150"></p>
 <p align="center">
