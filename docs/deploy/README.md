@@ -37,6 +37,10 @@ kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_outputs.y
 kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
+
+<p align="center"><img src="../img/helm.svg" width="260"></p>
+<p align="center">
+
 # Deploy logging-operator with Helm
 
 ### Add operator chart repository:
