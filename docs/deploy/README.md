@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/img/lo.svg" width="260"></p>
+<p align="center"><img src="../img/lo.svg" width="260"></p>
 <p align="center">
 
 # Deploy logging-operator from Kubernetes Manifests
