@@ -1,0 +1,6 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: null-output-sample
+spec:
+  nullout: {}
