@@ -6,7 +6,7 @@ Before you start [install logging-operator](/README.md#deploying-with-helm-chart
 
 Create a namespace for logging
 ```bash
-kubectl create ns logging-system
+kubectl create ns logging
 ```
 > You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
 
@@ -23,7 +23,7 @@ metadata:
 spec:
   fluentd: {}
   fluentbit: {}
-  controlNamespace: logging-system
+  controlNamespace: logging
 ```
 
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
@@ -32,11 +32,11 @@ spec:
 
 If you have your `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` set you can use the following snippet.
 ```bash
-kubectl create secret generic logging-s3 --from-literal "awsAccessKeyId=$AWS_ACCESS_KEY_ID" --from-literal "awsSecretAccesKey=$AWS_SECRET_ACCESS_KEY"
+kubectl -n logging create secret generic logging-s3 --from-literal "awsAccessKeyId=$AWS_ACCESS_KEY_ID" --from-literal "awsSecretAccesKey=$AWS_SECRET_ACCESS_KEY"
 ```
 Or set up the secret manually.
 ```bash
-kubectl apply -f secret.yaml
+kubectl -n logging apply -f secret.yaml
 ```
 *secret.yaml*
 ```yaml
@@ -44,7 +44,6 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: logging-s3
-  namespace: logging-system
 type: Opaque
 data:
   awsAccessKeyId: <base64encoded>
@@ -56,7 +55,7 @@ data:
 Create an S3 output definition 
 
 ```bash
-kubectl apply -f clusteroutput.yaml
+kubectl -n logging apply -f clusteroutput.yaml
 ```
 *clusteroutput.yaml*
 ```yaml
@@ -64,7 +63,7 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: s3-output
-  namespace: logging-system
+  namespace: logging
 spec:
   s3:
     aws_key_id:
@@ -92,7 +91,7 @@ spec:
 The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to S3.
 
 ```bash
-kubectl apply -f clusterflow.yaml
+kubectl -n logging apply -f clusterflow.yaml
 ```
 *clusterflow.yaml*
 ```yaml
@@ -100,7 +99,7 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterFlow
 metadata:
   name: all-log-to-s3
-  namespace: logging-system
+  namespace: logging
 spec:
   filters:
     - tag_normaliser: {}
