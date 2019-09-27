@@ -21,17 +21,17 @@ helm install --namespace logging --name elasticsearch es-operator/elasticsearch 
 ## Deploy Logging-Operator with Demo Application
 
 ### Install with Helm 
-### Logging Operator
+
 [Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
 
-### Nginx App + Logging Definition
+#### Nginx App and Logging Definition
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
 ```
 
 ---
-## Install from Kubernetes manifests
+### Install from Kubernetes manifests
 [Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
 #### Create `logging` resource
