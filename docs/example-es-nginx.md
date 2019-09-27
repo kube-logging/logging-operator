@@ -4,10 +4,11 @@
 
 <p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
 
-### Add operator chart repository:
+## Deploy ElasticSearch
+
+### Add chart repository:
 ```bash
 helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
@@ -17,20 +18,21 @@ helm install --namespace logging --name elasticsearch-operator es-operator/elast
 helm install --namespace logging --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
+## Deploy Logging-Operator with Demo Application
 
-## Install with Helm 
+### Install with Helm 
 ### Logging Operator
-```bash
-helm install --name logging banzaicloud-stable/logging-operator
-```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
+
 
 ### Nginx App + Logging Definition
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-es-demo
 ```
 
-## Install from manifest
+---
+## Install from Kubernetes manifests
+[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
 #### Create `logging` resource
 ```bash
