@@ -38,7 +38,7 @@ kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
 
-<p align="center"><img src="../img/helm.svg" width="260"></p>
+<p align="center"><img src="../img/helm.svg" width="150"></p>
 <p align="center">
 
 # Deploy logging-operator with Helm
