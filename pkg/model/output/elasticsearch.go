@@ -54,10 +54,8 @@ type ElasticsearchOutput struct {
 	TargetTypeKey string `json:"target_type_key,omitempty"`
 	// The name of the template to define. If a template by the name given is already present, it will be left unchanged, unless template_overwrite is set, in which case the template will be updated.
 	TemplateName string `json:"template_name,omitempty"`
-
 	// The path to the file containing the template to install.
 	TemplateFile string `json:"template_file,omitempty"`
-
 	// Specify index templates in form of hash. Can contain multiple templates.
 	Templates string `json:"templates,omitempty"`
 	// Specify the string and its value to be replaced in form of hash. Can contain multiple key value pair that would be replaced in the specified template_file. This setting only creates template and to add rollover index please check the rollover_index configuration.
@@ -81,7 +79,6 @@ type ElasticsearchOutput struct {
 
 	// You can specify times of retry obtaining Elasticsearch version.(default: 15)
 	MaxRetryGetEsVersion string `json:"max_retry_get_es_version,omitempty"`
-
 	// You can specify HTTP request timeout.(default: 5s)
 	RequestTimeout string `json:"request_timeout,omitempty"`
 	// You can tune how the elasticsearch-transport host reloading feature works.(default: true)
@@ -90,12 +87,10 @@ type ElasticsearchOutput struct {
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
 	// You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.(default: 60s)
 	ResurrectAfter string `json:"resurrect_after,omitempty"`
-
 	// This will add the Fluentd tag in the JSON record.(default: false)
 	IncludeTagKey bool `json:"include_tag_key,omitempty"`
 	// This will add the Fluentd tag in the JSON record.(default: tag)
 	TagKey string `json:"tag_key,omitempty"`
-
 	// https://github.com/uken/fluent-plugin-elasticsearch#id_key
 	IdKey string `json:"id_key,omitempty"`
 	// Similar to parent_key config, will add _routing into elasticsearch command if routing_key is set and the field does exist in input event.
@@ -120,10 +115,43 @@ type ElasticsearchOutput struct {
 	TimeParseErrorTag string `json:"time_parse_error_tag,omitempty"`
 	// With http_backend typhoeus, elasticsearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
 	HttpBackend string `json:"http_backend,omitempty"`
-
 	// With default behavior, Elasticsearch client uses Yajl as JSON encoder/decoder. Oj is the alternative high performance JSON encoder/decoder. When this parameter sets as true, Elasticsearch client uses Oj as JSON encoder/decoder. (default: fqlse)
-	OreferOjSerializer bool `json:"prefer_oj_serializer,omitempty"`
-
+	PreferOjSerializer bool `json:"prefer_oj_serializer,omitempty"`
+	// Elasticsearch will complain if you send object and concrete values to the same field. For example, you might have logs that look this, from different places:
+	//{"people" => 100} {"people" => {"some" => "thing"}}
+	//The second log line will be rejected by the Elasticsearch parser because objects and concrete values can't live in the same field. To combat this, you can enable hash flattening.
+	FlattenHashes bool `json:"flatten_hashes,omitempty"`
+	// Flatten separator
+	FlattenHashesSeparator string `json:"flatten_hashes_separator,omitempty"`
+	// When you use mismatched Elasticsearch server and client libraries, fluent-plugin-elasticsearch cannot send data into Elasticsearch. (default: false)
+	ValidateClientVersion bool `json:"validate_client_version,omitempty"`
+	// Default unrecoverable_error_types parameter is set up strictly. Because es_rejected_execution_exception is caused by exceeding Elasticsearch's thread pool capacity. Advanced users can increase its capacity, but normal users should follow default behavior.
+	// If you want to increase it and forcibly retrying bulk request, please consider to change unrecoverable_error_types parameter from default value.
+	// Change default value of thread_pool.bulk.queue_size in elasticsearch.yml)
+	UnrecoverableErrorTypes string `json:"unrecoverable_error_types,omitempty"`
+	// Because Elasticsearch plugin should change behavior each of Elasticsearch major versions.
+	// For example, Elasticsearch 6 starts to prohibit multiple type_names in one index, and Elasticsearch 7 will handle only _doc type_name in index.
+	// If you want to disable to verify Elasticsearch version at start up, set it as false.
+	// When using the following configuration, ES plugin intends to communicate into Elasticsearch 6. (default: true)
+	VerifyEsVersionAtStartup bool `json:"verify_es_version_at_startup,omitempty"`
+	// This parameter changes that ES plugin assumes default Elasticsearch version. The default value is 5.
+	DefaultElasticsearchVersion string `json:"default_elasticsearch_version,omitempty"`
+	// This parameter adds additional headers to request. Example: {"token":"secret"} (default: {})
+	CustomHeaders string `json:"custom_headers,omitempty"`
+	// By default, the error logger won't record the reason for a 400 error from the Elasticsearch API unless you set log_level to debug. However, this results in a lot of log spam, which isn't desirable if all you want is the 400 error reasons. You can set this true to capture the 400 error reasons without all the other debug logs. (default: false)
+	LogEs400Reason bool `json:"log_es_400_reason,omitempty"`
+	// By default, record body is wrapped by 'doc'. This behavior can not handle update script requests. You can set this to suppress doc wrapping and allow record body to be untouched. (default: false)
+	SuppressDocWrap bool `json:"suppress_doc_wrap,omitempty"`
+	// A list of exception that will be ignored - when the exception occurs the chunk will be discarded and the buffer retry mechanism won't be called. It is possible also to specify classes at higher level in the hierarchy. For example
+	// `ignore_exceptions ["Elasticsearch::Transport::Transport::ServerError"]`
+	// will match all subclasses of ServerError - Elasticsearch::Transport::Transport::Errors::BadRequest, Elasticsearch::Transport::Transport::Errors::ServiceUnavailable, etc.
+	IgnoreExceptions string `json:"ignore_exceptions,omitempty"`
+	// Indicates whether to backup chunk when ignore exception occurs. (default: true)
+	ExceptionBackup bool `json:"exception_backup,omitempty"`
+	// Configure bulk_message request splitting threshold size.
+	// Default value is 20MB. (20 * 1024 * 1024)
+	// If you specify this size as negative number, bulk_message request splitting feature will be disabled. (default: 20MB)
+	BulkMessageRequestThreshold string `json:"bulk_message_request_threshold,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
