@@ -14,17 +14,17 @@ cd logging-operator
 ```
 
 ### Now, let’s create a Namespace called “logging” to work in: 
-`````bash
+```bash
 kubectl create ns logging
 ```
 
 ### Create ServiceAccount and install cluster roles
-`````bash
+``bash
 kubectl -n logging create -f ./docs/deploy/manifests/rbac.yaml
 ```
 
 ### Apply the ClusterResources
-`````bash
+```bash
 kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_clusterflows.yaml
 kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_clusteroutputs.yaml
 kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_flows.yaml
@@ -33,7 +33,7 @@ kubectl -n logging create -f ./config/crd/bases/logging.banzaicloud.io_outputs.y
 ```
 
 ### Deploy the Operator
-`````bash
+```bash
 kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
