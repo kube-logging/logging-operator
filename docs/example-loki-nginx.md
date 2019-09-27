@@ -4,10 +4,11 @@
 
 <p align="center"><img src="./img/nginx-loki.png" width="900"></p>
 
-### Add operator chart repository:
+## Deploy Grafana & Loki
+
+### Add chart repository:
 ```bash
 helm repo add loki https://grafana.github.io/loki/charts
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
@@ -27,19 +28,20 @@ helm install --namespace logging --name grafana stable/grafana \
 ```
 
 
-## Install with Helm 
-### Logging Operator
-```bash
-helm install --namespace logging --name logging banzaicloud-stable/logging-operator
-```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+## Deploy Logging-Operator with Demo Application
 
-### Nginx App + Logging Definition
+### Install with Helm 
+
+[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
+
+#### Nginx App and Logging Definition
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
 ```
 
-## Install from manifest
+---
+### Install from Kubernetes manifests
+[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
 #### Create `logging` resource
 ```bash

@@ -3,20 +3,20 @@
 # Save all logs to ElasticSearch
 
 
-#### Add operator chart repository:
+## Deploy ElasticSearch
+
+### Add chart repository:
 ```bash
 helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
-## Install ElasticSearch with operator
+### Install ElasticSearch with operator
 ```bash
 helm install --namespace logging --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
 helm install --namespace logging --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
-
 
 #### Forward cerebro & kibana dashboards
 ```bash
@@ -25,15 +25,16 @@ kubectl -n logging port-forward svc/kibana-elasticsearch-cluster 5601:80
 ```
 
 
-### Create default logging
+## Deploy Logging-Operator
 
-Create a namespace for logging
-```bash
-kubectl create ns logging
-```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+### Install with Helm 
+[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
-Create `logging` resource
+
+### Install from Kubernetes manifests
+[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+
+#### Create `logging` resource
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -50,8 +51,7 @@ EOF
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-Create an ElasticSearch output definition 
-
+#### Create an ElasticSearch output definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -78,6 +78,7 @@ EOF
 
 The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to ElasticSearch.
 
+#### Create `flow` resource
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
