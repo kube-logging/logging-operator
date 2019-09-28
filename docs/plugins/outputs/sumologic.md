@@ -1,4 +1,10 @@
-### SumologicOutput
+# SumoLogic output plugin for Fluentd
+## Overview
+This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
+More info at https://github.com/SumoLogic/fluentd-output-sumologic
+
+## Configuration
+### Output Config
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | data_type | string | No |  logs | The type of data that will be sent to Sumo Logic, either logs or metrics <br> |
