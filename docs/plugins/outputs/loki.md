@@ -1,6 +1,10 @@
-### Loki
-#### Fluentd output plugin to ship logs to a Loki server.
+# Loki output plugin 
+## Overview
+Fluentd output plugin to ship logs to a Loki server.
+More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
 
+## Configuration
+### Output Config
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | url | string | No | https://logs-us-west1.grafana.net | The url of the Loki server to send logs to. <br> |

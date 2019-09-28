@@ -1,3 +1,8 @@
+# Elasticsearch output plugin for Fluentd
+## Overview
+More info at https://github.com/uken/fluent-plugin-elasticsearch
+
+## Configuration
 ### Elasticsearch
 #### Send your logs to Elasticsearch
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2019 Banzai Cloud
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package output
 
 import (
@@ -5,8 +21,24 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
 
+// +docName:"Aliyun OSS plugin for Fluentd"
+// **Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
+//
+//This plugin splits events by using the timestamp of event logs. For example,  a log '2019-04-09 message Hello' is reached, and then another log '2019-04-10 message World' is reached in this order, the former is stored in "20190409.gz" file, and latter in "20190410.gz" file.
+//
+//**Fluent OSS input plugin** reads data from OSS periodically.
+//
+//This plugin uses MNS on the same region of the OSS bucket. We must setup MNS and OSS event notification before using this plugin.
+//
+//[This document](https://help.aliyun.com/document_detail/52656.html) shows how to setup MNS and OSS event notification.
+//
+//This plugin will poll events from MNS queue and extract object keys from these events, and then will read those objects from OSS.
+// More info at https://github.com/aliyun/fluent-plugin-oss
+type _doc interface{}
+
+
 // +kubebuilder:object:generate=true
-// +docName:"Aliyun OSS"
+// +docName:"Output Config"
 type OSSOutput struct {
 	// OSS endpoint to connect to'
 	Endpoint string `json:"endpoint"`
