@@ -19,7 +19,7 @@ import (
 // | ${labels} | Kubernetes Pod labels. This is a nested map. You can access nested attributes via `.`  | {"app":"nginx-logging-demo", "pod-template-hash":"7dcdcfdcd7" }  |
 // | ${host} | Node hostname the Pod runs on | docker-desktop |
 // | ${docker_id} | Docker UUID of the container | 3a38148aa37aa3... |
-type _doc interface{}
+type _docTagNormaliser interface{}
 
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {

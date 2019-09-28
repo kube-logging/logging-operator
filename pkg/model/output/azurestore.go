@@ -24,7 +24,7 @@ import (
 // +docName:"Azure Storage output plugin for Fluentd"
 // Azure Storate output plugin buffers logs in local file and upload them to Azure Storage periodically.
 // More info at https://github.com/htgc/fluent-plugin-azurestorage
-type _doc interface{}
+type _docAzure interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

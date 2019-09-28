@@ -24,7 +24,7 @@ import (
 // +docName:"SumoLogic output plugin for Fluentd"
 // This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
 // More info at https://github.com/SumoLogic/fluentd-output-sumologic
-type _doc interface{}
+type _docSumoLogic interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

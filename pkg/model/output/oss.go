@@ -34,7 +34,7 @@ import (
 //
 //This plugin will poll events from MNS queue and extract object keys from these events, and then will read those objects from OSS.
 // More info at https://github.com/aliyun/fluent-plugin-oss
-type _doc interface{}
+type _docOss interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
