@@ -1399,7 +1399,6 @@ spec:
             loggingRef:
               type: string
             loki:
-              description: Fluentd output plugin to ship logs to a Loki server.
               properties:
                 buffer:
                   properties:
