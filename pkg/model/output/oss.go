@@ -36,7 +36,6 @@ import (
 // More info at https://github.com/aliyun/fluent-plugin-oss
 type _doc interface{}
 
-
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type OSSOutput struct {

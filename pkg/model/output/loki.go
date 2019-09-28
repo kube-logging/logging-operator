@@ -26,7 +26,6 @@ import (
 // More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
 type _doc interface{}
 
-
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type LokiOutput struct {
