@@ -52,7 +52,7 @@ func (d *doc) checkNodes(n ast.Node) bool {
 		typeName, ok := generic.Specs[0].(*ast.TypeSpec)
 		if ok {
 			_, ok := typeName.Type.(*ast.InterfaceType)
-			if ok && typeName.Name.Name == "_doc" {
+			if ok && strings.HasPrefix(typeName.Name.Name, "_doc") {
 				d.append(fmt.Sprintf("# %s", getTypeName(generic, d.Name)))
 				d.append("## Overview")
 				d.append(getTypeDocs(generic))

@@ -23,7 +23,7 @@ import (
 
 // +docName:"Elasticsearch output plugin for Fluentd"
 // More info at https://github.com/uken/fluent-plugin-elasticsearch
-type _doc interface{}
+type _docElasticsearch interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Elasticsearch"
