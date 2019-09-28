@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2019 Banzai Cloud
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package output
 
 import (
@@ -5,7 +21,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
 
+// +docName:"SumoLogic output plugin for Fluentd"
+// This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
+// More info at https://github.com/SumoLogic/fluentd-output-sumologic
+type _doc interface{}
+
 // +kubebuilder:object:generate=true
+// +docName:"Output Config"
 type SumologicOutput struct {
 	// The type of data that will be sent to Sumo Logic, either logs or metrics (default: logs)
 	DataType string `json:"data_type,omitempty"`
