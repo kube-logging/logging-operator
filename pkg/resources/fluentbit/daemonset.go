@@ -15,6 +15,7 @@
 package fluentbit
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
@@ -24,25 +25,25 @@ import (
 )
 
 // TODO in case of rbac add created serviceAccount name
-func (r *Reconciler) daemonSet() runtime.Object {
+func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 
 	var containerPorts []corev1.ContainerPort
 
-	if _, ok := r.Logging.Spec.FluentbitSpec.Annotations["prometheus.io/port"]; ok {
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: r.Logging.Spec.FluentbitSpec.GetPrometheusPortFromAnnotation(),
+			ContainerPort: r.Logging.Spec.FluentbitSpec.Metrics.Port,
 			Protocol:      corev1.ProtocolTCP,
 		})
 	}
 
-	labels := util.MergeLabels(r.Logging.Labels, labelSelector)
+	labels := util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())
 
 	return &appsv1.DaemonSet{
 		ObjectMeta: templates.FluentbitObjectMeta(
 			r.Logging.QualifiedName(fluentbitDaemonSetName), labels, r.Logging),
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, labelSelector)},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
@@ -65,7 +66,7 @@ func (r *Reconciler) daemonSet() runtime.Object {
 				},
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {

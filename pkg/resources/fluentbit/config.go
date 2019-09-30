@@ -20,7 +20,7 @@ var fluentBitConfigTemplate = `
     Daemon       Off
     Log_Level    info
     Parsers_File parsers.conf
-{{- if .Monitor.Port }}
+{{- if .Monitor.Enabled }}
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
     HTTP_Port    {{ .Monitor.Port }}

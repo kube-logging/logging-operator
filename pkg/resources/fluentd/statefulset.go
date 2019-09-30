@@ -16,6 +16,7 @@ package fluentd
 
 import (
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
@@ -24,13 +25,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) statefulset() runtime.Object {
+func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 	spec := *r.statefulsetSpec()
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
 			{
 				ObjectMeta: templates.FluentdObjectMeta(
-					r.Logging.QualifiedName(bufferVolumeName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
+					r.Logging.QualifiedName(bufferVolumeName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 				Spec: r.Logging.Spec.FluentdSpec.FluentdPvcSpec,
 				Status: corev1.PersistentVolumeClaimStatus{
 					Phase: corev1.ClaimPending,
@@ -40,16 +41,16 @@ func (r *Reconciler) statefulset() runtime.Object {
 	}
 	return &appsv1.StatefulSet{
 		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(StatefulSetName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
+			r.Logging.QualifiedName(StatefulSetName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Spec: spec,
-	}
+	}, k8sutil.StatePresent
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	return &appsv1.StatefulSetSpec{
 		Replicas: util.IntPointer(1),
 		Selector: &metav1.LabelSelector{
-			MatchLabels: labelSelector,
+			MatchLabels: r.getFluentdLabels(),
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: r.generatePodMeta(),
@@ -93,12 +94,16 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
-		Labels: util.MergeLabels(r.Logging.Labels, labelSelector),
+		Labels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 	}
 	if r.Logging.Spec.FluentdSpec.Annotations != nil {
 		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations
 	}
 	return meta
+}
+
+func generataLoggingRefLabels(loggingRef string) map[string]string {
+	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
 func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
@@ -132,10 +137,10 @@ func generatePorts(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
 			Protocol:      "TCP",
 		},
 	}
-	if spec.GetPrometheusPortFromAnnotation() != 0 {
+	if spec.Metrics != nil && spec.Metrics.Port != 0 {
 		ports = append(ports, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: spec.GetPrometheusPortFromAnnotation(),
+			ContainerPort: spec.Metrics.Port,
 			Protocol:      "TCP",
 		})
 	}

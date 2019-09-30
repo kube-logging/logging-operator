@@ -18,6 +18,7 @@ import (
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
+	"github.com/banzaicloud/logging-operator/pkg/util"
 	"github.com/go-logr/logr"
 	"github.com/goph/emperror"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,10 +31,16 @@ const (
 	clusterRoleName           = "logging"
 	fluentBitSecretConfigName = "fluentbit"
 	fluentbitDaemonSetName    = "fluentbit"
+	fluentbitServiceName      = "fluentbit"
 )
 
-var labelSelector = map[string]string{
-	"app": "fluent-bit",
+func generataLoggingRefLabels(loggingRef string) map[string]string {
+	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
+
+func (r *Reconciler) getFluentBitLabels() map[string]string {
+	return util.MergeLabels(r.Logging.Labels, map[string]string{
+		"app.kubernetes.io/name": "fluentd"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
 // Reconciler holds info what resource to reconcile
@@ -56,10 +63,13 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.configSecret, r.daemonSet,
+		r.configSecret,
+		r.daemonSet,
+		r.serviceMetrics,
+		r.monitorServiceMetrics,
 	} {
-		o := res()
-		err := r.ReconcileResource(o)
+		o, state := res()
+		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, emperror.WrapWith(err, "failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
 		}

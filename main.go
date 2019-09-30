@@ -20,6 +20,9 @@ import (
 
 	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/controllers"
+	"github.com/banzaicloud/logging-operator/pkg/util"
+	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -37,6 +40,8 @@ func init() {
 	clientgoscheme.AddToScheme(scheme)
 	_ = loggingv1alpha2.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
+	prometheusOperator.AddToScheme(scheme)
+	apiextensions.AddToScheme(scheme)
 }
 
 func main() {
@@ -56,6 +61,7 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		MapperProvider:     util.NewCached,
 	})
 
 	if err != nil {
