@@ -1630,7 +1630,7 @@ spec:
                   description: The list of all seed brokers, with their host and port
                     information.
                   type: string
-                buffer_topic:
+                buffer:
                   properties:
                     chunk_full_threshold:
                       description: The percentage of chunk size threshold for flushing.
@@ -1796,6 +1796,21 @@ spec:
                 exclude_topic_key:
                   description: 'Exclude Topic key (default: false)'
                   type: boolean
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
                 get_kafka_client_log:
                   description: 'Get Kafka Client log (default: false)'
                   type: boolean
@@ -1813,7 +1828,7 @@ spec:
                   description: 'Idempotent (default: false)'
                   type: boolean
                 max_send_retries:
-                  description: 'Number of times to retry sending of messages to a
+                  description: 'Number of times to retry sending of m essages to a
                     leader (default: 1)'
                   type: integer
                 message_key_key:
@@ -1830,7 +1845,7 @@ spec:
                     -1).'
                   type: integer
                 sasl_over_ssl:
-                  description: 'SASL over SSL (default: false)'
+                  description: 'SASL over SSL (default: true)'
                   type: boolean
                 topic_key:
                   description: 'Topic Key (default: "topic")'
@@ -1840,6 +1855,8 @@ spec:
                   type: boolean
               required:
               - brokers
+              - format
+              - sasl_over_ssl
               type: object
             loggingRef:
               type: string

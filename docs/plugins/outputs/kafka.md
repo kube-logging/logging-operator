@@ -1,6 +1,23 @@
 # Kafka output plugin for Fluentd
 ## Overview
- More info at https://github.com/uken/fluent-plugin-elasticsearch
+More info at https://github.com/fluent/fluent-plugin-kafka
+
+#### Example output configurations
+```
+spec:
+kafka:
+brokers: kafka-headless.kafka.svc.cluster.local:29092
+default_topic: topic
+sasl_over_ssl: false
+format:
+type: json
+buffer:
+tags: topic
+path: /tmp/buffer
+timekey: 1m
+timekey_wait: 30s
+timekey_use_utc: true
+```
 
 ## Configuration
 ### Kafka
@@ -23,9 +40,10 @@
 | headers_from_record | map[string]string | No |  {} | Headers from Record <br> |
 | use_default_for_unknown_topic | bool | No |  false | Use default for unknown topics <br> |
 | idempotent | bool | No |  false | Idempotent <br> |
-| sasl_over_ssl | bool | No |  false | SASL over SSL <br> |
-| max_send_retries | int | No |  1 | Number of times to retry sending of messages to a leader <br> |
+| sasl_over_ssl | bool | Yes |  true | SASL over SSL <br> |
+| max_send_retries | int | No |  1 | Number of times to retry sending of m essages to a leader <br> |
 | required_acks | int | No |  -1 | The number of acks required per request .<br> |
 | ack_timeout | int | No |  nil => Uses default of ruby-kafka library | How long the producer waits for acks. The unit is seconds <br> |
 | compression_codec | string | No |  nil | The codec the producer uses to compress messages . The available options are gzip and snappy.<br> |
-| buffer_topic | *Buffer | No | - |  |
+| format | *Format | Yes | - | [Format](./format.md)<br> |
+| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
