@@ -32,6 +32,7 @@ type OutputSpec struct {
 	ForwardOutput       *output.ForwardOutput       `json:"forward,omitempty"`
 	FileOutput          *output.FileOutputConfig    `json:"file,omitempty"`
 	NullOutputConfig    *output.NullOutputConfig    `json:"nullout,omitempty"`
+	KafkaOutputConfig   *output.KafkaOutputConfig   `json:"kafka,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output
