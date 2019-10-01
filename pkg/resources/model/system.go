@@ -22,12 +22,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/plugins"
+	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type LoggingResources struct {
-	client         client.Reader
+	client         client.Client
 	logger         logr.Logger
 	logging        *v1beta1.Logging
 	Outputs        []v1beta1.Output
@@ -36,7 +37,7 @@ type LoggingResources struct {
 	ClusterFlows   []v1beta1.ClusterFlow
 }
 
-func NewLoggingResources(logging *v1beta1.Logging, client client.Reader, logger logr.Logger) *LoggingResources {
+func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger logr.Logger) *LoggingResources {
 	return &LoggingResources{
 		client:         client,
 		logger:         logger,
@@ -49,6 +50,11 @@ func NewLoggingResources(logging *v1beta1.Logging, client client.Reader, logger 
 }
 
 func (l *LoggingResources) CreateModel() (*types.Builder, error) {
+	mountConfig := &secret.MountConfig{
+		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
+		SecretNamespace: l.logging.Spec.ControlNamespace,
+		ConfigPath:      fluentd.OutputSecretPath,
+	}
 	forwardInput := input.NewForwardInputConfig()
 	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
@@ -63,7 +69,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
 	}
-	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace))
+	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, mountConfig))
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
@@ -102,6 +108,11 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 }
 
 func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespace string) (*types.Flow, error) {
+	mountConfig := &secret.MountConfig{
+		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
+		SecretNamespace: l.logging.Spec.ControlNamespace,
+		ConfigPath:      fluentd.OutputSecretPath,
+	}
 	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
 	if err != nil {
 		return nil, err
@@ -115,7 +126,7 @@ FindOutputForAllRefs:
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
 				if output.Namespace == namespace && outputRef == output.Name {
-					plugin, err := plugins.CreateOutput(output.Spec, secret.NewSecretLoader(l.client, output.Namespace))
+					plugin, err := plugins.CreateOutput(output.Spec, secret.NewSecretLoader(l.client, output.Namespace, mountConfig))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 						continue FindOutputForAllRefs
@@ -127,7 +138,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, secret.NewSecretLoader(l.client, clusterOutput.Namespace))
+				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, secret.NewSecretLoader(l.client, clusterOutput.Namespace, mountConfig))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 					continue FindOutputForAllRefs
@@ -143,7 +154,7 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, secret.NewSecretLoader(l.client, flowCr.Namespace))
+		filter, err := plugins.CreateFilter(f, secret.NewSecretLoader(l.client, flowCr.Namespace, mountConfig))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.Errorf("failed to create filter with index %d for flow %s", i, flowCr.Name))
 			continue

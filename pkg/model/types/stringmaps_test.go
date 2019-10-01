@@ -29,7 +29,7 @@ func TestRequired(t *testing.T) {
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{})
+	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -44,7 +44,7 @@ func TestRequiredMeansItCannotEvenBeEmpty(t *testing.T) {
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{Field1: ""})
+	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{Field1: ""})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -60,7 +60,7 @@ func TestJsonTagsWithDefaultsAndOmitempty(t *testing.T) {
 		Field2 string `json:"field2,omitempty" plugin:"default:http://asdf and some space"`
 		Field3 string `json:"field3,omitempty"`
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{Field1: "value"})
+	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{Field1: "value"})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -78,7 +78,7 @@ func TestConflictingTags(t *testing.T) {
 	type Asd struct {
 		Field2 string `json:"field2,omitempty" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{})
+	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -96,7 +96,7 @@ func TestIgnoreNestedStructs(t *testing.T) {
 		Field2 string  `json:"field2"`
 		Field3 *Nested `json:"nested"`
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{Field2: "val"})
+	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{Field2: "val"})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -111,7 +111,7 @@ func TestIgnoreNestedStructs(t *testing.T) {
 func TestEmptyStructStructs(t *testing.T) {
 	type Asd struct {
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).StringsMap(Asd{})
+	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).StringsMap(Asd{})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -135,7 +135,7 @@ func TestConversion(t *testing.T) {
 
 	testStruct := Asd{Field: 2}
 
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "")).
+	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", nil)).
 		WithConverter("magic", converter).
 		StringsMap(testStruct)
 	if err != nil {
@@ -158,6 +158,18 @@ func (d *FakeLoader) Load(secret *secret.Secret) (string, error) {
 	}
 	if secret.ValueFrom != nil && secret.ValueFrom.SecretKeyRef != nil {
 		return fmt.Sprintf("%s:%s",
+			secret.ValueFrom.SecretKeyRef.Name,
+			secret.ValueFrom.SecretKeyRef.Key), nil
+	}
+	return "", errors.New("no value found")
+}
+
+func (d *FakeLoader) Mount(secret *secret.Secret) (string, error) {
+	if secret.Value != "" {
+		return secret.Value, nil
+	}
+	if secret.ValueFrom != nil && secret.ValueFrom.SecretKeyRef != nil {
+		return fmt.Sprintf("mountedFrom:%s:%s",
 			secret.ValueFrom.SecretKeyRef.Name,
 			secret.ValueFrom.SecretKeyRef.Key), nil
 	}

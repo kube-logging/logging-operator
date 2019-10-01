@@ -16,6 +16,7 @@ package secret
 
 import (
 	"context"
+	"fmt"
 
 	"emperror.dev/errors"
 	corev1 "k8s.io/api/core/v1"
@@ -27,7 +28,8 @@ import (
 
 type Secret struct {
 	Value     string     `json:"value,omitempty"`
-	ValueFrom *ValueFrom `json:"valueFrom,omitemtpy"`
+	ValueFrom *ValueFrom `json:"valueFrom,omitempty"`
+	MountFrom *ValueFrom `json:"mountFrom,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -47,19 +49,65 @@ type KubernetesSecret struct {
 
 type SecretLoader interface {
 	Load(secret *Secret) (string, error)
+	Mount(secret *Secret) (string, error)
 }
 
 type secretLoader struct {
 	// secretLoader is limited to a single namespace, to avoid hijacking other namespace's secrets
-	namespace string
-	client    client.Reader
+	namespace   string
+	client      client.Client
+	mountConfig *MountConfig
 }
 
-func NewSecretLoader(client client.Reader, namespace string) *secretLoader {
+// MountConfig to attach volume secrets to Fluentd
+type MountConfig struct {
+	SecretName      string
+	SecretNamespace string
+	ConfigPath      string
+}
+
+func NewSecretLoader(client client.Client, namespace string, mountConfig *MountConfig) *secretLoader {
 	return &secretLoader{
-		client:    client,
-		namespace: namespace,
+		client:      client,
+		namespace:   namespace,
+		mountConfig: mountConfig,
 	}
+}
+
+func (k *secretLoader) Mount(secret *Secret) (string, error) {
+	k8sSecret := &corev1.Secret{}
+	err := k.client.Get(context.TODO(), types.NamespacedName{
+		Name:      secret.MountFrom.SecretKeyRef.Name,
+		Namespace: k.namespace}, k8sSecret)
+	if err != nil {
+		return "", errors.WrapIff(err, "failed to get kubernetes secret %s:%s",
+			k.namespace,
+			secret.MountFrom.SecretKeyRef.Name)
+	}
+	secretKey := fmt.Sprintf("%s-%s-%s", k.namespace, secret.MountFrom.SecretKeyRef.Name, secret.MountFrom.SecretKeyRef.Key)
+	value, ok := k8sSecret.Data[secret.MountFrom.SecretKeyRef.Key]
+	if !ok {
+		return "", errors.Errorf("key %q not found in secret %q in namespace %q",
+			secret.MountFrom.SecretKeyRef.Key,
+			secret.MountFrom.SecretKeyRef.Name,
+			k.namespace)
+	}
+	fluentOutputSecret := &corev1.Secret{}
+	err = k.client.Get(context.TODO(), types.NamespacedName{
+		Name:      k.mountConfig.SecretName,
+		Namespace: k.mountConfig.SecretNamespace}, fluentOutputSecret)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("unable to get fluent output secret: %q", k.mountConfig.SecretName))
+	}
+	if fluentOutputSecret.Data == nil {
+		fluentOutputSecret.Data = make(map[string][]byte)
+	}
+	fluentOutputSecret.Data[secretKey] = value
+	err = k.client.Update(context.TODO(), fluentOutputSecret)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("unable to update fluent output secret: %q", k.mountConfig.SecretName))
+	}
+	return k.mountConfig.ConfigPath + "/" + secretKey, nil
 }
 
 func (k *secretLoader) Load(secret *Secret) (string, error) {

@@ -495,7 +495,7 @@ func TestRenderS3(t *testing.T) {
 func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected string) error {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter())
 
-	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, ""))
+	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", nil))
 	if err != nil {
 		return err
 	}
@@ -563,7 +563,7 @@ func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
 }
 
 func toDirective(t *testing.T, converter plugins.DirectiveConverter) types.Directive {
-	directive, err := converter.ToDirective(secret.NewSecretLoader(nil, ""))
+	directive, err := converter.ToDirective(secret.NewSecretLoader(nil, "", nil))
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
