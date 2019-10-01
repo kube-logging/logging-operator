@@ -50,13 +50,13 @@ type ForwardOutput struct {
 	// Verify hostname of servers and certificates or not in TLS transport. (default: true)
 	TlsVerifyHostname bool `json:"tls_verify_hostname,omitempty"`
 	// The additional CA certificate path for TLS.
-	TlsCertPath string `json:"tls_cert_path,omitempty"`
+	TlsCertPath *secret.Secret `json:"tls_cert_path,omitempty"`
 	// The client certificate path for TLS
-	TlsClientCertPath string `json:"tls_client_cert_path,omitempty"`
+	TlsClientCertPath *secret.Secret `json:"tls_client_cert_path,omitempty"`
 	// The client private key path for TLS.
-	TlsClientPrivateKeyPath string `json:"tls_client_private_key_path,omitempty"`
+	TlsClientPrivateKeyPath *secret.Secret `json:"tls_client_private_key_path,omitempty"`
 	// The client private key passphrase for TLS.
-	TlsClientPrivateKeyPassphrase string `json:"tls_client_private_key_passphrase,omitempty"`
+	TlsClientPrivateKeyPassphrase *secret.Secret `json:"tls_client_private_key_passphrase,omitempty"`
 	// The certificate thumbprint for searching from Windows system certstore This parameter is for Windows only.
 	TlsCertThumbprint string `json:"tls_cert_thumbprint,omitempty"`
 	// The certificate logical store name on Windows system certstore. This parameter is for Windows only.

@@ -163,6 +163,26 @@ func (in *ForwardOutput) DeepCopyInto(out *ForwardOutput) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.TlsCertPath != nil {
+		in, out := &in.TlsCertPath, &out.TlsCertPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.TlsClientCertPath != nil {
+		in, out := &in.TlsClientCertPath, &out.TlsClientCertPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.TlsClientPrivateKeyPath != nil {
+		in, out := &in.TlsClientPrivateKeyPath, &out.TlsClientPrivateKeyPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.TlsClientPrivateKeyPassphrase != nil {
+		in, out := &in.TlsClientPrivateKeyPassphrase, &out.TlsClientPrivateKeyPassphrase
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(common.Security)

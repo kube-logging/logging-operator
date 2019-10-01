@@ -150,6 +150,10 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/fluentd/app-config/",
 		},
 		{
+			Name:      "output-secret",
+			MountPath: OutputSecretPath,
+		},
+		{
 			Name:      r.Logging.QualifiedName(bufferVolumeName),
 			MountPath: "/buffers",
 		},
@@ -181,6 +185,14 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
+				},
+			},
+		},
+		{
+			Name: "output-secret",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: r.Logging.QualifiedName(OutputSecretName),
 				},
 			},
 		},

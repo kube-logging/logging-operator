@@ -5,6 +5,6 @@ metadata:
   namespace: default
 spec:
   outputRefs:
-    - s3-output-sample 
+    - forward-output-sample
   selectors:
     app: nginx

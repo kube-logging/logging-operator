@@ -5,8 +5,13 @@ metadata:
 spec:
   forward:
     servers:
-    - host: fluent-public.input.io
-      port: "24240"
+      - host: 127.0.0.1
+        name: example-fluent
+    tls_cert_path:
+      mountFrom:
+        secretKeyRef:
+          name: fluentd-tls
+          key: tls.crt
     buffer:
       timekey: 1m
       timekey_wait: 10s
