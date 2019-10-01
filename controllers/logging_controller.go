@@ -17,6 +17,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"regexp"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/model/render"
@@ -132,6 +133,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	clusterFlowSource := &source.Kind{Type: &loggingv1alpha2.ClusterFlow{}}
 	outputSource := &source.Kind{Type: &loggingv1alpha2.Output{}}
 	flowSource := &source.Kind{Type: &loggingv1alpha2.Flow{}}
+	secretSource := &source.Kind{Type: &corev1.Secret{}}
 
 	requestMapper := &handler.EnqueueRequestsFromMapFunc{
 		ToRequests: handler.ToRequestsFunc(func(mapObject handler.MapObject) []reconcile.Request {
@@ -145,6 +147,23 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			if err != nil {
 				logger.Error(err, "failed to list logging resources")
 				return nil
+			}
+			if o, ok := object.(*corev1.Secret); ok {
+				requestList := []reconcile.Request{}
+				for key, _ := range o.Annotations {
+					r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+					result := r.FindStringSubmatch(key)
+					if len(result) > 1 {
+						loggingRef := result[1]
+						// When loggingRef is default we trigger "empty" and default loggingRef as well
+						if loggingRef == "default" {
+							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
+							loggingRef = ""
+						}
+						requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
+					}
+				}
+				return requestList
 			}
 			if o, ok := object.(*loggingv1alpha2.ClusterOutput); ok {
 				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
@@ -168,7 +187,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(clusterOutputSource, requestMapper).
 		Watches(clusterFlowSource, requestMapper).
 		Watches(outputSource, requestMapper).
-		Watches(flowSource, requestMapper)
+		Watches(flowSource, requestMapper).
+		Watches(secretSource, requestMapper)
 
 	FluentdWatches(builder)
 	FluentbitWatches(builder)

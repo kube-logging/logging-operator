@@ -54,6 +54,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
 		SecretNamespace: l.logging.Spec.ControlNamespace,
 		ConfigPath:      fluentd.OutputSecretPath,
+		LoggingRef:      l.logging.Spec.LoggingRef,
 	}
 	forwardInput := input.NewForwardInputConfig()
 	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
@@ -112,6 +113,7 @@ func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, nam
 		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
 		SecretNamespace: l.logging.Spec.ControlNamespace,
 		ConfigPath:      fluentd.OutputSecretPath,
+		LoggingRef:      l.logging.Spec.LoggingRef,
 	}
 	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
 	if err != nil {
