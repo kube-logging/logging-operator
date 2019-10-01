@@ -19,6 +19,7 @@
 - [format](./outputs/format.md)
 - [forward](./outputs/forward.md)
 - [gcs](./outputs/gcs.md)
+- [kafka](./outputs/kafka.md)
 - [loki](./outputs/loki.md)
 - [oss](./outputs/oss.md)
 - [s3](./outputs/s3.md)
