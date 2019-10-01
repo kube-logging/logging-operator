@@ -64,6 +64,7 @@ type MountConfig struct {
 	SecretName      string
 	SecretNamespace string
 	ConfigPath      string
+	LoggingRef      string
 }
 
 func NewSecretLoader(client client.Client, namespace string, mountConfig *MountConfig) *secretLoader {
@@ -106,6 +107,21 @@ func (k *secretLoader) Mount(secret *Secret) (string, error) {
 	err = k.client.Update(context.TODO(), fluentOutputSecret)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("unable to update fluent output secret: %q", k.mountConfig.SecretName))
+	}
+	var loggingRef string
+	if k.mountConfig.LoggingRef != "" {
+		loggingRef = k.mountConfig.LoggingRef
+	} else {
+		loggingRef = "default"
+	}
+	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
+	if k8sSecret.ObjectMeta.Annotations == nil {
+		k8sSecret.ObjectMeta.Annotations = make(map[string]string)
+	}
+	k8sSecret.ObjectMeta.Annotations[annotationKey] = "watched"
+	err = k.client.Update(context.TODO(), k8sSecret)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("unable to update source secret: %q", secret.MountFrom.SecretKeyRef.Name))
 	}
 	return k.mountConfig.ConfigPath + "/" + secretKey, nil
 }

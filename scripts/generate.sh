@@ -159,7 +159,7 @@ function gen_ca {
     -key private/ca.key \
     -new -x509 -days 365 -sha256 -extensions v3_ca \
     -out certs/ca.crt \
-    -subj '/CN=logging/O=Banzai Cloud/C=US'
+    -subj '/CN=logging-ca/O=Banzai Cloud/C=HU/ST=Budapest'
 }
 
 function gen_server {
@@ -170,7 +170,7 @@ function gen_server {
   openssl req -config openssl.cnf \
     -key private/server.key \
     -new -out csr/server.csr \
-    -subj '/CN=logging/O=Banzai Cloud/C=US'
+    -subj '/CN=fluentd/O=Banzai Cloud/C=HU/ST=Budapest'
 
   echo "Generate Server certificate (fluentd)..."
   openssl ca -config openssl.cnf -outdir certs  \
@@ -179,7 +179,7 @@ function gen_server {
     -extensions server_cert -days 365 -notext -md sha256 \
     -in csr/server.csr \
     -out certs/server.crt \
-    -subj '/CN=fluentd/O=Banzai Cloud/C=US'
+    -subj '/CN=fluentd/O=Banzai Cloud/C=HU/ST=Budapest'
 }
 
 function gen_client {
@@ -191,7 +191,7 @@ function gen_client {
     -key private/client.key \
     -new \
     -out csr/client.csr \
-    -subj '/CN=fluent-bit/O=Banzai Cloud/C=US'
+    -subj '/CN=fluent-bit/O=Banzai Cloud/C=HU/ST=Budapest'
 
   echo "Generate Client certificate (fluent-bit)..."
   openssl ca -config openssl.cnf -outdir certs  \
@@ -200,7 +200,7 @@ function gen_client {
     -extensions client_cert -days 365 -notext -md sha256 \
     -in csr/client.csr \
     -out certs/client.crt \
-    -subj '/CN=fluent-bit/O=Banzai Cloud/C=US'
+    -subj '/CN=fluent-bit/O=Banzai Cloud/C=HU/ST=Budapest'
 }
 
 function install_fluentbit_secret {
