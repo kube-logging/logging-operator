@@ -20,10 +20,10 @@
 | tls_insecure_mode | bool | No |  false | Skip all verification of certificates or not. <br> |
 | tls_allow_self_signed_cert | bool | No |  false | Allow self signed certificates or not. <br> |
 | tls_verify_hostname | bool | No |  true | Verify hostname of servers and certificates or not in TLS transport. <br> |
-| tls_cert_path | string | No | - | The additional CA certificate path for TLS.<br> |
-| tls_client_cert_path | string | No | - | The client certificate path for TLS<br> |
-| tls_client_private_key_path | string | No | - | The client private key path for TLS.<br> |
-| tls_client_private_key_passphrase | string | No | - | The client private key passphrase for TLS.<br> |
+| tls_cert_path | *secret.Secret | No | - | The additional CA certificate path for TLS.<br> |
+| tls_client_cert_path | *secret.Secret | No | - | The client certificate path for TLS<br> |
+| tls_client_private_key_path | *secret.Secret | No | - | The client private key path for TLS.<br> |
+| tls_client_private_key_passphrase | *secret.Secret | No | - | The client private key passphrase for TLS.<br> |
 | tls_cert_thumbprint | string | No | - | The certificate thumbprint for searching from Windows system certstore This parameter is for Windows only.<br> |
 | tls_cert_logical_store_name | string | No | - | The certificate logical store name on Windows system certstore. This parameter is for Windows only.<br> |
 | tls_cert_use_enterprise_store | bool | No | - | Enable to use certificate enterprise store on Windows system certstore. This parameter is for Windows only.<br> |

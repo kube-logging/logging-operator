@@ -34,6 +34,9 @@ const (
 	StatefulSetName     = "fluentd"
 	ServiceName         = "fluentd"
 
+	OutputSecretName = "fluentd-output"
+	OutputSecretPath = "/fluentd/etc/secret"
+
 	bufferVolumeName   = "fluentd-buffer"
 	serviceAccountName = "fluentd"
 	roleBindingName    = "fluentd"
@@ -116,6 +119,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
+		r.outputSecretConfig,
 		r.secretConfig,
 		r.appconfigMap,
 		r.statefulset,
