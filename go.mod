@@ -10,6 +10,7 @@ require (
 	github.com/client9/misspell v0.3.4 // indirect
 	github.com/go-logr/logr v0.1.0
 	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/google/addlicense v0.0.0-20190907113143-be125746c2c4 // indirect
 	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/goph/emperror v0.17.2
 	github.com/gordonklaus/ineffassign v0.0.0-20190601041439-ed7b1b5ee0f8 // indirect

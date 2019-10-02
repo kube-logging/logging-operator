@@ -35,6 +35,7 @@ type LoggingResources struct {
 	Flows          []v1beta1.Flow
 	ClusterOutputs []v1beta1.ClusterOutput
 	ClusterFlows   []v1beta1.ClusterFlow
+	Secrets        *secret.MountSecrets
 }
 
 func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger logr.Logger) *LoggingResources {
@@ -46,16 +47,11 @@ func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger 
 		ClusterOutputs: make([]v1beta1.ClusterOutput, 0),
 		Flows:          make([]v1beta1.Flow, 0),
 		ClusterFlows:   make([]v1beta1.ClusterFlow, 0),
+		Secrets:        &secret.MountSecrets{},
 	}
 }
 
 func (l *LoggingResources) CreateModel() (*types.Builder, error) {
-	mountConfig := &secret.MountConfig{
-		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
-		SecretNamespace: l.logging.Spec.ControlNamespace,
-		ConfigPath:      fluentd.OutputSecretPath,
-		LoggingRef:      l.logging.Spec.LoggingRef,
-	}
 	forwardInput := input.NewForwardInputConfig()
 	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
@@ -70,7 +66,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
 	}
-	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, mountConfig))
+	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, fluentd.OutputSecretPath, l.Secrets))
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
@@ -109,12 +105,6 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 }
 
 func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespace string) (*types.Flow, error) {
-	mountConfig := &secret.MountConfig{
-		SecretName:      l.logging.QualifiedName(fluentd.OutputSecretName),
-		SecretNamespace: l.logging.Spec.ControlNamespace,
-		ConfigPath:      fluentd.OutputSecretPath,
-		LoggingRef:      l.logging.Spec.LoggingRef,
-	}
 	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
 	if err != nil {
 		return nil, err
@@ -128,7 +118,7 @@ FindOutputForAllRefs:
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
 				if output.Namespace == namespace && outputRef == output.Name {
-					plugin, err := plugins.CreateOutput(output.Spec, secret.NewSecretLoader(l.client, output.Namespace, mountConfig))
+					plugin, err := plugins.CreateOutput(output.Spec, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 						continue FindOutputForAllRefs
@@ -140,7 +130,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, secret.NewSecretLoader(l.client, clusterOutput.Namespace, mountConfig))
+				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 					continue FindOutputForAllRefs
@@ -156,7 +146,7 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, secret.NewSecretLoader(l.client, flowCr.Namespace, mountConfig))
+		filter, err := plugins.CreateFilter(f, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.Errorf("failed to create filter with index %d for flow %s", i, flowCr.Name))
 			continue

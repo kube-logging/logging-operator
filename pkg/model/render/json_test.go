@@ -27,7 +27,7 @@ import (
 )
 
 func TestJsonRender(t *testing.T) {
-	input, err := input.NewTailInputConfig("input.log").ToDirective(secret.NewSecretLoader(nil, "", nil))
+	input, err := input.NewTailInputConfig("input.log").ToDirective(secret.NewSecretLoader(nil, "", "", nil))
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -44,12 +44,12 @@ func TestJsonRender(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	filter, err := filter.NewStdOutFilterConfig().ToDirective(secret.NewSecretLoader(nil, "", nil))
+	filter, err := filter.NewStdOutFilterConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil))
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
 
-	nullOut, err := output.NewNullOutputConfig().ToDirective(secret.NewSecretLoader(nil, "", nil))
+	nullOut, err := output.NewNullOutputConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil))
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

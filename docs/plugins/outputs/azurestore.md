@@ -1,6 +1,6 @@
 # Azure Storage output plugin for Fluentd
 ## Overview
-Azure Storate output plugin buffers logs in local file and upload them to Azure Storage periodically.
+Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
 More info at https://github.com/htgc/fluent-plugin-azurestorage
 
 ## Configuration

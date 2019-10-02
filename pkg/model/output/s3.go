@@ -22,7 +22,6 @@ import (
 )
 
 // +docName:"Amazon S3 plugin for Fluentd"
-
 //**s3** output plugin buffers event logs in local file and upload it to S3 periodically. This plugin splits files exactly by using the time of event logs (not the time when the logs are received). For example, a log '2011-01-02 message B' is reached, and then another log '2011-01-03 message B' is reached in this order, the former one is stored in "20110102.gz" file, and latter one in "20110103.gz" file.
 type _docS3 interface{}
 
