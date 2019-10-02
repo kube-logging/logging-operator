@@ -22,8 +22,8 @@ import (
 )
 
 // +docName:"Loki output plugin "
-// Fluentd output plugin to ship logs to a Loki server.
-// More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
+//Fluentd output plugin to ship logs to a Loki server.
+//More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
 type _docLoki interface{}
 
 // +kubebuilder:object:generate=true

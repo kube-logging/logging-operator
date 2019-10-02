@@ -17,16 +17,54 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
+	"context"
+	"fmt"
+
+	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *Reconciler) outputSecretConfig() runtime.Object {
-	return &corev1.Secret{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(OutputSecretName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
-		Data: map[string][]byte{},
+func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) runtime.Object {
+	// Initialise output secret
+	fluentOutputSecret := &corev1.Secret{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      r.Logging.QualifiedName(OutputSecretName),
+			Namespace: r.Logging.Spec.ControlNamespace,
+		},
 	}
+	if fluentOutputSecret.Data == nil {
+		fluentOutputSecret.Data = make(map[string][]byte)
+	}
+
+	var loggingRef string
+	if r.Logging.Spec.LoggingRef != "" {
+		loggingRef = r.Logging.Spec.LoggingRef
+	} else {
+		loggingRef = "default"
+	}
+	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
+	for _, secret := range secrets.List() {
+		secretKey := fmt.Sprintf("%s-%s-%s", secret.Namespace, secret.Name, secret.Key)
+		secretItem := &corev1.Secret{}
+		err := r.Client.Get(context.TODO(), types.NamespacedName{
+			Name:      secret.Name,
+			Namespace: secret.Namespace}, secretItem)
+		if err != nil {
+			r.Log.Error(err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
+		}
+		value := secretItem.Data[secret.Key]
+		fluentOutputSecret.Data[secretKey] = value
+		if secretItem.ObjectMeta.Annotations == nil {
+			secretItem.ObjectMeta.Annotations = make(map[string]string)
+		}
+		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
+		err = r.ReconcileResource(secretItem)
+		if err != nil {
+			r.Log.Error(err, "failed to reconcile resource", "secret", secretItem.Name, "namespace", secretItem.Namespace)
+		}
+	}
+	return fluentOutputSecret
 }

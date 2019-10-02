@@ -22,7 +22,7 @@ import (
 )
 
 // +docName:"Aliyun OSS plugin for Fluentd"
-// **Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
+//**Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
 //
 //This plugin splits events by using the timestamp of event logs. For example,  a log '2019-04-09 message Hello' is reached, and then another log '2019-04-10 message World' is reached in this order, the former is stored in "20190409.gz" file, and latter in "20190410.gz" file.
 //
@@ -33,7 +33,7 @@ import (
 //[This document](https://help.aliyun.com/document_detail/52656.html) shows how to setup MNS and OSS event notification.
 //
 //This plugin will poll events from MNS queue and extract object keys from these events, and then will read those objects from OSS.
-// More info at https://github.com/aliyun/fluent-plugin-oss
+//More info at https://github.com/aliyun/fluent-plugin-oss
 type _docOss interface{}
 
 // +kubebuilder:object:generate=true
