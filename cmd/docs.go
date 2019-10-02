@@ -55,14 +55,14 @@ func (d *doc) checkNodes(n ast.Node) bool {
 			if ok && strings.HasPrefix(typeName.Name.Name, "_doc") {
 				d.append(fmt.Sprintf("# %s", getTypeName(generic, d.Name)))
 				d.append("## Overview")
-				d.append(getTypeDocs(generic))
+				d.append(getTypeDocs(generic, false))
 				d.append("## Configuration")
 			}
 			structure, ok := typeName.Type.(*ast.StructType)
 			if ok {
 				d.append(fmt.Sprintf("### %s", getTypeName(generic, typeName.Name.Name)))
-				if getTypeDocs(generic) != "" {
-					d.append(fmt.Sprintf("#### %s", getTypeDocs(generic)))
+				if getTypeDocs(generic, true) != "" {
+					d.append(fmt.Sprintf("#### %s", getTypeDocs(generic, true)))
 				}
 				d.append("| Variable Name | Type | Required | Default | Description |")
 				d.append("|---|---|---|---|---|")
@@ -190,14 +190,16 @@ func getTypeName(generic *ast.GenDecl, defaultName string) string {
 	return defaultName
 }
 
-func getTypeDocs(generic *ast.GenDecl) string {
+func getTypeDocs(generic *ast.GenDecl, trimSpace bool) string {
 	comment := ""
 	if generic.Doc != nil {
 		for _, line := range generic.Doc.List {
 			newLine := strings.TrimPrefix(line.Text, "//")
-			newLine = strings.TrimSpace(newLine)
-			if !strings.HasPrefix(newLine, "+kubebuilder") &&
-				!strings.HasPrefix(newLine, "+docName") {
+			if trimSpace {
+				newLine = strings.TrimSpace(newLine)
+			}
+			if !strings.HasPrefix(strings.TrimSpace(newLine), "+kubebuilder") &&
+				!strings.HasPrefix(strings.TrimSpace(newLine), "+docName") {
 				comment += newLine + "\n"
 			}
 		}
