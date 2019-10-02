@@ -205,7 +205,6 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 		}
 
 	}
-	log.Info("3")
 	err = r.Client.Delete(context.TODO(), current)
 	if err != nil {
 		return false, emperror.With(err)
