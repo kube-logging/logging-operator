@@ -182,7 +182,6 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 				return false, emperror.WrapWith(err, "getting crd failed",
 					"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))
 			}
-			//log.Info("crd not found", "resource", "servicemonitors.monitoring.coreos.com")
 			return false, nil
 
 		}
