@@ -240,7 +240,7 @@ func TestSecretErrorWhenEmpty(t *testing.T) {
 		t.Fatal("expected an error when secret contains no value or valuefrom")
 	}
 
-	expectedError := "failed to load secret for field field"
+	expectedError := "failed to load secret for field field; no value found"
 	if err.Error() != expectedError {
 		t.Fatalf("Expected `%s` got `%s`", expectedError, err.Error())
 	}
