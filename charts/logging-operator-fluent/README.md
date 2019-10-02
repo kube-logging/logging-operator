@@ -32,6 +32,7 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`            |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentbit.tolerations`                             | Fluentbit tolerations                                  | `nil`                          |
+| `fluentbit.resources`                             | Fluentbit container resource requests and limits         | `{}`                           |
 | `fluentbit.tlsSecret`                               | Secret name that contains Fluentbit TLS client cert    | Ignored if `tls.secretName` is specified. Must refer to a secret of type `kubernetes.io/tls` |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
 | `fluentd.namespace`                                 | Specified fluentd installation namespace               | same as operator namespace     |
@@ -46,6 +47,7 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentd.configReloaderImage.pullPolicy`            | Fluentd configReloaderImage container pull policy      | `IfNotPresent`                 |
 | `fluentd.fluentdPvcSpec.accessModes`                | Fluentd persistence volume access modes                | `[ReadWriteOnce]`              |
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                        | `21Gi`                         |
+| `fluentd.resources`                                 | Fluentd container resource requests and limits         | `{}`                           |
 | `fluentd.tolerations`                               | Fluentd tolerations                                    | `nil`                          |
 | `fluentd.tlsSecret`                                 | Secret name that contains Fluentd TLS client cert      | Ignored if `tls.secretName` is specified. Must refer to a secret of type `kubernetes.io/tls`. |
 | `psp.enabled`                                       | Install PodSecurityPolicy                              | `false`                        |
