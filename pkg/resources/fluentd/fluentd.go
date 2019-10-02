@@ -21,6 +21,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -51,19 +52,26 @@ var labelSelector = map[string]string{
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
-	config *string
+	config  *string
+	secrets *secret.MountSecrets
 }
 
-func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string) *Reconciler {
+func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: k8sutil.NewReconciler(client, log),
 		config:                    config,
+		secrets:                   secrets,
 	}
 }
 
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+	// Prepare output secret
+	err := r.ReconcileResource(r.outputSecret(r.secrets, OutputSecretPath))
+	if err != nil {
+		return nil, errors.WrapIf(err, "failed to reconcile resource")
+	}
 	// Config check and cleanup if enabled
 	if !r.Logging.Spec.FlowConfigCheckDisabled {
 		hash, err := r.configHash()
@@ -119,7 +127,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.outputSecretConfig,
 		r.secretConfig,
 		r.appconfigMap,
 		r.statefulset,

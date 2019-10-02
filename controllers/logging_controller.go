@@ -21,6 +21,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/model/render"
+	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
@@ -68,7 +69,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	logging = logging.SetDefaults()
 
-	fluentdConfig, err := r.clusterConfiguration(logging)
+	fluentdConfig, secretList, err := r.clusterConfiguration(logging)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -78,7 +79,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	reconcilers := make([]resources.ComponentReconciler, 0)
 
 	if logging.Spec.FluentdSpec != nil {
-		reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, logging, &fluentdConfig).Reconcile)
+		reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, logging, &fluentdConfig, secretList).Reconcile)
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
@@ -99,21 +100,21 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Logging) (string, error) {
+func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Logging) (string, *secret.MountSecrets, error) {
 	if logging.Spec.FlowConfigOverride != "" {
-		return logging.Spec.FlowConfigOverride, nil
+		return logging.Spec.FlowConfigOverride, nil, nil
 	}
 	loggingResources, err := r.GetResources(logging)
 	if err != nil {
-		return "", errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
 	builder, err := loggingResources.CreateModel()
 	if err != nil {
-		return "", errors.WrapIfWithDetails(err, "failed to create model", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to create model", "logging", logging)
 	}
 	fluentConfig, err := builder.Build()
 	if err != nil {
-		return "", errors.WrapIfWithDetails(err, "failed to build model", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", logging)
 	}
 	output := &bytes.Buffer{}
 	renderer := render.FluentRender{
@@ -122,9 +123,9 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Loggin
 	}
 	err = renderer.Render(fluentConfig)
 	if err != nil {
-		return "", errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
 	}
-	return output.String(), nil
+	return output.String(), loggingResources.Secrets, nil
 }
 
 // SetupLoggingWithManager setup logging manager
@@ -155,7 +156,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 					result := r.FindStringSubmatch(key)
 					if len(result) > 1 {
 						loggingRef := result[1]
-						// When loggingRef is default we trigger "empty" and default loggingRef as well
+						// When loggingRef is default we trigger "empty" and default loggingRef as well, because we can't use an empty string in the annotation, thus we refer to `default` in case the loggingRef is empty
 						if loggingRef == "default" {
 							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
 							loggingRef = ""

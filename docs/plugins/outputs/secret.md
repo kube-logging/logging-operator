@@ -1,6 +1,6 @@
 # Secret definition
 
-## Define secret
+## Define secret value
 
 Secrets can be used in logging-operator `Output` definitions.
 
@@ -19,4 +19,51 @@ For debug purposes you can define secret values directly. However this is *NOT* 
 ```yaml
 aws_key_id:
   value: "secretvalue"
+```
+
+## Define secret mount
+
+There are cases when you can't inject secret into the configuration because the plugin need a file to read from. For this cases you can use `mountSecret`.
+
+```yaml
+tls_cert_path:
+  valueFrom:
+    mountFrom:
+      name: <kubernetes-secret-name>
+      key: <kubernetes-secret-key>
+```
+
+The operator will collect the secret and copy it to the `fluentd-output` secret. The fluentd configuration will contain the secret path.
+
+**Example rendered configuration**
+```
+<match **>
+    @type forward
+    tls_cert_path /fluentd/etc/secret/default-fluentd-tls-tls.crt
+    ...
+</match>     
+```
+
+### How it works?
+Behind the scene the operator will mark the secret with an annotation. It will watches it for changes as long as the annotation is presented.
+
+**Example annotated secret**
+```yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  annotations:
+    logging.banzaicloud.io/default: watched
+  name: fluentd-tls
+  namespace: default
+data:
+  tls.crt: SGVsbG8gV29ybGQ=
+```
+ 
+> The annotation format is `logging.banzaicloud.io/<loggingRef>: watched`. Since the `name` part of the an annotation can't be empty the `default` applies to empty `loggingRef` value as well.
+
+The mount path is generated from the secret information
+```bash
+/fluentd/etc/secret/$namespace-$secret_name-$secret_key
 ```

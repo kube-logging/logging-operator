@@ -54,24 +54,36 @@ type SecretLoader interface {
 
 type secretLoader struct {
 	// secretLoader is limited to a single namespace, to avoid hijacking other namespace's secrets
-	namespace   string
-	client      client.Client
-	mountConfig *MountConfig
+	namespace string
+	mountPath string
+	client    client.Client
+	secrets   *MountSecrets
 }
 
-// MountConfig to attach volume secrets to Fluentd
-type MountConfig struct {
-	SecretName      string
-	SecretNamespace string
-	ConfigPath      string
-	LoggingRef      string
+type MountSecrets struct {
+	Secrets []MountSecret
 }
 
-func NewSecretLoader(client client.Client, namespace string, mountConfig *MountConfig) *secretLoader {
+func (m *MountSecrets) Append(secret MountSecret) {
+	m.Secrets = append(m.Secrets, secret)
+}
+
+func (m *MountSecrets) List() []MountSecret {
+	return m.Secrets
+}
+
+type MountSecret struct {
+	Name      string
+	Key       string
+	Namespace string
+}
+
+func NewSecretLoader(client client.Client, namespace, mountPath string, secrets *MountSecrets) *secretLoader {
 	return &secretLoader{
-		client:      client,
-		namespace:   namespace,
-		mountConfig: mountConfig,
+		client:    client,
+		mountPath: mountPath,
+		namespace: namespace,
+		secrets:   secrets,
 	}
 }
 
@@ -86,44 +98,12 @@ func (k *secretLoader) Mount(secret *Secret) (string, error) {
 			secret.MountFrom.SecretKeyRef.Name)
 	}
 	secretKey := fmt.Sprintf("%s-%s-%s", k.namespace, secret.MountFrom.SecretKeyRef.Name, secret.MountFrom.SecretKeyRef.Key)
-	value, ok := k8sSecret.Data[secret.MountFrom.SecretKeyRef.Key]
-	if !ok {
-		return "", errors.Errorf("key %q not found in secret %q in namespace %q",
-			secret.MountFrom.SecretKeyRef.Key,
-			secret.MountFrom.SecretKeyRef.Name,
-			k.namespace)
-	}
-	fluentOutputSecret := &corev1.Secret{}
-	err = k.client.Get(context.TODO(), types.NamespacedName{
-		Name:      k.mountConfig.SecretName,
-		Namespace: k.mountConfig.SecretNamespace}, fluentOutputSecret)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("unable to get fluent output secret: %q", k.mountConfig.SecretName))
-	}
-	if fluentOutputSecret.Data == nil {
-		fluentOutputSecret.Data = make(map[string][]byte)
-	}
-	fluentOutputSecret.Data[secretKey] = value
-	err = k.client.Update(context.TODO(), fluentOutputSecret)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("unable to update fluent output secret: %q", k.mountConfig.SecretName))
-	}
-	var loggingRef string
-	if k.mountConfig.LoggingRef != "" {
-		loggingRef = k.mountConfig.LoggingRef
-	} else {
-		loggingRef = "default"
-	}
-	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
-	if k8sSecret.ObjectMeta.Annotations == nil {
-		k8sSecret.ObjectMeta.Annotations = make(map[string]string)
-	}
-	k8sSecret.ObjectMeta.Annotations[annotationKey] = "watched"
-	err = k.client.Update(context.TODO(), k8sSecret)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("unable to update source secret: %q", secret.MountFrom.SecretKeyRef.Name))
-	}
-	return k.mountConfig.ConfigPath + "/" + secretKey, nil
+	k.secrets.Append(MountSecret{
+		Name:      secret.MountFrom.SecretKeyRef.Name,
+		Key:       secret.MountFrom.SecretKeyRef.Key,
+		Namespace: k.namespace,
+	})
+	return k.mountPath + "/" + secretKey, nil
 }
 
 func (k *secretLoader) Load(secret *Secret) (string, error) {
