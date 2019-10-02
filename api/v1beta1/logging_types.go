@@ -92,6 +92,12 @@ func (l *Logging) SetDefaults() *Logging {
 			if copy.Spec.FluentdSpec.Metrics.Port == 0 {
 				copy.Spec.FluentdSpec.Metrics.Port = 24231
 			}
+			if copy.Spec.FluentdSpec.Metrics.Timeout == "" {
+				copy.Spec.FluentdSpec.Metrics.Timeout = "30s"
+			}
+			if copy.Spec.FluentdSpec.Metrics.Interval == "" {
+				copy.Spec.FluentdSpec.Metrics.Interval = "15s"
+			}
 
 			if copy.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
 
@@ -181,6 +187,12 @@ func (l *Logging) SetDefaults() *Logging {
 			}
 			if copy.Spec.FluentbitSpec.Metrics.Port == 0 {
 				copy.Spec.FluentbitSpec.Metrics.Port = 2020
+			}
+			if copy.Spec.FluentbitSpec.Metrics.Timeout == "" {
+				copy.Spec.FluentbitSpec.Metrics.Timeout = "30s"
+			}
+			if copy.Spec.FluentbitSpec.Metrics.Interval == "" {
+				copy.Spec.FluentbitSpec.Metrics.Interval = "15s"
 			}
 			if copy.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
 

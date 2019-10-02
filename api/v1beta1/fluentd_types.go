@@ -44,25 +44,3 @@ type FluentdTLS struct {
 	SecretName string `json:"secretName"`
 	SharedKey  string `json:"sharedKey,omitempty"`
 }
-
-// GetPrometheusPortFromAnnotation gets the port value from annotation
-//func (spec FluentdSpec) GetPrometheusPortFromAnnotation() int32 {
-//	var err error
-//	var port int64
-//	if spec.Annotations != nil {
-//		port, err = strconv.ParseInt(spec.Annotations["prometheus.io/port"], 10, 32)
-//		if err != nil {
-//			return 0
-//		}
-//	}
-//	return int32(port)
-//}
-//
-//func (spec FluentdSpec) GetPrometheusPathFromAnnotation() string {
-//	var path string
-//	if spec.Annotations != nil {
-//		path = spec.Annotations["prometheus.io/path"]
-//
-//	}
-//	return path
-//}
