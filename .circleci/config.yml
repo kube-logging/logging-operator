@@ -5,6 +5,7 @@ version: 2.1
 
 orbs:
   helm: banzaicloud/helm@0.0.5
+  docker: circleci/docker@0.5.13
 
 
 jobs:
@@ -153,6 +154,60 @@ jobs:
           command: |
             hack/test.sh
 
+  docker-release:
+    executor:
+      name: docker/machine
+      dlc: true
+    parameters:
+      tag:
+        default: $CIRCLE_SHA1
+        description: 'Image tag'
+        type: string
+      extra_build_args:
+        default: ''
+        description: >
+          Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+        type: string
+      image:
+        description: Name of image to build
+        type: string
+      registry:
+        default: docker.io
+        description:
+          Name of registry to use, defaults to docker.io
+        type: string
+    steps:
+      - checkout
+      - docker/check
+      - docker/build:
+          extra_build_args: <<parameters.extra_build_args>>
+          registry: <<parameters.registry>>
+          image: <<parameters.image>>
+          tag: $CIRCLE_SHA1
+      - run:
+          name: Tag release
+          command: |
+            docker tag <<parameters.image>>:$CIRCLE_SHA1 <<parameters.registry>>/<<parameters.image>>:<<parameters.tag>>
+      - docker/push:
+          registry: <<parameters.registry>>
+          image: <<parameters.image>>
+          tag: <<parameters.tag>>
+      - run:
+          name: Check version
+          command: |
+            if ! echo "${CIRCLE_TAG}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo 'Unstable version. Skipping further steps.'
+              circleci step halt
+            fi
+      - run:
+          name: Tag latest
+          command: |
+            docker tag <<parameters.image>>:$CIRCLE_SHA1 <<parameters.registry>>/<<parameters.image>>:latest
+      - docker/push:
+          registry: <<parameters.registry>>
+          image: <<parameters.image>>
+          tag: latest
+
 workflows:
   version: 2
   build:
@@ -161,6 +216,31 @@ workflows:
       - e2e-test:
           requires:
             - build
+      - docker/publish:
+          name: Publish master docker image
+          executor:
+            name: docker/machine
+            dlc: true
+          context: dockerhub
+          deploy: true
+          image: banzaicloud/logging-operator
+          tag: master
+          requires:
+            - e2e-test
+          filters:
+            branches:
+              only: master
+      - docker-release:
+          name: Publish tagged & latest docker image
+          context: dockerhub
+          image: banzaicloud/logging-operator
+          tag: $CIRCLE_TAG
+          filters:
+            tags:
+              only: /^[0-9]+\.[0-9]+\.[0-9]+(?:-(?:dev|rc)\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+
   helm-chart:
     jobs:
       - helm/lint-chart:
