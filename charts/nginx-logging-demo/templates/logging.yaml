@@ -1,11 +1,12 @@
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
-  name: {{ include "nginx-logging-loki-demo.fullname" . }}-logging
+  name: {{ include "nginx-logging-demo.fullname" . }}-logging
 spec:
   fluentd:
     {{- toYaml .Values.loggingOperator.fluentd | nindent 6 }}
 
   fluentbit:
     {{- toYaml .Values.loggingOperator.fluentbit | nindent 6 }}
+
   controlNamespace: {{ .Release.Namespace }}

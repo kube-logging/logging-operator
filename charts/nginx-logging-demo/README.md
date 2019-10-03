@@ -1,5 +1,5 @@
 
-# Logging Operator Nginx & Elasticsearch output demonstration Chart 
+# Logging Operator Nginx DemoApp with Minio (local S3-compatible object store) output  
 
 [Logging Operator](https://github.com/banzaicloud/logging-operator) is a managed centralized logging component based on fluentd and fluent-bit.
 ## tl;dr:
@@ -7,7 +7,7 @@
 ```bash
 $ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com/
 $ helm repo update
-$ helm install banzaicloud-stable/nginx-logging-es-demo
+$ helm install banzaicloud-stable/nginx-logging-demo
 ```
 
 ## Introduction
@@ -24,7 +24,7 @@ This chart demonstrates the use of the  [Logging Operator](https://github.com/ba
 To install the chart with the release name `log-test-nginx`:
 
 ```bash
-$ helm install --name log-test-nginx banzaicloud-stable/nginx-logging-es-demo
+$ helm install --name log-test-nginx banzaicloud-stable/nginx-logging-demo
 ```
 ## Uninstalling the Chart
 
@@ -38,7 +38,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration
 
-The following tables lists the configurable parameters of the nginx-logging-es-demo chart and their default values.
+The following tables lists the configurable parameters of the nginx-logging-demo chart and their default values.
 
 |                          Parameter                        |                        Description                      |     Default    |
 | --------------------------------------------------------- | ------------------------------------------------------- | -------------- |
@@ -69,7 +69,7 @@ The following tables lists the configurable parameters of the nginx-logging-es-d
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```bash
-$ helm install --name my-release -f values.yaml banzaicloud-stable/nginx-logging-es-demo
+$ helm install --name my-release -f values.yaml banzaicloud-stable/nginx-logging-demo
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
