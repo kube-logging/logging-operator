@@ -18,7 +18,7 @@ spec:
   image: {{ toYaml .Values.fluentd.image | nindent 4 }}
   volumeModImage: {{ toYaml .Values.fluentd.volumeModImage | nindent 4 }}
   configReloaderImage: {{ toYaml .Values.fluentd.configReloaderImage | nindent 4 }}
-  resources: {}
+  resources: {{ toYaml .Values.fluentd.resources | nindent 4 }}
   fluentdPvcSpec: {{ toYaml .Values.fluentd.fluentdPvcSpec | nindent 4 }}
   {{- if .Values.fluentd.tolerations }}
   tolerations: {{ toYaml .Values.fluentd.tolerations | nindent 4 }}

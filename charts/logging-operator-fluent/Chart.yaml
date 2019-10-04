@@ -1,7 +1,7 @@
 apiVersion: v1
 description: Logging operator CR for Fluentd and Fluent-bit.
 name: logging-operator-fluent
-version: 1.0.0
+version: 1.0.1
 home: https://github.com/banzaicloud/logging-operator
 icon: https://banzaicloud.com/img/banzai-cloud-logo.png
 keywords:

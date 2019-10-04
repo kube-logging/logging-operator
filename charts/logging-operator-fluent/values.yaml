@@ -16,6 +16,13 @@ fluentbit:
     repository: "fluent/fluent-bit"
     pullPolicy: "IfNotPresent"
   tlsSecret: ""
+  resources: {}
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 100m
+#    memory: 128Mi
 
 fluentd:
   enabled: true
@@ -40,6 +47,13 @@ fluentd:
       requests:
         storage: 21Gi
   tlsSecret: ""
+  resources: {}
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 100m
+#    memory: 128Mi
 
 psp:
   enabled: false

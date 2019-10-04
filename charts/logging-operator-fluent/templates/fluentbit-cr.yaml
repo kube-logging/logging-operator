@@ -16,7 +16,7 @@ spec:
     prometheus.io/path:   "/api/v1/metrics/prometheus"
     prometheus.io/port:   "2020"
   image: {{ toYaml .Values.fluentbit.image | nindent 4 }}
-  resources: {}
+  resources: {{ toYaml .Values.fluentbit.resources | nindent 4 }}
   {{- if .Values.fluentbit.tolerations }}
   tolerations: {{ toYaml .Values.fluentbit.tolerations | nindent 4 }}
   {{- end }}
