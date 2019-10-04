@@ -40,7 +40,7 @@ func generataLoggingRefLabels(loggingRef string) map[string]string {
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentd"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+		"app.kubernetes.io/name": "fluentbit"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
 // Reconciler holds info what resource to reconcile
