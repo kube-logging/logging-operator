@@ -4,17 +4,36 @@
 
 <p align="center"><img src="./img/monitor.png" width="900"></p>
 
+---
+## Contents
+- Installation
+  - Prometheus Operator
+    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
+  - Logging Operator
+    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
+    - [Deploy with Kuberenetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+  - Demo Application  
+    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
+    - [Deploy with Kuberenetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+- Validation
+    - [Prometheus Dashboard](./docs/deploy/README.md#deploy-logging-operator-with-helm)
+    - [Minio Dashboard](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Grafana Dashboard](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+---
+
+
+## Install Prometheus Operator with Helm 
+
 ### Create `logging` namespace
 ```bash
 kubectl create namespace logging
 ```
-
-
-> [Prometheus Operator Documentation](https://github.com/coreos/prometheus-operator)
-### Install Prometheus Operator with Helm 
+### Install Prometheus Operator
 ```bash
 helm install --namespace logging --name monitor stable/prometheus-operator 
 ```
+> [Prometheus Operator Documentation](https://github.com/coreos/prometheus-operator)
+
 > The prometheus-operator install may take a few more minutes. *Please be patient.* 
 > The logging-operator metrics function depends on the prometheus-operator's resources.
 > If those do not exist in the cluster it may cause the logging-operator's malfunction.
@@ -122,7 +141,7 @@ spec:
 EOF
 ```
 
-#### Install nginx deployment
+#### Install nginx demo deployment
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: apps/v1 
@@ -168,8 +187,14 @@ spec:
 EOF
 ```
 
+## Validation
 
-#### Forward Prometheus Service
+### Minio
+#### Get Minio login credantials
+```bash
+kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base64d)'
+```
+#### Forward Service
 ```bash
 kubectl -n logging port-forward svc/grafana 3000:80
 ```
@@ -177,15 +202,21 @@ kubectl -n logging port-forward svc/grafana 3000:80
 <p align="center"><img src="./img/loki1.png" width="660"></p>
 
 
+### Prometheus
+#### Forward Service
+```bash
+kubectl -n logging port-forward svc/grafana 3000:80
+```
+[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
+<p align="center"><img src="./img/loki1.png" width="660"></p>
 
-### Grafana Dashboard
 
-#### Get Minio login credantials
+### Grafana 
+#### Get Grafana login credantials
 ```bash
 kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base64d)'
 ```
-
-#### Forward Minio Service
+#### Forward Service
 ```bash
 kubectl -n logging port-forward svc/grafana 3000:80
 ```
