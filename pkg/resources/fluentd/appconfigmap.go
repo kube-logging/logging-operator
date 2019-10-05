@@ -90,10 +90,15 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 	}
 
 	checkSecret := r.newCheckSecret(hashKey)
+	checkOutputSecret := r.newCheckOutputSecret(hashKey)
 
 	err = r.Client.Create(context.TODO(), checkSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create secret for fluentd configcheck")
+	}
+	err = r.Client.Create(context.TODO(), checkOutputSecret)
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return nil, errors.WrapIf(err, "failed to create output secret for fluentd configcheck")
 	}
 
 	err = r.Client.Create(context.TODO(), pod)
@@ -115,6 +120,13 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 			if !apierrors.IsNotFound(err) {
 				multierr = errors.Combine(multierr,
 					errors.Wrapf(err, "failed to remove config check secret %s", configHash))
+				continue
+			}
+		}
+		if err := r.Client.Delete(context.TODO(), r.newCheckOutputSecret(configHash)); err != nil {
+			if !apierrors.IsNotFound(err) {
+				multierr = errors.Combine(multierr,
+					errors.Wrapf(err, "failed to remove config check output secret %s", configHash))
 				continue
 			}
 		}
@@ -143,6 +155,19 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	}
 }
 
+func (r *Reconciler) newCheckOutputSecret(hashKey string) *v1.Secret {
+	obj := r.outputSecret(r.secrets, OutputSecretPath)
+	if secret, ok := obj.(*v1.Secret); ok {
+		secret.ObjectMeta = templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
+			util.MergeLabels(r.Logging.Labels, labelSelector),
+			r.Logging)
+		return secret
+	}
+	r.Log.Error(fmt.Errorf("output secret is invalid"), "unable to create output secret for config check")
+	return nil
+}
+
 func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 	pod := &v1.Pod{
 		ObjectMeta: templates.FluentdObjectMeta(
@@ -158,6 +183,14 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 					VolumeSource: v1.VolumeSource{
 						Secret: &v1.SecretVolumeSource{
 							SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
+						},
+					},
+				},
+				{
+					Name: "output-secret",
+					VolumeSource: v1.VolumeSource{
+						Secret: &v1.SecretVolumeSource{
+							SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
 						},
 					},
 				},
@@ -177,6 +210,10 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 						{
 							Name:      "config",
 							MountPath: "/fluentd/etc/",
+						},
+						{
+							Name:      "output-secret",
+							MountPath: OutputSecretPath,
 						},
 					},
 				},
@@ -198,7 +235,6 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 			MountPath: "/fluentd/tls/",
 		}
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
-
 	}
 	return pod
 }

@@ -67,11 +67,6 @@ func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config
 
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	// Prepare output secret
-	err := r.ReconcileResource(r.outputSecret(r.secrets, OutputSecretPath))
-	if err != nil {
-		return nil, errors.WrapIf(err, "failed to reconcile resource")
-	}
 	// Config check and cleanup if enabled
 	if !r.Logging.Spec.FlowConfigCheckDisabled {
 		hash, err := r.configHash()
@@ -122,7 +117,18 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			}
 		}
 	}
-
+	// Prepare output secret
+	err := r.ReconcileResource(r.outputSecret(r.secrets, OutputSecretPath))
+	if err != nil {
+		return nil, errors.WrapIf(err, "failed to reconcile resource")
+	}
+	// Mark watched secrets
+	for _, obj := range r.markSecrets(r.secrets) {
+		err := r.ReconcileResource(obj)
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to reconcile resource")
+		}
+	}
 	for _, res := range []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,

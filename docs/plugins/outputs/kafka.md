@@ -1,6 +1,6 @@
 # Kafka output plugin for Fluentd
 ## Overview
-More info at https://github.com/uken/fluent-plugin-elasticsearch
+ More info at https://github.com/uken/fluent-plugin-elasticsearch
 
 ## Configuration
 ### Kafka

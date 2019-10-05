@@ -45,7 +45,7 @@ The operator will collect the secret and copy it to the `fluentd-output` secret.
 ```
 
 ### How it works?
-Behind the scene the operator will mark the secret with an annotation. It will watches it for changes as long as the annotation is presented.
+Behind the scene the operator marks the secret with an annotation and watches it for changes as long as the annotation is present.
 
 **Example annotated secret**
 ```yaml
