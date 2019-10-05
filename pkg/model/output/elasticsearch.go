@@ -58,6 +58,8 @@ type ElasticsearchOutput struct {
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty"`
 	// Set the Logstash date format.(default: %Y.%m.%d)
 	LogstashDateformat string `json:"logstash_dateformat,omitempty"`
+	// Set the index type for elasticsearch. This is the fallback if `target_type_key` is missing. (default: fluentd)
+	TypeName string `json:"type_name,omitempty"`
 	// This param is to set a pipeline id of your elasticsearch to be added into the request, you can configure ingest node.
 	Pipeline string `json:"pipeline,omitempty"`
 	// The format of the time stamp field (@timestamp or what you specify with time_key). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to.
