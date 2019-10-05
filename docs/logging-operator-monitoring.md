@@ -58,7 +58,7 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
     --set=loggingOperator.fluentd.metrics.serviceMonitor=True \
     --set=loggingOperator.fluentbit.metrics.serviceMonitor=True
 ```
-
+---
 ## Install from manifest
 
 #### Create `logging` resource
@@ -80,11 +80,11 @@ EOF
 ```
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
-#### Create an Minio Secret
+#### Create Minio Credential Secret
 ```bash
 ANYAD
 ```
-#### Create an Minio output definition 
+#### Create Minio output definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -196,18 +196,18 @@ kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base
 ```
 #### Forward Service
 ```bash
-kubectl -n logging port-forward svc/grafana 3000:80
+kubectl -n logging port-forward svc/nginx-demo-minio 9000
 ```
-[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
+[Minio Dashboard: http://localhost:9000](http://localhost:9000)
 <p align="center"><img src="./img/loki1.png" width="660"></p>
 
 
 ### Prometheus
 #### Forward Service
 ```bash
-kubectl -n logging port-forward svc/grafana 3000:80
+kubectl port-forward svc/monitor-prometheus-operato-prometheus 9090
 ```
-[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
+[Prometheus Dashboard: http://localhost:9090](http://localhost:9090)
 <p align="center"><img src="./img/loki1.png" width="660"></p>
 
 
