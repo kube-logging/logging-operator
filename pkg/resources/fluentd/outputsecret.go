@@ -27,6 +27,32 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) []runtime.Object {
+	var loggingRef string
+	if r.Logging.Spec.LoggingRef != "" {
+		loggingRef = r.Logging.Spec.LoggingRef
+	} else {
+		loggingRef = "default"
+	}
+	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
+	var markedSecrets []runtime.Object
+	for _, secret := range secrets.List() {
+		secretItem := &corev1.Secret{}
+		err := r.Client.Get(context.TODO(), types.NamespacedName{
+			Name:      secret.Name,
+			Namespace: secret.Namespace}, secretItem)
+		if err != nil {
+			r.Log.Error(err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
+		}
+		if secretItem.ObjectMeta.Annotations == nil {
+			secretItem.ObjectMeta.Annotations = make(map[string]string)
+		}
+		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
+		markedSecrets = append(markedSecrets, secretItem)
+	}
+	return markedSecrets
+}
+
 func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) runtime.Object {
 	// Initialise output secret
 	fluentOutputSecret := &corev1.Secret{
@@ -38,14 +64,6 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 	if fluentOutputSecret.Data == nil {
 		fluentOutputSecret.Data = make(map[string][]byte)
 	}
-
-	var loggingRef string
-	if r.Logging.Spec.LoggingRef != "" {
-		loggingRef = r.Logging.Spec.LoggingRef
-	} else {
-		loggingRef = "default"
-	}
-	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
 	for _, secret := range secrets.List() {
 		secretKey := fmt.Sprintf("%s-%s-%s", secret.Namespace, secret.Name, secret.Key)
 		secretItem := &corev1.Secret{}
@@ -57,14 +75,6 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 		}
 		value := secretItem.Data[secret.Key]
 		fluentOutputSecret.Data[secretKey] = value
-		if secretItem.ObjectMeta.Annotations == nil {
-			secretItem.ObjectMeta.Annotations = make(map[string]string)
-		}
-		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
-		err = r.ReconcileResource(secretItem)
-		if err != nil {
-			r.Log.Error(err, "failed to reconcile resource", "secret", secretItem.Name, "namespace", secretItem.Namespace)
-		}
 	}
 	return fluentOutputSecret
 }
