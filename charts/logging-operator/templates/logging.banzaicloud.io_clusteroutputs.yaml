@@ -698,6 +698,10 @@ spec:
                     degree of sub-second time precision to preserve from the time
                     portion of the routed event.
                   type: string
+                type_name:
+                  description: 'Set the index type for elasticsearch. This is the
+                    fallback if `target_type_key` is missing. (default: fluentd)'
+                  type: string
                 unrecoverable_error_types:
                   description: Default unrecoverable_error_types parameter is set
                     up strictly. Because es_rejected_execution_exception is caused
@@ -1621,7 +1625,6 @@ spec:
             loggingRef:
               type: string
             loki:
-              description: Fluentd output plugin to ship logs to a Loki server.
               properties:
                 buffer:
                   properties:

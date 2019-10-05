@@ -4,6 +4,7 @@
 ### filters
 
 - [dedot](./filters/dedot.md)
+- [geoip](./filters/geoip.md)
 - [parser](./filters/parser.md)
 - [record_transformer](./filters/record_transformer.md)
 - [stdout](./filters/stdout.md)

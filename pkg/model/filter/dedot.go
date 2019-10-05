@@ -21,6 +21,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/model/types"
 )
 
+// +kubebuilder:object:generate=true
+
 // +docName:"Fluentd Filter plugin to de-dot field name for elasticsearch."
 // More info at https://github.com/lunardial/fluent-plugin-dedot_filter
 type DedotFilterConfig struct {

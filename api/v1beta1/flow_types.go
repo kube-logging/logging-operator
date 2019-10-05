@@ -34,6 +34,7 @@ type Filter struct {
 	TagNormaliser     *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
 	Dedot             *filter.DedotFilterConfig  `json:"dedot,omitempty"`
 	RecordTransformer *filter.RecordTransformer  `json:"record_transformer,omitempty"`
+	GeoIP             *filter.GeoIP              `json:"geoip,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
