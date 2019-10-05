@@ -53,6 +53,36 @@ spec:
                         description: Separator (default:_)
                         type: string
                     type: object
+                  geoip:
+                    properties:
+                      backend_library:
+                        description: Specify backend library (geoip2_c, geoip, geoip2_compat)
+                        type: string
+                      geoip_2_database:
+                        description: Specify optional geoip2 database (using bundled
+                          GeoLite2-City.mmdb by default)
+                        type: string
+                      geoip_database:
+                        description: Specify optional geoip database (using bundled
+                          GeoLiteCity databse by default)
+                        type: string
+                      geoip_lookup_keys:
+                        description: 'Specify one or more geoip lookup field which
+                          has ip address (default: host)'
+                        type: string
+                      records:
+                        items:
+                          additionalProperties:
+                            type: string
+                          description: Parameters inside record directives are considered
+                            to be new key-value pairs
+                          type: object
+                        type: array
+                      skip_adding_null_record:
+                        description: To avoid get stacktrace error with `[null, null]`
+                          array for elasticsearch.
+                        type: boolean
+                    type: object
                   parser:
                     description: https://docs.fluentd.org/filter/parser
                     properties:
