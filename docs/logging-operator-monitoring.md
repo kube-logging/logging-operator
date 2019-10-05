@@ -6,19 +6,19 @@
 
 ---
 ## Contents
-- Installation
+- **Installation**
   - Prometheus Operator
-    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
-  - Logging Operator
-    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
-    - [Deploy with Kuberenetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-  - Demo Application  
-    - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
-    - [Deploy with Kuberenetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-- Validation
-    - [Prometheus Dashboard](./docs/deploy/README.md#deploy-logging-operator-with-helm)
-    - [Minio Dashboard](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-    - [Grafana Dashboard](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Deploy with Helm](#install-prometheus-operator-with-helm)
+  - **Logging Operator**
+    - [Deploy with Helm](#install-with-helm)
+    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+  - **Demo Application**  
+    - [Deploy with Helm](#deploy-demo-nginx-app--logging-definition-with-metrics)
+    - [Deploy with Kuberenetes Manifests](#install-from-manifest)
+- **Validation**
+    - [Prometheus Dashboard](#prometheus)
+    - [Minio Dashboard](#minio)
+    - [Grafana Dashboard](#grafana)
 ---
 
 
@@ -34,11 +34,11 @@ helm install --namespace logging --name monitor stable/prometheus-operator
 ```
 > [Prometheus Operator Documentation](https://github.com/coreos/prometheus-operator)
 
-> The prometheus-operator install may take a few more minutes. *Please be patient.* 
+> The prometheus-operator install may take a few more minutes. ***Please be patient.*** 
 > The logging-operator metrics function depends on the prometheus-operator's resources.
 > If those do not exist in the cluster it may cause the logging-operator's malfunction.
 
-
+---
 ## Install with Helm 
 
 ### Add operator chart repository:
@@ -50,9 +50,9 @@ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 ```bash
 helm install --namespace logging --name logging banzaicloud-stable/logging-operator
 ```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+> You also can install logging-operator from manifest [guideline is here](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
-### Demo Nginx App + Logging Definition with metrics
+### Deploy demo Nginx App + Logging Definition with metrics
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
     --set=loggingOperator.fluentd.metrics.serviceMonitor=True \
