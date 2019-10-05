@@ -1,0 +1,25 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: geoip-sample
+spec:
+  filters:
+    - tag_normaliser:
+        format: ${namespace_name}.${pod_name}.${container_name}
+    - parser:
+        key_name: message
+        remove_key_name_field: true
+        parsers:
+          - type: nginx
+    - geoip:
+        records:
+          - city: ${city.names.en["remote"]}
+            latitude: ${location.latitude["remote"]}
+            longitude: ${location.longitude["remote"]}
+            country: ${country.iso_code["remote"]}
+            country_name: ${country.names.en["remote"]}
+            postal_code:  ${postal.code["remote"]}
+  outputRefs:
+    - forward-output-sample
+  selectors:
+    app: nginx
