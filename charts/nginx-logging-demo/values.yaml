@@ -33,7 +33,6 @@ ingress:
 loggingOperator:
   fluentd: {}
 #    metrics:
-#      enabled: false
 #      serviceMonitor: false
 #      prometheusAnnotations: false
 #      port: 24231
@@ -43,7 +42,6 @@ loggingOperator:
 
   fluentbit: {}
 #    metrics:
-#      enabled: false
 #      serviceMonitor: false
 #      prometheusAnnotations: false
 #      port: 2020

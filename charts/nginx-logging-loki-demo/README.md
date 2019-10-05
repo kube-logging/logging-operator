@@ -51,14 +51,12 @@ The following tables lists the configurable parameters of the nginx-logging-loki
 | `resources`                                               | CPU/Memory resource requests/limits                     | `{}`            |
 | `tolerations`                                             | Node Tolerations                                        | `[]`            |
 | `nodeSelector`                                            | Define which Nodes the Pods are scheduled on.           | `{}`            |
-| `loggingOperator.fluentd.metrics.enabled`                 | Enable Logging-Operator metrics function                | `false`         |
 | `loggingOperator.fluentd.metrics.serviceMonitor`          | Enable to create ServiceMonitor for Prometheus operator | `false`         |
 | `loggingOperator.fluentd.metrics.prometheusAnnotations`   | Add prometheus labes to fluent pods.                    | `false`         |
 | `loggingOperator.fluentd.metrics.port`                    | Metrics Port.                                           | ``              |
 | `loggingOperator.fluentd.metrics.path`                    | Metrics Path                                            | ``              |
 | `loggingOperator.fluentd.metrics.timeout`                 | Scrape timeout.                                         | ``              |
 | `loggingOperator.fluentd.metrics.interval`                | Scrape interval.                                        | ``              |
-| `loggingOperator.fluentbit.metrics.enabled`               | Enable Logging-Operator metrics function                | `false`         |
 | `loggingOperator.fluentbit.metrics.serviceMonitor`        | Enable to create ServiceMonitor for Prometheus operator | `false`         |
 | `loggingOperator.fluentbit.metrics.prometheusAnnotations` | Add prometheus labes to fluent pods.                    | `false`         |
 | `loggingOperator.fluentbit.metrics.port`                  | Metrics Port.                                           | ``              |

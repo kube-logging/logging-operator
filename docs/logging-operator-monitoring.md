@@ -1,8 +1,8 @@
-<p align="center"><img src="./img/nll.png" width="340"></p>
+<p align="center"><img src="./img/lo-pro.png" width="340"></p>
 
 # Monitor your logging pipeline with Prometheus Operator
 
-<p align="center"><img src="./img/nginx-loki.png" width="900"></p>
+<p align="center"><img src="./img/monitor.png" width="900"></p>
 
 ### Create `logging` namespace
 ```bash
@@ -11,10 +11,13 @@ kubectl create namespace logging
 
 
 > [Prometheus Operator Documentation](https://github.com/coreos/prometheus-operator)
-### Install Prometheus Operator with Helm
+### Install Prometheus Operator with Helm 
 ```bash
-helm install --namespace logging stable/prometheus-operator 
+helm install --namespace logging --name monitor stable/prometheus-operator 
 ```
+> The prometheus-operator install may take a few more minutes. *Please be patient.* 
+> The logging-operator metrics function depends on the prometheus-operator's resources.
+> If those do not exist in the cluster it may cause the logging-operator's malfunction.
 
 
 ## Install with Helm 
@@ -33,8 +36,8 @@ helm install --namespace logging --name logging banzaicloud-stable/logging-opera
 ### Demo Nginx App + Logging Definition with metrics
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
-    --set=loggingOperator.fluentd.metrics.enabled=True \
-    --set=loggingOperator.fluentbit.metrics.enabled=True
+    --set=loggingOperator.fluentd.metrics.serviceMonitor=True \
+    --set=loggingOperator.fluentbit.metrics.serviceMonitor=True
 ```
 
 ## Install from manifest
@@ -48,30 +51,49 @@ metadata:
   name: default-logging-simple
 spec:
   fluentd:
-    metics: {}
+    metics:
+      serviceMonitor: true
   fluentbit:
-    metics: {}
+    metics:
+      serviceMonitor: true
   controlNamespace: logging
 EOF
 ```
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
-
-#### Create an Loki output definition 
+#### Create an Minio Secret
+```bash
+ANYAD
+```
+#### Create an Minio output definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
-  name: loki-output
+  name: demo-output
 spec:
-  loki:
-    url: http://loki:3100
+  s3:
+    aws_key_id:
+      valueFrom:
+        secretKeyRef:
+          key: accesskey
+          name: logging-s3
+    aws_sec_key:
+      valueFrom:
+        secretKeyRef:
+          key: secretkey
+          name: logging-s3
     buffer:
       path: /tmp/buffer
-      timekey: 1m
-      timekey_wait: 30s
+      timekey: 10s
       timekey_use_utc: true
+      timekey_wait: 0s
+    force_path_style: "true"
+    path: logs/${tag}/%Y/%m/%d/
+    s3_bucket: demo
+    s3_endpoint: http://nginx-demo-minio.logging.svc.cluster.local:9000
+    s3_region: test_region
 EOF
 ```
 > Note: For production set-up we recommend using longer `timekey` interval to avoid generating too many object.
@@ -82,7 +104,7 @@ cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
-  name: loki-flow
+  name: demo-flow
 spec:
   filters:
     - tag_normaliser: {}
@@ -93,9 +115,10 @@ spec:
         parsers:
           - type: nginx
   selectors:
-    app: nginx
+    app.kubernetes.io/instance: nginx-demo
+    app.kubernetes.io/name: nginx-logging-demo
   outputRefs:
-    - loki-output
+    - demo-output
 EOF
 ```
 
@@ -109,7 +132,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: nginx
+      app.kubernetes.io/instance: nginx-demo
+      app.kubernetes.io/name: nginx-logging-demo 
   replicas: 1
   template:
     metadata:
