@@ -1860,7 +1860,6 @@ spec:
               required:
               - brokers
               - format
-              - sasl_over_ssl
               type: object
             loggingRef:
               type: string

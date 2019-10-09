@@ -8,7 +8,6 @@ metadata:
 spec:
   kafka:
     brokers: kafka-headless.kafka.svc.cluster.local:29092
-    sasl_over_ssl: false
     default_topic: topic
     format:
       type: json

@@ -51,7 +51,6 @@ spec:
   kafka:
     brokers: kafka-headless.kafka.svc.cluster.local:29092
     default_topic: topic
-    sasl_over_ssl: false
     format: 
       type: json    
     buffer:
