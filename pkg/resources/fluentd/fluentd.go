@@ -35,6 +35,8 @@ const (
 	AppConfigKey        = "fluentd.conf"
 	StatefulSetName     = "fluentd"
 	ServiceName         = "fluentd"
+	OutputSecretName    = "fluentd-output"
+	OutputSecretPath    = "/fluentd/secret"
 
 	bufferVolumeName   = "fluentd-buffer"
 	serviceAccountName = "fluentd"
@@ -122,8 +124,9 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		return nil, errors.WrapIf(err, "failed to reconcile resource")
 	}
 	// Mark watched secrets
-	for _, obj := range r.markSecrets(r.secrets) {
-		err := r.ReconcileResource(obj)
+	secretList, state := r.markSecrets(r.secrets)
+	for _, obj := range secretList {
+		err := r.ReconcileResource(obj, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
 		}

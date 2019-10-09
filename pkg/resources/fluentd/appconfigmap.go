@@ -157,11 +157,11 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) *v1.Secret {
-	obj := r.outputSecret(r.secrets, OutputSecretPath)
+	obj, _ := r.outputSecret(r.secrets, OutputSecretPath)
 	if secret, ok := obj.(*v1.Secret); ok {
 		secret.ObjectMeta = templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
-			util.MergeLabels(r.Logging.Labels, labelSelector),
+			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 			r.Logging)
 		return secret
 	}

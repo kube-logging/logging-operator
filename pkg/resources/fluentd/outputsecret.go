@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,7 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) []runtime.Object {
+func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object, k8sutil.DesiredState) {
 	var loggingRef string
 	if r.Logging.Spec.LoggingRef != "" {
 		loggingRef = r.Logging.Spec.LoggingRef
@@ -50,10 +51,10 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) []runtime.Object 
 		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
 		markedSecrets = append(markedSecrets, secretItem)
 	}
-	return markedSecrets
+	return markedSecrets, k8sutil.StatePresent
 }
 
-func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) runtime.Object {
+func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, k8sutil.DesiredState) {
 	// Initialise output secret
 	fluentOutputSecret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
@@ -76,5 +77,5 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 		value := secretItem.Data[secret.Key]
 		fluentOutputSecret.Data[secretKey] = value
 	}
-	return fluentOutputSecret
+	return fluentOutputSecret, k8sutil.StatePresent
 }
