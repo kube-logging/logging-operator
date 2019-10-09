@@ -79,7 +79,7 @@ type KafkaOutputConfig struct {
 	Idempotent bool `json:"idempotent,omitempty"`
 	// SASL over SSL (default: true)
 	SaslOverSSL bool `json:"sasl_over_ssl"`
-	// Number of times to retry sending of m essages to a leader (default: 1)
+	// Number of times to retry sending of messages to a leader (default: 1)
 	MaxSendRetries int `json:"max_send_retries,omitempty"`
 	// The number of acks required per request (default: -1).
 	RequiredAcks int `json:"required_acks,omitempty"`

@@ -1832,7 +1832,7 @@ spec:
                   description: 'Idempotent (default: false)'
                   type: boolean
                 max_send_retries:
-                  description: 'Number of times to retry sending of m essages to a
+                  description: 'Number of times to retry sending of messages to a
                     leader (default: 1)'
                   type: integer
                 message_key_key:
