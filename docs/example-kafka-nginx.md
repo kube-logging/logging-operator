@@ -56,7 +56,6 @@ spec:
       type: json    
     buffer:
       tags: topic
-      path: /tmp/buffer
       timekey: 1m
       timekey_wait: 30s
       timekey_use_utc: true
@@ -73,7 +72,6 @@ metadata:
   name: kafka-flow
 spec:
   filters:
-    - tag_normaliser: {}
     - parser:
         key_name: message
         remove_key_name_field: true

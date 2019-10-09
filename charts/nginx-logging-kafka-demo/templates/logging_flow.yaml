@@ -7,7 +7,6 @@ metadata:
 {{ include "nginx-logging-kafka-demo.labels" . | indent 4 }}
 spec:
   filters:
-    - tag_normaliser: {}
     - parser:
         key_name: message
         remove_key_name_field: true
