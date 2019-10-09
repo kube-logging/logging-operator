@@ -5,8 +5,8 @@ metadata:
 spec:
   forward:
     servers:
-      - host: 127.0.0.1
-        name: example-fluent
+      - host: fluent-public.input.io
+        port: "24240"
     tls_cert_path:
       mountFrom:
         secretKeyRef:
