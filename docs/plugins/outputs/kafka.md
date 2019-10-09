@@ -1,23 +1,23 @@
 # Kafka output plugin for Fluentd
 ## Overview
-More info at https://github.com/fluent/fluent-plugin-kafka
+  More info at https://github.com/fluent/fluent-plugin-kafka
 
-#### Example output configurations
-```
-spec:
-kafka:
-brokers: kafka-headless.kafka.svc.cluster.local:29092
-default_topic: topic
-sasl_over_ssl: false
-format:
-type: json
-buffer:
-tags: topic
-path: /tmp/buffer
-timekey: 1m
-timekey_wait: 30s
-timekey_use_utc: true
-```
+ #### Example output configurations
+ ```
+ spec:
+   kafka:
+     brokers: kafka-headless.kafka.svc.cluster.local:29092
+     default_topic: topic
+     sasl_over_ssl: false
+     format:
+       type: json
+     buffer:
+       tags: topic
+       path: /tmp/buffer
+       timekey: 1m
+       timekey_wait: 30s
+       timekey_use_utc: true
+ ```
 
 ## Configuration
 ### Kafka
