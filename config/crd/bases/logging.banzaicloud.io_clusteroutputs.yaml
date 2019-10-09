@@ -1634,7 +1634,7 @@ spec:
                   description: The list of all seed brokers, with their host and port
                     information.
                   type: string
-                buffer_topic:
+                buffer:
                   properties:
                     chunk_full_threshold:
                       description: The percentage of chunk size threshold for flushing.
@@ -1800,6 +1800,21 @@ spec:
                 exclude_topic_key:
                   description: 'Exclude Topic key (default: false)'
                   type: boolean
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
                 get_kafka_client_log:
                   description: 'Get Kafka Client log (default: false)'
                   type: boolean
@@ -1834,7 +1849,7 @@ spec:
                     -1).'
                   type: integer
                 sasl_over_ssl:
-                  description: 'SASL over SSL (default: false)'
+                  description: 'SASL over SSL (default: true)'
                   type: boolean
                 topic_key:
                   description: 'Topic Key (default: "topic")'
@@ -1844,6 +1859,7 @@ spec:
                   type: boolean
               required:
               - brokers
+              - format
               type: object
             loggingRef:
               type: string

@@ -77,7 +77,7 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
 		}
 		if copy.Spec.FluentdSpec.Image.Tag == "" {
-			copy.Spec.FluentdSpec.Image.Tag = "v1.6.3-alpine"
+			copy.Spec.FluentdSpec.Image.Tag = "v1.6.3-alpine-1"
 		}
 		if copy.Spec.FluentdSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"

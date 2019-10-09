@@ -22,7 +22,24 @@ import (
 )
 
 // +docName:"Kafka output plugin for Fluentd"
-// More info at https://github.com/uken/fluent-plugin-elasticsearch
+//  More info at https://github.com/fluent/fluent-plugin-kafka
+//
+// #### Example output configurations
+// ```
+// spec:
+//   kafka:
+//     brokers: kafka-headless.kafka.svc.cluster.local:29092
+//     default_topic: topic
+//     sasl_over_ssl: false
+//     format:
+//       type: json
+//     buffer:
+//       tags: topic
+//       path: /tmp/buffer
+//       timekey: 1m
+//       timekey_wait: 30s
+//       timekey_use_utc: true
+// ```
 type _docKafka interface{}
 
 // +kubebuilder:object:generate=true
@@ -60,8 +77,9 @@ type KafkaOutputConfig struct {
 	UseDefaultForUnknownTopic bool `json:"use_default_for_unknown_topic,omitempty"`
 	// Idempotent (default: false)
 	Idempotent bool `json:"idempotent,omitempty"`
-	// SASL over SSL (default: false)
-	SaslOverSSL bool `json:"sasl_over_ssl,omitempty"`
+	// SASL over SSL (default: true)
+	// +kubebuilder:validation:Optional
+	SaslOverSSL bool `json:"sasl_over_ssl"`
 	// Number of times to retry sending of messages to a leader (default: 1)
 	MaxSendRetries int `json:"max_send_retries,omitempty"`
 	// The number of acks required per request (default: -1).
@@ -70,8 +88,10 @@ type KafkaOutputConfig struct {
 	AckTimeout int `json:"ack_timeout,omitempty"`
 	// The codec the producer uses to compress messages (default: nil). The available options are gzip and snappy.
 	CompressionCodec string `json:"compression_codec,omitempty"`
-
-	Buffer *Buffer `json:"buffer_topic,omitempty"`
+	// +docLink:"Format,./format.md"
+	Format *Format `json:"format"`
+	// +docLink:"Buffer,./buffer.md"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
@@ -92,6 +112,13 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types
 			return nil, err
 		} else {
 			kafka.SubDirectives = append(kafka.SubDirectives, buffer)
+		}
+	}
+	if e.Format != nil {
+		if format, err := e.Format.ToDirective(secretLoader); err != nil {
+			return nil, err
+		} else {
+			kafka.SubDirectives = append(kafka.SubDirectives, format)
 		}
 	}
 	return kafka, nil
