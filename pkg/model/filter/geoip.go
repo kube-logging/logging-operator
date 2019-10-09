@@ -35,6 +35,7 @@ import (
 //        parsers:
 //          - type: nginx
 //    - geoip:
+//        geoip_lookup_keys: remote_addr
 //        records:
 //          - city: ${city.names.en["remote_addr"]}
 //            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''

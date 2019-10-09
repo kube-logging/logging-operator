@@ -1,28 +1,28 @@
 # Fluentd GeoIP filter
 ## Overview
-Fluentd Filter plugin to add information about geographical location of IP addresses with Maxmind GeoIP databases.
-More information at https://github.com/y-ken/fluent-plugin-geoip
+ Fluentd Filter plugin to add information about geographical location of IP addresses with Maxmind GeoIP databases.
+ More information at https://github.com/y-ken/fluent-plugin-geoip
 
-#### Example record configurations
-```
-spec:
-filters:
-- tag_normaliser:
-format: ${namespace_name}.${pod_name}.${container_name}
-- parser:
-key_name: message
-remove_key_name_field: true
-parsers:
-- type: nginx
-- geoip:
-records:
-- city: ${city.names.en["remote_addr"]}
-latitude: ${location.latitude["remote_addr"]}
-longitude: ${location.longitude["remote_addr"]}
-country: ${country.iso_code["remote_addr"]}
-country_name: ${country.names.en["remote_addr"]}
-postal_code:  ${postal.code["remote_addr"]}
-```
+ #### Example record configurations
+ ```
+ spec:
+  filters:
+    - tag_normaliser:
+        format: ${namespace_name}.${pod_name}.${container_name}
+    - parser:
+        key_name: message
+        remove_key_name_field: true
+        parsers:
+          - type: nginx
+    - geoip:
+        geoip_lookup_keys: remote_addr
+        records:
+          - city: ${city.names.en["remote_addr"]}
+            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
+            country: ${country.iso_code["remote_addr"]}
+            country_name: ${country.names.en["remote_addr"]}
+            postal_code:  ${postal.code["remote_addr"]}
+ ```
 
 ## Configuration
 ### GeoIP
