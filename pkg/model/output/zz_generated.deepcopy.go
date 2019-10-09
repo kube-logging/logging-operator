@@ -257,6 +257,11 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.Format != nil {
+		in, out := &in.Format, &out.Format
+		*out = new(Format)
+		**out = **in
+	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)

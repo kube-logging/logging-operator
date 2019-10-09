@@ -1,0 +1,20 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: {{ include "nginx-logging-kafka-demo.fullname" . }}-kafka-flow
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "nginx-logging-kafka-demo.labels" . | indent 4 }}
+spec:
+  filters:
+    - parser:
+        key_name: message
+        remove_key_name_field: true
+        reserve_data: true
+        parsers:
+          - type: nginx
+  selectors:
+    app.kubernetes.io/name: {{ include "nginx-logging-kafka-demo.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  outputRefs:
+    - {{ include "nginx-logging-kafka-demo.fullname" . }}-kafka-output
