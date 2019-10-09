@@ -41,6 +41,11 @@ jobs:
             make check-diff
 
       - run:
+          name: License
+          command: |
+            make license
+
+      - run:
           name: Test
           command: |
             make test
