@@ -93,7 +93,7 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentdSpec.Metrics.Port = 24231
 			}
 			if copy.Spec.FluentdSpec.Metrics.Timeout == "" {
-				copy.Spec.FluentdSpec.Metrics.Timeout = "30s"
+				copy.Spec.FluentdSpec.Metrics.Timeout = "5s"
 			}
 			if copy.Spec.FluentdSpec.Metrics.Interval == "" {
 				copy.Spec.FluentdSpec.Metrics.Interval = "15s"
@@ -189,7 +189,7 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.Metrics.Port = 2020
 			}
 			if copy.Spec.FluentbitSpec.Metrics.Timeout == "" {
-				copy.Spec.FluentbitSpec.Metrics.Timeout = "30s"
+				copy.Spec.FluentbitSpec.Metrics.Timeout = "5s"
 			}
 			if copy.Spec.FluentbitSpec.Metrics.Interval == "" {
 				copy.Spec.FluentbitSpec.Metrics.Interval = "15s"
