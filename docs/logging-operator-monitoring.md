@@ -199,7 +199,7 @@ kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base
 kubectl -n logging port-forward svc/nginx-demo-minio 9000
 ```
 [Minio Dashboard: http://localhost:9000](http://localhost:9000)
-<p align="center"><img src="./img/loki1.png" width="660"></p>
+<p align="center"><img src="./img/servicemonitor_minio.png" width="660"></p>
 
 
 ### Prometheus
@@ -208,7 +208,7 @@ kubectl -n logging port-forward svc/nginx-demo-minio 9000
 kubectl port-forward svc/monitor-prometheus-operato-prometheus 9090
 ```
 [Prometheus Dashboard: http://localhost:9090](http://localhost:9090)
-<p align="center"><img src="./img/loki1.png" width="660"></p>
+<p align="center"><img src="./img/servicemonitor_prometheus.png" width="660"></p>
 
 
 ### Grafana 
@@ -221,6 +221,6 @@ kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base
 kubectl -n logging port-forward svc/grafana 3000:80
 ```
 [Gradana Dashboard: http://localhost:3000](http://localhost:3000)
-<p align="center"><img src="./img/loki1.png" width="660"></p>
+<p align="center"><img src="./img/servicemonitor_grafana.png" width="660"></p>
 
 

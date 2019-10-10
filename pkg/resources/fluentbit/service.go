@@ -34,7 +34,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 				Ports: []corev1.ServicePort{
 					{
 						Protocol:   corev1.ProtocolTCP,
-						Name:       "monitor",
+						Name:       "metrics",
 						Port:       r.Logging.Spec.FluentbitSpec.Metrics.Port,
 						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentbitSpec.Metrics.Port},
 					},
