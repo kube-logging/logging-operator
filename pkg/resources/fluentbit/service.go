@@ -60,7 +60,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
-					Port: string(r.Logging.Spec.FluentbitSpec.Metrics.Port),
+					Port: "metrics",
 					Path: r.Logging.Spec.FluentbitSpec.Metrics.Path,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
