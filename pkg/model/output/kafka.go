@@ -33,7 +33,6 @@ import (
 //       type: json
 //     buffer:
 //       tags: topic
-//       path: /tmp/buffer
 //       timekey: 1m
 //       timekey_wait: 30s
 //       timekey_use_utc: true
