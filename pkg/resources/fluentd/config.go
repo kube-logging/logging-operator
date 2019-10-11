@@ -43,17 +43,17 @@ var fluentdInputTemplate = `
 # Prevent fluentd from handling records containing its own logs. Otherwise
 # it can lead to an infinite loop, when error in sending one message generates
 # another message which also fails to be sent and so on.
-<match **.fluentd**>
+<label @ERROR>
+<match **>
     @type null
+    @id main-fluentd-error
 </match>
-
-<match **.fluent-bit**>
-    @type null
-</match>
+</label>
 
 `
 var fluentdOutputTemplate = `
 <match **>
     @type null
+    @type main-no-output
 </match>
 `
