@@ -95,6 +95,7 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
   - [Nginx with Elasticsearch Output](./docs/example-es-nginx.md)
   - [Nginx with Loki Output](./docs/example-loki-nginx.md)
   - [Nginx with Kafka Output](./docs/example-kafka-nginx.md)
+- [Monitoring](./docs/logging-operator-monitoring.md)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 ---

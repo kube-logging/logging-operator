@@ -30,7 +30,16 @@ kubectl create namespace logging
 ```
 ### Install Prometheus Operator
 ```bash
-helm install --namespace logging --name monitor stable/prometheus-operator 
+helm install --namespace logging --name monitor stable/prometheus-operator \
+    --set "grafana.dashboardProviders.dashboardproviders\\.yaml.apiVersion=1" \
+    --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].orgId=1" \
+    --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].type=file" \
+    --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].disableDeletion=false" \
+    --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].options.path=/var/lib/grafana/dashboards/default" \
+    --set "grafana.dashboards.default.logging.gnetId=7752" \
+    --set "grafana.dashboards.default.logging.revision=2" \
+    --set "grafana.dashboards.default.logging.datasource=Prometheus" \
+    --set "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=False"
 ```
 > [Prometheus Operator Documentation](https://github.com/coreos/prometheus-operator)
 
@@ -104,7 +113,6 @@ spec:
           key: secretkey
           name: logging-s3
     buffer:
-      path: /tmp/buffer
       timekey: 10s
       timekey_use_utc: true
       timekey_wait: 0s
@@ -214,11 +222,13 @@ kubectl port-forward svc/monitor-prometheus-operato-prometheus 9090
 ### Grafana 
 #### Get Grafana login credantials
 ```bash
-kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base64d)'
+kubectl get secret --namespace logging monitor-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
+> Default username: `admin`
+
 #### Forward Service
 ```bash
-kubectl -n logging port-forward svc/grafana 3000:80
+kubectl -n logging port-forward svc/monitor-grafana 3000:80
 ```
 [Gradana Dashboard: http://localhost:3000](http://localhost:3000)
 <p align="center"><img src="./img/servicemonitor_grafana.png" width="660"></p>
