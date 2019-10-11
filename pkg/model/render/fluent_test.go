@@ -556,7 +556,7 @@ func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected str
         </source>
         <match **>
           @type label_router
-          @id: test-label_router
+          @id test-label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
