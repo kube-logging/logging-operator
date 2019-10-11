@@ -176,12 +176,14 @@ type ElasticsearchOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "elasticsearch"
 	elasticsearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "elasticsearch",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -190,7 +192,7 @@ func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader) (typ
 		elasticsearch.Params = params
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			elasticsearch.SubDirectives = append(elasticsearch.SubDirectives, buffer)

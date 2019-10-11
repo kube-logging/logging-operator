@@ -47,7 +47,7 @@ type Transport struct {
 	CaPrivateKeyPassphrase string `json:"ca_private_key_passphrase,omitempty"`
 }
 
-func (t *Transport) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (t *Transport) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "transport",
 		Tag:       "tls",

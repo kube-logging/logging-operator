@@ -35,10 +35,12 @@ func NewDedotFilterConfig() *DedotFilterConfig {
 	return &DedotFilterConfig{}
 }
 
-func (c *DedotFilterConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *DedotFilterConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "dedot"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "dedot",
+		Type:      pluginType,
 		Directive: "filter",
 		Tag:       "**",
+		Id:        id + "-" + pluginType,
 	}, c, secretLoader)
 }

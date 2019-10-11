@@ -91,12 +91,14 @@ type KafkaOutputConfig struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "kafka2"
 	kafka := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "kafka2",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -105,14 +107,14 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types
 		kafka.Params = params
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			kafka.SubDirectives = append(kafka.SubDirectives, buffer)
 		}
 	}
 	if e.Format != nil {
-		if format, err := e.Format.ToDirective(secretLoader); err != nil {
+		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			kafka.SubDirectives = append(kafka.SubDirectives, format)

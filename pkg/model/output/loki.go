@@ -43,12 +43,14 @@ type LokiOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "kubernetes_loki"
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "kubernetes_loki",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(l); err != nil {
@@ -57,7 +59,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader) (types.Direct
 		loki.Params = params
 	}
 	if l.Buffer != nil {
-		if buffer, err := l.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := l.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			loki.SubDirectives = append(loki.SubDirectives, buffer)

@@ -26,7 +26,7 @@ type Format struct {
 	Type string `json:"type,omitempty"`
 }
 
-func (f *Format) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (f *Format) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	metadata := types.PluginMeta{
 		Directive: "format",
 	}

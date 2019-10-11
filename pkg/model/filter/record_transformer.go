@@ -41,7 +41,7 @@ type RecordTransformer struct {
 // Parameters inside record directives are considered to be new key-value pairs
 type Record map[string]string
 
-func (r *Record) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (r *Record) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	recordSet := types.PluginMeta{
 		Directive: "record",
 	}
@@ -52,12 +52,14 @@ func (r *Record) ToDirective(secretLoader secret.SecretLoader) (types.Directive,
 	return directive, nil
 }
 
-func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "record_transformer"
 	recordTransformer := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
-			Type:      "record_transformer",
+			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(r); err != nil {
@@ -67,7 +69,7 @@ func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader) (types
 	}
 	if len(r.Records) > 0 {
 		for _, record := range r.Records {
-			if meta, err := record.ToDirective(secretLoader); err != nil {
+			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)

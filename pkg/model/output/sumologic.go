@@ -59,10 +59,12 @@ type SumologicOutput struct {
 	DisableCookies bool `json:"disable_cookies,omitempty"`
 }
 
-func (s *SumologicOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (s *SumologicOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "sumologic"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "sumologic",
+		Type:      pluginType,
 		Directive: "match",
 		Tag:       "**",
+		Id:        id + "-" + pluginType,
 	}, s, secretLoader)
 }

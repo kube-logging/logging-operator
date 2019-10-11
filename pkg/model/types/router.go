@@ -81,12 +81,14 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 	return r
 }
 
-func NewRouter() *Router {
+func NewRouter(id string) *Router {
+	pluginType := "label_router"
 	return &Router{
 		PluginMeta: PluginMeta{
 			Type:      "label_router",
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 }

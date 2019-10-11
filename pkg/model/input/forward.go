@@ -33,11 +33,13 @@ func NewForwardInputConfig() *ForwardInputConfig {
 	return &ForwardInputConfig{}
 }
 
-func (f *ForwardInputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (f *ForwardInputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "forward"
 	forward := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
-			Type:      "forward",
+			Type:      pluginType,
 			Directive: "source",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(f); err != nil {
@@ -46,14 +48,14 @@ func (f *ForwardInputConfig) ToDirective(secretLoader secret.SecretLoader) (type
 		forward.Params = params
 	}
 	if f.Transport != nil {
-		if transport, err := f.Transport.ToDirective(secretLoader); err != nil {
+		if transport, err := f.Transport.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			forward.SubDirectives = append(forward.SubDirectives, transport)
 		}
 	}
 	if f.Security != nil {
-		if security, err := f.Security.ToDirective(secretLoader); err != nil {
+		if security, err := f.Security.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			forward.SubDirectives = append(forward.SubDirectives, security)

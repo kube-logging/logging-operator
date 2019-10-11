@@ -41,10 +41,12 @@ type TagNormaliser struct {
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
 }
 
-func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "tag_normaliser"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "tag_normaliser",
+		Type:      pluginType,
 		Directive: "match",
 		Tag:       "kubernetes.**",
+		Id:        id + "-" + pluginType,
 	}, t, secretLoader)
 }

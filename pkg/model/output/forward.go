@@ -89,12 +89,14 @@ type ForwardOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "forward"
 	forward := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "forward",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(f); err != nil {
@@ -103,14 +105,14 @@ func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader) (types.Dir
 		forward.Params = params
 	}
 	if f.Buffer != nil {
-		if buffer, err := f.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := f.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			forward.SubDirectives = append(forward.SubDirectives, buffer)
 		}
 	}
 	if f.Security != nil {
-		if format, err := f.Security.ToDirective(secretLoader); err != nil {
+		if format, err := f.Security.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			forward.SubDirectives = append(forward.SubDirectives, format)
@@ -118,7 +120,7 @@ func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader) (types.Dir
 	}
 	if len(f.FluentdServers) > 0 {
 		for _, server := range f.FluentdServers {
-			if serv, err := server.ToDirective(secretLoader); err != nil {
+			if serv, err := server.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				forward.SubDirectives = append(forward.SubDirectives, serv)
@@ -150,7 +152,7 @@ type FluentdServer struct {
 	Weight int `json:"weight,omitempty"`
 }
 
-func (f *FluentdServer) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (f *FluentdServer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "server",
 	}, f, secretLoader)

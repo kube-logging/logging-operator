@@ -29,7 +29,7 @@ type Security struct {
 	AllowAnonymousSource bool `json:"allow_anonymous_source,omitempty"`
 }
 
-func (s *Security) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (s *Security) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "security",
 	}, s, secretLoader)
