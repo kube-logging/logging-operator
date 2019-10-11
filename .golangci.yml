@@ -1,0 +1,45 @@
+run:
+    skip-dirs:
+        - .gen
+        - client
+
+linters-settings:
+    golint:
+        min-confidence: 0.9
+    gocyclo:
+        min-complexity: 15
+    # goimports:
+        # local-prefixes: github.com/banzaicloud/logging-operator
+
+linters:
+    enable-all: true
+    disable:
+        - funlen
+        - dupl
+        - maligned
+
+        # TODO: fix these
+        - deadcode
+        - unused
+        - goconst
+        - unparam
+        - nakedret
+        - prealloc
+        - errcheck
+        - gochecknoinits
+        - gochecknoglobals
+        - lll
+        - gosec
+        - stylecheck
+        - staticcheck
+        - gosimple
+        - whitespace
+        - gocritic
+        - godox
+        - interfacer
+        - gocyclo
+
+issues:
+    exclude:
+        - if block ends with a return statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)
+        - "`if` block ends with a `return` statement, so drop this `else` and outdent its block"

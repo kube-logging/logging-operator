@@ -16,6 +16,8 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -
 GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/model/filter/*"  -not -path "./pkg/model/output/*"  -not -path "./pkg/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
+GOLANGCI_VERSION = 1.19.1
+
 export KUBEBUILDER_ASSETS := $(PWD)/bin
 export PATH := $(PWD)/bin:$(PATH)
 
@@ -25,38 +27,17 @@ all: manager
 .PHONY: docs
 docs:
 	go run cmd/docs.go
-check-fmt:
-	PKGS="${GOFILES_NOVENDOR}" GOFMT="gofmt" ./scripts/fmt-check.sh
 
-lint: install-golint
-	golint -min_confidence 0.9 -set_exit_status $(GOFILES_NOPLUGINS)
+bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
+	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
+bin/golangci-lint-${GOLANGCI_VERSION}:
+	@mkdir -p bin
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
+	@mv bin/golangci-lint $@
 
-install-golint:
-	GOLINT_CMD=$(shell command -v golint 2> /dev/null)
-ifndef GOLINT_CMD
-	go get golang.org/x/lint/golint
-endif
-
-check-misspell: install-misspell
-	PKGS="${GOFILES_NOVENDOR}" MISSPELL="misspell" ./scripts/misspell-check.sh
-
-misspell: install-misspell
-	misspell -w ${GOFILES_NOVENDOR}
-
-install-misspell:
-	MISSPELL_CMD=$(shell command -v misspell 2> /dev/null)
-ifndef MISSPELL_CMD
-	go get -u github.com/client9/misspell/cmd/misspell
-endif
-
-ineffassign: install-ineffassign
-	ineffassign ${GOFILES_NOVENDOR}
-
-install-ineffassign:
-	INEFFASSIGN_CMD=$(shell command -v ineffassign 2> /dev/null)
-ifndef INEFFASSIGN_CMD
-	go get -u github.com/gordonklaus/ineffassign
-endif
+.PHONY: lint
+lint: bin/golangci-lint ## Run linter
+	bin/golangci-lint run
 
 .PHONY: bin/kubebuilder_${KUBEBUILDER_VERSION}
 bin/kubebuilder_${KUBEBUILDER_VERSION}:

@@ -20,14 +20,15 @@ import (
 	"hash/fnv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/banzaicloud/logging-operator/pkg/util"
 )
 
 type ConfigCheckResult struct {
@@ -113,7 +114,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 	var multierr error
 	var removedHashes = make([]string, 0)
-	for configHash, _ := range r.Logging.Status.ConfigCheckResults {
+	for configHash := range r.Logging.Status.ConfigCheckResults {
 		if configHash == currentHash {
 			continue
 		}
