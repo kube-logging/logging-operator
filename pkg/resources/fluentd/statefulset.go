@@ -32,6 +32,9 @@ func (r *Reconciler) statefulset() runtime.Object {
 				ObjectMeta: templates.FluentdObjectMeta(
 					r.Logging.QualifiedName(bufferVolumeName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
 				Spec: r.Logging.Spec.FluentdSpec.FluentdPvcSpec,
+				Status: corev1.PersistentVolumeClaimStatus{
+					Phase: corev1.ClaimPending,
+				},
 			},
 		}
 	}
