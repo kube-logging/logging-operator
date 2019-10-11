@@ -4,6 +4,23 @@
 
 <p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
 
+---
+## Contents
+- **Installation**
+  - ElasticSearch Operator
+    - [Deploy with Helm](#example-es-nginx.md#deploy-elasticsearch)
+  - **Logging Operator**
+    - [Deploy with Helm](#install-with-helm)
+    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+   - **Demo Application**  
+    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Kuberenetes Manifests](#install-from-kubernetes-manifests)
+- **Validation**
+    - [Cerebro Dashboard](#forward-cerebro-dashboard)
+    - [Kibana Dashboard](#forward-kibana-dashboard)
+---
+
+
 ## Deploy ElasticSearch
 
 ### Add chart repository:

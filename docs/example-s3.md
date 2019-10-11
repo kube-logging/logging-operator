@@ -1,4 +1,8 @@
+<p align="center"><img src="./img/s3_logo.png" width="340"></p>
+
 # Save all logs to S3
+
+<p align="center"><img src="./img/s3_flow.png" width="900"></p>
 
 Before you start [install logging-operator](/README.md#deploying-with-helm-chart)
 

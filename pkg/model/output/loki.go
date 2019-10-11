@@ -22,6 +22,18 @@ import (
 // +docName:"Loki output plugin "
 //Fluentd output plugin to ship logs to a Loki server.
 //More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
+//>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../docs/example-loki-nginx.md)
+//
+// #### Example output configurations
+// ```
+// spec:
+//   loki:
+//     url: http://loki:3100
+//     buffer:
+//       timekey: 1m
+//       timekey_wait: 30s
+//       timekey_use_utc: true
+// ```
 type _docLoki interface{}
 
 // +kubebuilder:object:generate=true

@@ -154,7 +154,7 @@ func main() {
 	}
 
 	index := doc{
-		Name: "index",
+		Name: "Readme",
 	}
 	index.append("## Table of Contents\n\n")
 	for _, p := range pluginDirs {

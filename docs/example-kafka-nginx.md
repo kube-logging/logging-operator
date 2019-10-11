@@ -4,6 +4,21 @@
 
 <p align="center"><img src="./img/nignx-kafka.png" width="900"></p>
 
+---
+## Contents
+- **Installation**
+  - Kafka 
+    - [Deploy with Helm](#deploy-kafka)
+  - **Logging Operator**
+    - [Deploy with Helm](#install-with-helm)
+    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+   - **Demo Application**  
+    - [Deploy with Helm](install-with-helm)
+    - [Deploy with Kuberenetes Manifests](#install-from-kubernetes-manifests)
+- **Validation**
+    - [Kafkacat](#test-your-deployment-with-kafkacat)
+---
+
 ## Deploy Kafka
 >In this demo we are using our kafka operator.
 > [Easy Way Installing with Helm](https://github.com/banzaicloud/kafka-operator#easy-way-installing-with-helm)

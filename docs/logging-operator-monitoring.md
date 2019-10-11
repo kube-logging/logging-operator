@@ -12,7 +12,9 @@
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
     - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-  - **Demo Application**  
+  - **Minio**  
+    - [Deploy with Kuberenetes Manifests](#install-minio)
+   - **Demo Application**  
     - [Deploy with Helm](#deploy-demo-nginx-app--logging-definition-with-metrics)
     - [Deploy with Kuberenetes Manifests](#install-from-manifest)
 - **Validation**
@@ -37,7 +39,7 @@ helm install --namespace logging --name monitor stable/prometheus-operator \
     --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].disableDeletion=false" \
     --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].options.path=/var/lib/grafana/dashboards/default" \
     --set "grafana.dashboards.default.logging.gnetId=7752" \
-    --set "grafana.dashboards.default.logging.revision=2" \
+    --set "grafana.dashboards.default.logging.revision=3" \
     --set "grafana.dashboards.default.logging.datasource=Prometheus" \
     --set "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=False"
 ```
