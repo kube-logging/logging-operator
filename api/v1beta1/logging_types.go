@@ -94,6 +94,9 @@ func (l *Logging) SetDefaults() *Logging {
 				v1.ReadWriteOnce,
 			}
 		}
+		if copy.Spec.FluentdSpec.FluentdPvcSpec.VolumeMode == nil {
+			copy.Spec.FluentdSpec.FluentdPvcSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
+		}
 		if copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests == nil {
 			copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
 				"storage": resource.MustParse("20Gi"),
@@ -178,4 +181,8 @@ func (l *Logging) QualifiedNamespacedName(name string) string {
 
 func init() {
 	SchemeBuilder.Register(&Logging{}, &LoggingList{})
+}
+
+func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVolumeMode {
+	return &mode
 }
