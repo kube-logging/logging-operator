@@ -66,11 +66,11 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
 	}
-	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, fluentd.OutputSecretPath, l.Secrets))
+	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, fluentd.OutputSecretPath, l.Secrets), "main")
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
-	system := types.NewSystem(rootInput, types.NewRouter())
+	system := types.NewSystem(rootInput, types.NewRouter("main"))
 	for _, flow := range l.Flows {
 		flow, err := l.CreateFlowFromCustomResource(flow, flow.Namespace)
 		if err != nil {
@@ -118,7 +118,7 @@ FindOutputForAllRefs:
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
 				if output.Namespace == namespace && outputRef == output.Name {
-					plugin, err := plugins.CreateOutput(output.Spec, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
+					plugin, err := plugins.CreateOutput(output.Spec, output.Name, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 						continue FindOutputForAllRefs
@@ -130,7 +130,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
+				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, clusterOutput.Name, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 					continue FindOutputForAllRefs
@@ -146,7 +146,7 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
+		filter, err := plugins.CreateFilter(f, flowCr.Name, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.Errorf("failed to create filter with index %d for flow %s", i, flowCr.Name))
 			continue

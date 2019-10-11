@@ -23,6 +23,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
+	"github.com/banzaicloud/logging-operator/pkg/util"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -34,9 +35,8 @@ const (
 	AppConfigKey        = "fluentd.conf"
 	StatefulSetName     = "fluentd"
 	ServiceName         = "fluentd"
-
-	OutputSecretName = "fluentd-output"
-	OutputSecretPath = "/fluentd/etc/secret"
+	OutputSecretName    = "fluentd-output"
+	OutputSecretPath    = "/fluentd/secret"
 
 	bufferVolumeName   = "fluentd-buffer"
 	serviceAccountName = "fluentd"
@@ -44,16 +44,17 @@ const (
 	roleName           = "fluentd"
 )
 
-var labelSelector = map[string]string{
-	"app": "fluentd",
-}
-
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
 	config  *string
 	secrets *secret.MountSecrets
+}
+
+func (r *Reconciler) getFluentdLabels() map[string]string {
+	return util.MergeLabels(r.Logging.Labels, map[string]string{
+		"app.kubernetes.io/name": "fluentd"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
 func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets) *Reconciler {
@@ -123,8 +124,9 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		return nil, errors.WrapIf(err, "failed to reconcile resource")
 	}
 	// Mark watched secrets
-	for _, obj := range r.markSecrets(r.secrets) {
-		err := r.ReconcileResource(obj)
+	secretList, state := r.markSecrets(r.secrets)
+	for _, obj := range secretList {
+		err := r.ReconcileResource(obj, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
 		}
@@ -137,9 +139,11 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.appconfigMap,
 		r.statefulset,
 		r.service,
+		r.serviceMetrics,
+		r.monitorServiceMetrics,
 	} {
-		o := res()
-		err := r.ReconcileResource(o)
+		o, state := res()
+		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
 		}

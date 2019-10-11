@@ -15,13 +15,14 @@
 package fluentbit
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() runtime.Object {
+func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
 			r.Logging.QualifiedName(clusterRoleName), r.Logging.Labels, r.Logging),
@@ -32,10 +33,10 @@ func (r *Reconciler) clusterRole() runtime.Object {
 				Verbs:     []string{"get", "list", "watch"},
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
-func (r *Reconciler) clusterRoleBinding() runtime.Object {
+func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
 			r.Logging.QualifiedNamespacedName(clusterRoleBindingName), r.Logging.Labels, r.Logging),
@@ -51,12 +52,12 @@ func (r *Reconciler) clusterRoleBinding() runtime.Object {
 				Namespace: r.Logging.Spec.ControlNamespace,
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
-func (r *Reconciler) serviceAccount() runtime.Object {
+func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 	return &corev1.ServiceAccount{
 		ObjectMeta: templates.FluentbitObjectMeta(
 			r.Logging.QualifiedName(serviceAccountName), r.Logging.Labels, r.Logging),
-	}
+	}, k8sutil.StatePresent
 }

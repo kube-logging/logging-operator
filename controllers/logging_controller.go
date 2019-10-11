@@ -151,7 +151,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			}
 			if o, ok := object.(*corev1.Secret); ok {
 				requestList := []reconcile.Request{}
-				for key, _ := range o.Annotations {
+				for key := range o.Annotations {
 					r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
 					result := r.FindStringSubmatch(key)
 					if len(result) > 1 {

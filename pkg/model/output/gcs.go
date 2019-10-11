@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,12 +65,14 @@ type GCSOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "gcs"
 	gcs := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "gcs",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(g); err != nil {
@@ -79,14 +81,14 @@ func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directi
 		gcs.Params = params
 	}
 	if g.Buffer != nil {
-		if buffer, err := g.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := g.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			gcs.SubDirectives = append(gcs.SubDirectives, buffer)
 		}
 	}
 	if g.Format != nil {
-		if format, err := g.Format.ToDirective(secretLoader); err != nil {
+		if format, err := g.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			gcs.SubDirectives = append(gcs.SubDirectives, format)
@@ -94,7 +96,7 @@ func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directi
 	}
 	if len(g.ObjectMetadata) > 0 {
 		for _, metadata := range g.ObjectMetadata {
-			if meta, err := metadata.ToDirective(secretLoader); err != nil {
+			if meta, err := metadata.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				gcs.SubDirectives = append(gcs.SubDirectives, meta)
@@ -111,7 +113,7 @@ type ObjectMetadata struct {
 	Value string `json:"value"`
 }
 
-func (o *ObjectMetadata) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (o *ObjectMetadata) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "object_metadata",
 	}, o, secretLoader)

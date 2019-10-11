@@ -25,10 +25,12 @@ type FileOutputConfig struct {
 	Path string `json:"path"`
 }
 
-func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "file"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "file",
+		Type:      pluginType,
 		Directive: "match",
 		Tag:       "**",
+		Id:        id + "-" + pluginType,
 	}, c, secretLoader)
 }

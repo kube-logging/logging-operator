@@ -29,9 +29,11 @@ func NewTailInputConfig(path string) *TailInputConfig {
 	return &TailInputConfig{Path: path}
 }
 
-func (c *TailInputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *TailInputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "tail"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "tail",
+		Type:      pluginType,
 		Directive: "source",
+		Id:        id + "-" + pluginType,
 	}, c, secretLoader)
 }

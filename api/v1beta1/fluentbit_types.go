@@ -32,6 +32,7 @@ type FluentbitSpec struct {
 	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
 	Parser      string                      `json:"parser,omitempty"`
 	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
+	Metrics     *Metrics                    `json:"metrics,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

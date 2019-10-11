@@ -144,6 +144,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <source>
               @type tail
+              @id test-tail
               path /path/to/input
             </source>`,
 			),
@@ -154,6 +155,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <filter **>
               @type stdout
+              @id test-stdout
             </filter>`,
 			),
 		},
@@ -163,6 +165,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <match **>
               @type null
+              @id test-null
             </match>`,
 			),
 		},
@@ -197,13 +200,14 @@ func TestRenderDirective(t *testing.T) {
 		},
 		{
 			name: "global router",
-			directive: types.NewRouter().
+			directive: types.NewRouter("test").
 				AddRoute(
 					newFlowOrPanic("", nil),
 				),
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
+              @id test-label_router
               <route>
                 @label @d41d8cd98f00b204e9800998ecf8427e
               </route>
@@ -212,13 +216,14 @@ func TestRenderDirective(t *testing.T) {
 		},
 		{
 			name: "namespaced router",
-			directive: types.NewRouter().
+			directive: types.NewRouter("test").
 				AddRoute(
 					newFlowOrPanic("test", nil),
 				),
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
+              @id test-label_router
               <route>
                 @label @098f6bcd4621d373cade4e832627b4f6
                 namespace test
@@ -228,13 +233,14 @@ func TestRenderDirective(t *testing.T) {
 		},
 		{
 			name: "namespaced router with labels",
-			directive: types.NewRouter().
+			directive: types.NewRouter("test").
 				AddRoute(
 					newFlowOrPanic("test", map[string]string{"a": "b", "c": "d"}),
 				),
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
+              @id test-label_router
               <route>
                 @label @092f5fa58e4f619d739f5b65f2ed38bc
                 labels a:b,c:d
@@ -265,7 +271,7 @@ func TestRenderDirective(t *testing.T) {
 }
 
 func TestMultipleOutput(t *testing.T) {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter())
+	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
 		"ns-test",
@@ -304,10 +310,12 @@ func TestMultipleOutput(t *testing.T) {
 	expected := `
 		<source>
           @type tail
+          @id test-tail
           path input.log
         </source>
         <match **>
           @type label_router
+          @id test-label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
@@ -317,14 +325,17 @@ func TestMultipleOutput(t *testing.T) {
         <label @901f778f9602a78e8fd702c1973d8d8d>
           <filter **>
             @type stdout
+            @id test-stdout
           </filter>
           <match **>
             @type copy
             <store>
               @type null
+              @id test-null
             </store>
             <store>
               @type null
+              @id test-null
             </store>
           </match>
         </label>`
@@ -335,7 +346,7 @@ func TestMultipleOutput(t *testing.T) {
 }
 
 func TestRenderFullFluentConfig(t *testing.T) {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter())
+	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
 		"ns-test",
@@ -373,10 +384,12 @@ func TestRenderFullFluentConfig(t *testing.T) {
 	expected := `
 		<source>
           @type tail
+          @id test-tail
           path input.log
         </source>
         <match **>
           @type label_router
+          @id test-label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
@@ -386,9 +399,11 @@ func TestRenderFullFluentConfig(t *testing.T) {
         <label @901f778f9602a78e8fd702c1973d8d8d>
           <filter **>
             @type stdout
+            @id test-stdout
           </filter>
           <match **>
             @type null
+            @id test-null
           </match>
         </label>`
 
@@ -419,6 +434,7 @@ func TestRenderS3(t *testing.T) {
 				},
 			},
 			expected: ` @type s3
+                        @id test-s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<buffer tag,time>
@@ -440,6 +456,7 @@ func TestRenderS3(t *testing.T) {
 				InstanceProfileCredentials: &output.S3InstanceProfileCredentials{},
 			},
 			expected: ` @type s3
+                        @id test-s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<instance_profile_credentials>
@@ -456,6 +473,7 @@ func TestRenderS3(t *testing.T) {
 				},
 			},
 			expected: ` @type s3
+                        @id test-s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<shared_credentials>
@@ -493,9 +511,9 @@ func TestRenderS3(t *testing.T) {
 }
 
 func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected string) error {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter())
+	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
-	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", "", nil))
+	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", "", nil), "test")
 	if err != nil {
 		return err
 	}
@@ -533,10 +551,12 @@ func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected str
 	expected = fmt.Sprintf(`
 		<source>
           @type tail
+          @id test-tail
           path input.log
         </source>
         <match **>
           @type label_router
+          @id test-label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
@@ -563,7 +583,7 @@ func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
 }
 
 func toDirective(t *testing.T, converter plugins.DirectiveConverter) types.Directive {
-	directive, err := converter.ToDirective(secret.NewSecretLoader(nil, "", "", nil))
+	directive, err := converter.ToDirective(secret.NewSecretLoader(nil, "", "", nil), "test")
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

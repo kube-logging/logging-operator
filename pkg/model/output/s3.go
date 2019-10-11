@@ -156,12 +156,14 @@ type S3SharedCredentials struct {
 	Path string `json:"path,omitempty"`
 }
 
-func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "s3"
 	s3 := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "s3",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
@@ -170,14 +172,14 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Di
 		s3.Params = params
 	}
 	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			s3.SubDirectives = append(s3.SubDirectives, buffer)
 		}
 	}
 	if c.Format != nil {
-		if format, err := c.Format.ToDirective(secretLoader); err != nil {
+		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			s3.SubDirectives = append(s3.SubDirectives, format)

@@ -15,6 +15,7 @@
 package resources
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -24,7 +25,7 @@ import (
 type ComponentReconciler func() (*reconcile.Result, error)
 
 // Resource redeclaration of function with return type kubernetes Object
-type Resource func() runtime.Object
+type Resource func() (runtime.Object, k8sutil.DesiredState)
 
 // ResourceVariation redeclaration of function with parameter and return type kubernetes Object
 type ResourceVariation func(t string) runtime.Object

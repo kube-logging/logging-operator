@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package output
 
@@ -178,12 +176,14 @@ type ElasticsearchOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "elasticsearch"
 	elasticsearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "elasticsearch",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -192,7 +192,7 @@ func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader) (typ
 		elasticsearch.Params = params
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			elasticsearch.SubDirectives = append(elasticsearch.SubDirectives, buffer)

@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package output
 
@@ -85,12 +83,14 @@ type OSSOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "oss"
 	oss := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "gcs",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(o); err != nil {
@@ -99,14 +99,14 @@ func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directi
 		oss.Params = params
 	}
 	if o.Buffer != nil {
-		if buffer, err := o.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := o.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			oss.SubDirectives = append(oss.SubDirectives, buffer)
 		}
 	}
 	if o.Format != nil {
-		if format, err := o.Format.ToDirective(secretLoader); err != nil {
+		if format, err := o.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			oss.SubDirectives = append(oss.SubDirectives, format)

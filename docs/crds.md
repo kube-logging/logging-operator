@@ -233,7 +233,6 @@ spec:
     s3_region: eu-west-1
     path: logs/${tag}/%Y/%m/%d/
     buffer:
-      path: /tmp/buffer
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true

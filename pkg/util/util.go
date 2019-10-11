@@ -20,16 +20,15 @@ import (
 	"github.com/iancoleman/orderedmap"
 )
 
-// MergeLabels merges two map[string]string map
-func MergeLabels(l map[string]string, l2 map[string]string) map[string]string {
-	merged := make(map[string]string)
-	for lKey, lValue := range l {
-		merged[lKey] = lValue
+// MergeLabels merge into map[string]string map
+func MergeLabels(labelGroups ...map[string]string) map[string]string {
+	mergedLabels := make(map[string]string)
+	for _, labels := range labelGroups {
+		for k, v := range labels {
+			mergedLabels[k] = v
+		}
 	}
-	for lKey, lValue := range l2 {
-		merged[lKey] = lValue
-	}
-	return merged
+	return mergedLabels
 }
 
 // IntPointer converts int32 to *int32

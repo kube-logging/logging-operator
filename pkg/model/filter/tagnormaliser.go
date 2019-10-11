@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,10 +41,12 @@ type TagNormaliser struct {
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
 }
 
-func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "tag_normaliser"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "tag_normaliser",
+		Type:      pluginType,
 		Directive: "match",
 		Tag:       "kubernetes.**",
+		Id:        id + "-" + pluginType,
 	}, t, secretLoader)
 }

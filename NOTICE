@@ -1,0 +1,5 @@
+Logging operator
+Copyright © 2019 Banzai Cloud
+
+This product includes software from the Kubernetes project
+    CachedRestMapper in pkg/utils/cache.go is based on https://raw.githubusercontent.com/kubernetes-sigs/cluster-api/ee96c31eea0f9b1b2f4cffae5c7da2c274722e76/util/restmapper/cached.go

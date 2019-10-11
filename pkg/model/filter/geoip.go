@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,12 +61,14 @@ type GeoIP struct {
 	Records []Record `json:"records,omitempty"`
 }
 
-func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "geoip"
 	geoIP := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
-			Type:      "geoip",
+			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(g); err != nil {
@@ -76,7 +78,7 @@ func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader) (types.Directive, 
 	}
 	if len(g.Records) > 0 {
 		for _, record := range g.Records {
-			if meta, err := record.ToDirective(secretLoader); err != nil {
+			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				geoIP.SubDirectives = append(geoIP.SubDirectives, meta)

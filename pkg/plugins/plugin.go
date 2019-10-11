@@ -24,10 +24,10 @@ import (
 )
 
 type DirectiveConverter interface {
-	ToDirective(secret.SecretLoader) (types.Directive, error)
+	ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error)
 }
 
-func CreateOutput(outputSpec v1beta1.OutputSpec, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(outputSpec)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -41,13 +41,13 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, secretLoader secret.SecretLoade
 	case 0:
 		return nil, errors.New("no plugin config available for output")
 	case 1:
-		return converters[0].ToDirective(secretLoader)
+		return converters[0].ToDirective(secretLoader, outputName)
 	default:
 		return nil, errors.Errorf("more then one plugin config is not allowed for an output")
 	}
 }
 
-func CreateFilter(filter v1beta1.Filter, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, outputName string, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -61,7 +61,7 @@ func CreateFilter(filter v1beta1.Filter, secretLoader secret.SecretLoader) (type
 	case 0:
 		return nil, errors.New("no plugin config available for filter")
 	case 1:
-		return converters[0].ToDirective(secretLoader)
+		return converters[0].ToDirective(secretLoader, outputName)
 	default:
 		return nil, errors.Errorf("more then one plugin config is not allowed for a filter")
 	}
