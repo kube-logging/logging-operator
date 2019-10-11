@@ -20,3 +20,13 @@ type ImageSpec struct {
 	Tag        string `json:"tag"`
 	PullPolicy string `json:"pullPolicy"`
 }
+
+// Metrics defines the service monitor endpoints
+type Metrics struct {
+	Interval              string `json:"interval,omitempty"`
+	Timeout               string `json:"timeout,omitempty"`
+	Port                  int32  `json:"port,omitempty"`
+	Path                  string `json:"path,omitempty"`
+	ServiceMonitor        bool   `json:"serviceMonitor,omitempty"`
+	PrometheusAnnotations bool   `json:"prometheusAnnotations,omitempty"`
+}

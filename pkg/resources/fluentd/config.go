@@ -26,9 +26,11 @@ var fluentdInputTemplate = `
   rpc_endpoint 127.0.0.1:24444
 </system>
 # Prometheus monitoring
+{{ if .Monitor.Enabled }}
 <source>
     @type prometheus
-    port 25000
+    port {{ .Monitor.Port }}
+    metrics_path {{ .Monitor.Path }}
 </source>
 <source>
     @type prometheus_monitor
@@ -36,21 +38,22 @@ var fluentdInputTemplate = `
 <source>
     @type prometheus_output_monitor
 </source>
+{{ end }}
 
 # Prevent fluentd from handling records containing its own logs. Otherwise
 # it can lead to an infinite loop, when error in sending one message generates
 # another message which also fails to be sent and so on.
-<match **.fluentd**>
+<label @ERROR>
+<match **>
     @type null
+    @id main-fluentd-error
 </match>
-
-<match **.fluent-bit**>
-    @type null
-</match>
+</label>
 
 `
 var fluentdOutputTemplate = `
 <match **>
     @type null
+    @id main-no-output
 </match>
 `

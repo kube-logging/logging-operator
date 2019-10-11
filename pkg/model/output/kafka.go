@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package output
 
@@ -35,7 +33,6 @@ import (
 //       type: json
 //     buffer:
 //       tags: topic
-//       path: /tmp/buffer
 //       timekey: 1m
 //       timekey_wait: 30s
 //       timekey_use_utc: true
@@ -94,12 +91,14 @@ type KafkaOutputConfig struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "kafka2"
 	kafka := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "kafka2",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -108,14 +107,14 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types
 		kafka.Params = params
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			kafka.SubDirectives = append(kafka.SubDirectives, buffer)
 		}
 	}
 	if e.Format != nil {
-		if format, err := e.Format.ToDirective(secretLoader); err != nil {
+		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			kafka.SubDirectives = append(kafka.SubDirectives, format)

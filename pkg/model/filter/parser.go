@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,7 +62,7 @@ type ParseSection struct {
 	KeepTimeKey bool `json:"keep_time_key,omitempty"`
 }
 
-func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseMeta := types.PluginMeta{
 		Directive: "parse",
 		Type:      p.Type,
@@ -75,12 +75,14 @@ func NewParserConfig() *ParserConfig {
 	return &ParserConfig{}
 }
 
-func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "parser"
 	parser := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
-			Type:      "parser",
+			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(p); err != nil {
@@ -90,7 +92,7 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader) (types.Dire
 	}
 	if len(p.Parsers) > 0 {
 		for _, parseRule := range p.Parsers {
-			if meta, err := parseRule.ToDirective(secretLoader); err != nil {
+			if meta, err := parseRule.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				parser.SubDirectives = append(parser.SubDirectives, meta)

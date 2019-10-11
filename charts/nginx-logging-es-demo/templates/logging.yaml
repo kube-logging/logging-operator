@@ -3,6 +3,10 @@ kind: Logging
 metadata:
   name: {{ include "nginx-logging-es-demo.fullname" . }}-logging
 spec:
-  fluentd: {}
-  fluentbit: {}
+  fluentd:
+    {{- toYaml .Values.loggingOperator.fluentd | nindent 6 }}
+
+  fluentbit:
+    {{- toYaml .Values.loggingOperator.fluentbit | nindent 6 }}
+
   controlNamespace: {{ .Release.Namespace }}

@@ -11,34 +11,25 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.13
+        environment:
+          GOFLAGS: -mod=readonly
 
     steps:
       - checkout
 
       - run:
-          name: Run fmt
-          command: |
-            make check-fmt
-
-      - run:
-          name: Run golint
-          command: |
-            make lint
-
-      - run:
-          name: Run misspell
-          command: |
-            make check-misspell
-
-      - run:
-          name: Run ineffassign
-          command: |
-            make ineffassign
+          name: Run lint
+          command: make lint
 
       - run:
           name: Check generators for unwanted diffs
           command: |
             make check-diff
+
+      - run:
+          name: License
+          command: |
+            make license
 
       - run:
           name: Test

@@ -27,12 +27,12 @@ import (
 )
 
 func TestJsonRender(t *testing.T) {
-	input, err := input.NewTailInputConfig("input.log").ToDirective(secret.NewSecretLoader(nil, "", "", nil))
+	commonId := "test"
+	input, err := input.NewTailInputConfig("input.log").ToDirective(secret.NewSecretLoader(nil, "", "", nil), commonId)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
-
-	system := types.NewSystem(input, types.NewRouter())
+	system := types.NewSystem(input, types.NewRouter("test"))
 
 	flow, err := types.NewFlow(
 		"ns-test",
@@ -44,12 +44,12 @@ func TestJsonRender(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	filter, err := filter.NewStdOutFilterConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil))
+	filter, err := filter.NewStdOutFilterConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil), commonId)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
 
-	nullOut, err := output.NewNullOutputConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil))
+	nullOut, err := output.NewNullOutputConfig().ToDirective(secret.NewSecretLoader(nil, "", "", nil), commonId)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -77,6 +77,7 @@ func TestJsonRender(t *testing.T) {
 	expected := `{
           "input": {
             "type": "tail",
+            "id": "test-tail",
             "directive": "source",
 			"params": {
             	"path": "input.log"
@@ -84,6 +85,7 @@ func TestJsonRender(t *testing.T) {
           },
           "router": {
 			"type": "label_router",
+            "id": "test-label_router",
             "directive": "match",
 			"tag": "**",
             "routes": [
@@ -105,6 +107,7 @@ func TestJsonRender(t *testing.T) {
               "filters": [
                 {
                   "type": "stdout",
+                  "id": "test-stdout",
                   "directive": "filter",
                   "tag": "**"
                 }
@@ -112,6 +115,7 @@ func TestJsonRender(t *testing.T) {
               "outputs": [
                 {
                   "type": "null",
+                  "id": "test-null",
                   "directive": "match",
                   "tag": "**"
                 }

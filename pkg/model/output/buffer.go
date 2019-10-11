@@ -95,7 +95,7 @@ type Buffer struct {
 	TimekeyZone string `json:"timekey_zone,omitempty"`
 }
 
-func (b *Buffer) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	metadata := types.PluginMeta{
 		Type:      "file",
 		Directive: "buffer",

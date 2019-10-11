@@ -28,10 +28,12 @@ func NewNullOutputConfig() *NullOutputConfig {
 	return &NullOutputConfig{}
 }
 
-func (c *NullOutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *NullOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "null"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "null",
+		Type:      pluginType,
 		Directive: "match",
 		Tag:       "**",
+		Id:        id + "-" + pluginType,
 	}, c, secretLoader)
 }

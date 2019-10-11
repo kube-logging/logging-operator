@@ -1,0 +1,24 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: {{ include "nginx-logging-demo.fullname" . }}-flow
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "nginx-logging-demo.labels" . | indent 4 }}
+spec:
+  filters:
+    - tag_normaliser: {}
+    - parser:
+        key_name: message
+        remove_key_name_field: true
+        reserve_data: true
+        parsers:
+          - type: nginx
+  selectors:
+    app.kubernetes.io/name: {{ include "nginx-logging-demo.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  outputRefs:
+    - {{ include "nginx-logging-demo.fullname" . }}-output
+
+
+

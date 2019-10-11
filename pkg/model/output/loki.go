@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package output
 
@@ -45,12 +43,14 @@ type LokiOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "kubernetes_loki"
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
-			Type:      "kubernetes_loki",
+			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(l); err != nil {
@@ -59,7 +59,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader) (types.Direct
 		loki.Params = params
 	}
 	if l.Buffer != nil {
-		if buffer, err := l.Buffer.ToDirective(secretLoader); err != nil {
+		if buffer, err := l.Buffer.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			loki.SubDirectives = append(loki.SubDirectives, buffer)

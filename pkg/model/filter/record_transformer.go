@@ -1,18 +1,16 @@
-/*
- * Copyright © 2019 Banzai Cloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright © 2019 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package filter
 
@@ -43,7 +41,7 @@ type RecordTransformer struct {
 // Parameters inside record directives are considered to be new key-value pairs
 type Record map[string]string
 
-func (r *Record) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (r *Record) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	recordSet := types.PluginMeta{
 		Directive: "record",
 	}
@@ -54,12 +52,14 @@ func (r *Record) ToDirective(secretLoader secret.SecretLoader) (types.Directive,
 	return directive, nil
 }
 
-func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "record_transformer"
 	recordTransformer := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
-			Type:      "record_transformer",
+			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
+			Id:        id + "-" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(r); err != nil {
@@ -69,7 +69,7 @@ func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader) (types
 	}
 	if len(r.Records) > 0 {
 		for _, record := range r.Records {
-			if meta, err := record.ToDirective(secretLoader); err != nil {
+			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
 				recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)

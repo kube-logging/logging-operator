@@ -21,6 +21,26 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:
   - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - alertmanagers
+      - prometheuses
+      - prometheuses/finalizers
+      - alertmanagers/finalizers
+      - servicemonitors
+      - podmonitors
+      - prometheusrules
+      - podmonitors
+    verbs:
+      - '*'
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - list
+      - watch
+  - apiGroups:
       - logging.banzaicloud.io
     resources:
       - loggings

@@ -15,8 +15,6 @@
 package v1beta1
 
 import (
-	"strconv"
-
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -35,6 +33,7 @@ type FluentdSpec struct {
 	Port                int32                            `json:"port,omitempty"`
 	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
 	NodeSelector        map[string]string                `json:"nodeSelector,omitempty"`
+	Metrics             *Metrics                         `json:"metrics,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -44,17 +43,4 @@ type FluentdTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName"`
 	SharedKey  string `json:"sharedKey,omitempty"`
-}
-
-// GetPrometheusPortFromAnnotation gets the port value from annotation
-func (spec FluentdSpec) GetPrometheusPortFromAnnotation() int32 {
-	var err error
-	var port int64
-	if spec.Annotations != nil {
-		port, err = strconv.ParseInt(spec.Annotations["prometheus.io/port"], 10, 32)
-		if err != nil {
-			return 0
-		}
-	}
-	return int32(port)
 }

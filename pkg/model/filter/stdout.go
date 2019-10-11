@@ -28,10 +28,12 @@ func NewStdOutFilterConfig() *StdOutFilterConfig {
 	return &StdOutFilterConfig{}
 }
 
-func (c *StdOutFilterConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
+func (c *StdOutFilterConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "stdout"
 	return types.NewFlatDirective(types.PluginMeta{
-		Type:      "stdout",
+		Type:      pluginType,
 		Directive: "filter",
 		Tag:       "**",
+		Id:        id + "-" + pluginType,
 	}, c, secretLoader)
 }

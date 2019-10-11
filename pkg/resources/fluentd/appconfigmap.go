@@ -20,13 +20,15 @@ import (
 	"hash/fnv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/banzaicloud/logging-operator/pkg/util"
 )
 
 type ConfigCheckResult struct {
@@ -36,14 +38,14 @@ type ConfigCheckResult struct {
 
 const ConfigKey = "generated.conf"
 
-func (r *Reconciler) appconfigMap() runtime.Object {
+func (r *Reconciler) appconfigMap() (runtime.Object, k8sutil.DesiredState) {
 	data := make(map[string][]byte)
 	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(AppSecretConfigName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
+			r.Logging.QualifiedName(AppSecretConfigName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Data: data,
-	}
+	}, k8sutil.StatePresent
 }
 
 func (r *Reconciler) configHash() (string, error) {
@@ -112,7 +114,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 	var multierr error
 	var removedHashes = make([]string, 0)
-	for configHash, _ := range r.Logging.Status.ConfigCheckResults {
+	for configHash := range r.Logging.Status.ConfigCheckResults {
 		if configHash == currentHash {
 			continue
 		}
@@ -146,7 +148,7 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	return &v1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
-			util.MergeLabels(r.Logging.Labels, labelSelector),
+			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 			r.Logging,
 		),
 		Data: map[string][]byte{
@@ -156,11 +158,11 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) *v1.Secret {
-	obj := r.outputSecret(r.secrets, OutputSecretPath)
+	obj, _ := r.outputSecret(r.secrets, OutputSecretPath)
 	if secret, ok := obj.(*v1.Secret); ok {
 		secret.ObjectMeta = templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
-			util.MergeLabels(r.Logging.Labels, labelSelector),
+			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 			r.Logging)
 		return secret
 	}
@@ -172,7 +174,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 	pod := &v1.Pod{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
-			util.MergeLabels(r.Logging.Labels, labelSelector),
+			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 			r.Logging,
 		),
 		Spec: v1.PodSpec{

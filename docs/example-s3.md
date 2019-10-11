@@ -80,7 +80,6 @@ spec:
     s3_region: eu-central-1
     path: logs/${tag}/%Y/%m/%d/
     buffer:
-      path: /tmp/buffer
       timekey: 10m
       timekey_wait: 30s
       timekey_use_utc: true

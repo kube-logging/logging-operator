@@ -83,10 +83,28 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"
 		}
 		if copy.Spec.FluentdSpec.Annotations == nil {
-			copy.Spec.FluentdSpec.Annotations = map[string]string{
-				"prometheus.io/scrape": "true",
-				"prometheus.io/path":   "/metrics",
-				"prometheus.io/port":   "25000",
+			copy.Spec.FluentdSpec.Annotations = make(map[string]string)
+		}
+		if copy.Spec.FluentdSpec.Metrics != nil {
+			if copy.Spec.FluentdSpec.Metrics.Path == "" {
+				copy.Spec.FluentdSpec.Metrics.Path = "/metrics"
+			}
+			if copy.Spec.FluentdSpec.Metrics.Port == 0 {
+				copy.Spec.FluentdSpec.Metrics.Port = 24231
+			}
+			if copy.Spec.FluentdSpec.Metrics.Timeout == "" {
+				copy.Spec.FluentdSpec.Metrics.Timeout = "5s"
+			}
+			if copy.Spec.FluentdSpec.Metrics.Interval == "" {
+				copy.Spec.FluentdSpec.Metrics.Interval = "15s"
+			}
+
+			if copy.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
+
+				copy.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
+
+				copy.Spec.FluentdSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentdSpec.Metrics.Path
+				copy.Spec.FluentdSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
 		if copy.Spec.FluentdSpec.FluentdPvcSpec.AccessModes == nil {
@@ -158,13 +176,32 @@ func (l *Logging) SetDefaults() *Logging {
 				v1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
+
 		if copy.Spec.FluentbitSpec.Annotations == nil {
-			copy.Spec.FluentbitSpec.Annotations = map[string]string{
-				"prometheus.io/scrape": "true",
-				"prometheus.io/path":   "/api/v1/metrics/prometheus",
-				"prometheus.io/port":   "2020",
+			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
+		}
+
+		if copy.Spec.FluentbitSpec.Metrics != nil {
+			if copy.Spec.FluentbitSpec.Metrics.Path == "" {
+				copy.Spec.FluentbitSpec.Metrics.Path = "/api/v1/metrics/prometheus"
+			}
+			if copy.Spec.FluentbitSpec.Metrics.Port == 0 {
+				copy.Spec.FluentbitSpec.Metrics.Port = 2020
+			}
+			if copy.Spec.FluentbitSpec.Metrics.Timeout == "" {
+				copy.Spec.FluentbitSpec.Metrics.Timeout = "5s"
+			}
+			if copy.Spec.FluentbitSpec.Metrics.Interval == "" {
+				copy.Spec.FluentbitSpec.Metrics.Interval = "15s"
+			}
+			if copy.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
+
+				copy.Spec.FluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
+				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
+				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentbitSpec.Metrics.Port)
 			}
 		}
+
 	}
 	return copy
 }

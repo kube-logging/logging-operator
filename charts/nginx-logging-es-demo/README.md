@@ -40,17 +40,29 @@ The command removes all the Kubernetes components associated with the chart and 
 
 The following tables lists the configurable parameters of the nginx-logging-es-demo chart and their default values.
 
-|                      Parameter                      |                        Description                     |             Default            |
-| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
-| `image.repository`                                  | Container image repository                             | `nginx` |
-| `image.tag`                                         | Container image tag                                    | `stable`                        |
-| `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
-| `nameOverride`                                      | Override name of app                                   | ``                             |
-| `fullnameOverride`                                  | Override full name of app                              | ``                             |
-| `affinity`                                          | Node Affinity                                          | `{}`                           |
-| `resources`                                         | CPU/Memory resource requests/limits                    | `{}`                           |
-| `tolerations`                                       | Node Tolerations                                       | `[]`                           |
-| `nodeSelector`                                      | Define which Nodes the Pods are scheduled on.          | `{}`                           |
+|                          Parameter                        |                        Description                      |     Default    |
+| --------------------------------------------------------- | ------------------------------------------------------- | -------------- |
+| `image.repository`                                        | Container image repository                              | `nginx`        |
+| `image.tag`                                               | Container image tag                                     | `stable`       |
+| `image.pullPolicy`                                        | Container pull policy                                   | `IfNotPresent` |
+| `nameOverride`                                            | Override name of app                                    | ``             |
+| `fullnameOverride`                                        | Override full name of app                               | ``             |
+| `affinity`                                                | Node Affinity                                           | `{}`           |
+| `resources`                                               | CPU/Memory resource requests/limits                     | `{}`           |
+| `tolerations`                                             | Node Tolerations                                        | `[]`           |
+| `nodeSelector`                                            | Define which Nodes the Pods are scheduled on.           | `{}`           |
+| `loggingOperator.fluentd.metrics.serviceMonitor`          | Enable to create ServiceMonitor for Prometheus operator | `false`        |
+| `loggingOperator.fluentd.metrics.prometheusAnnotations`   | Add prometheus labes to fluent pods.                    | `false`        |
+| `loggingOperator.fluentd.metrics.port`                    | Metrics Port.                                           | ``             |
+| `loggingOperator.fluentd.metrics.path`                    | Metrics Path                                            | ``             |
+| `loggingOperator.fluentd.metrics.timeout`                 | Scrape timeout.                                         | ``             |
+| `loggingOperator.fluentd.metrics.interval`                | Scrape interval.                                        | ``             |
+| `loggingOperator.fluentbit.metrics.serviceMonitor`        | Enable to create ServiceMonitor for Prometheus operator | `false`        |
+| `loggingOperator.fluentbit.metrics.prometheusAnnotations` | Add prometheus labes to fluent pods.                    | `false`        |
+| `loggingOperator.fluentbit.metrics.port`                  | Metrics Port.                                           | ``             |
+| `loggingOperator.fluentbit.metrics.path`                  | Metrics Path                                            | ``             |
+| `loggingOperator.fluentbit.metrics.timeout`               | Scrape timeout.                                         | ``             |
+| `loggingOperator.fluentbit.metrics.interval`              | Scrape interval.                                        | ``             |
 
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:

@@ -15,13 +15,14 @@
 package fluentd
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() runtime.Object {
+func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
 	return &rbacv1.Role{
 		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
 		Rules: []rbacv1.PolicyRule{
@@ -31,10 +32,10 @@ func (r *Reconciler) clusterRole() runtime.Object {
 				Verbs:     []string{"*"},
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
-func (r *Reconciler) clusterRoleBinding() runtime.Object {
+func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
 	return &rbacv1.RoleBinding{
 		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
 		RoleRef: rbacv1.RoleRef{
@@ -49,11 +50,11 @@ func (r *Reconciler) clusterRoleBinding() runtime.Object {
 				Namespace: r.Logging.Spec.ControlNamespace,
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
-func (r *Reconciler) serviceAccount() runtime.Object {
+func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 	return &corev1.ServiceAccount{
 		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(serviceAccountName), r.Logging.Labels, r.Logging),
-	}
+	}, k8sutil.StatePresent
 }
