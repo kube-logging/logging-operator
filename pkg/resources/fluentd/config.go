@@ -54,6 +54,6 @@ var fluentdInputTemplate = `
 var fluentdOutputTemplate = `
 <match **>
     @type null
-    @type main-no-output
+    @id main-no-output
 </match>
 `
