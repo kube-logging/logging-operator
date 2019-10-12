@@ -21,6 +21,7 @@ import (
 
 // +docName:"Kafka output plugin for Fluentd"
 //  More info at https://github.com/fluent/fluent-plugin-kafka
+//>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../docs/example-kafka-nginx.md)
 //
 // #### Example output configurations
 // ```

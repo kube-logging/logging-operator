@@ -103,7 +103,7 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 
 ## Supported Plugins
 
-For complete list of supported plugins pleas checkl the [plugins index](/docs/plugins/index.md).
+For complete list of supported plugins please check the [plugins index](/docs/plugins/Readme.md).
 
 | Name                                                    |  Type  |                                Description               | Status  | Version                                                                                 |
 |---------------------------------------------------------|:------:|:--------------------------------------------------------:|---------|-----------------------------------------------------------------------------------------|
