@@ -12,7 +12,9 @@
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
     - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-  - **Demo Application**  
+  - **Minio**  
+    - [Deploy with Kuberenetes Manifests](#install-minio)
+   - **Demo Application**  
     - [Deploy with Helm](#deploy-demo-nginx-app--logging-definition-with-metrics)
     - [Deploy with Kuberenetes Manifests](#install-from-manifest)
 - **Validation**
@@ -37,7 +39,7 @@ helm install --namespace logging --name monitor stable/prometheus-operator \
     --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].disableDeletion=false" \
     --set "grafana.dashboardProviders.dashboardproviders\\.yaml.providers[0].options.path=/var/lib/grafana/dashboards/default" \
     --set "grafana.dashboards.default.logging.gnetId=7752" \
-    --set "grafana.dashboards.default.logging.revision=2" \
+    --set "grafana.dashboards.default.logging.revision=3" \
     --set "grafana.dashboards.default.logging.datasource=Prometheus" \
     --set "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=False"
 ```
@@ -70,6 +72,76 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 ---
 ## Install from manifest
 
+### Install Minio
+
+#### Create Minio Credential Secret
+```bash
+kubectl -n logging create secret generic logging-s3 --from-literal=accesskey='AKIAIOSFODNN7EXAMPLE' --from-literal=secretkey='wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+```
+#### Deploy Minio
+```bash
+cat <<EOF | kubectl -n logging apply -f -
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: minio-deployment
+  namespace: logging
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        args:
+        - server
+        - /storage
+        readinessProbe:
+          httpGet:
+            path: /minio/health/ready
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        env:
+        - name: MINIO_REGION
+          value: 'test_region'
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: logging-s3
+              key: accesskey
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: logging-s3
+              key: secretkey
+        ports:
+        - containerPort: 9000
+      volumes:
+        - name: logging-s3
+          secret:
+            secretName: logging-s3
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-demo-minio
+  namespace: logging
+spec:
+  selector:
+    app: minio
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: 9000
+
+EOF
+```
+
 #### Create `logging` resource
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
@@ -79,20 +151,16 @@ metadata:
   name: default-logging-simple
 spec:
   fluentd:
-    metics:
+    metrics:
       serviceMonitor: true
   fluentbit:
-    metics:
+    metrics:
       serviceMonitor: true
   controlNamespace: logging
 EOF
 ```
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
-#### Create Minio Credential Secret
-```bash
-ANYAD
-```
 #### Create Minio output definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
@@ -165,7 +233,8 @@ spec:
   template:
     metadata:
       labels:
-        app: nginx
+        app.kubernetes.io/instance: nginx-demo
+        app.kubernetes.io/name: nginx-logging-demo 
     spec:
       containers:
       - name: nginx

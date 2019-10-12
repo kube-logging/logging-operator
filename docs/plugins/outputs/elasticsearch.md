@@ -1,6 +1,22 @@
 # Elasticsearch output plugin for Fluentd
 ## Overview
 More info at https://github.com/uken/fluent-plugin-elasticsearch
+>Example Deployment: [Save all logs to ElasticSearch](../../../docs/example-es.md)
+
+ #### Example output configurations
+ ```
+ spec:
+   elasticsearch:
+     host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+     port: 9200
+     scheme: https
+     ssl_verify: false
+     ssl_version: TLSv1_2
+     buffer:
+       timekey: 1m
+       timekey_wait: 30s
+       timekey_use_utc: true
+ ```
 
 ## Configuration
 ### Elasticsearch
