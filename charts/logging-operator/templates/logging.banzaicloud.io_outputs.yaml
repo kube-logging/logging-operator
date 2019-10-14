@@ -47,6 +47,21 @@ spec:
                 azure_storage_access_key:
                   description: Your azure storage access key
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -64,12 +79,25 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 azure_storage_account:
                   description: Your azure storage account
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -87,8 +115,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 azure_storage_type:
                   description: 'Azure storage type currently only "blob" supported
@@ -542,6 +568,21 @@ spec:
                 password:
                   description: Password for HTTP Basic authentication.
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -559,8 +600,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 path:
                   description: Path for HTTP Basic authentication.
@@ -1003,6 +1042,21 @@ spec:
                       password:
                         description: The password for authentication.
                         properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
                           value:
                             type: string
                           valueFrom:
@@ -1020,8 +1074,6 @@ spec:
                                 - name
                                 type: object
                             type: object
-                        required:
-                        - valueFrom
                         type: object
                       port:
                         description: 'The port number of the host. Note that both
@@ -1031,6 +1083,21 @@ spec:
                       shared_key:
                         description: The shared key per server.
                         properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
                           value:
                             type: string
                           valueFrom:
@@ -1048,8 +1115,6 @@ spec:
                                 - name
                                 type: object
                             type: object
-                        required:
-                        - valueFrom
                         type: object
                       standby:
                         description: Marks a node as the standby node for an Active-Standby
@@ -1060,6 +1125,21 @@ spec:
                       username:
                         description: The username for authentication.
                         properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    description: Secret key for the value
+                                    type: string
+                                  name:
+                                    description: Name of the kubernetes secret
+                                    type: string
+                                required:
+                                - key
+                                - name
+                                type: object
+                            type: object
                           value:
                             type: string
                           valueFrom:
@@ -1077,8 +1157,6 @@ spec:
                                 - name
                                 type: object
                             type: object
-                        required:
-                        - valueFrom
                         type: object
                       weight:
                         description: 'The load balancing weight. If the weight of
@@ -1098,7 +1176,40 @@ spec:
                   type: string
                 tls_cert_path:
                   description: The additional CA certificate path for TLS.
-                  type: string
+                  properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  type: object
                 tls_cert_thumbprint:
                   description: The certificate thumbprint for searching from Windows
                     system certstore This parameter is for Windows only.
@@ -1113,13 +1224,112 @@ spec:
                   type: string
                 tls_client_cert_path:
                   description: The client certificate path for TLS
-                  type: string
+                  properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  type: object
                 tls_client_private_key_passphrase:
                   description: The client private key passphrase for TLS.
-                  type: string
+                  properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  type: object
                 tls_client_private_key_path:
                   description: The client private key path for TLS.
-                  type: string
+                  properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
+                  type: object
                 tls_insecure_mode:
                   description: 'Skip all verification of certificates or not. (default:
                     false)'
@@ -1308,6 +1518,21 @@ spec:
                 credentials_json:
                   description: GCS service account credentials in JSON format
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -1325,8 +1550,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 encryption_key:
                   description: Customer-supplied, AES-256 encryption key
@@ -1407,7 +1630,7 @@ spec:
                   description: The list of all seed brokers, with their host and port
                     information.
                   type: string
-                buffer_topic:
+                buffer:
                   properties:
                     chunk_full_threshold:
                       description: The percentage of chunk size threshold for flushing.
@@ -1573,6 +1796,21 @@ spec:
                 exclude_topic_key:
                   description: 'Exclude Topic key (default: false)'
                   type: boolean
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
                 get_kafka_client_log:
                   description: 'Get Kafka Client log (default: false)'
                   type: boolean
@@ -1607,16 +1845,17 @@ spec:
                     -1).'
                   type: integer
                 sasl_over_ssl:
-                  description: 'SASL over SSL (default: false)'
+                  description: 'SASL over SSL (default: true)'
                   type: boolean
                 topic_key:
                   description: 'Topic Key (default: "topic")'
                   type: string
-                use_default_for_unkown_topic:
+                use_default_for_unknown_topic:
                   description: 'Use default for unknown topics (default: false)'
                   type: boolean
               required:
               - brokers
+              - format
               type: object
             loggingRef:
               type: string
@@ -1776,6 +2015,21 @@ spec:
                 password:
                   description: Specify password if the Loki server requires authentication.
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -1793,8 +2047,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 tenant:
                   description: Loki is a multi-tenant log storage platform and all
@@ -1806,6 +2058,21 @@ spec:
                 username:
                   description: Specify a username if the Loki server requires authentication.
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -1823,8 +2090,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
               type: object
             nullout:
@@ -1834,6 +2099,21 @@ spec:
                 aaccess_key_secret:
                   description: Your access secret key
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -1851,12 +2131,25 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 access_key_id:
                   description: Your access key id
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -1874,8 +2167,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 auto_create_bucket:
                   description: 'desc ''Create OSS bucket if it does not exists (default:
@@ -2138,6 +2429,21 @@ spec:
                 aws_key_id:
                   description: AWS access key id
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -2155,12 +2461,25 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 aws_sec_key:
                   description: AWS secret key.
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -2178,8 +2497,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 buffer:
                   properties:
@@ -2496,6 +2813,21 @@ spec:
                 endpoint:
                   description: SumoLogic HTTP Collector URL
                   properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              description: Secret key for the value
+                              type: string
+                            name:
+                              description: Name of the kubernetes secret
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                      type: object
                     value:
                       type: string
                     valueFrom:
@@ -2513,8 +2845,6 @@ spec:
                           - name
                           type: object
                       type: object
-                  required:
-                  - valueFrom
                   type: object
                 log_format:
                   description: 'Format to post logs into Sumo. (default: json)'
