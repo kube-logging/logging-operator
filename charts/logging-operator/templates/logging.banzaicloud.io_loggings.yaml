@@ -61,6 +61,23 @@ spec:
                   - repository
                   - tag
                   type: object
+                metrics:
+                  description: Metrics defines the service monitor endpoints
+                  properties:
+                    interval:
+                      type: string
+                    path:
+                      type: string
+                    port:
+                      format: int32
+                      type: integer
+                    prometheusAnnotations:
+                      type: boolean
+                    serviceMonitor:
+                      type: boolean
+                    timeout:
+                      type: string
+                  type: object
                 parser:
                   type: string
                 resources:
@@ -291,6 +308,23 @@ spec:
                   - pullPolicy
                   - repository
                   - tag
+                  type: object
+                metrics:
+                  description: Metrics defines the service monitor endpoints
+                  properties:
+                    interval:
+                      type: string
+                    path:
+                      type: string
+                    port:
+                      format: int32
+                      type: integer
+                    prometheusAnnotations:
+                      type: boolean
+                    serviceMonitor:
+                      type: boolean
+                    timeout:
+                      type: string
                   type: object
                 nodeSelector:
                   additionalProperties:
