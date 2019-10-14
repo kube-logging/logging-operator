@@ -71,6 +71,7 @@ spec:
                           has ip address (default: host)'
                         type: string
                       records:
+                        description: 'Records are represented as maps: `key: value`'
                         items:
                           additionalProperties:
                             type: string
