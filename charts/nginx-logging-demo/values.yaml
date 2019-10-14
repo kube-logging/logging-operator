@@ -39,7 +39,6 @@ loggingOperator:
 #      path: "/metrics"
 #      timeout: "30s"
 #      interval: "15s"
-
   fluentbit: {}
 #    metrics:
 #      serviceMonitor: false
@@ -48,6 +47,15 @@ loggingOperator:
 #      path: "/api/v1/metrics/prometheus"
 #      timeout: "30s"
 #      interval: "15s"
+# If specified, the pod's tolerations.
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#     tolerations:
+#      - key: "node-role.kubernetes.io/master"
+#        operator: "Equal"
+#        effect: "NoSchedule"
+#      - key: "node.kubernetes.io/unschedulable"
+#        operator: "Equal"
+#        effect: "NoSchedule"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
