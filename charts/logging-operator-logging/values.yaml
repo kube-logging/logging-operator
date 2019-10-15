@@ -20,6 +20,15 @@ fluentd: {}
 #      requests:
 #        storage: 40Gi
 #    storageClassName: fast
+# If specified, the pod's tolerations.
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#     tolerations:
+#      - key: "node-role.kubernetes.io/master"
+#        operator: "Equal"
+#        effect: "NoSchedule"
+#      - key: "node.kubernetes.io/unschedulable"
+#        operator: "Equal"
+#        effect: "NoSchedule"
 
 # Enable secure connection between fluentd and fluent-bit
 tls:
