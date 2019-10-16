@@ -38,10 +38,10 @@ const (
 	OutputSecretName    = "fluentd-output"
 	OutputSecretPath    = "/fluentd/secret"
 
-	bufferVolumeName   = "fluentd-buffer"
-	serviceAccountName = "fluentd"
-	roleBindingName    = "fluentd"
-	roleName           = "fluentd"
+	bufferVolumeName          = "fluentd-buffer"
+	defaultServiceAccountName = "fluentd"
+	roleBindingName           = "fluentd"
+	roleName                  = "fluentd"
 )
 
 // Reconciler holds info what resource to reconcile
@@ -55,6 +55,13 @@ type Reconciler struct {
 func (r *Reconciler) getFluentdLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentd"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+}
+
+func (r *Reconciler) getServiceAccount() string {
+	if r.Logging.Spec.FluentdSpec.ServiceAccount != "" {
+		return r.Logging.Spec.FluentdSpec.ServiceAccount
+	}
+	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
 func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets) *Reconciler {

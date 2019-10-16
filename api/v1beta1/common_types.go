@@ -30,3 +30,10 @@ type Metrics struct {
 	ServiceMonitor        bool   `json:"serviceMonitor,omitempty"`
 	PrometheusAnnotations bool   `json:"prometheusAnnotations,omitempty"`
 }
+
+// Security defines Fluentd, Fluentbit deployment security properties
+type Security struct {
+	ServiceAccount               string `json:"serviceAccount,omitempty"`
+	RoleBasedAccessControlCreate bool   `json:"roleBasedAccessControlCreate,omitempty"`
+	PodSecurityPolicyCreate      bool   `json:"podSecurityPolicyCreate,omitempty"`
+}

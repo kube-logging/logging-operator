@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	serviceAccountName        = "logging"
+	defaultServiceAccountName = "logging"
 	clusterRoleBindingName    = "logging"
 	clusterRoleName           = "logging"
 	fluentBitSecretConfigName = "fluentbit"
@@ -41,6 +41,13 @@ func generataLoggingRefLabels(loggingRef string) map[string]string {
 func (r *Reconciler) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentbit"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+}
+
+func (r *Reconciler) getServiceAccount() string {
+	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
+		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
+	}
+	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
 // Reconciler holds info what resource to reconcile

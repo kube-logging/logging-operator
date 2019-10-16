@@ -34,6 +34,7 @@ type FluentdSpec struct {
 	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
 	NodeSelector        map[string]string                `json:"nodeSelector,omitempty"`
 	Metrics             *Metrics                         `json:"metrics,omitempty"`
+	Security            *Security                        `json:"security,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
