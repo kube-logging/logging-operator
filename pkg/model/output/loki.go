@@ -56,7 +56,7 @@ type LokiOutput struct {
 }
 
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "kubernetes_loki"
+	pluginType := "loki"
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
