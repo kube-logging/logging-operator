@@ -34,6 +34,6 @@ type Metrics struct {
 // Security defines Fluentd, Fluentbit deployment security properties
 type Security struct {
 	ServiceAccount               string `json:"serviceAccount,omitempty"`
-	RoleBasedAccessControlCreate bool   `json:"roleBasedAccessControlCreate,omitempty"`
+	RoleBasedAccessControlCreate *bool  `json:"roleBasedAccessControlCreate,omitempty"`
 	PodSecurityPolicyCreate      bool   `json:"podSecurityPolicyCreate,omitempty"`
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fluentd
+package fluentbit
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
@@ -27,24 +27,26 @@ import (
 )
 
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.DesiredState) {
-	if r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
+	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
 
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: templates.FluentdObjectMetaClusterScope(
-				r.Logging.QualifiedName(PodSecurityPolicyName),
-				util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
+			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+				r.Logging.QualifiedName(fluentbitPodSecurityPolicyName),
+				util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()),
+				r.Logging),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
 				Volumes: []policyv1beta1.FSType{
 					"configMap",
 					"emptyDir",
 					"secret",
-					"persistentVolumeClaim"},
+					"hostPath"},
 				SELinux: policyv1beta1.SELinuxStrategyOptions{
 					Rule: policyv1beta1.SELinuxStrategyRunAsAny,
 				},
 				RunAsUser: policyv1beta1.RunAsUserStrategyOptions{
 					Rule:   policyv1beta1.RunAsUserStrategyMustRunAs,
 					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}}},
+				RunAsGroup: nil,
 				SupplementalGroups: policyv1beta1.SupplementalGroupsStrategyOptions{
 					Rule:   policyv1beta1.SupplementalGroupsStrategyMustRunAs,
 					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}},
@@ -53,50 +55,60 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 					Rule:   policyv1beta1.FSGroupStrategyMustRunAs,
 					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}},
 				},
+				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),
+				AllowedHostPaths: []policyv1beta1.AllowedHostPath{{
+					PathPrefix: "/var/lib/docker/containers",
+					ReadOnly:   true,
+				}, {
+					PathPrefix: "/var/log",
+					ReadOnly:   true,
+				}},
 			},
 		}, k8sutil.StatePresent
 
 	}
 	return &policyv1beta1.PodSecurityPolicy{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(PodSecurityPolicyName),
-			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
+		ObjectMeta: templates.FluentbitObjectMeta(
+			r.Logging.QualifiedName(fluentbitPodSecurityPolicyName),
+			util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()),
+			r.Logging),
 		Spec: policyv1beta1.PodSecurityPolicySpec{},
 	}, k8sutil.StateAbsent
+
 }
 
-func (r *Reconciler) pspRole() (runtime.Object, k8sutil.DesiredState) {
-	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
-
-		return &rbacv1.Role{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName+"-psp"), r.Logging.Labels, r.Logging),
+func (r *Reconciler) pspClusterRole() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+		return &rbacv1.ClusterRole{
+			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+				r.Logging.QualifiedName(clusterRoleName+"-psp"), r.Logging.Labels, r.Logging),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{"policy"},
-					Resources: []string{r.Logging.QualifiedName(PodSecurityPolicyName)},
+					Resources: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
 					Verbs:     []string{"use"},
 				},
 			},
 		}, k8sutil.StatePresent
 	}
-	return &rbacv1.Role{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(roleName+"-psp"),
+	return &rbacv1.ClusterRole{
+		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+			r.Logging.QualifiedName(clusterRoleName+"-psp"),
 			r.Logging.Labels, r.Logging,
 		),
 		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
 }
 
-func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState) {
-	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
-
-		return &rbacv1.RoleBinding{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName+"-psp"), r.Logging.Labels, r.Logging),
+func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+				r.Logging.QualifiedNamespacedName(clusterRoleBindingName+"-psp"), r.Logging.Labels, r.Logging),
 			RoleRef: rbacv1.RoleRef{
-				Kind:     "Role",
+				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(roleName + "-psp"),
+				Name:     r.Logging.QualifiedName(clusterRoleName + "-psp"),
 			},
 			Subjects: []rbacv1.Subject{
 				{
@@ -107,10 +119,12 @@ func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState) {
 			},
 		}, k8sutil.StatePresent
 	}
-	return &rbacv1.RoleBinding{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(roleBindingName+"-psp"),
-			r.Logging.Labels, r.Logging,
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+			r.Logging.QualifiedNamespacedName(
+				clusterRoleBindingName+"-psp"),
+			r.Logging.Labels,
+			r.Logging,
 		),
 		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
 }

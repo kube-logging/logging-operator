@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"fmt"
 
+	"github.com/banzaicloud/logging-operator/pkg/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -84,6 +85,12 @@ func (l *Logging) SetDefaults() *Logging {
 		}
 		if copy.Spec.FluentdSpec.Annotations == nil {
 			copy.Spec.FluentdSpec.Annotations = make(map[string]string)
+		}
+		if copy.Spec.FluentdSpec.Security == nil {
+			copy.Spec.FluentdSpec.Security = &Security{}
+		}
+		if copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate == nil {
+			copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
 		if copy.Spec.FluentdSpec.Metrics != nil {
 			if copy.Spec.FluentdSpec.Metrics.Path == "" {
@@ -181,6 +188,12 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
 		}
 
+		if copy.Spec.FluentbitSpec.Security == nil {
+			copy.Spec.FluentbitSpec.Security = &Security{}
+		}
+		if copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
+			copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		}
 		if copy.Spec.FluentbitSpec.Metrics != nil {
 			if copy.Spec.FluentbitSpec.Metrics.Path == "" {
 				copy.Spec.FluentbitSpec.Metrics.Path = "/api/v1/metrics/prometheus"

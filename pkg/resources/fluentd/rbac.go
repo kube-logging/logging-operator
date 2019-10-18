@@ -22,8 +22,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
-	if r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
+func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 
 		return &rbacv1.Role{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
@@ -36,11 +36,16 @@ func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
 			},
 		}, k8sutil.StatePresent
 	}
-	return nil, k8sutil.StatePresent
+	return &rbacv1.Role{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(roleName),
+			r.Logging.Labels, r.Logging,
+		),
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
 }
 
-func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
-	if r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
+func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 
 		return &rbacv1.RoleBinding{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
@@ -58,15 +63,30 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState)
 			},
 		}, k8sutil.StatePresent
 	}
-	return nil, k8sutil.StatePresent
+	return &rbacv1.RoleBinding{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(roleBindingName),
+			r.Logging.Labels, r.Logging,
+		),
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
-	if r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 
 		return &corev1.ServiceAccount{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(defaultServiceAccountName), r.Logging.Labels, r.Logging),
+			ObjectMeta: templates.FluentdObjectMeta(
+				r.Logging.QualifiedName(defaultServiceAccountName),
+				r.Logging.Labels,
+				r.Logging,
+			),
 		}, k8sutil.StatePresent
 	}
-	return nil, k8sutil.StatePresent
+	return &corev1.ServiceAccount{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(defaultServiceAccountName),
+			r.Logging.Labels,
+			r.Logging,
+		),
+	}, k8sutil.StateAbsent
 }

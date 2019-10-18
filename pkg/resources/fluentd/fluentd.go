@@ -30,13 +30,14 @@ import (
 )
 
 const (
-	SecretConfigName    = "fluentd"
-	AppSecretConfigName = "fluentd-app"
-	AppConfigKey        = "fluentd.conf"
-	StatefulSetName     = "fluentd"
-	ServiceName         = "fluentd"
-	OutputSecretName    = "fluentd-output"
-	OutputSecretPath    = "/fluentd/secret"
+	SecretConfigName      = "fluentd"
+	AppSecretConfigName   = "fluentd-app"
+	AppConfigKey          = "fluentd.conf"
+	StatefulSetName       = "fluentd"
+	PodSecurityPolicyName = "fluentd"
+	ServiceName           = "fluentd"
+	OutputSecretName      = "fluentd-output"
+	OutputSecretPath      = "/fluentd/secret"
 
 	bufferVolumeName          = "fluentd-buffer"
 	defaultServiceAccountName = "fluentd"
@@ -58,8 +59,8 @@ func (r *Reconciler) getFluentdLabels() map[string]string {
 }
 
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentdSpec.ServiceAccount != "" {
-		return r.Logging.Spec.FluentdSpec.ServiceAccount
+	if r.Logging.Spec.FluentdSpec.Security.ServiceAccount != "" {
+		return r.Logging.Spec.FluentdSpec.Security.ServiceAccount
 	}
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
@@ -140,8 +141,11 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	}
 	for _, res := range []resources.Resource{
 		r.serviceAccount,
-		r.clusterRole,
-		r.clusterRoleBinding,
+		r.role,
+		r.roleBinding,
+		r.clusterPodSecurityPolicy,
+		r.pspRole,
+		r.pspRoleBinding,
 		r.secretConfig,
 		r.appconfigMap,
 		r.statefulset,
@@ -150,6 +154,9 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.monitorServiceMetrics,
 	} {
 		o, state := res()
+		if o == nil {
+			return nil, errors.Errorf("Reconcile error! Resource %s returns with nil object", res)
+		}
 		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
