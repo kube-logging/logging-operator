@@ -33,8 +33,8 @@ buffer:
 `)
 	expected := `
   <match **>
-    @type kubernetes_loki
-    @id test-kubernetes_loki
+    @type loki
+    @id test-loki
     extract_kubernetes_labels true
     line_format json
     url http://loki:3100
