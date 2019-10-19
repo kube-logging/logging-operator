@@ -49,3 +49,13 @@ func OrderedStringMap(original map[string]string) *orderedmap.OrderedMap {
 	o.SortKeys(sort.Strings)
 	return o
 }
+
+// Contains check if a string item exists in []string
+func Contains(s []string, e string) bool {
+	for _, i := range s {
+		if i == e {
+			return true
+		}
+	}
+	return false
+}
