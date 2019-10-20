@@ -37,14 +37,15 @@ buffer:
     @id test-loki
     extract_kubernetes_labels true
     line_format json
+    remove_keys ["kubernetes"]
     url http://loki:3100
     <label>
-      container ${record.dig("kubernetes", "container_name")}
-      container_id ${record.dig("kubernetes", "docker_id")}
-      host ${record.dig("kubernetes", "host")}
-      namespace ${record.dig("kubernetes", "namespace_name")}
-      pod ${record.dig("kubernetes", "pod_name")}
-      pod_id ${record.dig("kubernetes", "pod_id")}
+      container $.kubernetes.container_name
+      container_id $.kubernetes.docker_id
+      host $.kubernetes.host
+      namespace $.kubernetes.namespace_name
+      pod $.kubernetes.pod_name
+      pod_id $.kubernetes.pod_id
     </label>
     <buffer tag,time>
       @type file

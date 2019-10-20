@@ -90,15 +90,19 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	}
 	if l.ConfigureKubernetesLabels {
 		l.ExtraLabels = Label{
-			"namespace":    `${record.dig("kubernetes", "namespace_name")}`,
-			"pod":          `${record.dig("kubernetes", "pod_name")}`,
-			"container_id": `${record.dig("kubernetes", "docker_id")}`,
-			"container":    `${record.dig("kubernetes", "container_name")}`,
-			"pod_id":       `${record.dig("kubernetes", "pod_id")}`,
-			"host":         `${record.dig("kubernetes", "host")}`,
+			"namespace":    `$.kubernetes.namespace_name`,
+			"pod":          `$.kubernetes.pod_name`,
+			"container_id": `$.kubernetes.docker_id`,
+			"container":    `$.kubernetes.container_name`,
+			"pod_id":       `$.kubernetes.pod_id`,
+			"host":         `$.kubernetes.host`,
 		}
-		if !util.Contains(l.RemoveKeys, "kubernetes") {
-			l.RemoveKeys = append(l.RemoveKeys, "kubernetes")
+		if l.RemoveKeys != nil {
+			if !util.Contains(l.RemoveKeys, "kubernetes") {
+				l.RemoveKeys = append(l.RemoveKeys, "kubernetes")
+			}
+		} else {
+			l.RemoveKeys = []string{"kubernetes"}
 		}
 		l.ExtractKubernetesLabels = true
 		// Prevent meta configuration from marshalling
