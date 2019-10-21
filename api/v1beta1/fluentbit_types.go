@@ -33,6 +33,7 @@ type FluentbitSpec struct {
 	Parser      string                      `json:"parser,omitempty"`
 	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics     *Metrics                    `json:"metrics,omitempty"`
+	PositionDB  *KubernetesStorage          `json:"position_db,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

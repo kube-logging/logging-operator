@@ -15,6 +15,7 @@
 package fluentbit
 
 import (
+	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
@@ -23,6 +24,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
+
+const TailPositionVolume = "PositionDB"
 
 // TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
@@ -82,7 +85,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			SubPath:   "fluent-bit.conf",
 		},
 		{
-			Name:      "positions",
+			Name:      TailPositionVolume,
 			MountPath: "/tail-db",
 		},
 		{
@@ -135,12 +138,6 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		},
-		{
-			Name: "positions",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		},
 	}
 	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
@@ -153,5 +150,24 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
+	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.DBStorage, TailPositionVolume))
 	return
+}
+
+func GetVolumeFromKubernetesStorage(storage *v1beta1.KubernetesStorage, name string) corev1.Volume {
+	volume := corev1.Volume{
+		Name: name,
+	}
+	if storage != nil {
+		if storage.HostPath != nil {
+			volume.VolumeSource = corev1.VolumeSource{
+				HostPath: storage.HostPath,
+			}
+		}
+	} else {
+		volume.VolumeSource = corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
+		}
+	}
+	return volume
 }
