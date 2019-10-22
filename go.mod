@@ -8,6 +8,7 @@ require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/k8s-objectmatcher v1.0.1
 	github.com/coreos/prometheus-operator v0.33.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.1.0
 	github.com/goph/emperror v0.17.2
 	github.com/iancoleman/orderedmap v0.0.0-20190318233801-ac98e3ecb4b0

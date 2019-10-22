@@ -82,6 +82,7 @@ metadata:
 spec:
   loki:
     url: http://loki:3100
+    configure_kubernetes_labels: true
     buffer:
       timekey: 1m
       timekey_wait: 30s
@@ -99,7 +100,6 @@ metadata:
   name: loki-flow
 spec:
   filters:
-    - tag_normaliser: {}
     - parser:
         key_name: message
         remove_key_name_field: true
@@ -132,29 +132,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-          name: http
-          protocol: TCP
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
+        image: banzaicloud/loggen:latest
 EOF
 ```
 
