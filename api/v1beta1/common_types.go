@@ -14,6 +14,8 @@
 
 package v1beta1
 
+import corev1 "k8s.io/api/core/v1"
+
 // ImageSpec struct hold information about image specification
 type ImageSpec struct {
 	Repository string `json:"repository"`
@@ -29,4 +31,8 @@ type Metrics struct {
 	Path                  string `json:"path,omitempty"`
 	ServiceMonitor        bool   `json:"serviceMonitor,omitempty"`
 	PrometheusAnnotations bool   `json:"prometheusAnnotations,omitempty"`
+}
+
+type KubernetesStorage struct {
+	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
 }
