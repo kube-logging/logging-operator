@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-const TailPositionVolume = "PositionDB"
+const TailPositionVolume = "positiondb"
 
 // TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
@@ -150,7 +150,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.DBStorage, TailPositionVolume))
+	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.PositionDB, TailPositionVolume))
 	return
 }
 
