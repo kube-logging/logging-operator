@@ -15,6 +15,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -156,6 +157,24 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 				multierror = errors.Combine(multierror, errors.Errorf("field %s is required", name))
 			} else {
 				out[name] = finalVal
+			}
+		case reflect.Slice:
+			if stringSlice, ok := v.Interface().([]string); ok {
+				if len(stringSlice) > 0 {
+					b, err := json.Marshal(stringSlice)
+					if err != nil {
+						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, stringSlice), err)
+					}
+					out[name] = string(b)
+				} else {
+					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
+						b, err := json.Marshal(strings.Split(def, ","))
+						if err != nil {
+							multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
+						}
+						out[name] = string(b)
+					}
+				}
 			}
 		}
 	}
