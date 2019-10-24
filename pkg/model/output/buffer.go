@@ -28,7 +28,7 @@ type Buffer struct {
 	Type string `json:"type,omitempty"`
 	// When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags. (default: tag,time)
 	Tags string `json:"tags,omitempty"`
-	// The path where buffer chunks are stored. The '*' is replaced with random characters. This parameter is required.
+	// The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default. (default: operator generated)
 	Path string `json:"path,omitempty"`
 	// The max size of each chunks: events will be written into chunks until the size of chunks become this size
 	ChunkLimitSize string `json:"chunk_limit_size,omitempty"`
