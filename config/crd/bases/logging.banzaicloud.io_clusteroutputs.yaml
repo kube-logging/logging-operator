@@ -183,8 +183,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -352,8 +353,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -867,8 +869,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1429,8 +1432,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1697,8 +1701,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1928,8 +1933,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -2265,8 +2271,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -2588,8 +2595,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
