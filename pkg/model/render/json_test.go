@@ -77,7 +77,7 @@ func TestJsonRender(t *testing.T) {
 	expected := `{
           "input": {
             "type": "tail",
-            "id": "test-tail",
+            "id": "test_tail",
             "directive": "source",
 			"params": {
             	"path": "input.log"
@@ -85,7 +85,7 @@ func TestJsonRender(t *testing.T) {
           },
           "router": {
 			"type": "label_router",
-            "id": "test-label_router",
+            "id": "test_label_router",
             "directive": "match",
 			"tag": "**",
             "routes": [
@@ -107,7 +107,7 @@ func TestJsonRender(t *testing.T) {
               "filters": [
                 {
                   "type": "stdout",
-                  "id": "test-stdout",
+                  "id": "test_stdout",
                   "directive": "filter",
                   "tag": "**"
                 }
@@ -115,7 +115,7 @@ func TestJsonRender(t *testing.T) {
               "outputs": [
                 {
                   "type": "null",
-                  "id": "test-null",
+                  "id": "test_null",
                   "directive": "match",
                   "tag": "**"
                 }

@@ -88,7 +88,7 @@ func NewRouter(id string) *Router {
 			Type:      "label_router",
 			Directive: "match",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        id + "_" + pluginType,
 		},
 	}
 }

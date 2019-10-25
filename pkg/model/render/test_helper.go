@@ -66,12 +66,12 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 		Prefix: `
 <source>
   @type tail
-  @id test-tail
+  @id test_tail
   path input.log
 </source>
 <match **>
   @type label_router
-  @id test-label_router
+  @id test_label_router
   <route>
     @label @a42fd8d29c181fcf9887280c4a51bd1e
     namespace ns-test

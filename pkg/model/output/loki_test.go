@@ -34,7 +34,7 @@ buffer:
 	expected := `
   <match **>
     @type loki
-    @id test-loki
+    @id test_loki
     extract_kubernetes_labels true
     line_format json
     remove_keys ["kubernetes"]
@@ -49,7 +49,7 @@ buffer:
     </label>
     <buffer tag,time>
       @type file
-      path /buffers/default.*.buffer
+      path /buffers/test_loki.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true
