@@ -80,7 +80,7 @@ func (r Label) ToDirective(secretLoader secret.SecretLoader, id string) (types.D
 }
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "loki"
-	pluginID := id + "-" + pluginType
+	pluginID := id + "_" + pluginType
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

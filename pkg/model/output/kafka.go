@@ -94,7 +94,7 @@ type KafkaOutputConfig struct {
 
 func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "kafka2"
-	pluginID := id + "-" + pluginType
+	pluginID := id + "_" + pluginType
 	kafka := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -91,7 +91,7 @@ type ForwardOutput struct {
 
 func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "forward"
-	pluginID := id + "-" + pluginType
+	pluginID := id + "_" + pluginType
 	forward := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

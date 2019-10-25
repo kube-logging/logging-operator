@@ -85,7 +85,7 @@ type OSSOutput struct {
 
 func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "oss"
-	pluginID := id + "-" + pluginType
+	pluginID := id + "_" + pluginType
 	oss := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
