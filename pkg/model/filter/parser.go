@@ -36,7 +36,7 @@ type ParserConfig struct {
 	// Store parsed values with specified key name prefix.
 	InjectKeyPrefix string `json:"inject_key_prefix,omitempty"`
 	// Store parsed values as a hash value in a field.
-	HashValueField string `json:"hash_value_fiel,omitempty"`
+	HashValueField string `json:"hash_value_field,omitempty"`
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
 	// +docLink:"Parse Section,#Parse-Section"
@@ -60,6 +60,18 @@ type ParseSection struct {
 	EstimateCurrentEvent bool `json:"estimate_current_event,omitempty"`
 	// If true, keep time field in the record.
 	KeepTimeKey bool `json:"keep_time_key,omitempty"`
+	// Types casting the fields to proper types example: field1:type, field2:type
+	Types string `json:"types,omitempty"`
+	// Process value using specified format. This is available only when time_type is string
+	TimeFormat string `json:"time_format,omitempty"`
+	// Parse/format value according to this type available values: float, unixtime, string (default: string)
+	TimeType string `json:"time_type,omitempty"`
+	// Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
+	LocalTime bool `json:"local_time,omitempty"`
+	// If true, use UTC. Otherwise, local time is used. This is exclusive with localtime (default: false)
+	UTC bool `json:"utc,omitempty"`
+	// Use specified timezone. one can parse/format the time value in the specified timezone. (default: nil)
+	Timezone string `json:"timezone,omitempty"`
 }
 
 func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
