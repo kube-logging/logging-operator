@@ -82,7 +82,7 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        id + "_" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(p); err != nil {
