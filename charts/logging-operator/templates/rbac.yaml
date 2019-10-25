@@ -97,6 +97,14 @@ rules:
       - jobs
     verbs:
       - "*"
+  - apiGroups:
+      - extensions
+      - policy
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - list
+      - get
   {{- if .Values.rbac.psp.enabled }}
   - apiGroups:
       - extensions

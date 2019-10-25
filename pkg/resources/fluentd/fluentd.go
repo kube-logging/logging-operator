@@ -155,7 +155,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	} {
 		o, state := res()
 		if o == nil {
-			return nil, errors.Errorf("Reconcile error! Resource %s returns with nil object", res)
+			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
 		}
 		err := r.ReconcileResource(o, state)
 		if err != nil {
