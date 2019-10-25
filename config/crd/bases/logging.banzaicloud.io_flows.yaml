@@ -92,7 +92,7 @@ spec:
                           cases are: key not exist, format is not matched, unexpected
                           error'
                         type: boolean
-                      hash_value_fiel:
+                      hash_value_field:
                         description: Store parsed values as a hash value in a field.
                         type: string
                       inject_key_prefix:
@@ -114,6 +114,10 @@ spec:
                             keep_time_key:
                               description: If true, keep time field in the record.
                               type: boolean
+                            local_time:
+                              description: 'Ff true, use local time. Otherwise, UTC
+                                is used. This is exclusive with utc. (default: true)'
+                              type: boolean
                             null_empty_string:
                               description: If true, empty string field is replaced
                                 with nil
@@ -121,14 +125,37 @@ spec:
                             null_value_pattern:
                               description: ' Specify null value pattern.'
                               type: string
+                            time_format:
+                              description: Process value using specified format. This
+                                is available only when time_type is string
+                              type: string
                             time_key:
                               description: Specify time field for event time. If the
                                 event doesn't have this field, current time is used.
+                              type: string
+                            time_type:
+                              description: 'Parse/format value according to this type
+                                available values: float, unixtime, string (default:
+                                string)'
+                              type: string
+                            timezone:
+                              description: 'Use specified timezone. one can parse/format
+                                the time value in the specified timezone. (default:
+                                nil)'
                               type: string
                             type:
                               description: 'Parse type: apache2, apache_error, nginx,
                                 syslog, csv, tsv, ltsv, json, multiline, none'
                               type: string
+                            types:
+                              description: 'Types casting the fields to proper types
+                                example: field1:type, field2:type'
+                              type: string
+                            utc:
+                              description: 'If true, use UTC. Otherwise, local time
+                                is used. This is exclusive with localtime (default:
+                                false)'
+                              type: boolean
                           type: object
                         type: array
                       remove_key_name_field:
