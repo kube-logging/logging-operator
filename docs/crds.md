@@ -116,7 +116,8 @@ spec:
 | targetHost | string | *Fluentd host* | Hostname to send the logs forward |
 | targetPort | int | *Fluentd port* |  Port to send the logs forward |
 | parser | string | cri | Change fluent-bit input parse configuration. [Available parsers](https://github.com/fluent/fluent-bit/blob/master/conf/parsers.conf)  |
- 
+| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support |
+  
 **`logging` with custom fluent-bit annotations** 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -192,6 +193,15 @@ spec:
   controlNamespace: logging
 
 ```
+
+#### KubernetesStorage
+
+Define Kubernetes storage
+
+| Name      | Type | Default | Description |
+|-----------|------|---------|-------------|
+| host_path | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. |
+
 
 ## outputs, clusteroutputs
 
