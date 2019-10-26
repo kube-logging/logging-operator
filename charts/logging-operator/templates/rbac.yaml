@@ -90,6 +90,7 @@ rules:
       - rolebindings
       - clusterroles
       - clusterrolebindings
+      - podsecuritypolicies
       - daemonsets
       - deployments
       - replicasets

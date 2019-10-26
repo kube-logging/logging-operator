@@ -79,6 +79,7 @@ rules:
       - rolebindings
       - clusterroles
       - clusterrolebindings
+      - podsecuritypolicies
       - daemonsets
       - deployments
       - replicasets
@@ -86,6 +87,7 @@ rules:
       - jobs
     verbs:
       - "*"
+
 ---
 # Source: logging-operator/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
