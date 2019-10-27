@@ -6,16 +6,16 @@
 ---
 ## Contents
 - **Using RBAC Authorization**
-    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
-    - [Deploy with Helm](#nginx-app-and-logging-definition)
-    - [Output](#nginx-app-and-logging-definition)
+    - [Deploy with Kubernetes Manifests](#deploy-with-kubernetes-manifests)
+    - [Deploy with Helm](#deploy-with-helm)
+    - [Output](#example-manifest-generated-by-the-operator)
 - **Service Account**  
-    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
-    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Kubernetes Manifests](#deploy-with-kubernetes-manifests-1)
+    - [Deploy with Helm](#deploy-with-helm-1)
 - **Pod Security Policy**
-    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
-    - [Deploy with Helm](#nginx-app-and-logging-definition)
-    - [Output](#nginx-app-and-logging-definition)
+    - [Deploy with Kubernetes Manifests](#create-logging-resource-with-psp)
+    - [Deploy with Helm](#deploy-with-helm-2)
+    - [Output](#example-manifest-generated-by-the-operator-1)
 ---
 
 
