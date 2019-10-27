@@ -11,12 +11,12 @@
     - [Deploy with Helm](#install-prometheus-operator-with-helm)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
   - **Minio**  
-    - [Deploy with Kuberenetes Manifests](#install-minio)
+    - [Deploy with Kubernetes Manifests](#install-minio)
    - **Demo Application**  
     - [Deploy with Helm](#deploy-demo-nginx-app--logging-definition-with-metrics)
-    - [Deploy with Kuberenetes Manifests](#install-from-manifest)
+    - [Deploy with Kubernetes Manifests](#install-from-manifest)
 - **Validation**
     - [Prometheus Dashboard](#prometheus)
     - [Minio Dashboard](#minio)

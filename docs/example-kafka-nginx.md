@@ -11,10 +11,10 @@
     - [Deploy with Helm](#deploy-kafka)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
    - **Demo Application**  
     - [Deploy with Helm](install-with-helm)
-    - [Deploy with Kuberenetes Manifests](#install-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Kafkacat](#test-your-deployment-with-kafkacat)
 ---
