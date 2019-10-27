@@ -182,12 +182,13 @@ type S3SharedCredentials struct {
 
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "s3"
+	pluginID := id + "_" + pluginType
 	s3 := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        pluginID,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
@@ -196,7 +197,7 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		s3.Params = params
 	}
 	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, ""); err != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
 			return nil, err
 		} else {
 			s3.SubDirectives = append(s3.SubDirectives, buffer)

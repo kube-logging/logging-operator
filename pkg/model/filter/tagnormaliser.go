@@ -47,6 +47,6 @@ func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string)
 		Type:      pluginType,
 		Directive: "match",
 		Tag:       "kubernetes.**",
-		Id:        id + "-" + pluginType,
+		Id:        id + "_" + pluginType,
 	}, t, secretLoader)
 }

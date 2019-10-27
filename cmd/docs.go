@@ -135,6 +135,7 @@ type plugins []plugin
 var ignoredPluginsList = []string{
 	"null",
 	".*.deepcopy",
+	".*_test",
 }
 
 func main() {

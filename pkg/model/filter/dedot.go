@@ -41,6 +41,6 @@ func (c *DedotFilterConfig) ToDirective(secretLoader secret.SecretLoader, id str
 		Type:      pluginType,
 		Directive: "filter",
 		Tag:       "**",
-		Id:        id + "-" + pluginType,
+		Id:        id + "_" + pluginType,
 	}, c, secretLoader)
 }

@@ -27,10 +27,11 @@ type FileOutputConfig struct {
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "file"
+	pluginID := id + "_" + pluginType
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "match",
 		Tag:       "**",
-		Id:        id + "-" + pluginType,
+		Id:        pluginID,
 	}, c, secretLoader)
 }

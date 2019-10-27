@@ -85,12 +85,13 @@ type OSSOutput struct {
 
 func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "oss"
+	pluginID := id + "_" + pluginType
 	oss := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        pluginID,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(o); err != nil {
@@ -99,7 +100,7 @@ func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 		oss.Params = params
 	}
 	if o.Buffer != nil {
-		if buffer, err := o.Buffer.ToDirective(secretLoader, ""); err != nil {
+		if buffer, err := o.Buffer.ToDirective(secretLoader, pluginID); err != nil {
 			return nil, err
 		} else {
 			oss.SubDirectives = append(oss.SubDirectives, buffer)
