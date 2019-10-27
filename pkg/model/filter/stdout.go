@@ -34,6 +34,6 @@ func (c *StdOutFilterConfig) ToDirective(secretLoader secret.SecretLoader, id st
 		Type:      pluginType,
 		Directive: "filter",
 		Tag:       "**",
-		Id:        id + "-" + pluginType,
+		Id:        id + "_" + pluginType,
 	}, c, secretLoader)
 }

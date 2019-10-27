@@ -68,7 +68,7 @@ func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        id + "_" + pluginType,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(g); err != nil {

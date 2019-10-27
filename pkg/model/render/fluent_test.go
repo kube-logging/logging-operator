@@ -144,7 +144,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <source>
               @type tail
-              @id test-tail
+              @id test_tail
               path /path/to/input
             </source>`,
 			),
@@ -155,7 +155,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <filter **>
               @type stdout
-              @id test-stdout
+              @id test_stdout
             </filter>`,
 			),
 		},
@@ -165,7 +165,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <match **>
               @type null
-              @id test-null
+              @id test_null
             </match>`,
 			),
 		},
@@ -207,7 +207,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
-              @id test-label_router
+              @id test_label_router
               <route>
                 @label @d41d8cd98f00b204e9800998ecf8427e
               </route>
@@ -223,7 +223,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
-              @id test-label_router
+              @id test_label_router
               <route>
                 @label @098f6bcd4621d373cade4e832627b4f6
                 namespace test
@@ -240,7 +240,7 @@ func TestRenderDirective(t *testing.T) {
 			expected: heredoc.Doc(`
             <match **>
               @type label_router
-              @id test-label_router
+              @id test_label_router
               <route>
                 @label @092f5fa58e4f619d739f5b65f2ed38bc
                 labels a:b,c:d
@@ -310,12 +310,12 @@ func TestMultipleOutput(t *testing.T) {
 	expected := `
 		<source>
           @type tail
-          @id test-tail
+          @id test_tail
           path input.log
         </source>
         <match **>
           @type label_router
-          @id test-label_router
+          @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
@@ -325,17 +325,17 @@ func TestMultipleOutput(t *testing.T) {
         <label @901f778f9602a78e8fd702c1973d8d8d>
           <filter **>
             @type stdout
-            @id test-stdout
+            @id test_stdout
           </filter>
           <match **>
             @type copy
             <store>
               @type null
-              @id test-null
+              @id test_null
             </store>
             <store>
               @type null
-              @id test-null
+              @id test_null
             </store>
           </match>
         </label>`
@@ -384,12 +384,12 @@ func TestRenderFullFluentConfig(t *testing.T) {
 	expected := `
 		<source>
           @type tail
-          @id test-tail
+          @id test_tail
           path input.log
         </source>
         <match **>
           @type label_router
-          @id test-label_router
+          @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2
@@ -399,11 +399,11 @@ func TestRenderFullFluentConfig(t *testing.T) {
         <label @901f778f9602a78e8fd702c1973d8d8d>
           <filter **>
             @type stdout
-            @id test-stdout
+            @id test_stdout
           </filter>
           <match **>
             @type null
-            @id test-null
+            @id test_null
           </match>
         </label>`
 
@@ -434,7 +434,7 @@ func TestRenderS3(t *testing.T) {
 				},
 			},
 			expected: ` @type s3
-                        @id test-s3
+                        @id test_s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<buffer tag,time>
@@ -456,7 +456,7 @@ func TestRenderS3(t *testing.T) {
 				InstanceProfileCredentials: &output.S3InstanceProfileCredentials{},
 			},
 			expected: ` @type s3
-                        @id test-s3
+                        @id test_s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<instance_profile_credentials>
@@ -473,7 +473,7 @@ func TestRenderS3(t *testing.T) {
 				},
 			},
 			expected: ` @type s3
-                        @id test-s3
+                        @id test_s3
 						path /var/buffer
 						s3_bucket test_bucket
 						<shared_credentials>
@@ -551,12 +551,12 @@ func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected str
 	expected = fmt.Sprintf(`
 		<source>
           @type tail
-          @id test-tail
+          @id test_tail
           path input.log
         </source>
         <match **>
           @type label_router
-          @id test-label_router
+          @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
             labels key1:val1,key2:val2

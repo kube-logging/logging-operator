@@ -80,12 +80,13 @@ func (r Label) ToDirective(secretLoader secret.SecretLoader, id string) (types.D
 }
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "loki"
+	pluginID := id + "_" + pluginType
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        id + "-" + pluginType,
+			Id:        pluginID,
 		},
 	}
 	if l.ConfigureKubernetesLabels {
@@ -121,7 +122,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 	}
 	if l.Buffer != nil {
-		if buffer, err := l.Buffer.ToDirective(secretLoader, ""); err != nil {
+		if buffer, err := l.Buffer.ToDirective(secretLoader, pluginID); err != nil {
 			return nil, err
 		} else {
 			loki.SubDirectives = append(loki.SubDirectives, buffer)
