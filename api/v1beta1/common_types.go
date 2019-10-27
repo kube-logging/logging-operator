@@ -39,7 +39,17 @@ type KubernetesStorage struct {
 
 // Security defines Fluentd, Fluentbit deployment security properties
 type Security struct {
-	ServiceAccount               string `json:"serviceAccount,omitempty"`
-	RoleBasedAccessControlCreate *bool  `json:"roleBasedAccessControlCreate,omitempty"`
-	PodSecurityPolicyCreate      bool   `json:"podSecurityPolicyCreate,omitempty"`
+	ServiceAccount               string           `json:"serviceAccount,omitempty"`
+	RoleBasedAccessControlCreate *bool            `json:"roleBasedAccessControlCreate,omitempty"`
+	PodSecurityPolicyCreate      bool             `json:"podSecurityPolicyCreate,omitempty"`
+	SecurityContext              *SecurityContext `json:"securityContext,omitempty"`
+}
+
+// SecurityContext defines Fluentd, Fluentbit pods security context properties
+type SecurityContext struct {
+	RunAsNonRoot             *bool  `json:"runAsNonRoot,omitempty"`
+	AllowPrivilegeEscalation *bool  `json:"allowPrivilegeEscalation,omitempty"`
+	ReadOnlyRootFilesystem   *bool  `json:"readOnlyRootFilesystem,omitempty"`
+	RunAsUser                *int64 `json:"runAsUser,omitempty"`
+	FsGroup                  *int64 `json:"fsGroup,omitempty"`
 }

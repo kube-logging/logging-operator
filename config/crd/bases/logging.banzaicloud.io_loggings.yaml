@@ -127,6 +127,23 @@ spec:
                       type: boolean
                     roleBasedAccessControlCreate:
                       type: boolean
+                    securityContext:
+                      description: SecurityContext defines Fluentd, Fluentbit pods
+                        security context properties
+                      properties:
+                        allowPrivilegeEscalation:
+                          type: boolean
+                        fsGroup:
+                          format: int64
+                          type: integer
+                        readOnlyRootFilesystem:
+                          type: boolean
+                        runAsNonRoot:
+                          type: boolean
+                        runAsUser:
+                          format: int64
+                          type: integer
+                      type: object
                     serviceAccount:
                       type: string
                   type: object
@@ -391,6 +408,23 @@ spec:
                       type: boolean
                     roleBasedAccessControlCreate:
                       type: boolean
+                    securityContext:
+                      description: SecurityContext defines Fluentd, Fluentbit pods
+                        security context properties
+                      properties:
+                        allowPrivilegeEscalation:
+                          type: boolean
+                        fsGroup:
+                          format: int64
+                          type: integer
+                        readOnlyRootFilesystem:
+                          type: boolean
+                        runAsNonRoot:
+                          type: boolean
+                        runAsUser:
+                          format: int64
+                          type: integer
+                      type: object
                     serviceAccount:
                       type: string
                   type: object

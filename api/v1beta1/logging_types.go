@@ -92,6 +92,24 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate == nil {
 			copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext = &SecurityContext{}
+		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation = util.BoolPointer(false)
+		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext.RunAsUser == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext.RunAsUser = util.IntPointer64(1000)
+		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext.FsGroup == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext.FsGroup = util.IntPointer64(2000)
+		}
 		if copy.Spec.FluentdSpec.Metrics != nil {
 			if copy.Spec.FluentdSpec.Metrics.Path == "" {
 				copy.Spec.FluentdSpec.Metrics.Path = "/metrics"
@@ -193,6 +211,24 @@ func (l *Logging) SetDefaults() *Logging {
 		}
 		if copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
 			copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext = &SecurityContext{}
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation = util.BoolPointer(false)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser = util.IntPointer64(1000)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext.FsGroup == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext.FsGroup = util.IntPointer64(2000)
 		}
 		if copy.Spec.FluentbitSpec.Metrics != nil {
 			if copy.Spec.FluentbitSpec.Metrics.Path == "" {

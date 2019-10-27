@@ -63,6 +63,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 						Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 						ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
 						Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
+						SecurityContext: &corev1.SecurityContext{
+							RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
+							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+							AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+						},
 						VolumeMounts: []corev1.VolumeMount{
 							{
 								Name:      r.Logging.QualifiedName(bufferVolumeName),
@@ -77,6 +82,10 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				},
 				NodeSelector: r.Logging.Spec.FluentdSpec.NodeSelector,
 				Tolerations:  r.Logging.Spec.FluentdSpec.Tolerations,
+				SecurityContext: &corev1.PodSecurityContext{
+					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
+					FSGroup:      r.Logging.Spec.FluentdSpec.Security.SecurityContext.FsGroup,
+				},
 			},
 		},
 	}
