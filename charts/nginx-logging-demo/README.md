@@ -62,6 +62,7 @@ The following tables lists the configurable parameters of the nginx-logging-demo
 | `loggingOperator.fluentbit.metrics.port`                          | Metrics Port.                                           | ``             |
 | `loggingOperator.fluentbit.metrics.path`                          | Metrics Path                                            | ``             |
 | `loggingOperator.fluentbit.metrics.timeout`                       | Scrape timeout.                                         | ``             |
+| `loggingOperator.fluentbit.metrics.interval`                      | Scrape interval.                                        | ``             |
 | `loggingOperator.fluentd.security.roleBasedAccessControlCreate`   | Enable fluentd RBAC                                     | `true`         |
 | `loggingOperator.fluentd.security.podSecurityPolicyCreate`        | Enable fluentd PSP                                      | `true`         |
 | `loggingOperator.fluentd.security.serviceAccount`                 | Set fluentd Service Account                             | ``             |
