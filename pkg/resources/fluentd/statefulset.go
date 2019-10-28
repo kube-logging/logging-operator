@@ -64,9 +64,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 						ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
 						Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
 						SecurityContext: &corev1.SecurityContext{
-							RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
-							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-							AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+							RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsUser,
+							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
+							AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
+							Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerPrivileged,
+							RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsNonRoot,
 						},
 						VolumeMounts: []corev1.VolumeMount{
 							{
@@ -83,9 +85,10 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				NodeSelector: r.Logging.Spec.FluentdSpec.NodeSelector,
 				Tolerations:  r.Logging.Spec.FluentdSpec.Tolerations,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
-					FSGroup:      r.Logging.Spec.FluentdSpec.Security.SecurityContext.FsGroup,
-				},
+					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsNonRoot,
+					FSGroup:      r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodFsGroup,
+					RunAsUser:    r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsUser,
+					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsGroup},
 			},
 		},
 	}

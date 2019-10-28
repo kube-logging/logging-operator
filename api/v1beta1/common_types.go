@@ -47,9 +47,13 @@ type Security struct {
 
 // SecurityContext defines Fluentd, Fluentbit pods security context properties
 type SecurityContext struct {
-	RunAsNonRoot             *bool  `json:"runAsNonRoot,omitempty"`
-	AllowPrivilegeEscalation *bool  `json:"allowPrivilegeEscalation,omitempty"`
-	ReadOnlyRootFilesystem   *bool  `json:"readOnlyRootFilesystem,omitempty"`
-	RunAsUser                *int64 `json:"runAsUser,omitempty"`
-	FsGroup                  *int64 `json:"fsGroup,omitempty"`
+	PodRunAsNonRoot                   *bool  `json:"podRunAsNonRoot,omitempty"`
+	PodRunAsUser                      *int64 `json:"podRunAsUser,omitempty"`
+	PodRunAsGroup                     *int64 `json:"podRunAsGroup,omitempty"`
+	PodFsGroup                        *int64 `json:"podFsGroup,omitempty"`
+	ContainerRunAsUser                *int64 `json:"containerRunAsUser,omitempty"`
+	ContainerRunAsNonRoot             *bool  `json:"containerRunAsNonRoot,omitempty"`
+	ContainerAllowPrivilegeEscalation *bool  `json:"containerAllowPrivilegeEscalation,omitempty"`
+	ContainerReadOnlyRootFilesystem   *bool  `json:"containerReadOnlyRootFilesystem,omitempty"`
+	ContainerPrivileged               *bool  `json:"containerPrivileged,omitempty"`
 }

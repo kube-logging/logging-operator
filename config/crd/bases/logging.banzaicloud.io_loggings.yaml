@@ -131,16 +131,26 @@ spec:
                       description: SecurityContext defines Fluentd, Fluentbit pods
                         security context properties
                       properties:
-                        allowPrivilegeEscalation:
+                        containerAllowPrivilegeEscalation:
                           type: boolean
-                        fsGroup:
+                        containerPrivileged:
+                          type: boolean
+                        containerReadOnlyRootFilesystem:
+                          type: boolean
+                        containerRunAsNonRoot:
+                          type: boolean
+                        containerRunAsUser:
                           format: int64
                           type: integer
-                        readOnlyRootFilesystem:
+                        podFsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsNonRoot:
                           type: boolean
-                        runAsNonRoot:
-                          type: boolean
-                        runAsUser:
+                        podRunAsUser:
                           format: int64
                           type: integer
                       type: object
@@ -412,16 +422,26 @@ spec:
                       description: SecurityContext defines Fluentd, Fluentbit pods
                         security context properties
                       properties:
-                        allowPrivilegeEscalation:
+                        containerAllowPrivilegeEscalation:
                           type: boolean
-                        fsGroup:
+                        containerPrivileged:
+                          type: boolean
+                        containerReadOnlyRootFilesystem:
+                          type: boolean
+                        containerRunAsNonRoot:
+                          type: boolean
+                        containerRunAsUser:
                           format: int64
                           type: integer
-                        readOnlyRootFilesystem:
+                        podFsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsNonRoot:
                           type: boolean
-                        runAsNonRoot:
-                          type: boolean
-                        runAsUser:
+                        podRunAsUser:
                           format: int64
                           type: integer
                       type: object
