@@ -11,10 +11,10 @@
     - [Deploy with Helm](#add-operator-chart-repository)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
    - **Demo Application**  
     - [Deploy with Helm](#nginx-app--logging-definition)
-    - [Deploy with Kuberenetes Manifests](#install-from-manifest)
+    - [Deploy with Kubernetes Manifests](#install-from-manifest)
 - **Validation**
     - [Grafana Dashboard](#grafana-dashboard)
 ---

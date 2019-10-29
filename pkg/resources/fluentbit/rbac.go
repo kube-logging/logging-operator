@@ -23,41 +23,71 @@ import (
 )
 
 func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+		return &rbacv1.ClusterRole{
+			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+				r.Logging.QualifiedName(clusterRoleName), r.Logging.Labels, r.Logging),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups: []string{""},
+					Resources: []string{"pods", "namespaces"},
+					Verbs:     []string{"get", "list", "watch"},
+				},
+			},
+		}, k8sutil.StatePresent
+	}
 	return &rbacv1.ClusterRole{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
-			r.Logging.QualifiedName(clusterRoleName), r.Logging.Labels, r.Logging),
-		Rules: []rbacv1.PolicyRule{
-			{
-				APIGroups: []string{""},
-				Resources: []string{"pods", "namespaces"},
-				Verbs:     []string{"get", "list", "watch"},
-			},
-		},
-	}, k8sutil.StatePresent
+			r.Logging.QualifiedName(clusterRoleName),
+			r.Logging.Labels,
+			r.Logging,
+		),
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
+				r.Logging.QualifiedNamespacedName(clusterRoleBindingName), r.Logging.Labels, r.Logging),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "ClusterRole",
+				APIGroup: "rbac.authorization.k8s.io",
+				Name:     r.Logging.QualifiedName(clusterRoleName),
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Namespace: r.Logging.Spec.ControlNamespace,
+				},
+			},
+		}, k8sutil.StatePresent
+	}
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
-			r.Logging.QualifiedNamespacedName(clusterRoleBindingName), r.Logging.Labels, r.Logging),
-		RoleRef: rbacv1.RoleRef{
-			Kind:     "ClusterRole",
-			APIGroup: "rbac.authorization.k8s.io",
-			Name:     r.Logging.QualifiedName(clusterRoleName),
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				Kind:      "ServiceAccount",
-				Name:      r.Logging.QualifiedName(serviceAccountName),
-				Namespace: r.Logging.Spec.ControlNamespace,
-			},
-		},
-	}, k8sutil.StatePresent
+			r.Logging.QualifiedNamespacedName(clusterRoleBindingName),
+			r.Logging.Labels,
+			r.Logging,
+		),
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.ServiceAccount == "" {
+		return &corev1.ServiceAccount{
+			ObjectMeta: templates.FluentbitObjectMeta(
+				r.Logging.QualifiedName(defaultServiceAccountName),
+				r.Logging.Labels,
+				r.Logging,
+			),
+		}, k8sutil.StatePresent
+	}
 	return &corev1.ServiceAccount{
 		ObjectMeta: templates.FluentbitObjectMeta(
-			r.Logging.QualifiedName(serviceAccountName), r.Logging.Labels, r.Logging),
-	}, k8sutil.StatePresent
+			r.Logging.QualifiedName(defaultServiceAccountName),
+			r.Logging.Labels,
+			r.Logging,
+		),
+	}, k8sutil.StateAbsent
 }

@@ -15,6 +15,8 @@
 package fluentbit
 
 import (
+	"emperror.dev/errors"
+
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -26,12 +28,13 @@ import (
 )
 
 const (
-	serviceAccountName        = "logging"
-	clusterRoleBindingName    = "logging"
-	clusterRoleName           = "logging"
-	fluentBitSecretConfigName = "fluentbit"
-	fluentbitDaemonSetName    = "fluentbit"
-	fluentbitServiceName      = "fluentbit"
+	defaultServiceAccountName      = "fluentbit"
+	clusterRoleBindingName         = "fluentbit"
+	clusterRoleName                = "fluentbit"
+	fluentBitSecretConfigName      = "fluentbit"
+	fluentbitDaemonSetName         = "fluentbit"
+	fluentbitPodSecurityPolicyName = "fluentbit"
+	fluentbitServiceName           = "fluentbit"
 )
 
 func generataLoggingRefLabels(loggingRef string) map[string]string {
@@ -41,6 +44,13 @@ func generataLoggingRefLabels(loggingRef string) map[string]string {
 func (r *Reconciler) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentbit"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+}
+
+func (r *Reconciler) getServiceAccount() string {
+	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
+		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
+	}
+	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
 // Reconciler holds info what resource to reconcile
@@ -63,12 +73,18 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
+		r.clusterPodSecurityPolicy,
+		r.pspClusterRole,
+		r.pspClusterRoleBinding,
 		r.configSecret,
 		r.daemonSet,
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
 	} {
 		o, state := res()
+		if o == nil {
+			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
+		}
 		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, emperror.WrapWith(err, "failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())

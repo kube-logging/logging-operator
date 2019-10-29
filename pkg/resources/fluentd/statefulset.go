@@ -55,7 +55,8 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: r.generatePodMeta(),
 			Spec: corev1.PodSpec{
-				Volumes: r.generateVolume(),
+				Volumes:            r.generateVolume(),
+				ServiceAccountName: r.getServiceAccount(),
 				InitContainers: []corev1.Container{
 					{
 						Name:            "volume-mount-hack",

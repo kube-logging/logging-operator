@@ -36,3 +36,10 @@ type Metrics struct {
 type KubernetesStorage struct {
 	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
 }
+
+// Security defines Fluentd, Fluentbit deployment security properties
+type Security struct {
+	ServiceAccount               string `json:"serviceAccount,omitempty"`
+	RoleBasedAccessControlCreate *bool  `json:"roleBasedAccessControlCreate,omitempty"`
+	PodSecurityPolicyCreate      bool   `json:"podSecurityPolicyCreate,omitempty"`
+}
