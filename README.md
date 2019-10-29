@@ -33,7 +33,7 @@ Logging operator for Kubernetes based on Fluentd and Fluent-bit.
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
-<p align="center"><img src="docs/img/logging_operator_flow.png" width="660"></p>
+<p align="center"><img src="docs/img/logging_operator_flow.png" ></p>
 
 ### Feature highlights
 
