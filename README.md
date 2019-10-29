@@ -33,7 +33,7 @@ Logging operator for Kubernetes based on Fluentd and Fluent-bit.
 
 This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
 
-<p align="center"><img src="docs/img/logging_operator_flow.png" width="660"></p>
+<p align="center"><img src="docs/img/logging_operator_flow.png" ></p>
 
 ### Feature highlights
 
@@ -108,14 +108,14 @@ For complete list of supported plugins please check the [plugins index](/docs/pl
 
 | Name                                                    |  Type  |                                Description               | Status  | Version                                                                                 |
 |---------------------------------------------------------|:------:|:--------------------------------------------------------:|---------|-----------------------------------------------------------------------------------------|
-| [Alibaba](./docs/plugins/outputs/oss.md)                  | Output | Store logs the Alibaba Cloud Object Storage Service    |    GA   | [0.0.1](https://github.com/aliyun/fluent-plugin-oss)                                    |
-| [Amazon S3](./docs/plugins/outputs/s3.md)                 | Output | Store logs in Amazon S3                                |    GA   | [1.1.11](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.1.11)               |
+| [Alibaba](./docs/plugins/outputs/oss.md)                  | Output | Store logs the Alibaba Cloud Object Storage Service    |    GA   | [0.0.2](https://github.com/aliyun/fluent-plugin-oss)                                    |
+| [Amazon S3](./docs/plugins/outputs/s3.md)                 | Output | Store logs in Amazon S3                                |    GA   | [1.2.0](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.1.11)               |
 | [Azure](./docs/plugins/outputs/azurestore.md)             | Output | Store logs in Azure Storega                            |    GA   | [0.1.0](https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0)         |
 | [Google Storage](./docs/plugins/outputs/gcs.md)           | Output | Store logs in Google Cloud Storage                     |    GA   | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs)                               |
-| [Grafana Loki](./docs/plugins/outputs/loki.md)            | Output | Transfer logs to Loki                                  | Testing | [0.2](https://github.com/banzaicloud/fluent-plugin-kubernetes-loki/releases/tag/v0.2)   |
+| [Grafana Loki](./docs/plugins/outputs/loki.md)            | Output | Transfer logs to Loki                                  |    GA   | [1.1.0](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki)   |
 | [ElasticSearch](./docs/plugins/outputs/elasticsearch.md)  | Output | Send your logs to Elasticsearch                        |    GA   | [3.5.5](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.5.5)        |
-| [Sumologic](./docs/plugins/outputs/sumologic.md)          | Output | Send your logs to Sumologic                            |    GA   | [1.5.0](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.5.0)       |
-| [Kafka](./docs/plugins/outputs/kafka.md)                  | Output | Send your logs to Kafka                                |    GA   | [0.12.0](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.0)            |
+| [Sumologic](./docs/plugins/outputs/sumologic.md)          | Output | Send your logs to Sumologic                            |    GA   | [1.6.0](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.0)       |
+| [Kafka](./docs/plugins/outputs/kafka.md)                  | Output | Send your logs to Kafka                                |    GA   | [0.12.1](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1)            |
 | [Tag Normaliser](./docs/plugins/filters/tagnormaliser.md) | Parser | Normalise tags for outputs                             |    GA   |                                                                                         |
 | [Parser](./docs/plugins/filters/parser.md)                | Parser | Parse logs with parser plugin                          |    GA   |                                                                                         |
 
