@@ -22,39 +22,71 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
-	return &rbacv1.Role{
-		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
-		Rules: []rbacv1.PolicyRule{
-			{
-				APIGroups: []string{""},
-				Resources: []string{"configmaps", "secrets"},
-				Verbs:     []string{"*"},
+func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
+
+		return &rbacv1.Role{
+			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups: []string{""},
+					Resources: []string{"configmaps", "secrets"},
+					Verbs:     []string{"*"},
+				},
 			},
-		},
-	}, k8sutil.StatePresent
+		}, k8sutil.StatePresent
+	}
+	return &rbacv1.Role{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(roleName),
+			r.Logging.Labels, r.Logging,
+		),
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
 }
 
-func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
-	return &rbacv1.RoleBinding{
-		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
-		RoleRef: rbacv1.RoleRef{
-			Kind:     "Role",
-			APIGroup: "rbac.authorization.k8s.io",
-			Name:     r.Logging.QualifiedName(roleName),
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				Kind:      "ServiceAccount",
-				Name:      r.Logging.QualifiedName(serviceAccountName),
-				Namespace: r.Logging.Spec.ControlNamespace,
+func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
+
+		return &rbacv1.RoleBinding{
+			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "Role",
+				APIGroup: "rbac.authorization.k8s.io",
+				Name:     r.Logging.QualifiedName(roleName),
 			},
-		},
-	}, k8sutil.StatePresent
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Namespace: r.Logging.Spec.ControlNamespace,
+				},
+			},
+		}, k8sutil.StatePresent
+	}
+	return &rbacv1.RoleBinding{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(roleBindingName),
+			r.Logging.Labels, r.Logging,
+		),
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
+
+		return &corev1.ServiceAccount{
+			ObjectMeta: templates.FluentdObjectMeta(
+				r.Logging.QualifiedName(defaultServiceAccountName),
+				r.Logging.Labels,
+				r.Logging,
+			),
+		}, k8sutil.StatePresent
+	}
 	return &corev1.ServiceAccount{
-		ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(serviceAccountName), r.Logging.Labels, r.Logging),
-	}, k8sutil.StatePresent
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(defaultServiceAccountName),
+			r.Logging.Labels,
+			r.Logging,
+		),
+	}, k8sutil.StateAbsent
 }

@@ -53,7 +53,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 					Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName: r.Logging.QualifiedName(serviceAccountName),
+					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
 					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
 					Containers: []corev1.Container{

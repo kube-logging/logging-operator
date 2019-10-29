@@ -64,6 +64,7 @@ function wait_for_log_files()
     done
 
     echo 'Cannot find any log files within timeout'
+    kubectl get pod,svc --namespace logging
     exit 1
 }
 

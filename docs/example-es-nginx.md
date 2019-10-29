@@ -11,10 +11,10 @@
     - [Deploy with Helm](#example-es-nginx.md#deploy-elasticsearch)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kuberenetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
    - **Demo Application**  
     - [Deploy with Helm](#nginx-app-and-logging-definition)
-    - [Deploy with Kuberenetes Manifests](#install-from-kubernetes-manifests)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Cerebro Dashboard](#forward-cerebro-dashboard)
     - [Kibana Dashboard](#forward-kibana-dashboard)
