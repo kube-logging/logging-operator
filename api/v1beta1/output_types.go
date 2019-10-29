@@ -33,6 +33,7 @@ type OutputSpec struct {
 	FileOutput          *output.FileOutputConfig    `json:"file,omitempty"`
 	NullOutputConfig    *output.NullOutputConfig    `json:"nullout,omitempty"`
 	KafkaOutputConfig   *output.KafkaOutputConfig   `json:"kafka,omitempty"`
+	CloudWatchOutput    *output.CloudWatchOutput    `json:"cloudwatch,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

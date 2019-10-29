@@ -15,6 +15,7 @@
 
 - [azurestore](./outputs/azurestore.md)
 - [buffer](./outputs/buffer.md)
+- [cloudwatch](./outputs/cloudwatch.md)
 - [elasticsearch](./outputs/elasticsearch.md)
 - [file](./outputs/file.md)
 - [format](./outputs/format.md)
