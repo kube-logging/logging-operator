@@ -183,8 +183,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -352,8 +353,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -863,8 +865,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1425,8 +1428,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1693,8 +1697,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -1924,8 +1929,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -2008,10 +2014,27 @@ spec:
                   required:
                   - timekey
                   type: object
-                extra_labels:
-                  description: 'Set of labels to include with every Loki stream.(default:
-                    nil)'
+                configure_kubernetes_labels:
+                  description: Configure Kubernetes metadata in a Prometheus like
+                    format
                   type: boolean
+                drop_single_key:
+                  description: 'If a record only has 1 key, then just set the log
+                    line to the value and discard the key. (default: false)'
+                  type: boolean
+                extra_labels:
+                  additionalProperties:
+                    type: string
+                  description: Set of labels to include with every Loki stream.
+                  type: object
+                extract_kubernetes_labels:
+                  description: 'Extract kubernetes labels as loki labels (default:
+                    false)'
+                  type: boolean
+                line_format:
+                  description: 'Format to use when flattening the record to a log
+                    line: json, key_value (default: key_value)'
+                  type: string
                 password:
                   description: Specify password if the Loki server requires authentication.
                   properties:
@@ -2048,6 +2071,12 @@ spec:
                           type: object
                       type: object
                   type: object
+                remove_keys:
+                  description: 'Comma separated list of needless record keys to remove
+                    (default: [])'
+                  items:
+                    type: string
+                  type: array
                 tenant:
                   description: Loki is a multi-tenant log storage platform and all
                     requests sent must include a tenant.
@@ -2238,8 +2267,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
@@ -2561,8 +2591,9 @@ spec:
                         to accept newly incoming chunk'
                       type: string
                     path:
-                      description: The path where buffer chunks are stored. The '*'
-                        is replaced with random characters. This parameter is required.
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
                       type: string
                     queue_limit_length:
                       description: The queue length limitation of this buffer plugin
