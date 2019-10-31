@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "2.3.0"
 description: A Helm chart to install Banzai Cloud logging-operator
 name: logging-operator
-version: 2.3.0
+version: 2.3.1

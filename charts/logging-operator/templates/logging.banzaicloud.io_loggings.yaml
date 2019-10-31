@@ -80,6 +80,26 @@ spec:
                   type: object
                 parser:
                   type: string
+                position_db:
+                  properties:
+                    host_path:
+                      description: Represents a host path mapped into a pod. Host
+                        path volumes do not support ownership management or SELinux
+                        relabeling.
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                  type: object
                 resources:
                   description: ResourceRequirements describes the compute resource
                     requirements.
@@ -98,6 +118,17 @@ spec:
                         it defaults to Limits if that is explicitly specified, otherwise
                         to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                       type: object
+                  type: object
+                security:
+                  description: Security defines Fluentd, Fluentbit deployment security
+                    properties
+                  properties:
+                    podSecurityPolicyCreate:
+                      type: boolean
+                    roleBasedAccessControlCreate:
+                      type: boolean
+                    serviceAccount:
+                      type: string
                   type: object
                 targetHost:
                   type: string
@@ -351,6 +382,17 @@ spec:
                         it defaults to Limits if that is explicitly specified, otherwise
                         to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                       type: object
+                  type: object
+                security:
+                  description: Security defines Fluentd, Fluentbit deployment security
+                    properties
+                  properties:
+                    podSecurityPolicyCreate:
+                      type: boolean
+                    roleBasedAccessControlCreate:
+                      type: boolean
+                    serviceAccount:
+                      type: string
                   type: object
                 tls:
                   description: FluentdTLS defines the TLS configs
