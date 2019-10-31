@@ -63,13 +63,6 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 						Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 						ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
 						Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
-						SecurityContext: &corev1.SecurityContext{
-							RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsUser,
-							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
-							AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
-							Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerPrivileged,
-							RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsNonRoot,
-						},
 						VolumeMounts: []corev1.VolumeMount{
 							{
 								Name:      r.Logging.QualifiedName(bufferVolumeName),
@@ -102,6 +95,13 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		Ports:           generatePorts(r.Logging.Spec.FluentdSpec),
 		VolumeMounts:    r.generateVolumeMounts(),
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsUser,
+			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
+			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerPrivileged,
+			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsNonRoot,
+		},
 	}
 }
 
