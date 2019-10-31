@@ -64,11 +64,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 						ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
 						Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
 						SecurityContext: &corev1.SecurityContext{
-							RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsUser,
-							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
-							AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
-							Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerPrivileged,
-							RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsNonRoot,
+							RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsUser,
+							ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
+							AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
+							Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerPrivileged,
+							RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsNonRoot,
 						},
 						VolumeMounts: []corev1.VolumeMount{
 							{
