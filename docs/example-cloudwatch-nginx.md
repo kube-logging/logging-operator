@@ -8,27 +8,28 @@
 ## Contents
 - **Installation**
   - **Logging Operator**
-    - [Deploy with Helm](./deploy/README.md#deploy-logging-operator-with-helm)
-    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-   - **Demo Application**  
-    - [Deploy with Helm](#nginx-app--logging-definition)
-    - [Deploy with Kubernetes Manifests](#install-from-manifest)
+    - [Deploy with Helm](#install-with-helm)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
+  - **Demo Application**  
+    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
-    - [CloudWatch Dashboard](#output)
+    - [CloudWatch Dashboard](#deployment-validation)
 ---
+<br />
 
-### Add operator chart repository:
+## Deploy Logging-Operator with Demo Application
+
+### Install with Helm 
+#### Add operator chart repository:
 ```bash
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
+#### Logging Operator
+> [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
-## Install with Helm 
-### Logging Operator
->[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
-
-
-### Nginx App + Logging Definition
+#### Nginx App and Logging Definition
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-cw-demo \
  --set "aws.secret_key=" \
@@ -38,9 +39,14 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
  --set "aws.log_stream_name=" 
 ```
 
-## Install from manifest
-### Logging Operator
->[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+
+---
+<br />
+
+
+### Install from Kubernetes manifests
+#### Logging Operator
+> [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
 #### Create `logging` Namespace
 ```bash
@@ -84,7 +90,7 @@ EOF
 ```
 
 
-#### Create an CloudWatch Output Definition 
+#### Create an CloudWatch `Output` Definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -162,7 +168,7 @@ spec:
 EOF
 ```
 
-#### Output
+## Deployment Validation
 <p align="center"><img src="./img/cw.png" width="660"></p>
 
 
