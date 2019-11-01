@@ -7,19 +7,19 @@
 ---
 ## Contents
 - **Installation**
-  - ElasticSearch Operator
-    - [Deploy with Helm](#example-es-nginx.md#deploy-elasticsearch)
+  - **ElasticSearch Operator**
+    - [Deploy with Helm](#deploy-elasticsearch)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-   - **Demo Application**  
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
+  - **Demo Application**  
     - [Deploy with Helm](#nginx-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Cerebro Dashboard](#forward-cerebro-dashboard)
     - [Kibana Dashboard](#forward-kibana-dashboard)
 ---
-
+<br />
 
 ## Deploy ElasticSearch
 
@@ -32,15 +32,25 @@ helm repo update
 ### Install ElasticSearch with operator
 ```bash
 helm install --namespace logging --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-helm install --namespace logging --name elasticsearch es-operator/elasticsearch --set kibana.enabled=True --set cerebro.enabled=True
+helm install --namespace logging --name elasticsearch es-operator/elasticsearch \
+    --set kibana.enabled=True \
+    --set cerebro.enabled=True
 ```
 > [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
+> This installation can take a few more minutes. ***Please be patient.*** 
+<br />
+
+
 ## Deploy Logging-Operator with Demo Application
 
 ### Install with Helm 
-
-[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
-
+#### Add operator chart repository:
+```bash
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo update
+```
+#### Logging Operator
+> [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
 #### Nginx App and Logging Definition
 ```bash
@@ -48,8 +58,16 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 ```
 
 ---
+<br />
+
 ### Install from Kubernetes manifests
-[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+#### Logging Operator
+> [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+
+#### Create `logging` Namespace
+```bash
+kubectl create ns logging
+```
 
 #### Create `logging` resource
 ```bash
@@ -68,7 +86,7 @@ EOF
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-#### Create an ElasticSearch output definition 
+#### Create an ElasticSearch `output` definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -113,7 +131,7 @@ spec:
 EOF
 ```
 
-#### Install nginx deployment
+#### Install demo application 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: apps/v1 
@@ -132,47 +150,27 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-          name: http
-          protocol: TCP
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
+        image: banzaicloud/loggen:latest
 EOF
 ```
 
-#### Forward Cerebro Dashboard
+## Deployment Validation
+
+#### Port Forward Cerebro Dashboard Service
 ```bash
 kubectl -n logging port-forward svc/cerebro-elasticsearch-cluster 9001:80
 ```
-[Dashboard URL: http://localhost:9001](http://localhost:9001)
+Cerebro dashboard URL: [http://localhost:9001](http://localhost:9001)
 
 <p align="center"><img src="./img/es_cerb.png" width="660"></p>
 
 
 
-#### Forward Kibana Dashboard
+#### Port Forward Kibana Dashboard Service
 ```bash
 kubectl -n logging port-forward svc/kibana-elasticsearch-cluster 5601:80
 ```
-[Dashboard URL: https://localhost:5601](https://localhost:5601)
+Kibana dashboard URL: [https://localhost:5601](https://localhost:5601)
 
 <p align="center"><img src="./img/es_kibana.png" width="660"></p>
 

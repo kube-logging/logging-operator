@@ -37,35 +37,17 @@ This operator helps you to pack together logging information with your applicati
 
 ### Feature highlights
 
-- Namespace isolation
-- Native Kubernetes label selectors
-- Secure communication (TLS)
-- Configuration validation
-- Multiple flow support (multiply logs for different transformations)
-- Multiple [output](docs/plugins/outputs) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
-- Multiple logging system support (multiple fluentd, fluent-bit deployment on the same cluster)
+- [x] Namespace isolation 
+- [x] Native Kubernetes label selectors
+- [x] Secure communication (TLS)
+- [x] Configuration validation
+- [x] Multiple flow support (multiply logs for different transformations)
+- [x] Multiple [output](docs/plugins/outputs) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
+- [x] Multiple logging system support (multiple fluentd, fluent-bit deployment on the same cluster)
 
 ### Motivation
 
 The logging operator automates the deployment and configuration of a Kubernetes logging pipeline. Under the hood the operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters and transfer logs to multiple outputs. Your logs will always be transferred on authenticated and encrypted channels.
-
-##### Blogs
-  - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/)
-
-##### Blogs (general logging and operator v1)
-  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
-  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
-  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
-  - [Centralized logging on Kubernetes automated](https://banzaicloud.com/blog/k8s-logging-operator/)
-  - [And more...](https://banzaicloud.com/tags/logging/)
-
-
-Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) platform, a Cloud Native application and devops platform that natively supports multi- and hybrid-cloud deployments with multiple authentication backends. Check out the developer beta:
- <p align="center">
-   <a href="https://beta.banzaicloud.io">
-   <img src="https://camo.githubusercontent.com/a487fb3128bcd1ef9fc1bf97ead8d6d6a442049a/68747470733a2f2f62616e7a6169636c6f75642e636f6d2f696d672f7472795f706970656c696e655f627574746f6e2e737667">
-   </a>
- </p>
 
 ## Architecture
 
@@ -82,24 +64,43 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 
 *connection between custom resources*
 
+### Blogs
+  - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/)
+  - [Eleasticsearch and GeoIP](https://banzaicloud.com/blog/logging-operator-efk/)  
+
+##### Blogs (general logging and operator v1)
+  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
+  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
+  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
+  - [Centralized logging on Kubernetes automated](https://banzaicloud.com/blog/k8s-logging-operator/)
+  - [And more...](https://banzaicloud.com/tags/logging/)
+
+
+Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) platform, a Cloud Native application and devops platform that natively supports multi- and hybrid-cloud deployments with multiple authentication backends. Check out the developer beta:
+ <p align="center">
+   <a href="https://beta.banzaicloud.io">
+   <img src="https://camo.githubusercontent.com/a487fb3128bcd1ef9fc1bf97ead8d6d6a442049a/68747470733a2f2f62616e7a6169636c6f75642e636f6d2f696d672f7472795f706970656c696e655f627574746f6e2e737667">
+   </a>
+ </p>
+
 ---
 
 ## Contents
-- Installation
+- **[Installation](./docs/deploy/README.md)**
   - [Deploy with Helm](./docs/deploy/README.md#deploy-logging-operator-with-helm)
   - [Deploy with Kubernetes Manifests](./docs/deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-- [Supported Plugins](#supported-plugins)
-- Examples
+- **[Supported Plugins](#supported-plugins)**
+- **[Examples](./docs)**
   - [S3 Output](./docs/example-s3.md)
-  - [Elasticsearch Output](./docs/example-es.md)
-  - [Nginx with Elasticsearch Output](./docs/example-es-nginx.md)
-  - [Nginx with Loki Output](./docs/example-loki-nginx.md)
-  - [Nginx with Kafka Output](./docs/example-kafka-nginx.md)
-  - [Nginx with Amazon CloudWatch Output](./docs/example-cloudwatch-nginx.md)
-- [Monitoring](./docs/logging-operator-monitoring.md)
-- [Security](./docs/security/README.md)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+  - [Elasticsearch Output](./docs/example-es-nginx.md)
+  - [Loki Output](./docs/example-loki-nginx.md)
+  - [Kafka Output](./docs/example-kafka-nginx.md)
+  - [Amazon CloudWatch Output](./docs/example-cloudwatch-nginx.md)
+  - [And more...](./docs/examples)
+- **[Monitoring](./docs/logging-operator-monitoring.md)**
+- **[Security](./docs/security/README.md)**
+- **[Troubleshooting](#troubleshooting)**
+- **[Contributing](#contributing)**
 ---
 
 
