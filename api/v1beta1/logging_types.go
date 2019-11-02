@@ -78,7 +78,7 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
 		}
 		if copy.Spec.FluentdSpec.Image.Tag == "" {
-			copy.Spec.FluentdSpec.Image.Tag = "v1.6.3-alpine-2"
+			copy.Spec.FluentdSpec.Image.Tag = "v1.7.4-alpine-1"
 		}
 		if copy.Spec.FluentdSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"
@@ -166,7 +166,7 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentbitSpec.Image.Repository = "fluent/fluent-bit"
 		}
 		if copy.Spec.FluentbitSpec.Image.Tag == "" {
-			copy.Spec.FluentbitSpec.Image.Tag = "1.2.2"
+			copy.Spec.FluentbitSpec.Image.Tag = "1.3.2"
 		}
 		if copy.Spec.FluentbitSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"
