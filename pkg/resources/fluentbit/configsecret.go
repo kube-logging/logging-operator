@@ -20,8 +20,10 @@ import (
 	"text/template"
 
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/prometheus/common/log"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -41,6 +43,8 @@ type fluentBitConfig struct {
 	TargetHost string
 	TargetPort int32
 	Parser     string
+	Input      map[string]string
+	Filter     map[string]string
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
@@ -54,6 +58,17 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
 		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
+	mapper := types.NewStructToStringMapper(nil)
+	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
+	if err != nil {
+		log.Error(err)
+	}
+
+	fluentbitFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
+	if err != nil {
+		log.Error(err)
+	}
+
 	input := fluentBitConfig{
 		Namespace: r.Logging.Spec.ControlNamespace,
 		TLS: struct {
@@ -66,6 +81,8 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		Monitor:    monitor,
 		TargetHost: fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
 		TargetPort: r.Logging.Spec.FluentdSpec.Port,
+		Input:      fluentbitInput,
+		Filter:     fluentbitFilter,
 	}
 	if r.Logging.Spec.FluentbitSpec.Parser != "" {
 		input.Parser = r.Logging.Spec.FluentbitSpec.Parser
