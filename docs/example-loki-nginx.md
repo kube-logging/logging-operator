@@ -7,22 +7,25 @@
 ---
 ## Contents
 - **Installation**
-  - Loki
-    - [Deploy with Helm](#add-operator-chart-repository)
+  - **Loki**
+    - [Deploy with Helm](#deploy-loki-and-grafana)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-   - **Demo Application**  
-    - [Deploy with Helm](#nginx-app--logging-definition)
-    - [Deploy with Kubernetes Manifests](#install-from-manifest)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
+  - **Demo Application**  
+    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Grafana Dashboard](#grafana-dashboard)
 ---
 
-### Add operator chart repository:
+<br />
+
+## Deploy Loki and Grafana
+
+### Add loki chart repository:
 ```bash
 helm repo add loki https://grafana.github.io/loki/charts
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 helm repo update
 ```
 
@@ -40,21 +43,37 @@ helm install --namespace logging --name grafana stable/grafana \
  --set "datasources.datasources\\.yaml.datasources[0].url=http://loki:3100" \
  --set "datasources.datasources\\.yaml.datasources[0].access=proxy"
 ```
+<br />
 
 
-## Install with Helm 
-### Logging Operator
+
+## Deploy Logging-Operator with Demo Application
+
+### Install with Helm 
+#### Add operator chart repository:
 ```bash
-helm install --namespace logging --name logging banzaicloud-stable/logging-operator
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo update
 ```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+#### Logging Operator
+> [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
-### Nginx App + Logging Definition
+#### Nginx App and Logging Definition
 ```bash
 helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-loki-demo
 ```
 
-## Install from manifest
+---
+<br />
+
+### Install from Kubernetes manifests
+#### Logging Operator
+> [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+
+#### Create `logging` Namespace
+```bash
+kubectl create ns logging
+```
 
 #### Create `logging` resource
 ```bash
@@ -72,7 +91,7 @@ EOF
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-#### Create an Loki output definition 
+#### Create an Loki `output` definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -136,6 +155,8 @@ spec:
 EOF
 ```
 
+## Deployment Validation
+
 ### Grafana Dashboard
 
 #### Get Grafana login credantials
@@ -147,7 +168,7 @@ kubectl -n logging get secrets grafana -o json | jq '.data | map_values(@base64d
 ```bash
 kubectl -n logging port-forward svc/grafana 3000:80
 ```
-[Gradana Dashboard: http://localhost:3000](http://localhost:3000)
+Gradana Dashboard: [http://localhost:3000](http://localhost:3000)
 <p align="center"><img src="./img/loki1.png" width="660"></p>
 
 

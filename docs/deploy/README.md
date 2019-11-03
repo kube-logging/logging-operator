@@ -38,7 +38,7 @@ kubectl -n logging create -f ./docs/deploy/manifests/deployment.yaml
 ```
 
 ---
-
+<br />
 <p align="center"><img src="../img/helm.svg" width="150"></p>
 <p align="center">
 
@@ -55,3 +55,29 @@ helm repo update
 helm install --namespace logging --name logging banzaicloud-stable/logging-operator
 ```
 > You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
+
+
+---
+<br />
+
+# Check logging-operator deployment
+
+### Pods Status
+
+```bash
+$ kubectl -n logging get pods
+NAME                                        READY   STATUS    RESTARTS   AGE
+logging-logging-operator-599c9cf846-5nw2n   1/1     Running   0          52s
+```
+
+### Check CRD 
+```bash
+$  kubectl get crd
+NAME                                    CREATED AT
+clusterflows.logging.banzaicloud.io     2019-11-01T21:30:18Z
+clusteroutputs.logging.banzaicloud.io   2019-11-01T21:30:18Z
+flows.logging.banzaicloud.io            2019-11-01T21:30:18Z
+loggings.logging.banzaicloud.io         2019-11-01T21:30:18Z
+outputs.logging.banzaicloud.io          2019-11-01T21:30:18Z
+```
+
