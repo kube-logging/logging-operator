@@ -125,7 +125,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			Name: "varlibcontainers",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
-					Path: "/var/lib/docker/containers",
+					Path: r.Logging.Spec.FluentbitSpec.MountPath,
 				},
 			},
 		},
