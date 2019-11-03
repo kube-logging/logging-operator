@@ -90,7 +90,7 @@ EOF
 ```
 
 
-#### Create an CloudWatch `Output` Definition 
+#### Create a CloudWatch `Output` Definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
