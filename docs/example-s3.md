@@ -4,22 +4,14 @@
 
 <p align="center"><img src="./img/s3_flow.png" width="900"></p>
 
-Before you start [install logging-operator](/README.md#deploying-with-helm-chart)
+## Deploy Logging-operator
+Before you start [install logging-operator](./deploy/README.md#)
 
-### Create default logging
+## Create default logging
 
-Create a namespace for logging
+### Create `logging` resource
 ```bash
-kubectl create ns logging
-```
-> You can install `logging` resource via [Helm chart](/charts/logging-operator-logging) with built-in TLS generation.
-
-Create `logging` resource
-```bash
-kubectl apply -f logging.yaml
-```
-*logging.yaml*
-```yaml
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -28,9 +20,14 @@ spec:
   fluentd: {}
   fluentbit: {}
   controlNamespace: logging
+EOF
 ```
 
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
+
+
+
+
 
 ### Create AWS secret
 
@@ -40,10 +37,7 @@ kubectl -n logging create secret generic logging-s3 --from-literal "awsAccessKey
 ```
 Or set up the secret manually.
 ```bash
-kubectl -n logging apply -f secret.yaml
-```
-*secret.yaml*
-```yaml
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: v1
 kind: Secret
 metadata:
@@ -52,19 +46,16 @@ type: Opaque
 data:
   awsAccessKeyId: <base64encoded>
   awsSecretAccesKey: <base64encoded>
+EOF
 ```
-
 > You **MUST** install the `secret` and the `output` definition in the **SAME** namespace
 
-Create an S3 output definition 
 
+### Create an S3 Output Definition 
 ```bash
-kubectl -n logging apply -f clusteroutput.yaml
-```
-*clusteroutput.yaml*
-```yaml
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
-kind: ClusterOutput
+kind: Output
 metadata:
   name: s3-output
   namespace: logging
@@ -87,19 +78,16 @@ spec:
       timekey: 10m
       timekey_wait: 30s
       timekey_use_utc: true
+EOF
 ```
-
 > Note: For production set-up we recommend using longer `timekey` interval to avoid generating too many object.
 
-The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to S3.
 
+### Create `flow` resource
 ```bash
-kubectl -n logging apply -f clusterflow.yaml
-```
-*clusterflow.yaml*
-```yaml
+cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
-kind: ClusterFlow
+kind: Flow
 metadata:
   name: all-log-to-s3
   namespace: logging
@@ -109,8 +97,11 @@ spec:
   selectors: {}
   outputRefs:
     - s3-output
+EOF
 ```
+> The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to S3.
 
+
+### Output
 The logs will be available in the bucket on a `path` like:
-
 ```/logs/default.default-logging-simple-fluentbit-lsdp5.fluent-bit/2019/09/11/201909111432_0.gz```

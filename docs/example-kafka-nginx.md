@@ -7,27 +7,35 @@
 ---
 ## Contents
 - **Installation**
-  - Kafka 
+  - **Kafka** 
     - [Deploy with Helm](#deploy-kafka)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
-    - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-   - **Demo Application**  
-    - [Deploy with Helm](install-with-helm)
+    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
+  - **Demo Application**  
+    - [Deploy with Helm](#nginx-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Kafkacat](#test-your-deployment-with-kafkacat)
 ---
+<br />
 
 ## Deploy Kafka
 >In this demo we are using our kafka operator.
 > [Easy Way Installing with Helm](https://github.com/banzaicloud/kafka-operator#easy-way-installing-with-helm)
+<br />
+
+
 ## Deploy Logging-Operator with Demo Application
 
 ### Install with Helm 
-
-[Install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
-
+#### Add operator chart repository:
+```bash
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo update
+```
+#### Logging Operator
+> [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
 #### Nginx App and Logging Definition
 ```bash
@@ -35,8 +43,16 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 ```
 
 ---
+<br />
+
 ### Install from Kubernetes manifests
-[Install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+#### Logging Operator
+> [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+
+#### Create `logging` Namespace
+```bash
+kubectl create ns logging
+```
 
 #### Create `logging` resource
 ```bash
@@ -55,7 +71,7 @@ EOF
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-#### Create an Kafka output definition 
+#### Create an Kafka `output` definition 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -98,8 +114,7 @@ spec:
     - kafka-output
 EOF
 ```
-
-#### Install nginx deployment
+#### Install demo application 
 ```bash
 cat <<EOF | kubectl -n logging apply -f -
 apiVersion: apps/v1 
@@ -118,38 +133,17 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-          name: http
-          protocol: TCP
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
+        image: banzaicloud/loggen:latest
 EOF
 ```
 
-### Test Your Deployment with kafkacat
-##### Exec Kafaka test pod
+## Test Your Deployment with kafkacat
+#### Exec Kafaka test pod
 ```bash
 kubectl -n kafka exec -it kafka-test-c sh
 ```
-Run kafkacat
+
+#### Run kafkacat
 ```bash
 kafkacat -C -b kafka-0.kafka-headless.kafka.svc.cluster.local:29092 -t topic
 ```
