@@ -3,6 +3,7 @@
 
 ### filters
 
+- [concat](./filters/concat.md)
 - [dedot](./filters/dedot.md)
 - [geoip](./filters/geoip.md)
 - [parser](./filters/parser.md)
