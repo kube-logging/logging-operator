@@ -327,7 +327,7 @@ metadata:
 spec:
   fluentd:
     security:
-        securityContext:
+      securityContext:
         containerAllowPrivilegeEscalation: false
         containerReadOnlyRootFilesystem: false
         podFsGroup: 65533
