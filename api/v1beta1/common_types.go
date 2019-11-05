@@ -39,7 +39,9 @@ type KubernetesStorage struct {
 
 // Security defines Fluentd, Fluentbit deployment security properties
 type Security struct {
-	ServiceAccount               string `json:"serviceAccount,omitempty"`
-	RoleBasedAccessControlCreate *bool  `json:"roleBasedAccessControlCreate,omitempty"`
-	PodSecurityPolicyCreate      bool   `json:"podSecurityPolicyCreate,omitempty"`
+	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
+	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`
+	PodSecurityPolicyCreate      bool                       `json:"podSecurityPolicyCreate,omitempty"`
+	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`
+	PodSecurityContext           *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
 }

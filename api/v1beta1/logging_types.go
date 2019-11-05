@@ -92,6 +92,13 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate == nil {
 			copy.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
+		if copy.Spec.FluentdSpec.Security.SecurityContext == nil {
+			copy.Spec.FluentdSpec.Security.SecurityContext = &v1.SecurityContext{}
+		}
+		if copy.Spec.FluentdSpec.Security.PodSecurityContext == nil {
+			copy.Spec.FluentdSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
+		}
+
 		if copy.Spec.FluentdSpec.Metrics != nil {
 			if copy.Spec.FluentdSpec.Metrics.Path == "" {
 				copy.Spec.FluentdSpec.Metrics.Path = "/metrics"
@@ -193,6 +200,12 @@ func (l *Logging) SetDefaults() *Logging {
 		}
 		if copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
 			copy.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		}
+		if copy.Spec.FluentbitSpec.Security.SecurityContext == nil {
+			copy.Spec.FluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
+		}
+		if copy.Spec.FluentbitSpec.Security.PodSecurityContext == nil {
+			copy.Spec.FluentbitSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
 		}
 		if copy.Spec.FluentbitSpec.Metrics != nil {
 			if copy.Spec.FluentbitSpec.Metrics.Path == "" {
