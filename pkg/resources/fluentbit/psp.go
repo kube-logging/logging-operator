@@ -56,7 +56,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),
 				AllowedHostPaths: []policyv1beta1.AllowedHostPath{{
-					PathPrefix: "/var/lib/docker/containers",
+					PathPrefix: r.Logging.Spec.FluentbitSpec.MountPath,
 					ReadOnly:   true,
 				}, {
 					PathPrefix: "/var/log",

@@ -27,24 +27,20 @@ var fluentBitConfigTemplate = `
 {{- end }}
 
 [INPUT]
-    Name             tail
-    Path             /var/log/containers/*.log
-    Parser           {{ .Parser }}
-    Tag              kubernetes.*
-    Refresh_Interval 5
-    Mem_Buf_Limit    5MB
-    Skip_Long_Lines  On
-    DB               /tail-db/tail-containers-state.db
-    DB.Sync          Normal
+    Name         tail
+    {{- range $key, $value := .Input }}
+    {{- if $value }}
+    {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
 
 [FILTER]
-    Name                kubernetes
-    Match               kubernetes.*
-    Kube_Tag_Prefix     kubernetes.var.log.containers.
-    Kube_URL            https://kubernetes.default.svc:443
-    Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-    Merge_Log           On
+    Name        kubernetes
+    {{- range $key, $value := .Filter }}
+      {{- if $value }}
+    {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
 
 [OUTPUT]
     Name          forward

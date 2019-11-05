@@ -227,6 +227,9 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentbitSpec.Metrics.Port)
 			}
 		}
+		if copy.Spec.FluentbitSpec.MountPath == "" {
+			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
+		}
 
 	}
 	return copy
