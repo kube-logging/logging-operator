@@ -57,10 +57,10 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 					Volumes:            r.generateVolume(),
 					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.SecurityContext.PodFsGroup,
-						RunAsNonRoot: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.PodRunAsNonRoot,
-						RunAsUser:    r.Logging.Spec.FluentbitSpec.Security.SecurityContext.PodRunAsUser,
-						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.PodRunAsGroup,
+						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot: r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:    r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 					},
 					Containers: []corev1.Container{
 						{
@@ -71,11 +71,11 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 							Resources:       r.Logging.Spec.FluentbitSpec.Resources,
 							VolumeMounts:    r.generateVolumeMounts(),
 							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsUser,
-								RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerRunAsNonRoot,
-								ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
-								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
-								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ContainerPrivileged,
+								RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
+								RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
+								ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
 							},
 						},
 					},

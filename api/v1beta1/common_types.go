@@ -39,21 +39,22 @@ type KubernetesStorage struct {
 
 // Security defines Fluentd, Fluentbit deployment security properties
 type Security struct {
-	ServiceAccount               string           `json:"serviceAccount,omitempty"`
-	RoleBasedAccessControlCreate *bool            `json:"roleBasedAccessControlCreate,omitempty"`
-	PodSecurityPolicyCreate      bool             `json:"podSecurityPolicyCreate,omitempty"`
-	SecurityContext              *SecurityContext `json:"securityContext,omitempty"`
+	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
+	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`
+	PodSecurityPolicyCreate      bool                       `json:"podSecurityPolicyCreate,omitempty"`
+	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`
+	PodSecurityContext           *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
 }
 
 // SecurityContext defines Fluentd, Fluentbit pods security context properties
-type SecurityContext struct {
-	PodRunAsNonRoot                   *bool  `json:"podRunAsNonRoot,omitempty"`
-	PodRunAsUser                      *int64 `json:"podRunAsUser,omitempty"`
-	PodRunAsGroup                     *int64 `json:"podRunAsGroup,omitempty"`
-	PodFsGroup                        *int64 `json:"podFsGroup,omitempty"`
-	ContainerRunAsUser                *int64 `json:"containerRunAsUser,omitempty"`
-	ContainerRunAsNonRoot             *bool  `json:"containerRunAsNonRoot,omitempty"`
-	ContainerAllowPrivilegeEscalation *bool  `json:"containerAllowPrivilegeEscalation,omitempty"`
-	ContainerReadOnlyRootFilesystem   *bool  `json:"containerReadOnlyRootFilesystem,omitempty"`
-	ContainerPrivileged               *bool  `json:"containerPrivileged,omitempty"`
-}
+//type SecurityContext struct
+//	PodRunAsNonRoot                   *bool  `json:"podRunAsNonRoot,omitempty"`
+//	PodRunAsUser                      *int64 `json:"podRunAsUser,omitempty"`
+//	PodRunAsGroup                     *int64 `json:"podRunAsGroup,omitempty"`
+//	PodFsGroup                        *int64 `json:"podFsGroup,omitempty"`
+//	ContainerRunAsUser                *int64 `json:"containerRunAsUser,omitempty"`
+//	ContainerRunAsNonRoot             *bool  `json:"containerRunAsNonRoot,omitempty"`
+//	ContainerAllowPrivilegeEscalation *bool  `json:"containerAllowPrivilegeEscalation,omitempty"`
+//	ContainerReadOnlyRootFilesystem   *bool  `json:"containerReadOnlyRootFilesystem,omitempty"`
+//	ContainerPrivileged               *bool  `json:"containerPrivileged,omitempty"`
+//}

@@ -78,10 +78,10 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				NodeSelector: r.Logging.Spec.FluentdSpec.NodeSelector,
 				Tolerations:  r.Logging.Spec.FluentdSpec.Tolerations,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsNonRoot,
-					FSGroup:      r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodFsGroup,
-					RunAsUser:    r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsUser,
-					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.PodRunAsGroup},
+					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
+					RunAsUser:    r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
+					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup},
 			},
 		},
 	}
@@ -96,11 +96,11 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		VolumeMounts:    r.generateVolumeMounts(),
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsUser,
-			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerAllowPrivilegeEscalation,
-			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerPrivileged,
-			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.ContainerRunAsNonRoot,
+			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
+			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
+			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 		},
 	}
 }
