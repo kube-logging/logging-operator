@@ -56,6 +56,12 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
 					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
+					SecurityContext: &corev1.PodSecurityContext{
+						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot: r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:    r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+					},
 					Containers: []corev1.Container{
 						{
 							Name:            "fluent-bit",
@@ -64,6 +70,13 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 							Ports:           containerPorts,
 							Resources:       r.Logging.Spec.FluentbitSpec.Resources,
 							VolumeMounts:    r.generateVolumeMounts(),
+							SecurityContext: &corev1.SecurityContext{
+								RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
+								RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
+								ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
+							},
 						},
 					},
 				},

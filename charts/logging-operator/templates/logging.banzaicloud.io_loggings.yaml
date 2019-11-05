@@ -127,6 +127,33 @@ spec:
                       type: boolean
                     roleBasedAccessControlCreate:
                       type: boolean
+                    securityContext:
+                      description: SecurityContext defines Fluentd, Fluentbit pods
+                        security context properties
+                      properties:
+                        containerAllowPrivilegeEscalation:
+                          type: boolean
+                        containerPrivileged:
+                          type: boolean
+                        containerReadOnlyRootFilesystem:
+                          type: boolean
+                        containerRunAsNonRoot:
+                          type: boolean
+                        containerRunAsUser:
+                          format: int64
+                          type: integer
+                        podFsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsNonRoot:
+                          type: boolean
+                        podRunAsUser:
+                          format: int64
+                          type: integer
+                      type: object
                     serviceAccount:
                       type: string
                   type: object
@@ -391,6 +418,33 @@ spec:
                       type: boolean
                     roleBasedAccessControlCreate:
                       type: boolean
+                    securityContext:
+                      description: SecurityContext defines Fluentd, Fluentbit pods
+                        security context properties
+                      properties:
+                        containerAllowPrivilegeEscalation:
+                          type: boolean
+                        containerPrivileged:
+                          type: boolean
+                        containerReadOnlyRootFilesystem:
+                          type: boolean
+                        containerRunAsNonRoot:
+                          type: boolean
+                        containerRunAsUser:
+                          format: int64
+                          type: integer
+                        podFsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsGroup:
+                          format: int64
+                          type: integer
+                        podRunAsNonRoot:
+                          type: boolean
+                        podRunAsUser:
+                          format: int64
+                          type: integer
+                      type: object
                     serviceAccount:
                       type: string
                   type: object
