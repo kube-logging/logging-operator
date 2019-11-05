@@ -167,6 +167,11 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.Port == 0 {
 			copy.Spec.FluentdSpec.Port = 24240
 		}
+		if copy.Spec.FluentdSpec.Scaling == nil {
+			copy.Spec.FluentdSpec.Scaling = &FluentdScaling{
+				Replicas: 1,
+			}
+		}
 	}
 	if copy.Spec.FluentbitSpec != nil {
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {
