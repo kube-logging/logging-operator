@@ -802,6 +802,15 @@ spec:
                         to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                       type: object
                   type: object
+                scaling:
+                  description: FluentdScaling enables configuring the scaling behaviour
+                    of the fluentd statefulset
+                  properties:
+                    replicas:
+                      type: integer
+                  required:
+                  - replicas
+                  type: object
                 security:
                   description: Security defines Fluentd, Fluentbit deployment security
                     properties
