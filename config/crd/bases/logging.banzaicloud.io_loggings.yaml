@@ -47,6 +47,8 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                customConfigSecret:
+                  type: string
                 filterKubernetes:
                   description: FilterKubernetes Fluent Bit Kubernetes Filter allows
                     to enrich your log files with Kubernetes metadata.

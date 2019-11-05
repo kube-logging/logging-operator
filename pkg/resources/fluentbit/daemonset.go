@@ -93,11 +93,6 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/var/lib/docker/containers",
 		},
 		{
-			Name:      "config",
-			MountPath: "/fluent-bit/etc/fluent-bit.conf",
-			SubPath:   "fluent-bit.conf",
-		},
-		{
 			Name:      TailPositionVolume,
 			MountPath: "/tail-db",
 		},
@@ -107,6 +102,19 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/var/log/",
 		},
 	}
+	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
+		v = append(v, corev1.VolumeMount{
+			Name:      "config",
+			MountPath: "/fluent-bit/etc/fluent-bit.conf",
+			SubPath:   "fluent-bit.conf",
+		})
+	} else {
+		v = append(v, corev1.VolumeMount{
+			Name:      "config",
+			MountPath: "/fluent-bit/etc/",
+		})
+	}
+
 	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
@@ -130,6 +138,16 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 		{
+			Name: "varlogs",
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: "/var/log",
+				},
+			},
+		},
+	}
+	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
+		v = append(v, corev1.Volume{
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -142,15 +160,16 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 					},
 				},
 			},
-		},
-		{
-			Name: "varlogs",
+		})
+	} else {
+		v = append(v, corev1.Volume{
+			Name: "config",
 			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: "/var/log",
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: r.Logging.Spec.FluentbitSpec.CustomConfigSecret,
 				},
 			},
-		},
+		})
 	}
 	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
