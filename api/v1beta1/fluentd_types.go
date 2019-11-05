@@ -35,6 +35,14 @@ type FluentdSpec struct {
 	NodeSelector        map[string]string                `json:"nodeSelector,omitempty"`
 	Metrics             *Metrics                         `json:"metrics,omitempty"`
 	Security            *Security                        `json:"security,omitempty"`
+	Scaling             *FluentdScaling                  `json:"scaling,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+// FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
+type FluentdScaling struct {
+	Replicas int `json:"replicas"`
 }
 
 // +kubebuilder:object:generate=true

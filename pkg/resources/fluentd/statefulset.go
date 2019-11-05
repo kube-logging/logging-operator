@@ -19,6 +19,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
+	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,7 +49,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	return &appsv1.StatefulSetSpec{
-		Replicas: util.IntPointer(1),
+		Replicas: util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
 		Selector: &metav1.LabelSelector{
 			MatchLabels: r.getFluentdLabels(),
 		},

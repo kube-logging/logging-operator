@@ -17,6 +17,7 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus/common v0.6.0
 	github.com/sergi/go-diff v1.0.0 // indirect
+	github.com/spf13/cast v1.3.0
 	github.com/spf13/pflag v1.0.3 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
