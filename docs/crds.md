@@ -117,6 +117,7 @@ spec:
 | targetPort | int | *Fluentd port* |  Port to send the logs forward |
 | parser | string | cri | Change fluent-bit input parse configuration. [Available parsers](https://github.com/fluent/fluent-bit/blob/master/conf/parsers.conf)  |
 | position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support |
+| customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
   
 **`logging` with custom fluent-bit annotations** 
 ```yaml

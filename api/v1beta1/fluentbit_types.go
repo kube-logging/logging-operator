@@ -24,20 +24,21 @@ import (
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations      map[string]string           `json:"annotations,omitempty"`
-	Image            ImageSpec                   `json:"image,omitempty"`
-	TLS              FluentbitTLS                `json:"tls,omitempty"`
-	TargetHost       string                      `json:"targetHost,omitempty"`
-	TargetPort       int32                       `json:"targetPort,omitempty"`
-	Resources        corev1.ResourceRequirements `json:"resources,omitempty"`
-	Parser           string                      `json:"parser,omitempty"`
-	Tolerations      []corev1.Toleration         `json:"tolerations,omitempty"`
-	Metrics          *Metrics                    `json:"metrics,omitempty"`
-	Security         *Security                   `json:"security,omitempty"`
-	PositionDB       *KubernetesStorage          `json:"position_db,omitempty"`
-	MountPath        string                      `json:"mountPath,omitempty"`
-	InputTail        InputTail                   `json:"inputTail,omitempty"`
-	FilterKubernetes FilterKubernetes            `json:"filterKubernetes,omitempty"`
+	Annotations        map[string]string           `json:"annotations,omitempty"`
+	Image              ImageSpec                   `json:"image,omitempty"`
+	TLS                FluentbitTLS                `json:"tls,omitempty"`
+	TargetHost         string                      `json:"targetHost,omitempty"`
+	TargetPort         int32                       `json:"targetPort,omitempty"`
+	Resources          corev1.ResourceRequirements `json:"resources,omitempty"`
+	Parser             string                      `json:"parser,omitempty"`
+	Tolerations        []corev1.Toleration         `json:"tolerations,omitempty"`
+	Metrics            *Metrics                    `json:"metrics,omitempty"`
+	Security           *Security                   `json:"security,omitempty"`
+	PositionDB         *KubernetesStorage          `json:"position_db,omitempty"`
+	MountPath          string                      `json:"mountPath,omitempty"`
+	InputTail          InputTail                   `json:"inputTail,omitempty"`
+	FilterKubernetes   FilterKubernetes            `json:"filterKubernetes,omitempty"`
+	CustomConfigSecret string                      `json:"customConfigSecret,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

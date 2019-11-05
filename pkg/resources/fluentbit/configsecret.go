@@ -48,6 +48,12 @@ type fluentBitConfig struct {
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
+	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret != "" {
+		return &corev1.Secret{
+			ObjectMeta: templates.FluentbitObjectMeta(
+				r.Logging.QualifiedName(fluentBitSecretConfigName), r.Logging.Labels, r.Logging),
+		}, k8sutil.StateAbsent
+	}
 	monitor := struct {
 		Enabled bool
 		Port    int32
