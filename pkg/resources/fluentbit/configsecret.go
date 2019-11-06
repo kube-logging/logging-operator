@@ -39,12 +39,13 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
-	Output     map[string]string
-	TargetHost string
-	TargetPort int32
-	Parser     string
-	Input      map[string]string
-	Filter     map[string]string
+	Output        map[string]string
+	TargetHost    string
+	TargetPort    int32
+	Parser        string
+	Input         map[string]string
+	Filter        map[string]string
+	BufferStorage map[string]string
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
@@ -75,6 +76,11 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		log.Error(err)
 	}
 
+	fluentbitBufferStorage, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
+	if err != nil {
+		log.Error(err)
+	}
+
 	input := fluentBitConfig{
 		Namespace: r.Logging.Spec.ControlNamespace,
 		TLS: struct {
@@ -84,11 +90,12 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 			Enabled:   r.Logging.Spec.FluentbitSpec.TLS.Enabled,
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
-		Monitor:    monitor,
-		TargetHost: fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
-		TargetPort: r.Logging.Spec.FluentdSpec.Port,
-		Input:      fluentbitInput,
-		Filter:     fluentbitFilter,
+		Monitor:       monitor,
+		TargetHost:    fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
+		TargetPort:    r.Logging.Spec.FluentdSpec.Port,
+		Input:         fluentbitInput,
+		Filter:        fluentbitFilter,
+		BufferStorage: fluentbitBufferStorage,
 	}
 	if r.Logging.Spec.FluentbitSpec.Parser != "" {
 		input.Parser = r.Logging.Spec.FluentbitSpec.Parser
@@ -101,11 +108,14 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentbitSpec.TargetPort != 0 {
 		input.TargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
 	}
+
+	r.desiredConfig = generateConfig(input)
+
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentbitObjectMeta(
 			r.Logging.QualifiedName(fluentBitSecretConfigName), r.Logging.Labels, r.Logging),
 		Data: map[string][]byte{
-			"fluent-bit.conf": []byte(generateConfig(input)),
+			"fluent-bit.conf": []byte(r.desiredConfig),
 		},
 	}, k8sutil.StatePresent
 }

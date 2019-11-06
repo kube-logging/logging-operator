@@ -20,11 +20,16 @@ var fluentBitConfigTemplate = `
     Daemon       Off
     Log_Level    info
     Parsers_File parsers.conf
-{{- if .Monitor.Enabled }}
+    {{- if .Monitor.Enabled }}
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
     HTTP_Port    {{ .Monitor.Port }}
-{{- end }}
+    {{- end }}
+    {{- range $key, $value := .BufferStorage }}
+    {{- if $value }}
+    {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
 
 [INPUT]
     Name         tail
@@ -37,7 +42,7 @@ var fluentBitConfigTemplate = `
 [FILTER]
     Name        kubernetes
     {{- range $key, $value := .Filter }}
-      {{- if $value }}
+    {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}

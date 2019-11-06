@@ -3,10 +3,11 @@ kind: Logging
 metadata:
   name: customlogging
 spec:
-  loggingRef: customref
-  fluentd: {
-    disablePvc: true
-  }
-  watchNamespaces: ["custom"]
-  controlNamespace: control
+  fluentd: {}
+  fluentbit:
+    image:
+      repository: fluent/fluent-bit
+      tag: 1.3.2-debug
+      pullPolicy: Always
+  controlNamespace: logging
 

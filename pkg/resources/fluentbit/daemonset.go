@@ -15,6 +15,9 @@
 package fluentbit
 
 import (
+	"crypto/sha256"
+	"fmt"
+
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
@@ -25,7 +28,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-const TailPositionVolume = "positiondb"
+const (
+	TailPositionVolume  = "positiondb"
+	BufferStorageVolume = "buffers"
+)
 
 // TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
@@ -41,17 +47,24 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 	}
 
 	labels := util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())
+	meta := templates.FluentbitObjectMeta(r.Logging.QualifiedName(fluentbitDaemonSetName), labels, r.Logging)
+	podMeta := metav1.ObjectMeta{
+		Labels:      labels,
+		Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
+	}
+
+	if r.desiredConfig != "" {
+		h := sha256.New()
+		_, _ = h.Write([]byte(r.desiredConfig))
+		templates.Annotate(podMeta, "checksum/config", fmt.Sprintf("%x", h.Sum(nil)))
+	}
 
 	return &appsv1.DaemonSet{
-		ObjectMeta: templates.FluentbitObjectMeta(
-			r.Logging.QualifiedName(fluentbitDaemonSetName), labels, r.Logging),
+		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
 			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels:      labels,
-					Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
-				},
+				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
 					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
@@ -95,6 +108,10 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		{
 			Name:      TailPositionVolume,
 			MountPath: "/tail-db",
+		},
+		{
+			Name:      BufferStorageVolume,
+			MountPath: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
 		},
 		{
 			Name:      "varlogs",
@@ -183,6 +200,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		v = append(v, tlsRelatedVolume)
 	}
 	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.PositionDB, TailPositionVolume))
+	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.BufferStorageVolume, BufferStorageVolume))
 	return
 }
 
