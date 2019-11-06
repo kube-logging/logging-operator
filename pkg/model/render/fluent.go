@@ -78,7 +78,6 @@ func (f *FluentRender) indented(indent int, format string, values ...interface{}
 			fmt.Fprintln(f.Out, "")
 		}
 	}
-
 }
 
 func tag(tag string) string {

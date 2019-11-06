@@ -119,7 +119,6 @@ func (l *Logging) SetDefaults() *Logging {
 			}
 
 			if copy.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
-
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
 
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentdSpec.Metrics.Path
@@ -231,7 +230,6 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.Metrics.Interval = "15s"
 			}
 			if copy.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
-
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentbitSpec.Metrics.Port)

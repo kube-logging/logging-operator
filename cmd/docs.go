@@ -70,7 +70,6 @@ func (d *doc) checkNodes(n ast.Node) bool {
 					d.append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, normaliseType(item.Type), required, def, com))
 				}
 			}
-
 		}
 	}
 
@@ -169,7 +168,6 @@ func main() {
 	}
 
 	index.generate()
-
 }
 
 func getPrefixedLine(origin, expression string) string {
@@ -249,7 +247,6 @@ func getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
 	}
 
 	return nameResult, getLink(commentWithDefault), "-", required
-
 }
 
 func getDocumentParser(file plugin) *doc {

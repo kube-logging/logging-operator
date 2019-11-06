@@ -33,9 +33,7 @@ const (
 	BufferStorageVolume = "buffers"
 )
 
-// TODO in case of rbac add created serviceAccount name
 func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
-
 	var containerPorts []corev1.ContainerPort
 
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {

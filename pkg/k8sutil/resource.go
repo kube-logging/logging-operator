@@ -122,7 +122,6 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 			}
 			log.Info("resource updated", "resource", desired.GetObjectKind().GroupVersionKind())
 		}
-
 	}
 	return nil
 }
@@ -141,7 +140,6 @@ func (r *GenericResourceReconciler) createIfNotExists(desired runtime.Object) (b
 		if err != nil {
 			return false, current, err
 		}
-
 	}
 	key, err := runtimeClient.ObjectKeyFromObject(current)
 	if err != nil {
@@ -183,9 +181,7 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 					"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))
 			}
 			return false, nil
-
 		}
-
 	}
 
 	key, err := runtimeClient.ObjectKeyFromObject(current)
@@ -200,9 +196,7 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 		} else {
 			log.Info("resource not found skipping delete", "resource", current.GetObjectKind().GroupVersionKind())
 			return false, nil
-
 		}
-
 	}
 	err = r.Client.Delete(context.TODO(), current)
 	if err != nil {
