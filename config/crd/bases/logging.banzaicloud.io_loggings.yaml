@@ -47,6 +47,53 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                bufferStorage:
+                  description: BufferStorage is the Service Section Configuration
+                    of fluent-bit
+                  properties:
+                    storage.backlog.mem_limit:
+                      description: If storage.path is set, Fluent Bit will look for
+                        data chunks that were not delivered and are still in the storage
+                        layer, these are called backlog data. This option configure
+                        a hint of maximum value of memory to use when processing these
+                        records. (default:5M)
+                      type: string
+                    storage.checksum:
+                      description: Enable the data integrity check when writing and
+                        reading data from the filesystem. The storage layer uses the
+                        CRC32 algorithm. (default:Off)
+                      type: string
+                    storage.path:
+                      description: Set an optional location in the file system to
+                        store streams and chunks of data. If this parameter is not
+                        set, Input plugins can only use in-memory buffering.
+                      type: string
+                    storage.sync:
+                      description: Configure the synchronization mode used to store
+                        the data into the file system. It can take the values normal
+                        or full. (default:normal)
+                      type: string
+                  type: object
+                bufferStorageVolume:
+                  properties:
+                    host_path:
+                      description: Represents a host path mapped into a pod. Host
+                        path volumes do not support ownership management or SELinux
+                        relabeling.
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                  type: object
                 customConfigSecret:
                   type: string
                 filterKubernetes:
@@ -277,6 +324,10 @@ spec:
                       type: string
                     Tag_Regex:
                       description: Set a regex to extract fields from the file.
+                      type: string
+                    storage.type:
+                      description: Specify the buffering mechanism to use. It can
+                        be memory or filesystem. (default:memory)
                       type: string
                   type: object
                 metrics:

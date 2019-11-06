@@ -194,7 +194,6 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 					}
 				}
 			}
-
 		}
 	}
 	return multierror

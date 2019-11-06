@@ -81,6 +81,7 @@ The plugin supports the following configuration parameters:
 
 | Key | Description | Default |
 | :--- | :--- | :--- |
+| storage.type | Specify the buffering mechanism to use. It can be memory or filesystem. | memory |
 | Buffer\_Chunk\_Size | Set the initial buffer size to read files data. This value is used too to increase buffer size. The value must be according to the [Unit Size](../configuration/unit_sizes.md) specification. | 32k |
 | Buffer\_Max\_Size | Set the limit of the buffer size per monitored file. When a buffer needs to be increased \(e.g: very long lines\), this value is used to restrict how much the memory buffer can grow. If reading a file exceed this limit, the file is removed from the monitored file list. The value must be according to the [Unit Size](../configuration/unit_sizes.md) specification. | Buffer\_Chunk\_Size |
 | Path | Pattern specifying a specific log files or multiple ones through the use of common wildcards. |  |
@@ -103,3 +104,34 @@ The plugin supports the following configuration parameters:
 | Parser\_N | Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser\_1 ab1,  Parser\_2 ab2, Parser\_N abN. |  |
 | Docker\_Mode | If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. | Off |
 | Docker\_Mode\_Flush | Wait period time in seconds to flush queued unfinished split lines. | 4 |
+
+## Buffering
+
+### BufferStorage
+A mechanism to place processed data into a temporal location until is ready to be shipped. [More Info](https://docs.fluentbit.io/manual/configuration/buffering)
+
+
+| Key | Description | Default | 
+| :--- | :--- | :--- |
+| storage.path | Set an optional location in the file system to store streams and chunks of data. If this parameter is not set, Input plugins can only use in-memory buffering. | |
+| storage.sync | Configure the synchronization mode used to store the data into the file system. It can take the values normal or full. | normal |
+| storage.checksum | Enable the data integrity check when writing and reading data from the filesystem. The storage layer uses the CRC32 algorithm. | Off |
+| storage.backlog.mem_limit | If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records. | 5M |
+
+
+#### Default configuration
+
+If nothing is set, by default it configures the `storage.path` explicitly to use `/buffers` and leaves fluent-bit defaults for the other options. 
+
+```
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: {}
+  fluentbit:
+    bufferStorage:
+       storage.path: /buffers
+  controlNamespace: logging
+```

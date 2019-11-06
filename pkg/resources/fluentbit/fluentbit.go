@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
@@ -53,10 +54,17 @@ func (r *Reconciler) getServiceAccount() string {
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
+type DesiredObject struct {
+	Object runtime.Object
+	State  k8sutil.DesiredState
+}
+
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
+
+	desiredConfig string
 }
 
 // NewReconciler creates a new Fluentbit reconciler
@@ -69,7 +77,7 @@ func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Re
 
 // Reconcile reconciles the fluentBit resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	for _, res := range []resources.Resource{
+	for _, factory := range []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
@@ -81,14 +89,15 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
 	} {
-		o, state := res()
+		o, state := factory()
 		if o == nil {
-			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
+			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
 		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, emperror.WrapWith(err, "failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
 		}
 	}
+
 	return nil, nil
 }

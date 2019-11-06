@@ -26,7 +26,6 @@ import (
 
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
-
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
 				r.Logging.QualifiedName(fluentbitPodSecurityPolicyName),
@@ -64,7 +63,6 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 				}},
 			},
 		}, k8sutil.StatePresent
-
 	}
 	return &policyv1beta1.PodSecurityPolicy{
 		ObjectMeta: templates.FluentbitObjectMeta(
@@ -73,7 +71,6 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 			r.Logging),
 		Spec: policyv1beta1.PodSecurityPolicySpec{},
 	}, k8sutil.StateAbsent
-
 }
 
 func (r *Reconciler) pspClusterRole() (runtime.Object, k8sutil.DesiredState) {

@@ -23,6 +23,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	BuffersPath    = "/opt/fluent-bit/%s/buf"
+	PositionDbPath = "/opt/fluent-bit/%s/pos"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -114,7 +119,6 @@ func (l *Logging) SetDefaults() *Logging {
 			}
 
 			if copy.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
-
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
 
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentdSpec.Metrics.Path
@@ -226,7 +230,6 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.Metrics.Interval = "15s"
 			}
 			if copy.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
-
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentbitSpec.Metrics.Port)
@@ -235,7 +238,23 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
-
+		if copy.Spec.FluentbitSpec.PositionDB == nil {
+			copy.Spec.FluentbitSpec.PositionDB = &KubernetesStorage{
+				HostPath: &v1.HostPathVolumeSource{
+					Path: fmt.Sprintf(PositionDbPath, copy.Name),
+				},
+			}
+		}
+		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
+			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
+		}
+		if copy.Spec.FluentbitSpec.BufferStorageVolume == nil {
+			copy.Spec.FluentbitSpec.BufferStorageVolume = &KubernetesStorage{
+				HostPath: &v1.HostPathVolumeSource{
+					Path: fmt.Sprintf(BuffersPath, copy.Name),
+				},
+			}
+		}
 	}
 	return copy
 }
