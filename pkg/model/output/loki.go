@@ -80,6 +80,13 @@ func (r Label) ToDirective(secretLoader secret.SecretLoader, id string) (types.D
 	}
 	return directive, nil
 }
+
+func (r Label) merge(input Label) {
+	for k, v := range input {
+		r[k] = v
+	}
+}
+
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "loki"
 	pluginID := id + "_" + pluginType
@@ -135,10 +142,4 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 	}
 	return loki, nil
-}
-
-func (l Label) merge(input Label) {
-	for k, v := range input {
-		l[k] = v
-	}
 }

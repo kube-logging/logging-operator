@@ -26,6 +26,8 @@ func TestLoki(t *testing.T) {
 	CONFIG := []byte(`
 url: http://loki:3100
 configure_kubernetes_labels: true
+labels:
+  name: $.name
 extra_labels:
   testing: "testing"
 buffer:
@@ -46,6 +48,7 @@ buffer:
       container $.kubernetes.container_name
       container_id $.kubernetes.docker_id
       host $.kubernetes.host
+      name $.name
       namespace $.kubernetes.namespace_name
       pod $.kubernetes.pod_name
       pod_id $.kubernetes.pod_id

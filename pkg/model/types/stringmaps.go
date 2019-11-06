@@ -187,7 +187,7 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 				} else {
 					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
 						validate := map[string]string{}
-						if err := json.Unmarshal([]byte(def), validate); err != nil {
+						if err := json.Unmarshal([]byte(def), &validate); err != nil {
 							multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
 						}
 						out[name] = def
