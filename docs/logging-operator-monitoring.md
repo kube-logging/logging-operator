@@ -24,6 +24,17 @@
 ---
 
 
+### Metrics Variables
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| interval | string | No | "15s" | Scrape Interval |
+| timeout | string | No | "5s" |  Scrape Timeout |
+| port | int | No | - | Metrics Port. |
+| path | int | No | - | Metrics Path. |
+| serviceMonitor | bool | No | false | Enable to create ServiceMonitor for Prometheus operator |
+| prometheusAnnotations | bool | No | false | Add prometheus labes to fluent pods. |
+
+
 ## Install Prometheus Operator with Helm 
 
 ### Create `logging` namespace

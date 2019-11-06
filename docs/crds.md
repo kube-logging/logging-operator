@@ -85,6 +85,12 @@ You can customize the `fluentd` statefulset with the following parameters.
 | volumeModImage | [ImageSpec](#Image-Spec) | {} | Volume modifier image override |
 | configReloaderImage | [ImageSpec](#Image-Spec) | {} | Config reloader image override |
 | resources | [ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#resourcerequirements-v1-core) | {} | Resource requirements and limits |
+| port | int | 24240 | Fluentd target port |
+| tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
+| nodeSelector | [NodeSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#nodeselector-v1-core) | {} | A node selector represents the union of the results of one or more label queries over a set of nodes |
+| metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
+| security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
+
 
 **`logging` with custom fluentd pvc** 
 ```yaml
@@ -116,7 +122,12 @@ spec:
 | targetHost | string | *Fluentd host* | Hostname to send the logs forward |
 | targetPort | int | *Fluentd port* |  Port to send the logs forward |
 | parser | string | cri | Change fluent-bit input parse configuration. [Available parsers](https://github.com/fluent/fluent-bit/blob/master/conf/parsers.conf)  |
+| tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
+| metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
+| security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support |
+| inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | The tail input plugin allows to monitor one or several text files.  |
+| filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
   
 **`logging` with custom fluent-bit annotations** 
