@@ -389,11 +389,7 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	}
 	out.InputTail = in.InputTail
 	out.FilterKubernetes = in.FilterKubernetes
-	if in.BufferStorage != nil {
-		in, out := &in.BufferStorage, &out.BufferStorage
-		*out = new(BufferStorage)
-		**out = **in
-	}
+	out.BufferStorage = in.BufferStorage
 	if in.BufferStorageVolume != nil {
 		in, out := &in.BufferStorageVolume, &out.BufferStorageVolume
 		*out = new(KubernetesStorage)

@@ -24,7 +24,8 @@ import (
 )
 
 const (
-	BuffersPath = "/buffers"
+	BuffersPath    = "/opt/fluent-bit/%s/buf"
+	PositionDbPath = "/opt/fluent-bit/%s/pos"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -239,18 +240,20 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
-		if copy.Spec.FluentbitSpec.BufferStorage == nil {
-			copy.Spec.FluentbitSpec.BufferStorage = &BufferStorage{
-				StoragePath: BuffersPath,
+		if copy.Spec.FluentbitSpec.PositionDB == nil {
+			copy.Spec.FluentbitSpec.PositionDB = &KubernetesStorage{
+				HostPath: &v1.HostPathVolumeSource{
+					Path: fmt.Sprintf(PositionDbPath, copy.Name),
+				},
 			}
 		}
 		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
-			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = BuffersPath
+			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
 		}
 		if copy.Spec.FluentbitSpec.BufferStorageVolume == nil {
 			copy.Spec.FluentbitSpec.BufferStorageVolume = &KubernetesStorage{
 				HostPath: &v1.HostPathVolumeSource{
-					Path: copy.Spec.FluentbitSpec.BufferStorage.StoragePath,
+					Path: fmt.Sprintf(BuffersPath, copy.Name),
 				},
 			}
 		}

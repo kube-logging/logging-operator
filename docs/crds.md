@@ -125,9 +125,11 @@ spec:
 | tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
-| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support |
+| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. A `hostPath` volume is used if nothing is configured with the path `/opt/fluent-bit/%s/pos` where `%s` is the placeholder for the logging CR's name |
 | inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | The tail input plugin allows to monitor one or several text files.  |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
+| bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
+| bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. A `hostPath` volume is used if nothing is configured with the path `/opt/fluent-bit/%s/buf` where `%s` is the placeholder for the logging CR's name |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
   
 **`logging` with custom fluent-bit annotations** 

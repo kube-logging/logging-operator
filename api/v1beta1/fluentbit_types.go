@@ -38,7 +38,7 @@ type FluentbitSpec struct {
 	MountPath           string                      `json:"mountPath,omitempty"`
 	InputTail           InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
-	BufferStorage       *BufferStorage              `json:"bufferStorage,omitempty"`
+	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
 	BufferStorageVolume *KubernetesStorage          `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret  string                      `json:"customConfigSecret,omitempty"`
 }
