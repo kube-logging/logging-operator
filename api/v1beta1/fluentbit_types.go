@@ -24,21 +24,23 @@ import (
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations        map[string]string           `json:"annotations,omitempty"`
-	Image              ImageSpec                   `json:"image,omitempty"`
-	TLS                FluentbitTLS                `json:"tls,omitempty"`
-	TargetHost         string                      `json:"targetHost,omitempty"`
-	TargetPort         int32                       `json:"targetPort,omitempty"`
-	Resources          corev1.ResourceRequirements `json:"resources,omitempty"`
-	Parser             string                      `json:"parser,omitempty"`
-	Tolerations        []corev1.Toleration         `json:"tolerations,omitempty"`
-	Metrics            *Metrics                    `json:"metrics,omitempty"`
-	Security           *Security                   `json:"security,omitempty"`
-	PositionDB         *KubernetesStorage          `json:"position_db,omitempty"`
-	MountPath          string                      `json:"mountPath,omitempty"`
-	InputTail          InputTail                   `json:"inputTail,omitempty"`
-	FilterKubernetes   FilterKubernetes            `json:"filterKubernetes,omitempty"`
-	CustomConfigSecret string                      `json:"customConfigSecret,omitempty"`
+	Annotations         map[string]string           `json:"annotations,omitempty"`
+	Image               ImageSpec                   `json:"image,omitempty"`
+	TLS                 FluentbitTLS                `json:"tls,omitempty"`
+	TargetHost          string                      `json:"targetHost,omitempty"`
+	TargetPort          int32                       `json:"targetPort,omitempty"`
+	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
+	Parser              string                      `json:"parser,omitempty"`
+	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
+	Metrics             *Metrics                    `json:"metrics,omitempty"`
+	Security            *Security                   `json:"security,omitempty"`
+	PositionDB          *KubernetesStorage          `json:"position_db,omitempty"`
+	MountPath           string                      `json:"mountPath,omitempty"`
+	InputTail           InputTail                   `json:"inputTail,omitempty"`
+	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
+	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
+	BufferStorageVolume *KubernetesStorage          `json:"bufferStorageVolume,omitempty"`
+	CustomConfigSecret  string                      `json:"customConfigSecret,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -63,8 +65,22 @@ func (spec FluentbitSpec) GetPrometheusPortFromAnnotation() int32 {
 	return int32(port)
 }
 
+// BufferStorage is the Service Section Configuration of fluent-bit
+type BufferStorage struct {
+	// Set an optional location in the file system to store streams and chunks of data. If this parameter is not set, Input plugins can only use in-memory buffering.
+	StoragePath string `json:"storage.path,omitempty"`
+	// Configure the synchronization mode used to store the data into the file system. It can take the values normal or full. (default:normal)
+	StorageSync string `json:"storage.sync,omitempty"`
+	// Enable the data integrity check when writing and reading data from the filesystem. The storage layer uses the CRC32 algorithm. (default:Off)
+	StorageChecksum string `json:"storage.checksum,omitempty"`
+	// If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records. (default:5M)
+	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
+}
+
 // InputTail defines Fluentbit tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
 type InputTail struct {
+	// Specify the buffering mechanism to use. It can be memory or filesystem. (default:memory)
+	StorageType string `json:"storage.type,omitempty"`
 	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. (default:32k)
 	BufferChunkSize string `json:"Buffer_Chunk_Size,omitempty"`
 	// Set the limit of the buffer size per monitored file. When a buffer needs to be increased (e.g: very long lines), this value is used to restrict how much the memory buffer can grow. If reading a file exceed this limit, the file is removed from the monitored file list. The value must be according to the Unit Size specification. (default:Buffer_Chunk_Size)

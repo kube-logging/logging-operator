@@ -31,7 +31,6 @@ import (
 )
 
 func TestRenderDirective(t *testing.T) {
-
 	var tests = []struct {
 		name      string
 		directive types.Directive
@@ -266,7 +265,6 @@ func TestRenderDirective(t *testing.T) {
 				t.Errorf("[%s] Result does not match (-actual vs +expected):\n%v", test.name, diff.LineDiff(a, e))
 			}
 		}
-
 	}
 }
 
@@ -492,7 +490,7 @@ func TestRenderS3(t *testing.T) {
 	}
 	for _, item := range table {
 		t.Logf("> %s\n", item.name)
-		err := ValidateRenderS3(t, item.s3Config, item.expected)
+		err := ValidateRenderS3(t, &item.s3Config, item.expected)
 		if item.err != "" {
 			if err == nil {
 				t.Errorf("expected error: %s", item.err)
@@ -510,7 +508,7 @@ func TestRenderS3(t *testing.T) {
 	}
 }
 
-func ValidateRenderS3(t *testing.T, s3Config output.S3OutputConfig, expected string) error {
+func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expected string) error {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", "", nil), "test")

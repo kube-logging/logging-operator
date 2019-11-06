@@ -90,5 +90,4 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 		}, k8sutil.StatePresent
 	}
 	return &v1.ServiceMonitor{ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging), Spec: v1.ServiceMonitorSpec{}}, k8sutil.StateAbsent
-
 }

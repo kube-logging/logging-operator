@@ -70,5 +70,4 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 		}, k8sutil.StatePresent
 	}
 	return &v1.ServiceMonitor{ObjectMeta: templates.FluentbitObjectMeta(r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging), Spec: v1.ServiceMonitorSpec{}}, k8sutil.StateAbsent
-
 }

@@ -20,6 +20,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func Annotate(meta metav1.ObjectMeta, key, val string) metav1.ObjectMeta {
+	if meta.Annotations == nil {
+		meta.Annotations = make(map[string]string)
+	}
+	meta.Annotations[key] = val
+	return meta
+}
+
 // FluentbitObjectMeta creates an objectMeta for resource fluentbit
 func FluentbitObjectMeta(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
