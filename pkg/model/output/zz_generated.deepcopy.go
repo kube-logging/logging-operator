@@ -334,6 +334,13 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 			(*out)[key] = val
 		}
 	}
+	if in.ExtraLabels != nil {
+		in, out := &in.ExtraLabels, &out.ExtraLabels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.RemoveKeys != nil {
 		in, out := &in.RemoveKeys, &out.RemoveKeys
 		*out = make([]string, len(*in))

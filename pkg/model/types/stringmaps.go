@@ -176,6 +176,25 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 					}
 				}
 			}
+		case reflect.Map:
+			if mapStringString, ok := v.Interface().(map[string]string); ok {
+				if len(mapStringString) > 0 {
+					b, err := json.Marshal(mapStringString)
+					if err != nil {
+						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, mapStringString), err)
+					}
+					out[name] = string(b)
+				} else {
+					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
+						validate := map[string]string{}
+						if err := json.Unmarshal([]byte(def), validate); err != nil {
+							multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
+						}
+						out[name] = def
+					}
+				}
+			}
+
 		}
 	}
 	return multierror

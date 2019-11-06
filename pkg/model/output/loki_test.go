@@ -37,6 +37,7 @@ buffer:
   <match **>
     @type loki
     @id test_loki
+    extra_labels {"testing":"testing"}
     extract_kubernetes_labels true
     line_format json
     remove_keys ["kubernetes"]
@@ -48,7 +49,6 @@ buffer:
       namespace $.kubernetes.namespace_name
       pod $.kubernetes.pod_name
       pod_id $.kubernetes.pod_id
-      testing testing
     </label>
     <buffer tag,time>
       @type file

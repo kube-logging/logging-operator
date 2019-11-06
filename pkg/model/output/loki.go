@@ -91,13 +91,6 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        pluginID,
 		},
 	}
-	//if l.ExtraLabels != nil {
-	//	o, err := json.Marshal(l.ExtraLabels)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	l.ExtraLabels = string(o)
-	//}
 	if l.ConfigureKubernetesLabels {
 		if l.Labels == nil {
 			l.Labels = Label{}
