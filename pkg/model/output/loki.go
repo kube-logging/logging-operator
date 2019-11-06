@@ -51,7 +51,9 @@ type LokiOutput struct {
 	// Loki is a multi-tenant log storage platform and all requests sent must include a tenant.
 	Tenant string `json:"tenant,omitempty"`
 	// Set of labels to include with every Loki stream.
-	ExtraLabels Label `json:"extra_labels,omitempty"`
+	Labels Label `json:"labels,omitempty"`
+	// Set of extra labels to include with every Loki stream.
+	ExtraLabels map[string]string `json:"extra_labels,omitempty"`
 	// Format to use when flattening the record to a log line: json, key_value (default: key_value)
 	LineFormat string `json:"line_format,omitempty" plugin:"default:json"`
 	// Extract kubernetes labels as loki labels (default: false)
@@ -89,11 +91,18 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        pluginID,
 		},
 	}
+	//if l.ExtraLabels != nil {
+	//	o, err := json.Marshal(l.ExtraLabels)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	l.ExtraLabels = string(o)
+	//}
 	if l.ConfigureKubernetesLabels {
-		if l.ExtraLabels == nil {
-			l.ExtraLabels = Label{}
+		if l.Labels == nil {
+			l.Labels = Label{}
 		}
-		l.ExtraLabels.merge(Label{
+		l.Labels.merge(Label{
 			"namespace":    `$.kubernetes.namespace_name`,
 			"pod":          `$.kubernetes.pod_name`,
 			"container_id": `$.kubernetes.docker_id`,
@@ -118,8 +127,8 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	} else {
 		loki.Params = params
 	}
-	if l.ExtraLabels != nil {
-		if meta, err := l.ExtraLabels.ToDirective(secretLoader, ""); err != nil {
+	if l.Labels != nil {
+		if meta, err := l.Labels.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			loki.SubDirectives = append(loki.SubDirectives, meta)
