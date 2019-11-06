@@ -327,9 +327,16 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Labels != nil {
+		in, out := &in.Labels, &out.Labels
+		*out = make(Label, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.ExtraLabels != nil {
 		in, out := &in.ExtraLabels, &out.ExtraLabels
-		*out = make(Label, len(*in))
+		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
 		}
