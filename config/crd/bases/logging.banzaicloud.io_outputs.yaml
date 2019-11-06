@@ -2362,12 +2362,17 @@ spec:
                 extra_labels:
                   additionalProperties:
                     type: string
-                  description: Set of labels to include with every Loki stream.
+                  description: Set of extra labels to include with every Loki stream.
                   type: object
                 extract_kubernetes_labels:
                   description: 'Extract kubernetes labels as loki labels (default:
                     false)'
                   type: boolean
+                labels:
+                  additionalProperties:
+                    type: string
+                  description: Set of labels to include with every Loki stream.
+                  type: object
                 line_format:
                   description: 'Format to use when flattening the record to a log
                     line: json, key_value (default: key_value)'
