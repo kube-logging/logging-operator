@@ -90,14 +90,18 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		},
 	}
 	if l.ConfigureKubernetesLabels {
-		l.ExtraLabels = Label{
+		if l.ExtraLabels == nil {
+			l.ExtraLabels = Label{}
+		}
+		l.ExtraLabels.merge(Label{
 			"namespace":    `$.kubernetes.namespace_name`,
 			"pod":          `$.kubernetes.pod_name`,
 			"container_id": `$.kubernetes.docker_id`,
 			"container":    `$.kubernetes.container_name`,
 			"pod_id":       `$.kubernetes.pod_id`,
 			"host":         `$.kubernetes.host`,
-		}
+		})
+
 		if l.RemoveKeys != nil {
 			if !util.Contains(l.RemoveKeys, "kubernetes") {
 				l.RemoveKeys = append(l.RemoveKeys, "kubernetes")
@@ -129,4 +133,10 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 	}
 	return loki, nil
+}
+
+func (l Label) merge(input Label) {
+	for k, v := range input {
+		l[k] = v
+	}
 }

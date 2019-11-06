@@ -26,6 +26,8 @@ func TestLoki(t *testing.T) {
 	CONFIG := []byte(`
 url: http://loki:3100
 configure_kubernetes_labels: true
+extra_labels:
+  testing: "testing"
 buffer:
   timekey: 1m
   timekey_wait: 30s
@@ -46,6 +48,7 @@ buffer:
       namespace $.kubernetes.namespace_name
       pod $.kubernetes.pod_name
       pod_id $.kubernetes.pod_id
+      testing testing
     </label>
     <buffer tag,time>
       @type file
