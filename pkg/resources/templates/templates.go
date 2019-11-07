@@ -15,8 +15,8 @@
 package templates
 
 import (
-	"github.com/banzaicloud/logging-operator/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/util"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
