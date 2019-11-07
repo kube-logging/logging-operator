@@ -13,7 +13,7 @@ VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./client/*")
-GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/model/filter/*"  -not -path "./pkg/model/output/*"  -not -path "./pkg/model/input/*")
+GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/sdk/model/filter/*"  -not -path "./pkg/sdk/model/output/*"  -not -path "./pkg/sdk/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
 GOLANGCI_VERSION = 1.19.1
@@ -63,7 +63,7 @@ test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
 	@which etcd
 	kubebuilder version
-	go test ./api/... ./controllers/... ./pkg/... -coverprofile cover.out
+	go test ./controllers/... ./pkg/... -coverprofile cover.out
 
 # Build manager binary
 manager: generate fmt vet
@@ -96,8 +96,8 @@ vet:
 
 # Generate code
 generate: controller-gen
-	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths=./api/...
-	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths=./pkg/model/...
+	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./api/...
+	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./model/...
 
 # Build the docker image
 docker-build: test

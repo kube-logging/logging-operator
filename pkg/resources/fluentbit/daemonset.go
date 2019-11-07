@@ -18,10 +18,10 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

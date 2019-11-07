@@ -28,7 +28,7 @@ import (
 
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/util"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 )
 
 type ConfigCheckResult struct {
