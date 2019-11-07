@@ -37,6 +37,32 @@ type Metrics struct {
 
 type KubernetesStorage struct {
 	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
+	EmptyDir *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+}
+
+// GetVolume returns a default emptydir volume if none configured
+func (storage *KubernetesStorage) GetVolume(name string) corev1.Volume {
+	volume := corev1.Volume{
+		Name: name,
+	}
+	if storage != nil {
+		if storage.HostPath != nil {
+			volume.VolumeSource = corev1.VolumeSource{
+				HostPath: storage.HostPath,
+			}
+			return volume
+		} else if storage.EmptyDir != nil {
+			volume.VolumeSource = corev1.VolumeSource{
+				EmptyDir: storage.EmptyDir,
+			}
+			return volume
+		}
+	}
+	// return a default emptydir volume if none configured
+	volume.VolumeSource = corev1.VolumeSource{
+		EmptyDir: &corev1.EmptyDirVolumeSource{},
+	}
+	return volume
 }
 
 // Security defines Fluentd, Fluentbit deployment security properties

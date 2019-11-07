@@ -23,11 +23,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
-	BuffersPath    = "/opt/fluent-bit/%s/buf"
-	PositionDbPath = "/opt/fluent-bit/%s/pos"
-)
-
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -238,22 +233,8 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
-		if copy.Spec.FluentbitSpec.PositionDB == nil {
-			copy.Spec.FluentbitSpec.PositionDB = &KubernetesStorage{
-				HostPath: &v1.HostPathVolumeSource{
-					Path: fmt.Sprintf(PositionDbPath, copy.Name),
-				},
-			}
-		}
 		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
 			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
-		}
-		if copy.Spec.FluentbitSpec.BufferStorageVolume == nil {
-			copy.Spec.FluentbitSpec.BufferStorageVolume = &KubernetesStorage{
-				HostPath: &v1.HostPathVolumeSource{
-					Path: fmt.Sprintf(BuffersPath, copy.Name),
-				},
-			}
 		}
 	}
 	return copy
