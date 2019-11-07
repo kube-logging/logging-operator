@@ -16,13 +16,13 @@ package model
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/model/common"
-	"github.com/banzaicloud/logging-operator/pkg/model/input"
-	"github.com/banzaicloud/logging-operator/pkg/model/secret"
-	"github.com/banzaicloud/logging-operator/pkg/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/plugins"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

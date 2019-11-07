@@ -20,9 +20,9 @@ import (
 	"text/template"
 
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/prometheus/common/log"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

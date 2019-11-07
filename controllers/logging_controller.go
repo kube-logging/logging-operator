@@ -20,12 +20,12 @@ import (
 	"regexp"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/model/render"
-	"github.com/banzaicloud/logging-operator/pkg/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/model"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -39,7 +39,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1beta1"
+	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 )
 
 // LoggingReconciler reconciles a Logging object

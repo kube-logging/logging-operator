@@ -18,9 +18,9 @@ import (
 	"flag"
 	"os"
 
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/controllers"
-	"github.com/banzaicloud/logging-operator/pkg/util"
+	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"

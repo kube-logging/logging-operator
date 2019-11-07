@@ -28,7 +28,7 @@ go run main.go
 
 To add a `plugin` to the logging operator you need to define the plugin struct.
 
-> Note: Place your plugin in the corresponding directory `pkg/model/filter` or `pkg/model/output`
+> Note: Place your plugin in the corresponding directory `pkg/sdk/model/filter` or `pkg/sdk/model/output`
 
 ```go
 type MyExampleOutput struct {

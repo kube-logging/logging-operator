@@ -115,9 +115,9 @@ type PluginDir struct {
 }
 
 var pluginDirs = []PluginDir{
-	{"filters", "./pkg/model/filter/"},
-	{"outputs", "./pkg/model/output/"},
-	{"common", "./pkg/model/common/"},
+	{"filters", "./pkg/sdk/model/filter/"},
+	{"outputs", "./pkg/sdk/model/output/"},
+	{"common", "./pkg/sdk/model/common/"},
 }
 
 var docsPath = "docs/plugins"
