@@ -215,6 +215,7 @@ Define Kubernetes storage
 | Name      | Type | Default | Description |
 |-----------|------|---------|-------------|
 | host_path | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. |
+| emptyDir | [EmptyDirVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#emptydirvolumesource-v1-core) | - | Represents an empty directory for a pod. |
 
 
 ## outputs, clusteroutputs
