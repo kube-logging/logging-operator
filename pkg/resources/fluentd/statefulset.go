@@ -48,6 +48,23 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
+	initContainers := make([]corev1.Container, 0)
+
+	if !r.Logging.Spec.FluentdSpec.DisablePvc {
+		initContainers = append(initContainers, corev1.Container{
+			Name:            "volume-mount-hack",
+			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
+			Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      r.Logging.QualifiedName(bufferVolumeName),
+					MountPath: "/buffers",
+				},
+			},
+		})
+	}
+
 	return &appsv1.StatefulSetSpec{
 		Replicas: util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
 		Selector: &metav1.LabelSelector{
@@ -58,20 +75,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Spec: corev1.PodSpec{
 				Volumes:            r.generateVolume(),
 				ServiceAccountName: r.getServiceAccount(),
-				InitContainers: []corev1.Container{
-					{
-						Name:            "volume-mount-hack",
-						Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
-						ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-						Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
-						VolumeMounts: []corev1.VolumeMount{
-							{
-								Name:      r.Logging.QualifiedName(bufferVolumeName),
-								MountPath: "/buffers",
-							},
-						},
-					},
-				},
+				InitContainers:     initContainers,
 				Containers: []corev1.Container{
 					*r.fluentContainer(),
 					*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
