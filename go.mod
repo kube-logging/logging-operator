@@ -13,6 +13,7 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus/common v0.6.0
 	github.com/spf13/cast v1.3.0
+	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
 	k8s.io/api v0.0.0-20190813020757-36bff7324fb7
 	k8s.io/apiextensions-apiserver v0.0.0-20190801143813-8b5f3a974f92
 	k8s.io/apimachinery v0.0.0-20190809020650-423f5d784010
