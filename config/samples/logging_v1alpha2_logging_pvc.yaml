@@ -3,6 +3,6 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd:
+  fluentd: {}
   fluentbit: {}
   controlNamespace: default
