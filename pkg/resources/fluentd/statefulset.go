@@ -50,7 +50,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	initContainers := make([]corev1.Container, 0)
 
-	if !r.Logging.Spec.FluentdSpec.DisablePvc {
+	if !r.Logging.Spec.FluentdSpec.DisablePvc && r.Logging.Spec.FluentdSpec.VolumeMountChmod {
 		initContainers = append(initContainers, corev1.Container{
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,

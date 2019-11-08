@@ -35,6 +35,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 					"configMap",
 					"emptyDir",
 					"secret",
+					"hostPath",
 					"persistentVolumeClaim"},
 				SELinux: policyv1beta1.SELinuxStrategyOptions{
 					Rule: policyv1beta1.SELinuxStrategyRunAsAny,

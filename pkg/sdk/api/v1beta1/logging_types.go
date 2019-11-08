@@ -98,7 +98,9 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.Security.PodSecurityContext == nil {
 			copy.Spec.FluentdSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
 		}
-
+		if copy.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup == nil {
+			copy.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
+		}
 		if copy.Spec.FluentdSpec.Metrics != nil {
 			if copy.Spec.FluentdSpec.Metrics.Path == "" {
 				copy.Spec.FluentdSpec.Metrics.Path = "/metrics"

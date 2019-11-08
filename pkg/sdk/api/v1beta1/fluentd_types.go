@@ -27,6 +27,7 @@ type FluentdSpec struct {
 	Image               ImageSpec                        `json:"image,omitempty"`
 	FluentdPvcSpec      corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
 	DisablePvc          bool                             `json:"disablePvc,omitempty"`
+	VolumeMountChmod    bool                             `json:"volumeMountChmod,omitempty"`
 	VolumeModImage      ImageSpec                        `json:"volumeModImage,omitempty"`
 	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage,omitempty"`
 	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
