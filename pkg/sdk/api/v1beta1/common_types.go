@@ -15,6 +15,8 @@
 package v1beta1
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -41,12 +43,21 @@ type KubernetesStorage struct {
 }
 
 // GetVolume returns a default emptydir volume if none configured
-func (storage *KubernetesStorage) GetVolume(name string) corev1.Volume {
+// `logging` is the name of the logging CR to make sure multiple
+//           logging system can coexist in case a hostPath mount is used
+// `name`    will be the name of the volume and the lowest level directory in case a hostPath mount is used
+func (storage *KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
+	const (
+		hostPath = "/opt/logging-operator/%s/%s"
+	)
 	volume := corev1.Volume{
 		Name: name,
 	}
 	if storage != nil {
 		if storage.HostPath != nil {
+			if storage.HostPath.Path == "" {
+				storage.HostPath.Path = fmt.Sprintf(hostPath, logging, name)
+			}
 			volume.VolumeSource = corev1.VolumeSource{
 				HostPath: storage.HostPath,
 			}

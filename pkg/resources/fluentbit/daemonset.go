@@ -196,7 +196,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(TailPositionVolume))
-	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(BufferStorageVolume))
+	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(r.Logging.Name, TailPositionVolume))
+	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(r.Logging.Name, BufferStorageVolume))
 	return
 }
