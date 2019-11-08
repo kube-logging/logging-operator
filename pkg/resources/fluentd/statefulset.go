@@ -102,6 +102,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
+			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
 			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
 			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
