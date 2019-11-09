@@ -23,6 +23,7 @@
 - [forward](./outputs/forward.md)
 - [gcs](./outputs/gcs.md)
 - [kafka](./outputs/kafka.md)
+- [kinesis_stream](./outputs/kinesis_stream.md)
 - [loki](./outputs/loki.md)
 - [oss](./outputs/oss.md)
 - [s3](./outputs/s3.md)
