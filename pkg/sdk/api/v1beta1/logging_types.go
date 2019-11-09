@@ -135,6 +135,17 @@ func (l *Logging) SetDefaults() *Logging {
 				"storage": resource.MustParse("20Gi"),
 			}
 		}
+		// Temporarily copy the FluentdPvcSpec. Later set defaults here. FluentdSpec.
+		// DisablePvc will stay to allow disabling the default
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume = &PersistentVolume{
+				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
+				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
+					ClaimName: l.QualifiedName("fluentd-buffer"),
+					ReadOnly:  false,
+				},
+			}
+		}
 		if copy.Spec.FluentdSpec.VolumeModImage.Repository == "" {
 			copy.Spec.FluentdSpec.VolumeModImage.Repository = "busybox"
 		}

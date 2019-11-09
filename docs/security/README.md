@@ -103,8 +103,6 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
   - kind: ServiceAccount
     name: nginx-demo-nginx-logging-demo-logging-fluentd
     namespace: logging
-
-
 ```
 
 #### Fluentbit ClusterRole & ClusterRoleBinding Output

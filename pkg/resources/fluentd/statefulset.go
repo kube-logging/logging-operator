@@ -32,8 +32,11 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
 			{
 				ObjectMeta: templates.FluentdObjectMeta(
-					r.Logging.QualifiedName(bufferVolumeName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
-				Spec: r.Logging.Spec.FluentdSpec.FluentdPvcSpec,
+					r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume.PersistentVolumeSource.ClaimName,
+					util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
+					r.Logging,
+				),
+				Spec: r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume.PersistentVolumeClaimSpec,
 				Status: corev1.PersistentVolumeClaimStatus{
 					Phase: corev1.ClaimPending,
 				},
@@ -50,7 +53,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	initContainers := make([]corev1.Container, 0)
 
-	if !r.Logging.Spec.FluentdSpec.DisablePvc && r.Logging.Spec.FluentdSpec.VolumeMountChmod {
+	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
 		initContainers = append(initContainers, corev1.Container{
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
@@ -224,26 +227,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	if !r.Logging.Spec.FluentdSpec.DisablePvc {
-		bufferVolume := corev1.Volume{
-			Name: r.Logging.QualifiedName(bufferVolumeName),
-			VolumeSource: corev1.VolumeSource{
-				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: r.Logging.QualifiedName(bufferVolumeName),
-					ReadOnly:  false,
-				},
-			},
-		}
-		v = append(v, bufferVolume)
-	} else {
-		bufferVolume := corev1.Volume{
-			Name: r.Logging.QualifiedName(bufferVolumeName),
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		}
-		v = append(v, bufferVolume)
-	}
+	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)))
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",

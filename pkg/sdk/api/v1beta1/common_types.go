@@ -38,35 +38,43 @@ type Metrics struct {
 }
 
 type KubernetesStorage struct {
-	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
-	EmptyDir *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+	HostPath         *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
+	EmptyDir         *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+	PersistentVolume *PersistentVolume            `json:"pvc,omitempty"`
+}
+
+type PersistentVolume struct {
+	PersistentVolumeClaimSpec corev1.PersistentVolumeClaimSpec         `json:"spec,omitempty"`
+	PersistentVolumeSource    corev1.PersistentVolumeClaimVolumeSource `json:"source,omitempty"`
 }
 
 // GetVolume returns a default emptydir volume if none configured
 // `logging` is the name of the logging CR to make sure multiple
 //           logging system can coexist in case a hostPath mount is used
 // `name`    will be the name of the volume and the lowest level directory in case a hostPath mount is used
-func (storage *KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
+func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
 	const (
 		hostPath = "/opt/logging-operator/%s/%s"
 	)
 	volume := corev1.Volume{
 		Name: name,
 	}
-	if storage != nil {
-		if storage.HostPath != nil {
-			if storage.HostPath.Path == "" {
-				storage.HostPath.Path = fmt.Sprintf(hostPath, logging, name)
-			}
-			volume.VolumeSource = corev1.VolumeSource{
-				HostPath: storage.HostPath,
-			}
-			return volume
-		} else if storage.EmptyDir != nil {
-			volume.VolumeSource = corev1.VolumeSource{
-				EmptyDir: storage.EmptyDir,
-			}
-			return volume
+	if storage.HostPath != nil {
+		if storage.HostPath.Path == "" {
+			storage.HostPath.Path = fmt.Sprintf(hostPath, logging, name)
+		}
+		volume.VolumeSource = corev1.VolumeSource{
+			HostPath: storage.HostPath,
+		}
+		return volume
+	} else if storage.EmptyDir != nil {
+		volume.VolumeSource = corev1.VolumeSource{
+			EmptyDir: storage.EmptyDir,
+		}
+		return volume
+	} else if storage.PersistentVolume != nil {
+		volume.VolumeSource = corev1.VolumeSource{
+			PersistentVolumeClaim: &storage.PersistentVolume.PersistentVolumeSource,
 		}
 	}
 	// return a default emptydir volume if none configured
