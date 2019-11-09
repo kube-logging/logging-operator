@@ -18,7 +18,7 @@
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| kinesisStream | string | Yes | - | Name of the stream to put data.<br> |
+| stream_name | string | Yes | - | Name of the stream to put data.<br> |
 | partition_key | string | No | - | A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly.<br> |
 | aws_key_id | *secret.Secret | No | - | AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.<br> |
 | aws_sec_key | *secret.Secret | No | - | AWS secret key. This parameter is required when your agent is not running on EC2 instance with an IAM Role.<br> |

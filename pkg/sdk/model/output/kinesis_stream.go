@@ -39,7 +39,7 @@ type _docKinesisStream interface{}
 type KinesisStreamOutputConfig struct {
 
 	// Name of the stream to put data.
-	KinesisStream string `json:"kinesisStream"`
+	StreamName string `json:"stream_name"`
 
 	// A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly.
 	PartitionKey string `json:"partition_key,omitempty"`
