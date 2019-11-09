@@ -80,9 +80,10 @@ func (r *Reconciler) pspClusterRole() (runtime.Object, k8sutil.DesiredState) {
 				r.Logging.QualifiedName(clusterRoleName+"-psp"), r.Logging.Labels, r.Logging),
 			Rules: []rbacv1.PolicyRule{
 				{
-					APIGroups: []string{"policy"},
-					Resources: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
-					Verbs:     []string{"use"},
+					APIGroups:     []string{"policy"},
+					Resources:     []string{"podsecuritypolicies"},
+					ResourceNames: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
+					Verbs:         []string{"use"},
 				},
 			},
 		}, k8sutil.StatePresent
@@ -108,7 +109,7 @@ func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, k8sutil.DesiredSta
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},

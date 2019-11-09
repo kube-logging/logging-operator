@@ -1,0 +1,12 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: defaultlogging
+spec:
+  fluentd:
+    security:
+      podSecurityPolicyCreate: true
+  fluentbit:
+    security:
+      podSecurityPolicyCreate: true
+  controlNamespace: default
