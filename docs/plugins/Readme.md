@@ -22,6 +22,7 @@
 - [file](./outputs/file.md)
 - [format](./outputs/format.md)
 - [forward](./outputs/forward.md)
+- [gcl](./outputs/gcl.md)
 - [gcs](./outputs/gcs.md)
 - [kafka](./outputs/kafka.md)
 - [kinesis_stream](./outputs/kinesis_stream.md)
