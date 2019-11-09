@@ -102,16 +102,17 @@ func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types
 		Type:      "file",
 		Directive: "buffer",
 	}
+	buffer := b.DeepCopy()
 	// Set default values for tags
-	if b.Tags != "" {
-		metadata.Tag = b.Tags
+	if buffer.Tags != "" {
+		metadata.Tag = buffer.Tags
 	} else {
 		metadata.Tag = "tag,time"
 	}
-	if b.Path == "" {
-		b.Path = fmt.Sprintf("/buffers/%s.*.buffer", id)
+	if buffer.Path == "" {
+		buffer.Path = fmt.Sprintf("/buffers/%s.*.buffer", id)
 	}
 
-	b.Tags = ""
-	return types.NewFlatDirective(metadata, b, secretLoader)
+	buffer.Tags = ""
+	return types.NewFlatDirective(metadata, buffer, secretLoader)
 }

@@ -30,11 +30,12 @@ func (f *Format) ToDirective(secretLoader secret.SecretLoader, id string) (types
 	metadata := types.PluginMeta{
 		Directive: "format",
 	}
-	if f.Type != "" {
-		metadata.Type = f.Type
+	format := f.DeepCopy()
+	if format.Type != "" {
+		metadata.Type = format.Type
 	} else {
 		metadata.Type = "json"
 	}
-	f.Type = ""
-	return types.NewFlatDirective(metadata, f, secretLoader)
+	format.Type = ""
+	return types.NewFlatDirective(metadata, format, secretLoader)
 }
