@@ -11,7 +11,7 @@
     - [Deploy with Helm](#install-with-helm)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
   - **Demo Application**  
-    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Helm](#demo-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [CloudWatch Dashboard](#deployment-validation)
@@ -29,14 +29,15 @@ helm repo update
 #### Logging Operator
 > [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
-#### Nginx App and Logging Definition
+#### Demo App and Logging Definition
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-cw-demo \
- --set "aws.secret_key=" \
- --set "aws.access_key=" \
- --set "aws.region=" \
- --set "aws.log_group_name=" \
- --set "aws.log_stream_name=" 
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
+ --set "cloudwatch.enabled=True" \
+ --set "cloudwatch.aws.secret_key=" \
+ --set "cloudwatch.aws.access_key=" \
+ --set "cloudwatch.aws.region=" \
+ --set "cloudwatch.aws.log_group_name=" \
+ --set "cloudwatch.aws.log_stream_name=" 
 ```
 
 
@@ -55,7 +56,7 @@ kubectl create ns logging
 
 #### Create `logging` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -77,7 +78,7 @@ kubectl -n logging create secret generic logging-cloudwatch --from-literal "awsA
 ```
 Or set up the secret manually.
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: v1
 kind: Secret
 metadata:
@@ -92,7 +93,7 @@ EOF
 
 #### Create a CloudWatch `Output` Definition 
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -124,7 +125,7 @@ EOF
 
 #### Create `flow` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -146,7 +147,7 @@ EOF
 
 #### Install Nginx Demo Deployment
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: apps/v1 
 kind: Deployment
 metadata:

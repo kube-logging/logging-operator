@@ -1,0 +1,20 @@
+{{- if and .Values.kafka.enabled }}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "output.fullname" . }}-kafka
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "logging-demo.labels" . | indent 4 }}
+spec:
+  kafka:
+    brokers: kafka-headless.kafka.svc.cluster.local:29092
+    default_topic: topic
+    format:
+      type: json
+    buffer:
+      tags: topic
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true
+{{- end }}

@@ -26,11 +26,11 @@ import (
 //
 //| Parameter | Description | Example |
 //|-----------|-------------|---------|
-//| ${pod_name} | Pod name | understood-butterfly-nginx-logging-demo-7dcdcfdcd7-h7p9n |
-//| ${container_name} | Container name inside the Pod | nginx-logging-demo |
+//| ${pod_name} | Pod name | understood-butterfly-logging-demo-7dcdcfdcd7-h7p9n |
+//| ${container_name} | Container name inside the Pod | logging-demo |
 //| ${namespace_name} | Namespace name | default |
 //| ${pod_id} | Kubernetes UUID for Pod | 1f50d309-45a6-11e9-b795-025000000001  |
-//| ${labels} | Kubernetes Pod labels. This is a nested map. You can access nested attributes via `.`  | {"app":"nginx-logging-demo", "pod-template-hash":"7dcdcfdcd7" }  |
+//| ${labels} | Kubernetes Pod labels. This is a nested map. You can access nested attributes via `.`  | {"app":"logging-demo", "pod-template-hash":"7dcdcfdcd7" }  |
 //| ${host} | Node hostname the Pod runs on | docker-desktop |
 //| ${docker_id} | Docker UUID of the container | 3a38148aa37aa3... |
 type _docTagNormaliser interface{}
