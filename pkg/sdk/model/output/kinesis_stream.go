@@ -26,7 +26,7 @@ import (
 // ```
 // spec:
 //   kinesisStream:
-//     streamName: example-stream-name
+//     stream_name: example-stream-name
 //     region: us-east-1
 //     format:
 //       type: json
@@ -75,7 +75,7 @@ type KinesisStreamOutputConfig struct {
 	BatchRequestMaxSize int `json:"batch_request_max_size,omitempty"`
 
 	// +docLink:"Format,./format.md"
-	Format *Format `json:"format"`
+	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }

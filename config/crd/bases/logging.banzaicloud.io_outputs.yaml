@@ -2544,7 +2544,6 @@ spec:
                   description: Name of the stream to put data.
                   type: string
               required:
-              - format
               - stream_name
               type: object
             loggingRef:
