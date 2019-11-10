@@ -26,7 +26,7 @@ import (
 // ```
 // spec:
 //   kinesisStream:
-//     streamName: example-stream-name
+//     stream_name: example-stream-name
 //     region: us-east-1
 //     format:
 //       type: json
@@ -39,7 +39,7 @@ type _docKinesisStream interface{}
 type KinesisStreamOutputConfig struct {
 
 	// Name of the stream to put data.
-	KinesisStream string `json:"kinesisStream"`
+	StreamName string `json:"stream_name"`
 
 	// A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly.
 	PartitionKey string `json:"partition_key,omitempty"`
@@ -75,7 +75,7 @@ type KinesisStreamOutputConfig struct {
 	BatchRequestMaxSize int `json:"batch_request_max_size,omitempty"`
 
 	// +docLink:"Format,./format.md"
-	Format *Format `json:"format"`
+	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
