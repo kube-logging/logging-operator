@@ -22,20 +22,24 @@ import (
 
 // FluentdSpec defines the desired state of Fluentd
 type FluentdSpec struct {
-	Annotations         map[string]string                `json:"annotations,omitempty"`
-	TLS                 FluentdTLS                       `json:"tls,omitempty"`
-	Image               ImageSpec                        `json:"image,omitempty"`
-	FluentdPvcSpec      corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
-	DisablePvc          bool                             `json:"disablePvc,omitempty"`
-	VolumeModImage      ImageSpec                        `json:"volumeModImage,omitempty"`
-	ConfigReloaderImage ImageSpec                        `json:"configReloaderImage,omitempty"`
-	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
-	Port                int32                            `json:"port,omitempty"`
-	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
-	NodeSelector        map[string]string                `json:"nodeSelector,omitempty"`
-	Metrics             *Metrics                         `json:"metrics,omitempty"`
-	Security            *Security                        `json:"security,omitempty"`
-	Scaling             *FluentdScaling                  `json:"scaling,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
+	TLS         FluentdTLS        `json:"tls,omitempty"`
+	Image       ImageSpec         `json:"image,omitempty"`
+	// Deprecated, use BufferStorageVolume to configure PVC explicitly
+	FluentdPvcSpec corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
+	DisablePvc     bool                             `json:"disablePvc,omitempty"`
+	// BufferStorageVolume is the alternative volume to use if PVC is disabled
+	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
+	VolumeMountChmod    bool                        `json:"volumeMountChmod,omitempty"`
+	VolumeModImage      ImageSpec                   `json:"volumeModImage,omitempty"`
+	ConfigReloaderImage ImageSpec                   `json:"configReloaderImage,omitempty"`
+	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
+	Port                int32                       `json:"port,omitempty"`
+	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
+	NodeSelector        map[string]string           `json:"nodeSelector,omitempty"`
+	Metrics             *Metrics                    `json:"metrics,omitempty"`
+	Security            *Security                   `json:"security,omitempty"`
+	Scaling             *FluentdScaling             `json:"scaling,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

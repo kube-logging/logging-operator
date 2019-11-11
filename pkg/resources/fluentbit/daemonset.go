@@ -20,7 +20,6 @@ import (
 
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -197,25 +196,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.PositionDB, TailPositionVolume))
-	v = append(v, GetVolumeFromKubernetesStorage(r.Logging.Spec.FluentbitSpec.BufferStorageVolume, BufferStorageVolume))
+	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(r.Logging.Name, TailPositionVolume))
+	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(r.Logging.Name, BufferStorageVolume))
 	return
-}
-
-func GetVolumeFromKubernetesStorage(storage *v1beta1.KubernetesStorage, name string) corev1.Volume {
-	volume := corev1.Volume{
-		Name: name,
-	}
-	if storage != nil {
-		if storage.HostPath != nil {
-			volume.VolumeSource = corev1.VolumeSource{
-				HostPath: storage.HostPath,
-			}
-		}
-	} else {
-		volume.VolumeSource = corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
-		}
-	}
-	return volume
 }

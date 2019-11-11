@@ -125,11 +125,11 @@ spec:
 | tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
-| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured a `hostPath` volume is used with the path `/opt/fluent-bit/<name of the logging CR>/pos`. |
+| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
 | inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | The tail input plugin allows to monitor one or several text files.  |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
-| bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured a `hostPath` volume is used with the path `/opt/fluent-bit/<name of the logging CR>/buf`. |
+| bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
   
 **`logging` with custom fluent-bit annotations** 
@@ -214,10 +214,20 @@ Define Kubernetes storage
 
 | Name      | Type | Default | Description |
 |-----------|------|---------|-------------|
-| host_path | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. |
+| host_path | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. If path is empty, it will automatically be set to "/opt/logging-operator/<name of the logging CR>/<name of the volume>" |
+| emptyDir | [EmptyDirVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#emptydirvolumesource-v1-core) | - | Represents an empty directory for a pod. |
+| pvc | [PersistentVolumeClaim](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaim-v1-core) | - | A PersistentVolumeClaim (PVC) is a request for storage by a user. |
 
+#### Persistent Volume Claim
 
-## outputs, clusteroutputs
+| Name      | Type | Default | Description |
+|-----------|------|---------|-------------|
+| spec | [PersistentVolumeClaimSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimspec-v1-core) | - | Spec defines the desired characteristics of a volume requested by a pod author. |
+| source | [PersistentVolumeClaimVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimvolumesource-v1-core) | - | PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace.  |
+
+The Persistent Volume Claim should be created with the given `spec` and with the `name` defined in the `source`'s `claimName`.
+
+## Outputs, Clusteroutputs
 
 Outputs are the final stage for a `logging flow`. You can define multiple `outputs` and attach them to multiple `flows`.
 

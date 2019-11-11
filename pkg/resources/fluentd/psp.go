@@ -35,6 +35,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 					"configMap",
 					"emptyDir",
 					"secret",
+					"hostPath",
 					"persistentVolumeClaim"},
 				SELinux: policyv1beta1.SELinuxStrategyOptions{
 					Rule: policyv1beta1.SELinuxStrategyRunAsAny,
@@ -68,9 +69,10 @@ func (r *Reconciler) pspRole() (runtime.Object, k8sutil.DesiredState) {
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName+"-psp"), r.Logging.Labels, r.Logging),
 			Rules: []rbacv1.PolicyRule{
 				{
-					APIGroups: []string{"policy"},
-					Resources: []string{r.Logging.QualifiedName(PodSecurityPolicyName)},
-					Verbs:     []string{"use"},
+					APIGroups:     []string{"policy"},
+					Resources:     []string{"podsecuritypolicies"},
+					ResourceNames: []string{r.Logging.QualifiedName(PodSecurityPolicyName)},
+					Verbs:         []string{"use"},
 				},
 			},
 		}, k8sutil.StatePresent
@@ -95,7 +97,7 @@ func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState) {
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},

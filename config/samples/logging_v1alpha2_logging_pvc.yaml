@@ -3,8 +3,6 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd: {
-    disablePvc: true
-  }
+  fluentd: {}
   fluentbit: {}
   controlNamespace: default
