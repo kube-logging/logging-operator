@@ -41,7 +41,7 @@ type KubernetesStorage struct {
 	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
 	EmptyDir *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
 	// PersistentVolumeClaim defines the Spec and the Source at the same time.
-	// It's the client's responsibility to create the PVC with the configured spec.
+	// It's the client's responsibility to create the PVC with the configured spec and the name defined in the source.
 	PersistentVolumeClaim *PersistentVolumeClaim `json:"pvc,omitempty"`
 }
 
