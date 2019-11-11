@@ -3,8 +3,10 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd: {
-    disablePvc: true
-  }
-  fluentbit: {}
+  fluentd:
+    security:
+      podSecurityPolicyCreate: true
+  fluentbit:
+    security:
+      podSecurityPolicyCreate: true
   controlNamespace: default

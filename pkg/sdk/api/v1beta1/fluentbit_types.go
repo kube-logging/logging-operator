@@ -34,12 +34,12 @@ type FluentbitSpec struct {
 	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics             *Metrics                    `json:"metrics,omitempty"`
 	Security            *Security                   `json:"security,omitempty"`
-	PositionDB          *KubernetesStorage          `json:"position_db,omitempty"`
+	PositionDB          KubernetesStorage           `json:"position_db,omitempty"`
 	MountPath           string                      `json:"mountPath,omitempty"`
 	InputTail           InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
-	BufferStorageVolume *KubernetesStorage          `json:"bufferStorageVolume,omitempty"`
+	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret  string                      `json:"customConfigSecret,omitempty"`
 }
 

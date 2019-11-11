@@ -36,6 +36,11 @@ func IntPointer(i int32) *int32 {
 	return &i
 }
 
+// IntPointer converts int64 to *int64
+func IntPointer64(i int64) *int64 {
+	return &i
+}
+
 // BoolPointer converts bool to *bool
 func BoolPointer(b bool) *bool {
 	return &b

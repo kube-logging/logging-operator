@@ -23,11 +23,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
-	BuffersPath    = "/opt/fluent-bit/%s/buf"
-	PositionDbPath = "/opt/fluent-bit/%s/pos"
-)
-
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -103,7 +98,9 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.Security.PodSecurityContext == nil {
 			copy.Spec.FluentdSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
 		}
-
+		if copy.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup == nil {
+			copy.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
+		}
 		if copy.Spec.FluentdSpec.Metrics != nil {
 			if copy.Spec.FluentdSpec.Metrics.Path == "" {
 				copy.Spec.FluentdSpec.Metrics.Path = "/metrics"
@@ -136,6 +133,18 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests == nil {
 			copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
 				"storage": resource.MustParse("20Gi"),
+			}
+		}
+		// Temporarily copy the FluentdPvcSpec for backward compatibility
+		// if BufferStorageVolume.PersistentVolumeClaim is not set.
+		// DisablePvc will stay for a while. The alternative would be to set a hostPath or emptyDir explicitly
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
+				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
+				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
+					ClaimName: l.QualifiedName("fluentd-buffer"),
+					ReadOnly:  false,
+				},
 			}
 		}
 		if copy.Spec.FluentdSpec.VolumeModImage.Repository == "" {
@@ -238,22 +247,8 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
-		if copy.Spec.FluentbitSpec.PositionDB == nil {
-			copy.Spec.FluentbitSpec.PositionDB = &KubernetesStorage{
-				HostPath: &v1.HostPathVolumeSource{
-					Path: fmt.Sprintf(PositionDbPath, copy.Name),
-				},
-			}
-		}
 		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
 			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
-		}
-		if copy.Spec.FluentbitSpec.BufferStorageVolume == nil {
-			copy.Spec.FluentbitSpec.BufferStorageVolume = &KubernetesStorage{
-				HostPath: &v1.HostPathVolumeSource{
-					Path: fmt.Sprintf(BuffersPath, copy.Name),
-				},
-			}
 		}
 	}
 	return copy
