@@ -38,12 +38,14 @@ type Metrics struct {
 }
 
 type KubernetesStorage struct {
-	HostPath         *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
-	EmptyDir         *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
-	PersistentVolume *PersistentVolume            `json:"pvc,omitempty"`
+	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
+	EmptyDir *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+	// PersistentVolumeClaim defines the Spec and the Source at the same time.
+	// It's the client's responsibility to create the PVC with the configured spec.
+	PersistentVolumeClaim *PersistentVolumeClaim `json:"pvc,omitempty"`
 }
 
-type PersistentVolume struct {
+type PersistentVolumeClaim struct {
 	PersistentVolumeClaimSpec corev1.PersistentVolumeClaimSpec         `json:"spec,omitempty"`
 	PersistentVolumeSource    corev1.PersistentVolumeClaimVolumeSource `json:"source,omitempty"`
 }
@@ -72,9 +74,9 @@ func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
 			EmptyDir: storage.EmptyDir,
 		}
 		return volume
-	} else if storage.PersistentVolume != nil {
+	} else if storage.PersistentVolumeClaim != nil {
 		volume.VolumeSource = corev1.VolumeSource{
-			PersistentVolumeClaim: &storage.PersistentVolume.PersistentVolumeSource,
+			PersistentVolumeClaim: &storage.PersistentVolumeClaim.PersistentVolumeSource,
 		}
 	}
 	// return a default emptydir volume if none configured

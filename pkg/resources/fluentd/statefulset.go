@@ -32,11 +32,11 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
 			{
 				ObjectMeta: templates.FluentdObjectMeta(
-					r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume.PersistentVolumeSource.ClaimName,
+					r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName,
 					util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 					r.Logging,
 				),
-				Spec: r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume.PersistentVolumeClaimSpec,
+				Spec: r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec,
 				Status: corev1.PersistentVolumeClaimStatus{
 					Phase: corev1.ClaimPending,
 				},

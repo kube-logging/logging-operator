@@ -135,10 +135,11 @@ func (l *Logging) SetDefaults() *Logging {
 				"storage": resource.MustParse("20Gi"),
 			}
 		}
-		// Temporarily copy the FluentdPvcSpec. Later set defaults here. FluentdSpec.
-		// DisablePvc will stay to allow disabling the default
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolume = &PersistentVolume{
+		// Temporarily copy the FluentdPvcSpec for backward compatibility
+		// if BufferStorageVolume.PersistentVolumeClaim is not set.
+		// DisablePvc will stay for a while. The alternative would be to set a hostPath or emptyDir explicitly
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
 				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
 					ClaimName: l.QualifiedName("fluentd-buffer"),
