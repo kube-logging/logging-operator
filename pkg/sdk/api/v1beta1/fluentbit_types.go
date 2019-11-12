@@ -30,7 +30,7 @@ type FluentbitSpec struct {
 	TargetHost          string                      `json:"targetHost,omitempty"`
 	TargetPort          int32                       `json:"targetPort,omitempty"`
 	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
-	Parser              string                      `json:"parser,omitempty"`
+	Parser              string                      `json:"parser,omitempty"` // deprecated, use InputTail.Parser instead
 	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics             *Metrics                    `json:"metrics,omitempty"`
 	Security            *Security                   `json:"security,omitempty"`
