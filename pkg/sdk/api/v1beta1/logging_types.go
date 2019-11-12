@@ -214,7 +214,9 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.InputTail.Parser = copy.Spec.FluentbitSpec.Parser
 			}
 		}
-
+		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
+			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()
+		}
 		if copy.Spec.FluentbitSpec.Annotations == nil {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
 		}
