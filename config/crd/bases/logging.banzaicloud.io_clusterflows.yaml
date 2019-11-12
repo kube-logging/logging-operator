@@ -201,7 +201,7 @@ spec:
                               type: string
                             type:
                               description: 'Parse type: apache2, apache_error, nginx,
-                                syslog, csv, tsv, ltsv, json, multiline, none'
+                                syslog, csv, tsv, ltsv, json, multiline, none, logfmt'
                               type: string
                             types:
                               description: 'Types casting the fields to proper types
