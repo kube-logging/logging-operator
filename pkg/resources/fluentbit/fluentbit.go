@@ -63,15 +63,16 @@ type DesiredObject struct {
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
-
+	CRI           string
 	desiredConfig string
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, CRI string) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: k8sutil.NewReconciler(client, logger),
+		CRI:                       CRI,
 	}
 }
 

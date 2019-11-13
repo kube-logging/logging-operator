@@ -64,6 +64,18 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
 		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
+
+	if r.Logging.Spec.FluentbitSpec.InputTail.Parser == "" {
+		switch r.CRI {
+		case "docker":
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "docker"
+		case "containerd":
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+		default:
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+		}
+	}
+
 	mapper := types.NewStructToStringMapper(nil)
 	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
 	if err != nil {
