@@ -41,16 +41,13 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 					Rule: policyv1beta1.SELinuxStrategyRunAsAny,
 				},
 				RunAsUser: policyv1beta1.RunAsUserStrategyOptions{
-					Rule:   policyv1beta1.RunAsUserStrategyMustRunAs,
-					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}}},
-				RunAsGroup: nil,
+					Rule: policyv1beta1.RunAsUserStrategyRunAsAny,
+				},
 				SupplementalGroups: policyv1beta1.SupplementalGroupsStrategyOptions{
-					Rule:   policyv1beta1.SupplementalGroupsStrategyMustRunAs,
-					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}},
+					Rule: policyv1beta1.SupplementalGroupsStrategyRunAsAny,
 				},
 				FSGroup: policyv1beta1.FSGroupStrategyOptions{
-					Rule:   policyv1beta1.FSGroupStrategyMustRunAs,
-					Ranges: []policyv1beta1.IDRange{{Min: 1, Max: 65535}},
+					Rule: policyv1beta1.FSGroupStrategyRunAsAny,
 				},
 				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),

@@ -234,29 +234,27 @@ spec:
   allowPrivilegeEscalation: false
   fsGroup:
     ranges:
-    - max: 65535
-      min: 1
+    - max: 101
+      min: 101
     rule: MustRunAs
   runAsUser:
     ranges:
-    - max: 65535
-      min: 1
+    - max: 100
+      min: 100
     rule: MustRunAs
   seLinux:
     rule: RunAsAny
   supplementalGroups:
     ranges:
-    - max: 65535
-      min: 1
+    - max: 101
+      min: 101
     rule: MustRunAs
   volumes:
   - configMap
   - emptyDir
   - secret
   - hostPath
-
-
-
+  - persistentVolumeClaim
 ```
 #### Fluentbit PSP+ClusterRole Output
 ```
@@ -284,23 +282,14 @@ spec:
   - pathPrefix: /var/log
     readOnly: true
   fsGroup:
-    ranges:
-    - max: 65535
-      min: 1
-    rule: MustRunAs
+    rule: RunAsAny
   readOnlyRootFilesystem: true
   runAsUser:
-    ranges:
-    - max: 65535
-      min: 1
-    rule: MustRunAs
+    rule: RunAsAny
   seLinux:
     rule: RunAsAny
   supplementalGroups:
-    ranges:
-    - max: 65535
-      min: 1
-    rule: MustRunAs
+    rule: RunAsAny
   volumes:
   - configMap
   - emptyDir
