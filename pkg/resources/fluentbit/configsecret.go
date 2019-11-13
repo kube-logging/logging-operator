@@ -42,7 +42,6 @@ type fluentBitConfig struct {
 	Output        map[string]string
 	TargetHost    string
 	TargetPort    int32
-	Parser        string
 	Input         map[string]string
 	Filter        map[string]string
 	BufferStorage map[string]string
@@ -96,11 +95,6 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		Input:         fluentbitInput,
 		Filter:        fluentbitFilter,
 		BufferStorage: fluentbitBufferStorage,
-	}
-	if r.Logging.Spec.FluentbitSpec.Parser != "" {
-		input.Parser = r.Logging.Spec.FluentbitSpec.Parser
-	} else {
-		input.Parser = "cri"
 	}
 	if r.Logging.Spec.FluentbitSpec.TargetHost != "" {
 		input.TargetHost = r.Logging.Spec.FluentbitSpec.TargetHost

@@ -265,8 +265,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 format:
                   description: 'Compat format type: out_file, json, ltsv (default:
@@ -506,8 +504,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 concurrency:
                   description: 'Use to set the number of threads pushing data to CloudWatch.
@@ -772,8 +768,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 bulk_message_request_threshold:
                   description: 'Configure bulk_message request splitting threshold
@@ -1284,8 +1278,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 connect_timeout:
                   description: The timeout time for socket connect. When the connection
@@ -1847,8 +1839,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 client_retries:
                   description: Number of times to retry requests on server error
@@ -2116,8 +2106,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 compression_codec:
                   description: 'The codec the producer uses to compress messages (default:
@@ -2498,8 +2486,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 format:
                   properties:
@@ -2695,8 +2681,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 configure_kubernetes_labels:
                   description: Configure Kubernetes metadata in a Prometheus like
@@ -3038,8 +3022,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 check_bucket:
                   description: 'Check bucket if exists or not (default: true)'
@@ -3362,8 +3344,6 @@ spec:
                       description: Fluentd core bundles memory and file plugins. 3rd
                         party plugins are also available when installed.
                       type: string
-                  required:
-                  - timekey
                   type: object
                 check_apikey_on_start:
                   description: Check AWS key on start

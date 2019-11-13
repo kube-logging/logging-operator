@@ -30,11 +30,12 @@ type FluentbitSpec struct {
 	TargetHost          string                      `json:"targetHost,omitempty"`
 	TargetPort          int32                       `json:"targetPort,omitempty"`
 	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
-	Parser              string                      `json:"parser,omitempty"`
+	Parser              string                      `json:"parser,omitempty"` // deprecated, use InputTail.Parser instead
 	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics             *Metrics                    `json:"metrics,omitempty"`
 	Security            *Security                   `json:"security,omitempty"`
-	PositionDB          KubernetesStorage           `json:"position_db,omitempty"`
+	PositionDBLegacy    *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
+	PositionDB          KubernetesStorage           `json:"positiondb,omitempty"`
 	MountPath           string                      `json:"mountPath,omitempty"`
 	InputTail           InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
