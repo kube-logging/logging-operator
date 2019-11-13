@@ -15,7 +15,7 @@
 ### Parse Section
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| type | string | No | - | Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none<br> |
+| type | string | No | - | Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt<br> |
 | expression | string | No | - | Regexp expression to evaluate<br> |
 | time_key | string | No | - | Specify time field for event time. If the event doesn't have this field, current time is used.<br> |
 | null_value_pattern | string | No | - | Specify null value pattern.<br> |
