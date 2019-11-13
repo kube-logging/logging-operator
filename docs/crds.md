@@ -125,7 +125,8 @@ spec:
 | tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
-| position_db |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
+| position_db | | | Deprecated, use positiondb instead |
+| positiondb |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
 | inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | The tail input plugin allows to monitor one or several text files.  |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
@@ -214,7 +215,8 @@ Define Kubernetes storage
 
 | Name      | Type | Default | Description |
 |-----------|------|---------|-------------|
-| host_path | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. If path is empty, it will automatically be set to "/opt/logging-operator/<name of the logging CR>/<name of the volume>" |
+| host_path | | | deprecated, use hostPath instead |
+| hostPath | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. If path is empty, it will automatically be set to "/opt/logging-operator/<name of the logging CR>/<name of the volume>" |
 | emptyDir | [EmptyDirVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#emptydirvolumesource-v1-core) | - | Represents an empty directory for a pod. |
 | pvc | [PersistentVolumeClaim](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaim-v1-core) | - | A PersistentVolumeClaim (PVC) is a request for storage by a user. |
 

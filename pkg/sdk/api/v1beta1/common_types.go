@@ -38,8 +38,9 @@ type Metrics struct {
 }
 
 type KubernetesStorage struct {
-	HostPath *corev1.HostPathVolumeSource `json:"host_path,omitempty"`
-	EmptyDir *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+	HostPathLegacy *corev1.HostPathVolumeSource `json:"host_path,omitempty"` // deprecated, use HostPath instead
+	HostPath       *corev1.HostPathVolumeSource `json:"hostPath,omitempty"`
+	EmptyDir       *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
 	// PersistentVolumeClaim defines the Spec and the Source at the same time.
 	// The PVC will be created with the configured spec and the name defined in the source.
 	PersistentVolumeClaim *PersistentVolumeClaim `json:"pvc,omitempty"`
@@ -60,6 +61,9 @@ func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
 	)
 	volume := corev1.Volume{
 		Name: name,
+	}
+	if storage.HostPathLegacy != nil && storage.HostPath == nil {
+		storage.HostPath = storage.HostPathLegacy.DeepCopy()
 	}
 	if storage.HostPath != nil {
 		if storage.HostPath.Path == "" {

@@ -88,6 +88,7 @@ type Buffer struct {
 	// Instead of storing unrecoverable chunks in the backup directory, just discard them. This option is new in Fluentd v1.2.6.
 	DisableChunkBackup bool `json:"disable_chunk_backup,omitempty"`
 	// Output plugin will flush chunks per specified time (enabled when time is specified in chunk keys)
+	// +kubebuilder:validation:Optional
 	Timekey string `json:"timekey" plugin:"default:10m"`
 	// Output plugin writes chunks after timekey_wait seconds later after timekey expiration
 	TimekeyWait string `json:"timekey_wait,omitempty"`
