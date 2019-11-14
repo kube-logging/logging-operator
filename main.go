@@ -22,6 +22,7 @@ import (
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/common/log"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -86,6 +87,7 @@ func main() {
 	} else {
 		log.Warnf("Unable to detect cri using default: %s", runtime)
 	}
+	types.ContainerRuntime = runtime
 
 	loggingReconciler := &controllers.LoggingReconciler{
 		Client: mgr.GetClient(),

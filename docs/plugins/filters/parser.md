@@ -3,7 +3,7 @@
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| key_name | string | Yes | - | Specify field name in the record to parse.<br> |
+| key_name | string | No | - | Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.<br> |
 | reserve_time | bool | No | - | Keep original event time in parsed result.<br> |
 | reserve_data | bool | No | - | Keep original key-value pair in parsed result.<br> |
 | remove_key_name_field | bool | No | - | Remove key_name field when parsing is succeeded<br> |
