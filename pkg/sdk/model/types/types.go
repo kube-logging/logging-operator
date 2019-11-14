@@ -21,6 +21,19 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 )
 
+var ContainerRuntime = ""
+
+func GetLogKey() string {
+	switch ContainerRuntime {
+	case "docker":
+		return "log"
+	case "containerd":
+		return "message"
+	default:
+		return "message"
+	}
+}
+
 type Directive interface {
 	GetPluginMeta() *PluginMeta
 	GetParams() map[string]string

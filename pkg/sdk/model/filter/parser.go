@@ -23,8 +23,8 @@ import (
 // +docName:"Parser"
 // https://docs.fluentd.org/filter/parser
 type ParserConfig struct {
-	// Specify field name in the record to parse.
-	KeyName string `json:"key_name"`
+	// Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.
+	KeyName string `json:"key_name,omitempty"`
 	// Keep original event time in parsed result.
 	ReserveTime bool `json:"reserve_time,omitempty"`
 	// Keep original key-value pair in parsed result.
@@ -97,13 +97,17 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 			Id:        id + "_" + pluginType,
 		},
 	}
-	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(p); err != nil {
+	parserConfig := p.DeepCopy()
+	if parserConfig.KeyName == "" {
+		parserConfig.KeyName = types.GetLogKey()
+	}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(parserConfig); err != nil {
 		return nil, err
 	} else {
 		parser.Params = params
 	}
-	if len(p.Parsers) > 0 {
-		for _, parseRule := range p.Parsers {
+	if len(parserConfig.Parsers) > 0 {
+		for _, parseRule := range parserConfig.Parsers {
 			if meta, err := parseRule.ToDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
