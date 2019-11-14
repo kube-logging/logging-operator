@@ -27,7 +27,8 @@ import (
 )
 
 type fluentdConfig struct {
-	Monitor struct {
+	LogLevel string
+	Monitor  struct {
 		Enabled bool
 		Port    int32
 		Path    string
@@ -61,6 +62,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState) {
 		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
 		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
 	}
+	input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
 
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
