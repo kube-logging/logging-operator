@@ -68,7 +68,10 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcile.Result{}, err
 	}
 
-	logging = logging.SetDefaults()
+	logging, err = logging.SetDefaults()
+	if err != nil {
+		return reconcile.Result{}, err
+	}
 
 	fluentdConfig, secretList, err := r.clusterConfiguration(logging)
 	if err != nil {

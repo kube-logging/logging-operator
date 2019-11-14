@@ -43,6 +43,7 @@ type fluentBitConfig struct {
 	TargetHost    string
 	TargetPort    int32
 	Input         map[string]string
+	Tailers       []map[string]string
 	Filter        map[string]string
 	BufferStorage map[string]string
 }
@@ -65,21 +66,33 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
 
-	if r.Logging.Spec.FluentbitSpec.InputTail.Parser == "" {
+	if r.Logging.Spec.FluentbitSpec.ContainerTail.Parser == "" {
 		switch r.CRI {
 		case "docker":
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "docker"
+			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "docker"
 		case "containerd":
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "cri"
 		default:
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "cri"
 		}
 	}
 
 	mapper := types.NewStructToStringMapper(nil)
-	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
+	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.ContainerTail)
 	if err != nil {
 		log.Error(err)
+	}
+
+	fluentbitTailers := make([]map[string]string, 0)
+	if len(r.Logging.Spec.FluentbitSpec.Tailers) > 0 {
+		for _, tailer := range r.Logging.Spec.FluentbitSpec.Tailers {
+			mappedTailer, err := mapper.StringsMap(tailer)
+			if err != nil {
+				log.Error(err)
+			} else {
+				fluentbitTailers = append(fluentbitTailers, mappedTailer)
+			}
+		}
 	}
 
 	fluentbitFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
@@ -105,6 +118,7 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		TargetHost:    fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
 		TargetPort:    r.Logging.Spec.FluentdSpec.Port,
 		Input:         fluentbitInput,
+		Tailers:       fluentbitTailers,
 		Filter:        fluentbitFilter,
 		BufferStorage: fluentbitBufferStorage,
 	}
@@ -115,7 +129,10 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 		input.TargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
 	}
 
-	r.desiredConfig = generateConfig(input)
+	r.desiredConfig, err = generateConfig(input)
+	if err != nil {
+		log.Error(err)
+	}
 
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentbitObjectMeta(
@@ -126,16 +143,16 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 	}, k8sutil.StatePresent
 }
 
-func generateConfig(input fluentBitConfig) string {
+func generateConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
 	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	outputString := output.String()
-	return outputString
+	return outputString, nil
 }

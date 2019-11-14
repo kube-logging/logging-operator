@@ -16,7 +16,9 @@ package v1beta1
 
 import (
 	"fmt"
+	"strings"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -65,7 +67,7 @@ type LoggingList struct {
 }
 
 // SetDefaults fill empty attributes
-func (l *Logging) SetDefaults() *Logging {
+func (l *Logging) SetDefaults() (*Logging, error) {
 	copy := l.DeepCopy()
 	if !copy.Spec.FlowConfigCheckDisabled && copy.Status.ConfigCheckResults == nil {
 		copy.Status.ConfigCheckResults = make(map[string]bool)
@@ -209,10 +211,32 @@ func (l *Logging) SetDefaults() *Logging {
 			}
 		}
 		// For backward compatibility
+		if copy.Spec.FluentbitSpec.InputTail != nil {
+			copy.Spec.FluentbitSpec.ContainerTail = *copy.Spec.FluentbitSpec.InputTail.DeepCopy()
+		}
+		// For backward compatibility
 		if copy.Spec.FluentbitSpec.Parser != "" {
-			if copy.Spec.FluentbitSpec.InputTail.Parser == "" {
-				copy.Spec.FluentbitSpec.InputTail.Parser = copy.Spec.FluentbitSpec.Parser
+			if copy.Spec.FluentbitSpec.ContainerTail.Parser == "" {
+				copy.Spec.FluentbitSpec.ContainerTail.Parser = copy.Spec.FluentbitSpec.Parser
 			}
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.Path == "" {
+			copy.Spec.FluentbitSpec.ContainerTail.Path = "/var/log/containers/*.log"
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.RefreshInterval == "" {
+			copy.Spec.FluentbitSpec.ContainerTail.RefreshInterval = "5"
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.SkipLongLines == "" {
+			copy.Spec.FluentbitSpec.ContainerTail.SkipLongLines = "On"
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.DB == nil {
+			copy.Spec.FluentbitSpec.ContainerTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.MemBufLimit == "" {
+			copy.Spec.FluentbitSpec.ContainerTail.MemBufLimit = "5MB"
+		}
+		if copy.Spec.FluentbitSpec.ContainerTail.Tag == "" {
+			copy.Spec.FluentbitSpec.ContainerTail.Tag = "kubernetes.*"
 		}
 		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
 			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()
@@ -220,7 +244,6 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.Annotations == nil {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
 		}
-
 		if copy.Spec.FluentbitSpec.Security == nil {
 			copy.Spec.FluentbitSpec.Security = &Security{}
 		}
@@ -258,8 +281,26 @@ func (l *Logging) SetDefaults() *Logging {
 		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
 			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
 		}
+		if len(copy.Spec.FluentbitSpec.Tailers) > 0 {
+			for i, tailer := range copy.Spec.FluentbitSpec.Tailers {
+				if !strings.HasPrefix(tailer.Path, "/var/log/") {
+					return nil, errors.New("Tailers outside of /var/log are currently not supported")
+				}
+				if tailer.DB != nil {
+					if !strings.HasPrefix(*tailer.DB, "/tail-db/") {
+						return nil, errors.New("Tailers with position db outside of /tail-db not supported")
+					}
+				} else {
+					h, err := util.Hash32(tailer.Path)
+					if err != nil {
+						return nil, errors.WrapIff(err, "Failed to calculate hash for tailer with path %s", tailer.Path)
+					}
+					copy.Spec.FluentbitSpec.Tailers[i].DB = util.StringPointer(fmt.Sprintf("/tail-db/%s.db", h))
+				}
+			}
+		}
 	}
-	return copy
+	return copy, nil
 }
 
 // QualifiedName is the "logging-resource" name combined

@@ -16,49 +16,60 @@ package fluentbit
 
 var fluentBitConfigTemplate = `
 [SERVICE]
-    Flush        1
-    Daemon       Off
-    Log_Level    info
+    Flush   1
+    Daemon   Off
+    Log_Level   info
     Parsers_File parsers.conf
     {{- if .Monitor.Enabled }}
-    HTTP_Server  On
-    HTTP_Listen  0.0.0.0
-    HTTP_Port    {{ .Monitor.Port }}
+    HTTP_Server   On
+    HTTP_Listen   0.0.0.0
+    HTTP_Port   {{ .Monitor.Port }}
     {{- end }}
     {{- range $key, $value := .BufferStorage }}
     {{- if $value }}
-    {{ $key }}  {{$value}}
+    {{ $key }}   {{$value}}
     {{- end }}
     {{- end }}
 
 [INPUT]
-    Name         tail
+    Name   tail
     {{- range $key, $value := .Input }}
     {{- if $value }}
-    {{ $key }}  {{$value}}
+    {{ $key }}   {{$value}}
     {{- end }}
     {{- end }}
 
+{{- range $i, $tailer := .Tailers }}
+
+[INPUT]
+    Name   tail
+    {{- range $key, $value := $tailer }}
+    {{- if $value }}
+    {{ $key }}   {{$value}}
+    {{- end }}
+    {{- end }}
+{{- end }}
+
 [FILTER]
-    Name        kubernetes
+    Name   kubernetes
     {{- range $key, $value := .Filter }}
     {{- if $value }}
-    {{ $key }}  {{$value}}
+    {{ $key }}   {{$value}}
     {{- end }}
     {{- end }}
 
 [OUTPUT]
-    Name          forward
-    Match         *
-    Host          {{ .TargetHost }}
-    Port          {{ .TargetPort }}
+    Name   forward
+    Match   *
+    Host   {{ .TargetHost }}
+    Port   {{ .TargetPort }}
     {{ if .TLS.Enabled }}
-    tls           On
-    tls.verify    Off
+    tls   On
+    tls.verify   Off
     tls.ca_file   /fluent-bit/tls/ca.crt
-    tls.crt_file  /fluent-bit/tls/tls.crt
-    tls.key_file  /fluent-bit/tls/tls.key
-    Shared_Key    {{ .TLS.SharedKey }}
+    tls.crt_file   /fluent-bit/tls/tls.crt
+    tls.key_file   /fluent-bit/tls/tls.key
+    Shared_Key   {{ .TLS.SharedKey }}
     {{- end }}
     Retry_Limit   False
 `

@@ -279,6 +279,125 @@ spec:
                           type: object
                       type: object
                   type: object
+                containerTail:
+                  description: InputTail defines Fluentbit tail input configuration
+                    The tail input plugin allows to monitor one or several text files.
+                    It has a similar behavior like tail -f shell command.
+                  properties:
+                    Buffer_Chunk_Size:
+                      description: Set the buffer size for HTTP client when reading
+                        responses from Kubernetes API server. The value must be according
+                        to the Unit Size specification. (default:32k)
+                      type: string
+                    Buffer_Max_Size:
+                      description: 'Set the limit of the buffer size per monitored
+                        file. When a buffer needs to be increased (e.g: very long
+                        lines), this value is used to restrict how much the memory
+                        buffer can grow. If reading a file exceed this limit, the
+                        file is removed from the monitored file list. The value must
+                        be according to the Unit Size specification. (default:Buffer_Chunk_Size)'
+                      type: string
+                    DB:
+                      description: Specify the database file to keep track of monitored
+                        files and offsets.
+                      type: string
+                    DB_Sync:
+                      description: 'Set a default synchronization (I/O) method. Values:
+                        Extra, Full, Normal, Off. This flag affects how the internal
+                        SQLite engine do synchronization to disk, for more details
+                        about each option please refer to this section. (default:Full)'
+                      type: string
+                    Docker_Mode:
+                      description: If enabled, the plugin will recombine split Docker
+                        log lines before passing them to any parser as configured
+                        above. This mode cannot be used at the same time as Multiline.
+                        (default:Off)
+                      type: string
+                    Docker_Mode_Flush:
+                      description: Wait period time in seconds to flush queued unfinished
+                        split lines. (default:4)
+                      type: string
+                    Exclude_Path:
+                      description: 'Set one or multiple shell patterns separated by
+                        commas to exclude files matching a certain criteria, e.g:
+                        exclude_path=*.gz,*.zip'
+                      type: string
+                    Ignore_Older:
+                      description: Ignores files that have been last modified before
+                        this time in seconds. Supports m,h,d (minutes, hours,days)
+                        syntax. Default behavior is to read all specified files.
+                      type: string
+                    Key:
+                      description: When a message is unstructured (no parser applied),
+                        it's appended as a string under the key name log. This option
+                        allows to define an alternative name for that key. (default:log)
+                      type: string
+                    Mem_Buf_Limit:
+                      description: Set a limit of memory that Tail plugin can use
+                        when appending data to the Engine. If the limit is reach,
+                        it will be paused; when the data is flushed it resumes.
+                      type: string
+                    Multiline:
+                      description: If enabled, the plugin will try to discover multiline
+                        messages and use the proper parsers to compose the outgoing
+                        messages. Note that when this option is enabled the Parser
+                        option is not used. (default:Off)
+                      type: string
+                    Multiline_Flush:
+                      description: Wait period time in seconds to process queued multiline
+                        messages (default:4)
+                      type: string
+                    Parser:
+                      description: Specify the name of a parser to interpret the entry
+                        as a structured message.
+                      type: string
+                    Parser_Firstline:
+                      description: Name of the parser that machs the beginning of
+                        a multiline message. Note that the regular expression defined
+                        in the parser must include a group name (named capture)
+                      type: string
+                    Parser_N:
+                      description: 'Optional-extra parser to interpret and structure
+                        multiline entries. This option can be used to define multiple
+                        parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.'
+                      type: string
+                    Path:
+                      description: Pattern specifying a specific log files or multiple
+                        ones through the use of common wildcards.
+                      type: string
+                    Path_Key:
+                      description: If enabled, it appends the name of the monitored
+                        file as part of the record. The value assigned becomes the
+                        key in the map.
+                      type: string
+                    Refresh_Interval:
+                      description: The interval of refreshing the list of watched
+                        files in seconds. (default:60)
+                      type: string
+                    Rotate_Wait:
+                      description: Specify the number of extra time in seconds to
+                        monitor a file once is rotated in case some pending data is
+                        flushed. (default:5)
+                      type: string
+                    Skip_Long_Lines:
+                      description: When a monitored file reach it buffer capacity
+                        due to a very long line (Buffer_Max_Size), the default behavior
+                        is to stop monitoring that file. Skip_Long_Lines alter that
+                        behavior and instruct Fluent Bit to skip long lines and continue
+                        processing other lines that fits into the buffer size. (default:Off)
+                      type: string
+                    Tag:
+                      description: Set a tag (with regex-extract fields) that will
+                        be placed on lines read.
+                      type: string
+                    Tag_Regex:
+                      description: Set a regex to extract fields from the file.
+                      type: string
+                    storage.type:
+                      description: Specify the buffering mechanism to use. It can
+                        be memory or filesystem. (default:memory)
+                      type: string
+                  type: object
                 customConfigSecret:
                   type: string
                 filterKubernetes:
@@ -1175,6 +1294,129 @@ spec:
                     serviceAccount:
                       type: string
                   type: object
+                tailers:
+                  items:
+                    description: InputTail defines Fluentbit tail input configuration
+                      The tail input plugin allows to monitor one or several text
+                      files. It has a similar behavior like tail -f shell command.
+                    properties:
+                      Buffer_Chunk_Size:
+                        description: Set the buffer size for HTTP client when reading
+                          responses from Kubernetes API server. The value must be
+                          according to the Unit Size specification. (default:32k)
+                        type: string
+                      Buffer_Max_Size:
+                        description: 'Set the limit of the buffer size per monitored
+                          file. When a buffer needs to be increased (e.g: very long
+                          lines), this value is used to restrict how much the memory
+                          buffer can grow. If reading a file exceed this limit, the
+                          file is removed from the monitored file list. The value
+                          must be according to the Unit Size specification. (default:Buffer_Chunk_Size)'
+                        type: string
+                      DB:
+                        description: Specify the database file to keep track of monitored
+                          files and offsets.
+                        type: string
+                      DB_Sync:
+                        description: 'Set a default synchronization (I/O) method.
+                          Values: Extra, Full, Normal, Off. This flag affects how
+                          the internal SQLite engine do synchronization to disk, for
+                          more details about each option please refer to this section.
+                          (default:Full)'
+                        type: string
+                      Docker_Mode:
+                        description: If enabled, the plugin will recombine split Docker
+                          log lines before passing them to any parser as configured
+                          above. This mode cannot be used at the same time as Multiline.
+                          (default:Off)
+                        type: string
+                      Docker_Mode_Flush:
+                        description: Wait period time in seconds to flush queued unfinished
+                          split lines. (default:4)
+                        type: string
+                      Exclude_Path:
+                        description: 'Set one or multiple shell patterns separated
+                          by commas to exclude files matching a certain criteria,
+                          e.g: exclude_path=*.gz,*.zip'
+                        type: string
+                      Ignore_Older:
+                        description: Ignores files that have been last modified before
+                          this time in seconds. Supports m,h,d (minutes, hours,days)
+                          syntax. Default behavior is to read all specified files.
+                        type: string
+                      Key:
+                        description: When a message is unstructured (no parser applied),
+                          it's appended as a string under the key name log. This option
+                          allows to define an alternative name for that key. (default:log)
+                        type: string
+                      Mem_Buf_Limit:
+                        description: Set a limit of memory that Tail plugin can use
+                          when appending data to the Engine. If the limit is reach,
+                          it will be paused; when the data is flushed it resumes.
+                        type: string
+                      Multiline:
+                        description: If enabled, the plugin will try to discover multiline
+                          messages and use the proper parsers to compose the outgoing
+                          messages. Note that when this option is enabled the Parser
+                          option is not used. (default:Off)
+                        type: string
+                      Multiline_Flush:
+                        description: Wait period time in seconds to process queued
+                          multiline messages (default:4)
+                        type: string
+                      Parser:
+                        description: Specify the name of a parser to interpret the
+                          entry as a structured message.
+                        type: string
+                      Parser_Firstline:
+                        description: Name of the parser that machs the beginning of
+                          a multiline message. Note that the regular expression defined
+                          in the parser must include a group name (named capture)
+                        type: string
+                      Parser_N:
+                        description: 'Optional-extra parser to interpret and structure
+                          multiline entries. This option can be used to define multiple
+                          parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.'
+                        type: string
+                      Path:
+                        description: Pattern specifying a specific log files or multiple
+                          ones through the use of common wildcards.
+                        type: string
+                      Path_Key:
+                        description: If enabled, it appends the name of the monitored
+                          file as part of the record. The value assigned becomes the
+                          key in the map.
+                        type: string
+                      Refresh_Interval:
+                        description: The interval of refreshing the list of watched
+                          files in seconds. (default:60)
+                        type: string
+                      Rotate_Wait:
+                        description: Specify the number of extra time in seconds to
+                          monitor a file once is rotated in case some pending data
+                          is flushed. (default:5)
+                        type: string
+                      Skip_Long_Lines:
+                        description: When a monitored file reach it buffer capacity
+                          due to a very long line (Buffer_Max_Size), the default behavior
+                          is to stop monitoring that file. Skip_Long_Lines alter that
+                          behavior and instruct Fluent Bit to skip long lines and
+                          continue processing other lines that fits into the buffer
+                          size. (default:Off)
+                        type: string
+                      Tag:
+                        description: Set a tag (with regex-extract fields) that will
+                          be placed on lines read.
+                        type: string
+                      Tag_Regex:
+                        description: Set a regex to extract fields from the file.
+                        type: string
+                      storage.type:
+                        description: Specify the buffering mechanism to use. It can
+                          be memory or filesystem. (default:memory)
+                        type: string
+                    type: object
+                  type: array
                 targetHost:
                   type: string
                 targetPort:
@@ -1592,6 +1834,8 @@ spec:
                   - repository
                   - tag
                   type: object
+                logLevel:
+                  type: string
                 metrics:
                   description: Metrics defines the service monitor endpoints
                   properties:

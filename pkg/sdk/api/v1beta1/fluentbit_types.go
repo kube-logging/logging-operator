@@ -37,7 +37,9 @@ type FluentbitSpec struct {
 	PositionDBLegacy    *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
 	PositionDB          KubernetesStorage           `json:"positiondb,omitempty"`
 	MountPath           string                      `json:"mountPath,omitempty"`
-	InputTail           InputTail                   `json:"inputTail,omitempty"`
+	InputTail           *InputTail                  `json:"inputTail,omitempty"` // deprecated, use Tailers instead
+	ContainerTail       InputTail                   `json:"containerTail,omitempty"`
+	Tailers             []InputTail                 `json:"tailers,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
 	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
@@ -87,31 +89,31 @@ type InputTail struct {
 	// Set the limit of the buffer size per monitored file. When a buffer needs to be increased (e.g: very long lines), this value is used to restrict how much the memory buffer can grow. If reading a file exceed this limit, the file is removed from the monitored file list. The value must be according to the Unit Size specification. (default:Buffer_Chunk_Size)
 	BufferMaxSize string `json:"Buffer_Max_Size,omitempty"`
 	// Pattern specifying a specific log files or multiple ones through the use of common wildcards.
-	Path string `json:"Path,omitempty" plugin:"default:/var/log/containers/*.log"`
+	Path string `json:"Path,omitempty"`
 	// If enabled, it appends the name of the monitored file as part of the record. The value assigned becomes the key in the map.
 	PathKey string `json:"Path_Key,omitempty"`
 	// Set one or multiple shell patterns separated by commas to exclude files matching a certain criteria, e.g: exclude_path=*.gz,*.zip
 	ExcludePath string `json:"Exclude_Path,omitempty"`
 	// The interval of refreshing the list of watched files in seconds. (default:60)
-	RefreshInterval string `json:"Refresh_Interval,omitempty" plugin:"default:5"`
+	RefreshInterval string `json:"Refresh_Interval,omitempty"`
 	// Specify the number of extra time in seconds to monitor a file once is rotated in case some pending data is flushed. (default:5)
 	RotateWait string `json:"Rotate_Wait,omitempty"`
 	// Ignores files that have been last modified before this time in seconds. Supports m,h,d (minutes, hours,days) syntax. Default behavior is to read all specified files.
 	IgnoreOlder string `json:"Ignore_Older,omitempty"`
 	// When a monitored file reach it buffer capacity due to a very long line (Buffer_Max_Size), the default behavior is to stop monitoring that file. Skip_Long_Lines alter that behavior and instruct Fluent Bit to skip long lines and continue processing other lines that fits into the buffer size. (default:Off)
-	SkipLongLines string `json:"Skip_Long_Lines,omitempty" plugin:"default:On"`
+	SkipLongLines string `json:"Skip_Long_Lines,omitempty"`
 	// Specify the database file to keep track of monitored files and offsets.
-	DB string `json:"DB,omitempty" plugin:"default:/tail-db/tail-containers-state.db"`
+	DB *string `json:"DB,omitempty"`
 	// Set a default synchronization (I/O) method. Values: Extra, Full, Normal, Off. This flag affects how the internal SQLite engine do synchronization to disk, for more details about each option please refer to this section. (default:Full)
 	DBSync string `json:"DB_Sync,omitempty"`
 	// Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes.
-	MemBufLimit string `json:"Mem_Buf_Limit,omitempty" plugin:"default:5MB"`
+	MemBufLimit string `json:"Mem_Buf_Limit,omitempty"`
 	// Specify the name of a parser to interpret the entry as a structured message.
 	Parser string `json:"Parser,omitempty"`
 	// When a message is unstructured (no parser applied), it's appended as a string under the key name log. This option allows to define an alternative name for that key. (default:log)
 	Key string `json:"Key,omitempty"`
 	// Set a tag (with regex-extract fields) that will be placed on lines read.
-	Tag string `json:"Tag,omitempty" plugin:"default:kubernetes.*"`
+	Tag string `json:"Tag,omitempty"`
 	// Set a regex to extract fields from the file.
 	TagRegex string `json:"Tag_Regex,omitempty"`
 	// If enabled, the plugin will try to discover multiline messages and use the proper parsers to compose the outgoing messages. Note that when this option is enabled the Parser option is not used. (default:Off)
