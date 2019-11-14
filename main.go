@@ -74,13 +74,19 @@ func main() {
 		os.Exit(1)
 	}
 	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
-
+	runtime := "cri"
 	nodeList, err := client.CoreV1().Nodes().List(metav1.ListOptions{Limit: 1})
 	if err != nil {
-		log.Errorf("CRI get failed: %s", err.Error())
+		log.Errorf("node get failed: %s", err.Error())
 	}
-	runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
-	runtime := strings.Split(runtimeWithVersion, "://")[0]
+	if nodeList != nil && len(nodeList.Items) > 0 {
+		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
+		runtime = strings.Split(runtimeWithVersion, "://")[0]
+		log.Infof("Detected cri: %s", runtime)
+	} else {
+		log.Warnf("Unable to detect cri using default: %s", runtime)
+	}
+
 	loggingReconciler := &controllers.LoggingReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Logging"),
