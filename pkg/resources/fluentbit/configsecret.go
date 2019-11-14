@@ -67,7 +67,7 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 	}
 
 	if r.Logging.Spec.FluentbitSpec.ContainerTail.Parser == "" {
-		switch r.CRI {
+		switch types.ContainerRuntime {
 		case "docker":
 			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "docker"
 		case "containerd":
