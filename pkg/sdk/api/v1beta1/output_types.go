@@ -21,20 +21,21 @@ import (
 
 // OutputSpec defines the desired state of Output
 type OutputSpec struct {
-	LoggingRef                string                            `json:"loggingRef,omitempty"`
-	S3OutputConfig            *output.S3OutputConfig            `json:"s3,omitempty"`
-	AzureStorage              *output.AzureStorage              `json:"azurestorage,omitempty"`
-	GCSOutput                 *output.GCSOutput                 `json:"gcs,omitempty"`
-	OSSOutput                 *output.OSSOutput                 `json:"oss,omitempty"`
-	ElasticsearchOutput       *output.ElasticsearchOutput       `json:"elasticsearch,omitempty"`
-	LokiOutput                *output.LokiOutput                `json:"loki,omitempty"`
-	SumologicOutput           *output.SumologicOutput           `json:"sumologic,omitempty"`
-	ForwardOutput             *output.ForwardOutput             `json:"forward,omitempty"`
-	FileOutput                *output.FileOutputConfig          `json:"file,omitempty"`
-	NullOutputConfig          *output.NullOutputConfig          `json:"nullout,omitempty"`
-	KafkaOutputConfig         *output.KafkaOutputConfig         `json:"kafka,omitempty"`
-	CloudWatchOutput          *output.CloudWatchOutput          `json:"cloudwatch,omitempty"`
-	KinesisStreamOutputConfig *output.KinesisStreamOutputConfig `json:"kinesisStream,omitempty"`
+	LoggingRef                    string                                `json:"loggingRef,omitempty"`
+	S3OutputConfig                *output.S3OutputConfig                `json:"s3,omitempty"`
+	AzureStorage                  *output.AzureStorage                  `json:"azurestorage,omitempty"`
+	GCSOutput                     *output.GCSOutput                     `json:"gcs,omitempty"`
+	OSSOutput                     *output.OSSOutput                     `json:"oss,omitempty"`
+	ElasticsearchOutput           *output.ElasticsearchOutput           `json:"elasticsearch,omitempty"`
+	LokiOutput                    *output.LokiOutput                    `json:"loki,omitempty"`
+	SumologicOutput               *output.SumologicOutput               `json:"sumologic,omitempty"`
+	ForwardOutput                 *output.ForwardOutput                 `json:"forward,omitempty"`
+	FileOutput                    *output.FileOutputConfig              `json:"file,omitempty"`
+	NullOutputConfig              *output.NullOutputConfig              `json:"nullout,omitempty"`
+	KafkaOutputConfig             *output.KafkaOutputConfig             `json:"kafka,omitempty"`
+	CloudWatchOutput              *output.CloudWatchOutput              `json:"cloudwatch,omitempty"`
+	KinesisStreamOutputConfig     *output.KinesisStreamOutputConfig     `json:"kinesisStream,omitempty"`
+	ExceptionDetectorOutputConfig *output.ExceptionDetectorOutputConfig `json:"exceptionDetector,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output
