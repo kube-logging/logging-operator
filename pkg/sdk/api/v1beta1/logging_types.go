@@ -187,7 +187,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				Replicas: 1,
 			}
 		}
-		copy.Spec.FluentdSpec.LogLevel = util.StringDefault(copy.Spec.FluentdSpec.LogLevel, "error")
 	}
 	if copy.Spec.FluentbitSpec != nil {
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {
