@@ -6,7 +6,6 @@ metadata:
 spec:
   filters:
     - parser:
-        key_name: log
         remove_key_name_field: true
         parsers:
           - type: nginx

@@ -103,7 +103,6 @@ metadata:
 spec:
   filters:
     - parser:
-        key_name: message
         remove_key_name_field: true
         reserve_data: true
         parsers:

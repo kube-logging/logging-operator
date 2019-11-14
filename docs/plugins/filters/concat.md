@@ -8,7 +8,6 @@
  spec:
   filters:
     - concat:
-        key: message
         partial_key: "partial_message"
         separator: ""
  ```
@@ -17,7 +16,7 @@
 ### Concat
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| key | string | Yes | - | The key for part of multiline log.<br> |
+| key | string | No | - | Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.<br> |
 | separator | string | No |  "\n" | The separator of lines. <br> |
 | n_lines | int | No | - | The number of lines. This is exclusive with multiline_start_regex.<br> |
 | multiline_start_regexp | string | No | - | The regexp to match beginning of multiline. This is exclusive with n_lines.<br> |

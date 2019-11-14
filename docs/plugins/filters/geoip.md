@@ -10,7 +10,6 @@
     - tag_normaliser:
         format: ${namespace_name}.${pod_name}.${container_name}
     - parser:
-        key_name: message
         remove_key_name_field: true
         parsers:
           - type: nginx

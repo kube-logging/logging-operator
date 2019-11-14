@@ -28,7 +28,6 @@ import (
 // spec:
 //  filters:
 //    - concat:
-//        key: message
 //        partial_key: "partial_message"
 //        separator: ""
 // ```
@@ -36,8 +35,8 @@ type _docConcat interface{}
 
 // +kubebuilder:object:generate=true
 type Concat struct {
-	//The key for part of multiline log.
-	Key string `json:"key"`
+	// Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.
+	Key string `json:"key,omitempty"`
 	//The separator of lines. (default: "\n")
 	Separator string `json:"separator,omitempty"`
 	//The number of lines. This is exclusive with multiline_start_regex.
@@ -70,10 +69,22 @@ type Concat struct {
 
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "concat"
-	return types.NewFlatDirective(types.PluginMeta{
-		Type:      pluginType,
-		Directive: "filter",
-		Tag:       "**",
-		Id:        id + "_" + pluginType,
-	}, c, secretLoader)
+	concat := &types.GenericDirective{
+		PluginMeta: types.PluginMeta{
+			Type:      pluginType,
+			Directive: "filter",
+			Tag:       "**",
+			Id:        id + "_" + pluginType,
+		},
+	}
+	concatConfig := c.DeepCopy()
+	if concatConfig.Key == "" {
+		concatConfig.Key = types.GetLogKey()
+	}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(concatConfig); err != nil {
+		return nil, err
+	} else {
+		concat.Params = params
+	}
+	return concat, nil
 }
