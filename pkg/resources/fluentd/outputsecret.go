@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	corev1 "k8s.io/api/core/v1"
@@ -26,7 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object, k8sutil.DesiredState, error) {
 	var loggingRef string
 	if r.Logging.Spec.LoggingRef != "" {
 		loggingRef = r.Logging.Spec.LoggingRef
@@ -41,7 +42,8 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 			Name:      secret.Name,
 			Namespace: secret.Namespace}, secretItem)
 		if err != nil {
-			r.Log.Error(err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
+			return nil, k8sutil.StatePresent, errors.WrapIfWithDetails(
+				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
 		}
 		if secretItem.ObjectMeta.Annotations == nil {
 			secretItem.ObjectMeta.Annotations = make(map[string]string)
@@ -49,10 +51,10 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
 		markedSecrets = append(markedSecrets, secretItem)
 	}
-	return markedSecrets, k8sutil.StatePresent
+	return markedSecrets, k8sutil.StatePresent, nil
 }
 
-func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, k8sutil.DesiredState, error) {
 	// Initialise output secret
 	fluentOutputSecret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
@@ -70,10 +72,11 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 			Name:      secret.Name,
 			Namespace: secret.Namespace}, secretItem)
 		if err != nil {
-			r.Log.Error(err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
+			return nil, k8sutil.StatePresent, errors.WrapIfWithDetails(
+				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
 		}
 		value := secretItem.Data[secret.Key]
 		fluentOutputSecret.Data[secretKey] = value
 	}
-	return fluentOutputSecret, k8sutil.StatePresent
+	return fluentOutputSecret, k8sutil.StatePresent, nil
 }

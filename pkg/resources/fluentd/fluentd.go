@@ -127,12 +127,19 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	// Prepare output secret
-	err := r.ReconcileResource(r.outputSecret(r.secrets, OutputSecretPath))
+	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, OutputSecretPath)
+	if err != nil {
+		return nil, errors.WrapIf(err, "failed to create output secret")
+	}
+	err = r.ReconcileResource(outputSecret, outputSecretDesiredState)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to reconcile resource")
 	}
 	// Mark watched secrets
-	secretList, state := r.markSecrets(r.secrets)
+	secretList, state, err := r.markSecrets(r.secrets)
+	if err != nil {
+		return nil, errors.WrapIf(err, "failed to mark secrets")
+	}
 	for _, obj := range secretList {
 		err := r.ReconcileResource(obj, state)
 		if err != nil {
@@ -153,11 +160,14 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
 	} {
-		o, state := res()
+		o, state, err := res()
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to create desired object")
+		}
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
 		}
-		err := r.ReconcileResource(o, state)
+		err = r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
 		}

@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 	return &corev1.Service{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(ServiceName), r.getFluentdLabels(), r.Logging),
@@ -40,10 +40,10 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState) {
 			Selector: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
-	}, k8sutil.StatePresent
+	}, k8sutil.StatePresent, nil
 }
 
-func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: templates.FluentdObjectMeta(
@@ -61,15 +61,15 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(ServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
-		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent
+		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &v1.ServiceMonitor{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
@@ -87,7 +87,12 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging), Spec: v1.ServiceMonitorSpec{}}, k8sutil.StateAbsent
+	return &v1.ServiceMonitor{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(ServiceName+"-metrics"),
+			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
+		Spec: v1.ServiceMonitorSpec{},
+	}, k8sutil.StateAbsent, nil
 }

@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: templates.FluentbitObjectMeta(
@@ -43,18 +43,19 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: templates.FluentbitObjectMeta(
 			r.Logging.QualifiedName(fluentbitServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
-		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent
+		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &v1.ServiceMonitor{
-			ObjectMeta: templates.FluentbitObjectMeta(r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
+			ObjectMeta: templates.FluentbitObjectMeta(
+				r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -63,11 +64,16 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 					Port: "metrics",
 					Path: r.Logging.Spec.FluentbitSpec.Metrics.Path,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
+				Selector: v12.LabelSelector{
+					MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{ObjectMeta: templates.FluentbitObjectMeta(r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging), Spec: v1.ServiceMonitorSpec{}}, k8sutil.StateAbsent
+	return &v1.ServiceMonitor{
+		ObjectMeta: templates.FluentbitObjectMeta(
+			r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
+		Spec: v1.ServiceMonitorSpec{},
+	}, k8sutil.StateAbsent, nil
 }

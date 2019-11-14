@@ -25,10 +25,7 @@ import (
 type ComponentReconciler func() (*reconcile.Result, error)
 
 // Resource redeclaration of function with return type kubernetes Object
-type Resource func() (runtime.Object, k8sutil.DesiredState)
-
-// ResourceVariation redeclaration of function with parameter and return type kubernetes Object
-type ResourceVariation func(t string) runtime.Object
+type Resource func() (runtime.Object, k8sutil.DesiredState, error)
 
 // ResourceWithLog redeclaration of function with logging parameter and return type kubernetes Object
 type ResourceWithLog func(log logr.Logger) runtime.Object

@@ -38,14 +38,14 @@ type ConfigCheckResult struct {
 
 const ConfigKey = "generated.conf"
 
-func (r *Reconciler) appconfigMap() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) appconfigMap() (runtime.Object, k8sutil.DesiredState, error) {
 	data := make(map[string][]byte)
 	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(AppSecretConfigName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Data: data,
-	}, k8sutil.StatePresent
+	}, k8sutil.StatePresent, nil
 }
 
 func (r *Reconciler) configHash() (string, error) {
@@ -92,7 +92,10 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 	}
 
 	checkSecret := r.newCheckSecret(hashKey)
-	checkOutputSecret := r.newCheckOutputSecret(hashKey)
+	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
+	if err != nil {
+		return nil, err
+	}
 
 	err = r.Client.Create(context.TODO(), checkSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
@@ -125,7 +128,13 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 				continue
 			}
 		}
-		if err := r.Client.Delete(context.TODO(), r.newCheckOutputSecret(configHash)); err != nil {
+		checkOutputSecret, err := r.newCheckOutputSecret(configHash)
+		if err != nil {
+			multierr = errors.Combine(multierr,
+				errors.Wrapf(err, "failed to create config check output secret %s", configHash))
+			continue
+		}
+		if err := r.Client.Delete(context.TODO(), checkOutputSecret); err != nil {
 			if !apierrors.IsNotFound(err) {
 				multierr = errors.Combine(multierr,
 					errors.Wrapf(err, "failed to remove config check output secret %s", configHash))
@@ -157,17 +166,19 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	}
 }
 
-func (r *Reconciler) newCheckOutputSecret(hashKey string) *v1.Secret {
-	obj, _ := r.outputSecret(r.secrets, OutputSecretPath)
+func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
+	obj, _, err := r.outputSecret(r.secrets, OutputSecretPath)
+	if err != nil {
+		return nil, err
+	}
 	if secret, ok := obj.(*v1.Secret); ok {
 		secret.ObjectMeta = templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
 			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
 			r.Logging)
-		return secret
+		return secret, nil
 	}
-	r.Log.Error(fmt.Errorf("output secret is invalid"), "unable to create output secret for config check")
-	return nil
+	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {

@@ -49,7 +49,7 @@ func generateConfig(input fluentdConfig) string {
 	return outputString
 }
 
-func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error) {
 	input := fluentdConfig{Monitor: struct {
 		Enabled bool
 		Port    int32
@@ -72,5 +72,5 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState) {
 			"input.conf":   []byte(generateConfig(input)),
 			"devnull.conf": []byte(fluentdOutputTemplate),
 		},
-	}, k8sutil.StatePresent
+	}, k8sutil.StatePresent, nil
 }
