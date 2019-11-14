@@ -60,7 +60,8 @@ spec:
                         description: If true, keep partial metadata
                         type: string
                       key:
-                        description: The key for part of multiline log.
+                        description: Specify field name in the record to parse. If
+                          you leave empty the Container Runtime default will be used.
                         type: string
                       multiline_end_regexp:
                         description: The regexp to match ending of multiline. This
@@ -99,8 +100,6 @@ spec:
                         description: Use partial metadata to concatenate multiple
                           records
                         type: string
-                    required:
-                    - key
                     type: object
                   dedot:
                     description: More info at https://github.com/lunardial/fluent-plugin-dedot_filter
@@ -160,7 +159,8 @@ spec:
                         description: Store parsed values with specified key name prefix.
                         type: string
                       key_name:
-                        description: Specify field name in the record to parse.
+                        description: Specify field name in the record to parse. If
+                          you leave empty the Container Runtime default will be used.
                         type: string
                       parsers:
                         items:
@@ -232,8 +232,6 @@ spec:
                       reserve_time:
                         description: Keep original event time in parsed result.
                         type: boolean
-                    required:
-                    - key_name
                     type: object
                   record_transformer:
                     properties:

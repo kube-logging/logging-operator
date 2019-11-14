@@ -215,7 +215,6 @@ spec:
   filters:
     - tag_normaliser: {}
     - parser:
-        key_name: message
         remove_key_name_field: true
         reserve_data: true
         parsers:

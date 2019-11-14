@@ -299,7 +299,6 @@ metadata:
 spec:
   filters:
     - parse:
-        key_name: log
         remove_key_name_field: true
         parsers:
           - type: nginx
