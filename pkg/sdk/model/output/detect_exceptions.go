@@ -27,9 +27,9 @@ import (
 // ```
 // spec:
 //   exceptionDetector:
-//     remove_tag_prefix foo
-//     languages java, python
-//     multiline_flush_interval 0.1
+//     remove_tag_prefix: foo
+//     languages: java, python
+//     multiline_flush_interval: 0.1
 //     buffer:
 //       timekey: 1m
 //       timekey_wait: 30s
