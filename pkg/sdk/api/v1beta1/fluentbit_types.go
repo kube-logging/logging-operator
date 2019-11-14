@@ -107,7 +107,7 @@ type InputTail struct {
 	// Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes.
 	MemBufLimit string `json:"Mem_Buf_Limit,omitempty" plugin:"default:5MB"`
 	// Specify the name of a parser to interpret the entry as a structured message.
-	Parser string `json:"Parser,omitempty" plugin:"default:cri"`
+	Parser string `json:"Parser,omitempty"`
 	// When a message is unstructured (no parser applied), it's appended as a string under the key name log. This option allows to define an alternative name for that key. (default:log)
 	Key string `json:"Key,omitempty"`
 	// Set a tag (with regex-extract fields) that will be placed on lines read.

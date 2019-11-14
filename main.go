@@ -17,16 +17,21 @@ package main
 import (
 	"flag"
 	"os"
+	"strings"
 
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/prometheus/common/log"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	// +kubebuilder:scaffold:imports
 )
@@ -68,10 +73,24 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
+	runtime := "cri"
+	nodeList, err := client.CoreV1().Nodes().List(metav1.ListOptions{Limit: 1})
+	if err != nil {
+		log.Errorf("node get failed: %s", err.Error())
+	}
+	if nodeList != nil && len(nodeList.Items) > 0 {
+		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
+		runtime = strings.Split(runtimeWithVersion, "://")[0]
+		log.Infof("Detected cri: %s", runtime)
+	} else {
+		log.Warnf("Unable to detect cri using default: %s", runtime)
+	}
 
 	loggingReconciler := &controllers.LoggingReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Logging"),
+		CRI:    runtime,
 	}
 
 	if err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
