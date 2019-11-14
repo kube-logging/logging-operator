@@ -34,7 +34,6 @@ const (
 
 func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 	var containerPorts []corev1.ContainerPort
-
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",

@@ -46,6 +46,7 @@ import (
 type LoggingReconciler struct {
 	client.Client
 	Log logr.Logger
+	CRI string
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings,verbs=get;list;watch;create;update;patch;delete
@@ -83,7 +84,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging, r.CRI).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
