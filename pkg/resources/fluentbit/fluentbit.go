@@ -23,7 +23,6 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	"github.com/go-logr/logr"
-	"github.com/goph/emperror"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -63,16 +62,14 @@ type DesiredObject struct {
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*k8sutil.GenericResourceReconciler
-	CRI           string
 	desiredConfig string
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, CRI string) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: k8sutil.NewReconciler(client, logger),
-		CRI:                       CRI,
 	}
 }
 
@@ -90,13 +87,17 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
 	} {
-		o, state := factory()
+		o, state, err := factory()
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to create desired object")
+		}
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
-		err := r.ReconcileResource(o, state)
+		err = r.ReconcileResource(o, state)
 		if err != nil {
-			return nil, emperror.WrapWith(err, "failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
+			return nil, errors.WrapWithDetails(err,
+				"failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
 		}
 	}
 

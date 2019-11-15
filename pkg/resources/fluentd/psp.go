@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: templates.FluentdObjectMetaClusterScope(
@@ -53,17 +53,17 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 				},
 				AllowPrivilegeEscalation: util.BoolPointer(false),
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &policyv1beta1.PodSecurityPolicy{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(PodSecurityPolicyName),
 			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Spec: policyv1beta1.PodSecurityPolicySpec{},
-	}, k8sutil.StateAbsent
+	}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) pspRole() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) pspRole() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.Role{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName+"-psp"), r.Logging.Labels, r.Logging),
@@ -75,17 +75,17 @@ func (r *Reconciler) pspRole() (runtime.Object, k8sutil.DesiredState) {
 					Verbs:         []string{"use"},
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.Role{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(roleName+"-psp"),
 			r.Logging.Labels, r.Logging,
 		),
-		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName+"-psp"), r.Logging.Labels, r.Logging),
@@ -101,12 +101,12 @@ func (r *Reconciler) pspRoleBinding() (runtime.Object, k8sutil.DesiredState) {
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(roleBindingName+"-psp"),
 			r.Logging.Labels, r.Logging,
 		),
-		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
 }

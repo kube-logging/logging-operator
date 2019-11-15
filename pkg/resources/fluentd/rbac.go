@@ -22,7 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
@@ -33,17 +33,17 @@ func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState) {
 					Verbs:     []string{"*"},
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.Role{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(roleName),
 			r.Logging.Labels, r.Logging,
 		),
-		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
@@ -59,17 +59,17 @@ func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState) {
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(roleBindingName),
 			r.Logging.Labels, r.Logging,
 		),
-		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
 			ObjectMeta: templates.FluentdObjectMeta(
@@ -77,7 +77,7 @@ func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 				r.Logging.Labels,
 				r.Logging,
 			),
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
 		ObjectMeta: templates.FluentdObjectMeta(
@@ -85,5 +85,5 @@ func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 			r.Logging.Labels,
 			r.Logging,
 		),
-	}, k8sutil.StateAbsent
+	}, k8sutil.StateAbsent, nil
 }
