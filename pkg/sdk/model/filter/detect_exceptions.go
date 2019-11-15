@@ -27,21 +27,17 @@ import (
 //
 // #### Example output configurations
 // ```
-// spec:
-//   exceptionDetector:
-//     remove_tag_prefix: foo
-//     languages: java, python
-//     multiline_flush_interval: 0.1
-//     buffer:
-//       timekey: 1m
-//       timekey_wait: 30s
-//       timekey_use_utc: true
+//filters:
+//  spec:
+//    detectExceptions:
+//      languages: java, python
+//      multiline_flush_interval: 0.1
 // ```
 type _docExceptionDetector interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
-type ExceptionDetectorOutputConfig struct {
+type DetectExceptions struct {
 	// The field which contains the raw message text in the input JSON data. (default: "")
 	Message string `json:"message,omitempty"`
 	// The prefix to be removed from the input tag when outputting a record. (default: "")
@@ -58,7 +54,7 @@ type ExceptionDetectorOutputConfig struct {
 	Stream string `json:"stream,omitempty"`
 }
 
-func (d *ExceptionDetectorOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "detect_exceptions"
 	pluginID := id + "_" + pluginType
 	detector := &types.OutputPlugin{

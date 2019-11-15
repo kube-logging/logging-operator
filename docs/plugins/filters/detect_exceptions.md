@@ -7,15 +7,11 @@ More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-excepti
 
  #### Example output configurations
  ```
- spec:
-   exceptionDetector:
-     remove_tag_prefix: foo
-     languages: java, python
-     multiline_flush_interval: 0.1
-     buffer:
-       timekey: 1m
-       timekey_wait: 30s
-       timekey_use_utc: true
+filters:
+  spec:
+    detectExceptions:
+      languages: java, python
+      multiline_flush_interval: 0.1
  ```
 
 ## Configuration
