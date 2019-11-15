@@ -125,6 +125,7 @@ For complete list of supported plugins please check the [plugins index](/docs/pl
 ---
 
 ## Troubleshooting
+:construction: The **master branch** is under heavy development. Please use [releases](https://github.com/banzaicloud/logging-operator/releases) instead of the master branch to get stable software.
 
 If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
 

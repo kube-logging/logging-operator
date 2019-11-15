@@ -11,7 +11,7 @@ Before you start [install logging-operator](./deploy/README.md#)
 
 ### Create `logging` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -37,7 +37,7 @@ kubectl -n logging create secret generic logging-s3 --from-literal "awsAccessKey
 ```
 Or set up the secret manually.
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: v1
 kind: Secret
 metadata:
@@ -53,7 +53,7 @@ EOF
 
 ### Create an S3 Output Definition 
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -85,7 +85,7 @@ EOF
 
 ### Create `flow` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:

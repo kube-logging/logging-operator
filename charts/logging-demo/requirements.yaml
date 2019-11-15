@@ -1,0 +1,10 @@
+dependencies:
+- name: minio
+  version: 2.x.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: minio.enabled
+
+- name: log-generator
+  version: 0.1.x
+  repository: https://kubernetes-charts.banzaicloud.com/
+  condition: logGenerator.enabled

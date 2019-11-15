@@ -39,7 +39,7 @@
 ### Deploy with Kubernetes Manifests
 #### Create `logging` resource with RBAC
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -57,7 +57,7 @@ EOF
 
 ### Deploy with Helm
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
     --set=loggingOperator.fluentd.security.roleBasedAccessControlCreate=True \
     --set=loggingOperator.fluentbit.security.roleBasedAccessControlCreate=True
 ```
@@ -69,7 +69,7 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
   metadata:
-    name: nginx-demo-nginx-logging-demo-logging-fluentd
+    name: logging-demo-nginx-logging-demo-logging-fluentd
     namespace: logging
     ownerReferences:
     - apiVersion: logging.banzaicloud.io/v1beta1
@@ -89,7 +89,7 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
   kind: RoleBinding
   metadata:
     annotations:
-    name: nginx-demo-nginx-logging-demo-logging-fluentd
+    name: logging-demo-nginx-logging-demo-logging-fluentd
     namespace: logging
     ownerReferences:
     - apiVersion: logging.banzaicloud.io/v1beta1
@@ -98,10 +98,10 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: Role
-    name: nginx-demo-nginx-logging-demo-logging-fluentd
+    name: logging-demo-nginx-logging-demo-logging-fluentd
   subjects:
   - kind: ServiceAccount
-    name: nginx-demo-nginx-logging-demo-logging-fluentd
+    name: logging-demo-nginx-logging-demo-logging-fluentd
     namespace: logging
 ```
 
@@ -110,7 +110,7 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 kind: ClusterRole
 metadata:
   annotations:
-  name: nginx-demo-nginx-logging-demo-logging-fluentbit
+  name: logging-demo-nginx-logging-demo-logging-fluentbit
   ownerReferences:
   - apiVersion: logging.banzaicloud.io/v1beta1
     controller: true
@@ -151,7 +151,7 @@ subjects:
 ### Deploy with Kubernetes Manifests
 #### Create `logging` resource with Service Account
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -168,7 +168,7 @@ EOF
 ```
 ### Deploy with Helm
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
     --set=loggingOperator.fluentd.security.serviceAccount=fluentdUser1 \
     --set=loggingOperator.fluentbit.security.serviceAccount=fluentbitUser1
 ```
@@ -180,7 +180,7 @@ helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logg
 ### Deploy with Kubernetes Manifests
 #### Create `logging` resource with PSP
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -199,7 +199,7 @@ EOF
 ```
 ### Deploy with Helm
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
     --set=loggingOperator.fluentd.security.podSecurityPolicyCreate=True \
     --set=loggingOperator.fluentd.security.roleBasedAccessControlCreate=True \
     --set=loggingOperator.fluentbit.security.podSecurityPolicyCreate=True \
@@ -305,7 +305,7 @@ spec:
 ### Deploy with Kubernetes Manifests
 #### Create `logging` resource with PSP
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -330,7 +330,7 @@ EOF
 ```
 ### Deploy with Helm
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
     --set=loggingOperator.fluentd.security.securityContext.allowPrivilegeEscalation=False \
     --set=loggingOperator.fluentd.security.securityContext.readOnlyRootFilesystem=False \
     --set=loggingOperator.fluentd.security.podSecurityContext.fsGroup=101 \

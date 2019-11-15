@@ -1,0 +1,29 @@
+{{- if and .Values.cloudwatch.enabled }}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "output.fullname" . }}-cloudwatch
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "logging-demo.labels" . | indent 4 }}
+spec:
+  cloudwatch:
+    aws_key_id:
+      valueFrom:
+        secretKeyRef:
+          name: logging-cloudwatch
+          key: accesskey
+    aws_sec_key:
+      valueFrom:
+        secretKeyRef:
+          name: logging-cloudwatch
+          key: secretkey
+    log_group_name: {{ .Values.cloudwatch.aws.log_group_name }}
+    log_stream_name: {{ .Values.cloudwatch.aws.log_stream_name }}
+    region: {{ .Values.cloudwatch.aws.region }}
+    auto_create_stream: true
+    buffer:
+      timekey: 30s
+      timekey_wait: 30s
+      timekey_use_utc: true
+{{- end }}

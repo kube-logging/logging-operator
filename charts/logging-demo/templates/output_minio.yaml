@@ -1,0 +1,30 @@
+{{- if and .Values.minio.enabled }}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "output.fullname" . }}-minio
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "logging-demo.labels" . | indent 4 }}
+spec:
+  s3:
+    aws_key_id:
+      valueFrom:
+        secretKeyRef:
+          name: logging-s3
+          key: accesskey
+    aws_sec_key:
+      valueFrom:
+        secretKeyRef:
+          name: logging-s3
+          key: secretkey
+    s3_bucket: demo
+    s3_region: test_region
+    s3_endpoint: 'http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000'
+    force_path_style: 'true'
+    path: logs/${tag}/%Y/%m/%d/
+    buffer:
+      timekey: 10s
+      timekey_wait: 0s
+      timekey_use_utc: true
+{{- end }}

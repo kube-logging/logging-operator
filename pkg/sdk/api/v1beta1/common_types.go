@@ -22,9 +22,9 @@ import (
 
 // ImageSpec struct hold information about image specification
 type ImageSpec struct {
-	Repository string `json:"repository"`
-	Tag        string `json:"tag"`
-	PullPolicy string `json:"pullPolicy"`
+	Repository string `json:"repository,omitempty"`
+	Tag        string `json:"tag,omitempty"`
+	PullPolicy string `json:"pullPolicy,omitempty"`
 }
 
 // Metrics defines the service monitor endpoints

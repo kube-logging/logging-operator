@@ -1,8 +1,0 @@
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Logging
-metadata:
-  name: {{ include "nginx-logging-kafka-demo.fullname" . }}-logging
-spec:
-  fluentd: {}
-  fluentbit: {}
-  controlNamespace: {{ .Release.Namespace }}
