@@ -37,7 +37,7 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState) {
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+			Selector: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
 	}, k8sutil.StatePresent
@@ -47,7 +47,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: templates.FluentdObjectMeta(
-				r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
+				r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -57,7 +57,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Metrics.Port},
 					},
 				},
-				Selector:  util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+				Selector:  util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
@@ -72,7 +72,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &v1.ServiceMonitor{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
+			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -83,7 +83,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 					Interval:      r.Logging.Spec.FluentdSpec.Metrics.Interval,
 					ScrapeTimeout: r.Logging.Spec.FluentdSpec.Metrics.Timeout,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
+				Selector:          v12.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
