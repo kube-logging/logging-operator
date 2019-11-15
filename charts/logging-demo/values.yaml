@@ -1,0 +1,84 @@
+# Default values for logging-demo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+loggingOperator:
+  controlNamespace:
+  fluentd: {}
+#    metrics:
+#      serviceMonitor: false
+#      prometheusAnnotations: false
+#      port: 24231
+#      path: "/metrics"
+#      timeout: "30s"
+#      interval: "15s"
+  fluentbit: {}
+#    metrics:
+#      serviceMonitor: false
+#      prometheusAnnotations: false
+#      port: 2020
+#      path: "/api/v1/metrics/prometheus"
+#      timeout: "30s"
+#      interval: "15s"
+# If specified, the pod's tolerations.
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#     tolerations:
+#      - key: "node-role.kubernetes.io/master"
+#        operator: "Equal"
+#        effect: "NoSchedule"
+#      - key: "node.kubernetes.io/unschedulable"
+#        operator: "Equal"
+#        effect: "NoSchedule"
+
+  # Enable secure connection between fluentd and fluent-bit
+  tls:
+    enabled: true
+    # Shared key for fluentd authentication
+    sharedKey: ""
+    fluentbitSecretName: ""
+    fluentdSecretName: ""
+
+# Logging-Operator Outputs
+# Enable Grafana Loki logging output
+file:
+  enabled: false
+
+# Enable Minio logging output and install chart
+minio:
+  enabled: false
+  existingSecret: logging-s3
+  environment:
+    MINIO_REGION: test_region
+  defaultBucket:
+    enabled: true
+    name: demo
+
+# Enable ElasticSearch logging output
+elasticsearch:
+  enabled: false
+
+# Enable Grafana Loki logging output
+loki:
+  enabled: false
+
+# Enable Kafka logging output
+kafka:
+  enabled: false
+
+# Enable AWS Cloudwatch logging output
+cloudwatch:
+  enabled: false
+  # AWS Credentials
+  aws:
+    secret_key: ""
+    access_key: ""
+    region: ""
+    log_group_name: ""
+    log_stream_name: ""
+
+# Enable Demo Log-Gen application
+logGenerator:
+  enabled: true

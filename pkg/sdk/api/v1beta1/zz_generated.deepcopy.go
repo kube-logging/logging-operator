@@ -813,7 +813,7 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.FileOutput != nil {
 		in, out := &in.FileOutput, &out.FileOutput
 		*out = new(output.FileOutputConfig)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.NullOutputConfig != nil {
 		in, out := &in.NullOutputConfig, &out.NullOutputConfig

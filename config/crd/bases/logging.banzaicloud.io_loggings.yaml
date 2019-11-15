@@ -510,10 +510,6 @@ spec:
                       type: string
                     tag:
                       type: string
-                  required:
-                  - pullPolicy
-                  - repository
-                  - tag
                   type: object
                 inputTail:
                   description: InputTail defines Fluentbit tail input configuration
@@ -1575,10 +1571,6 @@ spec:
                       type: string
                     tag:
                       type: string
-                  required:
-                  - pullPolicy
-                  - repository
-                  - tag
                   type: object
                 disablePvc:
                   type: boolean
@@ -1706,10 +1698,6 @@ spec:
                       type: string
                     tag:
                       type: string
-                  required:
-                  - pullPolicy
-                  - repository
-                  - tag
                   type: object
                 logLevel:
                   type: string
@@ -2036,10 +2024,6 @@ spec:
                       type: string
                     tag:
                       type: string
-                  required:
-                  - pullPolicy
-                  - repository
-                  - tag
                   type: object
                 volumeMountChmod:
                   type: boolean

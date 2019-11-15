@@ -171,7 +171,7 @@ spec:
   fluentd: 
     image:
       repository: banzaicloud/fluentd
-      tag: v1.7.4-alpine-5
+      tag: v1.7.4-alpine-6
       pullPolicy: IfNotPresent
   fluentbit: {}
   controlNamespace: logging
