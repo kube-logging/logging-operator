@@ -394,13 +394,6 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.ContainerTail.DeepCopyInto(&out.ContainerTail)
-	if in.Tailers != nil {
-		in, out := &in.Tailers, &out.Tailers
-		*out = make([]InputTail, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	out.FilterKubernetes = in.FilterKubernetes
 	out.BufferStorage = in.BufferStorage
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)

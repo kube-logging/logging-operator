@@ -16,9 +16,7 @@ package v1beta1
 
 import (
 	"fmt"
-	"strings"
 
-	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -280,24 +278,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
 			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
-		}
-		if len(copy.Spec.FluentbitSpec.Tailers) > 0 {
-			for i, tailer := range copy.Spec.FluentbitSpec.Tailers {
-				if !strings.HasPrefix(tailer.Path, "/var/log/") {
-					return nil, errors.New("Tailers outside of /var/log are currently not supported")
-				}
-				if tailer.DB != nil {
-					if !strings.HasPrefix(*tailer.DB, "/tail-db/") {
-						return nil, errors.New("Tailers with position db outside of /tail-db not supported")
-					}
-				} else {
-					h, err := util.Hash32(tailer.Path)
-					if err != nil {
-						return nil, errors.WrapIff(err, "Failed to calculate hash for tailer with path %s", tailer.Path)
-					}
-					copy.Spec.FluentbitSpec.Tailers[i].DB = util.StringPointer(fmt.Sprintf("/tail-db/%s.db", h))
-				}
-			}
 		}
 	}
 	return copy, nil

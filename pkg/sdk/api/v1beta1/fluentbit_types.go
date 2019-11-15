@@ -39,7 +39,6 @@ type FluentbitSpec struct {
 	MountPath           string                      `json:"mountPath,omitempty"`
 	InputTail           *InputTail                  `json:"inputTail,omitempty"` // deprecated, use Tailers instead
 	ContainerTail       InputTail                   `json:"containerTail,omitempty"`
-	Tailers             []InputTail                 `json:"tailers,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
 	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`

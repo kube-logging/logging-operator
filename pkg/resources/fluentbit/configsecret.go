@@ -43,7 +43,6 @@ type fluentBitConfig struct {
 	TargetHost    string
 	TargetPort    int32
 	Input         map[string]string
-	Tailers       []map[string]string
 	Filter        map[string]string
 	BufferStorage map[string]string
 }
@@ -83,19 +82,6 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
 
-	fluentbitTailers := make([]map[string]string, 0)
-	if len(r.Logging.Spec.FluentbitSpec.Tailers) > 0 {
-		for i, tailer := range r.Logging.Spec.FluentbitSpec.Tailers {
-			mappedTailer, err := mapper.StringsMap(tailer)
-			if err != nil {
-				return nil, k8sutil.StatePresent,
-					errors.WrapIff(err, "failed to map custom tailer config with index %d for fluentbit", i)
-			} else {
-				fluentbitTailers = append(fluentbitTailers, mappedTailer)
-			}
-		}
-	}
-
 	fluentbitFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
@@ -119,7 +105,6 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 		TargetHost:    fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
 		TargetPort:    r.Logging.Spec.FluentdSpec.Port,
 		Input:         fluentbitInput,
-		Tailers:       fluentbitTailers,
 		Filter:        fluentbitFilter,
 		BufferStorage: fluentbitBufferStorage,
 	}
