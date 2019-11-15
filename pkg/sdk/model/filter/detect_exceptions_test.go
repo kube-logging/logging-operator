@@ -17,32 +17,28 @@ package filter_test
 import (
 	"testing"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
 )
 
 func TestDetectExceptions(t *testing.T) {
 	CONFIG := []byte(`
-remove_tag_prefix: foo
 multiline_flush_interval: 0.1
 languages: 
   - java
   - python
-buffer:
-  timekey: 1m
-  timekey_wait: 30s
-  timekey_use_utc: true
 `)
 	expected := `
-<match **>
+<match kubernetes.**>
   @type detect_exceptions
   @id test_detect_exceptions
   languages ["java","python"]
   multiline_flush_interval 0.1
-  remove_tag_prefix foo
+  remove_tag_prefix kubernetes
 </match>
 `
-	ed := &ExceptionDetectorOutputConfig{}
+	ed := &filter.DetectExceptions{}
 	yaml.Unmarshal(CONFIG, ed)
 	test := render.NewOutputPluginTest(t, ed)
 	test.DiffResult(expected)
