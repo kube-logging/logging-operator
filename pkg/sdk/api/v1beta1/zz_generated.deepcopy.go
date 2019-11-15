@@ -827,7 +827,7 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	}
 	if in.ExceptionDetectorOutputConfig != nil {
 		in, out := &in.ExceptionDetectorOutputConfig, &out.ExceptionDetectorOutputConfig
-		*out = new(output.ExceptionDetectorOutputConfig)
+		*out = new(filter.ExceptionDetectorOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
 }

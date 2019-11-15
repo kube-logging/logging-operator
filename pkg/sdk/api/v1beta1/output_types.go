@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -35,7 +36,7 @@ type OutputSpec struct {
 	KafkaOutputConfig             *output.KafkaOutputConfig             `json:"kafka,omitempty"`
 	CloudWatchOutput              *output.CloudWatchOutput              `json:"cloudwatch,omitempty"`
 	KinesisStreamOutputConfig     *output.KinesisStreamOutputConfig     `json:"kinesisStream,omitempty"`
-	ExceptionDetectorOutputConfig *output.ExceptionDetectorOutputConfig `json:"exceptionDetector,omitempty"`
+	ExceptionDetectorOutputConfig *filter.ExceptionDetectorOutputConfig `json:"exceptionDetector,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

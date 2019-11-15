@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package output_test
+package filter_test
 
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
 )
@@ -43,7 +42,7 @@ buffer:
   remove_tag_prefix foo
 </match>
 `
-	ed := &output.ExceptionDetectorOutputConfig{}
+	ed := &ExceptionDetectorOutputConfig{}
 	yaml.Unmarshal(CONFIG, ed)
 	test := render.NewOutputPluginTest(t, ed)
 	test.DiffResult(expected)
