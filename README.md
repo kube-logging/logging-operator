@@ -119,9 +119,9 @@ For complete list of supported plugins please check the [plugins index](/docs/pl
 | [Sumologic](./docs/plugins/outputs/sumologic.md)          | Output | Send your logs to Sumologic                            |    GA   | [1.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1)       |
 | [CloudWatch](./docs/plugins/outputs/cloudwatch.md)        | Output | Send your logs to AWS CloudWatch                       |    GA   | [0.7.4](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.4) |
 | [Kafka](./docs/plugins/outputs/kafka.md)                  | Output | Send your logs to Kafka                                |    GA   | [0.12.1](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1)            |
-| [Exception Detector](./docs/plugins/outputs/detect_exceptions.md)| Output | Exception detector plugin for fluentd           |    GA   | [0.0.13](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions/releases/tag/0.0.13) |
-| [Tag Normaliser](./docs/plugins/filters/tagnormaliser.md) | Parser | Normalise tags for outputs                             |    GA   |                                                                                         |
-| [Parser](./docs/plugins/filters/parser.md)                | Parser | Parse logs with parser plugin                          |    GA   |                                                                                         |
+| [Exception Detector](./docs/plugins/outputs/detect_exceptions.md)| Filter | Exception detector plugin for fluentd           |    GA   | [0.0.13](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions/releases/tag/0.0.13) |
+| [Tag Normaliser](./docs/plugins/filters/tagnormaliser.md) | Filter | Normalise tags for outputs                             |    GA   |                                                                                         |
+| [Parser](./docs/plugins/filters/parser.md)                | Filter | Parse logs with parser plugin                          |    GA   |                                                                                         |
 
 ---
 
