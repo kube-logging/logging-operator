@@ -23,6 +23,9 @@ spec:
   {{- if .Values.fluentd.tolerations }}
   tolerations: {{ toYaml .Values.fluentd.tolerations | nindent 4 }}
   {{- end }}
+  {{- if .Values.fluentd.deploymentStrategy }}
+  deploymentStrategy: {{ .Values.fluentd.deploymentStrategy }}
+  {{- end }}
   tls:
     enabled: {{ .Values.tls.enabled }}
 {{- if $fluentdUseGenericSecret }}

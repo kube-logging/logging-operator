@@ -49,5 +49,6 @@ This chart applies Fluentd and Fluent-bit custom resources to [Logging Operator]
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                        | `21Gi`                         |
 | `fluentd.resources`                                 | Fluentd container resource requests and limits         | `{}`                           |
 | `fluentd.tolerations`                               | Fluentd tolerations                                    | `nil`                          |
+| `fluentd.deploymentStrategy`                        | Fluentd deployment strategy                            | `Rolling Update`               |
 | `fluentd.tlsSecret`                                 | Secret name that contains Fluentd TLS client cert      | Ignored if `tls.secretName` is specified. Must refer to a secret of type `kubernetes.io/tls`. |
 | `psp.enabled`                                       | Install PodSecurityPolicy                              | `false`                        |
