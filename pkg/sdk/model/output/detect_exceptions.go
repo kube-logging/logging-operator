@@ -54,8 +54,6 @@ type ExceptionDetectorOutputConfig struct {
 	MaxBytes int `json:"max_bytes,omitempty"`
 	// Separate log streams by this field in the input JSON data. (default: "")
 	Stream string `json:"stream,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
-	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (d *ExceptionDetectorOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
@@ -69,12 +67,10 @@ func (d *ExceptionDetectorOutputConfig) ToDirective(secretLoader secret.SecretLo
 			Id:        pluginID,
 		},
 	}
-	if d.Buffer != nil {
-		if buffer, err := d.Buffer.ToDirective(secretLoader, pluginID); err != nil {
-			return nil, err
-		} else {
-			detector.SubDirectives = append(detector.SubDirectives, buffer)
-		}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(d); err != nil {
+		return nil, err
+	} else {
+		detector.Params = params
 	}
 	return detector, nil
 }

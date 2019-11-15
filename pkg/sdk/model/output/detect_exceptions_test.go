@@ -35,18 +35,13 @@ buffer:
   timekey_use_utc: true
 `)
 	expected := `
-  <match **>
-@type detect_exceptions
-@id test_detect_exceptions
-    <buffer tag,time>
-      @type file
-      path /buffers/test_detect_exceptions.*.buffer
-      retry_forever true
-      timekey 1m
-      timekey_use_utc true
-      timekey_wait 30s
-    </buffer>
-  </match>
+<match **>
+  @type detect_exceptions
+  @id test_detect_exceptions
+  languages ["java","python"]
+  multiline_flush_interval 0.1
+  remove_tag_prefix foo
+</match>
 `
 	ed := &output.ExceptionDetectorOutputConfig{}
 	yaml.Unmarshal(CONFIG, ed)

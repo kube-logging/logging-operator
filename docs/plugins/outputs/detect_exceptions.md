@@ -27,4 +27,3 @@ More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-excepti
 | max_lines | int | No |  1000 | Maximum number of lines to flush (0 means no limit) <br> |
 | max_bytes | int | No |  0 | Maximum number of bytes to flush (0 means no limit) <br> |
 | stream | string | No |  "" | Separate log streams by this field in the input JSON data. <br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
