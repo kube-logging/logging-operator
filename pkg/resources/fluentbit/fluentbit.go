@@ -37,13 +37,13 @@ const (
 	fluentbitServiceName           = "fluentbit"
 )
 
-func generataLoggingRefLabels(loggingRef string) map[string]string {
+func generateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentbit"}, generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
 func (r *Reconciler) getServiceAccount() string {

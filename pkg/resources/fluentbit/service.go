@@ -65,7 +65,8 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 					Path: r.Logging.Spec.FluentbitSpec.Metrics.Path,
 				}},
 				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
+					MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
