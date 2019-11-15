@@ -32,7 +32,7 @@ const (
 	BufferStorageVolume = "buffers"
 )
 
-func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 	var containerPorts []corev1.ContainerPort
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
@@ -91,7 +91,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 				},
 			},
 		},
-	}, k8sutil.StatePresent
+	}, k8sutil.StatePresent, nil
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {

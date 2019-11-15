@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error) {
 	spec := *r.statefulsetSpec()
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
@@ -47,7 +47,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState) {
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(StatefulSetName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Spec: spec,
-	}, k8sutil.StatePresent
+	}, k8sutil.StatePresent, nil
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {

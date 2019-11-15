@@ -1580,6 +1580,8 @@ spec:
                     tag:
                       type: string
                   type: object
+                logLevel:
+                  type: string
                 metrics:
                   description: Metrics defines the service monitor endpoints
                   properties:

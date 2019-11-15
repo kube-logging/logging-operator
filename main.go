@@ -19,12 +19,12 @@ import (
 	"os"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	"github.com/prometheus/common/log"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -74,25 +74,15 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
-	runtime := "cri"
-	nodeList, err := client.CoreV1().Nodes().List(metav1.ListOptions{Limit: 1})
-	if err != nil {
-		log.Errorf("node get failed: %s", err.Error())
+
+	if err := detectContainerRuntime(); err != nil {
+		setupLog.Error(err, "failed to detect container runtime")
+		os.Exit(1)
 	}
-	if nodeList != nil && len(nodeList.Items) > 0 {
-		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
-		runtime = strings.Split(runtimeWithVersion, "://")[0]
-		log.Infof("Detected cri: %s", runtime)
-	} else {
-		log.Warnf("Unable to detect cri using default: %s", runtime)
-	}
-	types.ContainerRuntime = runtime
 
 	loggingReconciler := &controllers.LoggingReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Logging"),
-		CRI:    runtime,
 	}
 
 	if err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
@@ -106,4 +96,22 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func detectContainerRuntime() error {
+	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
+	runtime := "cri"
+	nodeList, err := client.CoreV1().Nodes().List(metav1.ListOptions{Limit: 1})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	if nodeList != nil && len(nodeList.Items) > 0 {
+		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
+		runtime = strings.Split(runtimeWithVersion, "://")[0]
+		setupLog.Info("Detected cri", "cri", runtime)
+	} else {
+		setupLog.Info("Unable to detect cri, falling back to default", "cri", runtime)
+	}
+	types.ContainerRuntime = runtime
+	return nil
 }

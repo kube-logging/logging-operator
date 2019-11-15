@@ -22,7 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
@@ -34,7 +34,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
 					Verbs:     []string{"get", "list", "watch"},
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
@@ -42,10 +42,10 @@ func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState) {
 			r.Logging.Labels,
 			r.Logging,
 		),
-		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent
+		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: templates.FluentbitObjectMetaClusterScope(
@@ -62,7 +62,7 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState)
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: templates.FluentbitObjectMetaClusterScope(
@@ -70,10 +70,10 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState)
 			r.Logging.Labels,
 			r.Logging,
 		),
-		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent
+		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
 }
 
-func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
 			ObjectMeta: templates.FluentbitObjectMeta(
@@ -81,7 +81,7 @@ func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 				r.Logging.Labels,
 				r.Logging,
 			),
-		}, k8sutil.StatePresent
+		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
 		ObjectMeta: templates.FluentbitObjectMeta(
@@ -89,5 +89,5 @@ func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState) {
 			r.Logging.Labels,
 			r.Logging,
 		),
-	}, k8sutil.StateAbsent
+	}, k8sutil.StateAbsent, nil
 }

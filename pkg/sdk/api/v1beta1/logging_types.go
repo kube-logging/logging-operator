@@ -65,7 +65,7 @@ type LoggingList struct {
 }
 
 // SetDefaults fill empty attributes
-func (l *Logging) SetDefaults() *Logging {
+func (l *Logging) SetDefaults() (*Logging, error) {
 	copy := l.DeepCopy()
 	if !copy.Spec.FlowConfigCheckDisabled && copy.Status.ConfigCheckResults == nil {
 		copy.Status.ConfigCheckResults = make(map[string]bool)
@@ -214,13 +214,30 @@ func (l *Logging) SetDefaults() *Logging {
 				copy.Spec.FluentbitSpec.InputTail.Parser = copy.Spec.FluentbitSpec.Parser
 			}
 		}
+		if copy.Spec.FluentbitSpec.InputTail.Path == "" {
+			copy.Spec.FluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
+		}
+		if copy.Spec.FluentbitSpec.InputTail.RefreshInterval == "" {
+			copy.Spec.FluentbitSpec.InputTail.RefreshInterval = "5"
+		}
+		if copy.Spec.FluentbitSpec.InputTail.SkipLongLines == "" {
+			copy.Spec.FluentbitSpec.InputTail.SkipLongLines = "On"
+		}
+		if copy.Spec.FluentbitSpec.InputTail.DB == nil {
+			copy.Spec.FluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
+		}
+		if copy.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
+			copy.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
+		}
+		if copy.Spec.FluentbitSpec.InputTail.Tag == "" {
+			copy.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
+		}
 		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
 			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()
 		}
 		if copy.Spec.FluentbitSpec.Annotations == nil {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
 		}
-
 		if copy.Spec.FluentbitSpec.Security == nil {
 			copy.Spec.FluentbitSpec.Security = &Security{}
 		}
@@ -259,7 +276,7 @@ func (l *Logging) SetDefaults() *Logging {
 			copy.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
 		}
 	}
-	return copy
+	return copy, nil
 }
 
 // QualifiedName is the "logging-resource" name combined
