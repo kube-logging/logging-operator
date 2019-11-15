@@ -4,7 +4,5 @@ metadata:
   name: defaultlogging
 spec:
   fluentd: {}
-  fluentbit:
-    tailers:
-      - Path: /var/log/asd
+  fluentbit: {}
   controlNamespace: default

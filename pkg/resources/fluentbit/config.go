@@ -39,17 +39,6 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 
-{{- range $i, $tailer := .Tailers }}
-
-[INPUT]
-    Name   tail
-    {{- range $key, $value := $tailer }}
-    {{- if $value }}
-    {{ $key }}   {{$value}}
-    {{- end }}
-    {{- end }}
-{{- end }}
-
 [FILTER]
     Name   kubernetes
     {{- range $key, $value := .Filter }}

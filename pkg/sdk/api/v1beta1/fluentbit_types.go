@@ -37,7 +37,7 @@ type FluentbitSpec struct {
 	PositionDBLegacy    *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
 	PositionDB          KubernetesStorage           `json:"positiondb,omitempty"`
 	MountPath           string                      `json:"mountPath,omitempty"`
-	InputTail           *InputTail                  `json:"inputTail,omitempty"` // deprecated, use Tailers instead
+	InputTail           *InputTail                  `json:"inputTail,omitempty"` // deprecated, use ContainerTail instead
 	ContainerTail       InputTail                   `json:"containerTail,omitempty"`
 	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
