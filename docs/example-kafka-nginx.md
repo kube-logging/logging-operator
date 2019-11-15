@@ -13,7 +13,7 @@
     - [Deploy with Helm](#install-with-helm)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
   - **Demo Application**  
-    - [Deploy with Helm](#nginx-app-and-logging-definition)
+    - [Deploy with Helm](#demo-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
     - [Kafkacat](#test-your-deployment-with-kafkacat)
@@ -37,9 +37,10 @@ helm repo update
 #### Logging Operator
 > [How to install Logging-operator with helm](./deploy/README.md#deploy-logging-operator-with-helm)
 
-#### Nginx App and Logging Definition
+#### Demo App and Logging Definition
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-kafka-demo
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
+ --set "kafka.enabled=True" 
 ```
 
 ---
@@ -56,7 +57,7 @@ kubectl create ns logging
 
 #### Create `logging` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -73,7 +74,7 @@ EOF
 
 #### Create an Kafka `output` definition 
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -95,7 +96,7 @@ EOF
 
 #### Create `flow` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -115,7 +116,7 @@ EOF
 ```
 #### Install demo application 
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: apps/v1 
 kind: Deployment
 metadata:

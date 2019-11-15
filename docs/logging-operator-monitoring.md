@@ -74,9 +74,10 @@ helm install --namespace logging --name logging banzaicloud-stable/logging-opera
 ```
 > You also can install logging-operator from manifest [guideline is here](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 
-### Deploy demo Nginx App + Logging Definition with metrics
+### Deploy Demo App + Logging Definition with metrics
 ```bash
-helm install --namespace logging --name nginx-demo banzaicloud-stable/nginx-logging-demo \
+helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
+    --set "minio.enabled=True" \
     --set=loggingOperator.fluentd.metrics.serviceMonitor=True \
     --set=loggingOperator.fluentbit.metrics.serviceMonitor=True
 ```
@@ -91,7 +92,7 @@ kubectl -n logging create secret generic logging-s3 --from-literal=accesskey='AK
 ```
 #### Deploy Minio
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -155,7 +156,7 @@ EOF
 
 #### Create `logging` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -174,7 +175,7 @@ EOF
 
 #### Create Minio output definition 
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -206,7 +207,7 @@ EOF
 
 #### Create `flow` resource
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -229,7 +230,7 @@ EOF
 
 #### Install nginx demo deployment
 ```bash
-cat <<EOF | kubectl -n logging apply -f -
+kubectl -n logging apply -f - <<"EOF" 
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -237,13 +238,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: nginx-demo
+      app.kubernetes.io/instance: logging-demo
       app.kubernetes.io/name: nginx-logging-demo 
   replicas: 1
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: nginx-demo
+        app.kubernetes.io/instance: logging-demo
         app.kubernetes.io/name: nginx-logging-demo 
     spec:
       containers:
@@ -283,7 +284,7 @@ kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base
 ```
 #### Forward Service
 ```bash
-kubectl -n logging port-forward svc/nginx-demo-minio 9000
+kubectl -n logging port-forward svc/logging-demo-minio 9000
 ```
 [Minio Dashboard: http://localhost:9000](http://localhost:9000)
 <p align="center"><img src="./img/servicemonitor_minio.png" width="660"></p>

@@ -19,19 +19,52 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
-// +kubebuilder:object:generate=true
+// +docName:"File output plugin for Fluentd"
+//This plugin has been designed to output logs or metrics to File.
+//More info at https://docs.fluentd.org/output/file
+//
+// #### Example output configurations
+// ```
+// spec:
+//  file:
+//    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+//    buffer:
+//      timekey: 1m
+//      timekey_wait: 10s
+//      timekey_use_utc: true
+// ```
+type _docFile interface{}
 
+// +kubebuilder:object:generate=true
 type FileOutputConfig struct {
+	// The Path of the file. The actual path is path + time + ".log" by default.
 	Path string `json:"path"`
+	// +docLink:"Buffer,./buffer.md"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "file"
 	pluginID := id + "_" + pluginType
-	return types.NewFlatDirective(types.PluginMeta{
-		Type:      pluginType,
-		Directive: "match",
-		Tag:       "**",
-		Id:        pluginID,
-	}, c, secretLoader)
+	file := &types.OutputPlugin{
+		PluginMeta: types.PluginMeta{
+			Type:      pluginType,
+			Directive: "match",
+			Tag:       "**",
+			Id:        pluginID,
+		},
+	}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
+		return nil, err
+	} else {
+		file.Params = params
+	}
+	if c.Buffer != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+			return nil, err
+		} else {
+			file.SubDirectives = append(file.SubDirectives, buffer)
+		}
+	}
+	return file, nil
 }
