@@ -116,7 +116,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
-		Labels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generataLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+		Labels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 	}
 	if r.Logging.Spec.FluentdSpec.Annotations != nil {
 		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations
@@ -124,7 +124,7 @@ func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	return meta
 }
 
-func generataLoggingRefLabels(loggingRef string) map[string]string {
+func generateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
