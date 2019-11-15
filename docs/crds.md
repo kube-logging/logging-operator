@@ -127,8 +127,7 @@ spec:
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | position_db | | | Deprecated, use positiondb instead |
 | positiondb |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
-| inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | Deprecated, use `containerTail` instead. |
-| containerTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | Preconfigured tailer for container logs on the host. Container runtime (containerd vs. docker) is automatically detected for convenience. |
+| inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | Preconfigured tailer for container logs on the host. Container runtime (containerd vs. docker) is automatically detected for convenience. |
 | tailers | [][InputTail](./fluentbit.md#tail-inputtail)  | nil | Custom tailers that can be used to collect additional log files from `/var/log` on the host. Position DB is preconfigured on the `/tail-db/` volume. |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |

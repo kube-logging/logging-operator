@@ -388,12 +388,7 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.PositionDB.DeepCopyInto(&out.PositionDB)
-	if in.InputTail != nil {
-		in, out := &in.InputTail, &out.InputTail
-		*out = new(InputTail)
-		(*in).DeepCopyInto(*out)
-	}
-	in.ContainerTail.DeepCopyInto(&out.ContainerTail)
+	in.InputTail.DeepCopyInto(&out.InputTail)
 	out.FilterKubernetes = in.FilterKubernetes
 	out.BufferStorage = in.BufferStorage
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)

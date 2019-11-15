@@ -209,32 +209,28 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			}
 		}
 		// For backward compatibility
-		if copy.Spec.FluentbitSpec.InputTail != nil {
-			copy.Spec.FluentbitSpec.ContainerTail = *copy.Spec.FluentbitSpec.InputTail.DeepCopy()
-		}
-		// For backward compatibility
 		if copy.Spec.FluentbitSpec.Parser != "" {
-			if copy.Spec.FluentbitSpec.ContainerTail.Parser == "" {
-				copy.Spec.FluentbitSpec.ContainerTail.Parser = copy.Spec.FluentbitSpec.Parser
+			if copy.Spec.FluentbitSpec.InputTail.Parser == "" {
+				copy.Spec.FluentbitSpec.InputTail.Parser = copy.Spec.FluentbitSpec.Parser
 			}
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.Path == "" {
-			copy.Spec.FluentbitSpec.ContainerTail.Path = "/var/log/containers/*.log"
+		if copy.Spec.FluentbitSpec.InputTail.Path == "" {
+			copy.Spec.FluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.RefreshInterval == "" {
-			copy.Spec.FluentbitSpec.ContainerTail.RefreshInterval = "5"
+		if copy.Spec.FluentbitSpec.InputTail.RefreshInterval == "" {
+			copy.Spec.FluentbitSpec.InputTail.RefreshInterval = "5"
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.SkipLongLines == "" {
-			copy.Spec.FluentbitSpec.ContainerTail.SkipLongLines = "On"
+		if copy.Spec.FluentbitSpec.InputTail.SkipLongLines == "" {
+			copy.Spec.FluentbitSpec.InputTail.SkipLongLines = "On"
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.DB == nil {
-			copy.Spec.FluentbitSpec.ContainerTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
+		if copy.Spec.FluentbitSpec.InputTail.DB == nil {
+			copy.Spec.FluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.MemBufLimit == "" {
-			copy.Spec.FluentbitSpec.ContainerTail.MemBufLimit = "5MB"
+		if copy.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
+			copy.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
 		}
-		if copy.Spec.FluentbitSpec.ContainerTail.Tag == "" {
-			copy.Spec.FluentbitSpec.ContainerTail.Tag = "kubernetes.*"
+		if copy.Spec.FluentbitSpec.InputTail.Tag == "" {
+			copy.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
 		}
 		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
 			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()

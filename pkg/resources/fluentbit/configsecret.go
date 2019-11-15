@@ -65,19 +65,19 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
 
-	if r.Logging.Spec.FluentbitSpec.ContainerTail.Parser == "" {
+	if r.Logging.Spec.FluentbitSpec.InputTail.Parser == "" {
 		switch types.ContainerRuntime {
 		case "docker":
-			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "docker"
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "docker"
 		case "containerd":
-			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "cri"
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
 		default:
-			r.Logging.Spec.FluentbitSpec.ContainerTail.Parser = "cri"
+			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
 		}
 	}
 
 	mapper := types.NewStructToStringMapper(nil)
-	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.ContainerTail)
+	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
 	if err != nil {
 		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
