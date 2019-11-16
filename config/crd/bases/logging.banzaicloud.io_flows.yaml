@@ -113,6 +113,39 @@ spec:
                         description: Separator (default:_)
                         type: string
                     type: object
+                  detectExceptions:
+                    properties:
+                      languages:
+                        description: 'Programming languages for which to detect exceptions.
+                          (default: [])'
+                        items:
+                          type: string
+                        type: array
+                      max_bytes:
+                        description: 'Maximum number of bytes to flush (0 means no
+                          limit) (default: 0)'
+                        type: integer
+                      max_lines:
+                        description: 'Maximum number of lines to flush (0 means no
+                          limit) (default: 1000)'
+                        type: integer
+                      message:
+                        description: 'The field which contains the raw message text
+                          in the input JSON data. (default: "")'
+                        type: string
+                      multiline_flush_interval:
+                        description: 'The interval of flushing the buffer for multiline
+                          format. (default: nil)'
+                        type: string
+                      remove_tag_prefix:
+                        description: 'The prefix to be removed from the input tag
+                          when outputting a record. (default: "")'
+                        type: string
+                      stream:
+                        description: 'Separate log streams by this field in the input
+                          JSON data. (default: "")'
+                        type: string
+                    type: object
                   geoip:
                     properties:
                       backend_library:
