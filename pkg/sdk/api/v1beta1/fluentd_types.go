@@ -40,6 +40,8 @@ type FluentdSpec struct {
 	Metrics             *Metrics                    `json:"metrics,omitempty"`
 	Security            *Security                   `json:"security,omitempty"`
 	Scaling             *FluentdScaling             `json:"scaling,omitempty"`
+	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
+	LogLevel string `json:"logLevel,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

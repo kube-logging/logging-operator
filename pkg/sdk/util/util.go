@@ -15,8 +15,11 @@
 package util
 
 import (
+	"fmt"
+	"hash/fnv"
 	"sort"
 
+	"emperror.dev/errors"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -46,6 +49,10 @@ func BoolPointer(b bool) *bool {
 	return &b
 }
 
+func StringPointer(s string) *string {
+	return &s
+}
+
 func OrderedStringMap(original map[string]string) *orderedmap.OrderedMap {
 	o := orderedmap.New()
 	for k, v := range original {
@@ -63,4 +70,13 @@ func Contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func Hash32(in string) (string, error) {
+	hasher := fnv.New32()
+	_, err := hasher.Write([]byte(in))
+	if err != nil {
+		return "", errors.WrapIf(err, "failed to calculate hash for the configmap data")
+	}
+	return fmt.Sprintf("%x", hasher.Sum32()), nil
 }

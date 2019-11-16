@@ -24,7 +24,9 @@ var fluentdInputTemplate = `
 # Enable RPC endpoint (this allows to trigger config reload without restart)
 <system>
   rpc_endpoint 127.0.0.1:24444
+  log_level {{ default .LogLevel "error" }}
 </system>
+
 # Prometheus monitoring
 {{ if .Monitor.Enabled }}
 <source>
@@ -39,10 +41,8 @@ var fluentdInputTemplate = `
     @type prometheus_output_monitor
 </source>
 {{ end }}
-
-# Prevent fluentd from handling records containing its own logs. Otherwise
-# it can lead to an infinite loop, when error in sending one message generates
-# another message which also fails to be sent and so on.
+`
+var fluentdOutputTemplate = `
 <label @ERROR>
 <match **>
     @type null
@@ -50,8 +50,6 @@ var fluentdInputTemplate = `
 </match>
 </label>
 
-`
-var fluentdOutputTemplate = `
 <match **>
     @type null
     @id main-no-output
