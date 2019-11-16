@@ -5,6 +5,7 @@
 
 - [concat](./filters/concat.md)
 - [dedot](./filters/dedot.md)
+- [detect_exceptions](./filters/detect_exceptions.md)
 - [geoip](./filters/geoip.md)
 - [parser](./filters/parser.md)
 - [record_transformer](./filters/record_transformer.md)
