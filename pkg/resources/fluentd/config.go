@@ -24,7 +24,7 @@ var fluentdInputTemplate = `
 # Enable RPC endpoint (this allows to trigger config reload without restart)
 <system>
   rpc_endpoint 127.0.0.1:24444
-  log_level {{ default .LogLevel "error" }}
+  log_level {{ .LogLevel }}
 </system>
 
 # Prometheus monitoring
