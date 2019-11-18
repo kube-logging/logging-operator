@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"html/template"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
@@ -35,18 +36,18 @@ type fluentdConfig struct {
 	}
 }
 
-func generateConfig(input fluentdConfig) string {
+func generateConfig(input fluentdConfig) (string, error) {
 	output := new(bytes.Buffer)
 	tmpl, err := template.New("test").Parse(fluentdInputTemplate)
 	if err != nil {
-		return ""
+		return "", errors.Wrap(err, "failed to parse template")
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
-		return ""
+		return "", errors.Wrap(err, "failed to execute template")
 	}
 	outputString := fmt.Sprint(output.String())
-	return outputString
+	return outputString, nil
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error) {
@@ -62,14 +63,23 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
 		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
 	}
-	input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
+	if r.Logging.Spec.FluentdSpec.LogLevel != "" {
+		input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
+	} else {
+		input.LogLevel = "error"
+	}
+
+	inputConfig, err := generateConfig(input)
+	if err != nil {
+		return nil, k8sutil.StatePresent, err
+	}
 
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(SecretConfigName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
 		Data: map[string][]byte{
 			"fluent.conf":  []byte(fluentdDefaultTemplate),
-			"input.conf":   []byte(generateConfig(input)),
+			"input.conf":   []byte(inputConfig),
 			"devnull.conf": []byte(fluentdOutputTemplate),
 		},
 	}, k8sutil.StatePresent, nil
