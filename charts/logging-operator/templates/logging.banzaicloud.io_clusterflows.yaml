@@ -55,7 +55,8 @@ spec:
                         description: If true, keep partial metadata
                         type: string
                       key:
-                        description: The key for part of multiline log.
+                        description: Specify field name in the record to parse. If
+                          you leave empty the Container Runtime default will be used.
                         type: string
                       multiline_end_regexp:
                         description: The regexp to match ending of multiline. This
@@ -94,8 +95,6 @@ spec:
                         description: Use partial metadata to concatenate multiple
                           records
                         type: string
-                    required:
-                    - key
                     type: object
                   dedot:
                     description: More info at https://github.com/lunardial/fluent-plugin-dedot_filter
@@ -107,6 +106,39 @@ spec:
                         type: boolean
                       de_dot_separator:
                         description: Separator (default:_)
+                        type: string
+                    type: object
+                  detectExceptions:
+                    properties:
+                      languages:
+                        description: 'Programming languages for which to detect exceptions.
+                          (default: [])'
+                        items:
+                          type: string
+                        type: array
+                      max_bytes:
+                        description: 'Maximum number of bytes to flush (0 means no
+                          limit) (default: 0)'
+                        type: integer
+                      max_lines:
+                        description: 'Maximum number of lines to flush (0 means no
+                          limit) (default: 1000)'
+                        type: integer
+                      message:
+                        description: 'The field which contains the raw message text
+                          in the input JSON data. (default: "")'
+                        type: string
+                      multiline_flush_interval:
+                        description: 'The interval of flushing the buffer for multiline
+                          format. (default: nil)'
+                        type: string
+                      remove_tag_prefix:
+                        description: 'The prefix to be removed from the input tag
+                          when outputting a record. (default: "")'
+                        type: string
+                      stream:
+                        description: 'Separate log streams by this field in the input
+                          JSON data. (default: "")'
                         type: string
                     type: object
                   geoip:
@@ -155,7 +187,8 @@ spec:
                         description: Store parsed values with specified key name prefix.
                         type: string
                       key_name:
-                        description: Specify field name in the record to parse.
+                        description: Specify field name in the record to parse. If
+                          you leave empty the Container Runtime default will be used.
                         type: string
                       parsers:
                         items:
@@ -201,7 +234,7 @@ spec:
                               type: string
                             type:
                               description: 'Parse type: apache2, apache_error, nginx,
-                                syslog, csv, tsv, ltsv, json, multiline, none'
+                                syslog, csv, tsv, ltsv, json, multiline, none, logfmt'
                               type: string
                             types:
                               description: 'Types casting the fields to proper types
@@ -227,8 +260,6 @@ spec:
                       reserve_time:
                         description: Keep original event time in parsed result.
                         type: boolean
-                    required:
-                    - key_name
                     type: object
                   record_transformer:
                     properties:
