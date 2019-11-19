@@ -148,7 +148,7 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, flowCr.Name, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
+		filter, err := plugins.CreateFilter(f, flowCr.Name, i, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.Errorf("failed to create filter with index %d for flow %s", i, flowCr.Name))
 			continue
@@ -158,13 +158,4 @@ FindOutputForAllRefs:
 	flow.WithFilters(filters...)
 
 	return flow, multierr
-}
-
-func isEnabled(namespace string, output v1beta1.ClusterOutputSpec) bool {
-	for _, enabledNs := range output.EnabledNamespaces {
-		if enabledNs == namespace {
-			return true
-		}
-	}
-	return false
 }

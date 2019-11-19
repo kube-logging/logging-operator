@@ -15,6 +15,7 @@
 package filter
 
 import (
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
@@ -40,7 +41,9 @@ type ParserConfig struct {
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
 	// +docLink:"Parse Section,#Parse-Section"
-	Parsers []ParseSection `json:"parsers,omitempty"`
+	Parsers []ParseSection `json:"parsers,omitempty"` //deprecated, use Parse instead
+	// +docLink:"Parse Section,#Parse-Section"
+	Parse ParseSection `json:"parse,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -83,10 +86,6 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 	return types.NewFlatDirective(parseMeta, p, secretLoader)
 }
 
-func NewParserConfig() *ParserConfig {
-	return &ParserConfig{}
-}
-
 func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "parser"
 	parser := &types.GenericDirective{
@@ -106,14 +105,19 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 	} else {
 		parser.Params = params
 	}
-	if len(parserConfig.Parsers) > 0 {
-		for _, parseRule := range parserConfig.Parsers {
-			if meta, err := parseRule.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				parser.SubDirectives = append(parser.SubDirectives, meta)
-			}
-		}
+
+	if len(parserConfig.Parsers) > 1 {
+		return nil, errors.Errorf("only one parser can be configured at once")
+	}
+	// for backward compatibility
+	if len(parserConfig.Parsers) == 1 {
+		parserConfig.Parse = parserConfig.Parsers[0]
+	}
+
+	if meta, err := parserConfig.Parse.ToDirective(secretLoader, ""); err != nil {
+		return nil, err
+	} else {
+		parser.SubDirectives = append(parser.SubDirectives, meta)
 	}
 	return parser, nil
 }
