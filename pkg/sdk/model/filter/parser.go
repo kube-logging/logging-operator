@@ -40,7 +40,7 @@ type ParserConfig struct {
 	HashValueField string `json:"hash_value_field,omitempty"`
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
-	// +docLink:"Parse Section,#Parse-Section"
+	// Deprecated, use parse
 	Parsers []ParseSection `json:"parsers,omitempty"` //deprecated, use Parse instead
 	// +docLink:"Parse Section,#Parse-Section"
 	Parse ParseSection `json:"parse,omitempty"`
