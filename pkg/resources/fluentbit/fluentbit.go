@@ -42,7 +42,7 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Labels, map[string]string{
+	return util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 

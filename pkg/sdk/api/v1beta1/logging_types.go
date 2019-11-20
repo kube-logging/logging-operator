@@ -284,11 +284,6 @@ func (l *Logging) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", l.Name, name)
 }
 
-// QualifiedNamespacedName is the "namespace-logging-resource" name combined
-func (l *Logging) QualifiedNamespacedName(name string) string {
-	return fmt.Sprintf("%s-%s-%s", l.Spec.ControlNamespace, l.Name, name)
-}
-
 func init() {
 	SchemeBuilder.Register(&Logging{}, &LoggingList{})
 }

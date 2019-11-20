@@ -16,7 +16,6 @@ package fluentd
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -25,7 +24,7 @@ import (
 func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleName), r.Logging.Labels, r.Logging),
+			ObjectMeta: r.FluentdObjectMeta(roleName),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{""},
@@ -36,17 +35,14 @@ func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState, error) {
 		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.Role{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(roleName),
-			r.Logging.Labels, r.Logging,
-		),
-		Rules: []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
+		ObjectMeta: r.FluentdObjectMeta(roleName),
+		Rules:      []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
 }
 
 func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(roleBindingName), r.Logging.Labels, r.Logging),
+			ObjectMeta: r.FluentdObjectMeta(roleBindingName),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "Role",
 				APIGroup: "rbac.authorization.k8s.io",
@@ -62,28 +58,17 @@ func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState, error)
 		}, k8sutil.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(roleBindingName),
-			r.Logging.Labels, r.Logging,
-		),
-		RoleRef: rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
+		ObjectMeta: r.FluentdObjectMeta(roleBindingName),
+		RoleRef:    rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
-			ObjectMeta: templates.FluentdObjectMeta(
-				r.Logging.QualifiedName(defaultServiceAccountName),
-				r.Logging.Labels,
-				r.Logging,
-			),
+			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
 		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(defaultServiceAccountName),
-			r.Logging.Labels,
-			r.Logging,
-		),
+		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
 	}, k8sutil.StateAbsent, nil
 }

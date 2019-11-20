@@ -511,6 +511,10 @@ spec:
                         be memory or filesystem. (default:memory)
                       type: string
                   type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  type: object
                 metrics:
                   description: Metrics defines the service monitor endpoints
                   properties:
@@ -1579,6 +1583,10 @@ spec:
                       type: string
                     tag:
                       type: string
+                  type: object
+                labels:
+                  additionalProperties:
+                    type: string
                   type: object
                 logLevel:
                   type: string
