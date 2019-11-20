@@ -367,6 +367,13 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 			(*out)[key] = val
 		}
 	}
+	if in.Labels != nil {
+		in, out := &in.Labels, &out.Labels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	out.Image = in.Image
 	out.TLS = in.TLS
 	in.Resources.DeepCopyInto(&out.Resources)
@@ -444,6 +451,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	*out = *in
 	if in.Annotations != nil {
 		in, out := &in.Annotations, &out.Annotations
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.Labels != nil {
+		in, out := &in.Labels, &out.Labels
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val

@@ -16,7 +16,6 @@ package fluentbit
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -28,8 +27,7 @@ import (
 func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: templates.FluentbitObjectMeta(
-				r.Logging.QualifiedName(fluentbitServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
+			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -46,16 +44,14 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, err
 		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: templates.FluentbitObjectMeta(
-			r.Logging.QualifiedName(fluentbitServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
-		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
+		Spec:       corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &v1.ServiceMonitor{
-			ObjectMeta: templates.FluentbitObjectMeta(
-				r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
+			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -65,7 +61,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 					Path: r.Logging.Spec.FluentbitSpec.Metrics.Path,
 				}},
 				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+					MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
 				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
@@ -73,8 +69,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 		}, k8sutil.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: templates.FluentbitObjectMeta(
-			r.Logging.QualifiedName(fluentbitServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels()), r.Logging),
-		Spec: v1.ServiceMonitorSpec{},
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
+		Spec:       v1.ServiceMonitorSpec{},
 	}, k8sutil.StateAbsent, nil
 }

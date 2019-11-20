@@ -78,6 +78,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | Name                    | Type           | Default | Description                                                             |
 |-------------------------|----------------|---------|-------------------------------------------------------------------------|
 | annotations | map[string]string | {} | Extra annotations to Kubernetes resource|
+| labels | map[string]string | {} | Extra labels for fluentd and it's related resources |
 | tls | [TLS](#TLS-Spec) | {} | Configure TLS settings|
 | image | [ImageSpec](#Image-Spec) | {} | Fluentd image override |
 | fluentdPvcSpec | [PersistentVolumeClaimSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimspec-v1-core) | {} | FLuentd PVC spec to mount persistent volume for Buffer |
@@ -116,6 +117,7 @@ spec:
 | Name                    | Type           | Default | Description                                                             |
 |-------------------------|----------------|---------|-------------------------------------------------------------------------|
 | annotations | map[string]string | {} | Extra annotations to Kubernetes resource|
+| labels | map[string]string | {} | Extra labels for fluent-bit and it's related resources |
 | tls | [TLS](#TLS-Spec) | {} | Configure TLS settings|
 | image | [ImageSpec](#Image-Spec) | {} | Fluentd image override |
 | resources | [ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#resourcerequirements-v1-core) | {} | Resource requirements and limits |

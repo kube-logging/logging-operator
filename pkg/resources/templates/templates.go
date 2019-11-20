@@ -15,8 +15,6 @@
 package templates
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,78 +24,4 @@ func Annotate(meta metav1.ObjectMeta, key, val string) metav1.ObjectMeta {
 	}
 	meta.Annotations[key] = val
 	return meta
-}
-
-// FluentbitObjectMeta creates an objectMeta for resource fluentbit
-func FluentbitObjectMeta(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
-	o := metav1.ObjectMeta{
-		Name:      name,
-		Namespace: logging.Spec.ControlNamespace,
-		Labels:    labels,
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: logging.APIVersion,
-				Kind:       logging.Kind,
-				Name:       logging.Name,
-				UID:        logging.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
-	}
-	return o
-}
-
-// FluentbitObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
-func FluentbitObjectMetaClusterScope(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
-	o := metav1.ObjectMeta{
-		Name:   name,
-		Labels: labels,
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: logging.APIVersion,
-				Kind:       logging.Kind,
-				Name:       logging.Name,
-				UID:        logging.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
-	}
-	return o
-}
-
-// FluentdObjectMeta creates an objectMeta for resource fluentd
-func FluentdObjectMeta(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
-	o := metav1.ObjectMeta{
-		Name:      name,
-		Namespace: logging.Spec.ControlNamespace,
-		Labels:    labels,
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: logging.APIVersion,
-				Kind:       logging.Kind,
-				Name:       logging.Name,
-				UID:        logging.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
-	}
-	return o
-}
-
-// FluentdObjectMetaClusterScope creates an objectMeta for resource fluentd
-func FluentdObjectMetaClusterScope(name string, labels map[string]string, logging *v1beta1.Logging) metav1.ObjectMeta {
-	o := metav1.ObjectMeta{
-		Name:   name,
-		Labels: labels,
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: logging.APIVersion,
-				Kind:       logging.Kind,
-				Name:       logging.Name,
-				UID:        logging.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
-	}
-	return o
 }

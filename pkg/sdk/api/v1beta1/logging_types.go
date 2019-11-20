@@ -142,7 +142,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
 				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
-					ClaimName: l.QualifiedName("fluentd-buffer"),
+					ClaimName: "fluentd-buffer",
 					ReadOnly:  false,
 				},
 			}
@@ -282,11 +282,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 // QualifiedName is the "logging-resource" name combined
 func (l *Logging) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", l.Name, name)
-}
-
-// QualifiedNamespacedName is the "namespace-logging-resource" name combined
-func (l *Logging) QualifiedNamespacedName(name string) string {
-	return fmt.Sprintf("%s-%s-%s", l.Spec.ControlNamespace, l.Name, name)
 }
 
 func init() {

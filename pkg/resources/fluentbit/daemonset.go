@@ -42,8 +42,8 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 		})
 	}
 
-	labels := util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())
-	meta := templates.FluentbitObjectMeta(r.Logging.QualifiedName(fluentbitDaemonSetName), labels, r.Logging)
+	labels := util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())
+	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
 	podMeta := metav1.ObjectMeta{
 		Labels:      labels,
 		Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
@@ -58,7 +58,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 	return &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentBitLabels())},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{

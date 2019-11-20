@@ -25,6 +25,7 @@ import (
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
 	Annotations         map[string]string           `json:"annotations,omitempty"`
+	Labels              map[string]string           `json:"labels,omitempty"`
 	Image               ImageSpec                   `json:"image,omitempty"`
 	TLS                 FluentbitTLS                `json:"tls,omitempty"`
 	TargetHost          string                      `json:"targetHost,omitempty"`

@@ -21,8 +21,6 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -75,8 +73,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 	}
 
 	return &corev1.Secret{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(SecretConfigName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
+		ObjectMeta: r.FluentdObjectMeta(SecretConfigName),
 		Data: map[string][]byte{
 			"fluent.conf":  []byte(fluentdDefaultTemplate),
 			"input.conf":   []byte(inputConfig),
