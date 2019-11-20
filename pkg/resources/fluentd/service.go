@@ -16,8 +16,6 @@ package fluentd
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,8 +25,7 @@ import (
 
 func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 	return &corev1.Service{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(ServiceName), r.getFluentdLabels(), r.Logging),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName),
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
@@ -37,7 +34,7 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+			Selector: r.getFluentdLabels(),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
 	}, k8sutil.StatePresent, nil
@@ -46,8 +43,7 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: templates.FluentdObjectMeta(
-				r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
+			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -57,22 +53,21 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, err
 						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Metrics.Port},
 					},
 				},
-				Selector:  util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+				Selector:  r.getFluentdLabels(),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
 		}, k8sutil.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(ServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
-		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
+		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-monitor"),
+		Spec:       corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &v1.ServiceMonitor{
-			ObjectMeta: templates.FluentdObjectMeta(r.Logging.QualifiedName(ServiceName+"-metrics"), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())), r.Logging),
+			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -83,16 +78,14 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 					Interval:      r.Logging.Spec.FluentdSpec.Metrics.Interval,
 					ScrapeTimeout: r.Logging.Spec.FluentdSpec.Metrics.Timeout,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))},
+				Selector:          v12.LabelSelector{MatchLabels: r.getFluentdLabels()},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
 		}, k8sutil.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(ServiceName+"-metrics"),
-			util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
-		Spec: v1.ServiceMonitorSpec{},
+		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
+		Spec:       v1.ServiceMonitorSpec{},
 	}, k8sutil.StateAbsent, nil
 }

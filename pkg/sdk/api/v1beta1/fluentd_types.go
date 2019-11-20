@@ -23,6 +23,7 @@ import (
 // FluentdSpec defines the desired state of Fluentd
 type FluentdSpec struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
+	Labels      map[string]string `json:"labels,omitempty"`
 	TLS         FluentdTLS        `json:"tls,omitempty"`
 	Image       ImageSpec         `json:"image,omitempty"`
 	// Deprecated, use BufferStorageVolume to configure PVC explicitly

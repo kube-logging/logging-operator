@@ -16,7 +16,6 @@ package fluentd
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	"github.com/spf13/cast"
@@ -31,12 +30,8 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error)
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
 			{
-				ObjectMeta: templates.FluentdObjectMeta(
-					r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName,
-					util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()),
-					r.Logging,
-				),
-				Spec: r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec,
+				ObjectMeta: r.FluentdObjectMeta(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName),
+				Spec:       r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec,
 				Status: corev1.PersistentVolumeClaimStatus{
 					Phase: corev1.ClaimPending,
 				},
@@ -44,9 +39,8 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error)
 		}
 	}
 	return &appsv1.StatefulSet{
-		ObjectMeta: templates.FluentdObjectMeta(
-			r.Logging.QualifiedName(StatefulSetName), util.MergeLabels(r.Logging.Labels, r.getFluentdLabels()), r.Logging),
-		Spec: spec,
+		ObjectMeta: r.FluentdObjectMeta(StatefulSetName),
+		Spec:       spec,
 	}, k8sutil.StatePresent, nil
 }
 
@@ -116,7 +110,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
-		Labels: util.MergeLabels(r.Logging.Labels, r.getFluentdLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+		Labels: r.getFluentdLabels(),
 	}
 	if r.Logging.Spec.FluentdSpec.Annotations != nil {
 		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations

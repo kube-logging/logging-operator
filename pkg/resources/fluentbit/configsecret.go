@@ -22,7 +22,6 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,8 +49,7 @@ type fluentBitConfig struct {
 func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
-			ObjectMeta: templates.FluentbitObjectMeta(
-				r.Logging.QualifiedName(fluentBitSecretConfigName), r.Logging.Labels, r.Logging),
+			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
 		}, k8sutil.StateAbsent, nil
 	}
 	monitor := struct {
@@ -121,8 +119,7 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 	}
 
 	return &corev1.Secret{
-		ObjectMeta: templates.FluentbitObjectMeta(
-			r.Logging.QualifiedName(fluentBitSecretConfigName), r.Logging.Labels, r.Logging),
+		ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
 		Data: map[string][]byte{
 			"fluent-bit.conf": []byte(r.desiredConfig),
 		},

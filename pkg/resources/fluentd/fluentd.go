@@ -54,7 +54,7 @@ type Reconciler struct {
 }
 
 func (r *Reconciler) getFluentdLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Labels, map[string]string{
+	return util.MergeLabels(r.Logging.Spec.FluentdSpec.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentd"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
