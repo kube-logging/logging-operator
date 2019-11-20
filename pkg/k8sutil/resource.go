@@ -16,38 +16,59 @@ package k8sutil
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"time"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/k8s-objectmatcher/patch"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/go-logr/logr"
 	"github.com/goph/emperror"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const (
-	StateAbsent  DesiredState = "Absent"
-	StatePresent DesiredState = "Present"
+	StateAbsent  StaticDesiredState = "Absent"
+	StatePresent StaticDesiredState = "Present"
 )
 
-type DesiredState string
+type DesiredState interface {
+	BeforeUpdate(object runtime.Object) error
+}
+
+type StaticDesiredState string
+
+func (s StaticDesiredState) BeforeUpdate(object runtime.Object) error {
+	return nil
+}
+
+type DesiredStateHook func(object runtime.Object) error
+
+func (d DesiredStateHook) BeforeUpdate(object runtime.Object) error {
+	return d(object)
+}
 
 // GenericResourceReconciler generic resource reconciler
 type GenericResourceReconciler struct {
-	Log    logr.Logger
-	Client runtimeClient.Client
+	Log     logr.Logger
+	Client  runtimeClient.Client
+	Logging *v1beta1.Logging
 }
 
 // NewReconciler returns GenericResourceReconciler
-func NewReconciler(client runtimeClient.Client, log logr.Logger) *GenericResourceReconciler {
+func NewReconciler(client runtimeClient.Client, log logr.Logger, logging *v1beta1.Logging) *GenericResourceReconciler {
 	return &GenericResourceReconciler{
-		Log:    log,
-		Client: client,
+		Log:     log,
+		Client:  client,
+		Logging: logging,
 	}
 }
 
@@ -58,29 +79,35 @@ func (r *GenericResourceReconciler) CreateResource(desired runtime.Object) error
 }
 
 // ReconcileResource reconciles various kubernetes types
-func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, desiredState DesiredState) error {
+func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, desiredState DesiredState) (*reconcile.Result, error) {
 	log := r.Log.WithValues("type", reflect.TypeOf(desired))
 
 	switch desiredState {
-	case StateAbsent:
-		_, err := r.delete(desired)
-		if err != nil {
-			return errors.Wrapf(err, "failed to delete resource %+v", desired)
-		}
-
-	case StatePresent:
+	default:
 		created, current, err := r.createIfNotExists(desired)
 		if err == nil && created {
-			return nil
+			return nil, nil
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to create resource %+v", desired)
+			return nil, errors.Wrapf(err, "failed to create resource %+v", desired)
+		}
+
+		// last chance to hook into the desired state armed with the knowledge of the current state
+		err = desiredState.BeforeUpdate(current)
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to get desired state dynamically")
 		}
 		key, err := runtimeClient.ObjectKeyFromObject(current)
 		if err != nil {
-			return errors.Wrapf(err, "meta accessor failed %+v", current)
+			return nil, errors.Wrapf(err, "meta accessor failed %+v", current)
 		}
 		if err == nil {
+			if metaObject, ok := current.(metav1.Object); ok {
+				if metaObject.GetDeletionTimestamp() != nil {
+					r.Log.Info(fmt.Sprintf("object %s is being deleted, backing off", metaObject.GetSelfLink()))
+					return &reconcile.Result{RequeueAfter: time.Second * 2}, nil
+				}
+			}
 			patchResult, err := patch.DefaultPatchMaker.Calculate(current, desired)
 			if err != nil {
 				log.Error(err, "could not match objects",
@@ -88,7 +115,7 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 			} else if patchResult.IsEmpty() {
 				log.V(1).Info("resource is in sync",
 					"kind", desired.GetObjectKind().GroupVersionKind(), "name", key.Name)
-				return nil
+				return nil, nil
 			} else {
 				log.V(1).Info("resource diffs",
 					"patch", string(patchResult.Patch),
@@ -105,25 +132,53 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 
 			currentResourceVersion, err := metaAccessor.ResourceVersion(current)
 			if err != nil {
-				return errors.Wrap(err, "failed to access resourceVersion from metadata")
+				return nil, errors.Wrap(err, "failed to access resourceVersion from metadata")
 			}
 			metaAccessor.SetResourceVersion(desired, currentResourceVersion)
 
 			var name string
 			if name, err = metaAccessor.Name(current); err != nil {
-				return errors.Wrap(err, "failed to access Name from metadata")
+				return nil, errors.Wrap(err, "failed to access Name from metadata")
 			}
 
 			log.V(1).Info("Updating resource",
 				"gvk", desired.GetObjectKind().GroupVersionKind(), "name", name)
 			if err := r.Client.Update(context.TODO(), desired); err != nil {
-				return emperror.WrapWith(err, "updating resource failed",
+				sErr, ok := err.(*apierrors.StatusError)
+				if ok && sErr.ErrStatus.Code == 422 && sErr.ErrStatus.Reason == metav1.StatusReasonInvalid {
+					if r.Logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange {
+						r.Log.Error(err, "failed to update resource, trying to recreate")
+						err := r.Client.Delete(context.TODO(), current,
+							// wait until all dependent resources gets cleared up
+							runtimeClient.PropagationPolicy(metav1.DeletePropagationForeground),
+						)
+						if err != nil {
+							return nil, errors.Wrapf(err, "failed to delete resource %+v", current)
+						}
+						return &reconcile.Result{
+							Requeue:      true,
+							RequeueAfter: time.Second * 10,
+						}, nil
+					} else {
+						return nil, errors.New(
+							"Object has to be recreated, but refusing to remove without explicitly being told so. " +
+								"Use logging.spec.enableRecreateWorkloadOnImmutableFieldChange to move on but make sure to understand the consequences. " +
+								"As of fluentd, to avoid data loss, make sure to use a persistent volume for buffers, which is the default, unless explicitly disabled or configured differently. " +
+								"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ")
+					}
+				}
+				return nil, emperror.WrapWith(err, "updating resource failed",
 					"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))
 			}
 			log.Info("resource updated", "resource", desired.GetObjectKind().GroupVersionKind())
 		}
+	case StateAbsent:
+		_, err := r.delete(desired)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to delete resource %+v", desired)
+		}
 	}
-	return nil
+	return nil, nil
 }
 
 func (r *GenericResourceReconciler) createIfNotExists(desired runtime.Object) (bool, runtime.Object, error) {

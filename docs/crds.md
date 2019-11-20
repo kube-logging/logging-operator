@@ -71,6 +71,17 @@ spec:
 | watchNamespaces         | []string       | ""      | Limit namespaces from where to read Flow and Output specs               |
 | controlNamespace        | string         | ""      | Control namespace that contains ClusterOutput and ClusterFlow resources |
 | podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
+| enableRecreateWorkloadOnImmutableFieldChange | bool | false | Recreate workloads that cannot be updated, see details below |
+
+**enableRecreateWorkloadOnImmutableFieldChange**
+
+Not all fields can be updated on Kubernetes objects. This is especially true for Statefulsets and Daemonsets.
+In case there is a change that requires recreating the fluentd/fluentbit workloads use this field  
+to move on but make sure to understand the consequences:
+ - As of fluentd, to avoid data loss, make sure to use a persistent volume for buffers `logging.spec.fluentd.`, 
+ which is the default, unless explicitly disabled or configured differently.
+ - As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for 
+ the positions through `logging.spec.fluentbit.spec.positiondb`.
 
 #### Fluentd Spec
 
@@ -82,7 +93,8 @@ You can customize the `fluentd` statefulset with the following parameters.
 | labels | map[string]string | {} | Extra labels for fluentd and it's related resources |
 | tls | [TLS](#TLS-Spec) | {} | Configure TLS settings|
 | image | [ImageSpec](#Image-Spec) | {} | Fluentd image override |
-| fluentdPvcSpec | [PersistentVolumeClaimSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimspec-v1-core) | {} | FLuentd PVC spec to mount persistent volume for Buffer |
+| fluentdPvcSpec | [PersistentVolumeClaimSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimspec-v1-core) | {} | Deprecated, use BufferStorageVolume |
+| bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Fluentd PVC spec to mount persistent volume for Buffer |
 | disablePvc | bool | false | Disable PVC binding |
 | volumeModImage | [ImageSpec](#Image-Spec) | {} | Volume modifier image override |
 | configReloaderImage | [ImageSpec](#Image-Spec) | {} | Config reloader image override |
@@ -95,22 +107,40 @@ You can customize the `fluentd` statefulset with the following parameters.
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
 
 
-**`logging` with custom fluentd pvc** 
+**`logging` with custom pvc volume for buffers** 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
-  namespace: logging
 spec:
   fluentd: 
-    fluentdPvcSpec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 40Gi
-        storageClassName: fast
+    bufferStorageVolume:
+      pvc:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 40Gi
+          storageClassName: fast
+          volumeMode: Filesystem
+  fluentbit: {}
+  controlNamespace: logging
+```
+
+**`logging` with custom hostPath volume for buffers** 
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: 
+    disablePvc: true
+    bufferStorageVolume:
+      hostPath:
+        path: "" # leave it empty to automatically generate: /opt/logging-operator/default-logging-simple/default-logging-simple-fluentd-buffer
   fluentbit: {}
   controlNamespace: logging
 ```
@@ -136,19 +166,36 @@ spec:
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
-  
+
 **`logging` with custom fluent-bit annotations** 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
-  namespace: logging
 spec:
   fluentd: {}
   fluentbit:
     annotations:
       my-annotations/enable: true
+  controlNamespace: logging
+```
+
+**`logging` with hostPath volumes for buffers and positions** 
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: {}
+  fluentbit:
+    bufferStorageVolume:
+      hostPath:
+        path: "" # leave it empty to automatically generate
+    positiondb:
+      hostPath:
+        path: "" # leave it empty to automatically generate
   controlNamespace: logging
 ```
 
@@ -168,7 +215,6 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-simple
-  namespace: logging
 spec:
   fluentd: 
     image:
@@ -196,10 +242,8 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: default-logging-tls
-  namespace: logging
 spec:
   fluentd:
-    disablePvc: true
     tls:
       enabled: true
       secretName: fluentd-tls
@@ -222,7 +266,7 @@ Define Kubernetes storage
 | host_path | | | deprecated, use hostPath instead |
 | hostPath | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. If path is empty, it will automatically be set to "/opt/logging-operator/<name of the logging CR>/<name of the volume>" |
 | emptyDir | [EmptyDirVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#emptydirvolumesource-v1-core) | - | Represents an empty directory for a pod. |
-| pvc | [PersistentVolumeClaim](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaim-v1-core) | - | A PersistentVolumeClaim (PVC) is a request for storage by a user. |
+| pvc | [PersistentVolumeClaim](#Persistent Volume Claim) | - | A PersistentVolumeClaim (PVC) is a request for storage by a user. |
 
 #### Persistent Volume Claim
 

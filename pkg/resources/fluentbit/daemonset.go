@@ -21,6 +21,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,7 +56,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 		templates.Annotate(podMeta, "checksum/config", fmt.Sprintf("%x", h.Sum(nil)))
 	}
 
-	return &appsv1.DaemonSet{
+	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
 			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())},
@@ -92,7 +93,9 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 				},
 			},
 		},
-	}, k8sutil.StatePresent, nil
+	}
+
+	return desired, k8sutil.StatePresent, nil
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
