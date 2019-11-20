@@ -142,7 +142,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
 				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
-					ClaimName: l.QualifiedName("fluentd-buffer"),
+					ClaimName: "fluentd-buffer",
 					ReadOnly:  false,
 				},
 			}
