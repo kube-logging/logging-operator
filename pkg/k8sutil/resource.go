@@ -194,7 +194,7 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 			return false, emperror.WrapWith(err, "getting resource failed",
 				"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))
 		} else {
-			log.Info("resource not found skipping delete", "resource", current.GetObjectKind().GroupVersionKind())
+			log.V(1).Info("resource not found skipping delete", "resource", current.GetObjectKind().GroupVersionKind())
 			return false, nil
 		}
 	}
