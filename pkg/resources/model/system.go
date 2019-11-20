@@ -150,7 +150,7 @@ FindOutputForAllRefs:
 	for i, f := range flowCr.Spec.Filters {
 		filter, err := plugins.CreateFilter(f, flowCr.Name, i, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
-			multierr = errors.Combine(multierr, errors.Errorf("failed to create filter with index %d for flow %s", i, flowCr.Name))
+			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowCr.Name))
 			continue
 		}
 		filters = append(filters, filter)
