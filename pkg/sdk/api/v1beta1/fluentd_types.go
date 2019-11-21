@@ -42,7 +42,8 @@ type FluentdSpec struct {
 	Security            *Security                   `json:"security,omitempty"`
 	Scaling             *FluentdScaling             `json:"scaling,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
-	LogLevel string `json:"logLevel,omitempty"`
+	LogLevel             string `json:"logLevel,omitempty"`
+	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
