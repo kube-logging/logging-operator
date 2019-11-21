@@ -24,6 +24,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.image.tag`                               | Fluentbit container image tag                          | `1.3.2`                                                    |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`                                        |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                                             |
+| `fluentbit.podPriorityClassName`                    | Priority class name for fluentbit pods                 | none                                                       |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                                                       |
 | `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.7.4-alpine-8`                                          |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `banzaicloud/fluentd`                                      |
@@ -39,3 +40,4 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.fluentdPvcSpec.resources.storageClassName` | Fluentd persistence volume storageclass                | `"""`                                                      |
 | `fluentd.tolerations`                               | Tolerations for fluentd statefulset                    | none                                                       |
 | `fluentd.nodeSelector`                              | Node selector for fluentd pods                         | none                                                       |
+| `fluentd.podPriorityClassName`                      | Priority class name for fluentd pods                   | none                                                       |

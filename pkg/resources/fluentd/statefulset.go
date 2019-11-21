@@ -77,8 +77,9 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 					*r.fluentContainer(),
 					*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
 				},
-				NodeSelector: r.Logging.Spec.FluentdSpec.NodeSelector,
-				Tolerations:  r.Logging.Spec.FluentdSpec.Tolerations,
+				NodeSelector:      r.Logging.Spec.FluentdSpec.NodeSelector,
+				Tolerations:       r.Logging.Spec.FluentdSpec.Tolerations,
+				PriorityClassName: r.Logging.Spec.FluentdSpec.PodPriorityClassName,
 				SecurityContext: &corev1.PodSecurityContext{
 					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
 					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,

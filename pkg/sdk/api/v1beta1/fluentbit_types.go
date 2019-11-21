@@ -24,25 +24,26 @@ import (
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations         map[string]string           `json:"annotations,omitempty"`
-	Labels              map[string]string           `json:"labels,omitempty"`
-	Image               ImageSpec                   `json:"image,omitempty"`
-	TLS                 FluentbitTLS                `json:"tls,omitempty"`
-	TargetHost          string                      `json:"targetHost,omitempty"`
-	TargetPort          int32                       `json:"targetPort,omitempty"`
-	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
-	Parser              string                      `json:"parser,omitempty"` // deprecated, use InputTail.Parser instead
-	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
-	Metrics             *Metrics                    `json:"metrics,omitempty"`
-	Security            *Security                   `json:"security,omitempty"`
-	PositionDBLegacy    *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
-	PositionDB          KubernetesStorage           `json:"positiondb,omitempty"`
-	MountPath           string                      `json:"mountPath,omitempty"`
-	InputTail           InputTail                   `json:"inputTail,omitempty"`
-	FilterKubernetes    FilterKubernetes            `json:"filterKubernetes,omitempty"`
-	BufferStorage       BufferStorage               `json:"bufferStorage,omitempty"`
-	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
-	CustomConfigSecret  string                      `json:"customConfigSecret,omitempty"`
+	Annotations          map[string]string           `json:"annotations,omitempty"`
+	Labels               map[string]string           `json:"labels,omitempty"`
+	Image                ImageSpec                   `json:"image,omitempty"`
+	TLS                  FluentbitTLS                `json:"tls,omitempty"`
+	TargetHost           string                      `json:"targetHost,omitempty"`
+	TargetPort           int32                       `json:"targetPort,omitempty"`
+	Resources            corev1.ResourceRequirements `json:"resources,omitempty"`
+	Parser               string                      `json:"parser,omitempty"` // deprecated, use InputTail.Parser instead
+	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
+	Metrics              *Metrics                    `json:"metrics,omitempty"`
+	Security             *Security                   `json:"security,omitempty"`
+	PositionDBLegacy     *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
+	PositionDB           KubernetesStorage           `json:"positiondb,omitempty"`
+	MountPath            string                      `json:"mountPath,omitempty"`
+	InputTail            InputTail                   `json:"inputTail,omitempty"`
+	FilterKubernetes     FilterKubernetes            `json:"filterKubernetes,omitempty"`
+	BufferStorage        BufferStorage               `json:"bufferStorage,omitempty"`
+	BufferStorageVolume  KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
+	CustomConfigSecret   string                      `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName string                      `json:"podPriorityClassName,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

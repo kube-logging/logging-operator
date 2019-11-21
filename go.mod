@@ -11,7 +11,6 @@ require (
 	github.com/goph/emperror v0.17.2
 	github.com/onsi/gomega v1.5.0
 	github.com/pborman/uuid v1.2.0
-	github.com/prometheus/common v0.6.0
 	github.com/spf13/cast v1.3.0
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
 	k8s.io/api v0.0.0-20190813020757-36bff7324fb7

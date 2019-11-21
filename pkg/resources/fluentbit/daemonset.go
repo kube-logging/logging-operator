@@ -65,6 +65,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
 					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
+					PriorityClassName:  r.Logging.Spec.FluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.FSGroup,
 						RunAsNonRoot: r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,

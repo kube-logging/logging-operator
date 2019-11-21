@@ -70,6 +70,7 @@ spec:
 | fluentd                 | [FluentdSpec](#Fluentd-Spec)   | {}      | Fluentd configurations                                                  |
 | watchNamespaces         | []string       | ""      | Limit namespaces from where to read Flow and Output specs               |
 | controlNamespace        | string         | ""      | Control namespace that contains ClusterOutput and ClusterFlow resources |
+| podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
 
 #### Fluentd Spec
 
@@ -91,6 +92,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | nodeSelector | [NodeSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#nodeselector-v1-core) | {} | A node selector represents the union of the results of one or more label queries over a set of nodes |
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
+| podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
 
 
 **`logging` with custom fluentd pvc** 
