@@ -3,7 +3,7 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd: {}
+  fluentd:
     bufferStorageVolume:
       pvc:
         spec:
