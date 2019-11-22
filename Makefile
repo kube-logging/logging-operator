@@ -89,6 +89,7 @@ deploy: manifests
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
+	cp config/crd/bases/* charts/logging-operator/templates/
 
 # Run go fmt against code
 fmt:
@@ -125,5 +126,6 @@ CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
 check-diff:
+	go mod tidy
 	$(MAKE) generate manifests docs
 	git diff --exit-code
