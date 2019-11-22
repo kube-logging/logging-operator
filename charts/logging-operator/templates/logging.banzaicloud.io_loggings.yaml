@@ -36,6 +36,13 @@ spec:
           properties:
             controlNamespace:
               type: string
+            enableRecreateWorkloadOnImmutableFieldChange:
+              description: EnableRecreateWorkloadOnImmutableFieldChange enables the
+                operator to recreate the fluentbit daemonset and the fluentd statefulset
+                (and possibly other resource in the future) in case there is a change
+                in an immutable field that otherwise couldn't be managed with a simple
+                update.
+              type: boolean
             flowConfigCheckDisabled:
               type: boolean
             flowConfigOverride:
@@ -511,6 +518,10 @@ spec:
                         be memory or filesystem. (default:memory)
                       type: string
                   type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  type: object
                 metrics:
                   description: Metrics defines the service monitor endpoints
                   properties:
@@ -531,6 +542,8 @@ spec:
                 mountPath:
                   type: string
                 parser:
+                  type: string
+                podPriorityClassName:
                   type: string
                 position_db:
                   properties:
@@ -1580,6 +1593,10 @@ spec:
                     tag:
                       type: string
                   type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  type: object
                 logLevel:
                   type: string
                 metrics:
@@ -1603,6 +1620,8 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                podPriorityClassName:
+                  type: string
                 port:
                   format: int32
                   type: integer
