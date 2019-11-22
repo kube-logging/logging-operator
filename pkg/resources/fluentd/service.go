@@ -15,6 +15,7 @@
 package fluentd
 
 import (
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -24,7 +25,7 @@ import (
 )
 
 func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
-	return &corev1.Service{
+	desired := &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName),
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
@@ -37,7 +38,18 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 			Selector: r.getFluentdLabels(),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
-	}, k8sutil.StatePresent, nil
+	}
+
+	beforeUpdateHook := k8sutil.DesiredStateHook(func(current runtime.Object) error {
+		if s, ok := current.(*corev1.Service); ok {
+			desired.Spec.ClusterIP = s.Spec.ClusterIP
+		} else {
+			return errors.Errorf("failed to cast service object %+v", current)
+		}
+		return nil
+	})
+
+	return desired, beforeUpdateHook, nil
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {

@@ -69,7 +69,7 @@ type Reconciler struct {
 func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, logger),
+		GenericResourceReconciler: k8sutil.NewReconciler(client, logger, logging),
 	}
 }
 
@@ -94,10 +94,13 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
-		err = r.ReconcileResource(o, state)
+		result, err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapWithDetails(err,
 				"failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
+		}
+		if result != nil {
+			return result, nil
 		}
 	}
 
