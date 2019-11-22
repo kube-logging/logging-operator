@@ -3,6 +3,15 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd: {}
+  fluentd:
+    bufferStorageVolume:
+      pvc:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          volumeMode: Filesystem
   fluentbit: {}
   controlNamespace: default

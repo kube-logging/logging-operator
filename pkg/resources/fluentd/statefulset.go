@@ -38,10 +38,12 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error)
 			},
 		}
 	}
-	return &appsv1.StatefulSet{
+	desired := &appsv1.StatefulSet{
 		ObjectMeta: r.FluentdObjectMeta(StatefulSetName),
 		Spec:       spec,
-	}, k8sutil.StatePresent, nil
+	}
+
+	return desired, k8sutil.StatePresent, nil
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {

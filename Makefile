@@ -73,6 +73,10 @@ manager: generate fmt vet
 run: generate fmt vet
 	go run ./main.go --verbose
 
+# remote debug
+debug: manager
+	dlv --listen=:40000 --log --headless=true --api-version=2 exec bin/manager -- $(ARGS)
+
 # Install CRDs into a cluster
 install: manifests
 	kubectl apply -f config/crd/bases

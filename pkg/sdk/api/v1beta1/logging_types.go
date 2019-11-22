@@ -35,6 +35,12 @@ type LoggingSpec struct {
 	FluentdSpec             *FluentdSpec   `json:"fluentd,omitempty"`
 	WatchNamespaces         []string       `json:"watchNamespaces,omitempty"`
 	ControlNamespace        string         `json:"controlNamespace"`
+
+	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
+	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
+	// in case there is a change in an immutable field
+	// that otherwise couldn't be managed with a simple update.
+	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging
@@ -141,11 +147,10 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
-				PersistentVolumeSource: v1.PersistentVolumeClaimVolumeSource{
-					ClaimName: "fluentd-buffer",
-					ReadOnly:  false,
-				},
 			}
+		}
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = "fluentd-buffer"
 		}
 		if copy.Spec.FluentdSpec.VolumeModImage.Repository == "" {
 			copy.Spec.FluentdSpec.VolumeModImage.Repository = "busybox"

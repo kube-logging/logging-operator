@@ -25,6 +25,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -53,6 +54,14 @@ type Reconciler struct {
 	secrets *secret.MountSecrets
 }
 
+type Desire struct {
+	DesiredObject runtime.Object
+	DesiredState  k8sutil.DesiredState
+	// BeforeUpdateHook has the ability to change the desired object
+	// or even to change the desired state in case the object should be recreated
+	BeforeUpdateHook func(runtime.Object) (k8sutil.DesiredState, error)
+}
+
 func (r *Reconciler) getFluentdLabels() map[string]string {
 	return util.MergeLabels(r.Logging.Spec.FluentdSpec.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentd"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
@@ -68,7 +77,7 @@ func (r *Reconciler) getServiceAccount() string {
 func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, log),
+		GenericResourceReconciler: k8sutil.NewReconciler(client, log, logging),
 		config:                    config,
 		secrets:                   secrets,
 	}
@@ -131,9 +140,12 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create output secret")
 	}
-	err = r.ReconcileResource(outputSecret, outputSecretDesiredState)
+	result, err := r.ReconcileResource(outputSecret, outputSecretDesiredState)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to reconcile resource")
+	}
+	if result != nil {
+		return result, nil
 	}
 	// Mark watched secrets
 	secretList, state, err := r.markSecrets(r.secrets)
@@ -141,9 +153,12 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		return nil, errors.WrapIf(err, "failed to mark secrets")
 	}
 	for _, obj := range secretList {
-		err := r.ReconcileResource(obj, state)
+		result, err := r.ReconcileResource(obj, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
+		}
+		if result != nil {
+			return result, nil
 		}
 	}
 	for _, res := range []resources.Resource{
@@ -167,9 +182,12 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
 		}
-		err = r.ReconcileResource(o, state)
+		result, err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
+		}
+		if result != nil {
+			return result, nil
 		}
 	}
 
