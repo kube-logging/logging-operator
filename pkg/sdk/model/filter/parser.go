@@ -75,15 +75,45 @@ type ParseSection struct {
 	UTC bool `json:"utc,omitempty"`
 	// Use specified timezone. one can parse/format the time value in the specified timezone. (default: nil)
 	Timezone string `json:"timezone,omitempty"`
+	// Only available when using type: multi_format
+	// +docLink:"Parse Section,#Parse-Section"
+	Patterns []ParseSection `json:"patterns,omitempty"`
+	// Only available when using type: multi_format
+	Format string `json:"format,omitempty"`
+}
+
+func (p *ParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	parseMeta := types.PluginMeta{
+		Directive: "pattern",
+	}
+	section := p.DeepCopy()
+	return types.NewFlatDirective(parseMeta, section, secretLoader)
 }
 
 func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	parseMeta := types.PluginMeta{
-		Directive: "parse",
-		Type:      p.Type,
+	parseSection := &types.GenericDirective{
+		PluginMeta: types.PluginMeta{
+			Type:      p.Type,
+			Directive: "parse",
+		},
 	}
-	p.Type = ""
-	return types.NewFlatDirective(parseMeta, p, secretLoader)
+	section := p.DeepCopy()
+	section.Type = ""
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(section); err != nil {
+		return nil, err
+	} else {
+		parseSection.Params = params
+	}
+	if len(section.Patterns) > 0 {
+		for _, parseRule := range section.Patterns {
+			if meta, err := parseRule.ToPatternDirective(secretLoader, ""); err != nil {
+				return nil, err
+			} else {
+				parseSection.SubDirectives = append(parseSection.SubDirectives, meta)
+			}
+		}
+	}
+	return parseSection, nil
 }
 
 func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
