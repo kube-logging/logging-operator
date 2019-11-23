@@ -106,6 +106,12 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 	}
 	if len(section.Patterns) > 0 {
 		for _, parseRule := range section.Patterns {
+			if parseRule.Format != "" && p.Type != "multi_format" {
+				return nil, errors.Errorf("format parameter only works with multi_format type")
+			}
+			if parseRule.Format == "none" && p.Type != "multi_format" {
+				return nil, errors.Errorf("none format type parameter only works with multi_format type")
+			}
 			if meta, err := parseRule.ToPatternDirective(secretLoader, ""); err != nil {
 				return nil, err
 			} else {
