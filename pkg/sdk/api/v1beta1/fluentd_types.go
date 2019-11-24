@@ -27,9 +27,9 @@ type FluentdSpec struct {
 	TLS         FluentdTLS        `json:"tls,omitempty"`
 	Image       ImageSpec         `json:"image,omitempty"`
 	// Deprecated, use BufferStorageVolume to configure PVC explicitly
-	FluentdPvcSpec corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
-	DisablePvc     bool                             `json:"disablePvc,omitempty"`
-	// BufferStorageVolume is the alternative volume to use if PVC is disabled
+	FluentdPvcSpec *corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
+	DisablePvc     bool                              `json:"disablePvc,omitempty"`
+	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
 	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
 	VolumeMountChmod    bool                        `json:"volumeMountChmod,omitempty"`
 	VolumeModImage      ImageSpec                   `json:"volumeModImage,omitempty"`
