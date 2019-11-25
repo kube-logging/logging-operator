@@ -125,7 +125,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
 
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentdSpec.Metrics.Path
-				copy.Spec.FluentdSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentdSpec.Metrics.Port)
+				copy.Spec.FluentdSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", copy.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
 		if copy.Spec.FluentdSpec.FluentdPvcSpec == nil {
@@ -274,7 +274,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			if copy.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
-				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentbitSpec.Metrics.Port)
+				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", copy.Spec.FluentbitSpec.Metrics.Port)
 			}
 		}
 		if copy.Spec.FluentbitSpec.MountPath == "" {

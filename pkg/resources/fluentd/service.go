@@ -77,7 +77,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, err
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
-	if r.Logging.Spec.FluentdSpec.Metrics != nil {
+	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
 		return &v1.ServiceMonitor{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
 			Spec: v1.ServiceMonitorSpec{
