@@ -19,6 +19,7 @@ var fluentdDefaultTemplate = `
 @include /fluentd/etc/input.conf
 @include /fluentd/app-config/*
 @include /fluentd/etc/devnull.conf
+@include /fluentd/etc/fluentlog.conf
 `
 var fluentdInputTemplate = `
 # Enable RPC endpoint (this allows to trigger config reload without restart)
@@ -54,4 +55,13 @@ var fluentdOutputTemplate = `
     @type null
     @id main-no-output
 </match>
+`
+
+var fluentLog = `
+<label @FLUENT_LOG>
+  <match fluent.*>
+    @type %s
+    @id main-fluentd-log
+  </match>
+</label>
 `
