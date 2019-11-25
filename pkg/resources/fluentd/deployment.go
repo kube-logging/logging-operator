@@ -32,7 +32,7 @@ func (r *Reconciler) deployment() runtime.Object {
 		deploymentName = r.Fluentd.Labels["release"] + "-fluentd"
 	}
 
-	return &appsv1.Deployment{
+	deployment := appsv1.Deployment{
 		ObjectMeta: templates.FluentdObjectMeta(deploymentName, util.MergeLabels(r.Fluentd.Labels, labelSelector), r.Fluentd),
 		Spec: appsv1.DeploymentSpec{
 			Replicas: util.IntPointer(1),
@@ -88,6 +88,12 @@ func (r *Reconciler) deployment() runtime.Object {
 			},
 		},
 	}
+	if r.Fluentd.Spec.DeploymentStrategy != "" || r.Fluentd.Spec.DeploymentStrategy != appsv1.RollingUpdateDeploymentStrategyType {
+		deployment.Spec.Strategy = appsv1.DeploymentStrategy{
+			Type: r.Fluentd.Spec.DeploymentStrategy,
+		}
+	}
+	return &deployment
 }
 
 func newConfigMapReloader(spec loggingv1alpha1.ImageSpec) *corev1.Container {

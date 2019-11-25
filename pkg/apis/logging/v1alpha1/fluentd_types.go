@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"strconv"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -42,6 +43,7 @@ type FluentdSpec struct {
 	Resources           corev1.ResourceRequirements      `json:"resources,omitempty"`
 	ServiceType         corev1.ServiceType               `json:"serviceType,omitempty"`
 	Tolerations         []corev1.Toleration              `json:"tolerations,omitempty"`
+	DeploymentStrategy  appsv1.DeploymentStrategyType    `json:"deploymentStrategy,omitempty"`
 }
 
 // FluentdTLS defines the TLS configs
