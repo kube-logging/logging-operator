@@ -64,7 +64,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 	if r.Logging.Spec.FluentdSpec.LogLevel != "" {
 		input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
 	} else {
-		input.LogLevel = "error"
+		input.LogLevel = "info"
 	}
 
 	inputConfig, err := generateConfig(input)

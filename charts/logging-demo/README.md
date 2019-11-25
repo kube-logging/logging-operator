@@ -50,6 +50,7 @@ The following tables lists the configurable parameters of the logging-demo chart
 | `loggingOperator.fluentd.metrics.path`                            | Metrics Path                                            | ``             |
 | `loggingOperator.fluentd.metrics.timeout`                         | Scrape timeout.                                         | ``             |
 | `loggingOperator.fluentd.metrics.interval`                        | Scrape interval.                                        | ``             |
+| `loggingOperator.fluentd.logLevel`                                | FluentD loglevel fatal,error,warn,info,debug,trace      | `info`         |
 | `loggingOperator.fluentbit.metrics.serviceMonitor`                | Enable to create ServiceMonitor for Prometheus operator | `false`        |
 | `loggingOperator.fluentbit.metrics.prometheusAnnotations`         | Add prometheus labels to fluent pods.                   | `false`        |
 | `loggingOperator.fluentbit.metrics.port`                          | Metrics Port.                                           | ``             |
