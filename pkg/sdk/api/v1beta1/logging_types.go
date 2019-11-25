@@ -128,6 +128,9 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/port"] = string(copy.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
+		if copy.Spec.FluentdSpec.FluentdPvcSpec == nil {
+			copy.Spec.FluentdSpec.FluentdPvcSpec = &v1.PersistentVolumeClaimSpec{}
+		}
 		if copy.Spec.FluentdSpec.FluentdPvcSpec.AccessModes == nil {
 			copy.Spec.FluentdSpec.FluentdPvcSpec.AccessModes = []v1.PersistentVolumeAccessMode{
 				v1.ReadWriteOnce,
@@ -146,7 +149,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		// DisablePvc will stay for a while. The alternative would be to set a hostPath or emptyDir explicitly
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
-				PersistentVolumeClaimSpec: copy.Spec.FluentdSpec.FluentdPvcSpec,
+				PersistentVolumeClaimSpec: *copy.Spec.FluentdSpec.FluentdPvcSpec.DeepCopy(),
 			}
 		}
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {

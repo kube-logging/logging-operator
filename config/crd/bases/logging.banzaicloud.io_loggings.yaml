@@ -1250,8 +1250,8 @@ spec:
                     type: string
                   type: object
                 bufferStorageVolume:
-                  description: BufferStorageVolume is the alternative volume to use
-                    if PVC is disabled
+                  description: BufferStorageVolume is by default configured as PVC
+                    using FluentdPvcSpec
                   properties:
                     emptyDir:
                       description: Represents an empty directory for a pod. Empty
