@@ -17,7 +17,7 @@ enableRecreateWorkloadOnImmutableFieldChange: false
 fluentbit: {}
 # Fluentd configurations
 fluentd: {}
-# Send internal fluentd logs to stdout instead of circulating it internally without kubernetes labels
+# Send internal fluentd logs to stdout instead of circulating it internally without kubernetes labels. Use null to omit these logs.
 #  fluentLogDestination: stdout
 #  fluentdPvcSpec:
 #    accessModes:
