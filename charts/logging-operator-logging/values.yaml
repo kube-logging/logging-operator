@@ -9,6 +9,10 @@ flowConfigCheckDisabled: false
 # Use static configuration instead of generated config.
 flowConfigOverride:	""
 
+# If an immutable field is changed, delete the existing resource
+# and recreate it with the new configuration.
+enableRecreateWorkloadOnImmutableFieldChange: false
+
 # Fluent-bit configurations
 fluentbit: {}
 # Fluentd configurations
