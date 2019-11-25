@@ -5,6 +5,9 @@ metadata:
   labels:
 {{ include "logging-operator-logging.labels" . | indent 4 }}
 spec:
+  {{- with .Values.enableRecreateWorkloadOnImmutableFieldChange }}
+  enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
+  {{- end}}
   {{- with .Values.loggingRef }}
   loggingRef: {{ . }}
   {{- end }}
