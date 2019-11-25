@@ -48,7 +48,8 @@ RUN apk update \
          fluent-plugin-kinesis \
          fluent-plugin-parser-logfmt \
          fluent-plugin-detect-exceptions \
- && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.5/fluent-plugin-cloudwatch-logs-0.7.5.gem \
+         fluent-plugin-multi-format-parser \
+ && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
