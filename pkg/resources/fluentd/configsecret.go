@@ -72,12 +72,16 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 		return nil, k8sutil.StatePresent, err
 	}
 
-	return &corev1.Secret{
+	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName),
 		Data: map[string][]byte{
 			"fluent.conf":  []byte(fluentdDefaultTemplate),
 			"input.conf":   []byte(inputConfig),
 			"devnull.conf": []byte(fluentdOutputTemplate),
 		},
-	}, k8sutil.StatePresent, nil
+	}
+
+	configs.Data["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
+
+	return configs, k8sutil.StatePresent, nil
 }
