@@ -193,6 +193,9 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				Replicas: 1,
 			}
 		}
+		if copy.Spec.FluentdSpec.FluentLogDestination == "" {
+			copy.Spec.FluentdSpec.FluentLogDestination = "stdout"
+		}
 	}
 	if copy.Spec.FluentbitSpec != nil {
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {

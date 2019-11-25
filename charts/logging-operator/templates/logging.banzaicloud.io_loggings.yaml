@@ -1468,6 +1468,8 @@ spec:
                   type: object
                 disablePvc:
                   type: boolean
+                fluentLogDestination:
+                  type: string
                 fluentdPvcSpec:
                   description: Deprecated, use BufferStorageVolume to configure PVC
                     explicitly
