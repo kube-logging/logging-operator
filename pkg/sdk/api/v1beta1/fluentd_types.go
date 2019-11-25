@@ -44,6 +44,8 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel             string `json:"logLevel,omitempty"`
 	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
+	// +kubebuilder:validation:enum=stdout,null
+	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
