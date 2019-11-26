@@ -111,17 +111,18 @@ For complete list of supported plugins please check the [plugins index](/docs/pl
 | Name                                                    |  Type  |                                Description               | Status  | Version                                                                                 |
 |---------------------------------------------------------|:------:|:--------------------------------------------------------:|---------|-----------------------------------------------------------------------------------------|
 | [Alibaba](./docs/plugins/outputs/oss.md)                  | Output | Store logs the Alibaba Cloud Object Storage Service    |    GA   | [0.0.2](https://github.com/aliyun/fluent-plugin-oss)                                    |
-| [Amazon S3](./docs/plugins/outputs/s3.md)                 | Output | Store logs in Amazon S3                                |    GA   | [1.2.0](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.1.11)               |
+| [Amazon S3](./docs/plugins/outputs/s3.md)                 | Output | Store logs in Amazon S3                                |    GA   | [1.2.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1)               |
 | [Azure](./docs/plugins/outputs/azurestore.md)             | Output | Store logs in Azure Storega                            |    GA   | [0.1.0](https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0)         |
 | [Google Storage](./docs/plugins/outputs/gcs.md)           | Output | Store logs in Google Cloud Storage                     |    GA   | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs)                               |
-| [Grafana Loki](./docs/plugins/outputs/loki.md)            | Output | Transfer logs to Loki                                  |    GA   | [1.1.0](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki)   |
-| [ElasticSearch](./docs/plugins/outputs/elasticsearch.md)  | Output | Send your logs to Elasticsearch                        |    GA   | [3.5.6](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.5.6)        |
+| [Grafana Loki](./docs/plugins/outputs/loki.md)            | Output | Transfer logs to Loki                                  |    GA   | [1.2.2](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki)   |
+| [ElasticSearch](./docs/plugins/outputs/elasticsearch.md)  | Output | Send your logs to Elasticsearch                        |    GA   | [3.7.0](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.7.0)        |
 | [Sumologic](./docs/plugins/outputs/sumologic.md)          | Output | Send your logs to Sumologic                            |    GA   | [1.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1)       |
-| [CloudWatch](./docs/plugins/outputs/cloudwatch.md)        | Output | Send your logs to AWS CloudWatch                       |    GA   | [0.7.5](https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.5) |
+| [CloudWatch](./docs/plugins/outputs/cloudwatch.md)        | Output | Send your logs to AWS CloudWatch                       |    GA   | [0.7.6](https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.6) |
 | [Kafka](./docs/plugins/outputs/kafka.md)                  | Output | Send your logs to Kafka                                |    GA   | [0.12.1](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1)            |
 | [Exception Detector](./docs/plugins/outputs/detect_exceptions.md)| Filter | Exception detector plugin for fluentd           |    GA   | [0.0.13](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions/releases/tag/0.0.13) |
 | [Tag Normaliser](./docs/plugins/filters/tagnormaliser.md) | Filter | Normalise tags for outputs                             |    GA   |                                                                                         |
 | [Parser](./docs/plugins/filters/parser.md)                | Filter | Parse logs with parser plugin                          |    GA   |                                                                                         |
+| [Multi Format Parser](./docs/plugins/outputs/detect_exceptions.md)| Filter | Exception detector plugin for fluentd           |    GA   | [1.0.0](https://github.com/repeatedly/fluent-plugin-multi-format-parser/releases/tag/v1.0.0) |
 
 ---
 
