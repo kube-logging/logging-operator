@@ -194,7 +194,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			}
 		}
 		if copy.Spec.FluentdSpec.FluentLogDestination == "" {
-			copy.Spec.FluentdSpec.FluentLogDestination = "stdout"
+			copy.Spec.FluentdSpec.FluentLogDestination = "null"
 		}
 	}
 	if copy.Spec.FluentbitSpec != nil {
