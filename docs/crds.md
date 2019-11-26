@@ -105,7 +105,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
-| fluentLogDestination | string | "stdout" | Send internal fluentd logs to stdout, or use "null" to omit them |
+| fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them |
 
 
 **`logging` with custom pvc volume for buffers** 
