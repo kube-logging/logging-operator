@@ -4,15 +4,14 @@ metadata:
   name: flow-sample
 spec:
   filters:
-  - tag_normaliser: {}
   - parser:
       parsers:
       - type: multi_format
-      patterns:
-      - format: nginx
-      - expression: /asdsada/
-        format: regexp
-      - format: none
+        patterns:
+        - format: nginx
+        - format: regexp
+          expression: /^\[(?<logtime>[^\]]*)\] (?<name>[^ ]*) (?<title>[^ ]*) (?<id>\d*)$/
+        - format: none
       remove_key_name_field: true
       reserve_data: true
   outputRefs:
@@ -20,4 +19,3 @@ spec:
   selectors:
     app.kubernetes.io/instance: nginx-demo
     app.kubernetes.io/name: nginx-logging-demo
-EOF
