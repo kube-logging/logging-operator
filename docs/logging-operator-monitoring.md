@@ -228,7 +228,7 @@ spec:
 EOF
 ```
 
-#### Install nginx demo deployment
+#### Install test deployment
 ```bash
 kubectl -n logging apply -f - <<"EOF" 
 apiVersion: apps/v1 
@@ -238,40 +238,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: logging-demo
-      app.kubernetes.io/name: nginx-logging-demo 
+      app: nginx
   replicas: 1
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: logging-demo
-        app.kubernetes.io/name: nginx-logging-demo 
+        app: nginx
     spec:
       containers:
       - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-          name: http
-          protocol: TCP
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
+        image: banzaicloud/loggen:latest
 EOF
 ```
 
