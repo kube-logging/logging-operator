@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -196,6 +197,21 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		if copy.Spec.FluentdSpec.FluentLogDestination == "" {
 			copy.Spec.FluentdSpec.FluentLogDestination = "null"
 		}
+		if copy.Spec.FluentdSpec.FluentOutLogrotate == nil {
+			copy.Spec.FluentdSpec.FluentOutLogrotate = &FluentOutLogrotate{
+				Enabled: true,
+			}
+		}
+		if copy.Spec.FluentdSpec.FluentOutLogrotate.Path == "" {
+			copy.Spec.FluentdSpec.FluentOutLogrotate.Path = "/fluentd/log/out"
+		}
+		if copy.Spec.FluentdSpec.FluentOutLogrotate.Age == "" {
+			copy.Spec.FluentdSpec.FluentOutLogrotate.Age = "10"
+		}
+		if copy.Spec.FluentdSpec.FluentOutLogrotate.Size == "" {
+			copy.Spec.FluentdSpec.FluentOutLogrotate.Size = cast.ToString(1024 * 1024 * 10)
+		}
+
 	}
 	if copy.Spec.FluentbitSpec != nil {
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {

@@ -46,6 +46,17 @@ type FluentdSpec struct {
 	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
+	// FluentOutLogrotate sends fluent's stdout to file and rotates it
+	FluentOutLogrotate *FluentOutLogrotate `json:"fluentOutLogrotate,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+type FluentOutLogrotate struct {
+	Enabled bool   `json:"enabled"`
+	Path    string `json:"path,omitempty"`
+	Age     string `json:"age,omitempty"`
+	Size    string `json:"size,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
