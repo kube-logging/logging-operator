@@ -60,6 +60,14 @@ type CloudWatchOutput struct {
 	// AWS secret key.
 	// +docLink:"Secret,./secret.md"
 	AwsSecretKey *secret.Secret `json:"aws_sec_key,omitempty"`
+	// Instance Profile Credentials call retries (default: nil)
+	AwsInstanceProfileCredentialsRetries int `json:"aws_instance_profile_credentials_retries,omitempty"`
+	// Enable AssumeRoleCredentials to authenticate, rather than the default credential hierarchy. See 'Cross-Account Operation' below for more detail.
+	AwsUseSts bool `json:"aws_use_sts,omitempty"`
+	// The role ARN to assume when using cross-account sts authentication
+	AwsStsRoleArn string `json:"aws_sts_role_arn,omitempty"`
+	// The session name to use with sts authentication  (default: 'fluentd')
+	AwsStsSessionName string `json:"aws_sts_session_name,omitempty"`
 	// Use to set the number of threads pushing data to CloudWatch. (default: 1)
 	Concurrency int `json:"concurrency,omitempty"`
 	// Use this parameter to connect to the local API endpoint (for testing)

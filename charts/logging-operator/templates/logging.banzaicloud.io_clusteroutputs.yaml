@@ -287,6 +287,10 @@ spec:
                   description: ' Create log group and stream automatically. (default:
                     false)'
                   type: boolean
+                aws_instance_profile_credentials_retries:
+                  description: 'Instance Profile Credentials call retries (default:
+                    nil)'
+                  type: integer
                 aws_key_id:
                   description: AWS access key id
                   properties:
@@ -359,6 +363,19 @@ spec:
                           type: object
                       type: object
                   type: object
+                aws_sts_role_arn:
+                  description: The role ARN to assume when using cross-account sts
+                    authentication
+                  type: string
+                aws_sts_session_name:
+                  description: 'The session name to use with sts authentication  (default:
+                    ''fluentd'')'
+                  type: string
+                aws_use_sts:
+                  description: Enable AssumeRoleCredentials to authenticate, rather
+                    than the default credential hierarchy. See 'Cross-Account Operation'
+                    below for more detail.
+                  type: boolean
                 buffer:
                   properties:
                     chunk_full_threshold:
