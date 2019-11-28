@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.10
 LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.7.4"
 
 # Do not split this into multiple RUN!
@@ -20,6 +20,7 @@ RUN apk update \
         ruby-dev gnupg \
  && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
+ && gem update --system --no-ri --no-rdoc \
  && gem install oj -v 3.3.10 \
  && gem install json -v 2.2.0 \
  && gem install async-http -v 0.46.3 \
