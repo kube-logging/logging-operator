@@ -93,7 +93,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 }
 
 func (r *Reconciler) fluentContainer() *corev1.Container {
-	return &corev1.Container{
+	container := &corev1.Container{
 		Name:            "fluentd",
 		Image:           r.Logging.Spec.FluentdSpec.Image.Repository + ":" + r.Logging.Spec.FluentdSpec.Image.Tag,
 		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
@@ -109,6 +109,17 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 		},
 	}
+
+	if r.Logging.Spec.FluentdSpec.FluentOutLogrotate != nil && r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Enabled {
+		container.Args = []string{
+			"fluentd",
+			"-o", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Path,
+			"--log-rotate-age", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Age,
+			"--log-rotate-size", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Size,
+		}
+	}
+
+	return container
 }
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {

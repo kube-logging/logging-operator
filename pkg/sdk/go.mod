@@ -13,6 +13,7 @@ require (
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
 	github.com/sergi/go-diff v1.0.0 // indirect
+	github.com/spf13/cast v1.3.0
 	go.uber.org/zap v1.12.0
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
