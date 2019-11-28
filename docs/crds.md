@@ -105,7 +105,8 @@ You can customize the `fluentd` statefulset with the following parameters.
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
-| fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them |
+| fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
+| fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
 
 
 **`logging` with custom pvc volume for buffers** 
@@ -277,6 +278,33 @@ Define Kubernetes storage
 | source | [PersistentVolumeClaimVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimvolumesource-v1-core) | - | PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace.  |
 
 The Persistent Volume Claim should be created with the given `spec` and with the `name` defined in the `source`'s `claimName`.
+
+#### FluentOutLogrotate
+
+Redirect fluentd's stdout to file and configure rotation settings.
+
+This is important to avoid fluentd getting into a ripple effect when there is an error and the error message get's
+back to the system as a log message, which generates another error, etc... 
+
+Default settings configured by the operator
+```
+spec:
+  fluentd:
+    fluentOutLogroutate:
+      enabled: true
+      path: /fluentd/log/out
+      age: 10
+      size: 10485760
+```
+
+Disabling it and write to stdout (not recommended)
+```
+spec:
+  fluentd:
+    fluentOutLogroutate:
+      enabled: false
+```
+
 
 ## Outputs, Clusteroutputs
 

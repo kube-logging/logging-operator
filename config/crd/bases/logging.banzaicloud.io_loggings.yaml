@@ -1470,6 +1470,21 @@ spec:
                   type: boolean
                 fluentLogDestination:
                   type: string
+                fluentOutLogroutate:
+                  description: FluentOutLogrotate sends fluent's stdout to file and
+                    rotates it
+                  properties:
+                    age:
+                      type: string
+                    enabled:
+                      type: boolean
+                    path:
+                      type: string
+                    size:
+                      type: string
+                  required:
+                  - enabled
+                  type: object
                 fluentdPvcSpec:
                   description: Deprecated, use BufferStorageVolume to configure PVC
                     explicitly
