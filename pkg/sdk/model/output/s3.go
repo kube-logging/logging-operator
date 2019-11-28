@@ -59,27 +59,27 @@ type S3OutputConfig struct {
 	// +docLink:"Secret,./secret.md"
 	AwsSecretKey *secret.Secret `json:"aws_sec_key,omitempty"`
 	// Check AWS key on start
-	CheckApikeyOnStart string `json:"check_apikey_on_start,omitempty"`
+	CheckApikeyOnStart bool `json:"check_apikey_on_start,omitempty"`
 	// Allows grantee to read the object data and its metadata
 	GrantRead string `json:"grant_read,omitempty"`
 	// Overwrite already existing path
-	Overwrite string `json:"overwrite,omitempty"`
+	Overwrite bool `json:"overwrite,omitempty"`
 	// Path prefix of the files on S3
 	Path string `json:"path,omitempty"`
 	// Allows grantee to write the ACL for the applicable object
 	GrantWriteAcp string `json:"grant_write_acp,omitempty"`
 	// Check bucket if exists or not
-	CheckBucket string `json:"check_bucket,omitempty"`
+	CheckBucket bool `json:"check_bucket,omitempty"`
 	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data
 	SseCustomerKey string `json:"sse_customer_key,omitempty" default:"10m"`
 	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321
 	SseCustomerKeyMd5 string `json:"sse_customer_key_md5,omitempty"`
 	// AWS SDK uses MD5 for API request/response by default
-	ComputeChecksums string `json:"compute_checksums,omitempty"`
+	ComputeChecksums bool `json:"compute_checksums,omitempty"`
 	// Given a threshold to treat events as delay, output warning logs if delayed events were put into s3
 	WarnForDelay string `json:"warn_for_delay,omitempty"`
 	// Use aws-sdk-ruby bundled cert
-	UseBundledCert string `json:"use_bundled_cert,omitempty"`
+	UseBundledCert bool `json:"use_bundled_cert,omitempty"`
 	// Custom S3 endpoint (like minio)
 	S3Endpoint string `json:"s3_endpoint,omitempty"`
 	// Specifies the AWS KMS key ID to use for object encryption
@@ -87,23 +87,23 @@ type S3OutputConfig struct {
 	// Arbitrary S3 metadata headers to set for the object
 	S3Metadata string `json:"s3_metadata,omitempty"`
 	// If true, the bucket name is always left in the request URI and never moved to the host as a sub-domain
-	ForcePathStyle string `json:"force_path_style,omitempty"`
+	ForcePathStyle bool `json:"force_path_style,omitempty"`
 	// Create S3 bucket if it does not exists
-	AutoCreateBucket string `json:"auto_create_bucket,omitempty"`
+	AutoCreateBucket bool `json:"auto_create_bucket,omitempty"`
 	// `sprintf` format for `%{index}`
 	IndexFormat string `json:"index_format,omitempty"`
 	// Signature version for API Request (s3,v4)
 	SignatureVersion string `json:"signature_version,omitempty"`
 	// If true, S3 Transfer Acceleration will be enabled for uploads. IMPORTANT: You must first enable this feature on your destination S3 bucket
-	EnableTransferAcceleration string `json:"enable_transfer_acceleration,omitempty"`
+	EnableTransferAcceleration bool `json:"enable_transfer_acceleration,omitempty"`
 	// If false, the certificate of endpoint will not be verified
-	SslVerifyPeer string `json:"ssl_verify_peer,omitempty"`
+	SslVerifyPeer bool `json:"ssl_verify_peer,omitempty"`
 	// URI of proxy environment
 	ProxyUri string `json:"proxy_uri,omitempty"`
 	// Allows grantee to read the object ACL
 	GrantReadAcp string `json:"grant_read_acp,omitempty"`
 	// Check object before creation
-	CheckObject string `json:"check_object,omitempty"`
+	CheckObject bool `json:"check_object,omitempty"`
 	// Specifies the algorithm to use to when encrypting the object
 	SseCustomerAlgorithm string `json:"sse_customer_algorithm,omitempty"`
 	// The Server-side encryption algorithm used when storing this object in S3 (AES256, aws:kms)

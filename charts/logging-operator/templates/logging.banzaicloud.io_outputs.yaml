@@ -3270,7 +3270,7 @@ spec:
                   type: object
                 auto_create_bucket:
                   description: Create S3 bucket if it does not exists
-                  type: string
+                  type: boolean
                 aws_iam_retries:
                   description: The number of attempts to load instance profile credentials
                     from the EC2 metadata service using IAM role
@@ -3495,25 +3495,25 @@ spec:
                   type: object
                 check_apikey_on_start:
                   description: Check AWS key on start
-                  type: string
+                  type: boolean
                 check_bucket:
                   description: Check bucket if exists or not
-                  type: string
+                  type: boolean
                 check_object:
                   description: Check object before creation
-                  type: string
+                  type: boolean
                 compute_checksums:
                   description: AWS SDK uses MD5 for API request/response by default
-                  type: string
+                  type: boolean
                 enable_transfer_acceleration:
                   description: 'If true, S3 Transfer Acceleration will be enabled
                     for uploads. IMPORTANT: You must first enable this feature on
                     your destination S3 bucket'
-                  type: string
+                  type: boolean
                 force_path_style:
                   description: If true, the bucket name is always left in the request
                     URI and never moved to the host as a sub-domain
-                  type: string
+                  type: boolean
                 format:
                   properties:
                     type:
@@ -3571,7 +3571,7 @@ spec:
                   type: object
                 overwrite:
                   description: Overwrite already existing path
-                  type: string
+                  type: boolean
                 path:
                   description: Path prefix of the files on S3
                   type: string
@@ -3623,7 +3623,7 @@ spec:
                   type: string
                 ssl_verify_peer:
                   description: If false, the certificate of endpoint will not be verified
-                  type: string
+                  type: boolean
                 storage_class:
                   description: The type of storage to use for the object(STANDARD,REDUCED_REDUNDANCY,STANDARD_IA)
                   type: string
@@ -3632,7 +3632,7 @@ spec:
                   type: string
                 use_bundled_cert:
                   description: Use aws-sdk-ruby bundled cert
-                  type: string
+                  type: boolean
                 use_server_side_encryption:
                   description: The Server-side encryption algorithm used when storing
                     this object in S3 (AES256, aws:kms)
