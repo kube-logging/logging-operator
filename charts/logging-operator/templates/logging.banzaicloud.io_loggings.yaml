@@ -1470,7 +1470,7 @@ spec:
                   type: boolean
                 fluentLogDestination:
                   type: string
-                fluentOutLogroutate:
+                fluentOutLogrotate:
                   description: FluentOutLogrotate sends fluent's stdout to file and
                     rotates it
                   properties:

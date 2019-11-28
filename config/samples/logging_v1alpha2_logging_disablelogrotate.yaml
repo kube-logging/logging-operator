@@ -5,7 +5,7 @@ metadata:
 spec:
   fluentd:
     disablePvc: true
-    fluentOutLogroutate:
+    fluentOutLogrotate:
       enabled: false
   fluentbit: {}
   controlNamespace: default

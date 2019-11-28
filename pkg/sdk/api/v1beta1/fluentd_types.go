@@ -47,7 +47,7 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
-	FluentOutLogrotate *FluentOutLogrotate `json:"fluentOutLogroutate,omitempty"`
+	FluentOutLogrotate *FluentOutLogrotate `json:"fluentOutLogrotate,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

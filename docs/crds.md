@@ -290,7 +290,7 @@ Default settings configured by the operator
 ```
 spec:
   fluentd:
-    fluentOutLogroutate:
+    fluentOutLogrotate:
       enabled: true
       path: /fluentd/log/out
       age: 10
@@ -301,7 +301,7 @@ Disabling it and write to stdout (not recommended)
 ```
 spec:
   fluentd:
-    fluentOutLogroutate:
+    fluentOutLogrotate:
       enabled: false
 ```
 
