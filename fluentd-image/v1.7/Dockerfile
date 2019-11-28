@@ -4,11 +4,12 @@ LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.7.4"
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
 # therefore an 'apk delete' has no effect
-RUN apk update \
+RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+ && apk update \
  && apk add --no-cache \
         ca-certificates linux-headers \
         ruby ruby-irb ruby-etc ruby-webrick \
-        tini libmaxminddb geoip \
+        tini libmaxminddb geoip daemontools@testing \
  && buildDeps=" \
       make gcc g++ libc-dev \
       wget bzip2 zlib-dev git linux-headers \
@@ -61,15 +62,15 @@ RUN addgroup -S fluent && adduser -S -G fluent fluent \
     && mkdir -p /fluentd/etc /fluentd/plugins \
     && chown -R fluent /fluentd && chgrp -R fluent /fluentd
 
-
 COPY fluent.conf /fluentd/etc/
 COPY entrypoint.sh /bin/
-
 
 ENV FLUENTD_CONF="fluent.conf"
 
 ENV LD_PRELOAD=""
 EXPOSE 24224 5140
+
+RUN apk add bash && mkdir /fluentd/multilog && chown -R fluent /fluentd/multilog
 
 USER fluent
 ENTRYPOINT ["tini",  "--", "/bin/entrypoint.sh"]

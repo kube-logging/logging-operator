@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #source vars if file exists
 DEFAULT=/etc/default/fluentd
@@ -25,4 +25,5 @@ if [ "$1" = "fluentd" ]; then
     fi
 fi
 
+exec > >(multilog s1048576 n100 ./fluentd/multilog)  2>&1
 exec "$@"
