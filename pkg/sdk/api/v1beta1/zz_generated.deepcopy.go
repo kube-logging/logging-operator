@@ -803,6 +803,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.GCSOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.GclOutputConfig != nil {
+		in, out := &in.GclOutputConfig, &out.GclOutputConfig
+		*out = new(output.GclOutputConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.OSSOutput != nil {
 		in, out := &in.OSSOutput, &out.OSSOutput
 		*out = new(output.OSSOutput)

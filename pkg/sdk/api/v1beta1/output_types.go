@@ -25,6 +25,7 @@ type OutputSpec struct {
 	S3OutputConfig            *output.S3OutputConfig            `json:"s3,omitempty"`
 	AzureStorage              *output.AzureStorage              `json:"azurestorage,omitempty"`
 	GCSOutput                 *output.GCSOutput                 `json:"gcs,omitempty"`
+	GclOutputConfig           *output.GclOutputConfig           `json:"googleClouds,omitempty"`
 	OSSOutput                 *output.OSSOutput                 `json:"oss,omitempty"`
 	ElasticsearchOutput       *output.ElasticsearchOutput       `json:"elasticsearch,omitempty"`
 	LokiOutput                *output.LokiOutput                `json:"loki,omitempty"`

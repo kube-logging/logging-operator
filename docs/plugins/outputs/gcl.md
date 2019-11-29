@@ -6,7 +6,7 @@
  #### Example output configurations
  ```
  spec:
-  google_cloud:
+  googleClouds:
     num_threads: 8
     use_grpc: true
     partial_success: true
@@ -27,3 +27,7 @@
 | autoformat_stackdriver_trace | bool | No |  true | When set to true, the trace will be reformatted if the value of structured payload field logging.googleapis.com/trace matches ResourceTrace traceId format. Details of the autoformatting can be found under Special fields in structured payloads. <br> |
 | buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
 | format | *Format | No | - | [Format](./format.md)<br> |
+| auth_method | string | No | - | <br> |
+| private_key_email | string | No | - | <br> |
+| private_key_path | string | No | - | <br> |
+| private_key_passphrase | string | No | - | <br> |

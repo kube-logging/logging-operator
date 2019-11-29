@@ -26,7 +26,7 @@ import (
 // #### Example output configurations
 // ```
 // spec:
-//  google_cloud:
+//  googleClouds:
 //    num_threads: 8
 //    use_grpc: true
 //    partial_success: true
@@ -53,6 +53,14 @@ type GclOutputConfig struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 	// +docLink:"Format,./format.md"
 	Format *Format `json:"format,omitempty"`
+	//
+	AuthMethod string `json:"auth_method,omitempty"`
+	//
+	PrivateKeyEmail string `json:"private_key_email,omitempty"`
+	//
+	PrivateKeyPath *secret.Secret `json:"private_key_path,omitempty"`
+	//
+	PrivateKeyPassphrase string `json:"private_key_passphrase,omitempty"`
 }
 
 func (c *GclOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
