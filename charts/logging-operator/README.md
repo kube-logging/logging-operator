@@ -56,6 +56,7 @@ The following tables lists the configurable parameters of the logging-operator c
 | `resources`                                         | CPU/Memory resource requests/limits                    | `{}`                           |
 | `tolerations`                                       | Node Tolerations                                       | `[]`                           |
 | `nodeSelector`                                      | Define which Nodes the Pods are scheduled on.          | `{}`                           |
+| `annotations`                                       | Define annotations for logging-operator pods           | `{}`                           |
 | `podSecurityContext`                                | Pod SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"runAsNonRoot": true, "runAsUser": 1000, "fsGroup": 2000}` |
 | `securityContext`                                   | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true}` |
 
