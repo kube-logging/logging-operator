@@ -172,6 +172,123 @@ spec:
                           array for elasticsearch.
                         type: boolean
                     type: object
+                  grep:
+                    properties:
+                      and:
+                        items:
+                          description: Specify filtering rule. This directive contains
+                            either <regexp> or <exclude> directive.
+                          properties:
+                            exclude:
+                              items:
+                                description: Specify filtering rule to reject events.
+                                  This directive contains two parameters.
+                                properties:
+                                  key:
+                                    description: Specify field name in the record
+                                      to parse.
+                                    type: string
+                                  pattern:
+                                    description: Pattern expression to evaluate
+                                    type: string
+                                required:
+                                - key
+                                - pattern
+                                type: object
+                              type: array
+                            regexp:
+                              items:
+                                description: Specify filtering rule. This directive
+                                  contains two parameters.
+                                properties:
+                                  key:
+                                    description: Specify field name in the record
+                                      to parse.
+                                    type: string
+                                  pattern:
+                                    description: Pattern expression to evaluate
+                                    type: string
+                                required:
+                                - key
+                                - pattern
+                                type: object
+                              type: array
+                          type: object
+                        type: array
+                      exclude:
+                        items:
+                          description: Specify filtering rule to reject events. This
+                            directive contains two parameters.
+                          properties:
+                            key:
+                              description: Specify field name in the record to parse.
+                              type: string
+                            pattern:
+                              description: Pattern expression to evaluate
+                              type: string
+                          required:
+                          - key
+                          - pattern
+                          type: object
+                        type: array
+                      or:
+                        items:
+                          description: Specify filtering rule. This directive contains
+                            either <regexp> or <exclude> directive.
+                          properties:
+                            exclude:
+                              items:
+                                description: Specify filtering rule to reject events.
+                                  This directive contains two parameters.
+                                properties:
+                                  key:
+                                    description: Specify field name in the record
+                                      to parse.
+                                    type: string
+                                  pattern:
+                                    description: Pattern expression to evaluate
+                                    type: string
+                                required:
+                                - key
+                                - pattern
+                                type: object
+                              type: array
+                            regexp:
+                              items:
+                                description: Specify filtering rule. This directive
+                                  contains two parameters.
+                                properties:
+                                  key:
+                                    description: Specify field name in the record
+                                      to parse.
+                                    type: string
+                                  pattern:
+                                    description: Pattern expression to evaluate
+                                    type: string
+                                required:
+                                - key
+                                - pattern
+                                type: object
+                              type: array
+                          type: object
+                        type: array
+                      regexp:
+                        items:
+                          description: Specify filtering rule. This directive contains
+                            two parameters.
+                          properties:
+                            key:
+                              description: Specify field name in the record to parse.
+                              type: string
+                            pattern:
+                              description: Pattern expression to evaluate
+                              type: string
+                          required:
+                          - key
+                          - pattern
+                          type: object
+                        type: array
+                    type: object
                   parser:
                     description: https://docs.fluentd.org/filter/parser
                     properties:
