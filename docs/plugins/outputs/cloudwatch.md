@@ -34,6 +34,10 @@ More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-
 | auto_create_stream | bool | No |  false | Create log group and stream automatically. <br> |
 | aws_key_id | *secret.Secret | No | - | AWS access key id<br>[Secret](./secret.md)<br> |
 | aws_sec_key | *secret.Secret | No | - | AWS secret key.<br>[Secret](./secret.md)<br> |
+| aws_instance_profile_credentials_retries | int | No |  nil | Instance Profile Credentials call retries <br> |
+| aws_use_sts | bool | No | - | Enable AssumeRoleCredentials to authenticate, rather than the default credential hierarchy. See 'Cross-Account Operation' below for more detail.<br> |
+| aws_sts_role_arn | string | No | - | The role ARN to assume when using cross-account sts authentication<br> |
+| aws_sts_session_name | string | No |  'fluentd' | The session name to use with sts authentication  <br> |
 | concurrency | int | No |  1 | Use to set the number of threads pushing data to CloudWatch. <br> |
 | endpoint | string | No | - | Use this parameter to connect to the local API endpoint (for testing)<br> |
 | http_proxy | string | No | - | Use to set an optional HTTP proxy<br> |
