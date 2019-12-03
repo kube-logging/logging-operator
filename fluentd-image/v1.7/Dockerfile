@@ -59,7 +59,8 @@ RUN addgroup -S fluent && adduser -S -G fluent fluent \
     && mkdir -p /fluentd/log \
     # configuration/plugins path (default: copied from .)
     && mkdir -p /fluentd/etc /fluentd/plugins \
-    && chown -R fluent /fluentd && chgrp -R fluent /fluentd
+    && chown -R fluent /fluentd && chgrp -R fluent /fluentd \
+    && mkdir -p /buffers && chown -R fluent /buffers
 
 
 COPY fluent.conf /fluentd/etc/
