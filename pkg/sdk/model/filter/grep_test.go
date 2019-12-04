@@ -22,9 +22,115 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func TestGrep(t *testing.T) {
+func TestGrepRegexp(t *testing.T) {
 	CONFIG := []byte(`
 regexp:
+  - key: elso
+    pattern: /^5\d\d$/
+`)
+	expected := `
+<filter **>
+@type grep
+@id test_grep
+<regexp>
+  key elso
+  pattern /^5\d\d$/
+</regexp>
+</filter>
+`
+	grep := &filter.GrepConfig{}
+	yaml.Unmarshal(CONFIG, grep)
+	test := render.NewOutputPluginTest(t, grep)
+	test.DiffResult(expected)
+}
+
+func TestGrepExclude(t *testing.T) {
+	CONFIG := []byte(`
+exclude:
+  - key: elso
+    pattern: /^5\d\d$/
+`)
+	expected := `
+<filter **>
+@type grep
+@id test_grep
+<exclude>
+  key elso
+  pattern /^5\d\d$/
+</exclude>
+</filter>
+`
+	grep := &filter.GrepConfig{}
+	yaml.Unmarshal(CONFIG, grep)
+	test := render.NewOutputPluginTest(t, grep)
+	test.DiffResult(expected)
+}
+
+func TestGrepOr(t *testing.T) {
+	CONFIG := []byte(`
+or:
+  - regexp:
+    - key: elso
+      pattern: /^5\d\d$/
+    - key: masodik
+      pattern: /\.css$/
+`)
+	expected := `
+<filter **>
+@type grep
+@id test_grep
+<or>
+  <regexp>
+	key elso
+	pattern /^5\d\d$/
+  </regexp>
+  <regexp>
+	key masodik
+	pattern /\.css$/
+  </regexp>
+</or>
+</filter>
+`
+	grep := &filter.GrepConfig{}
+	yaml.Unmarshal(CONFIG, grep)
+	test := render.NewOutputPluginTest(t, grep)
+	test.DiffResult(expected)
+}
+
+func TestGrepAnd(t *testing.T) {
+	CONFIG := []byte(`
+and:
+  - exclude:
+    - key: elso
+      pattern: /^5\d\d$/
+    - key: masodik
+      pattern: /\.css$/
+`)
+	expected := `
+<filter **>
+@type grep
+@id test_grep
+<and>
+  <exclude>
+	key elso
+	pattern /^5\d\d$/
+  </exclude>
+  <exclude>
+	key masodik
+	pattern /\.css$/
+  </exclude>
+</and>
+</filter>
+`
+	grep := &filter.GrepConfig{}
+	yaml.Unmarshal(CONFIG, grep)
+	test := render.NewOutputPluginTest(t, grep)
+	test.DiffResult(expected)
+}
+
+func TestGrepMulti(t *testing.T) {
+	CONFIG := []byte(`
+exclude:
   - key: elso
     pattern: /^5\d\d$/
   - key: masodik
@@ -40,14 +146,14 @@ and:
 <filter **>
 @type grep
 @id test_grep
-<regexp>
+<exclude>
   key elso
   pattern /^5\d\d$/
-</regexp>
-<regexp>
+</exclude>
+<exclude>
   key masodik
   pattern /\.css$/
-</regexp>
+</exclude>
 <and>
   <regexp>
 	key elso
