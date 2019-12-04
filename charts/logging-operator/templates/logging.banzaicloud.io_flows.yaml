@@ -182,7 +182,7 @@ spec:
                       and:
                         items:
                           description: Specify filtering rule. This directive contains
-                            either <regexp> or <exclude> directive.
+                            either `regexp` or `exclude` directive.
                           properties:
                             exclude:
                               items:
@@ -239,7 +239,7 @@ spec:
                       or:
                         items:
                           description: Specify filtering rule. This directive contains
-                            either <regexp> or <exclude> directive.
+                            either `regexp` or `exclude` directive.
                           properties:
                             exclude:
                               items:

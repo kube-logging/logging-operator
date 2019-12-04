@@ -85,7 +85,7 @@ spec:
 
 ---
 ### [Or Directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive)
-#### Specify filtering rule. This directive contains either <regexp> or <exclude> directive.
+#### Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
@@ -128,7 +128,7 @@ spec:
 
 ---
 ### [And Directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive)
-#### Specify filtering rule. This directive contains either <regexp> or <exclude> directive.
+#### Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

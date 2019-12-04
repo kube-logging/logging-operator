@@ -118,7 +118,7 @@ type _expExclude interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"[Or Directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive)"
-// Specify filtering rule. This directive contains either <regexp> or <exclude> directive.
+// Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
 type OrSection struct {
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp []RegexpSection `json:"regexp,omitempty"`
@@ -164,7 +164,7 @@ type _expOR interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"[And Directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive)"
-// Specify filtering rule. This directive contains either <regexp> or <exclude> directive.
+// Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
 type AndSection struct {
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp []RegexpSection `json:"regexp,omitempty"`
