@@ -37,6 +37,7 @@ type Filter struct {
 	GeoIP             *filter.GeoIP              `json:"geoip,omitempty"`
 	Concat            *filter.Concat             `json:"concat,omitempty"`
 	DetectExceptions  *filter.DetectExceptions   `json:"detectExceptions,omitempty"`
+	Grep              *filter.GrepConfig         `json:"grep,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
