@@ -135,10 +135,10 @@ If you encounter any problems that the documentation does not address, please [f
 
 If you find this project useful here's how you can help:
 
-:rocket: Send a pull request with your new features and bug fixes
-:muscle: Help new users with issues they may encounter
-:star: Support the development of this project and star this repo!
-:metal: If you use the operator, we would like to kindly ask you to add yourself to the list of production adopters.
+- Send a pull request with your new features and bug fixes :rocket: 
+- Help new users with issues they may encounter :muscle:
+- Support the development of this project and star this repo! :star:
+- If you use the operator, we would like to kindly ask you to add yourself to the list of production [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
 For more information please read the [developer documentation](./docs/developers.md)
 
 ## License
