@@ -27,7 +27,7 @@ spec:
   filters:
     - grep:
         regexp:
-        - key: elso
+        - key: first
           pattern: /^5\d\d$/
   selectors: {}
   outputRefs:
@@ -40,7 +40,7 @@ spec:
     @type grep
     @id demo-flow_1_grep
     <regexp>
-      key elso
+      key first
       pattern /^5\d\d$/
     </regexp>
   </filter>
@@ -64,7 +64,7 @@ spec:
   filters:
     - grep:
         exclude:
-        - key: elso
+        - key: first
           pattern: /^5\d\d$/
   selectors: {}
   outputRefs:
@@ -77,7 +77,7 @@ spec:
     @type grep
     @id demo-flow_0_grep
     <exclude>
-      key elso
+      key first
       pattern /^5\d\d$/
     </exclude>
   </filter>
@@ -102,9 +102,9 @@ spec:
     - grep:
         or:
           - exclude:
-            - key: elso
+            - key: first
               pattern: /^5\d\d$/
-            - key: masodik
+            - key: second
               pattern: /\.css$/
 
   selectors: {}
@@ -116,11 +116,11 @@ spec:
  ```
     <or>
       <exclude>
-        key elso
+        key first
         pattern /^5\d\d$/
       </exclude>
       <exclude>
-        key masodik
+        key second
         pattern /\.css$/
       </exclude>
     </or>
@@ -145,9 +145,9 @@ spec:
     - grep:
         and:
           - regexp:
-            - key: elso
+            - key: first
               pattern: /^5\d\d$/
-            - key: masodik
+            - key: second
               pattern: /\.css$/
 
   selectors: {}
@@ -159,11 +159,11 @@ spec:
  ```
     <and>
       <regexp>
-        key elso
+        key first
         pattern /^5\d\d$/
       </regexp>
       <regexp>
-        key masodik
+        key second
         pattern /\.css$/
       </regexp>
     </and>
