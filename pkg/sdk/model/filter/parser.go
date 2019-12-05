@@ -20,6 +20,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Parser"
+// +url:"https://docs.fluentd.org/filter/parser"
+// +version:"more info"
+// +description:"Parses" string field in event records and mutates its"
+// +status:"GA"
+type _metaParser interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Parser"
 // https://docs.fluentd.org/filter/parser

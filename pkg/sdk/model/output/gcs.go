@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Google Cloud Storage"
+// +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
+// +version:"0.4.0"
+// +description:"Store logs in Google Cloud Storage"
+// +status:"GA"
+type _metaGCS interface{}
+
 // +kubebuilder:object:generate=true
 type GCSOutput struct {
 	// Project identifier for GCS

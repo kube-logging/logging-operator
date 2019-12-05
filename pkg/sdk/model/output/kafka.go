@@ -40,6 +40,13 @@ import (
 // ```
 type _docKafka interface{}
 
+// +name:"Kafka"
+// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1"
+// +version:"0.12.1"
+// +description:"Send your logs to Kafka"
+// +status:"GA"
+type _metaKafka interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Kafka"
 // Send your logs to Kafka

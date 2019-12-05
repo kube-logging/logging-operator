@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Null"
+// +url:"https://docs.fluentd.org/output/null"
+// +version:"more info"
+// +description:"Null output plugin just throws away events."
+// +status:"GA"
+type _metaNull interface{}
+
 // +kubebuilder:object:generate=true
 
 type NullOutputConfig struct {
