@@ -135,10 +135,10 @@ If you encounter any problems that the documentation does not address, please [f
 
 If you find this project useful here's how you can help:
 
-- Send a pull request with your new features and bug fixes
-- Help new users with issues they may encounter
-- Support the development of this project and star this repo!
-
+:rocket: Send a pull request with your new features and bug fixes
+:muscle: Help new users with issues they may encounter
+:star: Support the development of this project and star this repo!
+:metal: If you use the operator, we would like to kindly ask you to add yourself to the list of production adopters.
 For more information please read the [developer documentation](./docs/developers.md)
 
 ## License
