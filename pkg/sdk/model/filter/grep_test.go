@@ -25,7 +25,7 @@ import (
 func TestGrepRegexp(t *testing.T) {
 	CONFIG := []byte(`
 regexp:
-  - key: elso
+  - key: first
     pattern: /^5\d\d$/
 `)
 	expected := `
@@ -33,7 +33,7 @@ regexp:
 @type grep
 @id test_grep
 <regexp>
-  key elso
+  key first
   pattern /^5\d\d$/
 </regexp>
 </filter>
@@ -47,7 +47,7 @@ regexp:
 func TestGrepExclude(t *testing.T) {
 	CONFIG := []byte(`
 exclude:
-  - key: elso
+  - key: first
     pattern: /^5\d\d$/
 `)
 	expected := `
@@ -55,7 +55,7 @@ exclude:
 @type grep
 @id test_grep
 <exclude>
-  key elso
+  key first
   pattern /^5\d\d$/
 </exclude>
 </filter>
@@ -70,9 +70,9 @@ func TestGrepOr(t *testing.T) {
 	CONFIG := []byte(`
 or:
   - regexp:
-    - key: elso
+    - key: first
       pattern: /^5\d\d$/
-    - key: masodik
+    - key: second
       pattern: /\.css$/
 `)
 	expected := `
@@ -81,11 +81,11 @@ or:
 @id test_grep
 <or>
   <regexp>
-	key elso
+	key first
 	pattern /^5\d\d$/
   </regexp>
   <regexp>
-	key masodik
+	key second
 	pattern /\.css$/
   </regexp>
 </or>
@@ -101,9 +101,9 @@ func TestGrepAnd(t *testing.T) {
 	CONFIG := []byte(`
 and:
   - exclude:
-    - key: elso
+    - key: first
       pattern: /^5\d\d$/
-    - key: masodik
+    - key: second
       pattern: /\.css$/
 `)
 	expected := `
@@ -112,11 +112,11 @@ and:
 @id test_grep
 <and>
   <exclude>
-	key elso
+	key first
 	pattern /^5\d\d$/
   </exclude>
   <exclude>
-	key masodik
+	key second
 	pattern /\.css$/
   </exclude>
 </and>
@@ -131,15 +131,15 @@ and:
 func TestGrepMulti(t *testing.T) {
 	CONFIG := []byte(`
 exclude:
-  - key: elso
+  - key: first
     pattern: /^5\d\d$/
-  - key: masodik
+  - key: second
     pattern: /\.css$/
 and:
   - regexp:
-    - key: elso
+    - key: first
       pattern: /^5\d\d$/
-    - key: masodik
+    - key: second
       pattern: /\.css$/
 `)
 	expected := `
@@ -147,20 +147,20 @@ and:
 @type grep
 @id test_grep
 <exclude>
-  key elso
+  key first
   pattern /^5\d\d$/
 </exclude>
 <exclude>
-  key masodik
+  key second
   pattern /\.css$/
 </exclude>
 <and>
   <regexp>
-	key elso
+	key first
 	pattern /^5\d\d$/
   </regexp>
   <regexp>
-	key masodik
+	key second
 	pattern /\.css$/
   </regexp>
 </and>

@@ -56,7 +56,7 @@ type RegexpSection struct {
 //  filters:
 //    - grep:
 //        regexp:
-//        - key: elso
+//        - key: first
 //          pattern: /^5\d\d$/
 //  selectors: {}
 //  outputRefs:
@@ -69,7 +69,7 @@ type RegexpSection struct {
 //    @type grep
 //    @id demo-flow_1_grep
 //    <regexp>
-//      key elso
+//      key first
 //      pattern /^5\d\d$/
 //    </regexp>
 //  </filter>
@@ -96,7 +96,7 @@ type ExcludeSection struct {
 //  filters:
 //    - grep:
 //        exclude:
-//        - key: elso
+//        - key: first
 //          pattern: /^5\d\d$/
 //  selectors: {}
 //  outputRefs:
@@ -109,7 +109,7 @@ type ExcludeSection struct {
 //    @type grep
 //    @id demo-flow_0_grep
 //    <exclude>
-//      key elso
+//      key first
 //      pattern /^5\d\d$/
 //    </exclude>
 //  </filter>
@@ -137,9 +137,9 @@ type OrSection struct {
 //    - grep:
 //        or:
 //          - exclude:
-//            - key: elso
+//            - key: first
 //              pattern: /^5\d\d$/
-//            - key: masodik
+//            - key: second
 //              pattern: /\.css$/
 //
 //  selectors: {}
@@ -151,11 +151,11 @@ type OrSection struct {
 // ```
 //    <or>
 //      <exclude>
-//        key elso
+//        key first
 //        pattern /^5\d\d$/
 //      </exclude>
 //      <exclude>
-//        key masodik
+//        key second
 //        pattern /\.css$/
 //      </exclude>
 //    </or>
@@ -183,9 +183,9 @@ type AndSection struct {
 //    - grep:
 //        and:
 //          - regexp:
-//            - key: elso
+//            - key: first
 //              pattern: /^5\d\d$/
-//            - key: masodik
+//            - key: second
 //              pattern: /\.css$/
 //
 //  selectors: {}
@@ -197,11 +197,11 @@ type AndSection struct {
 // ```
 //    <and>
 //      <regexp>
-//        key elso
+//        key first
 //        pattern /^5\d\d$/
 //      </regexp>
 //      <regexp>
-//        key masodik
+//        key second
 //        pattern /\.css$/
 //      </regexp>
 //    </and>
