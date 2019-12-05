@@ -33,6 +33,13 @@ import (
 // ```
 type _docConcat interface{}
 
+// +name:"Concat"
+// +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-concat"
+// +version:"more info"
+// +description:"Concatenate multiline log separated in multiple events"
+// +status:"GA"
+type _metaConcat interface{}
+
 // +kubebuilder:object:generate=true
 type Concat struct {
 	// Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.

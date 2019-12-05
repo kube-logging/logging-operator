@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Format"
+// +url:"https://docs.fluentd.org/configuration/format-section"
+// +version:"more info"
+// +description:"Specify how to format output record."
+// +status:"GA"
+type _metaFormat interface{}
+
 // +kubebuilder:object:generate=true
 type Format struct {
 	// Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value (default: json)

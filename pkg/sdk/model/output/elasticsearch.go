@@ -39,6 +39,13 @@ import (
 // ```
 type _docElasticsearch interface{}
 
+// +name:"Elasticsearch"
+// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.7.0"
+// +version:"3.7.0"
+// +description:"Send your logs to Elasticsearch"
+// +status:"GA"
+type _metaElasticsearch interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Elasticsearch"
 // Send your logs to Elasticsearch

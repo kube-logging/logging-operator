@@ -35,6 +35,13 @@ import (
 // ```
 type _docExceptionDetector interface{}
 
+// +name:"Exception Detector"
+// +url:"https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions"
+// +version:"more info"
+// +description:"Exception Detector"
+// +status:"GA"
+type _metaDDetectExceptions interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type DetectExceptions struct {

@@ -18,6 +18,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Security"
+type _metaSecurity interface{}
+
 type Security struct {
 	// Hostname
 	SelfHostname string `json:"self_hostname"`

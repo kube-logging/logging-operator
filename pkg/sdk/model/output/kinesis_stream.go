@@ -33,6 +33,13 @@ import (
 // ```
 type _docKinesisStream interface{}
 
+// +name:"Amazon Kinesis"
+// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.0"
+// +version:"3.2.0"
+// +description:"Fluent plugin for Amazon Kinesis"
+// +status:"GA"
+type _metaKinesis interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"KinesisStream"
 // Send your logs to a Kinesis Stream

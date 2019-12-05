@@ -18,6 +18,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Transport"
+type _metaTransport interface{}
+
 type Transport struct {
 	// Protocol Default: :tcp
 	Protocol string `json:"protocol,omitempty"`

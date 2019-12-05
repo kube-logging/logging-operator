@@ -20,6 +20,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Forward"
+// +url:"https://docs.fluentd.org/output/forward"
+// +version:"more info"
+// +description:"Forwards events to other fluentd nodes."
+// +status:"GA"
+type _metaForward interface{}
+
 // +kubebuilder:object:generate=true
 type ForwardOutput struct {
 	// Server definitions at least one is required
