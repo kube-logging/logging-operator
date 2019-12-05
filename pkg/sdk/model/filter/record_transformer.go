@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Record Transformer"
+// +url:"https://docs.fluentd.org/filter/record_transformer"
+// +version:"more info"
+// +description:"Mutates/transforms incoming event streams."
+// +status:"GA"
+type _metaRecordTransformer interface{}
+
 // +kubebuilder:object:generate=true
 type RecordTransformer struct {
 	// A comma-delimited list of keys to delete

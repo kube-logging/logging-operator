@@ -35,9 +35,15 @@ import (
 var log logr.Logger
 
 type doc struct {
-	Name     string
-	Content  string
-	Type     string
+	Name        string
+	DisplayName string
+	Content     string
+	Type        string
+	Version     string
+	Url         string
+	Desc        string
+	Status      string
+
 	RootNode *ast.File
 }
 
@@ -56,6 +62,13 @@ func (d *doc) checkNodes(n ast.Node) bool {
 				d.append("## Overview")
 				d.append(getTypeDocs(generic, false))
 				d.append("## Configuration")
+			}
+			if ok && strings.HasPrefix(typeName.Name.Name, "_meta") {
+				d.DisplayName = getPrefixedLine(getTypeDocs(generic, true), `\+name:\"(.*)\"`)
+				d.Url = getPrefixedLine(getTypeDocs(generic, true), `\+url:\"(.*)\"`)
+				d.Version = getPrefixedLine(getTypeDocs(generic, true), `\+version:\"(.*)\"`)
+				d.Desc = getPrefixedLine(getTypeDocs(generic, true), `\+description:\"(.*)\"`)
+				d.Status = getPrefixedLine(getTypeDocs(generic, true), `\+status:\"(.*)\"`)
 			}
 			if ok && strings.HasPrefix(typeName.Name.Name, "_exp") {
 				d.append(getTypeDocs(generic, false))
@@ -145,32 +158,34 @@ func main() {
 	verboseLogging := true
 	ctrl.SetLogger(zap.Logger(verboseLogging))
 	log = ctrl.Log.WithName("docs").WithName("main")
-	//log.Info("plugin Directories:", "packageDir", packageDir)
 
 	fileList, err := getPlugins(pluginDirs)
 	if err != nil {
 		log.Error(err, "Directory check error.")
 	}
+	index := doc{
+		Name: "Readme",
+	}
+	index.append("# Supported Plugins\n\n")
+	index.append("For more information please click on the plugin name")
+	index.append("<center>\n")
+	index.append("| Name | Type | Description | Status |Version |")
+	index.append("|:---|---|:---|:---:|---:|")
+
 	for _, file := range fileList {
 		log.Info("plugin", "Name", file.SourcePath)
 		document := getDocumentParser(file)
 		document.generate()
+		index.append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
+			document.DisplayName,
+			file.DocumentationPath,
+			document.Type,
+			document.Desc,
+			document.Status,
+			document.Version,
+			document.Url))
 	}
-
-	index := doc{
-		Name: "Readme",
-	}
-	index.append("## Table of Contents\n\n")
-	for _, p := range pluginDirs {
-		index.append(fmt.Sprintf("### %s\n", p.Type))
-		for _, plugin := range fileList {
-			if plugin.Type == p.Type {
-				index.append(fmt.Sprintf("- [%s](%s)", plugin.Name, plugin.DocumentationPath))
-			}
-		}
-		index.append("\n")
-	}
-
+	index.append("</center>")
 	index.generate()
 }
 

@@ -49,6 +49,13 @@ import (
 // ```
 type _docS3 interface{}
 
+// +name:"Amazon S3"
+// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1"
+// +version:"1.2.1"
+// +description:"Store logs in Amazon S3"
+// +status:"GA"
+type _metaS3 interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type S3OutputConfig struct {

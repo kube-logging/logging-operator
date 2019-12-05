@@ -44,6 +44,13 @@ import (
 // ```
 type _docGeoIP interface{}
 
+// +name:"Geo IP"
+// +url:"https://github.com/y-ken/fluent-plugin-geoip"
+// +version:"more info"
+// +description:"Fluentd GeoIP filter"
+// +status:"GA"
+type _metaGeoIP interface{}
+
 // +kubebuilder:object:generate=true
 type GeoIP struct {
 	//Specify one or more geoip lookup field which has ip address (default: host)

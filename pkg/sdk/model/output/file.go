@@ -35,6 +35,13 @@ import (
 // ```
 type _docFile interface{}
 
+// +name:"File"
+// +url:"https://docs.fluentd.org/output/file"
+// +version:"more info"
+// +description:"Output plugin writes events to files"
+// +status:"GA"
+type _metaFile interface{}
+
 // +kubebuilder:object:generate=true
 type FileOutputConfig struct {
 	// The Path of the file. The actual path is path + time + ".log" by default.

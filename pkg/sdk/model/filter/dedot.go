@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Dedot"
+// +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
+// +version:"more info"
+// +description:"Concatenate multiline log separated in multiple events"
+// +status:"GA"
+type _metaDedot interface{}
+
 // +kubebuilder:object:generate=true
 
 // +docName:"Fluentd Filter plugin to de-dot field name for elasticsearch."
