@@ -57,6 +57,10 @@ func (d *doc) checkNodes(n ast.Node) bool {
 				d.append(getTypeDocs(generic, false))
 				d.append("## Configuration")
 			}
+			if ok && strings.HasPrefix(typeName.Name.Name, "_exp") {
+				d.append(getTypeDocs(generic, false))
+				d.append("---")
+			}
 			structure, ok := typeName.Type.(*ast.StructType)
 			if ok {
 				d.append(fmt.Sprintf("### %s", getTypeName(generic, typeName.Name.Name)))

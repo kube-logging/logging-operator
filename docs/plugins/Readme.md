@@ -7,6 +7,7 @@
 - [dedot](./filters/dedot.md)
 - [detect_exceptions](./filters/detect_exceptions.md)
 - [geoip](./filters/geoip.md)
+- [grep](./filters/grep.md)
 - [parser](./filters/parser.md)
 - [record_transformer](./filters/record_transformer.md)
 - [stdout](./filters/stdout.md)
