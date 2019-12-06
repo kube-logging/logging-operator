@@ -28,7 +28,7 @@ $ helm install --name my-release banzaicloud-stable/logging-operator
 
 ### CRDs
 The CRDs are provisioned using crd-install hooks, rather than relying on a separate chart installation.
-If you already have these CRDs provisioned and don't want to remove them, you can disable the CRD creation by these hooks by passing `createCustomResource=false` (not required if using Helm v3).
+Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
 
 The command deploys **logging-operator** on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
