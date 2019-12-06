@@ -26,6 +26,9 @@ To install the chart with the release name `my-release`:
 $ helm install --name my-release banzaicloud-stable/logging-operator
 ```
 
+### CRDs
+Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+
 The command deploys **logging-operator** on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 ## Uninstalling the Chart
@@ -58,7 +61,8 @@ The following tables lists the configurable parameters of the logging-operator c
 | `nodeSelector`                                      | Define which Nodes the Pods are scheduled on.          | `{}`                           |
 | `annotations`                                       | Define annotations for logging-operator pods           | `{}`                           |
 | `podSecurityContext`                                | Pod SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"runAsNonRoot": true, "runAsUser": 1000, "fsGroup": 2000}` |
-| `securityContext`                                   | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true}` |
+| `securityContext`                                   | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/) | `{"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true}` |
+| `createCustomResource`                              | Create CRDs. | `true` |
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
