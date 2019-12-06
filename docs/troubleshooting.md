@@ -180,6 +180,10 @@ fluentd:
   logLevel: debug
 ```
 
+### Get fluentd logs
+`kubectl exec -it logging-demo-fluentd-0 cat /fluentd/log/out`
+
+
 ### Set stdout as an output 
 You can use an stdout filter for this at any point in the flow to dump logs to the fluentd container’s stdout:<br>
 e.g.: `kubectl edit loggings.logging.banzaicloud.io logging-demo`
