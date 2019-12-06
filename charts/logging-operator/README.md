@@ -48,7 +48,7 @@ The following tables lists the configurable parameters of the logging-operator c
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `image.repository`                                  | Container image repository                             | `banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `2.6.1`                        |
+| `image.tag`                                         | Container image tag                                    | `2.7.0`                        |
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
@@ -111,7 +111,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`            |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
-| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.7.4-alpine-11`              |
+| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.7.4-alpine-12`              |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `banzaicloud/fluentd`          |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                          | `IfNotPresent`                 |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag             | `latest`                       |
