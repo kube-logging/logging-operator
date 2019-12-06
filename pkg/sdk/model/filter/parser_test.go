@@ -26,8 +26,8 @@ func TestParser(t *testing.T) {
 	CONFIG := []byte(`
 remove_key_name_field: true
 reserve_data: true
-parsers:
-- type: nginx
+parse:
+  type: nginx
 `)
 	expected := `
 <filter **>
@@ -51,8 +51,8 @@ func TestParserMultiParser(t *testing.T) {
 	CONFIG := []byte(`
 remove_key_name_field: true
 reserve_data: true
-parsers:
-- type: multi_format
+parse:
+  type: multi_format
   patterns:
   - format: nginx
   - format: regexp

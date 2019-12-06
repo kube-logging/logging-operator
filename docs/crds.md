@@ -375,10 +375,10 @@ metadata:
   namespace: default
 spec:
   filters:
-    - parse:
+    - parser:
         remove_key_name_field: true
-        parsers:
-          - type: nginx
+        parse:
+          type: nginx
     - tag_normaliser:
         format: ${namespace_name}.${pod_name}.${container_name}
   outputRefs:
