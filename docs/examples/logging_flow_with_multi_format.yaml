@@ -5,8 +5,8 @@ metadata:
 spec:
   filters:
   - parser:
-      parsers:
-      - type: multi_format
+      parse:
+        type: multi_format
         patterns:
         - format: nginx
         - format: regexp

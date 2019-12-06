@@ -31,8 +31,8 @@ import (
 //        format: ${namespace_name}.${pod_name}.${container_name}
 //    - parser:
 //        remove_key_name_field: true
-//        parsers:
-//          - type: nginx
+//        parse:
+//          type: nginx
 //    - geoip:
 //        geoip_lookup_keys: remote_addr
 //        records:

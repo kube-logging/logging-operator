@@ -8,8 +8,8 @@ spec:
         format: ${namespace_name}.${pod_name}.${container_name}
     - parser:
         remove_key_name_field: true
-        parsers:
-          - type: nginx
+        parse:
+          type: nginx
     - geoip:
         records:
           - city: ${city.names.en["remote"]}

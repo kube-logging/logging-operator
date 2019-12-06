@@ -218,8 +218,8 @@ spec:
     - parser:
         remove_key_name_field: true
         reserve_data: true
-        parsers:
-          - type: nginx
+        parse:
+          type: nginx
   selectors:
     app.kubernetes.io/instance: nginx-demo
     app.kubernetes.io/name: nginx-logging-demo
