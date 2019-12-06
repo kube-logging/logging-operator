@@ -122,8 +122,8 @@ spec:
     - parser:
         remove_key_name_field: true
         reserve_data: true
-        parsers:
-          - type: nginx
+        parse:
+          type: nginx
   selectors:
     app: nginx
   outputRefs:
