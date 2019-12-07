@@ -1,11 +1,11 @@
-<p align="center"><img src="./img/s3_logo.png" width="340"></p>
+<p align="center"><img src="../img/s3_logo.png" width="340"></p>
 
 # Save all logs to S3
 
-<p align="center"><img src="./img/s3_flow.png" width="900"></p>
+<p align="center"><img src="../img/s3_flow.png" width="900"></p>
 
 ## Deploy Logging-operator
-Before you start [install logging-operator](./deploy/README.md#)
+Before you start [install logging-operator](../deploy/README.md#)
 
 ## Create default logging
 
@@ -99,7 +99,7 @@ spec:
     - s3-output
 EOF
 ```
-> The following snippet will use [tag_normaliser](./plugins/filters/tagnormaliser.md) to re-tag logs and after push it to S3.
+> The following snippet will use [tag_normaliser](../plugins/filters/tagnormaliser.md) to re-tag logs and after push it to S3.
 
 
 ### Output
