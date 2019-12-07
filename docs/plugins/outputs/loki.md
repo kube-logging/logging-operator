@@ -2,7 +2,7 @@
 ## Overview
 Fluentd output plugin to ship logs to a Loki server.
 More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
->Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../docs/example-loki-nginx.md)
+>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../examples/example-loki-nginx.md)
 
  #### Example output configurations
  ```
