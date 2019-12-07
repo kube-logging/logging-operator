@@ -23,20 +23,20 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
   - [Deploy with Helm](./deploy/README.md#deploy-logging-operator-with-helm)
   - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 - **[Supported Plugins](./plugins/Readme.md)**
-- **[Examples](./docs)**
-  - [S3 Output](./example-s3.md)
-  - [Elasticsearch Output](./example-es-nginx.md)
-  - [Loki Output](./example-loki-nginx.md)
-  - [Kafka Output](./example-kafka-nginx.md)
-  - [Amazon CloudWatch Output](./example-cloudwatch-nginx.md)
-  - [And more...](./examples)
 - **[Custom Resource Definitions](./crds.md)**
+- **[Troubleshooting](./troubleshooting.md)**
 - **[Fluentbit Configuration](./fluentbit.md)**
 - **[For Developers](./developers.md)**
 - **[Monitoring](./logging-operator-monitoring.md)**
 - **[Security](./security/README.md)**
+- **[Examples](./docs)**
+  - [Amazon S3 Output](examples/example-s3.md)
+  - [Amazon CloudWatch Output](examples/cloudwatch-nginx.md)
+  - [Elasticsearch Output](examples/es-nginx.md)
+  - [Grafana Loki Output](examples/loki-nginx.md)
+  - [Kafka Output](examples/kafka-nginx.md)
+  - [And more...](./examples)
 - **[Requirements](#requirements)**
-- **[Troubleshooting](./troubleshooting.md)**
 - **[Contributing](../README.md#contributing)**
 - **[Blogs](#blogs)**
 - **[Licence](#License)**
@@ -51,20 +51,23 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 Hardware requirements scale based on the size of your cluster.<br>
 Default configuration is:<br>
 **Fluentbit:**
+```yaml
 - Limits:
   - cpu: 200m
   - memory: 100M
 - Requests:
   - cpu: 100m
   - memory: 50M
-
+```
 **FluentD**
+```yaml
 - Limits:
   - cpu: 1
   - memory: 200M
 - Requests:
   - cpu: 500m
   - memory:  100M
+```
 
 You can easily change this  
  ```yaml
@@ -95,9 +98,10 @@ spec:
  
 ## Blogs
   - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/)
+  - [Measuring the performance](https://banzaicloud.com/blog/logging-operator-monitoring/)
   - [Eleasticsearch and GeoIP](https://banzaicloud.com/blog/logging-operator-efk/)  
 
-##### Blogs (general logging and operator v1)
+#### Blogs (general logging and operator v1)
   - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
   - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
   - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
