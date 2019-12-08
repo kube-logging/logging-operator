@@ -43,31 +43,31 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 ---
 
 ## Requirements
- `Software`
+### Software
  - Logging Operator requires use of Kubernetes v1.14.x and up.
  - For the [Helm base installation](./deploy/README.md#deploy-logging-operator-with-helm) we required Helm v2.16.0 or higher.
  
- `CPU and Memory`<br>
+### CPU and Memory
 Hardware requirements scale based on the size of your cluster.<br>
-Default configuration is:<br>
+#### Default configuration:
 **Fluentbit:**
-```yaml
-- Limits:
-  - cpu: 200m
-  - memory: 100M
-- Requests:
-  - cpu: 100m
-  - memory: 50M
-```
+>```yaml
+>- Limits:
+>  - cpu: 200m
+>  - memory: 100M
+>- Requests:
+>  - cpu: 100m
+>  - memory: 50M
+>```
 **FluentD**
-```yaml
-- Limits:
-  - cpu: 1
-  - memory: 200M
-- Requests:
-  - cpu: 500m
-  - memory:  100M
-```
+>```yaml
+>- Limits:
+>  - cpu: 1
+>  - memory: 200M
+>- Requests:
+>  - cpu: 500m
+>  - memory:  100M
+>```
 
 You can easily change this  
  ```yaml
