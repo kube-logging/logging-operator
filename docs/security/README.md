@@ -361,5 +361,4 @@ spec:
     fsGroup: 101
   serviceAccount: nginx-demo-nginx-logging-demo-logging-fluentd
 ...
-```
 
