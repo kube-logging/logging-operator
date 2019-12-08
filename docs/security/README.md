@@ -1,9 +1,9 @@
 <p align="center"><img src="../img/lo.svg" width="260"></p>
 <p align="center">
 
-# Logging-operator && Security
+# Security
 
----
+
 ## Contents
 - **Using RBAC Authorization**
     - [Deploy with Kubernetes Manifests](#deploy-with-kubernetes-manifests)
