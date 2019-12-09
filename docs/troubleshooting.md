@@ -213,5 +213,15 @@ logging_logging-demo-flow_logging-demo-output-minio_s3.b598f7eb0b2b34076b6da13a9
 
 If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
 
-
-
+## Still In Trouble
+If you are still in trouble with the operator you can contact us in the #logging-operator slack channel [here](https://slack.banzaicloud.io/).
+The following information gives a huge help for us:
+- logging-operator version
+- kubernetes version
+- helm/chart version(if you are install with helm)
+- operator logs
+- fluentd config
+- fluentd logs
+- fluentbit config
+- fluentbit logs
+Please be sure you cleaned up all the sensitive information before sharing.
