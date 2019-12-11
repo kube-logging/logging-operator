@@ -104,6 +104,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
+| scaling | [scaling](#scaling)] | "" | Fluentd scaling preferences |
 | fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
 | livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container liveness. Container will be restarted if the probe fails. |
@@ -310,6 +311,28 @@ spec:
       enabled: false
 ```
 
+
+#### Scaling
+
+Scaling components 
+
+| Name                    | Type           | Default | Description |
+|-------------------------|----------------|---------|-------------|
+| replicas | int | 1 | number of pod replicas |
+
+**`logging` with custom fluentd replica number** 
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: 
+    scaling:
+      replicas: 3
+  fluentbit: {}
+  controlNamespace: logging
+```
 
 ## Outputs, Clusteroutputs
 
