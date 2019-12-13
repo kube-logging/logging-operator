@@ -9,6 +9,9 @@ flowConfigCheckDisabled: false
 # Use static configuration instead of generated config.
 flowConfigOverride:	""
 
+nameOverride: ""
+fullnameOverride: ""
+
 # If an immutable field is changed, delete the existing resource
 # and recreate it with the new configuration.
 enableRecreateWorkloadOnImmutableFieldChange: false
