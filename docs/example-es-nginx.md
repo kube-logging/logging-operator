@@ -8,7 +8,7 @@
 ## Contents
 - **Installation**
   - **ElasticSearch Operator**
-    - [Deploy with Helm](#deploy-elasticsearch)
+    - [Deploy with Kubernetes Manifests](#deploy-elasticsearch)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
@@ -23,23 +23,55 @@
 
 ## Deploy ElasticSearch
 
-### Add chart repository:
-```bash
-helm repo add es-operator https://raw.githubusercontent.com/upmc-enterprises/elasticsearch-operator/master/charts/
-helm repo update
-```
+### Install ElasticSearch
 
-### Install ElasticSearch with operator
-```bash
-helm install --namespace logging --name elasticsearch-operator es-operator/elasticsearch-operator --set rbac.enabled=True
-helm install --namespace logging --name elasticsearch es-operator/elasticsearch \
-    --set kibana.enabled=True \
-    --set cerebro.enabled=True
-```
-> [Elasticsearch Operator Documentation](https://github.com/upmc-enterprises/elasticsearch-operator)
-> This installation can take a few more minutes. ***Please be patient.*** 
+We will follow the [Elastic Cloud on Kubernetes quickstart](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html)
 <br />
 
+Install the operator
+```yaml
+kubectl apply -f https://download.elastic.co/downloads/eck/1.0.0-beta1/all-in-one.yaml
+```
+
+Create `logging` Namespace
+```bash
+kubectl create ns logging
+```
+
+Install the ElasticSearch cluster
+```yaml
+cat <<EOF | kubectl apply -n logging -f -
+apiVersion: elasticsearch.k8s.elastic.co/v1beta1
+kind: Elasticsearch
+metadata:
+  name: quickstart
+spec:
+  version: 7.5.0
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.master: true
+      node.data: true
+      node.ingest: true
+      node.store.allow_mmap: false
+EOF
+```
+
+Install Kibana
+```yaml
+cat <<EOF | kubectl apply -n logging -f -
+apiVersion: kibana.k8s.elastic.co/v1beta1
+kind: Kibana
+metadata:
+  name: quickstart
+spec:
+  version: 7.5.0
+  count: 1
+  elasticsearchRef:
+    name: quickstart
+EOF
+```
 
 ## Deploy Logging-Operator with Demo Application
 
@@ -55,7 +87,7 @@ helm repo update
 #### Demo App and Logging Definition
 ```bash
 helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
- --set "elasticsearch.enabled=True" 
+  --set "elasticsearch.enabled=True"
 ```
 
 ---
@@ -64,11 +96,6 @@ helm install --namespace logging --name logging-demo banzaicloud-stable/logging-
 ### Install from Kubernetes manifests
 #### Logging Operator
 > [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
-
-#### Create `logging` Namespace
-```bash
-kubectl create ns logging
-```
 
 #### Create `logging` resource
 ```bash
@@ -83,7 +110,6 @@ spec:
   controlNamespace: logging
 EOF
 ```
-
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
@@ -96,11 +122,17 @@ metadata:
   name: es-output
 spec:
   elasticsearch:
-    host: elasticsearch-elasticsearch-cluster.logging.svc.cluster.local
+    host: quickstart-es-http.logging.svc.cluster.local
     port: 9200
     scheme: https
     ssl_verify: false
     ssl_version: TLSv1_2
+    user: elastic
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: quickstart-es-elastic-user
+          key: elastic
     buffer:
       timekey: 1m
       timekey_wait: 30s
@@ -156,19 +188,15 @@ EOF
 
 ## Deployment Validation
 
-#### Port Forward Cerebro Dashboard Service
-```bash
-kubectl -n logging port-forward svc/cerebro-elasticsearch-cluster 9001:80
-```
-Cerebro dashboard URL: [http://localhost:9001](http://localhost:9001)
-
-<p align="center"><img src="./img/es_cerb.png" width="660"></p>
-
-
-
 #### Port Forward Kibana Dashboard Service
+
+Use the user `elastic` and get the password using the following command:
 ```bash
-kubectl -n logging port-forward svc/kibana-elasticsearch-cluster 5601:80
+kubectl -n logging get secret quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode
+```
+
+```bash
+kubectl -n logging port-forward svc/quickstart-kb-http 5601
 ```
 Kibana dashboard URL: [https://localhost:5601](https://localhost:5601)
 
