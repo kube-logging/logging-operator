@@ -176,7 +176,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentdSpec.Resources.Limits == nil {
 			copy.Spec.FluentdSpec.Resources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("200M"),
+				v1.ResourceMemory: resource.MustParse("400M"),
 				v1.ResourceCPU:    resource.MustParse("1000m"),
 			}
 		}
