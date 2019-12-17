@@ -1,9 +1,9 @@
 dependencies:
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 3.x.x
+  version: 3.0.7
 - name: log-generator
   repository: https://kubernetes-charts.banzaicloud.com/
-  version: 0.1.1
-digest: sha256:0693ffaf69293a09880d32c46d0d3ffb344556317484e962a41e0b2e7842af17
-generated: "2019-12-13T13:31:01.727402+01:00"
+  version: 0.1.2
+digest: sha256:78e9d9eeceb7efe2a930b831f1e938e3b2f6a473a2af91f79f714ce5217f23ef
+generated: "2019-12-17T17:25:56.113589+01:00"
