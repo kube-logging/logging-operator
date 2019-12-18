@@ -23,7 +23,7 @@ spec:
     tls:
       enabled: true
       secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
-      sharedKey: "{{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) }}"
+      sharedKey: "{{ .Values.tls.sharedKey | default (derivePassword 1 "long" ( now | unixEpoch) .Release.Name .Chart.Name ) }}"
     {{- end }}
     {{- if .Values.fluentd }}
 {{ toYaml .Values.fluentd | indent 4}}
@@ -33,7 +33,7 @@ spec:
     tls:
       enabled: true
       secretName: {{ .Values.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
-      sharedKey: "{{ .Values.tls.sharedKey | default (derivePassword 1 "long" (.Release.Time | toString) .Release.Name .Chart.Name ) }}"
+      sharedKey: "{{ .Values.tls.sharedKey | default (derivePassword 1 "long" ( now | unixEpoch) .Release.Name .Chart.Name ) }}"
     {{- end }}
     {{- if .Values.fluentbit }}
 {{ toYaml .Values.fluentbit | indent 4}}

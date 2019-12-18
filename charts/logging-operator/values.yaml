@@ -13,6 +13,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+annotations: {}
+
 ## Deploy CRDs used by Logging Operator.
 ##
 createCustomResource: true
