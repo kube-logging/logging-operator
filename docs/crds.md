@@ -70,7 +70,6 @@ spec:
 | fluentd                 | [FluentdSpec](#Fluentd-Spec)   | {}      | Fluentd configurations                                                  |
 | watchNamespaces         | []string       | ""      | Limit namespaces from where to read Flow and Output specs               |
 | controlNamespace        | string         | ""      | Control namespace that contains ClusterOutput and ClusterFlow resources |
-| podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
 | enableRecreateWorkloadOnImmutableFieldChange | bool | false | Recreate workloads that cannot be updated, see details below |
 
 **enableRecreateWorkloadOnImmutableFieldChange**
@@ -168,7 +167,8 @@ spec:
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
-
+| podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
+s
 **`logging` with custom fluent-bit annotations** 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
