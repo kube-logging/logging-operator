@@ -4,6 +4,6 @@ dependencies:
   version: 3.0.7
 - name: log-generator
   repository: https://kubernetes-charts.banzaicloud.com/
-  version: 0.1.2
+  version: 0.1.3
 digest: sha256:78e9d9eeceb7efe2a930b831f1e938e3b2f6a473a2af91f79f714ce5217f23ef
-generated: "2019-12-17T17:25:56.113589+01:00"
+generated: "2019-12-18T14:08:29.081912+01:00"
