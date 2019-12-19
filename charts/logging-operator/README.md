@@ -122,4 +122,4 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.configReloaderImage.pullPolicy`            | Fluentd configReloaderImage container pull policy      | `IfNotPresent`                 |
 | `fluentd.fluentdPvcSpec.accessModes`                | Fluentd persistence volume access modes                | `[ReadWriteOnce]`              |
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                        | `21Gi`                         |
-| `fluentd.fluentdPvcSpec.resources.storageClassName` | Fluentd persistence volume storageclass                | `"""`                          |
+| `fluentd.fluentdPvcSpec.storageClassName`           | Fluentd persistence volume storageclass                | `"""`                          |
