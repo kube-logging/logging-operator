@@ -35,6 +35,8 @@ type FluentdSpec struct {
 	VolumeModImage      ImageSpec                   `json:"volumeModImage,omitempty"`
 	ConfigReloaderImage ImageSpec                   `json:"configReloaderImage,omitempty"`
 	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
+	LivenessProbe       *corev1.Probe               `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *corev1.Probe               `json:"readinessProbe,omitempty"`
 	Port                int32                       `json:"port,omitempty"`
 	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
 	NodeSelector        map[string]string           `json:"nodeSelector,omitempty"`

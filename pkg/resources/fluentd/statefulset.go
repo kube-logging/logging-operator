@@ -108,6 +108,8 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 		},
+		LivenessProbe:  r.Logging.Spec.FluentdSpec.LivenessProbe,
+		ReadinessProbe: r.Logging.Spec.FluentdSpec.ReadinessProbe,
 	}
 
 	if r.Logging.Spec.FluentdSpec.FluentOutLogrotate != nil && r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Enabled {
