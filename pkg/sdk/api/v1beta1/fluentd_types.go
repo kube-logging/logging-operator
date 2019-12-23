@@ -30,19 +30,20 @@ type FluentdSpec struct {
 	FluentdPvcSpec *corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
 	DisablePvc     bool                              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
-	BufferStorageVolume KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
-	VolumeMountChmod    bool                        `json:"volumeMountChmod,omitempty"`
-	VolumeModImage      ImageSpec                   `json:"volumeModImage,omitempty"`
-	ConfigReloaderImage ImageSpec                   `json:"configReloaderImage,omitempty"`
-	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
-	LivenessProbe       *corev1.Probe               `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *corev1.Probe               `json:"readinessProbe,omitempty"`
-	Port                int32                       `json:"port,omitempty"`
-	Tolerations         []corev1.Toleration         `json:"tolerations,omitempty"`
-	NodeSelector        map[string]string           `json:"nodeSelector,omitempty"`
-	Metrics             *Metrics                    `json:"metrics,omitempty"`
-	Security            *Security                   `json:"security,omitempty"`
-	Scaling             *FluentdScaling             `json:"scaling,omitempty"`
+	BufferStorageVolume  KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
+	VolumeMountChmod     bool                        `json:"volumeMountChmod,omitempty"`
+	VolumeModImage       ImageSpec                   `json:"volumeModImage,omitempty"`
+	ConfigReloaderImage  ImageSpec                   `json:"configReloaderImage,omitempty"`
+	Resources            corev1.ResourceRequirements `json:"resources,omitempty"`
+	LivenessProbe        *corev1.Probe               `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck bool                        `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe       *corev1.Probe               `json:"readinessProbe,omitempty"`
+	Port                 int32                       `json:"port,omitempty"`
+	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
+	NodeSelector         map[string]string           `json:"nodeSelector,omitempty"`
+	Metrics              *Metrics                    `json:"metrics,omitempty"`
+	Security             *Security                   `json:"security,omitempty"`
+	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel             string `json:"logLevel,omitempty"`
 	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
