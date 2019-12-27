@@ -36,8 +36,17 @@ spec:
         set -e
         set -x
         mc config host add minio "${MINIO_URL}" "${AWS_KEY_ID}" "${AWS_SECRET_KEY}"
-        mc find minio/"${BUCKET}"  --name '*.gz' -exec 'mc cat {}' | gzip -d
-        sleep 300000
+
+        END="$(( $(date +%s) + 180 ))"
+        echo 'Waiting for log files...'
+        while [ $(date +%s) -lt ${END} ]; do
+          GET_CNT=$(mc find minio/"${BUCKET}" --name '*.gz' -exec 'mc cat {}' | gzip -d |awk '{ print $3 }'|grep '"method":"GET"'|wc -l)
+          if [ $GET_CNT -gt 10 ]; then
+            exit 0
+          fi
+            sleep 5
+        done
+        exit 1
 
 {{/*{{- end }}*/}}
 
