@@ -65,7 +65,7 @@ function wait_for_log_files()
 
     echo 'Cannot find any log files within timeout'
     kubectl get pod,svc --namespace logging
-    kubectl exec -it logging-operator-logging-fluentd-0 cat /fluentd/log/out
+    kubectl exec -it --namespace logging logging-operator-logging-fluentd-0 cat /fluentd/log/out
     exit 1
 }
 
