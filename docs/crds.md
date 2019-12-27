@@ -108,8 +108,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
 | livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container liveness. Container will be restarted if the probe fails. |
 | readinessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container service readiness. Container will be removed from service endpoints if the probe fails. |
-
-
+| scaling | [Scaling](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#deploymentspec-v1-apps) | {replicas: 1} | Fluentd scaling configuration i.e replica count
 
 **`logging` with custom pvc volume for buffers** 
 ```yaml
