@@ -106,7 +106,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
 | fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
-
+| scaling | [Scaling](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#deploymentspec-v1-apps) | {replicas: 1} | Fluentd scaling configuration i.e replica count
 
 **`logging` with custom pvc volume for buffers** 
 ```yaml
