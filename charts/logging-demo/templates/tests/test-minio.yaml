@@ -1,4 +1,3 @@
-{{/*{{- if not .Values.minio.enabled }}*/}}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -47,7 +46,4 @@ spec:
             sleep 5
         done
         exit 1
-
-{{/*{{- end }}*/}}
-
 

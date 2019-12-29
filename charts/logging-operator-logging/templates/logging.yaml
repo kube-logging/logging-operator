@@ -1,4 +1,4 @@
-{{- $sharedKey := .Values.loggingOperator.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) -}}
+{{- $sharedKey := .Values.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) -}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
