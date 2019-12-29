@@ -20,7 +20,6 @@ fi;
 touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
 if [ -z "$(find ${BUFFER_PATH} -type d -newer /tmp/marker-stuck -print -quit)" ];
 then
-  rm -rf ${BUFFER_PATH};
   exit 1;
 fi;
 touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
