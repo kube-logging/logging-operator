@@ -107,6 +107,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
 | livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container liveness. Container will be restarted if the probe fails. |
+| LivenessDefaultCheck | bool | false | Enable default liveness probe of fluentd container. |
 | readinessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container service readiness. Container will be removed from service endpoints if the probe fails. |
 | scaling | [Scaling](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#deploymentspec-v1-apps) | {replicas: 1} | Fluentd scaling configuration i.e replica count
 
@@ -425,18 +426,17 @@ spec:
         - >
           LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
           STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
-          if [ ! -e /var/log/fluentd-buffers ];
+          if [ ! -e /buffers ];
           then
             exit 1;
           fi;
           touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-          if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
+          if [ -z "$(find /buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
           then
-            rm -rf /var/log/fluentd-buffers;
             exit 1;
           fi;
           touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
-          if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
+          if [ -z "$(find /buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
           then
             exit 1;
           fi;
