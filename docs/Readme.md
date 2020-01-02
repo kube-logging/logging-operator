@@ -89,7 +89,7 @@ spec:
       limits:
         cpu: 2
         memory: 2Gi
-  fluentbit: {}
+  fluentbit:
     resources:
       requests:
         cpu: 500m
