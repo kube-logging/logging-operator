@@ -1,3 +1,4 @@
+{{- $sharedKey := .Values.loggingOperator.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) -}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -8,7 +9,7 @@ spec:
     tls:
       enabled: true
       secretName: {{ .Values.loggingOperator.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentd-tls" ) }}
-      sharedKey: {{ .Values.loggingOperator.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) }}
+      sharedKey: {{ $sharedKey }}
   {{- end }}
     {{- if .Values.loggingOperator.fluentd }}
 {{ toYaml .Values.loggingOperator.fluentd | indent 4}}
@@ -19,7 +20,7 @@ spec:
     tls:
       enabled: true
       secretName: {{ .Values.loggingOperator.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentbit-tls" ) }}
-      sharedKey: {{ .Values.loggingOperator.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) }}
+      sharedKey: {{ $sharedKey }}
   {{- end }}
     {{- if .Values.loggingOperator.fluentbit }}
 {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}

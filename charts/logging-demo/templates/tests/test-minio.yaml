@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "output.fullname" . }}-test-minio
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "logging-demo.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  restartPolicy: Never
+  containers:
+  - name: {{ .Release.Name }}-minio-test
+    image: minio/mc
+    env:
+      - name: MINIO_URL
+        value:  'http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000'
+      - name: BUCKET
+        value: "demo"
+      - name: AWS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: logging-s3
+            key: accesskey
+      - name: AWS_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: logging-s3
+            key: secretkey
+    command:
+      - "sh"
+    args:
+      - "-c"
+      - |
+        set -e
+        set -x
+        mc config host add minio "${MINIO_URL}" "${AWS_KEY_ID}" "${AWS_SECRET_KEY}"
+
+        END="$(( $(date +%s) + 180 ))"
+        echo 'Waiting for log files...'
+        while [ $(date +%s) -lt ${END} ]; do
+          GET_CNT=$(mc find minio/"${BUCKET}" --name '*.gz' -exec 'mc cat {}' | gzip -d |awk '{ print $3 }'|grep '"method":"GET"'|wc -l)
+          if [ $GET_CNT -gt 10 ]; then
+            exit 0
+          fi
+            sleep 5
+        done
+        exit 1
+
