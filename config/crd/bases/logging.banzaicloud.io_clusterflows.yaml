@@ -448,6 +448,45 @@ spec:
                         description: Keep original event time in parsed result.
                         type: boolean
                     type: object
+                  prometheus:
+                    properties:
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      metrics:
+                        items:
+                          properties:
+                            buckets:
+                              description: Buckets of record for instrumentation
+                              type: string
+                            desc:
+                              description: Description of metric
+                              type: string
+                            key:
+                              description: Key name of record for instrumentation.
+                              type: string
+                            labels:
+                              additionalProperties:
+                                type: string
+                              description: Additional labels for this metric
+                              type: object
+                            name:
+                              description: Metrics name
+                              type: string
+                            type:
+                              description: Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counter-type),
+                                [gauge](https://github.com/fluent/fluent-plugin-prometheus#gauge-type),
+                                [summary](https://github.com/fluent/fluent-plugin-prometheus#summary-type),
+                                [histogram](https://github.com/fluent/fluent-plugin-prometheus#histogram-type)
+                              type: string
+                          required:
+                          - desc
+                          - name
+                          - type
+                          type: object
+                        type: array
+                    type: object
                   record_transformer:
                     properties:
                       auto_typecast:
