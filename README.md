@@ -64,11 +64,11 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 
 ## QuickStart
 
-This short movie shows how to get a complete logging solution on Kubernetes using Logging-Operator in less than 2 minutes:
+Follow these [quickstart guides](docs/quickstarts) to try out Logging Operator!
 
 ### Install
 
-
+Deploy Logging Operator with [Kubernetes manifests](/docs/deploy/README.md) or [Helm chart](/docs/deploy/README.md#Deploy-logging-operator-with-Helm).
 
 ## Documentation
 
