@@ -48,7 +48,7 @@ In a large scale infrastructure the logging components can easily get under high
 
 ## Requirements
 ### Software
- - Logging Operator requires use of Kubernetes v1.14.x and up.
+ - Logging Operator requires Kubernetes v1.14.x or later.
  - For the [Helm base installation](./deploy/README.md#deploy-logging-operator-with-helm) we required Helm v2.16.0 or higher.
  
 ### CPU and Memory
