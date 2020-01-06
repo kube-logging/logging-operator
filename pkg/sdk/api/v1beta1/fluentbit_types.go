@@ -44,6 +44,8 @@ type FluentbitSpec struct {
 	BufferStorageVolume  KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                      `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                      `json:"podPriorityClassName,omitempty"`
+	LivenessProbe        *corev1.Probe               `json:"livenessProbe,omitempty"`
+	ReadinessProbe       *corev1.Probe               `json:"readinessProbe,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

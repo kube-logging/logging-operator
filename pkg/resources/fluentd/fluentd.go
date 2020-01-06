@@ -39,6 +39,7 @@ const (
 	ServiceName           = "fluentd"
 	OutputSecretName      = "fluentd-output"
 	OutputSecretPath      = "/fluentd/secret"
+	BufferPath            = "/buffer"
 
 	bufferVolumeName          = "fluentd-buffer"
 	defaultServiceAccountName = "fluentd"
