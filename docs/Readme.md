@@ -52,7 +52,7 @@ In a large scale infrastructure the logging components can easily get under high
  - For the [Helm base installation](./deploy/README.md#deploy-logging-operator-with-helm) we require Helm v2.16.0 or higher.
  
 ### CPU and Memory
-Hardware requirements scale based on the size of your cluster.<br>
+Resource requirements should be tuned according to the size of the cluster and the logging intensity of its workloads.<br>
 #### Default configuration:
 **Fluentbit:**
 >```yaml
