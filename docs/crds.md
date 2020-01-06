@@ -425,13 +425,7 @@ spec:
         - "-c"
         - >
           LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
-          STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
           if [ ! -e /buffers ];
-          then
-            exit 1;
-          fi;
-          touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-          if [ -z "$(find /buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
           then
             exit 1;
           fi;

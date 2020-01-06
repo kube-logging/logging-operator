@@ -11,14 +11,8 @@
 
 BUFFER_PATH=${BUFFER_PATH};
 LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
-STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
 
 if [ ! -e ${BUFFER_PATH} ];
-then
-  exit 1;
-fi;
-touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-if [ -z "$(find ${BUFFER_PATH} -type d -newer /tmp/marker-stuck -print -quit)" ];
 then
   exit 1;
 fi;
