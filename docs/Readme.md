@@ -44,7 +44,7 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 ---
 
 ## Scaling
-In high scaling infrastructure the monitoring/logging components are also under huge pressure. The typical sign of this overload is when the fluentd can not handle its buffer directory size growth for a significant time. In this case, we can scaleup the [component.](./crds.md#Scaling). 
+In a large scale infrastructure the logging components can easily get under high pressure as well. The typical sign of this is when `fluentd` can not handle its buffer directory size growth for more then the configured or calculated (timekey + timekey_wait) flush interval. In this case, we can scale out the [fluentd statefulset](./crds.md#Scaling). 
 
 ## Requirements
 ### Software
