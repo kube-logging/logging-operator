@@ -108,7 +108,12 @@ You can check the buffer directory if fluentbit is configured to buffer queued l
 NAME                   READY   AGE
 logging-demo-fluentd   1/1     1m
 ```
-### ConfigCheck How its works
+### ConfigCheck
+
+There is a builtin configcheck mechanism, that validates the generated fluentd configuration before applying it to fluentd. You should be able to see the configcheck pod and it's log output. The result
+of the check is written into the `status` field of the corresponding `Logging` resource.
+
+In case the operator is getting stuck in an error state caused by a failed configcheck, you should try to restore the previous configuration by modifiing or removing the invalid resources to the point where the configcheck pod is finally able to complete successfully.
 ### Check Configuration
 `kubectl get secret logging-demo-fluentd-app -o jsonpath="{.data['fluentd\.conf']}" | base64 --decode`
 ```yaml
