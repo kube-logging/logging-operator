@@ -94,6 +94,8 @@ e.g.: `kubectl exec -it logging-demo-fluentbit-778zg sh`
 
 ### temp dir
 
+You can check the buffer directory if fluentbit is configured to buffer queued log messages to disk instead of in memory. (You can configure it through the InputTail fluentbit config, by setting the `storage.type` field to `filesystem`.)
+
 `kubectl exec -it logging-demo-fluentbit-9dpzg ls  /buffers`
 
 ---
