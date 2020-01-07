@@ -76,7 +76,7 @@ logging-demo-fluentbit   1         1         1       1            1           <n
     Retry_Limit   False
 ```
 ### Debug fluentbit Container
-All fluentbit image has debug tag version you can use like this:
+All fluentbit image tags has a debug version marked with the `-debug` suffix, that you can use like this:
 `kubectl edit loggings.logging.banzaicloud.io logging-demo`
 ```yam
 fluentbit:
