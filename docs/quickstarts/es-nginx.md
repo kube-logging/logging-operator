@@ -1,8 +1,8 @@
-<p align="center"><img src="./img/nle.png" width="340"></p>
+<p align="center"><img src="../img/nle.png" width="340"></p>
 
 # Store Nginx Access Logs in ElasticSearch with Logging Operator
 
-<p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
+<p align="center"><img src="../img/nginx-elastic.png" width="900"></p>
 
 ---
 ## Contents
@@ -16,8 +16,7 @@
     - [Deploy with Helm](#demo-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
-    - [Cerebro Dashboard](#port-forward-cerebro-dashboard-service)
-    - [Kibana Dashboard](#port-forward-kibana-dashboard-service)
+    - [Kibana Dashboard](#Deployment-Validation)
 ---
 <br />
 
@@ -200,6 +199,6 @@ kubectl -n logging port-forward svc/quickstart-kb-http 5601
 ```
 Kibana dashboard URL: [https://localhost:5601](https://localhost:5601)
 
-<p align="center"><img src="./img/es_kibana.png" width="660"></p>
+<p align="center"><img src="../img/es_kibana.png" width="660"></p>
 
 
