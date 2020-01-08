@@ -36,15 +36,13 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
   - [Grafana Loki Output](examples/loki-nginx.md)
   - [Kafka Output](examples/kafka-nginx.md)
   - [And more...](./examples)
-- **[Scaling](#scaling)**
+- **[Scaling](./scaling.md)**
 - **[Requirements](#requirements)**
 - **[Contributing](../README.md#contributing)**
 - **[Blogs](#blogs)**
 - **[License](./license.md)**
 ---
 
-## Scaling
-In a large scale infrastructure the logging components can easily get under high pressure as well. The typical sign of this is when `fluentd` can not handle its buffer directory size growth for more then the configured or calculated (timekey + timekey_wait) flush interval. In this case, we can scale out the [fluentd statefulset](./crds.md#Scaling). 
 ## CPU and memory requirements
 
 Resource requirements should be tuned according to the size of the cluster and the logging workloads.
