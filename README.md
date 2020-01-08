@@ -61,9 +61,9 @@ The detailed CRD documentation can be found [here](/docs/crds.md).
 
 <p align="center"><img src="docs/img/logging-operator-v2-architecture.png" ></p>
 
-## QuickStart
+## Quickstart
 
-Follow these [quickstart guides](docs/quickstarts) to try out Logging Operator!
+Follow these [quickstart guides](docs/quickstarts) to try out the Logging operator!
 
 ### Install
 
