@@ -29,7 +29,7 @@ $ helm install --name my-release banzaicloud-stable/logging-operator
 ### CRDs
 Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
 
-The command deploys **logging-operator** on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+The command deploys **Logging operator** on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 ## Uninstalling the Chart
 

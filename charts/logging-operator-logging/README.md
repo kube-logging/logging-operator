@@ -1,4 +1,4 @@
-# Installing logging resource to logging-operator
+# Installing logging resource to Logging operator
 
 ## tl;dr:
 

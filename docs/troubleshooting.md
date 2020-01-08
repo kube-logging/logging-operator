@@ -253,7 +253,7 @@ If you encounter any problems that the documentation does not address, [file an 
 
 Before asking for help, prepare the following information to make troubleshooting faster:
 
-- logging-operator version
+- Logging operator version
 - kubernetes version
 - helm/chart version (if you are install with helm)
 - Logging operator logs
