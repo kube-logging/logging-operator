@@ -45,15 +45,12 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 
 ## Scaling
 In a large scale infrastructure the logging components can easily get under high pressure as well. The typical sign of this is when `fluentd` can not handle its buffer directory size growth for more then the configured or calculated (timekey + timekey_wait) flush interval. In this case, we can scale out the [fluentd statefulset](./crds.md#Scaling). 
+## CPU and memory requirements
 
-## Requirements
-### Software
- - Logging Operator requires Kubernetes v1.14.x or later.
- - For the [Helm base installation](./deploy/README.md#deploy-logging-operator-with-helm) we require Helm v2.16.0 or higher.
- 
-### CPU and Memory
-Resource requirements should be tuned according to the size of the cluster and the logging intensity of its workloads.<br>
-#### Default configuration:
+Resource requirements should be tuned according to the size of the cluster and the logging workloads.
+
+### Default configuration
+
 **Fluentbit:**
 >```yaml
 >- Limits:

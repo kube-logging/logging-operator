@@ -1,7 +1,12 @@
 <p align="center"><img src="../img/lo.svg" width="260"></p>
 <p align="center">
 
-# Deploy logging-operator from Kubernetes Manifests
+# Requirements
+
+- Logging operator requires Kubernetes v1.14.x or later.
+- For the [Helm base installation](#deploy-logging-operator-with-helm) you need Helm v2.16.0 or later.
+
+# Deploy the Logging operator from Kubernetes Manifests
 
 1. Clone the logging-operator repo.
     ```bash
@@ -38,6 +43,7 @@
 <p align="center"><img src="../img/helm.svg" width="150"></p>
 <p align="center">
 
+> Note: For the [Helm base installation](#deploy-logging-operator-with-helm) you need Helm v2.16.0 or later.
 1. Add operator chart repository.
     ```bash
     helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
