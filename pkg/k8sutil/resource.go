@@ -22,11 +22,8 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/k8s-objectmatcher/patch"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/go-logr/logr"
 	"github.com/goph/emperror"
-	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -60,15 +57,20 @@ func (d DesiredStateHook) BeforeUpdate(object runtime.Object) error {
 type GenericResourceReconciler struct {
 	Log     logr.Logger
 	Client  runtimeClient.Client
-	Logging *v1beta1.Logging
+	Options ReconcilerOpts
+}
+
+type ReconcilerOpts struct {
+	EnableRecreateWorkloadOnImmutableFieldChange     bool
+	EnableRecreateWorkloadOnImmutableFieldChangeHelp string
 }
 
 // NewReconciler returns GenericResourceReconciler
-func NewReconciler(client runtimeClient.Client, log logr.Logger, logging *v1beta1.Logging) *GenericResourceReconciler {
+func NewReconciler(client runtimeClient.Client, log logr.Logger, opts ReconcilerOpts) *GenericResourceReconciler {
 	return &GenericResourceReconciler{
 		Log:     log,
 		Client:  client,
-		Logging: logging,
+		Options: opts,
 	}
 }
 
@@ -146,7 +148,7 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 			if err := r.Client.Update(context.TODO(), desired); err != nil {
 				sErr, ok := err.(*apierrors.StatusError)
 				if ok && sErr.ErrStatus.Code == 422 && sErr.ErrStatus.Reason == metav1.StatusReasonInvalid {
-					if r.Logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange {
+					if r.Options.EnableRecreateWorkloadOnImmutableFieldChange {
 						r.Log.Error(err, "failed to update resource, trying to recreate")
 						err := r.Client.Delete(context.TODO(), current,
 							// wait until all dependent resources gets cleared up
@@ -160,11 +162,7 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 							RequeueAfter: time.Second * 10,
 						}, nil
 					} else {
-						return nil, errors.New(
-							"Object has to be recreated, but refusing to remove without explicitly being told so. " +
-								"Use logging.spec.enableRecreateWorkloadOnImmutableFieldChange to move on but make sure to understand the consequences. " +
-								"As of fluentd, to avoid data loss, make sure to use a persistent volume for buffers, which is the default, unless explicitly disabled or configured differently. " +
-								"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ")
+						return nil, errors.New(r.Options.EnableRecreateWorkloadOnImmutableFieldChangeHelp)
 					}
 				}
 				return nil, emperror.WrapWith(err, "updating resource failed",
@@ -183,19 +181,7 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 
 func (r *GenericResourceReconciler) createIfNotExists(desired runtime.Object) (bool, runtime.Object, error) {
 	log := r.Log.WithValues("type", reflect.TypeOf(desired))
-
 	var current = desired.DeepCopyObject()
-	switch current.(type) {
-	case *v1.ServiceMonitor:
-		var crd apiextensions.CustomResourceDefinition
-		o := runtimeClient.ObjectKey{
-			Name: v1.SchemeGroupVersion.WithResource(v1.ServiceMonitorName).GroupResource().String(),
-		}
-		err := r.Client.Get(context.TODO(), o, &crd)
-		if err != nil {
-			return false, current, err
-		}
-	}
 	key, err := runtimeClient.ObjectKeyFromObject(current)
 	if err != nil {
 		return false, nil, emperror.With(err)
@@ -223,28 +209,16 @@ func (r *GenericResourceReconciler) createIfNotExists(desired runtime.Object) (b
 func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error) {
 	log := r.Log.WithValues("type", reflect.TypeOf(desired))
 	var current = desired.DeepCopyObject()
-	switch current.(type) {
-	case *v1.ServiceMonitor:
-		var crd apiextensions.CustomResourceDefinition
-		o := runtimeClient.ObjectKey{
-			Name: v1.SchemeGroupVersion.WithResource(v1.ServiceMonitorName).GroupResource().String(),
-		}
-		err := r.Client.Get(context.TODO(), o, &crd)
-		if err != nil {
-			if !apierrors.IsNotFound(err) {
-				return false, emperror.WrapWith(err, "getting crd failed",
-					"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))
-			}
-			return false, nil
-		}
-	}
-
 	key, err := runtimeClient.ObjectKeyFromObject(current)
 	if err != nil {
 		return false, emperror.With(err)
 	}
 	err = r.Client.Get(context.TODO(), key, current)
 	if err != nil {
+		// If the resource type does not exist we should be ok to move on
+		if meta.IsNoMatchError(err) {
+			return false, nil
+		}
 		if !apierrors.IsNotFound(err) {
 			return false, emperror.WrapWith(err, "getting resource failed",
 				"resource", desired.GetObjectKind().GroupVersionKind(), "type", reflect.TypeOf(desired))

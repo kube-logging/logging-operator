@@ -75,10 +75,11 @@ func (r *Reconciler) getServiceAccount() string {
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
-func New(client client.Client, log logr.Logger, logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets) *Reconciler {
+func New(client client.Client, log logr.Logger,
+	logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets, opts k8sutil.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, log, logging),
+		GenericResourceReconciler: k8sutil.NewReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
 	}

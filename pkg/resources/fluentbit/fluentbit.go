@@ -66,10 +66,10 @@ type Reconciler struct {
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts k8sutil.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, logger, logging),
+		GenericResourceReconciler: k8sutil.NewReconciler(client, logger, opts),
 	}
 }
 
