@@ -77,6 +77,9 @@ If you encounter any problems that the documentation does not address, [open an 
 
  You can find the complete documentation of Logging operator v2 [here](./docs/Readme.md) :blue_book: <br>
 
+## Commercial support
+If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/products/logging-operator/), the company backing the development of the Logging operator.
+
 ## Contributing
 
 If you find this project useful, help us:
