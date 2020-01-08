@@ -1,39 +1,50 @@
 <p align="center"><img src="./img/troubleshooting.svg" width="260"></p>
 <p align="center">
 
+# Logging operator troubleshooting
 
-# Logging Operator Troubleshooting
+The following tips and commands can help you to troubleshoot your Logging operator installation.
 
-## Check to ensure the necessary CRD are installed.
-`kubectl get crd`
-```bash
-clusterflows.logging.banzaicloud.io     2019-12-05T15:11:48Z
-clusteroutputs.logging.banzaicloud.io   2019-12-05T15:11:48Z
-flows.logging.banzaicloud.io            2019-12-05T15:11:48Z
-loggings.logging.banzaicloud.io         2019-12-05T15:11:48Z
-outputs.logging.banzaicloud.io          2019-12-05T15:11:48Z
-```
+## First things to do
 
-## Running Operator POD
-`kubectl get pods |grep logging-operator`
-```bash
-NAME                                          READY   STATUS      RESTARTS   AGE
-logging-demo-log-generator-6448d45cd9-z7zk8   1/1     Running     0          24m
-```
+1. Check that the necessary CRDs are installed. Issue the following command: `kubectl get crd`
+   The output should include the following CRDs:
+    ```bash
+    clusterflows.logging.banzaicloud.io     2019-12-05T15:11:48Z
+    clusteroutputs.logging.banzaicloud.io   2019-12-05T15:11:48Z
+    flows.logging.banzaicloud.io            2019-12-05T15:11:48Z
+    loggings.logging.banzaicloud.io         2019-12-05T15:11:48Z
+    outputs.logging.banzaicloud.io          2019-12-05T15:11:48Z
+    ```
+1. Verify that the Logging operator pod is running. Issue the following command: `kubectl get pods |grep logging-operator`
+   The output should include the a running pod, for example:
+    ```bash
+    NAME                                          READY   STATUS      RESTARTS   AGE
+    logging-demo-log-generator-6448d45cd9-z7zk8   1/1     Running     0          24m
+    ```
 
 ---
 
+## Troubleshooting Fluent Bit
+
 <p align="center"><img src="./img/fluentbit.png" height="100"></p>
 
-## Check Fluentbit daemonset 
-`kubectl get daemonsets`
+The following sections help you troubleshoot the Fluent Bit component of the Logging operator.
+
+### Check the Fluent Bit daemonset
+
+Verify that the Fluent Bit daemonset is available. Issue the following command: `kubectl get daemonsets`
+The output should include a Fluent Bit daemonset, for example:
 ```bash
 NAME                     DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 logging-demo-fluentbit   1         1         1       1            1           <none>          110s
 ```
 
-### Configuration secret
+### Check the Fluent Bit configuration
+
+You can display the current configuration of the Fluent Bit daemonset using the following command:
 `kubectl get secret logging-demo-fluentbit -o jsonpath="{.data['fluent-bit\.conf']}" | base64 --decode`
+The output looks like the following:
 ```yaml
 [SERVICE]
     Flush        1
@@ -75,8 +86,10 @@ logging-demo-fluentbit   1         1         1       1            1           <n
     Shared_Key    Kamk2_SukuWenk
     Retry_Limit   False
 ```
-### Debug fluentbit Container
-All fluentbit image tags has a debug version marked with the `-debug` suffix, that you can use like this:
+
+### Debug version of the fluentbit container
+
+All Fluent Bit image tags have a debug version marked with the `-debug` suffix. You can install this debug version using the following command:
 `kubectl edit loggings.logging.banzaicloud.io logging-demo`
 ```yam
 fluentbit:
@@ -84,38 +97,48 @@ fluentbit:
       pullPolicy: Always
       repository: fluent/fluent-bit
       tag: 1.3.2-debug
-``` 
-or update directly the daemonset
+```
+
+Alternatively, you can update the daemonset directly:
 `kubectl edit daemonsets logging-demo-fluentbit`
 
-With this you can kubectl exec into the pod using `sh` and look around. <br>
-e.g.: `kubectl exec -it logging-demo-fluentbit-778zg sh`
+After deploying the debug version, you can kubectl exec into the pod using `sh` and look around. For example: `kubectl exec -it logging-demo-fluentbit-778zg sh`
 
+### Check the queued log messages
 
-### temp dir
+You can check the buffer directory if Fluent Bit is configured to buffer queued log messages to disk instead of in memory. (You can configure it through the InputTail fluentbit config, by setting the `storage.type` field to `filesystem`.)
 
-You can check the buffer directory if fluentbit is configured to buffer queued log messages to disk instead of in memory. (You can configure it through the InputTail fluentbit config, by setting the `storage.type` field to `filesystem`.)
-
-`kubectl exec -it logging-demo-fluentbit-9dpzg ls  /buffers`
+`kubectl exec -it logging-demo-fluentbit-9dpzg ls /buffers`
 
 ---
+## Troubleshooting Fluentd
 
 <p align="center"><img src="./img/fluentd.png" height="100"></p>
 
-### Pod status (statefulset)
-`kubectl get statefulsets`
+The following sections help you troubleshoot the Fluentd statefulset component of the Logging operator.
+
+### Check Fluentd pod status (statefulset)
+
+Verify that the Fluentd statefulset is available using the following command: `kubectl get statefulsets`
+
+Expected output:
 ```bash
 NAME                   READY   AGE
 logging-demo-fluentd   1/1     1m
 ```
+
 ### ConfigCheck
 
-There is a builtin configcheck mechanism, that validates the generated fluentd configuration before applying it to fluentd. You should be able to see the configcheck pod and it's log output. The result
-of the check is written into the `status` field of the corresponding `Logging` resource.
+The Logging operator has a builtin mechanism that validates the generated fluentd configuration before applying it to fluentd. You should be able to see the configcheck pod and it's log output. The result of the check is written into the `status` field of the corresponding `Logging` resource.
 
-In case the operator is getting stuck in an error state caused by a failed configcheck, you should try to restore the previous configuration by modifiing or removing the invalid resources to the point where the configcheck pod is finally able to complete successfully.
-### Check Configuration
+In case the operator is stuck in an error state caused by a failed configcheck, restore the previous configuration by modifying or removing the invalid resources to the point where the configcheck pod is finally able to complete successfully.
+
+### Check Fluentd configuration
+
+Use the following command to display the configuration of Fluentd:
 `kubectl get secret logging-demo-fluentd-app -o jsonpath="{.data['fluentd\.conf']}" | base64 --decode`
+
+The output should be similar to the following:
 ```yaml
 <source>
   @type forward
@@ -180,20 +203,25 @@ In case the operator is getting stuck in an error state caused by a failed confi
   </match>
 </label>
 ```
+
 ### Set Fluentd log Level
+
+Use the following command to change the log level of Fluentd.
 `kubectl edit loggings.logging.banzaicloud.io logging-demo`
 ```yaml 
 fluentd:
   logLevel: debug
 ```
 
-### Get fluentd logs
+### Get Fluentd logs
+
+The following command displays the logs of the Fluentd container.
 `kubectl exec -it logging-demo-fluentd-0 cat /fluentd/log/out`
 
+### Set stdout as an output
 
-### Set stdout as an output 
-You can use an stdout filter for this at any point in the flow to dump logs to the fluentd container’s stdout:<br>
-e.g.: `kubectl edit loggings.logging.banzaicloud.io logging-demo`
+You can use an stdout filter at any point in the flow to dump the log messages to the stdout of the Fluentd container. For example:
+`kubectl edit loggings.logging.banzaicloud.io logging-demo`
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -209,7 +237,8 @@ spec:
     application: exchange
 ```
 
-### check the buffer path in the fluentd container
+### Check the buffer path in the fluentd container
+
 `kubectl exec -it logging-demo-fluentd-0 ls  /buffers`
 ```bash
 Defaulting container name to fluentd.
@@ -218,17 +247,18 @@ logging_logging-demo-flow_logging-demo-output-minio_s3.b598f7eb0b2b34076b6da13a9
 logging_logging-demo-flow_logging-demo-output-minio_s3.b598f7eb0b2b34076b6da13a996ff2671.buffer.meta
 ```
 
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+### Other problems and getting support
 
-## Still In Trouble
-If you are still in trouble with the operator you can contact us in the #logging-operator slack channel [here](https://slack.banzaicloud.io/).
-The following information gives a huge help for us:
+If you encounter any problems that the documentation does not address, [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+Before asking for help, prepare the following information to make troubleshooting faster:
+
 - logging-operator version
 - kubernetes version
-- helm/chart version(if you are install with helm)
-- operator logs
-- fluentd config
-- fluentd logs
-- fluentbit config
+- helm/chart version (if you are install with helm)
+- Logging operator logs
+- [fluentd configuration](#check-fluentd-configuration)
+- [fluentd logs](#get-fluentd-logs)
+- [fluentbit configuration](#check-the-fluent-bit-configuration)
 - fluentbit logs
-Please be sure you cleaned up all the sensitive information before sharing.
+
+Do not forget to remove any sensitive information (for example, passwords and private keys) before sharing.
