@@ -99,8 +99,6 @@ fluentbit:
       tag: 1.3.2-debug
 ```
 
-Alternatively, you can update the daemonset directly:
-`kubectl edit daemonsets logging-demo-fluentbit`
 
 After deploying the debug version, you can kubectl exec into the pod using `sh` and look around. For example: `kubectl exec -it logging-demo-fluentbit-778zg sh`
 
