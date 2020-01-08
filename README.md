@@ -23,21 +23,21 @@
 
 </p>
 
-
-# logging-operator v2
+# Logging operator
 
 Logging operator for Kubernetes based on Fluentd and Fluent-bit.
 
+The Logging operator automates the deployment and configuration of a Kubernetes logging pipeline. The operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters, and transfer logs to multiple outputs. Your logs will always be transferred on authenticated and encrypted channels.
 
 ## What is this operator for?
 
-This operator helps you to pack together logging information with your applications. With the help of Custom Resource Definition you can describe the behaviour of your application within its charts. The operator does the rest.
+This operator helps you bundle logging information with your applications: you can describe the behavior of your application in its charts, the Logging operator does the rest.
 
 <p align="center"><img src="docs/img/logging_operator_flow.png" ></p>
 
 ## Feature highlights
 
-- [x] Namespace isolation 
+- [x] Namespace isolation
 - [x] Native Kubernetes label selectors
 - [x] Secure communication (TLS)
 - [x] Configuration validation
@@ -45,13 +45,10 @@ This operator helps you to pack together logging information with your applicati
 - [x] Multiple [output](docs/plugins/outputs) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
 - [x] Multiple logging system support (multiple fluentd, fluent-bit deployment on the same cluster)
 
-## Motivation
-
-The logging operator automates the deployment and configuration of a Kubernetes logging pipeline. Under the hood the operator configures a fluent-bit daemonset for collecting container logs from the node file system. Fluent-bit enriches the logs with Kubernetes metadata and transfers them to fluentd. Fluentd receives, filters and transfer logs to multiple outputs. Your logs will always be transferred on authenticated and encrypted channels.
-
 ## Architecture
 
 Available custom resources:
+
 - [logging](/docs/crds.md#loggings) - Represents a logging system. Includes `Fluentd` and `Fluent-bit` configuration. Specifies the `controlNamespace`. Fluentd and Fluent-bit will be deployed in the `controlNamespace`
 - [output](/docs/crds.md#outputs-clusteroutputs) - Defines an Output for a logging flow. This is a namespaced resource.
 - [flow](/docs/crds.md#flows-clusterflows) - Defines a logging flow with `filters` and `outputs`. You can specify `selectors` to filter logs by labels. Outputs can be `output` or `clusteroutput`.  This is a namespaced resource.
@@ -70,21 +67,21 @@ Follow these [quickstart guides](docs/quickstarts) to try out Logging Operator!
 
 Deploy Logging Operator with [Kubernetes manifests](/docs/deploy/README.md) or [Helm chart](/docs/deploy/README.md#Deploy-logging-operator-with-Helm).
 
+> Caution: The **master branch** is under heavy development. Use [releases](https://github.com/banzaicloud/logging-operator/releases) instead of the master branch to get stable software.
+
+If you encounter any problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+
 ## Documentation
 
- You can find the complete documentation of Logging Operator v2 at [here](./docs/Readme.md) :blue_book: <br>
-:construction: The **master branch** is under heavy development. Please use [releases](https://github.com/banzaicloud/logging-operator/releases) instead of the master branch to get stable software.
-
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
-
+ You can find the complete documentation of Logging operator v2 [here](./docs/Readme.md) :blue_book: <br>
 
 ## Contributing
 
-If you find this project useful here's how you can help:
+If you find this project useful, help us:
 
-- Send a pull request with your new features and bug fixes :rocket: 
-- Help new users with issues they may encounter :muscle:
 - Support the development of this project and star this repo! :star:
-- If you use the operator, we would like to kindly ask you to add yourself to the list of production [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
+- If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
+- Help new users with issues they may encounter :muscle:
+- Send a pull request with your new features and bug fixes :rocket: 
 
-*For more information please read the [developer documentation](./docs/developers.md)*
+*For more information, read the [developer documentation](./docs/developers.md)*.
