@@ -39,7 +39,7 @@ Logging-operator is a core part of the [Pipeline](https://beta.banzaicloud.io) p
 - **[Scaling](./scaling.md)**
 - **[Requirements](#requirements)**
 - **[Contributing](../README.md#contributing)**
-- **[Blogs](#blogs)**
+- **[Blogs](./blogs.md)**
 - **[License](./license.md)**
 ---
 
@@ -95,15 +95,3 @@ spec:
 ```
 ---
 
- 
-## Blogs
-  - [Logging-Operator v2](https://banzaicloud.com/blog/logging-operator-v2/)
-  - [Measuring the performance](https://banzaicloud.com/blog/logging-operator-monitoring/)
-  - [Eleasticsearch and GeoIP](https://banzaicloud.com/blog/logging-operator-efk/)  
-
-#### Blogs (general logging and operator v1)
-  - [Advanced logging on Kubernetes](https://banzaicloud.com/blog/k8s-logging-advanced/)
-  - [Secure logging on Kubernetes with Fluentd and Fluent Bit](https://banzaicloud.com/blog/k8s-logging-tls/)
-  - [Centralized logging under Kubernetes](https://banzaicloud.com/blog/k8s-logging/)
-  - [Centralized logging on Kubernetes automated](https://banzaicloud.com/blog/k8s-logging-operator/)
-  - [And more...](https://banzaicloud.com/tags/logging/)
