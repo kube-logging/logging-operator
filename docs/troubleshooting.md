@@ -250,6 +250,9 @@ logging_logging-demo-flow_logging-demo-output-minio_s3.b598f7eb0b2b34076b6da13a9
 ### Other problems and getting support
 
 If you encounter any problems that the documentation does not address, [file an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://slack.banzaicloud.io/).
+
+[Commercial support](https://banzaicloud.com/products/logging-operator/) is also available for the Logging operator.
+
 Before asking for help, prepare the following information to make troubleshooting faster:
 
 - logging-operator version
