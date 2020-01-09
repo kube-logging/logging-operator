@@ -78,17 +78,13 @@ func NewSecretLoader(client client.Client, namespace, mountPath string, secrets 
 	}
 }
 
-func (k *secretLoader) Namespace() string {
-	return k.namespace
-}
-
 func (k *secretLoader) Load(secret *Secret) (string, error) {
 	if secret.Value != "" {
 		return secret.Value, nil
 	}
 
 	if secret.MountFrom != nil && secret.MountFrom.SecretKeyRef != nil {
-		mappedKey := fmt.Sprintf("%s-%s-%s", k.Namespace, secret.MountFrom.SecretKeyRef.Name, secret.MountFrom.SecretKeyRef.Key)
+		mappedKey := fmt.Sprintf("%s-%s-%s", k.namespace, secret.MountFrom.SecretKeyRef.Name, secret.MountFrom.SecretKeyRef.Key)
 		secretItem := &corev1.Secret{}
 		err := k.client.Get(context.TODO(), types.NamespacedName{
 			Name:      secret.MountFrom.SecretKeyRef.Name,

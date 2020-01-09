@@ -16,6 +16,7 @@ package controllers_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -458,6 +459,16 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 						},
 					},
 				},
+				AwsSecretKey: &secret.Secret{
+					MountFrom: &secret.ValueFrom{
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "topsecret",
+							},
+							Key: "key",
+						},
+					},
+				},
 				SharedCredentials: &output.S3SharedCredentials{},
 			},
 		},
@@ -493,7 +504,9 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	secret := &corev1.Secret{}
 
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
-	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("topsecretdata"))
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("aws_key_id topsecretdata"))
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring(
+		fmt.Sprintf("aws_sec_key /fluentd/secret/%s-topsecret-key", testNamespace)))
 }
 
 // TODO add following tests:
