@@ -36,7 +36,7 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 	}
 	annotationKey := fmt.Sprintf("logging.banzaicloud.io/%s", loggingRef)
 	var markedSecrets []runtime.Object
-	for _, secret := range secrets.List() {
+	for _, secret := range *secrets {
 		secretItem := &corev1.Secret{}
 		err := r.Client.Get(context.TODO(), types.NamespacedName{
 			Name:      secret.Name,
@@ -65,18 +65,8 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 	if fluentOutputSecret.Data == nil {
 		fluentOutputSecret.Data = make(map[string][]byte)
 	}
-	for _, secret := range secrets.List() {
-		secretKey := fmt.Sprintf("%s-%s-%s", secret.Namespace, secret.Name, secret.Key)
-		secretItem := &corev1.Secret{}
-		err := r.Client.Get(context.TODO(), types.NamespacedName{
-			Name:      secret.Name,
-			Namespace: secret.Namespace}, secretItem)
-		if err != nil {
-			return nil, k8sutil.StatePresent, errors.WrapIfWithDetails(
-				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
-		}
-		value := secretItem.Data[secret.Key]
-		fluentOutputSecret.Data[secretKey] = value
+	for _, secret := range *secrets {
+		fluentOutputSecret.Data[secret.MappedKey] = secret.Value
 	}
 	return fluentOutputSecret, k8sutil.StatePresent, nil
 }

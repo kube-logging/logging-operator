@@ -115,18 +115,9 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 		if s.SecretLoader != nil {
 			if v.Kind() == reflect.Ptr && !v.IsNil() {
 				if secretItem, ok := val.Interface().(*secret.Secret); ok {
-					var loadedSecret string
-					var err error
-					if secretItem.MountFrom != nil {
-						loadedSecret, err = s.SecretLoader.Mount(secretItem)
-						if err != nil {
-							multierror = errors.Combine(multierror, errors.Errorf("failed to mount secret for field %s", name), err)
-						}
-					} else {
-						loadedSecret, err = s.SecretLoader.Load(secretItem)
-						if err != nil {
-							multierror = errors.Combine(multierror, errors.Errorf("failed to load secret for field %s", name), err)
-						}
+					loadedSecret, err := s.SecretLoader.Load(secretItem)
+					if err != nil {
+						multierror = errors.Combine(multierror, errors.WrapIff(err, "failed to load secret for field %s", name))
 					}
 					if err == nil {
 						out[name] = loadedSecret
