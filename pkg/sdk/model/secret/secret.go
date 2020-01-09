@@ -35,16 +35,7 @@ type Secret struct {
 // +kubebuilder:object:generate=true
 
 type ValueFrom struct {
-	SecretKeyRef *KubernetesSecret `json:"secretKeyRef,omitempty"`
-}
-
-// +kubebuilder:object:generate=true
-
-type KubernetesSecret struct {
-	// Name of the kubernetes secret
-	Name string `json:"name"`
-	// Secret key for the value
-	Key string `json:"key"`
+	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
 }
 
 type SecretLoader interface {
@@ -59,7 +50,7 @@ type secretLoader struct {
 	secrets   *MountSecrets
 }
 
-func (m MountSecrets) Append(namespace string, secret *KubernetesSecret, mappedKey string, value []byte) {
+func (m MountSecrets) Append(namespace string, secret *corev1.SecretKeySelector, mappedKey string, value []byte) {
 	m = append(m, MountSecret{
 		Name:      secret.Name,
 		Key:       secret.Key,

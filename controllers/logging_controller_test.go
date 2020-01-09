@@ -450,9 +450,11 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 			S3OutputConfig: &output.S3OutputConfig{
 				AwsAccessKey: &secret.Secret{
 					ValueFrom: &secret.ValueFrom{
-						SecretKeyRef: &secret.KubernetesSecret{
-							Name: "topsecret",
-							Key:  "key",
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "topsecret",
+							},
+							Key: "key",
 						},
 					},
 				},
