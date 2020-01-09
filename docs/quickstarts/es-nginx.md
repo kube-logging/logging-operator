@@ -1,13 +1,13 @@
-<p align="center"><img src="./img/nle.png" width="340"></p>
+<p align="center"><img src="../img/nle.png" width="340"></p>
 
-# Store Nginx Access Logs in ElasticSearch with Logging Operator
+# Store NGINX Access Logs in Elasticsearch with Logging Operator
 
-<p align="center"><img src="./img/nginx-elastic.png" width="900"></p>
+<p align="center"><img src="../img/nginx-elastic.png" width="900"></p>
 
 ---
 ## Contents
 - **Installation**
-  - **ElasticSearch Operator**
+  - **Elasticsearch Operator**
     - [Deploy with Kubernetes Manifests](#deploy-elasticsearch)
   - **Logging Operator**
     - [Deploy with Helm](#install-with-helm)
@@ -16,14 +16,13 @@
     - [Deploy with Helm](#demo-app-and-logging-definition)
     - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
-    - [Cerebro Dashboard](#port-forward-cerebro-dashboard-service)
-    - [Kibana Dashboard](#port-forward-kibana-dashboard-service)
+    - [Kibana Dashboard](#Deployment-Validation)
 ---
 <br />
 
-## Deploy ElasticSearch
+## Deploy Elasticsearch
 
-### Install ElasticSearch
+### Install Elasticsearch
 
 We will follow the [Elastic Cloud on Kubernetes quickstart](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html)
 <br />
@@ -38,7 +37,7 @@ Create `logging` Namespace
 kubectl create ns logging
 ```
 
-Install the ElasticSearch cluster
+Install the Elasticsearch cluster
 ```yaml
 cat <<EOF | kubectl apply -n logging -f -
 apiVersion: elasticsearch.k8s.elastic.co/v1beta1
@@ -113,7 +112,7 @@ EOF
 > Note: `ClusterOutput` and `ClusterFlow` resource will only be accepted in the `controlNamespace` 
 
 
-#### Create an ElasticSearch `output` definition 
+#### Create an Elasticsearch `output` definition
 ```bash
 kubectl -n logging apply -f - <<"EOF" 
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -200,6 +199,6 @@ kubectl -n logging port-forward svc/quickstart-kb-http 5601
 ```
 Kibana dashboard URL: [https://localhost:5601](https://localhost:5601)
 
-<p align="center"><img src="./img/es_kibana.png" width="660"></p>
+<p align="center"><img src="../img/es_kibana.png" width="660"></p>
 
 

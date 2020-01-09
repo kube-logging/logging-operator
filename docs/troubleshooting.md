@@ -253,9 +253,9 @@ If you encounter any problems that the documentation does not address, [file an 
 
 Before asking for help, prepare the following information to make troubleshooting faster:
 
-- logging-operator version
+- Logging operator version
 - kubernetes version
-- helm/chart version (if you are install with helm)
+- helm/chart version (if you installed the Logging operator with helm)
 - Logging operator logs
 - [fluentd configuration](#check-fluentd-configuration)
 - [fluentd logs](#get-fluentd-logs)

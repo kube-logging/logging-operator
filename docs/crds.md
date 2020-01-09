@@ -1,6 +1,6 @@
 # Custom Resource Definitions
 
-This document contains the detailed information about the CRDs logging-operator uses.
+This document contains the detailed information about the CRDs Logging operator uses.
 
 Available CRDs:
 - [loggings.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_loggings.yaml)
