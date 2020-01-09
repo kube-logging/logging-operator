@@ -4,7 +4,7 @@
 
 This guide describes how to collect application and container logs in Kubernetes using the Logging operator, and how to send them to Elasticsearch.
 
-The following figure gives you an overview about how the system works. The Logging operator collects the logs from the application, selects which logs to forward to the output, and sends the selected log messages to the output (in this case, to Elasticsearch). For more details about the Logging operator, see the [Logging operator overview](../README.md).
+The following figure gives you an overview about how the system works. The Logging operator collects the logs from the application, selects which logs to forward to the output, and sends the selected log messages to the output (in this case, to Elasticsearch). For more details about the Logging operator, see the [Logging operator overview](../Readme.md).
 
 <p align="center"><img src="../img/nginx-elastic.png" width="900"></p>
 
@@ -15,14 +15,11 @@ The following figure gives you an overview about how the system works. The Loggi
 - **Installation**
   - **Elasticsearch operator**
     - [Deploy with Kubernetes Manifests](#deploy-elasticsearch)
-  - **Logging operator**
+  - **Logging operator and Demo application**
     - [Deploy with Helm](#deploy-the-logging-operator-with-helm)
     - [Deploy with Kubernetes Manifests](#deploy-the-logging-operator-with-kubernetes-manifests)
-  - **Demo application**  
-    - [Deploy with Helm](#demo-app-and-logging-definition)
-    - [Deploy with Kubernetes Manifests](#install-from-kubernetes-manifests)
 - **Validation**
-    - [Kibana Dashboard](#Deployment-Validation)
+    - [Kibana Dashboard](#validate-the-deployment)
 
 ---
 
@@ -78,14 +75,14 @@ Next, install the Logging operator and a demo application to provide sample log 
 
 ### Deploy the Logging operator with Helm
 
-To install the Logging operator using Helm, complete these steps. If you want to install the Logging operator using Kubernetes manifests, see [Deploy the Logging operator with Kubernetes manifests](#deploy-the-logging-operator-with-kubernetes-manifests).
+To install the Logging operator using Helm, complete these steps. If you want to install the Logging operator using Kubernetes manifests, see [Deploy the Logging operator with Kubernetes manifests](../deploy/README.md#deploy-the-logging-operator-from-kubernetes-manifests).
 
 1. Add the chart repository of the Logging operator using the following commands:
     ```bash
     helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
     helm repo update
     ```
-1. Install the Logging operator. For details, see [How to install Logging-operator with Helm](./deploy/README.md#deploy-logging-operator-with-helm)
+1. Install the Logging operator. For details, see [How to install Logging-operator with Helm](../deploy/README.md#deploy-logging-operator-with-helm)
 1. Install the demo application and its logging definition.
     ```bash
     helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
@@ -94,9 +91,9 @@ To install the Logging operator using Helm, complete these steps. If you want to
 
 ### Deploy the Logging operator with Kubernetes manifests
 
-To deploy the Logging operator using Kubernetes manifests, complete these steps. If you want to install the Logging operator using Helm, see [Deploy the Logging operator with Helm](#deploy-the-logging-operator-with-kubernetes-manifests).
+To deploy the Logging operator using Kubernetes manifests, complete these steps. If you want to install the Logging operator using Helm, see [Deploy the Logging operator with Helm](#deploy-the-logging-operator-with-helm).   
 
-1. Install the Logging operator. For details, see [How to install Logging-operator from manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
+1. Install the Logging operator. For details, see [How to install Logging-operator from manifests](../deploy/README.md#deploy-the-logging-operator-from-kubernetes-manifests)
 1. Create the `logging` resource.
      ```bash
      kubectl -n logging apply -f - <<"EOF" 
@@ -161,25 +158,25 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
      ```
 1. Install the demo application.
      ```bash
-     kubectl -n logging apply -f - <<"EOF" 
-     apiVersion: apps/v1 
-     kind: Deployment
-     metadata:
-       name: nginx-deployment
-     spec:
-       selector:
-         matchLabels:
-           app: nginx
-       replicas: 1
-       template:
-         metadata:
-           labels:
-             app: nginx
-         spec:
-           containers:
-           - name: nginx
-             image: banzaicloud/loggen:latest
-     EOF
+    kubectl -n logging apply -f - <<"EOF" 
+    apiVersion: apps/v1 
+    kind: Deployment
+    metadata:
+      name: log-generator
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: log-generator
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: log-generator
+        spec:
+          containers:
+          - name: nginx
+            image: banzaicloud/log-generator:0.3.2
+    EOF
      ```
 
 ## Validate the deployment
