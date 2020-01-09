@@ -216,7 +216,7 @@ func (r *GenericResourceReconciler) delete(desired runtime.Object) (bool, error)
 	err = r.Client.Get(context.TODO(), key, current)
 	if err != nil {
 		// If the resource type does not exist we should be ok to move on
-		if meta.IsNoMatchError(err) {
+		if meta.IsNoMatchError(err) || runtime.IsNotRegisteredError(err) {
 			return false, nil
 		}
 		if !apierrors.IsNotFound(err) {
