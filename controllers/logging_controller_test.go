@@ -502,11 +502,17 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	defer ensureCreated(t, flow)()
 
 	secret := &corev1.Secret{}
+	secretKey := fmt.Sprintf("%s-topsecret-key", testNamespace)
 
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("aws_key_id topsecretdata"))
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring(
-		fmt.Sprintf("aws_sec_key /fluentd/secret/%s-topsecret-key", testNamespace)))
+		fmt.Sprintf("aws_sec_key /fluentd/secret/%s", secretKey)))
+
+	outputSecret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.OutputSecretName), outputSecret)()
+
+	g.Expect(outputSecret.Data).Should(gomega.HaveKeyWithValue(secretKey, []byte("topsecretdata")))
 }
 
 // TODO add following tests:

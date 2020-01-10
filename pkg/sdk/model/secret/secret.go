@@ -50,10 +50,11 @@ type secretLoader struct {
 	secrets   *MountSecrets
 }
 
-func (m MountSecrets) Append(namespace string, secret *corev1.SecretKeySelector, mappedKey string, value []byte) {
-	m = append(m, MountSecret{
+func (m *MountSecrets) Append(namespace string, secret *corev1.SecretKeySelector, mappedKey string, value []byte) {
+	*m = append(*m, MountSecret{
 		Name:      secret.Name,
 		Key:       secret.Key,
+		MappedKey: mappedKey,
 		Namespace: namespace,
 		Value:     value,
 	})
