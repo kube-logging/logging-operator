@@ -136,7 +136,9 @@ func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, de
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to access resourceVersion from metadata")
 			}
-			metaAccessor.SetResourceVersion(desired, currentResourceVersion)
+			if err := metaAccessor.SetResourceVersion(desired, currentResourceVersion); err != nil {
+				return nil, errors.Wrap(err, "failed to set resourceVersion in metadata")
+			}
 
 			var name string
 			if name, err = metaAccessor.Name(current); err != nil {
