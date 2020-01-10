@@ -8,7 +8,7 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
-KUBEBUILDER_VERSION = 2.0.0
+KUBEBUILDER_VERSION = 2.2.0
 VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
@@ -63,7 +63,7 @@ test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
 	@which etcd
 	kubebuilder version
-	go test ./controllers/... ./pkg/... -coverprofile cover.out
+	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
 
 # Build manager binary
 manager: generate fmt vet

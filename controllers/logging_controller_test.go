@@ -29,6 +29,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/onsi/gomega"
+	"github.com/pborman/uuid"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -57,7 +58,7 @@ func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -90,7 +91,7 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -129,7 +130,7 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -169,7 +170,7 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -218,7 +219,7 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -268,7 +269,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -330,7 +331,7 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:              "someloggingref",
@@ -381,7 +382,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -432,7 +433,7 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -521,7 +522,8 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 
 func beforeEach(t *testing.T) func() {
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
-		Scheme: scheme.Scheme,
+		Scheme:             scheme.Scheme,
+		MetricsBindAddress: "0",
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
@@ -534,6 +536,7 @@ func beforeEach(t *testing.T) func() {
 	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
 
 	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).Complete(wrappedReconciler)
+
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
 	stopMgr, mgrStopped = startTestManager(t, mgr)
@@ -550,7 +553,10 @@ func ensureCreated(t *testing.T, object runtime.Object) func() {
 		t.Fatalf("%+v", err)
 	}
 	return func() {
-		mgr.GetClient().Delete(context.TODO(), object)
+		err := mgr.GetClient().Delete(context.TODO(), object)
+		if err != nil {
+			t.Fatalf("%+v", errors.WithStack(err))
+		}
 	}
 }
 
@@ -568,6 +574,9 @@ func ensureCreatedEventually(t *testing.T, ns, name string, object runtime.Objec
 		t.Fatalf("%+v", errors.WithStack(err))
 	}
 	return func() {
-		mgr.GetClient().Delete(context.TODO(), object)
+		err := mgr.GetClient().Delete(context.TODO(), object)
+		if err != nil {
+			t.Fatalf("%+v", errors.WithStack(err))
+		}
 	}
 }

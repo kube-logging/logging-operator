@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.4.2
 	github.com/banzaicloud/k8s-objectmatcher v1.1.0
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
-	github.com/coreos/prometheus-operator v0.33.0
+	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.1.0
 	github.com/goph/emperror v0.17.2
 	github.com/onsi/gomega v1.5.0
@@ -22,10 +22,5 @@ require (
 
 replace (
 	github.com/banzaicloud/logging-operator/pkg/sdk => ./pkg/sdk
-	github.com/prometheus/prometheus => github.com/prometheus/prometheus v1.8.2-0.20190818123050-43acd0e2e93f
-	// k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
-	// required for test deps only
-	// k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
-	// k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
 	k8s.io/client-go => k8s.io/client-go v0.16.4
 )

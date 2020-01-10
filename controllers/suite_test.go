@@ -62,7 +62,7 @@ func TestMain(m *testing.M) {
 }
 
 func beforeSuite() error {
-	logf.SetLogger(zap.LoggerTo(os.Stdout, true))
+	logf.SetLogger(zap.New(zap.UseDevMode(true), zap.WriteTo(os.Stdout)))
 
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
