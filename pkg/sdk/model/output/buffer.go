@@ -21,6 +21,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Buffer"
+// +url:"https://docs.fluentd.org/configuration/buffer-section"
+// +version:"mode info"
+// +description:"Fluentd event buffer"
+// +status:"GA"
+type _metaBuffer interface{}
+
 // +kubebuilder:object:generate=true
 
 type Buffer struct {

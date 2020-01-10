@@ -41,7 +41,7 @@ loggingOperator:
     fluentbitSecretName: ""
     fluentdSecretName: ""
 
-# Logging-Operator Outputs
+# Logging Operator Outputs
 # Enable Grafana Loki logging output
 file:
   enabled: false

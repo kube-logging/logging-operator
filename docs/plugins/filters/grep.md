@@ -18,7 +18,7 @@
 | key | string | Yes | - | Specify field name in the record to parse.<br> |
 | pattern | string | Yes | - | Pattern expression to evaluate<br> |
  #### Example `Regexp` filter configurations
- ```
+ ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -35,7 +35,7 @@ spec:
  ```
 
  #### Fluentd Config Result
- ```
+ ```yaml
   <filter **>
     @type grep
     @id demo-flow_1_grep
@@ -55,7 +55,7 @@ spec:
 | key | string | Yes | - | Specify field name in the record to parse.<br> |
 | pattern | string | Yes | - | Pattern expression to evaluate<br> |
  #### Example `Exclude` filter configurations
- ```
+ ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -72,7 +72,7 @@ spec:
  ```
 
  #### Fluentd Config Result
- ```
+ ```yaml
   <filter **>
     @type grep
     @id demo-flow_0_grep
@@ -92,7 +92,7 @@ spec:
 | regexp | []RegexpSection | No | - | [Regexp Directive](#Regexp-Directive)<br> |
 | exclude | []ExcludeSection | No | - | [Exclude Directive](#Exclude-Directive)<br> |
  #### Example `Or` filter configurations
- ```
+ ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -113,7 +113,7 @@ spec:
 ```
 
  #### Fluentd Config Result
- ```
+ ```yaml
     <or>
       <exclude>
         key first
@@ -135,7 +135,7 @@ spec:
 | regexp | []RegexpSection | No | - | [Regexp Directive](#Regexp-Directive)<br> |
 | exclude | []ExcludeSection | No | - | [Exclude Directive](#Exclude-Directive)<br> |
  #### Example `And` filter configurations
- ```
+ ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -156,7 +156,7 @@ spec:
 ```
 
  #### Fluentd Config Result
- ```
+ ```yaml
     <and>
       <regexp>
         key first

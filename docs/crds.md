@@ -1,6 +1,6 @@
 # Custom Resource Definitions
 
-This document contains the detailed information about the CRDs logging-operator uses.
+This document contains the detailed information about the CRDs Logging operator uses.
 
 Available CRDs:
 - [loggings.logging.banzaicloud.io](/config/crd/bases/logging.banzaicloud.io_loggings.yaml)
@@ -104,8 +104,12 @@ You can customize the `fluentd` statefulset with the following parameters.
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
 | podPriorityClassName | string | "" | Name of a priority class to launch fluentd with |
+| scaling | [scaling](#scaling)] | "" | Fluentd scaling preferences |
 | fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
+| livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container liveness. Container will be restarted if the probe fails. |
+| LivenessDefaultCheck | bool | false | Enable default liveness probe of fluentd container. |
+| readinessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container service readiness. Container will be removed from service endpoints if the probe fails. |
 | scaling | [Scaling](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#deploymentspec-v1-apps) | {replicas: 1} | Fluentd scaling configuration i.e replica count
 
 **`logging` with custom pvc volume for buffers** 
@@ -168,7 +172,9 @@ spec:
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
 | podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
-s
+| livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentbit container liveness. Container will be restarted if the probe fails. |
+| readinessProbe | [Probe](#Probe) | {} | Periodic probe of fluentbit container service readiness. Container will be removed from service endpoints if the probe fails. |
+
 **`logging` with custom fluent-bit annotations** 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -306,6 +312,28 @@ spec:
 ```
 
 
+#### Scaling
+
+Scaling components 
+
+| Name                    | Type           | Default | Description |
+|-------------------------|----------------|---------|-------------|
+| replicas | int | 1 | number of pod replicas |
+
+**`logging` with custom fluentd replica number** 
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: 
+    scaling:
+      replicas: 3
+  fluentbit: {}
+  controlNamespace: logging
+```
+
 ## Outputs, Clusteroutputs
 
 Outputs are the final stage for a `logging flow`. You can define multiple `outputs` and attach them to multiple `flows`.
@@ -385,4 +413,50 @@ spec:
     - s3-output
   selectors:
     app: nginx
+```
+
+
+#### Probe
+A Probe is a diagnostic performed periodically by the kubelet on a Container. To perform a diagnostic, the kubelet calls a Handler implemented by the Container. [More info](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
+
+
+| Name                    | Type           | Default | Description |
+|-------------------------|----------------|---------|-------------|
+| initialDelaySeconds | int | 0 | Number of seconds after the container has started before liveness probes are initiated. |
+| timeoutSeconds | int | 1 | Number of seconds after which the probe times out. |
+| periodSeconds | int | 10 | How often (in seconds) to perform the probe. |
+| successThreshold | int | 1 | Minimum consecutive successes for the probe to be considered successful after having failed. |
+| failureThreshold | int | 3 |  Minimum consecutive failures for the probe to be considered failed after having succeeded. |
+| exec | array | {} |  Exec specifies the action to take. [More info](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#execaction-v1-core) |
+| httpGet | array | {} |  HTTPGet specifies the http request to perform. [More info](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#httpgetaction-v1-core) |
+| tcpSocket | array | {} |  TCPSocket specifies an action involving a TCP port. [More info](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#tcpsocketaction-v1-core) |
+
+**`logging` with custom liveness config** 
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd:
+    livenessProbe:
+      periodSeconds: 60
+      initialDelaySeconds: 600
+      exec:
+        command: 
+        - "/bin/sh"
+        - "-c"
+        - >
+          LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
+          if [ ! -e /buffers ];
+          then
+            exit 1;
+          fi;
+          touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
+          if [ -z "$(find /buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
+          then
+            exit 1;
+          fi;
+  fluentbit: {}
+  controlNamespace: logging
 ```

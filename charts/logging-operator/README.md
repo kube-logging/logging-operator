@@ -1,7 +1,8 @@
 
-# Logging Operator Chart
+# Logging operator Chart
 
-[Logging Operator](https://github.com/banzaicloud/logging-operator) Managed centralized logging component fluentd and fluent-bit instance on cluster.
+[Logging operator](https://github.com/banzaicloud/logging-operator) Managed centralized logging component fluentd and fluent-bit instance on cluster.
+
 ## tl;dr:
 
 ```bash
@@ -12,7 +13,7 @@ $ helm install banzaicloud-stable/logging-operator
 
 ## Introduction
 
-This chart bootstraps an [Logging Operator](https://github.com/banzaicloud/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Logging Operator](https://github.com/banzaicloud/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -29,7 +30,7 @@ $ helm install --name my-release banzaicloud-stable/logging-operator
 ### CRDs
 Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
 
-The command deploys **logging-operator** on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+The command deploys **Logging operator** on the Kubernetes cluster with the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 ## Uninstalling the Chart
 
@@ -39,7 +40,7 @@ To uninstall/delete the `my-release` deployment:
 $ helm delete my-release
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+The command removes all Kubernetes components associated with the chart and deletes the release.
 
 ## Configuration
 

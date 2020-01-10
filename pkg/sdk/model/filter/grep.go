@@ -24,6 +24,13 @@ import (
 // The grep filter plugin "greps" events by the values of specified fields.
 type _docGrep interface{}
 
+// +name:"Grep"
+// +url:"https://docs.fluentd.org/filter/grep"
+// +version:"more info"
+// +description:"Grep events by the values"
+// +status:"GA"
+type _metaGrep interface{}
+
 // +kubebuilder:object:generate=true
 type GrepConfig struct {
 	// +docLink:"Regexp Directive,#Regexp-Directive"
@@ -47,7 +54,7 @@ type RegexpSection struct {
 }
 
 // #### Example `Regexp` filter configurations
-// ```
+// ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
 //metadata:
@@ -64,7 +71,7 @@ type RegexpSection struct {
 // ```
 //
 // #### Fluentd Config Result
-// ```
+// ```yaml
 //  <filter **>
 //    @type grep
 //    @id demo-flow_1_grep
@@ -87,7 +94,7 @@ type ExcludeSection struct {
 }
 
 // #### Example `Exclude` filter configurations
-// ```
+// ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
 //metadata:
@@ -104,7 +111,7 @@ type ExcludeSection struct {
 // ```
 //
 // #### Fluentd Config Result
-// ```
+// ```yaml
 //  <filter **>
 //    @type grep
 //    @id demo-flow_0_grep
@@ -127,7 +134,7 @@ type OrSection struct {
 }
 
 // #### Example `Or` filter configurations
-// ```
+// ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
 //metadata:
@@ -148,7 +155,7 @@ type OrSection struct {
 //```
 //
 // #### Fluentd Config Result
-// ```
+// ```yaml
 //    <or>
 //      <exclude>
 //        key first
@@ -173,7 +180,7 @@ type AndSection struct {
 }
 
 // #### Example `And` filter configurations
-// ```
+// ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
 //metadata:
@@ -194,7 +201,7 @@ type AndSection struct {
 //```
 //
 // #### Fluentd Config Result
-// ```
+// ```yaml
 //    <and>
 //      <regexp>
 //        key first

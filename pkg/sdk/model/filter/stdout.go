@@ -19,6 +19,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
+// +name:"Stdout"
+// +url:"https://docs.fluentd.org/filter/stdout"
+// +version:"more info"
+// +description:"Prints events to stdout"
+// +status:"GA"
+type _metaStdOut interface{}
+
 // +kubebuilder:object:generate=true
 
 type StdOutFilterConfig struct {

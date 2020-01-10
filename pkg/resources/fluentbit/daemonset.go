@@ -88,6 +88,8 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
 							},
+							LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
+							ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
 						},
 					},
 				},

@@ -54,11 +54,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
+			Command:         []string{"sh", "-c", "chmod -R 777", BufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.QualifiedName(bufferVolumeName),
-					MountPath: "/buffers",
+					MountPath: BufferPath,
 				},
 			},
 		})
@@ -100,6 +100,12 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		Ports:           generatePorts(r.Logging.Spec.FluentdSpec),
 		VolumeMounts:    r.generateVolumeMounts(),
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
+		Env: []corev1.EnvVar{
+			{
+				Name:  "BUFFER_PATH",
+				Value: BufferPath,
+			},
+		},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
 			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
@@ -108,6 +114,8 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 		},
+		LivenessProbe:  r.Logging.Spec.FluentdSpec.LivenessProbe,
+		ReadinessProbe: r.Logging.Spec.FluentdSpec.ReadinessProbe,
 	}
 
 	if r.Logging.Spec.FluentdSpec.FluentOutLogrotate != nil && r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Enabled {
@@ -193,7 +201,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		},
 		{
 			Name:      r.Logging.QualifiedName(bufferVolumeName),
-			MountPath: "/buffers",
+			MountPath: BufferPath,
 		},
 	}
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {

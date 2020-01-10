@@ -24,6 +24,13 @@ import (
 //More info at https://github.com/htgc/fluent-plugin-azurestorage
 type _docAzure interface{}
 
+// +name:"Azure Storage"
+// +url:"https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0"
+// +version:"0.1.0"
+// +description:"Store logs in Azure Storage"
+// +status:"GA"
+type _metaAzure interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type AzureStorage struct {

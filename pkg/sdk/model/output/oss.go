@@ -34,6 +34,13 @@ import (
 //More info at https://github.com/aliyun/fluent-plugin-oss
 type _docOss interface{}
 
+// +name:"Alibaba Cloud Storage"
+// +url:"https://github.com/aliyun/fluent-plugin-oss"
+// +version:"0.0.2"
+// +description:"Store logs the Alibaba Cloud Object Storage Service"
+// +status:"GA"
+type _metaOSS interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type OSSOutput struct {

@@ -35,6 +35,13 @@ import (
 //| ${docker_id} | Docker UUID of the container | 3a38148aa37aa3... |
 type _docTagNormaliser interface{}
 
+// +name:"Tag Normaliser"
+// +url:"https://github.com/banzaicloud/fluent-plugin-tag-normaliser"
+// +version:"more info"
+// +description:"Re-tag based on log metadata"
+// +status:"GA"
+type _metaTagNormaliser interface{}
+
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {
 	// Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)

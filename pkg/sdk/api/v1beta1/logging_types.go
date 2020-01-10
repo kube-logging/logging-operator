@@ -85,7 +85,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
 		}
 		if copy.Spec.FluentdSpec.Image.Tag == "" {
-			copy.Spec.FluentdSpec.Image.Tag = "v1.7.4-alpine-12"
+			copy.Spec.FluentdSpec.Image.Tag = "v1.7.4-alpine-13-dev1"
 		}
 		if copy.Spec.FluentdSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"
@@ -210,6 +210,20 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentdSpec.FluentOutLogrotate.Size == "" {
 			copy.Spec.FluentdSpec.FluentOutLogrotate.Size = cast.ToString(1024 * 1024 * 10)
+		}
+		if copy.Spec.FluentdSpec.LivenessProbe == nil {
+			if copy.Spec.FluentdSpec.LivenessDefaultCheck {
+				copy.Spec.FluentdSpec.LivenessProbe = &v1.Probe{
+					Handler: v1.Handler{
+						Exec: &v1.ExecAction{[]string{"/bin/healthy.sh"}},
+					},
+					InitialDelaySeconds: 600,
+					TimeoutSeconds:      0,
+					PeriodSeconds:       60,
+					SuccessThreshold:    0,
+					FailureThreshold:    0,
+				}
+			}
 		}
 
 	}

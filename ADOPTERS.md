@@ -1,7 +1,10 @@
-# Adopters
+# Logging Operator Adopters
 
-This is a list of production adopters of Logging Operator (in alphabetical order):
+This is a list of production adopters of Logging Operator:
 
-- [Banzai Cloud](https://banzaicloud.com) uses Logging Operator to collect logs from the Pipeline platform.
-- [hipages](https://hipages.com.au) uses Logging Operator to collect logs to send them to [Humio](https://humio.com/).
-- [Flexera](https://www.flexera.com/) uses Logging Operator to collect logs to send them to S3.
+| Company | Industry |
+| :--- | :--- |
+|[Banzai Cloud](https://banzaicloud.com)|Enterprise Technology|
+|[hipages](https://hipages.com.au)|E-commerce|
+|[Code Factory](https://codefactory.hu)|Software Development/Consultancy|
+|[Flexera](https://www.flexera.com/) | Optimizing your IT assets from on-premises to the cloud |
