@@ -17,7 +17,7 @@ package types
 import (
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 // OutputPlugin plugin: https://github.com/banzaicloud/fluent-plugin-label-router

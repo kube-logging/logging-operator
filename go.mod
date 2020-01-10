@@ -6,6 +6,7 @@ require (
 	emperror.dev/errors v0.4.2
 	github.com/banzaicloud/k8s-objectmatcher v1.1.0
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
+	github.com/banzaicloud/operator-tools v0.1.0
 	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.1.0
 	github.com/goph/emperror v0.17.2

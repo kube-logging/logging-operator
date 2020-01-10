@@ -20,9 +20,9 @@ import (
 	"text/template"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -46,11 +46,11 @@ type fluentBitConfig struct {
 	BufferStorage map[string]string
 }
 
-func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
-		}, k8sutil.StateAbsent, nil
+		}, reconciler.StateAbsent, nil
 	}
 	monitor := struct {
 		Enabled bool
@@ -77,17 +77,17 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 	mapper := types.NewStructToStringMapper(nil)
 	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
 	if err != nil {
-		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
+		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
 
 	fluentbitFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {
-		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
+		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
 	}
 
 	fluentbitBufferStorage, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
 	if err != nil {
-		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to map buffer storage for fluentbit")
+		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map buffer storage for fluentbit")
 	}
 
 	input := fluentBitConfig{
@@ -115,7 +115,7 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 
 	r.desiredConfig, err = generateConfig(input)
 	if err != nil {
-		return nil, k8sutil.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
+		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
 	}
 
 	return &corev1.Secret{
@@ -123,7 +123,7 @@ func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState, error
 		Data: map[string][]byte{
 			"fluent-bit.conf": []byte(r.desiredConfig),
 		},
-	}, k8sutil.StatePresent, nil
+	}, reconciler.StatePresent, nil
 }
 
 func generateConfig(input fluentBitConfig) (string, error) {

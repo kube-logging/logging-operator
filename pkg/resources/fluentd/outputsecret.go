@@ -19,15 +19,15 @@ import (
 	"fmt"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object, reconciler.DesiredState, error) {
 	var loggingRef string
 	if r.Logging.Spec.LoggingRef != "" {
 		loggingRef = r.Logging.Spec.LoggingRef
@@ -42,7 +42,7 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 			Name:      secret.Name,
 			Namespace: secret.Namespace}, secretItem)
 		if err != nil {
-			return nil, k8sutil.StatePresent, errors.WrapIfWithDetails(
+			return nil, reconciler.StatePresent, errors.WrapIfWithDetails(
 				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
 		}
 		if secretItem.ObjectMeta.Annotations == nil {
@@ -51,10 +51,10 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
 		markedSecrets = append(markedSecrets, secretItem)
 	}
-	return markedSecrets, k8sutil.StatePresent, nil
+	return markedSecrets, reconciler.StatePresent, nil
 }
 
-func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, reconciler.DesiredState, error) {
 	// Initialise output secret
 	fluentOutputSecret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
@@ -68,5 +68,5 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 	for _, secret := range *secrets {
 		fluentOutputSecret.Data[secret.MappedKey] = secret.Value
 	}
-	return fluentOutputSecret, k8sutil.StatePresent, nil
+	return fluentOutputSecret, reconciler.StatePresent, nil
 }

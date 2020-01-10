@@ -19,11 +19,11 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,17 +50,17 @@ const (
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	Logging *v1beta1.Logging
-	*k8sutil.GenericResourceReconciler
+	*reconciler.GenericResourceReconciler
 	config  *string
 	secrets *secret.MountSecrets
 }
 
 type Desire struct {
 	DesiredObject runtime.Object
-	DesiredState  k8sutil.DesiredState
+	DesiredState  reconciler.DesiredState
 	// BeforeUpdateHook has the ability to change the desired object
 	// or even to change the desired state in case the object should be recreated
-	BeforeUpdateHook func(runtime.Object) (k8sutil.DesiredState, error)
+	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
 func (r *Reconciler) getFluentdLabels() map[string]string {
@@ -76,10 +76,10 @@ func (r *Reconciler) getServiceAccount() string {
 }
 
 func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets, opts k8sutil.ReconcilerOpts) *Reconciler {
+	logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, log, opts),
+		GenericResourceReconciler: reconciler.NewReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
 	}

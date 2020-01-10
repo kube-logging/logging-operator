@@ -25,9 +25,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 func TestRenderDirective(t *testing.T) {

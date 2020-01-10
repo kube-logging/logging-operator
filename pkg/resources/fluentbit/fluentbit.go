@@ -18,10 +18,10 @@ import (
 	"emperror.dev/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -55,21 +55,21 @@ func (r *Reconciler) getServiceAccount() string {
 
 type DesiredObject struct {
 	Object runtime.Object
-	State  k8sutil.DesiredState
+	State  reconciler.DesiredState
 }
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
 	Logging *v1beta1.Logging
-	*k8sutil.GenericResourceReconciler
+	*reconciler.GenericResourceReconciler
 	desiredConfig string
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts k8sutil.ReconcilerOpts) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: k8sutil.NewReconciler(client, logger, opts),
+		GenericResourceReconciler: reconciler.NewReconciler(client, logger, opts),
 	}
 }
 

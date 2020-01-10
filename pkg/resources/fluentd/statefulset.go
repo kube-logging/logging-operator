@@ -15,9 +15,9 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	spec := *r.statefulsetSpec()
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
@@ -43,7 +43,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error)
 		Spec:       spec,
 	}
 
-	return desired, k8sutil.StatePresent, nil
+	return desired, reconciler.StatePresent, nil
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
