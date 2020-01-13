@@ -22,12 +22,12 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -604,7 +604,7 @@ spec:
                     successThreshold:
                       description: Minimum consecutive successes for the probe to
                         be considered successful after having failed. Defaults to
-                        1. Must be 1 for liveness. Minimum value is 1.
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
                       format: int32
                       type: integer
                     tcpSocket:
@@ -1148,7 +1148,7 @@ spec:
                     successThreshold:
                       description: Minimum consecutive successes for the probe to
                         be considered successful after having failed. Defaults to
-                        1. Must be 1 for liveness. Minimum value is 1.
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
                       format: int32
                       type: integer
                     tcpSocket:
@@ -1296,6 +1296,38 @@ spec:
                             - value
                             type: object
                           type: array
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options within a container's
+                            SecurityContext will be used. If set in both SecurityContext
+                            and PodSecurityContext, the value specified in SecurityContext
+                            takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
+                              type: string
+                          type: object
                       type: object
                     podSecurityPolicyCreate:
                       type: boolean
@@ -1400,6 +1432,37 @@ spec:
                             user:
                               description: User is a SELinux user label that applies
                                 to the container.
+                              type: string
+                          type: object
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options from the PodSecurityContext
+                            will be used. If set in both SecurityContext and PodSecurityContext,
+                            the value specified in SecurityContext takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
                               type: string
                           type: object
                       type: object
@@ -1920,7 +1983,7 @@ spec:
                     successThreshold:
                       description: Minimum consecutive successes for the probe to
                         be considered successful after having failed. Defaults to
-                        1. Must be 1 for liveness. Minimum value is 1.
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
                       format: int32
                       type: integer
                     tcpSocket:
@@ -2059,7 +2122,7 @@ spec:
                     successThreshold:
                       description: Minimum consecutive successes for the probe to
                         be considered successful after having failed. Defaults to
-                        1. Must be 1 for liveness. Minimum value is 1.
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
                       format: int32
                       type: integer
                     tcpSocket:
@@ -2216,6 +2279,38 @@ spec:
                             - value
                             type: object
                           type: array
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options within a container's
+                            SecurityContext will be used. If set in both SecurityContext
+                            and PodSecurityContext, the value specified in SecurityContext
+                            takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
+                              type: string
+                          type: object
                       type: object
                     podSecurityPolicyCreate:
                       type: boolean
@@ -2320,6 +2415,37 @@ spec:
                             user:
                               description: User is a SELinux user label that applies
                                 to the container.
+                              type: string
+                          type: object
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options from the PodSecurityContext
+                            will be used. If set in both SecurityContext and PodSecurityContext,
+                            the value specified in SecurityContext takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
                               type: string
                           type: object
                       type: object

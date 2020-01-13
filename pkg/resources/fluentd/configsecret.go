@@ -20,7 +20,7 @@ import (
 	"html/template"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -48,7 +48,7 @@ func generateConfig(input fluentdConfig) (string, error) {
 	return outputString, nil
 }
 
-func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
 	input := fluentdConfig{Monitor: struct {
 		Enabled bool
 		Port    int32
@@ -69,7 +69,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
-		return nil, k8sutil.StatePresent, err
+		return nil, reconciler.StatePresent, err
 	}
 
 	configs := &corev1.Secret{
@@ -83,5 +83,5 @@ func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState, error
 
 	configs.Data["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
 
-	return configs, k8sutil.StatePresent, nil
+	return configs, reconciler.StatePresent, nil
 }

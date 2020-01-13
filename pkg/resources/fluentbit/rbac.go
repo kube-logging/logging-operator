@@ -15,13 +15,13 @@
 package fluentbit
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName),
@@ -32,14 +32,14 @@ func (r *Reconciler) clusterRole() (runtime.Object, k8sutil.DesiredState, error)
 					Verbs:     []string{"get", "list", "watch"},
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
 		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName),
-		Rules:      []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName),
@@ -55,20 +55,20 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, k8sutil.DesiredState,
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName),
-		RoleRef:    rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
 			ObjectMeta: r.FluentbitObjectMeta(defaultServiceAccountName),
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
 		ObjectMeta: r.FluentbitObjectMeta(defaultServiceAccountName),
-	}, k8sutil.StateAbsent, nil
+	}, reconciler.StateAbsent, nil
 }

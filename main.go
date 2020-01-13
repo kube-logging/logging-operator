@@ -61,13 +61,16 @@ func main() {
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
 	flag.Parse()
 
-	ctrl.SetLogger(zap.Logger(verboseLogging))
+	ctrl.SetLogger(zap.New(func(o *zap.Options) {
+		o.Development = verboseLogging
+	}))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
 		MapperProvider:     k8sutil.NewCached,
+		Port:               9443,
 	})
 
 	if err != nil {
