@@ -15,8 +15,8 @@
 package fluentbit
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
@@ -41,14 +41,14 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, err
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
-		Spec:       corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitor {
 		return &v1.ServiceMonitor{
 			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
@@ -66,10 +66,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
 		Spec:       v1.ServiceMonitorSpec{},
-	}, k8sutil.StateAbsent, nil
+	}, reconciler.StateAbsent, nil
 }

@@ -71,7 +71,7 @@ func (in *ClusterFlow) DeepCopyObject() runtime.Object {
 func (in *ClusterFlowList) DeepCopyInto(out *ClusterFlowList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]ClusterFlow, len(*in))
@@ -130,7 +130,7 @@ func (in *ClusterOutput) DeepCopyObject() runtime.Object {
 func (in *ClusterOutputList) DeepCopyInto(out *ClusterOutputList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]ClusterOutput, len(*in))
@@ -285,7 +285,7 @@ func (in *Flow) DeepCopyObject() runtime.Object {
 func (in *FlowList) DeepCopyInto(out *FlowList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Flow, len(*in))
@@ -676,7 +676,7 @@ func (in *Logging) DeepCopyObject() runtime.Object {
 func (in *LoggingList) DeepCopyInto(out *LoggingList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Logging, len(*in))
@@ -802,7 +802,7 @@ func (in *Output) DeepCopyObject() runtime.Object {
 func (in *OutputList) DeepCopyInto(out *OutputList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Output, len(*in))

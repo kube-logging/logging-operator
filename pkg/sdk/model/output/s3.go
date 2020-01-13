@@ -17,8 +17,8 @@ package output
 import (
 	"errors"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Amazon S3 plugin for Fluentd"

@@ -15,15 +15,15 @@
 package fluentbit
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
@@ -55,15 +55,15 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, k8sutil.Desired
 					ReadOnly:   true,
 				}},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &policyv1beta1.PodSecurityPolicy{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitPodSecurityPolicyName),
 		Spec:       policyv1beta1.PodSecurityPolicySpec{},
-	}, k8sutil.StateAbsent, nil
+	}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) pspClusterRole() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
@@ -75,14 +75,14 @@ func (r *Reconciler) pspClusterRole() (runtime.Object, k8sutil.DesiredState, err
 					Verbs:         []string{"use"},
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
 		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
-		Rules:      []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
@@ -98,9 +98,9 @@ func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, k8sutil.DesiredSta
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
-		RoleRef:    rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
