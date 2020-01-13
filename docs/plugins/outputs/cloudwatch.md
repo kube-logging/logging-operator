@@ -47,6 +47,7 @@ More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-
 | log_group_aws_tags | string | No | - | Set a hash with keys and values to tag the log group resource<br> |
 | log_group_aws_tags_key | string | No | - | Specified field of records as AWS tags for the log group<br> |
 | log_group_name | string | No | - | Name of log group to store logs<br> |
+| log_group_name_key | string | No | - | Specified field of records as log group name<br> |
 | log_rejected_request | string | No |  false | Output rejected_log_events_info request log. <br> |
 | log_stream_name | string | No | - | Name of log stream to store logs<br> |
 | log_stream_name_key | string | No | - | Specified field of records as log stream name<br> |
