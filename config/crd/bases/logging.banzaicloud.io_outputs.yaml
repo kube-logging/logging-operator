@@ -619,6 +619,9 @@ spec:
                 log_group_name:
                   description: Name of log group to store logs
                   type: string
+                log_group_name_key:
+                  description: Specified field of records as log group name
+                  type: string
                 log_rejected_request:
                   description: 'Output rejected_log_events_info request log. (default:
                     false)'
