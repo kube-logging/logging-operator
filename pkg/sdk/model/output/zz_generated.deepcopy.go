@@ -111,6 +111,36 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.SslVerify != nil {
+		in, out := &in.SslVerify, &out.SslVerify
+		*out = new(bool)
+		**out = **in
+	}
+	if in.UtcIndex != nil {
+		in, out := &in.UtcIndex, &out.UtcIndex
+		*out = new(bool)
+		**out = **in
+	}
+	if in.FailOnPuttingTemplateRetryExceed != nil {
+		in, out := &in.FailOnPuttingTemplateRetryExceed, &out.FailOnPuttingTemplateRetryExceed
+		*out = new(bool)
+		**out = **in
+	}
+	if in.ReloadConnections != nil {
+		in, out := &in.ReloadConnections, &out.ReloadConnections
+		*out = new(bool)
+		**out = **in
+	}
+	if in.VerifyEsVersionAtStartup != nil {
+		in, out := &in.VerifyEsVersionAtStartup, &out.VerifyEsVersionAtStartup
+		*out = new(bool)
+		**out = **in
+	}
+	if in.ExceptionBackup != nil {
+		in, out := &in.ExceptionBackup, &out.ExceptionBackup
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)
