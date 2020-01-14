@@ -860,8 +860,8 @@ spec:
                     configuration.
                   type: string
                 default_elasticsearch_version:
-                  description: This parameter changes that ES plugin assumes default
-                    Elasticsearch version. The default value is 5.
+                  description: 'This parameter changes that ES plugin assumes default
+                    Elasticsearch version.(default: 5)'
                   type: string
                 deflector_alias:
                   description: Specify the deflector alias which would be assigned
@@ -925,18 +925,18 @@ spec:
                     false)'
                   type: boolean
                 include_timestamp:
-                  description: Adds a @timestamp field to the log, following all settings
-                    logstash_format does, except without the restrictions on index_name.
-                    This allows one to log to an alias in Elasticsearch and utilize
-                    the rollover API.
+                  description: 'Adds a @timestamp field to the log, following all
+                    settings logstash_format does, except without the restrictions
+                    on index_name. This allows one to log to an alias in Elasticsearch
+                    and utilize the rollover API.(default: false)'
                   type: boolean
                 index_date_pattern:
                   description: 'Specify this to override the index date pattern for
                     creating a rollover index.(default: now/d)'
                   type: string
                 index_prefix:
-                  description: Specify the index prefix for the rollover index to
-                    be created.
+                  description: 'Specify the index prefix for the rollover index to
+                    be created.(default: logstash)'
                   type: string
                 log_es_400_reason:
                   description: 'By default, the error logger won''t record the reason
@@ -953,7 +953,7 @@ spec:
                   description: 'Enable Logstash log format.(default: false)'
                   type: boolean
                 logstash_prefix:
-                  description: 'Set the Logstash prefix.(default: true)'
+                  description: 'Set the Logstash prefix.(default: logstash)'
                   type: string
                 logstash_prefix_separator:
                   description: 'Set the Logstash prefix separator.(default: -)'
@@ -1029,7 +1029,7 @@ spec:
                   description: 'With default behavior, Elasticsearch client uses Yajl
                     as JSON encoder/decoder. Oj is the alternative high performance
                     JSON encoder/decoder. When this parameter sets as true, Elasticsearch
-                    client uses Oj as JSON encoder/decoder. (default: fqlse)'
+                    client uses Oj as JSON encoder/decoder. (default: false)'
                   type: boolean
                 reconnect_on_error:
                   description: 'Indicates that the plugin should reset connection
@@ -1108,7 +1108,7 @@ spec:
                 target_type_key:
                   description: 'Similar to target_index_key config, find the type
                     name to write to in the record under this key (or nested record).
-                    If key not found in record - fallback to type_name.(default: true)'
+                    If key not found in record - fallback to type_name.(default: fluentd)'
                   type: string
                 template_file:
                   description: The path to the file containing the template to install.
@@ -1196,8 +1196,6 @@ spec:
                   description: 'The write_operation can be any of: (index,create,update,upsert)(default:
                     index)'
                   type: string
-              required:
-              - ssl_verify
               type: object
             file:
               properties:
