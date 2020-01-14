@@ -121,14 +121,14 @@ type ElasticsearchOutput struct {
 	MaxRetryPuttingTemplate string `json:"max_retry_putting_template,omitempty"`
 	// Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)
 	// +kubebuilder:validation:Optional
-	FailOnPuttingTemplateRetryExceed *bool `json:"fail_on_putting_template_retry_exceed,omitempty,omitempty" plugin:"default:true"`
+	FailOnPuttingTemplateRetryExceed *bool `json:"fail_on_putting_template_retry_exceed,omitempty" plugin:"default:true"`
 	// You can specify times of retry obtaining Elasticsearch version.(default: 15)
 	MaxRetryGetEsVersion string `json:"max_retry_get_es_version,omitempty"`
 	// You can specify HTTP request timeout.(default: 5s)
 	RequestTimeout string `json:"request_timeout,omitempty"`
 	// You can tune how the elasticsearch-transport host reloading feature works.(default: true)
 	// +kubebuilder:validation:Optional
-	ReloadConnections bool `json:"reload_connections,omitempty"`
+	ReloadConnections *bool `json:"reload_connections,omitempty" plugin:"default:true"`
 	//Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.(default: false)
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
 	// You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.(default: 60s)

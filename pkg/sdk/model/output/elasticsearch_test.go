@@ -38,16 +38,15 @@ buffer:
   <match **>
 	@type elasticsearch
 	@id test_elasticsearch
-	exception_backup false
-	fail_on_putting_template_retry_exceed false
+	exception_backup true
+	fail_on_putting_template_retry_exceed true
 	host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
 	port 9200
-	reload_connections false
 	scheme https
 	ssl_verify false
 	ssl_version TLSv1_2
-	utc_index false
-	verify_es_version_at_startup false
+	utc_index true
+	verify_es_version_at_startup true
     <buffer tag,time>
       @type file
       path /buffers/test_elasticsearch.*.buffer

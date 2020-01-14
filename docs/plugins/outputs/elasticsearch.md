@@ -60,7 +60,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | fail_on_putting_template_retry_exceed | *bool | No | true | Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)<br> |
 | max_retry_get_es_version | string | No |  15 | You can specify times of retry obtaining Elasticsearch version.<br> |
 | request_timeout | string | No |  5s | You can specify HTTP request timeout.<br> |
-| reload_connections | bool | No |  true | You can tune how the elasticsearch-transport host reloading feature works.<br> |
+| reload_connections | *bool | No | true | You can tune how the elasticsearch-transport host reloading feature works.(default: true)<br> |
 | reload_on_failure | bool | No |  false | Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.<br> |
 | resurrect_after | string | No |  60s | You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.<br> |
 | include_tag_key | bool | No |  false | This will add the Fluentd tag in the JSON record.<br> |
