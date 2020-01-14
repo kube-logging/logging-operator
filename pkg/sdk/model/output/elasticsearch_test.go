@@ -36,13 +36,18 @@ buffer:
 `)
 	expected := `
   <match **>
-    @type elasticsearch
-    @id test_elasticsearch
-    host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
-    port 9200
-    scheme https
-    ssl_verify false
-    ssl_version TLSv1_2
+	@type elasticsearch
+	@id test_elasticsearch
+	exception_backup false
+	fail_on_putting_template_retry_exceed false
+	host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+	port 9200
+	reload_connections false
+	scheme https
+	ssl_verify false
+	ssl_version TLSv1_2
+	utc_index false
+	verify_es_version_at_startup false
     <buffer tag,time>
       @type file
       path /buffers/test_elasticsearch.*.buffer
