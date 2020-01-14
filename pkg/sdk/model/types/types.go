@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 var ContainerRuntime = ""

@@ -15,13 +15,13 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
 			ObjectMeta: r.FluentdObjectMeta(roleName),
@@ -32,14 +32,14 @@ func (r *Reconciler) role() (runtime.Object, k8sutil.DesiredState, error) {
 					Verbs:     []string{"*"},
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.Role{
 		ObjectMeta: r.FluentdObjectMeta(roleName),
-		Rules:      []rbacv1.PolicyRule{}}, k8sutil.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: r.FluentdObjectMeta(roleBindingName),
@@ -55,20 +55,20 @@ func (r *Reconciler) roleBinding() (runtime.Object, k8sutil.DesiredState, error)
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: r.FluentdObjectMeta(roleBindingName),
-		RoleRef:    rbacv1.RoleRef{}}, k8sutil.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) serviceAccount() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
 			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
 		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
-	}, k8sutil.StateAbsent, nil
+	}, reconciler.StateAbsent, nil
 }

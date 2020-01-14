@@ -16,7 +16,7 @@ package fluentd
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	v1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) {
 	desired := &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName),
 		Spec: corev1.ServiceSpec{
@@ -40,7 +40,7 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 		},
 	}
 
-	beforeUpdateHook := k8sutil.DesiredStateHook(func(current runtime.Object) error {
+	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
 		if s, ok := current.(*corev1.Service); ok {
 			desired.Spec.ClusterIP = s.Spec.ClusterIP
 		} else {
@@ -52,7 +52,7 @@ func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState, error) {
 	return desired, beforeUpdateHook, nil
 }
 
-func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
@@ -69,14 +69,14 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState, err
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-monitor"),
-		Spec:       corev1.ServiceSpec{}}, k8sutil.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
 		return &v1.ServiceMonitor{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
@@ -94,10 +94,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, k8sutil.DesiredSta
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
-		}, k8sutil.StatePresent, nil
+		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
 		Spec:       v1.ServiceMonitorSpec{},
-	}, k8sutil.StateAbsent, nil
+	}, reconciler.StateAbsent, nil
 }

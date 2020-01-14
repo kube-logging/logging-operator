@@ -15,9 +15,9 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 // +docName:"Loki output plugin "

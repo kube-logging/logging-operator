@@ -25,7 +25,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/model"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -81,12 +82,21 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	reconcilers := make([]resources.ComponentReconciler, 0)
 
+	reconcilerOpts := reconciler.ReconcilerOpts{
+		EnableRecreateWorkloadOnImmutableFieldChange: logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange,
+		EnableRecreateWorkloadOnImmutableFieldChangeHelp: "Object has to be recreated, but refusing to remove without explicitly being told so. " +
+			"Use logging.spec.enableRecreateWorkloadOnImmutableFieldChange to move on but make sure to understand the consequences. " +
+			"As of fluentd, to avoid data loss, make sure to use a persistent volume for buffers, which is the default, unless explicitly disabled or configured differently. " +
+			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
+	}
+
 	if logging.Spec.FluentdSpec != nil {
-		reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, logging, &fluentdConfig, secretList).Reconcile)
+		reconcilers = append(reconcilers,
+			fluentd.New(r.Client, r.Log, logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging, reconcilerOpts).Reconcile)
 	}
 
 	for _, rec := range reconcilers {

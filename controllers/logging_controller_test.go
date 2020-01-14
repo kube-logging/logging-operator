@@ -16,6 +16,7 @@ package controllers_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -26,8 +27,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/onsi/gomega"
+	"github.com/pborman/uuid"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -56,7 +58,7 @@ func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -89,7 +91,7 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -128,7 +130,7 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -168,7 +170,7 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -217,7 +219,7 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -267,7 +269,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -329,7 +331,7 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:              "someloggingref",
@@ -380,7 +382,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
@@ -431,7 +433,7 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
-			Name: "test",
+			Name: "test-" + uuid.New()[:8],
 		},
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -450,9 +452,21 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 			S3OutputConfig: &output.S3OutputConfig{
 				AwsAccessKey: &secret.Secret{
 					ValueFrom: &secret.ValueFrom{
-						SecretKeyRef: &secret.KubernetesSecret{
-							Name: "topsecret",
-							Key:  "key",
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "topsecret",
+							},
+							Key: "key",
+						},
+					},
+				},
+				AwsSecretKey: &secret.Secret{
+					MountFrom: &secret.ValueFrom{
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "topsecret",
+							},
+							Key: "key",
 						},
 					},
 				},
@@ -489,9 +503,17 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	defer ensureCreated(t, flow)()
 
 	secret := &corev1.Secret{}
+	secretKey := fmt.Sprintf("%s-topsecret-key", testNamespace)
 
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
-	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("topsecretdata"))
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("aws_key_id topsecretdata"))
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring(
+		fmt.Sprintf("aws_sec_key /fluentd/secret/%s", secretKey)))
+
+	outputSecret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.OutputSecretName), outputSecret)()
+
+	g.Expect(outputSecret.Data).Should(gomega.HaveKeyWithValue(secretKey, []byte("topsecretdata")))
 }
 
 // TODO add following tests:
@@ -500,7 +522,8 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 
 func beforeEach(t *testing.T) func() {
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
-		Scheme: scheme.Scheme,
+		Scheme:             scheme.Scheme,
+		MetricsBindAddress: "0",
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
@@ -513,6 +536,7 @@ func beforeEach(t *testing.T) func() {
 	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
 
 	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).Complete(wrappedReconciler)
+
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
 	stopMgr, mgrStopped = startTestManager(t, mgr)
@@ -529,7 +553,10 @@ func ensureCreated(t *testing.T, object runtime.Object) func() {
 		t.Fatalf("%+v", err)
 	}
 	return func() {
-		mgr.GetClient().Delete(context.TODO(), object)
+		err := mgr.GetClient().Delete(context.TODO(), object)
+		if err != nil {
+			t.Fatalf("%+v", errors.WithStack(err))
+		}
 	}
 }
 
@@ -547,6 +574,9 @@ func ensureCreatedEventually(t *testing.T, ns, name string, object runtime.Objec
 		t.Fatalf("%+v", errors.WithStack(err))
 	}
 	return func() {
-		mgr.GetClient().Delete(context.TODO(), object)
+		err := mgr.GetClient().Delete(context.TODO(), object)
+		if err != nil {
+			t.Fatalf("%+v", errors.WithStack(err))
+		}
 	}
 }
