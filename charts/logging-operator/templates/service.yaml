@@ -15,4 +15,3 @@ spec:
   selector:
     app.kubernetes.io/name:  {{ include "logging-operator.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/component: query
