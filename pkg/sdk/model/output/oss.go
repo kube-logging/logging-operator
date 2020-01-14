@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Aliyun OSS plugin for Fluentd"
@@ -33,6 +33,13 @@ import (
 //This plugin will poll events from MNS queue and extract object keys from these events, and then will read those objects from OSS.
 //More info at https://github.com/aliyun/fluent-plugin-oss
 type _docOss interface{}
+
+// +name:"Alibaba Cloud Storage"
+// +url:"https://github.com/aliyun/fluent-plugin-oss"
+// +version:"0.0.2"
+// +description:"Store logs the Alibaba Cloud Object Storage Service"
+// +status:"GA"
+type _metaOSS interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

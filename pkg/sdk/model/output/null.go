@@ -15,9 +15,16 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Null"
+// +url:"https://docs.fluentd.org/output/null"
+// +version:"more info"
+// +description:"Null output plugin just throws away events."
+// +status:"GA"
+type _metaNull interface{}
 
 // +kubebuilder:object:generate=true
 

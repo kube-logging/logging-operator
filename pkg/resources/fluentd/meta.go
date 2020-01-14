@@ -15,7 +15,7 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

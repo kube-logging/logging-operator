@@ -15,9 +15,16 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Record Transformer"
+// +url:"https://docs.fluentd.org/filter/record_transformer"
+// +version:"more info"
+// +description:"Mutates/transforms incoming event streams."
+// +status:"GA"
+type _metaRecordTransformer interface{}
 
 // +kubebuilder:object:generate=true
 type RecordTransformer struct {

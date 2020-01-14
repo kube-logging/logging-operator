@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Fluentd Plugin to re-tag based on log metadata"
@@ -34,6 +34,13 @@ import (
 //| ${host} | Node hostname the Pod runs on | docker-desktop |
 //| ${docker_id} | Docker UUID of the container | 3a38148aa37aa3... |
 type _docTagNormaliser interface{}
+
+// +name:"Tag Normaliser"
+// +url:"https://github.com/banzaicloud/fluent-plugin-tag-normaliser"
+// +version:"more info"
+// +description:"Re-tag based on log metadata"
+// +status:"GA"
+type _metaTagNormaliser interface{}
 
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {

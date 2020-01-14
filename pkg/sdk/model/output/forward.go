@@ -16,9 +16,16 @@ package output
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Forward"
+// +url:"https://docs.fluentd.org/output/forward"
+// +version:"more info"
+// +description:"Forwards events to other fluentd nodes."
+// +status:"GA"
+type _metaForward interface{}
 
 // +kubebuilder:object:generate=true
 type ForwardOutput struct {

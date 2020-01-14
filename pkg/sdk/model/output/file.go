@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"File output plugin for Fluentd"
@@ -34,6 +34,13 @@ import (
 //      timekey_use_utc: true
 // ```
 type _docFile interface{}
+
+// +name:"File"
+// +url:"https://docs.fluentd.org/output/file"
+// +version:"more info"
+// +description:"Output plugin writes events to files"
+// +status:"GA"
+type _metaFile interface{}
 
 // +kubebuilder:object:generate=true
 type FileOutputConfig struct {

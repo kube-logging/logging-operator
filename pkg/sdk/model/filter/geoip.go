@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Fluentd GeoIP filter"
@@ -43,6 +43,13 @@ import (
 //            postal_code:  ${postal.code["remote_addr"]}
 // ```
 type _docGeoIP interface{}
+
+// +name:"Geo IP"
+// +url:"https://github.com/y-ken/fluent-plugin-geoip"
+// +version:"more info"
+// +description:"Fluentd GeoIP filter"
+// +status:"GA"
+type _metaGeoIP interface{}
 
 // +kubebuilder:object:generate=true
 type GeoIP struct {

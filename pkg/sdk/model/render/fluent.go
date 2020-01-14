@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/goph/emperror"
 )
 

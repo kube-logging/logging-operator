@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"CloudWatch output plugin for Fluentd"
@@ -47,6 +47,13 @@ import (
 //      timekey_use_utc: true
 // ```
 type _docCloudWatch interface{}
+
+// +name:"Amazon CloudWatch"
+// +url:"https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.6"
+// +version:"0.7.6"
+// +description:"Send your logs to AWS CloudWatch"
+// +status:"GA"
+type _metaCloudWatch interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

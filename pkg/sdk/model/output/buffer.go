@@ -17,9 +17,16 @@ package output
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Buffer"
+// +url:"https://docs.fluentd.org/configuration/buffer-section"
+// +version:"mode info"
+// +description:"Fluentd event buffer"
+// +status:"GA"
+type _metaBuffer interface{}
 
 // +kubebuilder:object:generate=true
 

@@ -15,9 +15,9 @@
 package fluentd
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	spec := *r.statefulsetSpec()
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
@@ -43,7 +43,7 @@ func (r *Reconciler) statefulset() (runtime.Object, k8sutil.DesiredState, error)
 		Spec:       spec,
 	}
 
-	return desired, k8sutil.StatePresent, nil
+	return desired, reconciler.StatePresent, nil
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
@@ -54,11 +54,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777 /buffers"},
+			Command:         []string{"sh", "-c", "chmod -R 777", BufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.QualifiedName(bufferVolumeName),
-					MountPath: "/buffers",
+					MountPath: BufferPath,
 				},
 			},
 		})
@@ -100,6 +100,12 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		Ports:           generatePorts(r.Logging.Spec.FluentdSpec),
 		VolumeMounts:    r.generateVolumeMounts(),
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
+		Env: []corev1.EnvVar{
+			{
+				Name:  "BUFFER_PATH",
+				Value: BufferPath,
+			},
+		},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
 			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
@@ -108,6 +114,8 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 		},
+		LivenessProbe:  r.Logging.Spec.FluentdSpec.LivenessProbe,
+		ReadinessProbe: r.Logging.Spec.FluentdSpec.ReadinessProbe,
 	}
 
 	if r.Logging.Spec.FluentdSpec.FluentOutLogrotate != nil && r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Enabled {
@@ -193,7 +201,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		},
 		{
 			Name:      r.Logging.QualifiedName(bufferVolumeName),
-			MountPath: "/buffers",
+			MountPath: BufferPath,
 		},
 	}
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {

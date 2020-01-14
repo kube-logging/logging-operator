@@ -15,14 +15,21 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"SumoLogic output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
 //More info at https://github.com/SumoLogic/fluentd-output-sumologic
 type _docSumoLogic interface{}
+
+// +name:"SumoLogic"
+// +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1"
+// +version:"0.6.1"
+// +description:"Send your logs to Sumologic"
+// +status:"GA"
+type _metaSumologic interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

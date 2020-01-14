@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Elasticsearch output plugin for Fluentd"
@@ -38,6 +38,13 @@ import (
 //       timekey_use_utc: true
 // ```
 type _docElasticsearch interface{}
+
+// +name:"Elasticsearch"
+// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.7.0"
+// +version:"3.7.0"
+// +description:"Send your logs to Elasticsearch"
+// +status:"GA"
+type _metaElasticsearch interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Elasticsearch"

@@ -17,8 +17,8 @@ package output
 import (
 	"errors"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Amazon S3 plugin for Fluentd"
@@ -48,6 +48,13 @@ import (
 //      timekey_use_utc: true*/
 // ```
 type _docS3 interface{}
+
+// +name:"Amazon S3"
+// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1"
+// +version:"1.2.1"
+// +description:"Store logs in Amazon S3"
+// +status:"GA"
+type _metaS3 interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

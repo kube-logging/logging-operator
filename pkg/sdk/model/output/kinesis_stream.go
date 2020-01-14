@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Kinesis Stream output plugin for Fluentd"
@@ -32,6 +32,13 @@ import (
 //       type: json
 // ```
 type _docKinesisStream interface{}
+
+// +name:"Amazon Kinesis"
+// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.0"
+// +version:"3.2.0"
+// +description:"Fluent plugin for Amazon Kinesis"
+// +status:"GA"
+type _metaKinesis interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"KinesisStream"

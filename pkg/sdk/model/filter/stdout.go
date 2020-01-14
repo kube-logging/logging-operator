@@ -15,9 +15,16 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Stdout"
+// +url:"https://docs.fluentd.org/filter/stdout"
+// +version:"more info"
+// +description:"Prints events to stdout"
+// +status:"GA"
+type _metaStdOut interface{}
 
 // +kubebuilder:object:generate=true
 

@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Exception Detector"
@@ -34,6 +34,13 @@ import (
 //      multiline_flush_interval: 0.1
 // ```
 type _docExceptionDetector interface{}
+
+// +name:"Exception Detector"
+// +url:"https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions"
+// +version:"more info"
+// +description:"Exception Detector"
+// +status:"GA"
+type _metaDDetectExceptions interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

@@ -22,12 +22,12 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -522,6 +522,117 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                livenessProbe:
+                  description: Probe describes a health check to be performed against
+                    a container to determine whether it is alive or ready to receive
+                    traffic.
+                  properties:
+                    exec:
+                      description: One and only one of the following should be specified.
+                        Exec specifies the action to take.
+                      properties:
+                        command:
+                          description: Command is the command line to execute inside
+                            the container, the working directory for the command  is
+                            root ('/') in the container's filesystem. The command
+                            is simply exec'd, it is not run inside a shell, so traditional
+                            shell instructions ('|', etc) won't work. To use a shell,
+                            you need to explicitly call out to that shell. Exit status
+                            of 0 is treated as live/healthy and non-zero is unhealthy.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    failureThreshold:
+                      description: Minimum consecutive failures for the probe to be
+                        considered failed after having succeeded. Defaults to 3. Minimum
+                        value is 1.
+                      format: int32
+                      type: integer
+                    httpGet:
+                      description: HTTPGet specifies the http request to perform.
+                      properties:
+                        host:
+                          description: Host name to connect to, defaults to the pod
+                            IP. You probably want to set "Host" in httpHeaders instead.
+                          type: string
+                        httpHeaders:
+                          description: Custom headers to set in the request. HTTP
+                            allows repeated headers.
+                          items:
+                            description: HTTPHeader describes a custom header to be
+                              used in HTTP probes
+                            properties:
+                              name:
+                                description: The header field name
+                                type: string
+                              value:
+                                description: The header field value
+                                type: string
+                            required:
+                            - name
+                            - value
+                            type: object
+                          type: array
+                        path:
+                          description: Path to access on the HTTP server.
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Name or number of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                        scheme:
+                          description: Scheme to use for connecting to the host. Defaults
+                            to HTTP.
+                          type: string
+                      required:
+                      - port
+                      type: object
+                    initialDelaySeconds:
+                      description: 'Number of seconds after the container has started
+                        before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                    periodSeconds:
+                      description: How often (in seconds) to perform the probe. Default
+                        to 10 seconds. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    successThreshold:
+                      description: Minimum consecutive successes for the probe to
+                        be considered successful after having failed. Defaults to
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    tcpSocket:
+                      description: 'TCPSocket specifies an action involving a TCP
+                        port. TCP hooks not yet supported TODO: implement a realistic
+                        TCP lifecycle hook'
+                      properties:
+                        host:
+                          description: 'Optional: Host name to connect to, defaults
+                            to the pod IP.'
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Number or name of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                      required:
+                      - port
+                      type: object
+                    timeoutSeconds:
+                      description: 'Number of seconds after which the probe times
+                        out. Defaults to 1 second. Minimum value is 1. More info:
+                        https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                  type: object
                 metrics:
                   description: Metrics defines the service monitor endpoints
                   properties:
@@ -955,6 +1066,117 @@ spec:
                           type: object
                       type: object
                   type: object
+                readinessProbe:
+                  description: Probe describes a health check to be performed against
+                    a container to determine whether it is alive or ready to receive
+                    traffic.
+                  properties:
+                    exec:
+                      description: One and only one of the following should be specified.
+                        Exec specifies the action to take.
+                      properties:
+                        command:
+                          description: Command is the command line to execute inside
+                            the container, the working directory for the command  is
+                            root ('/') in the container's filesystem. The command
+                            is simply exec'd, it is not run inside a shell, so traditional
+                            shell instructions ('|', etc) won't work. To use a shell,
+                            you need to explicitly call out to that shell. Exit status
+                            of 0 is treated as live/healthy and non-zero is unhealthy.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    failureThreshold:
+                      description: Minimum consecutive failures for the probe to be
+                        considered failed after having succeeded. Defaults to 3. Minimum
+                        value is 1.
+                      format: int32
+                      type: integer
+                    httpGet:
+                      description: HTTPGet specifies the http request to perform.
+                      properties:
+                        host:
+                          description: Host name to connect to, defaults to the pod
+                            IP. You probably want to set "Host" in httpHeaders instead.
+                          type: string
+                        httpHeaders:
+                          description: Custom headers to set in the request. HTTP
+                            allows repeated headers.
+                          items:
+                            description: HTTPHeader describes a custom header to be
+                              used in HTTP probes
+                            properties:
+                              name:
+                                description: The header field name
+                                type: string
+                              value:
+                                description: The header field value
+                                type: string
+                            required:
+                            - name
+                            - value
+                            type: object
+                          type: array
+                        path:
+                          description: Path to access on the HTTP server.
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Name or number of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                        scheme:
+                          description: Scheme to use for connecting to the host. Defaults
+                            to HTTP.
+                          type: string
+                      required:
+                      - port
+                      type: object
+                    initialDelaySeconds:
+                      description: 'Number of seconds after the container has started
+                        before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                    periodSeconds:
+                      description: How often (in seconds) to perform the probe. Default
+                        to 10 seconds. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    successThreshold:
+                      description: Minimum consecutive successes for the probe to
+                        be considered successful after having failed. Defaults to
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    tcpSocket:
+                      description: 'TCPSocket specifies an action involving a TCP
+                        port. TCP hooks not yet supported TODO: implement a realistic
+                        TCP lifecycle hook'
+                      properties:
+                        host:
+                          description: 'Optional: Host name to connect to, defaults
+                            to the pod IP.'
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Number or name of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                      required:
+                      - port
+                      type: object
+                    timeoutSeconds:
+                      description: 'Number of seconds after which the probe times
+                        out. Defaults to 1 second. Minimum value is 1. More info:
+                        https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                  type: object
                 resources:
                   description: ResourceRequirements describes the compute resource
                     requirements.
@@ -1074,6 +1296,38 @@ spec:
                             - value
                             type: object
                           type: array
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options within a container's
+                            SecurityContext will be used. If set in both SecurityContext
+                            and PodSecurityContext, the value specified in SecurityContext
+                            takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
+                              type: string
+                          type: object
                       type: object
                     podSecurityPolicyCreate:
                       type: boolean
@@ -1178,6 +1432,37 @@ spec:
                             user:
                               description: User is a SELinux user label that applies
                                 to the container.
+                              type: string
+                          type: object
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options from the PodSecurityContext
+                            will be used. If set in both SecurityContext and PodSecurityContext,
+                            the value specified in SecurityContext takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
                               type: string
                           type: object
                       type: object
@@ -1614,6 +1899,119 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                livenessDefaultCheck:
+                  type: boolean
+                livenessProbe:
+                  description: Probe describes a health check to be performed against
+                    a container to determine whether it is alive or ready to receive
+                    traffic.
+                  properties:
+                    exec:
+                      description: One and only one of the following should be specified.
+                        Exec specifies the action to take.
+                      properties:
+                        command:
+                          description: Command is the command line to execute inside
+                            the container, the working directory for the command  is
+                            root ('/') in the container's filesystem. The command
+                            is simply exec'd, it is not run inside a shell, so traditional
+                            shell instructions ('|', etc) won't work. To use a shell,
+                            you need to explicitly call out to that shell. Exit status
+                            of 0 is treated as live/healthy and non-zero is unhealthy.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    failureThreshold:
+                      description: Minimum consecutive failures for the probe to be
+                        considered failed after having succeeded. Defaults to 3. Minimum
+                        value is 1.
+                      format: int32
+                      type: integer
+                    httpGet:
+                      description: HTTPGet specifies the http request to perform.
+                      properties:
+                        host:
+                          description: Host name to connect to, defaults to the pod
+                            IP. You probably want to set "Host" in httpHeaders instead.
+                          type: string
+                        httpHeaders:
+                          description: Custom headers to set in the request. HTTP
+                            allows repeated headers.
+                          items:
+                            description: HTTPHeader describes a custom header to be
+                              used in HTTP probes
+                            properties:
+                              name:
+                                description: The header field name
+                                type: string
+                              value:
+                                description: The header field value
+                                type: string
+                            required:
+                            - name
+                            - value
+                            type: object
+                          type: array
+                        path:
+                          description: Path to access on the HTTP server.
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Name or number of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                        scheme:
+                          description: Scheme to use for connecting to the host. Defaults
+                            to HTTP.
+                          type: string
+                      required:
+                      - port
+                      type: object
+                    initialDelaySeconds:
+                      description: 'Number of seconds after the container has started
+                        before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                    periodSeconds:
+                      description: How often (in seconds) to perform the probe. Default
+                        to 10 seconds. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    successThreshold:
+                      description: Minimum consecutive successes for the probe to
+                        be considered successful after having failed. Defaults to
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    tcpSocket:
+                      description: 'TCPSocket specifies an action involving a TCP
+                        port. TCP hooks not yet supported TODO: implement a realistic
+                        TCP lifecycle hook'
+                      properties:
+                        host:
+                          description: 'Optional: Host name to connect to, defaults
+                            to the pod IP.'
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Number or name of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                      required:
+                      - port
+                      type: object
+                    timeoutSeconds:
+                      description: 'Number of seconds after which the probe times
+                        out. Defaults to 1 second. Minimum value is 1. More info:
+                        https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                  type: object
                 logLevel:
                   type: string
                 metrics:
@@ -1642,6 +2040,117 @@ spec:
                 port:
                   format: int32
                   type: integer
+                readinessProbe:
+                  description: Probe describes a health check to be performed against
+                    a container to determine whether it is alive or ready to receive
+                    traffic.
+                  properties:
+                    exec:
+                      description: One and only one of the following should be specified.
+                        Exec specifies the action to take.
+                      properties:
+                        command:
+                          description: Command is the command line to execute inside
+                            the container, the working directory for the command  is
+                            root ('/') in the container's filesystem. The command
+                            is simply exec'd, it is not run inside a shell, so traditional
+                            shell instructions ('|', etc) won't work. To use a shell,
+                            you need to explicitly call out to that shell. Exit status
+                            of 0 is treated as live/healthy and non-zero is unhealthy.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    failureThreshold:
+                      description: Minimum consecutive failures for the probe to be
+                        considered failed after having succeeded. Defaults to 3. Minimum
+                        value is 1.
+                      format: int32
+                      type: integer
+                    httpGet:
+                      description: HTTPGet specifies the http request to perform.
+                      properties:
+                        host:
+                          description: Host name to connect to, defaults to the pod
+                            IP. You probably want to set "Host" in httpHeaders instead.
+                          type: string
+                        httpHeaders:
+                          description: Custom headers to set in the request. HTTP
+                            allows repeated headers.
+                          items:
+                            description: HTTPHeader describes a custom header to be
+                              used in HTTP probes
+                            properties:
+                              name:
+                                description: The header field name
+                                type: string
+                              value:
+                                description: The header field value
+                                type: string
+                            required:
+                            - name
+                            - value
+                            type: object
+                          type: array
+                        path:
+                          description: Path to access on the HTTP server.
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Name or number of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                        scheme:
+                          description: Scheme to use for connecting to the host. Defaults
+                            to HTTP.
+                          type: string
+                      required:
+                      - port
+                      type: object
+                    initialDelaySeconds:
+                      description: 'Number of seconds after the container has started
+                        before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                    periodSeconds:
+                      description: How often (in seconds) to perform the probe. Default
+                        to 10 seconds. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    successThreshold:
+                      description: Minimum consecutive successes for the probe to
+                        be considered successful after having failed. Defaults to
+                        1. Must be 1 for liveness and startup. Minimum value is 1.
+                      format: int32
+                      type: integer
+                    tcpSocket:
+                      description: 'TCPSocket specifies an action involving a TCP
+                        port. TCP hooks not yet supported TODO: implement a realistic
+                        TCP lifecycle hook'
+                      properties:
+                        host:
+                          description: 'Optional: Host name to connect to, defaults
+                            to the pod IP.'
+                          type: string
+                        port:
+                          anyOf:
+                          - type: string
+                          - type: integer
+                          description: Number or name of the port to access on the
+                            container. Number must be in the range 1 to 65535. Name
+                            must be an IANA_SVC_NAME.
+                      required:
+                      - port
+                      type: object
+                    timeoutSeconds:
+                      description: 'Number of seconds after which the probe times
+                        out. Defaults to 1 second. Minimum value is 1. More info:
+                        https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+                      format: int32
+                      type: integer
+                  type: object
                 resources:
                   description: ResourceRequirements describes the compute resource
                     requirements.
@@ -1770,6 +2279,38 @@ spec:
                             - value
                             type: object
                           type: array
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options within a container's
+                            SecurityContext will be used. If set in both SecurityContext
+                            and PodSecurityContext, the value specified in SecurityContext
+                            takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
+                              type: string
+                          type: object
                       type: object
                     podSecurityPolicyCreate:
                       type: boolean
@@ -1874,6 +2415,37 @@ spec:
                             user:
                               description: User is a SELinux user label that applies
                                 to the container.
+                              type: string
+                          type: object
+                        windowsOptions:
+                          description: The Windows specific settings applied to all
+                            containers. If unspecified, the options from the PodSecurityContext
+                            will be used. If set in both SecurityContext and PodSecurityContext,
+                            the value specified in SecurityContext takes precedence.
+                          properties:
+                            gmsaCredentialSpec:
+                              description: GMSACredentialSpec is where the GMSA admission
+                                webhook (https://github.com/kubernetes-sigs/windows-gmsa)
+                                inlines the contents of the GMSA credential spec named
+                                by the GMSACredentialSpecName field. This field is
+                                alpha-level and is only honored by servers that enable
+                                the WindowsGMSA feature flag.
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: GMSACredentialSpecName is the name of the
+                                GMSA credential spec to use. This field is alpha-level
+                                and is only honored by servers that enable the WindowsGMSA
+                                feature flag.
+                              type: string
+                            runAsUserName:
+                              description: The UserName in Windows to run the entrypoint
+                                of the container process. Defaults to the user specified
+                                in image metadata if unspecified. May also be set
+                                in PodSecurityContext. If set in both SecurityContext
+                                and PodSecurityContext, the value specified in SecurityContext
+                                takes precedence. This field is alpha-level and it
+                                is only honored by servers that enable the WindowsRunAsUserName
+                                feature flag.
                               type: string
                           type: object
                       type: object

@@ -15,9 +15,9 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 // +docName:"Loki output plugin "
@@ -36,6 +36,13 @@ import (
 //       timekey_use_utc: true
 // ```
 type _docLoki interface{}
+
+// +name:"Grafana Loki"
+// +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
+// +version:"1.2.2"
+// +description:"Transfer logs to Loki"
+// +status:"GA"
+type _metaLoki interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

@@ -15,14 +15,21 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Azure Storage output plugin for Fluentd"
 //Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
 //More info at https://github.com/htgc/fluent-plugin-azurestorage
 type _docAzure interface{}
+
+// +name:"Azure Storage"
+// +url:"https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0"
+// +version:"0.1.0"
+// +description:"Store logs in Azure Storage"
+// +status:"GA"
+type _metaAzure interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

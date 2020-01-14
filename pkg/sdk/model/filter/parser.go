@@ -16,9 +16,16 @@ package filter
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Parser"
+// +url:"https://docs.fluentd.org/filter/parser"
+// +version:"more info"
+// +description:"Parses" string field in event records and mutates its"
+// +status:"GA"
+type _metaParser interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"Parser"

@@ -15,9 +15,16 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
+
+// +name:"Dedot"
+// +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
+// +version:"more info"
+// +description:"Concatenate multiline log separated in multiple events"
+// +status:"GA"
+type _metaDedot interface{}
 
 // +kubebuilder:object:generate=true
 

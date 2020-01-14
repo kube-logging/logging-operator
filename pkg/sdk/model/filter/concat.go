@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/secret"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
 // +docName:"Fluentd concat filter"
@@ -32,6 +32,13 @@ import (
 //        separator: ""
 // ```
 type _docConcat interface{}
+
+// +name:"Concat"
+// +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-concat"
+// +version:"more info"
+// +description:"Concatenate multiline log separated in multiple events"
+// +status:"GA"
+type _metaConcat interface{}
 
 // +kubebuilder:object:generate=true
 type Concat struct {

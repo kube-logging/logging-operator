@@ -18,9 +18,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,7 +33,7 @@ const (
 	BufferStorageVolume = "buffers"
 )
 
-func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
+func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error) {
 	var containerPorts []corev1.ContainerPort
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
@@ -88,6 +88,8 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
 							},
+							LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
+							ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
 						},
 					},
 				},
@@ -95,7 +97,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState, error) {
 		},
 	}
 
-	return desired, k8sutil.StatePresent, nil
+	return desired, reconciler.StatePresent, nil
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
