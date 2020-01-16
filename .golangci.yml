@@ -17,6 +17,7 @@ linters:
         - funlen
         - dupl
         - maligned
+        - wsl
 
         # TODO: fix these
         - deadcode
@@ -36,6 +37,7 @@ linters:
         - gocritic
         - godox
         - gocyclo
+        - gocognit
 
 issues:
     exclude:
