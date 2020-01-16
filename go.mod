@@ -3,7 +3,7 @@ module github.com/banzaicloud/logging-operator
 go 1.12
 
 require (
-	emperror.dev/errors v0.4.2
+	emperror.dev/errors v0.7.0
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
 	github.com/banzaicloud/operator-tools v0.1.0
 	github.com/coreos/prometheus-operator v0.34.0
