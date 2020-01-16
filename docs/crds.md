@@ -108,7 +108,7 @@ You can customize the `fluentd` statefulset with the following parameters.
 | fluentLogDestination | string | "null" | Send internal fluentd logs to stdout, or use "null" to omit them, see: https://docs.fluentd.org/deployment/logging#capture-fluentd-logs |
 | fluentOutLogrotate | [FluentOutLogrotate](#FluentOutLogrotate) | nil | Write to file instead of stdout and configure logrotate params. The operator configures it by default to write to /fluentd/log/out. https://docs.fluentd.org/deployment/logging#output-to-log-file |
 | livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container liveness. Container will be restarted if the probe fails. |
-| LivenessDefaultCheck | bool | false | Enable default liveness probe of fluentd container. |
+| livenessDefaultCheck | bool | false | Enable default liveness probe of fluentd container, which looks for stuck chunks under the buffer path. See [healthy.sh](../fluentd-image/v1.7/healthy.sh) for the details. |
 | readinessProbe | [Probe](#Probe) | {} | Periodic probe of fluentd container service readiness. Container will be removed from service endpoints if the probe fails. |
 | scaling | [Scaling](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#deploymentspec-v1-apps) | {replicas: 1} | Fluentd scaling configuration i.e replica count
 
