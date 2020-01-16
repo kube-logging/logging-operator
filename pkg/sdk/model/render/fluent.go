@@ -19,9 +19,9 @@ import (
 	"io"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/util"
-	"github.com/goph/emperror"
 )
 
 type FluentRender struct {
@@ -60,7 +60,7 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 		if len(d.GetSections()) > 0 {
 			err := f.RenderDirectives(d.GetSections(), indent+f.Indent)
 			if err != nil {
-				return emperror.Wrapf(err, "failed to render sections for %s", d.GetPluginMeta().Directive)
+				return errors.WrapIff(err, "failed to render sections for %s", d.GetPluginMeta().Directive)
 			}
 		}
 		f.indented(indent, "</%s>", meta.Directive)

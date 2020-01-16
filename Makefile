@@ -16,7 +16,7 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -
 GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/sdk/model/filter/*"  -not -path "./pkg/sdk/model/output/*"  -not -path "./pkg/sdk/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
-GOLANGCI_VERSION = 1.19.1
+GOLANGCI_VERSION = 1.21.0
 GOBIN_VERSION = 0.0.13
 
 export KUBEBUILDER_ASSETS := $(PWD)/bin

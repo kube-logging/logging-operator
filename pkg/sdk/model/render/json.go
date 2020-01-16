@@ -20,8 +20,9 @@ import (
 	"io"
 	"strings"
 
+	"emperror.dev/errors"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
-	"github.com/goph/emperror"
 )
 
 type JsonRender struct {
@@ -39,7 +40,7 @@ func (t *JsonRender) Render(config types.FluentConfig) error {
 	}
 
 	if err != nil {
-		return emperror.Wrap(err, "Failed to marshal model into yaml")
+		return errors.WrapIf(err, "Failed to marshal model into yaml")
 	}
 	fmt.Fprintf(t.out, "%s", out)
 	return nil
