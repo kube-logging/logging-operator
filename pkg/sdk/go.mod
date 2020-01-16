@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.5.0
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/spf13/cast v1.3.0
-	go.uber.org/zap v1.12.0
+	go.uber.org/zap v1.13.0
 	golang.org/x/net v0.0.0-20190812203447-cdfb69ac37fc
 	k8s.io/api v0.16.4
 	k8s.io/apimachinery v0.16.4
