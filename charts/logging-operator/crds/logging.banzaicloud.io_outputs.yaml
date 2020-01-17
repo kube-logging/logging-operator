@@ -1199,6 +1199,9 @@ spec:
               type: object
             file:
               properties:
+                add_path_suffix:
+                  description: 'Add path suffix(default: true)'
+                  type: boolean
                 append:
                   description: The flushed chunk is appended to existence file or
                     not. The default is not appended.
@@ -1349,11 +1352,35 @@ spec:
                         party plugins are also available when installed.
                       type: string
                   type: object
+                format:
+                  properties:
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
                 path:
                   description: The Path of the file. The actual path is path + time
                     + ".log" by default.
                   type: string
+                path_suffix:
+                  description: 'The suffix of output result.(default: ".log")'
+                  type: string
+                symlink_path:
+                  description: 'Create symlink to temporary buffered file when buffer_type
+                    is file. This is useful for tailing file content to check logs.(default:
+                    false)'
+                  type: boolean
               required:
+              - format
               - path
               type: object
             forward:
