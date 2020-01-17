@@ -48,6 +48,31 @@ type TagNormaliser struct {
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
 }
 
+// #### Example `Parser` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - tag_normaliser:
+//        format: cluster1.${namespace_name}.${pod_name}.${labels.app}
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<match kubernetes.**>
+//  @type tag_normaliser
+//  @id test_tag_normaliser
+//  format cluster1.${namespace_name}.${pod_name}.${labels.app}
+//</match>
+// ```
+type _expTagNormaliser interface{}
+
 func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "tag_normaliser"
 	return types.NewFlatDirective(types.PluginMeta{

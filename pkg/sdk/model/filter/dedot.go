@@ -19,6 +19,11 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +kubebuilder:object:generate=true
+// +docName:"[Dedot Filter](https://github.com/lunardial/fluent-plugin-dedot_filter)"
+// Fluentd Filter plugin to de-dot field name for elasticsearch.
+type _docDedot interface{}
+
 // +name:"Dedot"
 // +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
 // +version:"more info"
@@ -27,16 +32,39 @@ import (
 type _metaDedot interface{}
 
 // +kubebuilder:object:generate=true
-
-// +docName:"Fluentd Filter plugin to de-dot field name for elasticsearch."
-// More info at https://github.com/lunardial/fluent-plugin-dedot_filter
 type DedotFilterConfig struct {
-	// Will cause the plugin to recurse through nested structures (hashes and arrays), and remove dots in those key-names too.
-	Nested bool `json:"de_dot_nested,omitempty" plugin:"default:true"`
-
+	// Will cause the plugin to recurse through nested structures (hashes and arrays), and remove dots in those key-names too.(default: false)
+	Nested bool `json:"de_dot_nested,omitempty"`
 	// Separator (default:_)
 	Separator string `json:"de_dot_separator,omitempty"`
 }
+
+// #### Example `Dedot` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - dedot:
+//        de_dot_separator: "-"
+//        de_dot_nested: true
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<filter **>
+//  @type dedot
+//  @id test_dedot
+//  de_dot_nested true
+//  de_dot_separator -
+//</filter>
+// ```
+type _expDedot interface{}
 
 func NewDedotFilterConfig() *DedotFilterConfig {
 	return &DedotFilterConfig{}

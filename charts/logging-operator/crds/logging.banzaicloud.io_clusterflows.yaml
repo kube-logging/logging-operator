@@ -97,12 +97,11 @@ spec:
                         type: string
                     type: object
                   dedot:
-                    description: More info at https://github.com/lunardial/fluent-plugin-dedot_filter
                     properties:
                       de_dot_nested:
-                        description: Will cause the plugin to recurse through nested
+                        description: 'Will cause the plugin to recurse through nested
                           structures (hashes and arrays), and remove dots in those
-                          key-names too.
+                          key-names too.(default: false)'
                         type: boolean
                       de_dot_separator:
                         description: Separator (default:_)
@@ -290,7 +289,6 @@ spec:
                         type: array
                     type: object
                   parser:
-                    description: https://docs.fluentd.org/filter/parser
                     properties:
                       emit_invalid_record_to_error:
                         description: 'Emit invalid record to @ERROR label. Invalid
@@ -522,6 +520,10 @@ spec:
                         type: string
                     type: object
                   stdout:
+                    properties:
+                      output_type:
+                        description: This is the option of stdout format.
+                        type: string
                     type: object
                   tag_normaliser:
                     properties:
