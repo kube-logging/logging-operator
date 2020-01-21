@@ -6,7 +6,7 @@ For more information please click on the plugin name
 
 | Name | Type | Description | Status |Version |
 |:---|---|:---|:---:|---:|
-| **[Concat](./filters/concat.md)** | filters | Concatenate multiline log separated in multiple events | GA | [more info](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
+| **[Concat](./filters/concat.md)** | filters | Fluentd Filter plugin to concatenate multiline log separated in multiple events. | GA | [more info](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
 | **[Dedot](./filters/dedot.md)** | filters | Concatenate multiline log separated in multiple events | GA | [more info](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](./filters/detect_exceptions.md)** | filters | Exception Detector | GA | [more info](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[Geo IP](./filters/geoip.md)** | filters | Fluentd GeoIP filter | GA | [more info](https://github.com/y-ken/fluent-plugin-geoip) |

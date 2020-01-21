@@ -19,6 +19,11 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +kubebuilder:object:generate=true
+// +docName:"[Stdout Filter](https://docs.fluentd.org/filter/stdout)"
+// Fluentd Filter plugin to print events to stdout
+type _docStdOut interface{}
+
 // +name:"Stdout"
 // +url:"https://docs.fluentd.org/filter/stdout"
 // +version:"more info"
@@ -27,9 +32,35 @@ import (
 type _metaStdOut interface{}
 
 // +kubebuilder:object:generate=true
-
 type StdOutFilterConfig struct {
+	// This is the option of stdout format.
+	OutputType string `json:"output_type,omitempty"`
 }
+
+// #### Example `StdOut` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - stdout:
+//        output_type: json
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<filter **>
+//  @type stdout
+//  @id test_stdout
+//  output_type json
+//</filter>
+// ```
+type _expStdOut interface{}
 
 func NewStdOutFilterConfig() *StdOutFilterConfig {
 	return &StdOutFilterConfig{}

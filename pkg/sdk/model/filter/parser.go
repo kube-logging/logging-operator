@@ -20,6 +20,11 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +kubebuilder:object:generate=true
+// +docName:"[Parser Filter](https://docs.fluentd.org/filter/parser)"
+// Parses" string field in event records and mutates its
+type _docParser interface{}
+
 // +name:"Parser"
 // +url:"https://docs.fluentd.org/filter/parser"
 // +version:"more info"
@@ -28,8 +33,6 @@ import (
 type _metaParser interface{}
 
 // +kubebuilder:object:generate=true
-// +docName:"Parser"
-// https://docs.fluentd.org/filter/parser
 type ParserConfig struct {
 	// Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.
 	KeyName string `json:"key_name,omitempty"`
@@ -88,6 +91,54 @@ type ParseSection struct {
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
 }
+
+// #### Example `Parser` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - parse:
+//        remove_key_name_field: true
+//        reserve_data: true
+//        parse:
+//          type: multi_format
+//          patterns:
+//          - format: nginx
+//          - format: regexp
+//            expression: /foo/
+//          - format: none
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<filter **>
+//  @type parser
+//  @id test_parser
+//  key_name message
+//  remove_key_name_field true
+//  reserve_data true
+//  <parse>
+//    @type multi_format
+//    <pattern>
+//      format nginx
+//    </pattern>
+//    <pattern>
+//      expression /foo/
+//      format regexp
+//    </pattern>
+//    <pattern>
+//      format none
+//    </pattern>
+//  </parse>
+//</filter>
+// ```
+type _expParser interface{}
 
 func (p *ParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseMeta := types.PluginMeta{

@@ -1,3 +1,6 @@
+<p align="center"><img src="../img/lo.svg" width="260"></p>
+<p align="center">
+
 ### Logging Operator quick start guides
 
 Try out Logging Operator with these quickstart guides!

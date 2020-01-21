@@ -1,6 +1,9 @@
-### Parser
-#### https://docs.fluentd.org/filter/parser
+# [Parser Filter](https://docs.fluentd.org/filter/parser)
+## Overview
+ Parses" string field in event records and mutates its
 
+## Configuration
+### ParserConfig
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | key_name | string | No | - | Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.<br> |
@@ -31,3 +34,51 @@
 | timezone | string | No |  nil | Use specified timezone. one can parse/format the time value in the specified timezone. <br> |
 | patterns | []ParseSection | No | - | Only available when using type: multi_format<br>[Parse Section](#Parse-Section)<br> |
 | format | string | No | - | Only available when using type: multi_format<br> |
+ #### Example `Parser` filter configurations
+ ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - parse:
+        remove_key_name_field: true
+        reserve_data: true
+        parse:
+          type: multi_format
+          patterns:
+          - format: nginx
+          - format: regexp
+            expression: /foo/
+          - format: none
+  selectors: {}
+  outputRefs:
+    - demo-output
+ ```
+
+ #### Fluentd Config Result
+ ```yaml
+<filter **>
+  @type parser
+  @id test_parser
+  key_name message
+  remove_key_name_field true
+  reserve_data true
+  <parse>
+    @type multi_format
+    <pattern>
+      format nginx
+    </pattern>
+    <pattern>
+      expression /foo/
+      format regexp
+    </pattern>
+    <pattern>
+      format none
+    </pattern>
+  </parse>
+</filter>
+ ```
+
+---

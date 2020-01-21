@@ -19,3 +19,28 @@ Available kubernetes metadata
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | format | string | No | ${namespace_name}.${pod_name}.${container_name} | Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)<br> |
+ #### Example `Parser` filter configurations
+ ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - tag_normaliser:
+        format: cluster1.${namespace_name}.${pod_name}.${labels.app}
+  selectors: {}
+  outputRefs:
+    - demo-output
+ ```
+
+ #### Fluentd Config Result
+ ```yaml
+<match kubernetes.**>
+  @type tag_normaliser
+  @id test_tag_normaliser
+  format cluster1.${namespace_name}.${pod_name}.${labels.app}
+</match>
+ ```
+
+---
