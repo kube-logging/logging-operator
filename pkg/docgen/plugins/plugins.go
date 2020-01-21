@@ -21,17 +21,15 @@ import (
 	"regexp"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/docgen"
-	ctrl "sigs.k8s.io/controller-runtime"
+	"github.com/go-logr/logr"
 )
 
-var (
-	log = ctrl.Log.WithName("docs").WithName("plugins")
-)
-
-type PluginDirs struct {
-	Sources            []PluginDir
-	IgnoredPluginsList []string
+type PluginLister struct {
+	Logger         logr.Logger
+	Sources        []PluginDir
+	IgnoredPlugins []string
 }
 
 type PluginDir struct {
@@ -39,16 +37,23 @@ type PluginDir struct {
 	Path string
 }
 
-func (pd PluginDirs) GetPlugins() ([]docgen.DocItem, error) {
+func NewPluginLister(sources []PluginDir, ignoredPlugins []string, logger logr.Logger) *PluginLister {
+	return &PluginLister{
+		Logger:         logger,
+		Sources:        sources,
+		IgnoredPlugins: ignoredPlugins,
+	}
+}
+
+func (pd PluginLister) GetPlugins() ([]docgen.DocItem, error) {
 	var pluginList []docgen.DocItem
 	for _, p := range pd.Sources {
 		files, err := ioutil.ReadDir(p.Path)
 		if err != nil {
-			log.Error(err, err.Error())
-			return nil, err
+			return nil, errors.WrapIff(err, "failed to read files from %s", p.Path)
 		}
 		for _, file := range files {
-			log.V(2).Info("fileListGenerator", "filename", "file")
+			pd.Logger.V(2).Info("fileListGenerator", "filename", "file")
 			fname := strings.Replace(file.Name(), ".go", "", 1)
 			if filepath.Ext(file.Name()) == ".go" && pd.getPluginWhiteList(fname) {
 				fullPath := p.Path + file.Name()
@@ -62,11 +67,11 @@ func (pd PluginDirs) GetPlugins() ([]docgen.DocItem, error) {
 	return pluginList, nil
 }
 
-func (pd PluginDirs) getPluginWhiteList(pluginName string) bool {
-	for _, p := range pd.IgnoredPluginsList {
+func (pd PluginLister) getPluginWhiteList(pluginName string) bool {
+	for _, p := range pd.IgnoredPlugins {
 		r := regexp.MustCompile(p)
 		if r.MatchString(pluginName) {
-			log.Info("fileListGenerator", "ignored plugin", pluginName)
+			pd.Logger.V(2).Info("fileListGenerator", "ignored plugin", pluginName)
 			return false
 		}
 	}

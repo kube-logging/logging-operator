@@ -28,18 +28,20 @@ func main() {
 	ctrl.SetLogger(zap.Logger(verboseLogging))
 	var log = ctrl.Log.WithName("docs").WithName("main")
 
-	fileList, err := plugins.PluginDirs{
-		Sources: []plugins.PluginDir{
+	lister := plugins.NewPluginLister(
+		[]plugins.PluginDir{
 			{"filters", "./pkg/sdk/model/filter/"},
 			{"outputs", "./pkg/sdk/model/output/"},
 			{"common", "./pkg/sdk/model/common/"},
 		},
-		IgnoredPluginsList: []string{
+		[]string{
 			"null",
 			".*.deepcopy",
 			".*_test",
 		},
-	}.GetPlugins()
+		ctrl.Log.WithName("docs").WithName("pluginlister"))
+
+	fileList, err := lister.GetPlugins()
 
 	if err != nil {
 		log.Error(err, "Directory check error.")
