@@ -19,24 +19,15 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
-// +docName:"Fluentd concat filter"
+// +kubebuilder:object:generate=true
+// +docName:"[Concat Filter](https://github.com/fluent-plugins-nursery/fluent-plugin-concat)"
 // Fluentd Filter plugin to concatenate multiline log separated in multiple events.
-// More information at https://github.com/fluent-plugins-nursery/fluent-plugin-concat
-//
-// #### Example record configurations
-// ```
-// spec:
-//  filters:
-//    - concat:
-//        partial_key: "partial_message"
-//        separator: ""
-// ```
 type _docConcat interface{}
 
 // +name:"Concat"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-concat"
 // +version:"more info"
-// +description:"Concatenate multiline log separated in multiple events"
+// +description:"Fluentd Filter plugin to concatenate multiline log separated in multiple events."
 // +status:"GA"
 type _metaConcat interface{}
 
@@ -73,6 +64,35 @@ type Concat struct {
 	//If true, keep partial metadata
 	KeepPartialMetadata string `json:"keep_partial_metadata,omitempty"`
 }
+
+// #### Example `Concat` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - concat:
+//        partial_key: "partial_message"
+//        separator: ""
+//        n_lines: 10
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<filter **>
+//  @type concat
+//  @id test_concat
+//  key message
+//  n_lines 10
+//  partial_key partial_message
+//</filter>
+// ```
+type _expConcat interface{}
 
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "concat"

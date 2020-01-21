@@ -15,7 +15,7 @@ filters:
  ```
 
 ## Configuration
-### Output Config
+### DetectExceptions
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | message | string | No |  "" | The field which contains the raw message text in the input JSON data. <br> |
@@ -25,3 +25,33 @@ filters:
 | max_lines | int | No |  1000 | Maximum number of lines to flush (0 means no limit) <br> |
 | max_bytes | int | No |  0 | Maximum number of bytes to flush (0 means no limit) <br> |
 | stream | string | No |  "" | Separate log streams by this field in the input JSON data. <br> |
+ #### Example `Exception Detector` filter configurations
+ ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - detectExceptions:
+        multiline_flush_interval: 0.1
+        languages:
+          - java
+          - python
+  selectors: {}
+  outputRefs:
+    - demo-output
+ ```
+
+ #### Fluentd Config Result
+ ```yaml
+<match kubernetes.**>
+  @type detect_exceptions
+  @id test_detect_exceptions
+  languages ["java","python"]
+  multiline_flush_interval 0.1
+  remove_tag_prefix kubernetes
+</match>
+ ```
+
+---

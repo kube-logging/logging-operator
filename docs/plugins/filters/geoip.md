@@ -3,26 +3,6 @@
  Fluentd Filter plugin to add information about geographical location of IP addresses with Maxmind GeoIP databases.
  More information at https://github.com/y-ken/fluent-plugin-geoip
 
- #### Example record configurations
- ```
- spec:
-  filters:
-    - tag_normaliser:
-        format: ${namespace_name}.${pod_name}.${container_name}
-    - parser:
-        remove_key_name_field: true
-        parse:
-          type: nginx
-    - geoip:
-        geoip_lookup_keys: remote_addr
-        records:
-          - city: ${city.names.en["remote_addr"]}
-            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
-            country: ${country.iso_code["remote_addr"]}
-            country_name: ${country.names.en["remote_addr"]}
-            postal_code:  ${postal.code["remote_addr"]}
- ```
-
 ## Configuration
 ### GeoIP
 | Variable Name | Type | Required | Default | Description |
@@ -33,3 +13,42 @@
 | backend_library | string | No | - | Specify backend library (geoip2_c, geoip, geoip2_compat)<br> |
 | skip_adding_null_record | bool | No | true | To avoid get stacktrace error with `[null, null]` array for elasticsearch.<br> |
 | records | []Record | No | - | Records are represented as maps: `key: value`<br> |
+ #### Example `GeoIP` filter configurations
+ ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - geoip:
+        geoip_lookup_keys: remote_addr
+        records:
+          - city: ${city.names.en["remote_addr"]}
+            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
+            country: ${country.iso_code["remote_addr"]}
+            country_name: ${country.names.en["remote_addr"]}
+            postal_code:  ${postal.code["remote_addr"]}
+  selectors: {}
+  outputRefs:
+    - demo-output
+ ```
+
+ #### Fluentd Config Result
+ ```yaml
+<filter **>
+  @type geoip
+  @id test_geoip
+  geoip_lookup_keys remote_addr
+  skip_adding_null_record true
+  <record>
+    city ${city.names.en["remote_addr"]}
+    country ${country.iso_code["remote_addr"]}
+    country_name ${country.names.en["remote_addr"]}
+    location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
+    postal_code ${postal.code["remote_addr"]}
+  </record>
+</filter>
+ ```
+
+---
