@@ -74,7 +74,7 @@ EOF
 
 > If you have your `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` set you can use the following snippet.
 ```bash
-kubectl -n logging create secret generic logging-cloudwatch --from-literal "awsAccessKeyId=$AWS_ACCESS_KEY_ID" --from-literal "awsSecretAccesKey=$AWS_SECRET_ACCESS_KEY"
+kubectl -n logging create secret generic logging-cloudwatch --from-literal "awsAccessKeyId=$AWS_ACCESS_KEY_ID" --from-literal "awsSecretAccessKey=$AWS_SECRET_ACCESS_KEY"
 ```
 Or set up the secret manually.
 ```bash
@@ -86,7 +86,7 @@ metadata:
 type: Opaque
 data:
   awsAccessKeyId: <base64encoded>
-  awsSecretAccesKey: <base64encoded>
+  awsSecretAccessKey: <base64encoded>
 EOF
 ```
 
@@ -110,7 +110,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: logging-cloudwatch
-          key: awsSecretAccesKey
+          key: awsSecretAccessKey
     log_group_name: operator-log-group
     log_stream_name: operator-log-stream
     region: us-east-1

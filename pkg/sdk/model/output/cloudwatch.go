@@ -36,7 +36,7 @@ import (
 //      valueFrom:
 //        secretKeyRef:
 //          name: logging-s3
-//          key: awsSecretAccesKey
+//          key: awsSecretAccessKey
 //    log_group_name: operator-log-group
 //    log_stream_name: operator-log-stream
 //    region: us-east-1
