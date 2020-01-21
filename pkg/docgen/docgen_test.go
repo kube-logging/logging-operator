@@ -15,10 +15,13 @@
 package docgen_test
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"runtime"
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
+	"github.com/andreyvit/diff"
 	"github.com/banzaicloud/logging-operator/pkg/docgen"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -39,12 +42,37 @@ func TestGenParse(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	currentDir := filepath.Dir(filename)
 
-	docItem := docgen.DocItem{
-		Name:       "sample-name",
-		SourcePath: filepath.Join(currentDir, "testdata", "sample.go"),
-		DestPath:   filepath.Join(currentDir, "../../build/test/docgen"),
+	var testData = []struct {
+		docItem  docgen.DocItem
+		expected string
+	}{
+		{
+			docItem: docgen.DocItem{
+				Name:       "sample-name",
+				SourcePath: filepath.Join(currentDir, "testdata", "sample.go"),
+				DestPath:   filepath.Join(currentDir, "../../build/test/docgen"),
+			},
+			expected: heredoc.Doc(`
+				### Sample
+				| Variable Name | Type | Required | Default | Description |
+				|---|---|---|---|---|
+				| field1 | string | No | - |  |
+			`),
+		},
 	}
 
-	parser := docgen.GetDocumentParser(docItem, logger)
-	parser.Generate()
+	for _, item := range testData {
+		parser := docgen.GetDocumentParser(item.docItem, logger)
+		err := parser.Generate()
+
+		bytes, err := ioutil.ReadFile(filepath.Join(item.docItem.DestPath, item.docItem.Name+".md"))
+
+		if a, e := diff.TrimLinesInString(string(bytes)), diff.TrimLinesInString(item.expected); a != e {
+			t.Errorf("Result does not match (-actual vs +expected):\n%v\nActual: %s", diff.LineDiff(a, e), string(bytes))
+		}
+
+		if err != nil {
+			t.Fatalf("%+v", err)
+		}
+	}
 }

@@ -15,5 +15,5 @@
 package testdata
 
 type Sample struct {
-	Field1 string `json:omitempty`
+	Field1 string `json:"field1,omitempty"`
 }

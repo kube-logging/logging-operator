@@ -46,6 +46,7 @@ type Doc struct {
 	Url         string
 	Desc        string
 	Status      string
+	TagName     string
 
 	RootNode *ast.File
 	Logger   logr.Logger
@@ -57,8 +58,9 @@ func (d *Doc) Append(line string) {
 
 func NewDoc(item DocItem, log logr.Logger) *Doc {
 	return &Doc{
-		Item:   item,
-		Logger: log,
+		Item:    item,
+		Logger:  log,
+		TagName: "plugin",
 	}
 }
 
@@ -131,7 +133,7 @@ func (d *Doc) visitNode(n ast.Node) bool {
 				d.Append("| Variable Name | Type | Required | Default | Description |")
 				d.Append("|---|---|---|---|---|")
 				for _, item := range structure.Fields.List {
-					name, com, def, required := getValuesFromItem(item)
+					name, com, def, required := d.getValuesFromItem(item)
 					d.Append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, d.normaliseType(item.Type), required, def, com))
 				}
 			}
@@ -202,7 +204,7 @@ func formatRequired(r bool) string {
 	return "No"
 }
 
-func getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
+func (d *Doc) getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
 	commentWithDefault := ""
 	if item.Doc != nil {
 		for _, line := range item.Doc.List {
@@ -214,7 +216,7 @@ func getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
 		}
 	}
 	tag := item.Tag.Value
-	tagResult := getPrefixedLine(tag, `plugin:\"default:(.*)\"`)
+	tagResult := getPrefixedLine(tag, fmt.Sprintf(`%s:\"default:(.*)\"`, d.TagName))
 	nameResult := getPrefixedLine(tag, `json:\"([^,\"]*).*\"`)
 	required = formatRequired(!strings.Contains(getPrefixedLine(tag, `json:\"(.*)\"`), "omitempty"))
 	if tagResult != "" {

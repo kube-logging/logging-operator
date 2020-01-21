@@ -4,6 +4,8 @@ go 1.12
 
 require (
 	emperror.dev/errors v0.7.0
+	github.com/MakeNowJust/heredoc v0.0.0-20171113091838-e9091a26100e
+	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
 	github.com/banzaicloud/operator-tools v0.1.0
 	github.com/coreos/prometheus-operator v0.34.0
