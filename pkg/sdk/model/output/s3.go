@@ -38,7 +38,7 @@ import (
 //      valueFrom:
 //        secretKeyRef:
 //          name: logging-s3
-//          key: awsSecretAccesKey
+//          key: awsSecretAccessKey
 //    s3_bucket: logging-amazon-s3
 //    s3_region: eu-central-1
 //    path: logs/${tag}/%Y/%m/%d/

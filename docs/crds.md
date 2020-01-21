@@ -368,7 +368,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: s3-secret
-          key: awsSecretAccesKey
+          key: awsSecretAccessKey
           namespace: default
     s3_bucket: example-logging-bucket
     s3_region: eu-west-1
