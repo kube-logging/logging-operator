@@ -46,6 +46,8 @@ type _metaFile interface{}
 type FileOutputConfig struct {
 	// The Path of the file. The actual path is path + time + ".log" by default.
 	Path string `json:"path"`
+	// The flushed chunk is appended to existence file or not. The default is not appended.
+	Append bool `json:"append,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }

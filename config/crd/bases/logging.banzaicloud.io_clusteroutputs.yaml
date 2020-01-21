@@ -1205,6 +1205,10 @@ spec:
               type: array
             file:
               properties:
+                append:
+                  description: The flushed chunk is appended to existence file or
+                    not. The default is not appended.
+                  type: boolean
                 buffer:
                   properties:
                     chunk_full_threshold:

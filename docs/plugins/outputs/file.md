@@ -19,4 +19,5 @@ More info at https://docs.fluentd.org/output/file
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | path | string | Yes | - | The Path of the file. The actual path is path + time + ".log" by default.<br> |
+| append | bool | No | - | The flushed chunk is appended to existence file or not. The default is not appended.<br> |
 | buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
