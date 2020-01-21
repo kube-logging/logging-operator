@@ -14,7 +14,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: logging-s3
-          key: awsSecretAccesKey
+          key: awsSecretAccessKey
     stream_name: operator-log-stream
     region: us-east-1
     auto_create_stream: true

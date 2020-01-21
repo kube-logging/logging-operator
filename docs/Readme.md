@@ -12,7 +12,7 @@ The Logging operator is a core part of the [Banzai Cloud Pipeline](https://banza
   - [Deploy with Helm](./deploy/README.md#deploy-logging-operator-with-helm)
   - [Deploy with Kubernetes Manifests](./deploy/README.md#deploy-logging-operator-from-kubernetes-manifests)
 - **[Supported Plugins](./plugins/Readme.md)**
-- **[Custom Resource Definitions](./crds.md)**
+- **[Custom Resource Definitions (CRD)](./crds.md)**
 - **[Troubleshooting](./troubleshooting.md)**
 - **[Fluentd Configuration](./crds.md#fluentd-spec)**
 - **[Fluent Bit Configuration](./fluentbit.md)**

@@ -19,6 +19,11 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +kubebuilder:object:generate=true
+// +docName:"[Record Transformer](https://docs.fluentd.org/filter/record_transformer)"
+// Mutates/transforms incoming event streams.
+type _docRecordTransformer interface{}
+
 // +name:"Record Transformer"
 // +url:"https://docs.fluentd.org/filter/record_transformer"
 // +version:"more info"
@@ -44,6 +49,34 @@ type RecordTransformer struct {
 	// Records are represented as maps: `key: value`
 	Records []Record `json:"records,omitempty"`
 }
+
+// #### Example `Record Transformer` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - record_transformer:
+//        records:
+//        - foo: "bar"
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<filter **>
+//  @type record_transformer
+//  @id test_record_transformer
+//  <record>
+//    foo bar
+//  </record>
+//</filter>
+// ```
+type _expRecordTransformer interface{}
 
 // Parameters inside record directives are considered to be new key-value pairs
 type Record map[string]string

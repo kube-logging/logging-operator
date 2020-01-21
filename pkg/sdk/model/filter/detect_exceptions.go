@@ -43,7 +43,6 @@ type _docExceptionDetector interface{}
 type _metaDDetectExceptions interface{}
 
 // +kubebuilder:object:generate=true
-// +docName:"Output Config"
 type DetectExceptions struct {
 	// The field which contains the raw message text in the input JSON data. (default: "")
 	Message string `json:"message,omitempty"`
@@ -60,6 +59,36 @@ type DetectExceptions struct {
 	// Separate log streams by this field in the input JSON data. (default: "")
 	Stream string `json:"stream,omitempty"`
 }
+
+// #### Example `Exception Detector` filter configurations
+// ```yaml
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Flow
+//metadata:
+//  name: demo-flow
+//spec:
+//  filters:
+//    - detectExceptions:
+//        multiline_flush_interval: 0.1
+//        languages:
+//          - java
+//          - python
+//  selectors: {}
+//  outputRefs:
+//    - demo-output
+// ```
+//
+// #### Fluentd Config Result
+// ```yaml
+//<match kubernetes.**>
+//  @type detect_exceptions
+//  @id test_detect_exceptions
+//  languages ["java","python"]
+//  multiline_flush_interval 0.1
+//  remove_tag_prefix kubernetes
+//</match>
+// ```
+type _expDetectExceptions interface{}
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "detect_exceptions"

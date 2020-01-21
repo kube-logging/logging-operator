@@ -6,12 +6,13 @@ For more information please click on the plugin name
 
 | Name | Type | Description | Status |Version |
 |:---|---|:---|:---:|---:|
-| **[Concat](./filters/concat.md)** | filters | Concatenate multiline log separated in multiple events | GA | [more info](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
+| **[Concat](./filters/concat.md)** | filters | Fluentd Filter plugin to concatenate multiline log separated in multiple events. | GA | [more info](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
 | **[Dedot](./filters/dedot.md)** | filters | Concatenate multiline log separated in multiple events | GA | [more info](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](./filters/detect_exceptions.md)** | filters | Exception Detector | GA | [more info](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[Geo IP](./filters/geoip.md)** | filters | Fluentd GeoIP filter | GA | [more info](https://github.com/y-ken/fluent-plugin-geoip) |
 | **[Grep](./filters/grep.md)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Parser](./filters/parser.md)** | filters | Parses" string field in event records and mutates its | GA | [more info](https://docs.fluentd.org/filter/parser) |
+| **[Prometheus](./filters/prometheus.md)** | filters | Prometheus Filter Plugin to count Incoming Records | GA | [more info](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin) |
 | **[Record Transformer](./filters/record_transformer.md)** | filters | Mutates/transforms incoming event streams. | GA | [more info](https://docs.fluentd.org/filter/record_transformer) |
 | **[Stdout](./filters/stdout.md)** | filters | Prints events to stdout | GA | [more info](https://docs.fluentd.org/filter/stdout) |
 | **[Tag Normaliser](./filters/tagnormaliser.md)** | filters | Re-tag based on log metadata | GA | [more info](https://github.com/banzaicloud/fluent-plugin-tag-normaliser) |

@@ -1,16 +1,6 @@
-# Fluentd concat filter
+# [Concat Filter](https://github.com/fluent-plugins-nursery/fluent-plugin-concat)
 ## Overview
  Fluentd Filter plugin to concatenate multiline log separated in multiple events.
- More information at https://github.com/fluent-plugins-nursery/fluent-plugin-concat
-
- #### Example record configurations
- ```
- spec:
-  filters:
-    - concat:
-        partial_key: "partial_message"
-        separator: ""
- ```
 
 ## Configuration
 ### Concat
@@ -31,3 +21,32 @@
 | keep_partial_key | bool | No | False | If true, keep partial_key in concatenated records <br> |
 | use_partial_metadata | string | No | - | Use partial metadata to concatenate multiple records<br> |
 | keep_partial_metadata | string | No | - | If true, keep partial metadata<br> |
+ #### Example `Concat` filter configurations
+ ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - concat:
+        partial_key: "partial_message"
+        separator: ""
+        n_lines: 10
+  selectors: {}
+  outputRefs:
+    - demo-output
+ ```
+
+ #### Fluentd Config Result
+ ```yaml
+<filter **>
+  @type concat
+  @id test_concat
+  key message
+  n_lines 10
+  partial_key partial_message
+</filter>
+ ```
+
+---

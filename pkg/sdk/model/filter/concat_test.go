@@ -12,36 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package render
+package filter_test
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+	"testing"
 
-	"emperror.dev/errors"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
+	"github.com/ghodss/yaml"
 )
 
-type JsonRender struct {
-	out    io.Writer
-	indent int
-}
+func TestConcat(t *testing.T) {
+	CONFIG := []byte(`
+partial_key: "partial_message"
+separator: ""
+n_lines: 10
 
-func (t *JsonRender) Render(config types.FluentConfig) error {
-	var out []byte
-	var err error
-	if t.indent > 0 {
-		out, err = json.MarshalIndent(config, "", strings.Repeat(" ", t.indent))
-	} else {
-		out, err = json.Marshal(config)
-	}
-
-	if err != nil {
-		return errors.WrapIf(err, "Failed to marshal model into yaml")
-	}
-	fmt.Fprintf(t.out, "%s", out)
-	return nil
+`)
+	expected := `
+<filter **>
+  @type concat
+  @id test_concat
+  key message
+  n_lines 10
+  partial_key partial_message
+</filter>
+`
+	parser := &filter.Concat{}
+	yaml.Unmarshal(CONFIG, parser)
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
 }

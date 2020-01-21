@@ -12,36 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package render
+package filter_test
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+	"testing"
 
-	"emperror.dev/errors"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
+	"github.com/ghodss/yaml"
 )
 
-type JsonRender struct {
-	out    io.Writer
-	indent int
-}
+func TestDedot(t *testing.T) {
+	CONFIG := []byte(`
+de_dot_separator: "-"
+de_dot_nested: true
 
-func (t *JsonRender) Render(config types.FluentConfig) error {
-	var out []byte
-	var err error
-	if t.indent > 0 {
-		out, err = json.MarshalIndent(config, "", strings.Repeat(" ", t.indent))
-	} else {
-		out, err = json.Marshal(config)
-	}
-
-	if err != nil {
-		return errors.WrapIf(err, "Failed to marshal model into yaml")
-	}
-	fmt.Fprintf(t.out, "%s", out)
-	return nil
+`)
+	expected := `
+<filter **>
+  @type dedot
+  @id test_dedot
+  de_dot_nested true
+  de_dot_separator -
+</filter>
+`
+	parser := &filter.DedotFilterConfig{}
+	yaml.Unmarshal(CONFIG, parser)
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
 }

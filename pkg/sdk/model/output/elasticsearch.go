@@ -65,15 +65,16 @@ type ElasticsearchOutput struct {
 	Path string `json:"path,omitempty"`
 	// Connection scheme (default: http)
 	Scheme string `json:"scheme,omitempty"`
+	// +kubebuilder:validation:Optional
 	// Skip ssl verification (default: true)
-	SslVerify bool `json:"ssl_verify" plugin:"default:true"`
+	SslVerify *bool `json:"ssl_verify,omitempty" plugin:"default:true"`
 	// If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
 	SslVersion string `json:"ssl_version,omitempty"`
 	// Enable Logstash log format.(default: false)
 	LogstashFormat bool `json:"logstash_format,omitempty"`
-	// Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.
+	// Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.(default: false)
 	IncludeTimestamp bool `json:"include_timestamp,omitempty"`
-	// Set the Logstash prefix.(default: true)
+	// Set the Logstash prefix.(default: logstash)
 	LogstashPrefix string `json:"logstash_prefix,omitempty"`
 	// Set the Logstash prefix separator.(default: -)
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty"`
@@ -90,10 +91,11 @@ type ElasticsearchOutput struct {
 	// By default, when inserting records in Logstash format, @timestamp is dynamically created with the time at log ingestion. If you'd like to use a custom time, include an @timestamp with your record.
 	TimeKey string `json:"time_key,omitempty"`
 	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe utc_index to false.(default: true)
-	UtcIndex bool `json:"utc_index,omitempty"`
+	// +kubebuilder:validation:Optional
+	UtcIndex *bool `json:"utc_index,omitempty" plugin:"default:true"`
 	// Tell this plugin to find the index name to write to in the record under this key in preference to other mechanisms. Key can be specified as path to nested record using dot ('.') as a separator. https://github.com/uken/fluent-plugin-elasticsearch#target_index_key
 	TargetIndexKey string `json:"target_index_key,omitempty"`
-	// Similar to target_index_key config, find the type name to write to in the record under this key (or nested record). If key not found in record - fallback to type_name.(default: true)
+	// Similar to target_index_key config, find the type name to write to in the record under this key (or nested record). If key not found in record - fallback to type_name.(default: fluentd)
 	TargetTypeKey string `json:"target_type_key,omitempty"`
 	// The name of the template to define. If a template by the name given is already present, it will be left unchanged, unless template_overwrite is set, in which case the template will be updated.
 	TemplateName string `json:"template_name,omitempty"`
@@ -109,7 +111,7 @@ type ElasticsearchOutput struct {
 	IndexDatePattern string `json:"index_date_pattern,omitempty"`
 	// Specify the deflector alias which would be assigned to the rollover index created. This is useful in case of using the Elasticsearch rollover API
 	DeflectorAlias string `json:"deflector_alias,omitempty"`
-	// Specify the index prefix for the rollover index to be created.
+	// Specify the index prefix for the rollover index to be created.(default: logstash)
 	IndexPrefix string `json:"index_prefix,omitempty"`
 	// Specify the application name for the rollover index to be created.(default: default)
 	ApplicationName string `json:"application_name,omitempty"`
@@ -118,14 +120,15 @@ type ElasticsearchOutput struct {
 	// You can specify times of retry putting template.(default: 10)
 	MaxRetryPuttingTemplate string `json:"max_retry_putting_template,omitempty"`
 	// Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)
-	FailOnPuttingTemplateRetryExceed bool `json:"fail_on_putting_template_retry_exceed,omitempty"`
-
+	// +kubebuilder:validation:Optional
+	FailOnPuttingTemplateRetryExceed *bool `json:"fail_on_putting_template_retry_exceed,omitempty" plugin:"default:true"`
 	// You can specify times of retry obtaining Elasticsearch version.(default: 15)
 	MaxRetryGetEsVersion string `json:"max_retry_get_es_version,omitempty"`
 	// You can specify HTTP request timeout.(default: 5s)
 	RequestTimeout string `json:"request_timeout,omitempty"`
 	// You can tune how the elasticsearch-transport host reloading feature works.(default: true)
-	ReloadConnections bool `json:"reload_connections,omitempty"`
+	// +kubebuilder:validation:Optional
+	ReloadConnections *bool `json:"reload_connections,omitempty" plugin:"default:true"`
 	//Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.(default: false)
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
 	// You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.(default: 60s)
@@ -158,7 +161,7 @@ type ElasticsearchOutput struct {
 	TimeParseErrorTag string `json:"time_parse_error_tag,omitempty"`
 	// With http_backend typhoeus, elasticsearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
 	HttpBackend string `json:"http_backend,omitempty"`
-	// With default behavior, Elasticsearch client uses Yajl as JSON encoder/decoder. Oj is the alternative high performance JSON encoder/decoder. When this parameter sets as true, Elasticsearch client uses Oj as JSON encoder/decoder. (default: fqlse)
+	// With default behavior, Elasticsearch client uses Yajl as JSON encoder/decoder. Oj is the alternative high performance JSON encoder/decoder. When this parameter sets as true, Elasticsearch client uses Oj as JSON encoder/decoder. (default: false)
 	PreferOjSerializer bool `json:"prefer_oj_serializer,omitempty"`
 	// Elasticsearch will complain if you send object and concrete values to the same field. For example, you might have logs that look this, from different places:
 	//{"people" => 100} {"people" => {"some" => "thing"}}
@@ -176,8 +179,9 @@ type ElasticsearchOutput struct {
 	// For example, Elasticsearch 6 starts to prohibit multiple type_names in one index, and Elasticsearch 7 will handle only _doc type_name in index.
 	// If you want to disable to verify Elasticsearch version at start up, set it as false.
 	// When using the following configuration, ES plugin intends to communicate into Elasticsearch 6. (default: true)
-	VerifyEsVersionAtStartup bool `json:"verify_es_version_at_startup,omitempty"`
-	// This parameter changes that ES plugin assumes default Elasticsearch version. The default value is 5.
+	// +kubebuilder:validation:Optional
+	VerifyEsVersionAtStartup *bool `json:"verify_es_version_at_startup,omitempty" plugin:"default:true"`
+	// This parameter changes that ES plugin assumes default Elasticsearch version.(default: 5)
 	DefaultElasticsearchVersion string `json:"default_elasticsearch_version,omitempty"`
 	// This parameter adds additional headers to request. Example: {"token":"secret"} (default: {})
 	CustomHeaders string `json:"custom_headers,omitempty"`
@@ -190,7 +194,8 @@ type ElasticsearchOutput struct {
 	// will match all subclasses of ServerError - Elasticsearch::Transport::Transport::Errors::BadRequest, Elasticsearch::Transport::Transport::Errors::ServiceUnavailable, etc.
 	IgnoreExceptions string `json:"ignore_exceptions,omitempty"`
 	// Indicates whether to backup chunk when ignore exception occurs. (default: true)
-	ExceptionBackup bool `json:"exception_backup,omitempty"`
+	// +kubebuilder:validation:Optional
+	ExceptionBackup *bool `json:"exception_backup,omitempty" plugin:"default:true"`
 	// Configure bulk_message request splitting threshold size.
 	// Default value is 20MB. (20 * 1024 * 1024)
 	// If you specify this size as negative number, bulk_message request splitting feature will be disabled. (default: 20MB)

@@ -13,7 +13,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: s3-secret
-          key: awsSecretAccesKey
+          key: awsSecretAccessKey
     s3_bucket: example-logging-bucket
     s3_region: eu-central-1
     path: logs/${tag}/%Y/%m/%d/
