@@ -14,7 +14,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: logging-s3
-          key: awsSecretAccesKey
+          key: awsSecretAccessKey
     s3_bucket: test
     s3_region: test_region
     s3_endpoint: 'http://minio-service.logging.svc.cluster.local:9000'
