@@ -25,11 +25,8 @@ import (
 	"regexp"
 	"strings"
 
-	ctrl "sigs.k8s.io/controller-runtime"
-)
-
-var (
-	log = ctrl.Log.WithName("docs").WithName("gen")
+	"emperror.dev/errors"
+	"github.com/go-logr/logr"
 )
 
 type DocItem struct {
@@ -52,13 +49,21 @@ type Doc struct {
 	Status      string
 
 	RootNode *ast.File
+	Logger   logr.Logger
 }
 
 func (d *Doc) Append(line string) {
 	d.Content = d.Content + line + "\n"
 }
 
-func GetDocumentParser(file DocItem) *Doc {
+func NewDoc(name string, log logr.Logger) *Doc {
+	return &Doc{
+		Name:   name,
+		Logger: log,
+	}
+}
+
+func GetDocumentParser(file DocItem, log logr.Logger) *Doc {
 	fileSet := token.NewFileSet()
 	node, err := parser.ParseFile(fileSet, file.SourcePath, nil, parser.ParseComments)
 	if err != nil {
@@ -68,31 +73,33 @@ func GetDocumentParser(file DocItem) *Doc {
 		Name:     file.Name,
 		RootNode: node,
 		Type:     file.Type,
+		Logger:   log,
 	}
 	return newDoc
 }
 
-func (d *Doc) Generate(destPath string) {
+func (d *Doc) Generate(destPath string) error {
 	if d.RootNode != nil {
 		ast.Inspect(d.RootNode, d.checkNodes)
-		log.Info("DocumentRoot not present skipping parse")
+		d.Logger.V(2).Info("DocumentRoot not present skipping parse")
 	}
 	directory := fmt.Sprintf("./%s/%s/", destPath, d.Type)
 	err := os.MkdirAll(directory, os.ModePerm)
 	if err != nil {
-		log.Error(err, "Md file create error %s", err.Error())
+		return errors.WrapIf(err, "failed to create destination directory")
 	}
 	filepath := fmt.Sprintf("./%s/%s/%s.md", destPath, d.Type, d.Name)
 	f, err := os.Create(filepath)
 	if err != nil {
-		log.Error(err, "Md file create error %s", err.Error())
+		return errors.WrapIf(err, "failed to create destination file")
 	}
-	defer closeFile(f)
 
 	_, err = f.WriteString(d.Content)
 	if err != nil {
-		log.Error(err, "Md file write error %s", err.Error())
+		return errors.WrapIf(errors.WrapIf(f.Close(), "failed to close file"), "failed to write content")
 	}
+
+	return errors.WrapIf(f.Close(), "failed to close file")
 }
 
 func (d *Doc) checkNodes(n ast.Node) bool {
@@ -128,7 +135,7 @@ func (d *Doc) checkNodes(n ast.Node) bool {
 				d.Append("|---|---|---|---|---|")
 				for _, item := range structure.Fields.List {
 					name, com, def, required := getValuesFromItem(item)
-					d.Append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, normaliseType(item.Type), required, def, com))
+					d.Append(fmt.Sprintf("| %s | %s | %s | %s | %s |", name, d.normaliseType(item.Type), required, def, com))
 				}
 			}
 		}
@@ -137,12 +144,12 @@ func (d *Doc) checkNodes(n ast.Node) bool {
 	return true
 }
 
-func normaliseType(fieldType ast.Expr) string {
+func (d *Doc) normaliseType(fieldType ast.Expr) string {
 	fset := token.NewFileSet()
 	var typeNameBuf bytes.Buffer
 	err := printer.Fprint(&typeNameBuf, fset, fieldType)
 	if err != nil {
-		log.Error(err, "error getting type")
+		d.Logger.Error(err, "error getting type")
 	}
 	return typeNameBuf.String()
 }
@@ -224,11 +231,4 @@ func getValuesFromItem(item *ast.Field) (name, comment, def, required string) {
 	}
 
 	return nameResult, getLink(commentWithDefault), "-", required
-}
-
-func closeFile(f *os.File) {
-	err := f.Close()
-	if err != nil {
-		log.Error(err, "File Close Error: %s", err.Error())
-	}
 }

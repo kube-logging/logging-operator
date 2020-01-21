@@ -44,9 +44,8 @@ func main() {
 	if err != nil {
 		log.Error(err, "Directory check error.")
 	}
-	index := docgen.Doc{
-		Name: "Readme",
-	}
+	index := docgen.NewDoc("Readme", ctrl.Log.WithName("docs").WithName("index"))
+
 	index.Append("# Supported Plugins\n\n")
 	index.Append("For more information please click on the plugin name")
 	index.Append("<center>\n")
@@ -55,7 +54,7 @@ func main() {
 
 	for _, file := range fileList {
 		log.Info("plugin", "Name", file.SourcePath)
-		document := docgen.GetDocumentParser(file)
+		document := docgen.GetDocumentParser(file, ctrl.Log.WithName("docs").WithName("plugin"))
 		document.Generate("docs/plugins")
 		index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
 			document.DisplayName,
