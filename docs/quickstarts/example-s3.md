@@ -38,7 +38,7 @@ If you have your `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` set you can u
     type: Opaque
     data:
       awsAccessKeyId: <base64encoded>
-      awsSecretAccesKey: <base64encoded>
+      awsSecretAccessKey: <base64encoded>
     EOF
     ```
     > Caution: You **MUST** install the `secret` and the `output` definition in the **SAME** namespace
@@ -61,7 +61,7 @@ If you have your `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` set you can u
           valueFrom:
             secretKeyRef:
               name: logging-s3
-              key: awsSecretAccesKey
+              key: awsSecretAccessKey
         s3_bucket: logging-amazon-s3
         s3_region: eu-central-1
         path: logs/${tag}/%Y/%m/%d/
