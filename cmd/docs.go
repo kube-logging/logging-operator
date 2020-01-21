@@ -15,58 +15,29 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/banzaicloud/logging-operator/pkg/docgen"
 	"github.com/banzaicloud/logging-operator/pkg/docgen/plugins"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 func main() {
 	verboseLogging := true
-	ctrl.SetLogger(zap.Logger(verboseLogging))
-	var log = ctrl.Log.WithName("docs").WithName("main")
+	rootLogger := zap.New(zap.UseDevMode(verboseLogging))
 
 	lister := plugins.NewPluginLister(
-		[]plugins.PluginDir{
-			{"filters", "./pkg/sdk/model/filter/"},
-			{"outputs", "./pkg/sdk/model/output/"},
-			{"common", "./pkg/sdk/model/common/"},
+		map[string]plugins.PluginDir{
+			"filters": {"pkg/sdk/model/filter", "docs/plugins/filters"},
+			"outputs": {"pkg/sdk/model/output", "docs/plugins/outputs"},
+			"common":  {"pkg/sdk/model/common", "docs/plugins/common"},
 		},
 		[]string{
 			"null",
 			".*.deepcopy",
 			".*_test",
 		},
-		ctrl.Log.WithName("docs").WithName("pluginlister"))
+		rootLogger.WithName("pluginlister"))
 
-	fileList, err := lister.GetPlugins()
-
+	err := plugins.GenerateWithIndex(lister, rootLogger.WithName("plugins"))
 	if err != nil {
-		log.Error(err, "Directory check error.")
+		panic(err)
 	}
-	index := docgen.NewDoc("Readme", ctrl.Log.WithName("docs").WithName("index"))
-
-	index.Append("# Supported Plugins\n\n")
-	index.Append("For more information please click on the plugin name")
-	index.Append("<center>\n")
-	index.Append("| Name | Type | Description | Status |Version |")
-	index.Append("|:---|---|:---|:---:|---:|")
-
-	for _, file := range fileList {
-		log.Info("plugin", "Name", file.SourcePath)
-		document := docgen.GetDocumentParser(file, ctrl.Log.WithName("docs").WithName("plugin"))
-		document.Generate("docs/plugins")
-		index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
-			document.DisplayName,
-			file.DocumentationPath,
-			document.Type,
-			document.Desc,
-			document.Status,
-			document.Version,
-			document.Url))
-	}
-	index.Append("</center>")
-	index.Generate("docs/plugins")
 }

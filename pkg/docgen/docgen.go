@@ -22,6 +22,7 @@ import (
 	"go/printer"
 	"go/token"
 	"os"
+	filepath2 "path/filepath"
 	"regexp"
 	"strings"
 
@@ -30,19 +31,17 @@ import (
 )
 
 type DocItem struct {
-	Name              string
-	Type              string
-	SourcePath        string
-	DocumentationPath string
+	Name       string
+	SourcePath string
+	DestPath   string
 }
 
 type DocItems []DocItem
 
 type Doc struct {
-	Name        string
+	Item        DocItem
 	DisplayName string
 	Content     string
-	Type        string
 	Version     string
 	Url         string
 	Desc        string
@@ -56,9 +55,9 @@ func (d *Doc) Append(line string) {
 	d.Content = d.Content + line + "\n"
 }
 
-func NewDoc(name string, log logr.Logger) *Doc {
+func NewDoc(item DocItem, log logr.Logger) *Doc {
 	return &Doc{
-		Name:   name,
+		Item:   item,
 		Logger: log,
 	}
 }
@@ -70,25 +69,23 @@ func GetDocumentParser(file DocItem, log logr.Logger) *Doc {
 		log.Error(err, "Error!")
 	}
 	newDoc := &Doc{
-		Name:     file.Name,
+		Item:     file,
 		RootNode: node,
-		Type:     file.Type,
 		Logger:   log,
 	}
 	return newDoc
 }
 
-func (d *Doc) Generate(destPath string) error {
+func (d *Doc) Generate() error {
 	if d.RootNode != nil {
-		ast.Inspect(d.RootNode, d.checkNodes)
+		ast.Inspect(d.RootNode, d.visitNode)
 		d.Logger.V(2).Info("DocumentRoot not present skipping parse")
 	}
-	directory := fmt.Sprintf("./%s/%s/", destPath, d.Type)
-	err := os.MkdirAll(directory, os.ModePerm)
+	err := os.MkdirAll(d.Item.DestPath, os.ModePerm)
 	if err != nil {
 		return errors.WrapIf(err, "failed to create destination directory")
 	}
-	filepath := fmt.Sprintf("./%s/%s/%s.md", destPath, d.Type, d.Name)
+	filepath := filepath2.Join(d.Item.DestPath, d.Item.Name+".md")
 	f, err := os.Create(filepath)
 	if err != nil {
 		return errors.WrapIf(err, "failed to create destination file")
@@ -102,14 +99,14 @@ func (d *Doc) Generate(destPath string) error {
 	return errors.WrapIf(f.Close(), "failed to close file")
 }
 
-func (d *Doc) checkNodes(n ast.Node) bool {
+func (d *Doc) visitNode(n ast.Node) bool {
 	generic, ok := n.(*ast.GenDecl)
 	if ok {
 		typeName, ok := generic.Specs[0].(*ast.TypeSpec)
 		if ok {
 			_, ok := typeName.Type.(*ast.InterfaceType)
 			if ok && strings.HasPrefix(typeName.Name.Name, "_doc") {
-				d.Append(fmt.Sprintf("# %s", getTypeName(generic, d.Name)))
+				d.Append(fmt.Sprintf("# %s", getTypeName(generic, d.Item.Name)))
 				d.Append("## Overview")
 				d.Append(getTypeDocs(generic, false))
 				d.Append("## Configuration")

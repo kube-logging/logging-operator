@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
@@ -28,16 +27,21 @@ import (
 
 type PluginLister struct {
 	Logger         logr.Logger
-	Sources        []PluginDir
+	Sources        map[string]PluginDir
 	IgnoredPlugins []string
 }
 
 type PluginDir struct {
-	Type string
-	Path string
+	Path     string
+	DestPath string
 }
 
-func NewPluginLister(sources []PluginDir, ignoredPlugins []string, logger logr.Logger) *PluginLister {
+type Plugin struct {
+	Item     docgen.DocItem
+	Category string
+}
+
+func NewPluginLister(sources map[string]PluginDir, ignoredPlugins []string, logger logr.Logger) *PluginLister {
 	return &PluginLister{
 		Logger:         logger,
 		Sources:        sources,
@@ -45,9 +49,9 @@ func NewPluginLister(sources []PluginDir, ignoredPlugins []string, logger logr.L
 	}
 }
 
-func (pd PluginLister) GetPlugins() ([]docgen.DocItem, error) {
-	var pluginList []docgen.DocItem
-	for _, p := range pd.Sources {
+func (pd *PluginLister) GetPlugins() ([]Plugin, error) {
+	pluginList := []Plugin{}
+	for category, p := range pd.Sources {
 		files, err := ioutil.ReadDir(p.Path)
 		if err != nil {
 			return nil, errors.WrapIff(err, "failed to read files from %s", p.Path)
@@ -56,10 +60,12 @@ func (pd PluginLister) GetPlugins() ([]docgen.DocItem, error) {
 			pd.Logger.V(2).Info("fileListGenerator", "filename", "file")
 			fname := strings.Replace(file.Name(), ".go", "", 1)
 			if filepath.Ext(file.Name()) == ".go" && pd.getPluginWhiteList(fname) {
-				fullPath := p.Path + file.Name()
-				filepath := fmt.Sprintf("./%s/%s.md", p.Type, fname)
-				pluginList = append(pluginList, docgen.DocItem{
-					Name: fname, SourcePath: fullPath, DocumentationPath: filepath, Type: p.Type})
+				fullPath := filepath.Join(p.Path, file.Name())
+				pluginList = append(pluginList, Plugin{
+					Category: category,
+					Item: docgen.DocItem{
+						Name: fname, SourcePath: fullPath, DestPath: p.DestPath},
+				})
 			}
 		}
 	}

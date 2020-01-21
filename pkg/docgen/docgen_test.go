@@ -13,3 +13,39 @@
 // limitations under the License.
 
 package docgen_test
+
+import (
+	"path/filepath"
+	"runtime"
+	"testing"
+
+	"github.com/banzaicloud/logging-operator/pkg/docgen"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
+)
+
+var logger logr.Logger
+
+func init() {
+	log, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
+	logger = zapr.NewLogger(log)
+}
+
+func TestGenParse(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	currentDir := filepath.Dir(filename)
+
+	docItem := docgen.DocItem{
+		Name:              "sample-name",
+		Category:          "sample-category",
+		SourcePath:        filepath.Join(currentDir, "testdata", "sample.go"),
+		DocumentationPath: filepath.Join(currentDir, "../../build/test/docgen"),
+	}
+
+	parser := docgen.GetDocumentParser(docItem, logger)
+	parser.Generate()
+}
