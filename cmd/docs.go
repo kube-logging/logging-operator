@@ -25,9 +25,9 @@ func main() {
 
 	lister := plugins.NewPluginLister(
 		map[string]plugins.PluginDir{
-			"filters": {"pkg/sdk/model/filter", "docs/plugins/filters"},
-			"outputs": {"pkg/sdk/model/output", "docs/plugins/outputs"},
-			"common":  {"pkg/sdk/model/common", "docs/plugins/common"},
+			"filters": {Path: "pkg/sdk/model/filter", DestPath: "docs/plugins/filters"},
+			"outputs": {Path: "pkg/sdk/model/output", DestPath: "docs/plugins/outputs"},
+			"common":  {Path: "pkg/sdk/model/common", DestPath: "docs/plugins/common"},
 		},
 		[]string{
 			"null",

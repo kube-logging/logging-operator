@@ -40,10 +40,9 @@ func TestGenParse(t *testing.T) {
 	currentDir := filepath.Dir(filename)
 
 	docItem := docgen.DocItem{
-		Name:              "sample-name",
-		Category:          "sample-category",
-		SourcePath:        filepath.Join(currentDir, "testdata", "sample.go"),
-		DocumentationPath: filepath.Join(currentDir, "../../build/test/docgen"),
+		Name:       "sample-name",
+		SourcePath: filepath.Join(currentDir, "testdata", "sample.go"),
+		DestPath:   filepath.Join(currentDir, "../../build/test/docgen"),
 	}
 
 	parser := docgen.GetDocumentParser(docItem, logger)
