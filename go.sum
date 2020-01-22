@@ -43,6 +43,8 @@ github.com/banzaicloud/k8s-objectmatcher v1.1.0 h1:KHWn9Oxh21xsaGKBHWElkaRrr4ypC
 github.com/banzaicloud/k8s-objectmatcher v1.1.0/go.mod h1:gGaElvgkqa0Lk1khRr+jel/nsCLfzhLnD3CEWozpk9k=
 github.com/banzaicloud/operator-tools v0.3.0 h1:e1MrwPhmKOmLsTJL7WwQ6nPUpY3eOpNj0qe+9chnk+I=
 github.com/banzaicloud/operator-tools v0.3.0/go.mod h1:12rKcmPZkK8CaESI6YI3UGFBBBQvYZH9i8Gn5cfCi+U=
+github.com/banzaicloud/operator-tools v0.3.1 h1:DhUhPPFO/7wqsLCwEGsnC15rn5D/WV7eRwmtFZthR38=
+github.com/banzaicloud/operator-tools v0.3.1/go.mod h1:12rKcmPZkK8CaESI6YI3UGFBBBQvYZH9i8Gn5cfCi+U=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 h1:xJ4a3vCFaGF/jqvzLMYoU8P317H5OQ+Via4RmuPwCS0=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
