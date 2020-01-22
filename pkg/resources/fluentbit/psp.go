@@ -25,6 +25,21 @@ import (
 
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+		allowedHostPaths := []policyv1beta1.AllowedHostPath{{
+			PathPrefix: r.Logging.Spec.FluentbitSpec.MountPath,
+			ReadOnly:   true,
+		}, {
+			PathPrefix: "/var/log",
+			ReadOnly:   true,
+		}}
+
+		for _, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+				PathPrefix: vMnt.Source,
+				ReadOnly:   vMnt.ReadOnly,
+			})
+		}
+
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
@@ -47,13 +62,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 				},
 				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),
-				AllowedHostPaths: []policyv1beta1.AllowedHostPath{{
-					PathPrefix: r.Logging.Spec.FluentbitSpec.MountPath,
-					ReadOnly:   true,
-				}, {
-					PathPrefix: "/var/log",
-					ReadOnly:   true,
-				}},
+				AllowedHostPaths:         allowedHostPaths,
 			},
 		}, reconciler.StatePresent, nil
 	}

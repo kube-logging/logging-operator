@@ -170,6 +170,7 @@ spec:
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
+| extraVolumeMounts | [][VolumeMount](#Volume-Mount) | "" | ExtraVolumeMounts defines source and destination foldersof a pod mount |
 | customConfigSecret | string | "" | Custom secret to use as fluent-bit config.<br /> It must include all the config files necessary to run fluent-bit (_fluent-bit.conf_, _parsers*.conf_) |
 | podPriorityClassName    | string         | ""      | Name of a priority class to launch fluentbit with                       |
 | livenessProbe | [Probe](#Probe) | {} | Periodic probe of fluentbit container liveness. Container will be restarted if the probe fails. |
@@ -262,7 +263,33 @@ spec:
       secretName: fluentbit-tls
       sharedKey: asdadas
   controlNamespace: logging
+```
 
+#### Volume Mount
+
+Defines a pod volume mount
+
+| Name                    | Type           | Default | Description |
+|-------------------------|----------------|---------|-------------|
+| source | string | "" | Source directory to mount |
+| destination | string | "" | Destination directory to mount to |
+| readOnly | bool | false | Whether the mount is read-only or not |
+
+
+**`logging` setup with extra volume mount**
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-tls
+spec:
+  fluentd: {}
+  fluentbit:
+    extraVolumeMounts:
+    - source: /opt/docker
+      destination: /opt/docker
+      readOnly: true
+  controlNamespace: logging
 ```
 
 #### KubernetesStorage

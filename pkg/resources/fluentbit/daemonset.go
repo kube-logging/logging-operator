@@ -17,6 +17,7 @@ package fluentbit
 import (
 	"crypto/sha256"
 	"fmt"
+	"strconv"
 
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
@@ -121,6 +122,15 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/var/log/",
 		},
 	}
+
+	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+		v = append(v, corev1.VolumeMount{
+			Name:      "extravolumemount" + strconv.Itoa(vCount),
+			ReadOnly:  vMnt.ReadOnly,
+			MountPath: vMnt.Destination,
+		})
+	}
+
 	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
 		v = append(v, corev1.VolumeMount{
 			Name:      "config",
@@ -165,6 +175,17 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
+
+	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+		v = append(v, corev1.Volume{
+			Name: "extravolumemount" + strconv.Itoa(vCount),
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: vMnt.Source,
+				},
+			}})
+	}
+
 	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
 		v = append(v, corev1.Volume{
 			Name: "config",
