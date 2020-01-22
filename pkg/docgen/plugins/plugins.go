@@ -64,7 +64,13 @@ func (pd *PluginLister) GetPlugins() ([]Plugin, error) {
 				pluginList = append(pluginList, Plugin{
 					Category: category,
 					Item: docgen.DocItem{
-						Name: fname, SourcePath: fullPath, DestPath: p.DestPath},
+						Name:       fname,
+						SourcePath: fullPath,
+						DestPath:   p.DestPath,
+						DefaultValueFromTagExtractor: func(tag string) string {
+							return docgen.GetPrefixedValue(tag, `plugin:\"default:(.*)\"`)
+						},
+					},
 				})
 			}
 		}

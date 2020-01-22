@@ -31,9 +31,10 @@ import (
 )
 
 type DocItem struct {
-	Name       string
-	SourcePath string
-	DestPath   string
+	Name                         string
+	SourcePath                   string
+	DestPath                     string
+	DefaultValueFromTagExtractor func(string) string
 }
 
 type DocItems []DocItem
@@ -46,7 +47,6 @@ type Doc struct {
 	Url         string
 	Desc        string
 	Status      string
-	TagName     string
 
 	RootNode *ast.File
 	Logger   logr.Logger
@@ -58,9 +58,8 @@ func (d *Doc) Append(line string) {
 
 func NewDoc(item DocItem, log logr.Logger) *Doc {
 	return &Doc{
-		Item:    item,
-		Logger:  log,
-		TagName: "plugin",
+		Item:   item,
+		Logger: log,
 	}
 }
 
@@ -114,11 +113,11 @@ func (d *Doc) visitNode(n ast.Node) bool {
 				d.Append("## Configuration")
 			}
 			if ok && strings.HasPrefix(typeName.Name.Name, "_meta") {
-				d.DisplayName = getPrefixedLine(getTypeDocs(generic, true), `\+name:\"(.*)\"`)
-				d.Url = getPrefixedLine(getTypeDocs(generic, true), `\+url:\"(.*)\"`)
-				d.Version = getPrefixedLine(getTypeDocs(generic, true), `\+version:\"(.*)\"`)
-				d.Desc = getPrefixedLine(getTypeDocs(generic, true), `\+description:\"(.*)\"`)
-				d.Status = getPrefixedLine(getTypeDocs(generic, true), `\+status:\"(.*)\"`)
+				d.DisplayName = GetPrefixedValue(getTypeDocs(generic, true), `\+name:\"(.*)\"`)
+				d.Url = GetPrefixedValue(getTypeDocs(generic, true), `\+url:\"(.*)\"`)
+				d.Version = GetPrefixedValue(getTypeDocs(generic, true), `\+version:\"(.*)\"`)
+				d.Desc = GetPrefixedValue(getTypeDocs(generic, true), `\+description:\"(.*)\"`)
+				d.Status = GetPrefixedValue(getTypeDocs(generic, true), `\+status:\"(.*)\"`)
 			}
 			if ok && strings.HasPrefix(typeName.Name.Name, "_exp") {
 				d.Append(getTypeDocs(generic, false))
@@ -153,7 +152,7 @@ func (d *Doc) normaliseType(fieldType ast.Expr) string {
 	return typeNameBuf.String()
 }
 
-func getPrefixedLine(origin, expression string) string {
+func GetPrefixedValue(origin, expression string) string {
 	r := regexp.MustCompile(expression)
 	result := r.FindStringSubmatch(origin)
 	if len(result) > 1 {
@@ -164,7 +163,7 @@ func getPrefixedLine(origin, expression string) string {
 
 func getTypeName(generic *ast.GenDecl, defaultName string) string {
 	structName := generic.Doc.Text()
-	result := getPrefixedLine(structName, `\+docName:\"(.*)\"`)
+	result := GetPrefixedValue(structName, `\+docName:\"(.*)\"`)
 	if result != "" {
 		return result
 	}
@@ -189,7 +188,7 @@ func getTypeDocs(generic *ast.GenDecl, trimSpace bool) string {
 }
 
 func getLink(def string) string {
-	result := getPrefixedLine(def, `\+docLink:\"(.*)\"`)
+	result := GetPrefixedValue(def, `\+docLink:\"(.*)\"`)
 	if result != "" {
 		url := strings.Split(result, ",")
 		def = strings.Replace(def, fmt.Sprintf("+docLink:\"%s\"", result), fmt.Sprintf("[%s](%s)", url[0], url[1]), 1)
@@ -216,13 +215,16 @@ func (d *Doc) getValuesFromItem(item *ast.Field) (name, comment, def, required s
 		}
 	}
 	tag := item.Tag.Value
-	tagResult := getPrefixedLine(tag, fmt.Sprintf(`%s:\"default:(.*)\"`, d.TagName))
-	nameResult := getPrefixedLine(tag, `json:\"([^,\"]*).*\"`)
-	required = formatRequired(!strings.Contains(getPrefixedLine(tag, `json:\"(.*)\"`), "omitempty"))
+	tagResult := ""
+	if d.Item.DefaultValueFromTagExtractor != nil {
+		tagResult = d.Item.DefaultValueFromTagExtractor(tag)
+	}
+	nameResult := GetPrefixedValue(tag, `json:\"([^,\"]*).*\"`)
+	required = formatRequired(!strings.Contains(GetPrefixedValue(tag, `json:\"(.*)\"`), "omitempty"))
 	if tagResult != "" {
 		return nameResult, getLink(commentWithDefault), tagResult, required
 	}
-	result := getPrefixedLine(commentWithDefault, `\(default:(.*)\)`)
+	result := GetPrefixedValue(commentWithDefault, `\(default:(.*)\)`)
 	if result != "" {
 		ignore := fmt.Sprintf("(default:%s)", result)
 		comment = strings.Replace(commentWithDefault, ignore, "", 1)
