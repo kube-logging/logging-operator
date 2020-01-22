@@ -34,6 +34,7 @@ type DocItem struct {
 	Name                         string
 	SourcePath                   string
 	DestPath                     string
+	Category                     string
 	DefaultValueFromTagExtractor func(string) string
 }
 
@@ -65,14 +66,14 @@ func NewDoc(item DocItem, log logr.Logger) *Doc {
 	}
 }
 
-func GetDocumentParser(file DocItem, log logr.Logger) *Doc {
+func GetDocumentParser(source DocItem, log logr.Logger) *Doc {
 	fileSet := token.NewFileSet()
-	node, err := parser.ParseFile(fileSet, file.SourcePath, nil, parser.ParseComments)
+	node, err := parser.ParseFile(fileSet, source.SourcePath, nil, parser.ParseComments)
 	if err != nil {
 		log.Error(err, "Error!")
 	}
 	newDoc := &Doc{
-		Item:     file,
+		Item:     source,
 		RootNode: node,
 		Logger:   log,
 	}
@@ -123,6 +124,9 @@ func (d *Doc) visitNode(n ast.Node) bool {
 				d.Version = GetPrefixedValue(getTypeDocs(generic, true), `\+version:\"(.*)\"`)
 				d.Desc = GetPrefixedValue(getTypeDocs(generic, true), `\+description:\"(.*)\"`)
 				d.Status = GetPrefixedValue(getTypeDocs(generic, true), `\+status:\"(.*)\"`)
+			}
+			if d.DisplayName == "" {
+				d.DisplayName = typeName.Name.Name
 			}
 			if ok && strings.HasPrefix(typeName.Name.Name, "_exp") {
 				d.Append(getTypeDocs(generic, false))

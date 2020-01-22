@@ -15,7 +15,6 @@
 package docgen
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
@@ -31,6 +30,9 @@ type SourceLister struct {
 	IgnoredSources               []string
 	DefaultValueFromTagExtractor func(string) string
 	Index                        *Doc
+	DocGeneratedHook             func(doc *Doc) error
+	Header                       string
+	Footer                       string
 }
 
 type DocIndex struct {
@@ -42,11 +44,6 @@ type SourceDir struct {
 	DestPath string
 }
 
-type Source struct {
-	Item     DocItem
-	Category string
-}
-
 func NewSourceLister(sources map[string]SourceDir, logger logr.Logger) *SourceLister {
 	return &SourceLister{
 		Logger:  logger,
@@ -54,8 +51,8 @@ func NewSourceLister(sources map[string]SourceDir, logger logr.Logger) *SourceLi
 	}
 }
 
-func (sl *SourceLister) ListSources() ([]Source, error) {
-	sourceList := []Source{}
+func (sl *SourceLister) ListSources() ([]DocItem, error) {
+	sourceList := []DocItem{}
 	for category, p := range sl.Sources {
 		files, err := ioutil.ReadDir(p.Path)
 		if err != nil {
@@ -65,15 +62,14 @@ func (sl *SourceLister) ListSources() ([]Source, error) {
 			fname := strings.Replace(file.Name(), ".go", "", 1)
 			if filepath.Ext(file.Name()) == ".go" && sl.IsWhiteListed(fname) {
 				fullPath := filepath.Join(p.Path, file.Name())
-				sourceList = append(sourceList, Source{
-					Category: category,
-					Item: DocItem{
-						Name:                         fname,
-						SourcePath:                   fullPath,
-						DestPath:                     p.DestPath,
-						DefaultValueFromTagExtractor: sl.DefaultValueFromTagExtractor,
-					},
-				})
+				sourceList = append(sourceList, DocItem{
+					Name:                         fname,
+					SourcePath:                   fullPath,
+					DestPath:                     p.DestPath,
+					DefaultValueFromTagExtractor: sl.DefaultValueFromTagExtractor,
+					Category:                     category,
+				},
+				)
 			}
 		}
 	}
@@ -93,10 +89,8 @@ func (sl *SourceLister) IsWhiteListed(source string) bool {
 	return true
 }
 
-func (lister *SourceLister) Generate(log logr.Logger) error {
-	lister.Index.Append("<center>\n")
-	lister.Index.Append("| Name | Type | Description | Status |Version |")
-	lister.Index.Append("|:---|---|:---|:---:|---:|")
+func (lister *SourceLister) Generate() error {
+	lister.Index.Append(lister.Header)
 
 	sources, err := lister.ListSources()
 	if err != nil {
@@ -104,30 +98,19 @@ func (lister *SourceLister) Generate(log logr.Logger) error {
 	}
 
 	for _, source := range sources {
-		document := GetDocumentParser(source.Item, log.WithName("docgen"))
+		document := GetDocumentParser(source, lister.Logger.WithName("docgen"))
 		if err := document.Generate(); err != nil {
 			return err
 		}
 
-		if lister.Index != nil {
-			relPath, err := filepath.Rel(lister.Index.Item.DestPath, document.Item.DestPath)
-			if err != nil {
-				return errors.WrapIff(err, "failed to determine relpath for %s", document.Item.DestPath)
+		if lister.DocGeneratedHook != nil {
+			if err := lister.DocGeneratedHook(document); err != nil {
+				return err
 			}
-
-			lister.Index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
-				document.DisplayName,
-				filepath.Join(relPath, document.Item.Name+".md"),
-				source.Category,
-				document.Desc,
-				document.Status,
-				document.Version,
-				document.Url))
 		}
-
 	}
 
-	lister.Index.Append("</center>")
+	lister.Index.Append(lister.Footer)
 
 	if err := lister.Index.Generate(); err != nil {
 		return err
