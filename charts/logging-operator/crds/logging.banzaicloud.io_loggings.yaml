@@ -288,6 +288,27 @@ spec:
                   type: object
                 customConfigSecret:
                   type: string
+                extraVolumeMounts:
+                  items:
+                    description: VolumeMount defines source and destination folders
+                      of a hostPath type pod mount
+                    properties:
+                      destination:
+                        description: Destination Folder
+                        pattern: ^/.+$
+                        type: string
+                      readOnly:
+                        description: Mount Mode
+                        type: boolean
+                      source:
+                        description: Source folder
+                        pattern: ^/.+$
+                        type: string
+                    required:
+                    - destination
+                    - source
+                    type: object
+                  type: array
                 filterKubernetes:
                   description: FilterKubernetes Fluent Bit Kubernetes Filter allows
                     to enrich your log files with Kubernetes metadata.

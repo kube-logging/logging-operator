@@ -17,6 +17,7 @@
 | position_db | *KubernetesStorage | No | - |  |
 | positiondb | KubernetesStorage | No | - |  |
 | mountPath | string | No | - |  |
+| extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
 | filterKubernetes | FilterKubernetes | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
@@ -97,3 +98,11 @@
 | Annotations | string | No | On | Include Kubernetes resource annotations in the extra metadata. <br> |
 | Kube_meta_preload_cache_dir | string | No | - | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta<br> |
 | Dummy_Meta | string | No | Off | If set, use dummy-meta data (for test/dev purposes) <br> |
+### VolumeMount
+#### VolumeMount defines source and destination folders of a hostPath type pod mount
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| source | string | Yes | - | Source folder<br> |
+| destination | string | Yes | - | Destination Folder<br> |
+| readOnly | bool | No | - | Mount Mode<br> |
