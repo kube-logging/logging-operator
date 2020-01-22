@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"strconv"
 
+	"github.com/banzaicloud/operator-tools/pkg/storage"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -35,14 +36,14 @@ type FluentbitSpec struct {
 	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
-	PositionDBLegacy     *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
-	PositionDB           KubernetesStorage           `json:"positiondb,omitempty"`
+	PositionDBLegacy     *storage.KubernetesStorage  `json:"position_db,omitempty"` // deprecated, use PositionDB instead
+	PositionDB           storage.KubernetesStorage   `json:"positiondb,omitempty"`
 	MountPath            string                      `json:"mountPath,omitempty"`
 	ExtraVolumeMounts    []VolumeMount               `json:"extraVolumeMounts,omitempty"`
 	InputTail            InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes     FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage        BufferStorage               `json:"bufferStorage,omitempty"`
-	BufferStorageVolume  KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
+	BufferStorageVolume  storage.KubernetesStorage   `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                      `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                      `json:"podPriorityClassName,omitempty"`
 	LivenessProbe        *corev1.Probe               `json:"livenessProbe,omitempty"`
