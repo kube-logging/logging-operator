@@ -19,20 +19,9 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
-// +docName:"File output plugin for Fluentd"
-//This plugin has been designed to output logs or metrics to File.
-//More info at https://docs.fluentd.org/output/file
-//
-// #### Example output configurations
-// ```
-// spec:
-//  file:
-//    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
-//    buffer:
-//      timekey: 1m
-//      timekey_wait: 10s
-//      timekey_use_utc: true
-// ```
+// +kubebuilder:object:generate=true
+// +docName:"[File Output](https://docs.fluentd.org/output/file)"
+// This plugin has been designed to output logs or metrics to File.
 type _docFile interface{}
 
 // +name:"File"
@@ -48,9 +37,54 @@ type FileOutputConfig struct {
 	Path string `json:"path"`
 	// The flushed chunk is appended to existence file or not. The default is not appended.
 	Append bool `json:"append,omitempty"`
+	// +kubebuilder:validation:Optional
+	// Add path suffix(default: true)
+	AddPathSuffix *bool `json:"add_path_suffix,omitempty" plugin:"default:true"`
+	// The suffix of output result.(default: ".log")
+	PathSuffix string `json:"path_suffix,omitempty"`
+	// Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.(default: false)
+	SymlinkPath bool `json:"symlink_path,omitempty"`
+	// +docLink:"Format,./format.md"
+	Format *Format `json:"format"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
+
+// #### Example `File` output configurations
+// ```
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: Output
+//metadata:
+//  name: demo-output
+//spec:
+//  file:
+//    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+//    append: true
+//    buffer:
+//      timekey: 1m
+//      timekey_wait: 10s
+//      timekey_use_utc: true
+// ```
+//
+// #### Fluentd Config Result
+// ```
+//  <match **>
+//	@type file
+//	@id test_file
+//	add_path_suffix true
+//	append true
+//	path /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+//	<buffer tag,time>
+//	  @type file
+//	  path /buffers/test_file.*.buffer
+//	  retry_forever true
+//	  timekey 1m
+//	  timekey_use_utc true
+//	  timekey_wait 30s
+//	</buffer>
+//  </match>
+// ```
+type _expFile interface{}
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "file"
@@ -73,6 +107,13 @@ func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id stri
 			return nil, err
 		} else {
 			file.SubDirectives = append(file.SubDirectives, buffer)
+		}
+	}
+	if c.Format != nil {
+		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			file.SubDirectives = append(file.SubDirectives, format)
 		}
 	}
 	return file, nil
