@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"fmt"
 
+	"github.com/banzaicloud/operator-tools/pkg/storage"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
@@ -154,7 +155,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		// if BufferStorageVolume.PersistentVolumeClaim is not set.
 		// DisablePvc will stay for a while. The alternative would be to set a hostPath or emptyDir explicitly
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &storage.PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: *copy.Spec.FluentdSpec.FluentdPvcSpec.DeepCopy(),
 			}
 		}
