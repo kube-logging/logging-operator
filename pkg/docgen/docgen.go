@@ -53,7 +53,9 @@ type Doc struct {
 }
 
 func (d *Doc) Append(line string) {
-	d.Content = d.Content + line + "\n"
+	if d != nil {
+		d.Content = d.Content + line + "\n"
+	}
 }
 
 func NewDoc(item DocItem, log logr.Logger) *Doc {
@@ -78,6 +80,9 @@ func GetDocumentParser(file DocItem, log logr.Logger) *Doc {
 }
 
 func (d *Doc) Generate() error {
+	if d == nil {
+		return nil
+	}
 	if d.RootNode != nil {
 		ast.Inspect(d.RootNode, d.visitNode)
 		d.Logger.V(2).Info("DocumentRoot not present skipping parse")

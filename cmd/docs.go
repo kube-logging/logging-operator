@@ -15,12 +15,7 @@
 package main
 
 import (
-	"fmt"
-	"path/filepath"
-
-	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/docgen"
-	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
@@ -46,55 +41,15 @@ func main() {
 		return docgen.GetPrefixedValue(tag, `plugin:\"default:(.*)\"`)
 	}
 
-	err := GenerateWithIndex(lister, rootLogger.WithName("plugins"))
-	if err != nil {
-		panic(err)
-	}
-}
-
-func GenerateWithIndex(lister *docgen.SourceLister, log logr.Logger) error {
-	index := docgen.NewDoc(docgen.DocItem{
+	lister.Index = docgen.NewDoc(docgen.DocItem{
 		Name:     "Readme",
 		DestPath: "docs/plugins",
-	}, log.WithName("index"))
+	}, rootLogger.WithName("plugins"))
 
-	index.Append("# Supported Plugins\n\n")
-	index.Append("For more information please click on the plugin name")
-	index.Append("<center>\n")
-	index.Append("| Name | Type | Description | Status |Version |")
-	index.Append("|:---|---|:---|:---:|---:|")
+	lister.Index.Append("# Supported Plugins\n\n")
+	lister.Index.Append("For more information please click on the plugin name")
 
-	plugins, err := lister.ListSources()
-	if err != nil {
-		return errors.WrapIf(err, "failed to get plugin list")
+	if err := lister.Generate(rootLogger.WithName("plugins")); err != nil {
+		panic(err)
 	}
-
-	for _, plugin := range plugins {
-		log.Info("plugin", "Name", plugin.Item.SourcePath)
-		document := docgen.GetDocumentParser(plugin.Item, log.WithName("docgen"))
-		if err := document.Generate(); err != nil {
-			return err
-		}
-
-		relPath, err := filepath.Rel("docs/plugins", document.Item.DestPath)
-		if err != nil {
-			return errors.WrapIff(err, "failed to determine relpath for %s", document.Item.DestPath)
-		}
-
-		index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
-			document.DisplayName,
-			filepath.Join(relPath, document.Item.Name+".md"),
-			plugin.Category,
-			document.Desc,
-			document.Status,
-			document.Version,
-			document.Url))
-	}
-	index.Append("</center>")
-
-	if err := index.Generate(); err != nil {
-		return err
-	}
-
-	return nil
 }

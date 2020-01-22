@@ -15,6 +15,7 @@
 package docgen
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
@@ -29,6 +30,11 @@ type SourceLister struct {
 	Sources                      map[string]SourceDir
 	IgnoredSources               []string
 	DefaultValueFromTagExtractor func(string) string
+	Index                        *Doc
+}
+
+type DocIndex struct {
+	Path string
 }
 
 type SourceDir struct {
@@ -85,4 +91,47 @@ func (sl *SourceLister) IsWhiteListed(source string) bool {
 	}
 	sl.Logger.V(2).Info("included source", "source", source)
 	return true
+}
+
+func (lister *SourceLister) Generate(log logr.Logger) error {
+	lister.Index.Append("<center>\n")
+	lister.Index.Append("| Name | Type | Description | Status |Version |")
+	lister.Index.Append("|:---|---|:---|:---:|---:|")
+
+	sources, err := lister.ListSources()
+	if err != nil {
+		return errors.WrapIf(err, "failed to get plugin list")
+	}
+
+	for _, source := range sources {
+		document := GetDocumentParser(source.Item, log.WithName("docgen"))
+		if err := document.Generate(); err != nil {
+			return err
+		}
+
+		if lister.Index != nil {
+			relPath, err := filepath.Rel(lister.Index.Item.DestPath, document.Item.DestPath)
+			if err != nil {
+				return errors.WrapIff(err, "failed to determine relpath for %s", document.Item.DestPath)
+			}
+
+			lister.Index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
+				document.DisplayName,
+				filepath.Join(relPath, document.Item.Name+".md"),
+				source.Category,
+				document.Desc,
+				document.Status,
+				document.Version,
+				document.Url))
+		}
+
+	}
+
+	lister.Index.Append("</center>")
+
+	if err := lister.Index.Generate(); err != nil {
+		return err
+	}
+
+	return nil
 }
