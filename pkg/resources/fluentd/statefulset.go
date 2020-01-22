@@ -15,6 +15,8 @@
 package fluentd
 
 import (
+	"fmt"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
@@ -243,7 +245,11 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)))
+	v = append(v,
+		r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(
+			r.Logging.QualifiedName(bufferVolumeName),
+			fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
+		))
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",

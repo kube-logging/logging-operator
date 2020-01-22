@@ -20,6 +20,7 @@ import (
 	"strconv"
 
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 
@@ -222,7 +223,9 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(r.Logging.Name, TailPositionVolume))
-	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(r.Logging.Name, BufferStorageVolume))
+	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(
+		TailPositionVolume, fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume)))
+	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(
+		BufferStorageVolume, fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume)))
 	return
 }

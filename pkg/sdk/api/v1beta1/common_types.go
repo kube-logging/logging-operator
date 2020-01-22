@@ -15,9 +15,11 @@
 package v1beta1
 
 import (
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
+)
+
+const (
+	HostPath = "/opt/logging-operator/%s/%s"
 )
 
 // ImageSpec struct hold information about image specification
@@ -52,13 +54,10 @@ type PersistentVolumeClaim struct {
 }
 
 // GetVolume returns a default emptydir volume if none configured
-// `logging` is the name of the logging CR to make sure multiple
-//           logging system can coexist in case a hostPath mount is used
+//
 // `name`    will be the name of the volume and the lowest level directory in case a hostPath mount is used
-func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
-	const (
-		hostPath = "/opt/logging-operator/%s/%s"
-	)
+// `path`    is the path in case the hostPath volume type is used
+func (storage KubernetesStorage) GetVolume(name, path string) corev1.Volume {
 	volume := corev1.Volume{
 		Name: name,
 	}
@@ -67,7 +66,7 @@ func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
 	}
 	if storage.HostPath != nil {
 		if storage.HostPath.Path == "" {
-			storage.HostPath.Path = fmt.Sprintf(hostPath, logging, name)
+			storage.HostPath.Path = path
 		}
 		volume.VolumeSource = corev1.VolumeSource{
 			HostPath: storage.HostPath,
