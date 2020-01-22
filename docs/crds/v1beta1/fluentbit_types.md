@@ -14,14 +14,14 @@
 | tolerations | []corev1.Toleration | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
-| position_db | *KubernetesStorage | No | - |  |
-| positiondb | KubernetesStorage | No | - |  |
+| position_db | *storage.KubernetesStorage | No | - |  |
+| positiondb | storage.KubernetesStorage | No | - |  |
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
 | filterKubernetes | FilterKubernetes | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
-| bufferStorageVolume | KubernetesStorage | No | - |  |
+| bufferStorageVolume | storage.KubernetesStorage | No | - |  |
 | customConfigSecret | string | No | - |  |
 | podPriorityClassName | string | No | - |  |
 | livenessProbe | *corev1.Probe | No | - |  |

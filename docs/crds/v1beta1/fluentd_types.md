@@ -9,7 +9,7 @@
 | image | ImageSpec | No | - |  |
 | fluentdPvcSpec | *corev1.PersistentVolumeClaimSpec | No | - | Deprecated, use BufferStorageVolume to configure PVC explicitly<br> |
 | disablePvc | bool | No | - |  |
-| bufferStorageVolume | KubernetesStorage | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br> |
+| bufferStorageVolume | storage.KubernetesStorage | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br> |
 | volumeMountChmod | bool | No | - |  |
 | volumeModImage | ImageSpec | No | - |  |
 | configReloaderImage | ImageSpec | No | - |  |
