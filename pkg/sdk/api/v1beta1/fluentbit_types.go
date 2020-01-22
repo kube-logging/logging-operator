@@ -38,6 +38,7 @@ type FluentbitSpec struct {
 	PositionDBLegacy     *KubernetesStorage          `json:"position_db,omitempty"` // deprecated, use PositionDB instead
 	PositionDB           KubernetesStorage           `json:"positiondb,omitempty"`
 	MountPath            string                      `json:"mountPath,omitempty"`
+	ExtraVolumeMounts    []VolumeMount               `json:"extraVolumeMounts,omitempty"`
 	InputTail            InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes     FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage        BufferStorage               `json:"bufferStorage,omitempty"`
@@ -178,4 +179,16 @@ type FilterKubernetes struct {
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
 	DummyMeta string `json:"Dummy_Meta,omitempty"`
+}
+
+// VolumeMount defines source and destination folders of a hostPath type pod mount
+type VolumeMount struct {
+	// Source folder
+	// +kubebuilder:validation:Pattern=^/.+$
+	Source string `json:"source"`
+	// Destination Folder
+	// +kubebuilder:validation:Pattern=^/.+$
+	Destination string `json:"destination"`
+	// Mount Mode
+	ReadOnly bool `json:"readOnly,omitempty"`
 }
