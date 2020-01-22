@@ -15,29 +15,132 @@
 package main
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/docgen/plugins"
+	"fmt"
+	"path/filepath"
+
+	"emperror.dev/errors"
+	"github.com/MakeNowJust/heredoc"
+	"github.com/banzaicloud/logging-operator/pkg/docgen"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-func main() {
-	verboseLogging := true
-	rootLogger := zap.New(zap.UseDevMode(verboseLogging))
+var logger = zap.New(zap.UseDevMode(true))
 
-	lister := plugins.NewPluginLister(
-		map[string]plugins.PluginDir{
+func main() {
+	plugins()
+	crds()
+}
+
+func plugins() {
+	lister := docgen.NewSourceLister(
+		map[string]docgen.SourceDir{
 			"filters": {Path: "pkg/sdk/model/filter", DestPath: "docs/plugins/filters"},
 			"outputs": {Path: "pkg/sdk/model/output", DestPath: "docs/plugins/outputs"},
 			"common":  {Path: "pkg/sdk/model/common", DestPath: "docs/plugins/common"},
 		},
-		[]string{
-			"null",
-			".*.deepcopy",
-			".*_test",
-		},
-		rootLogger.WithName("pluginlister"))
+		logger.WithName("pluginlister"))
 
-	err := plugins.GenerateWithIndex(lister, rootLogger.WithName("plugins"))
-	if err != nil {
+	lister.IgnoredSources = []string{
+		"null",
+		".*.deepcopy",
+		".*_test",
+	}
+
+	lister.DefaultValueFromTagExtractor = func(tag string) string {
+		return docgen.GetPrefixedValue(tag, `plugin:\"default:(.*)\"`)
+	}
+
+	lister.Index = docgen.NewDoc(docgen.DocItem{
+		Name:     "Readme",
+		DestPath: "docs/plugins",
+	}, logger.WithName("plugins"))
+
+	lister.Header = heredoc.Doc(`
+		# Supported Plugins
+		
+		For more information please click on the plugin name
+		<center>
+
+		| Name | Type | Description | Status |Version |
+		|:---|---|:---|:---:|---:|`,
+	)
+
+	lister.Footer = heredoc.Doc(`
+		</center>
+	`)
+
+	lister.DocGeneratedHook = func(document *docgen.Doc) error {
+		relPath, err := filepath.Rel(lister.Index.Item.DestPath, document.Item.DestPath)
+		if err != nil {
+			return errors.WrapIff(err, "failed to determine relpath for %s", document.Item.DestPath)
+		}
+
+		lister.Index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s | %s | [%s](%s) |",
+			document.DisplayName,
+			filepath.Join(relPath, document.Item.Name+".md"),
+			document.Item.Category,
+			document.Desc,
+			document.Status,
+			document.Version,
+			document.Url))
+		return nil
+	}
+
+	if err := lister.Generate(); err != nil {
+		panic(err)
+	}
+}
+
+func crds() {
+	lister := docgen.NewSourceLister(
+		map[string]docgen.SourceDir{
+			"v1beta1": {Path: "pkg/sdk/api/v1beta1", DestPath: "docs/crds/v1beta1"},
+		},
+		logger.WithName("crdlister"))
+
+	lister.IgnoredSources = []string{
+		".*.deepcopy",
+		".*_test",
+		".*_info",
+	}
+
+	lister.DefaultValueFromTagExtractor = func(tag string) string {
+		return docgen.GetPrefixedValue(tag, `plugin:\"default:(.*)\"`)
+	}
+
+	lister.Index = docgen.NewDoc(docgen.DocItem{
+		Name:     "Readme",
+		DestPath: "docs/crds",
+	}, logger.WithName("crds"))
+
+	lister.Header = heredoc.Doc(`
+		# Available CRDs
+		
+		For more information please click on the name
+		<center>
+
+		| Name | Description | Version |
+		|---|---|---|`,
+	)
+
+	lister.Footer = heredoc.Doc(`
+		</center>
+	`)
+
+	lister.DocGeneratedHook = func(document *docgen.Doc) error {
+		relPath, err := filepath.Rel(lister.Index.Item.DestPath, document.Item.DestPath)
+		if err != nil {
+			return errors.WrapIff(err, "failed to determine relpath for %s", document.Item.DestPath)
+		}
+		lister.Index.Append(fmt.Sprintf("| **[%s](%s)** | %s | %s |",
+			document.DisplayName,
+			filepath.Join(relPath, document.Item.Name+".md"),
+			document.Desc,
+			document.Item.Category))
+		return nil
+	}
+
+	if err := lister.Generate(); err != nil {
 		panic(err)
 	}
 }

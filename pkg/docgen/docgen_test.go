@@ -50,7 +50,7 @@ func TestGenParse(t *testing.T) {
 			docItem: docgen.DocItem{
 				Name:       "sample-name",
 				SourcePath: filepath.Join(currentDir, "testdata", "sample.go"),
-				DestPath:   filepath.Join(currentDir, "../../build/test/docgen"),
+				DestPath:   filepath.Join(currentDir, "../../build/_test/docgen"),
 			},
 			expected: heredoc.Doc(`
 				### Sample
@@ -59,13 +59,35 @@ func TestGenParse(t *testing.T) {
 				| field1 | string | No | - |  |
 			`),
 		},
+		{
+			docItem: docgen.DocItem{
+				Name:       "sample-name",
+				SourcePath: filepath.Join(currentDir, "testdata", "sample_default.go"),
+				DestPath:   filepath.Join(currentDir, "../../build/_test/docgen"),
+				DefaultValueFromTagExtractor: func(tag string) string {
+					return docgen.GetPrefixedValue(tag, `asd:\"default:(.*)\"`)
+				},
+			},
+			expected: heredoc.Doc(`
+				### SampleDefault
+				| Variable Name | Type | Required | Default | Description |
+				|---|---|---|---|---|
+				| field1 | string | No | testval |  |
+			`),
+		},
 	}
 
 	for _, item := range testData {
 		parser := docgen.GetDocumentParser(item.docItem, logger)
 		err := parser.Generate()
+		if err != nil {
+			t.Fatalf("%+v", err)
+		}
 
 		bytes, err := ioutil.ReadFile(filepath.Join(item.docItem.DestPath, item.docItem.Name+".md"))
+		if err != nil {
+			t.Fatalf("%+v", err)
+		}
 
 		if a, e := diff.TrimLinesInString(string(bytes)), diff.TrimLinesInString(item.expected); a != e {
 			t.Errorf("Result does not match (-actual vs +expected):\n%v\nActual: %s", diff.LineDiff(a, e), string(bytes))
