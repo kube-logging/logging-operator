@@ -7,7 +7,6 @@
 | labels | map[string]string | No | - |  |
 | tls | FluentdTLS | No | - |  |
 | image | ImageSpec | No | - |  |
-| fluentdPvcSpec | *corev1.PersistentVolumeClaimSpec | No | - | Deprecated, use BufferStorageVolume to configure PVC explicitly<br> |
 | disablePvc | bool | No | - |  |
 | bufferStorageVolume | storage.KubernetesStorage | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br> |
 | volumeMountChmod | bool | No | - |  |

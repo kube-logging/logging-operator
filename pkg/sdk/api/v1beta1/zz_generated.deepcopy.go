@@ -506,11 +506,6 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	}
 	out.TLS = in.TLS
 	out.Image = in.Image
-	if in.FluentdPvcSpec != nil {
-		in, out := &in.FluentdPvcSpec, &out.FluentdPvcSpec
-		*out = new(v1.PersistentVolumeClaimSpec)
-		(*in).DeepCopyInto(*out)
-	}
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
 	out.VolumeModImage = in.VolumeModImage
 	out.ConfigReloaderImage = in.ConfigReloaderImage
