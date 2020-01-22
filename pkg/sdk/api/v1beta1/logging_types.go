@@ -27,6 +27,11 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// +name:"Logging"
+// +version:"v1beta1"
+// +description:"Logging system configuration"
+type _metaDetectExceptions interface{}
+
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
 	LoggingRef              string         `json:"loggingRef,omitempty"`
