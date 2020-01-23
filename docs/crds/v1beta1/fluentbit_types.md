@@ -10,11 +10,9 @@
 | targetHost | string | No | - |  |
 | targetPort | int32 | No | - |  |
 | resources | corev1.ResourceRequirements | No | - |  |
-| parser | string | No | - |  |
 | tolerations | []corev1.Toleration | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
-| position_db | *storage.KubernetesStorage | No | - |  |
 | positiondb | storage.KubernetesStorage | No | - |  |
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |

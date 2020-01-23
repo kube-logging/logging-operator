@@ -21,7 +21,6 @@ package v1beta1
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
-	"github.com/banzaicloud/operator-tools/pkg/storage"
 	"k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -418,11 +417,6 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(Security)
-		(*in).DeepCopyInto(*out)
-	}
-	if in.PositionDBLegacy != nil {
-		in, out := &in.PositionDBLegacy, &out.PositionDBLegacy
-		*out = new(storage.KubernetesStorage)
 		(*in).DeepCopyInto(*out)
 	}
 	in.PositionDB.DeepCopyInto(&out.PositionDB)
