@@ -268,9 +268,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		if copy.Spec.FluentbitSpec.InputTail.Tag == "" {
 			copy.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
 		}
-		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
-			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()
-		}
 		if copy.Spec.FluentbitSpec.Annotations == nil {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
 		}

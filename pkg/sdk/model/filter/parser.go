@@ -198,14 +198,6 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 		parser.Params = params
 	}
 
-	if len(parserConfig.Parsers) > 1 {
-		return nil, errors.Errorf("only one parser can be configured at once")
-	}
-	// for backward compatibility
-	if len(parserConfig.Parsers) == 1 {
-		parserConfig.Parse = parserConfig.Parsers[0]
-	}
-
 	if meta, err := parserConfig.Parse.ToDirective(secretLoader, ""); err != nil {
 		return nil, err
 	} else {
