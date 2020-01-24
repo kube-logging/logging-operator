@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.7.0
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
-	github.com/banzaicloud/operator-tools v0.3.1
+	github.com/banzaicloud/operator-tools v0.4.0
 	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.1.0
 	github.com/onsi/gomega v1.5.0

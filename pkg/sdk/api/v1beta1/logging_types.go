@@ -17,7 +17,7 @@ package v1beta1
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/storage"
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
@@ -137,7 +137,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &storage.PersistentVolumeClaim{
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
 				PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
 			}
 		}

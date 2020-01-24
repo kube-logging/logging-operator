@@ -13,13 +13,13 @@
 | tolerations | []corev1.Toleration | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
-| positiondb | storage.KubernetesStorage | No | - |  |
+| positiondb | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
 | filterKubernetes | FilterKubernetes | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
-| bufferStorageVolume | storage.KubernetesStorage | No | - |  |
+| bufferStorageVolume | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
 | customConfigSecret | string | No | - |  |
 | podPriorityClassName | string | No | - |  |
 | livenessProbe | *corev1.Probe | No | - |  |

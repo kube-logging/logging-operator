@@ -39,6 +39,8 @@ github.com/banzaicloud/operator-tools v0.0.0-20200110142834-2f23ea345ea7 h1:24sx
 github.com/banzaicloud/operator-tools v0.0.0-20200110142834-2f23ea345ea7/go.mod h1:GHB/Hblw07+st5dlKO4znCjLrRUxBPQKRMKq8frf/WI=
 github.com/banzaicloud/operator-tools v0.3.0 h1:e1MrwPhmKOmLsTJL7WwQ6nPUpY3eOpNj0qe+9chnk+I=
 github.com/banzaicloud/operator-tools v0.3.0/go.mod h1:12rKcmPZkK8CaESI6YI3UGFBBBQvYZH9i8Gn5cfCi+U=
+github.com/banzaicloud/operator-tools v0.4.0 h1:oQxCKy8Dn9dNo7a/G7yl6mQ7x6xYrMc99arrzjbVAVU=
+github.com/banzaicloud/operator-tools v0.4.0/go.mod h1:12rKcmPZkK8CaESI6YI3UGFBBBQvYZH9i8Gn5cfCi+U=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/blang/semver v3.5.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=

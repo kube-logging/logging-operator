@@ -245,11 +245,12 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	v = append(v,
-		r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(
-			r.Logging.QualifiedName(bufferVolumeName),
-			fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
-		))
+
+	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
+	)
+
+	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.QualifiedName(bufferVolumeName)))
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",

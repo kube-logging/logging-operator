@@ -17,7 +17,7 @@ package v1beta1
 import (
 	"strconv"
 
-	"github.com/banzaicloud/operator-tools/pkg/storage"
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -35,13 +35,15 @@ type FluentbitSpec struct {
 	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
-	PositionDB           storage.KubernetesStorage   `json:"positiondb,omitempty"`
+	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	PositionDB           volume.KubernetesVolume     `json:"positiondb,omitempty"`
 	MountPath            string                      `json:"mountPath,omitempty"`
 	ExtraVolumeMounts    []VolumeMount               `json:"extraVolumeMounts,omitempty"`
 	InputTail            InputTail                   `json:"inputTail,omitempty"`
 	FilterKubernetes     FilterKubernetes            `json:"filterKubernetes,omitempty"`
 	BufferStorage        BufferStorage               `json:"bufferStorage,omitempty"`
-	BufferStorageVolume  storage.KubernetesStorage   `json:"bufferStorageVolume,omitempty"`
+	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	BufferStorageVolume  volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                      `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                      `json:"podPriorityClassName,omitempty"`
 	LivenessProbe        *corev1.Probe               `json:"livenessProbe,omitempty"`

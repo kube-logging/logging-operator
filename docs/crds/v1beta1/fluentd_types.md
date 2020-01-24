@@ -8,7 +8,7 @@
 | tls | FluentdTLS | No | - |  |
 | image | ImageSpec | No | - |  |
 | disablePvc | bool | No | - |  |
-| bufferStorageVolume | storage.KubernetesStorage | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br> |
+| bufferStorageVolume | volume.KubernetesVolume | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br>[volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
 | volumeMountChmod | bool | No | - |  |
 | volumeModImage | ImageSpec | No | - |  |
 | configReloaderImage | ImageSpec | No | - |  |
