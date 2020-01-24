@@ -56,7 +56,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777", BufferPath},
+			Command:         []string{"sh", "-c", "chmod -R 777 " + BufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.QualifiedName(bufferVolumeName),
