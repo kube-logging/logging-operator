@@ -17,18 +17,6 @@
 | path | string | No | - |  |
 | serviceMonitor | bool | No | - |  |
 | prometheusAnnotations | bool | No | - |  |
-### KubernetesStorage
-| Variable Name | Type | Required | Default | Description |
-|---|---|---|---|---|
-| host_path | *corev1.HostPathVolumeSource | No | - |  |
-| hostPath | *corev1.HostPathVolumeSource | No | - |  |
-| emptyDir | *corev1.EmptyDirVolumeSource | No | - |  |
-| pvc | *PersistentVolumeClaim | No | - | PersistentVolumeClaim defines the Spec and the Source at the same time.<br>The PVC will be created with the configured spec and the name defined in the source.<br> |
-### PersistentVolumeClaim
-| Variable Name | Type | Required | Default | Description |
-|---|---|---|---|---|
-| spec | corev1.PersistentVolumeClaimSpec | No | - |  |
-| source | corev1.PersistentVolumeClaimVolumeSource | No | - |  |
 ### Security
 #### Security defines Fluentd, Fluentbit deployment security properties
 

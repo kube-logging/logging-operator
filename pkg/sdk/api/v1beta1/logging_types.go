@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"fmt"
 
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
@@ -134,29 +135,24 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				copy.Spec.FluentdSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", copy.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
-		if copy.Spec.FluentdSpec.FluentdPvcSpec == nil {
-			copy.Spec.FluentdSpec.FluentdPvcSpec = &v1.PersistentVolumeClaimSpec{}
+
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
+				PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
+			}
 		}
-		if copy.Spec.FluentdSpec.FluentdPvcSpec.AccessModes == nil {
-			copy.Spec.FluentdSpec.FluentdPvcSpec.AccessModes = []v1.PersistentVolumeAccessMode{
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []v1.PersistentVolumeAccessMode{
 				v1.ReadWriteOnce,
 			}
 		}
-		if copy.Spec.FluentdSpec.FluentdPvcSpec.VolumeMode == nil {
-			copy.Spec.FluentdSpec.FluentdPvcSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
-		}
-		if copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests == nil {
-			copy.Spec.FluentdSpec.FluentdPvcSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
 				"storage": resource.MustParse("20Gi"),
 			}
 		}
-		// Temporarily copy the FluentdPvcSpec for backward compatibility
-		// if BufferStorageVolume.PersistentVolumeClaim is not set.
-		// DisablePvc will stay for a while. The alternative would be to set a hostPath or emptyDir explicitly
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &PersistentVolumeClaim{
-				PersistentVolumeClaimSpec: *copy.Spec.FluentdSpec.FluentdPvcSpec.DeepCopy(),
-			}
+		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
+			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
 		}
 		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
 			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = "fluentd-buffer"
@@ -254,12 +250,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				v1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
-		// For backward compatibility
-		if copy.Spec.FluentbitSpec.Parser != "" {
-			if copy.Spec.FluentbitSpec.InputTail.Parser == "" {
-				copy.Spec.FluentbitSpec.InputTail.Parser = copy.Spec.FluentbitSpec.Parser
-			}
-		}
 		if copy.Spec.FluentbitSpec.InputTail.Path == "" {
 			copy.Spec.FluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
 		}
@@ -277,9 +267,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentbitSpec.InputTail.Tag == "" {
 			copy.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
-		}
-		if copy.Spec.FluentbitSpec.PositionDBLegacy != nil {
-			copy.Spec.FluentbitSpec.PositionDB = *copy.Spec.FluentbitSpec.PositionDBLegacy.DeepCopy()
 		}
 		if copy.Spec.FluentbitSpec.Annotations == nil {
 			copy.Spec.FluentbitSpec.Annotations = make(map[string]string)
