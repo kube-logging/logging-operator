@@ -17,8 +17,8 @@ package v1beta1
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/volume"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -91,7 +91,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
 		}
 		if copy.Spec.FluentdSpec.Image.Tag == "" {
-			copy.Spec.FluentdSpec.Image.Tag = "v1.7.4-alpine-13-dev1"
+			copy.Spec.FluentdSpec.Image.Tag = "v1.7.4-alpine-13"
 		}
 		if copy.Spec.FluentdSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"
