@@ -50,8 +50,6 @@ type ParserConfig struct {
 	HashValueField string `json:"hash_value_field,omitempty"`
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
-	// Deprecated, use parse
-	Parsers []ParseSection `json:"parsers,omitempty"` //deprecated, use Parse instead
 	// +docLink:"Parse Section,#Parse-Section"
 	Parse ParseSection `json:"parse,omitempty"`
 }
@@ -198,14 +196,6 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 		return nil, err
 	} else {
 		parser.Params = params
-	}
-
-	if len(parserConfig.Parsers) > 1 {
-		return nil, errors.Errorf("only one parser can be configured at once")
-	}
-	// for backward compatibility
-	if len(parserConfig.Parsers) == 1 {
-		parserConfig.Parse = parserConfig.Parsers[0]
 	}
 
 	if meta, err := parserConfig.Parse.ToDirective(secretLoader, ""); err != nil {

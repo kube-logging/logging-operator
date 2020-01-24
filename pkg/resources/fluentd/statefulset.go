@@ -15,6 +15,8 @@
 package fluentd
 
 import (
+	"fmt"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
@@ -54,7 +56,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777", BufferPath},
+			Command:         []string{"sh", "-c", "chmod -R 777 " + BufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.QualifiedName(bufferVolumeName),
@@ -243,7 +245,12 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)))
+
+	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
+	)
+
+	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.QualifiedName(bufferVolumeName)))
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",

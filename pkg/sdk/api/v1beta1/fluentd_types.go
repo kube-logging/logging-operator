@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -26,11 +27,10 @@ type FluentdSpec struct {
 	Labels      map[string]string `json:"labels,omitempty"`
 	TLS         FluentdTLS        `json:"tls,omitempty"`
 	Image       ImageSpec         `json:"image,omitempty"`
-	// Deprecated, use BufferStorageVolume to configure PVC explicitly
-	FluentdPvcSpec *corev1.PersistentVolumeClaimSpec `json:"fluentdPvcSpec,omitempty"`
-	DisablePvc     bool                              `json:"disablePvc,omitempty"`
+	DisablePvc  bool              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
-	BufferStorageVolume  KubernetesStorage           `json:"bufferStorageVolume,omitempty"`
+	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	BufferStorageVolume  volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`
 	VolumeMountChmod     bool                        `json:"volumeMountChmod,omitempty"`
 	VolumeModImage       ImageSpec                   `json:"volumeModImage,omitempty"`
 	ConfigReloaderImage  ImageSpec                   `json:"configReloaderImage,omitempty"`

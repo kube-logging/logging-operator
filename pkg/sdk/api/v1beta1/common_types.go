@@ -15,9 +15,11 @@
 package v1beta1
 
 import (
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
+)
+
+const (
+	HostPath = "/opt/logging-operator/%s/%s"
 )
 
 // ImageSpec struct hold information about image specification
@@ -35,59 +37,6 @@ type Metrics struct {
 	Path                  string `json:"path,omitempty"`
 	ServiceMonitor        bool   `json:"serviceMonitor,omitempty"`
 	PrometheusAnnotations bool   `json:"prometheusAnnotations,omitempty"`
-}
-
-type KubernetesStorage struct {
-	HostPathLegacy *corev1.HostPathVolumeSource `json:"host_path,omitempty"` // deprecated, use HostPath instead
-	HostPath       *corev1.HostPathVolumeSource `json:"hostPath,omitempty"`
-	EmptyDir       *corev1.EmptyDirVolumeSource `json:"emptyDir,omitempty"`
-	// PersistentVolumeClaim defines the Spec and the Source at the same time.
-	// The PVC will be created with the configured spec and the name defined in the source.
-	PersistentVolumeClaim *PersistentVolumeClaim `json:"pvc,omitempty"`
-}
-
-type PersistentVolumeClaim struct {
-	PersistentVolumeClaimSpec corev1.PersistentVolumeClaimSpec         `json:"spec,omitempty"`
-	PersistentVolumeSource    corev1.PersistentVolumeClaimVolumeSource `json:"source,omitempty"`
-}
-
-// GetVolume returns a default emptydir volume if none configured
-// `logging` is the name of the logging CR to make sure multiple
-//           logging system can coexist in case a hostPath mount is used
-// `name`    will be the name of the volume and the lowest level directory in case a hostPath mount is used
-func (storage KubernetesStorage) GetVolume(logging, name string) corev1.Volume {
-	const (
-		hostPath = "/opt/logging-operator/%s/%s"
-	)
-	volume := corev1.Volume{
-		Name: name,
-	}
-	if storage.HostPathLegacy != nil && storage.HostPath == nil {
-		storage.HostPath = storage.HostPathLegacy.DeepCopy()
-	}
-	if storage.HostPath != nil {
-		if storage.HostPath.Path == "" {
-			storage.HostPath.Path = fmt.Sprintf(hostPath, logging, name)
-		}
-		volume.VolumeSource = corev1.VolumeSource{
-			HostPath: storage.HostPath,
-		}
-		return volume
-	} else if storage.EmptyDir != nil {
-		volume.VolumeSource = corev1.VolumeSource{
-			EmptyDir: storage.EmptyDir,
-		}
-		return volume
-	} else if storage.PersistentVolumeClaim != nil {
-		volume.VolumeSource = corev1.VolumeSource{
-			PersistentVolumeClaim: &storage.PersistentVolumeClaim.PersistentVolumeSource,
-		}
-	}
-	// return a default emptydir volume if none configured
-	volume.VolumeSource = corev1.VolumeSource{
-		EmptyDir: &corev1.EmptyDirVolumeSource{},
-	}
-	return volume
 }
 
 // Security defines Fluentd, Fluentbit deployment security properties

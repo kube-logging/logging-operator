@@ -48,6 +48,8 @@ spec:
                   description: Your azure storage access key
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -69,8 +71,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -96,6 +100,8 @@ spec:
                   description: Your azure storage account
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -117,8 +123,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -319,6 +327,8 @@ spec:
                   description: AWS access key id
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -340,8 +350,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -367,6 +379,8 @@ spec:
                   description: AWS secret key.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -388,8 +402,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -970,6 +986,8 @@ spec:
                   description: Password for HTTP Basic authentication.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -991,8 +1009,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1632,6 +1652,8 @@ spec:
                         description: The password for authentication.
                         properties:
                           mountFrom:
+                            description: Refers to a secret value to be used through
+                              a volume mount
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1656,8 +1678,10 @@ spec:
                                 type: object
                             type: object
                           value:
+                            description: Refers to a non-secret value
                             type: string
                           valueFrom:
+                            description: Refers to a secret value to be used directly
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1691,6 +1715,8 @@ spec:
                         description: The shared key per server.
                         properties:
                           mountFrom:
+                            description: Refers to a secret value to be used through
+                              a volume mount
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1715,8 +1741,10 @@ spec:
                                 type: object
                             type: object
                           value:
+                            description: Refers to a non-secret value
                             type: string
                           valueFrom:
+                            description: Refers to a secret value to be used directly
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1751,6 +1779,8 @@ spec:
                         description: The username for authentication.
                         properties:
                           mountFrom:
+                            description: Refers to a secret value to be used through
+                              a volume mount
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1775,8 +1805,10 @@ spec:
                                 type: object
                             type: object
                           value:
+                            description: Refers to a non-secret value
                             type: string
                           valueFrom:
+                            description: Refers to a secret value to be used directly
                             properties:
                               secretKeyRef:
                                 description: SecretKeySelector selects a key of a
@@ -1821,6 +1853,8 @@ spec:
                   description: The additional CA certificate path for TLS.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1842,8 +1876,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1881,6 +1917,8 @@ spec:
                   description: The client certificate path for TLS
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1902,8 +1940,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1929,6 +1969,8 @@ spec:
                   description: The client private key passphrase for TLS.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1950,8 +1992,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1977,6 +2021,8 @@ spec:
                   description: The client private key path for TLS.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -1998,8 +2044,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2209,6 +2257,8 @@ spec:
                   description: GCS service account credentials in JSON format
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2230,8 +2280,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2595,6 +2647,8 @@ spec:
                     your agent is not running on EC2 instance with an IAM Role.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2616,8 +2670,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2644,6 +2700,8 @@ spec:
                     agent is not running on EC2 instance with an IAM Role.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2665,8 +2723,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2694,6 +2754,8 @@ spec:
                     agent is not running on EC2 instance with an IAM Role.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -2715,8 +2777,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3119,6 +3183,8 @@ spec:
                   description: Specify password if the Loki server requires authentication.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3140,8 +3206,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3180,6 +3248,8 @@ spec:
                   description: Specify a username if the Loki server requires authentication.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3201,8 +3271,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3233,6 +3305,8 @@ spec:
                   description: Your access secret key
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3254,8 +3328,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3281,6 +3357,8 @@ spec:
                   description: Your access key id
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3302,8 +3380,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3586,6 +3666,8 @@ spec:
                   description: AWS access key id
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3607,8 +3689,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3634,6 +3718,8 @@ spec:
                   description: AWS secret key.
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3655,8 +3741,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -3993,6 +4081,8 @@ spec:
                   description: SumoLogic HTTP Collector URL
                   properties:
                     mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.
@@ -4014,8 +4104,10 @@ spec:
                           type: object
                       type: object
                     value:
+                      description: Refers to a non-secret value
                       type: string
                     valueFrom:
+                      description: Refers to a secret value to be used directly
                       properties:
                         secretKeyRef:
                           description: SecretKeySelector selects a key of a Secret.

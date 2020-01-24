@@ -92,7 +92,6 @@ You can customize the `fluentd` statefulset with the following parameters.
 | labels | map[string]string | {} | Extra labels for fluentd and it's related resources |
 | tls | [TLS](#TLS-Spec) | {} | Configure TLS settings|
 | image | [ImageSpec](#Image-Spec) | {} | Fluentd image override |
-| fluentdPvcSpec | [PersistentVolumeClaimSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#persistentvolumeclaimspec-v1-core) | {} | Deprecated, use BufferStorageVolume |
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Fluentd PVC spec to mount persistent volume for Buffer |
 | disablePvc | bool | false | Disable PVC binding |
 | volumeModImage | [ImageSpec](#Image-Spec) | {} | Volume modifier image override |
@@ -164,7 +163,6 @@ spec:
 | tolerations | [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core) | {} | Pod toleration |
 | metrics | [Metrics](./logging-operator-monitoring.md#metrics-variables) | {} | Metrics defines the service monitor endpoints |
 | security | [Security](./security#security-variables) | {} | Security defines Fluentd, Fluentbit deployment security properties |
-| position_db | | | Deprecated, use positiondb instead |
 | positiondb |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
 | inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | Preconfigured tailer for container logs on the host. Container runtime (containerd vs. docker) is automatically detected for convenience. |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
@@ -298,7 +296,6 @@ Define Kubernetes storage
 
 | Name      | Type | Default | Description |
 |-----------|------|---------|-------------|
-| host_path | | | deprecated, use hostPath instead |
 | hostPath | [HostPathVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#hostpathvolumesource-v1-core) | - | Represents a host path mapped into a pod. If path is empty, it will automatically be set to "/opt/logging-operator/<name of the logging CR>/<name of the volume>" |
 | emptyDir | [EmptyDirVolumeSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#emptydirvolumesource-v1-core) | - | Represents an empty directory for a pod. |
 | pvc | [PersistentVolumeClaim](#Persistent Volume Claim) | - | A PersistentVolumeClaim (PVC) is a request for storage by a user. |
