@@ -43,7 +43,9 @@ type FlowRoute struct {
 	// Optional set of kubernetes labels
 	Labels map[string]string `json:"labels,omitempty"`
 	// Optional namespace
-	Namespace string `json:"namespace,omitempty"`
+	Namespaces []string `json:"namespace,omitempty"`
+	// Negate
+	Negate bool `json:"negate,omitempty"`
 }
 
 func (f *FlowRoute) GetPluginMeta() *PluginMeta {
@@ -52,7 +54,7 @@ func (f *FlowRoute) GetPluginMeta() *PluginMeta {
 
 func (f *FlowRoute) GetParams() map[string]string {
 	params := map[string]string{}
-	if f.Namespace != "" {
+	if f.Namespaces != "" {
 		params["namespace"] = f.Namespace
 	}
 	if len(f.Labels) > 0 {
@@ -75,8 +77,8 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 			Directive: "route",
 			Label:     flow.FlowLabel,
 		},
-		Labels:    flow.Labels,
-		Namespace: flow.Namespace,
+		Labels:     flow.Labels,
+		Namespaces: flow.Namespace,
 	})
 	return r
 }

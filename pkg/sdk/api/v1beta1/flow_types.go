@@ -19,12 +19,27 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Match struct {
+	*Select  `json:"select,omitempty"`
+	*Exclude `json:"exclude,omitempty"`
+}
+
+type Select struct {
+	Namespaces []string          `json:"namespaces,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
+}
+
+type Exclude struct {
+	Namespaces []string          `json:"namespaces,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
+}
+
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
-	Selectors  map[string]string `json:"selectors"`
-	Filters    []Filter          `json:"filters,omitempty"`
-	LoggingRef string            `json:"loggingRef,omitempty"`
-	OutputRefs []string          `json:"outputRefs"`
+	Match      []Match  `json:"match,omitempty"`
+	Filters    []Filter `json:"filters,omitempty"`
+	LoggingRef string   `json:"loggingRef,omitempty"`
+	OutputRefs []string `json:"outputRefs"`
 }
 
 // Filter definition for FlowSpec

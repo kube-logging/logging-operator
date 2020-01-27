@@ -104,8 +104,8 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	return system, nil
 }
 
-func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespace string) (*types.Flow, error) {
-	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
+func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespaces []string) (*types.Flow, error) {
+	flow, err := types.NewFlow(namespace, flowCr.Spec.Match)
 	if err != nil {
 		return nil, err
 	}

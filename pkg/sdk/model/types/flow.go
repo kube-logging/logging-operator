@@ -94,8 +94,8 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(namespace string, labels map[string]string) (*Flow, error) {
-	flowLabel, err := calculateFlowLabel(namespace, labels)
+func NewFlow(namespaces []string, labels map[string]string) (*Flow, error) {
+	flowLabel, err := calculateFlowLabel(namespaces, labels)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +110,14 @@ func NewFlow(namespace string, labels map[string]string) (*Flow, error) {
 	}, nil
 }
 
-func calculateFlowLabel(namespace string, labels map[string]string) (string, error) {
+func calculateFlowLabel(namespaces []string, labels map[string]string) (string, error) {
 	b := md5.New()
-	if _, err := io.WriteString(b, namespace); err != nil {
-		return "", err
+	sort.Strings(namespaces)
+	for _, n := range namespaces {
+		if _, err := io.WriteString(b, n); err != nil {
+			return "", err
+		}
 	}
-
 	// Make sure the generated label is consistent
 	keys := []string{}
 	for k := range labels {
