@@ -45,7 +45,7 @@ type FileOutputConfig struct {
 	// Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.(default: false)
 	SymlinkPath bool `json:"symlink_path,omitempty"`
 	// +docLink:"Format,./format.md"
-	Format *Format `json:"format"`
+	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
