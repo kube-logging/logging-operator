@@ -37,8 +37,6 @@ To install the Logging operator using Helm, complete these steps. If you want to
 1. Install the demo application and its logging definition.
     ```bash
    helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
-      --set "elasticsearch.enabled=True"
-   helm install --namespace logging --name logging-demo banzaicloud-stable/logging-demo \
      --set "cloudwatch.enabled=True" \
      --set "cloudwatch.aws.secret_key=" \
      --set "cloudwatch.aws.access_key=" \
@@ -55,12 +53,12 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
 
 1. Install the Logging operator. For details, see [How to install Logging-operator from manifests](../deploy/README.md#deploy-the-logging-operator-from-kubernetes-manifests)
 
-1. Create `logging` Namespace
+1. Create logging `Namespace`
 ```bash
 kubectl create ns logging
 ```
 
-1. Create AWS secret
+1. Create AWS `secret`
 
 > If you have your `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` set you can use the following snippet.
 ```bash
@@ -132,7 +130,7 @@ Or set up the secret manually.
      apiVersion: logging.banzaicloud.io/v1beta1
      kind: Flow
      metadata:
-       name: es-flow
+       name: cloudwatch-flow
      spec:
        filters:
          - tag_normaliser: {}
