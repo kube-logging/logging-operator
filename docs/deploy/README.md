@@ -54,8 +54,13 @@ Complete the following steps to deploy the Logging operator using Helm. Alternat
     helm repo update
     ```
 2. Install the Logging Operator
+  - Helm v2
     ```bash
     helm install --namespace logging --name logging banzaicloud-stable/logging-operator
+    ```
+  - Helm v3
+    ```bash
+    helm install --namespace logging --name logging banzaicloud-stable/logging-operator --set createCustomResource=false
     ```
     > You can install the `logging` resource with built-in TLS generation using a [Helm chart](/charts/logging-operator-logging).
 
