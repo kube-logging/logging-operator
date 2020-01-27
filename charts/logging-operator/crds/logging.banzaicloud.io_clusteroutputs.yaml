@@ -1404,7 +1404,6 @@ spec:
                     false)'
                   type: boolean
               required:
-              - format
               - path
               type: object
             forward:

@@ -1,27 +1,30 @@
-{{- $sharedKey := .Values.loggingOperator.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) -}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: {{ include "logging-demo.fullname" . }}
 spec:
   fluentd:
-  {{- if .Values.loggingOperator.tls.enabled }}
     tls:
+    {{- if .Values.loggingOperator.tls.enabled }}
       enabled: true
       secretName: {{ .Values.loggingOperator.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentd-tls" ) }}
-      sharedKey: {{ $sharedKey }}
-  {{- end }}
+      sharedKey: "{{ .Values.loggingOperator.tls.sharedKey }}"
+    {{- else -}}
+      enabled: false
+    {{- end }}
     {{- if .Values.loggingOperator.fluentd }}
 {{ toYaml .Values.loggingOperator.fluentd | indent 4}}
     {{- end}}
 
   fluentbit:
-  {{- if .Values.loggingOperator.tls.enabled }}
     tls:
+    {{- if .Values.loggingOperator.tls.enabled }}
       enabled: true
       secretName: {{ .Values.loggingOperator.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentbit-tls" ) }}
-      sharedKey: {{ $sharedKey }}
-  {{- end }}
+      sharedKey: "{{ .Values.loggingOperator.tls.sharedKey }}"
+    {{- else -}}
+      enabled: false
+    {{- end }}
     {{- if .Values.loggingOperator.fluentbit }}
 {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
     {{- end}}
