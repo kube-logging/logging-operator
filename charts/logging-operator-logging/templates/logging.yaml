@@ -1,4 +1,3 @@
-{{- $sharedKey := .Values.tls.sharedKey | default (derivePassword 1 "long" (now | unixEpoch) .Release.Name .Chart.Name ) -}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -24,7 +23,7 @@ spec:
     {{- if .Values.tls.enabled }}
       enabled: true
       secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
-      sharedKey: {{ $sharedKey }}
+      sharedKey: "{{ .Values.tls.sharedKey }}"
     {{- else -}}
       enabled: false
     {{- end }}
@@ -36,7 +35,7 @@ spec:
     {{- if .Values.tls.enabled }}
       enabled: true
       secretName: {{ .Values.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
-      sharedKey: {{ $sharedKey }}
+      sharedKey: "{{ .Values.tls.sharedKey }}"
     {{- else -}}
       enabled: false
     {{- end }}

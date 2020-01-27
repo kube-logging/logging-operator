@@ -233,7 +233,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentbitSpec.Image.Repository = "fluent/fluent-bit"
 		}
 		if copy.Spec.FluentbitSpec.Image.Tag == "" {
-			copy.Spec.FluentbitSpec.Image.Tag = "1.3.2"
+			copy.Spec.FluentbitSpec.Image.Tag = "1.3.6"
 		}
 		if copy.Spec.FluentbitSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"
