@@ -58,7 +58,11 @@ var fluentBitConfigTemplate = `
     tls.ca_file   /fluent-bit/tls/ca.crt
     tls.crt_file  /fluent-bit/tls/tls.crt
     tls.key_file  /fluent-bit/tls/tls.key
+	{{- if .TLS.SharedKey }}
     Shared_Key    {{ .TLS.SharedKey }}
+	{{- else }}
+    Empty_Shared_Key true
+    {{- end }}
     {{- end }}
     Retry_Limit   False
 `
