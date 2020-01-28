@@ -30,6 +30,6 @@
 | retry_randomize | bool | No | - | If true, output plugin will retry after randomized interval not to do burst retries<br> |
 | disable_chunk_backup | bool | No | - | Instead of storing unrecoverable chunks in the backup directory, just discard them. This option is new in Fluentd v1.2.6.<br> |
 | timekey | string | Yes | 10m | Output plugin will flush chunks per specified time (enabled when time is specified in chunk keys)<br> |
-| timekey_wait | string | No | - | Output plugin writes chunks after timekey_wait seconds later after timekey expiration<br> |
+| timekey_wait | string | No | 10m | Output plugin writes chunks after timekey_wait seconds later after timekey expiration<br> |
 | timekey_use_utc | bool | No | - | Output plugin decides to use UTC or not to format placeholders using timekey<br> |
 | timekey_zone | string | No | - | The timezone (-0700 or Asia/Tokyo) string for formatting timekey placeholders<br> |

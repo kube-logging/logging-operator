@@ -98,7 +98,7 @@ type Buffer struct {
 	// +kubebuilder:validation:Optional
 	Timekey string `json:"timekey" plugin:"default:10m"`
 	// Output plugin writes chunks after timekey_wait seconds later after timekey expiration
-	TimekeyWait string `json:"timekey_wait,omitempty"`
+	TimekeyWait string `json:"timekey_wait,omitempty" plugin:"default:10m"`
 	// Output plugin decides to use UTC or not to format placeholders using timekey
 	TimekeyUseUtc bool `json:"timekey_use_utc,omitempty"`
 	// The timezone (-0700 or Asia/Tokyo) string for formatting timekey placeholders
