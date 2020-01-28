@@ -88,7 +88,7 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
      EOF
      ```
      > Note: You can use the `ClusterOutput` and `ClusterFlow` resources only in the `controlNamespace`.
-1. Create an Elasticsearch `output` definition.
+1. Create an Loki `output` definition.
      ```bash
     kubectl -n logging apply -f - <<"EOF" 
     apiVersion: logging.banzaicloud.io/v1beta1
