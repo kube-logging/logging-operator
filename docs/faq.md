@@ -1,4 +1,4 @@
-<p align="center"><img src="../img/lo.svg" width="260"></p>
+<p align="center"><img src="./img/lo.svg" width="260"></p>
 <p align="center">
 
 ### Logging Operator frequently asked questions
@@ -15,5 +15,6 @@
 
 ## How can I support the project:
 
-### How can I add my self to the [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md list?
+### How can I add my self to the [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md) list?
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/2iaK8adpwfk/0.jpg)](http://www.youtube.com/watch?v=2iaK8adpwfk)
 
