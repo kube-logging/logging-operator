@@ -5,6 +5,19 @@
 
 The following tips and commands can help you to troubleshoot your Logging operator installation.
 
+## Running on Kind
+
+Persistent Volumes do not respect the `fsGroup` value on Kind so please disable using a PVC for fluentd:
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: example-on-kind
+spec:
+  fluentd:
+    disablePvc: true
+```
+
 ## First things to do
 
 1. Check that the necessary CRDs are installed. Issue the following command: `kubectl get crd`
