@@ -4,6 +4,9 @@ metadata:
   name: minio-mc-deployment
   namespace: logging
 spec:
+  selector:
+    matchLabels:
+      app: minio-mc
   strategy:
     type: Recreate
   template:
