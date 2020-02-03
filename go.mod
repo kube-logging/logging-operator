@@ -22,6 +22,5 @@ require (
 
 replace (
 	github.com/banzaicloud/logging-operator/pkg/sdk => ./pkg/sdk
-
 	k8s.io/client-go => k8s.io/client-go v0.16.4
 )

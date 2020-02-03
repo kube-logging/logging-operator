@@ -22,6 +22,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	v1 "k8s.io/api/core/v1"
 )
 
 func TestRequired(t *testing.T) {
@@ -204,9 +205,11 @@ func TestSecretValueFrom(t *testing.T) {
 	testStruct := Asd{
 		Field: &secret.Secret{
 			ValueFrom: &secret.ValueFrom{
-				SecretKeyRef: &secret.KubernetesSecret{
-					Name: "a",
-					Key:  "b",
+				SecretKeyRef: &v1.SecretKeySelector{
+					LocalObjectReference: v1.LocalObjectReference{
+						Name: "a",
+					},
+					Key: "b",
 				},
 			},
 		},
@@ -240,7 +243,7 @@ func TestSecretErrorWhenEmpty(t *testing.T) {
 		t.Fatal("expected an error when secret contains no value or valuefrom")
 	}
 
-	expectedError := "failed to load secret for field field; no value found"
+	expectedError := "failed to load secret for field field: no value found"
 	if err.Error() != expectedError {
 		t.Fatalf("Expected `%s` got `%s`", expectedError, err.Error())
 	}

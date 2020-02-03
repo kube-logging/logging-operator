@@ -216,7 +216,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			if copy.Spec.FluentdSpec.LivenessDefaultCheck {
 				copy.Spec.FluentdSpec.LivenessProbe = &v1.Probe{
 					Handler: v1.Handler{
-						Exec: &v1.ExecAction{[]string{"/bin/healthy.sh"}},
+						Exec: &v1.ExecAction{Command: []string{"/bin/healthy.sh"}},
 					},
 					InitialDelaySeconds: 600,
 					TimeoutSeconds:      0,
@@ -226,7 +226,6 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				}
 			}
 		}
-
 	}
 	if copy.Spec.FluentbitSpec != nil {
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {

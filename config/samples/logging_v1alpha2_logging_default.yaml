@@ -3,8 +3,9 @@ kind: Logging
 metadata:
   name: defaultlogging
 spec:
-  fluentd: {
+  fluentd:
     disablePvc: true
-  }
+    metrics:
+      serviceMonitor: false
   fluentbit: {}
   controlNamespace: default

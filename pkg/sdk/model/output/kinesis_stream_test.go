@@ -24,7 +24,7 @@ import (
 
 func TestKinesisStream(t *testing.T) {
 	CONFIG := []byte(`
-streamName: test
+stream_name: test
 region: us-east-1
 format:
   type: json
@@ -36,7 +36,17 @@ buffer:
 	expected := `
   <match **>
     @type kinesis_streams
+    @id test_kinesis_streams    
     region us-east-1
+    stream_name test
+    <buffer tag,time>
+      @type file
+      path /buffers/test_kinesis_streams.*.buffer
+      retry_forever true
+      timekey 1m
+      timekey_use_utc true
+      timekey_wait 30s
+    </buffer>
     <format>
       @type json
     </format>
