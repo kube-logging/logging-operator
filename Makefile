@@ -39,6 +39,12 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter
 	bin/golangci-lint run
+	cd pkg/sdk && golangci-lint run -c ../../.golangci.yml
+
+.PHONY: lint-fix
+lint-fix: bin/golangci-lint ## Run linter
+	bin/golangci-lint run --fix
+	cd pkg/sdk && golangci-lint run -c ../../.golangci.yml --fix
 
 bin/gobin: bin/gobin-${GOBIN_VERSION}
 	@ln -sf gobin-${GOBIN_VERSION} bin/gobin
@@ -63,6 +69,7 @@ test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
 	@which etcd
 	kubebuilder version
+	cd pkg/sdk && go test ./...
 	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
 
 # Build manager binary
@@ -94,10 +101,12 @@ manifests: controller-gen
 # Run go fmt against code
 fmt:
 	go fmt ./...
+	cd pkg/sdk && go fmt ./...
 
 # Run go vet against code
 vet:
 	go vet ./...
+	cd pkg/sdk && go vet ./...
 
 # Generate code
 generate: controller-gen

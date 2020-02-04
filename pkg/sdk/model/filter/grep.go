@@ -230,7 +230,6 @@ func (r *ExcludeSection) ToDirective(secretLoader secret.SecretLoader, id string
 }
 
 func (r *OrSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-
 	or := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Directive: "or",

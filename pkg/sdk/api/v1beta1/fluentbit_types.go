@@ -25,29 +25,29 @@ import (
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations          map[string]string           `json:"annotations,omitempty"`
-	Labels               map[string]string           `json:"labels,omitempty"`
-	Image                ImageSpec                   `json:"image,omitempty"`
-	TLS                  FluentbitTLS                `json:"tls,omitempty"`
-	TargetHost           string                      `json:"targetHost,omitempty"`
-	TargetPort           int32                       `json:"targetPort,omitempty"`
-	Resources            corev1.ResourceRequirements `json:"resources,omitempty"`
-	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
-	Metrics              *Metrics                    `json:"metrics,omitempty"`
-	Security             *Security                   `json:"security,omitempty"`
+	Annotations map[string]string           `json:"annotations,omitempty"`
+	Labels      map[string]string           `json:"labels,omitempty"`
+	Image       ImageSpec                   `json:"image,omitempty"`
+	TLS         FluentbitTLS                `json:"tls,omitempty"`
+	TargetHost  string                      `json:"targetHost,omitempty"`
+	TargetPort  int32                       `json:"targetPort,omitempty"`
+	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
+	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
+	Metrics     *Metrics                    `json:"metrics,omitempty"`
+	Security    *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB           volume.KubernetesVolume     `json:"positiondb,omitempty"`
-	MountPath            string                      `json:"mountPath,omitempty"`
-	ExtraVolumeMounts    []VolumeMount               `json:"extraVolumeMounts,omitempty"`
-	InputTail            InputTail                   `json:"inputTail,omitempty"`
-	FilterKubernetes     FilterKubernetes            `json:"filterKubernetes,omitempty"`
-	BufferStorage        BufferStorage               `json:"bufferStorage,omitempty"`
+	PositionDB        volume.KubernetesVolume `json:"positiondb,omitempty"`
+	MountPath         string                  `json:"mountPath,omitempty"`
+	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
+	InputTail         InputTail               `json:"inputTail,omitempty"`
+	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
+	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	BufferStorageVolume  volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`
-	CustomConfigSecret   string                      `json:"customConfigSecret,omitempty"`
-	PodPriorityClassName string                      `json:"podPriorityClassName,omitempty"`
-	LivenessProbe        *corev1.Probe               `json:"livenessProbe,omitempty"`
-	ReadinessProbe       *corev1.Probe               `json:"readinessProbe,omitempty"`
+	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
+	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName string                  `json:"podPriorityClassName,omitempty"`
+	LivenessProbe        *corev1.Probe           `json:"livenessProbe,omitempty"`
+	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

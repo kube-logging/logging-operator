@@ -42,6 +42,7 @@ buffer:
 	fail_on_putting_template_retry_exceed true
 	host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
 	port 9200
+	reload_connections true
 	scheme https
 	ssl_verify false
 	ssl_version TLSv1_2
