@@ -5,7 +5,5 @@ metadata:
 spec:
   fluentd:
     disablePvc: true
-    metrics:
-      serviceMonitor: false
   fluentbit: {}
   controlNamespace: default
