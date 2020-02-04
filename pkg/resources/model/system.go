@@ -131,7 +131,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				outputId := "_" + flowCr.Name + "_" + clusterOutput.Name
+				outputId := namespace + "_" + flowCr.Name + "_" + clusterOutput.Name
 				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputId, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))

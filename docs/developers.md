@@ -1,6 +1,6 @@
 # Developers documentation
 
-THis documentation helps to set-up a developer environment and writing plugins for the operator.
+This documentation helps to set-up a developer environment and writing plugins for the operator.
 
 ## Setting up Kind
 

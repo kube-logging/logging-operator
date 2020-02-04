@@ -436,10 +436,11 @@ func TestRenderS3(t *testing.T) {
 						path /var/buffer
 						s3_bucket test_bucket
 						<buffer tag,time>
-						  @type file
-                          path asd
-						  retry_forever true
-                          timekey 10m
+						@type file
+						path asd
+						retry_forever true
+						timekey 10m
+						timekey_wait 10m
 						</buffer>
 						<assume_role_credentials>
 							role_arn asd
