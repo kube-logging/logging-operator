@@ -24,6 +24,13 @@ import (
 // This plugin has been designed to output logs to LogDNA. Example Deployment: [Transport Nginx Access Logs into LogDNA with Logging Operator](../../examples/logging_output_logdna.yaml)
 type _docLogDNA interface{}
 
+// +name:"LogDNA"
+// +url:"https://github.com/logdna/fluent-plugin-logdna"
+// +version:"more info"
+// +description:"Send your logs to LogDNA"
+// +status:"GA"
+type _metaLogDNA interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"LogDNA"
 // Send your logs to LogDNA
@@ -78,7 +85,6 @@ func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) 
 		return nil, err
 	} else {
 		logdna.Params = params
-
 	}
 	return logdna, nil
 }
