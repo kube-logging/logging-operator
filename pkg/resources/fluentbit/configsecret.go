@@ -38,12 +38,13 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
-	Output        map[string]string
-	TargetHost    string
-	TargetPort    int32
-	Input         map[string]string
-	Filter        map[string]string
-	BufferStorage map[string]string
+	Output           map[string]string
+	TargetHost       string
+	TargetPort       int32
+	Input            map[string]string
+	KubernetesFilter map[string]string
+	AwsFilter        map[string]string
+	BufferStorage    map[string]string
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
@@ -80,11 +81,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
 
-	fluentbitFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
+	fluentbitKubernetesFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
 	}
-
 	fluentbitBufferStorage, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map buffer storage for fluentbit")
@@ -99,12 +99,19 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			Enabled:   r.Logging.Spec.FluentbitSpec.TLS.Enabled,
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
-		Monitor:       monitor,
-		TargetHost:    fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
-		TargetPort:    r.Logging.Spec.FluentdSpec.Port,
-		Input:         fluentbitInput,
-		Filter:        fluentbitFilter,
-		BufferStorage: fluentbitBufferStorage,
+		Monitor:          monitor,
+		TargetHost:       fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
+		TargetPort:       r.Logging.Spec.FluentdSpec.Port,
+		Input:            fluentbitInput,
+		KubernetesFilter: fluentbitKubernetesFilter,
+		BufferStorage:    fluentbitBufferStorage,
+	}
+	if r.Logging.Spec.FluentbitSpec.FilterAws != nil {
+		awsFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterAws)
+		if err != nil {
+			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map aws filter for fluentbit")
+		}
+		input.AwsFilter = awsFilter
 	}
 	if r.Logging.Spec.FluentbitSpec.TargetHost != "" {
 		input.TargetHost = r.Logging.Spec.FluentbitSpec.TargetHost

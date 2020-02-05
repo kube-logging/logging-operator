@@ -56,6 +56,31 @@ The plugin supports the following configuration parameters:
 | Kube\_meta_preload_cache_dir | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta | |
 | Dummy\_Meta | If set, use dummy-meta data (for test/dev purposes) | Off |
 
+### Aws (filterAws)
+The AWS Filter Enriches logs with AWS Metadata. Currently the plugin adds the EC2 instance ID and availability zone to log records. To use this plugin, you must be running in EC2 and have the instance metadata service enabled.
+[More info](https://github.com/fluent/fluent-bit-docs/blob/master/filter/aws.md)
+
+#### Example filter configurations
+```
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: default-logging-simple
+spec:
+  fluentd: {}
+  fluentbit:
+    filterAws:
+      imds_version: "v1"
+  controlNamespace: logging
+```
+
+#### Configuration Parameters
+
+The plugin supports the following configuration parameters:
+
+| Key | Description | Default |
+| :--- | :--- | :--- |
+| imds\_version      | Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'. | v2 |
 
 ## Inputs
 ### Tail (inputTail)

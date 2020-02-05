@@ -18,6 +18,7 @@
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
 | filterKubernetes | FilterKubernetes | No | - |  |
+| filterAws | *FilterAws | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
 | bufferStorageVolume | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
 | customConfigSecret | string | No | - |  |
@@ -96,6 +97,12 @@
 | Annotations | string | No | On | Include Kubernetes resource annotations in the extra metadata. <br> |
 | Kube_meta_preload_cache_dir | string | No | - | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta<br> |
 | Dummy_Meta | string | No | Off | If set, use dummy-meta data (for test/dev purposes) <br> |
+### FilterAws
+#### FilterAws The AWS Filter Enriches logs with AWS Metadata.
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| imds_version | string | No | v2 | Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'; 'v2' is the default.<br> |
 ### VolumeMount
 #### VolumeMount defines source and destination folders of a hostPath type pod mount
 

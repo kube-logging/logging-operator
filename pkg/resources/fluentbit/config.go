@@ -41,11 +41,22 @@ var fluentBitConfigTemplate = `
 
 [FILTER]
     Name        kubernetes
-    {{- range $key, $value := .Filter }}
+    {{- range $key, $value := .KubernetesFilter }}
     {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
+		{{- end }}
+		
+{{- if .AwsFilter }}
+
+[FILTER]
+    Name        aws
+    {{- range $key, $value := .AwsFilter }}
+    {{- if $value }}
+    {{ $key }}  {{$value}}
     {{- end }}
+		{{- end }}
+{{- end}}
 
 [OUTPUT]
     Name          forward

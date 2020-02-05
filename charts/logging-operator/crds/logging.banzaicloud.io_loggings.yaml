@@ -292,6 +292,15 @@ spec:
                     - source
                     type: object
                   type: array
+                filterAws:
+                  description: FilterAws The AWS Filter Enriches logs with AWS Metadata.
+                  properties:
+                    imds_version:
+                      description: Specify which version of the instance metadata
+                        service to use. Valid values are 'v1' or 'v2'; 'v2' is the
+                        default.
+                      type: string
+                  type: object
                 filterKubernetes:
                   description: FilterKubernetes Fluent Bit Kubernetes Filter allows
                     to enrich your log files with Kubernetes metadata.

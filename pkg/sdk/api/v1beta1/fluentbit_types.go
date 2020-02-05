@@ -41,6 +41,7 @@ type FluentbitSpec struct {
 	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail               `json:"inputTail,omitempty"`
 	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
+	FilterAws         *FilterAws              `json:"filterAws,omitempty"`
 	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
@@ -180,6 +181,12 @@ type FilterKubernetes struct {
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
 	DummyMeta string `json:"Dummy_Meta,omitempty"`
+}
+
+// FilterAws The AWS Filter Enriches logs with AWS Metadata.
+type FilterAws struct {
+	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'; 'v2' is the default.
+	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
 }
 
 // VolumeMount defines source and destination folders of a hostPath type pod mount

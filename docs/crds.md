@@ -166,6 +166,7 @@ spec:
 | positiondb |  [KubernetesStorage](#KubernetesStorage) | nil | Add position db storage support. If nothing is configured an emptyDir volume will be used. |
 | inputTail | [InputTail](./fluentbit.md#tail-inputtail) | {} | Preconfigured tailer for container logs on the host. Container runtime (containerd vs. docker) is automatically detected for convenience. |
 | filterKubernetes | [FilterKubernetes](./fluentbit.md#kubernetes-filterkubernetes) | {} | Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata. |
+| filterAws | [FilterAws](./fluentbit.md#filteraws) | nil | The AWS Filter Enriches logs with AWS Metadata. |
 | bufferStorage | [BufferStorage](./fluentbit.md#bufferstorage) |  | Buffer Storage configures persistent buffer to avoid losing data in case of a failure |
 | bufferStorageVolume | [KubernetesStorage](#KubernetesStorage) | nil | Volume definition for the Buffer Storage. If nothing is configured an emptydir volume will be used. |
 | extraVolumeMounts | [][VolumeMount](#Volume-Mount) | "" | ExtraVolumeMounts defines source and destination foldersof a pod mount |
