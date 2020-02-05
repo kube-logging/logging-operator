@@ -295,6 +295,9 @@ spec:
                 filterAws:
                   description: FilterAws The AWS Filter Enriches logs with AWS Metadata.
                   properties:
+                    Match:
+                      description: Match filtered records (default:*)
+                      type: string
                     imds_version:
                       description: Specify which version of the instance metadata
                         service to use. Valid values are 'v1' or 'v2'; 'v2' is the
