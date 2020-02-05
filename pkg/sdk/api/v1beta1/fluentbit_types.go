@@ -187,6 +187,8 @@ type FilterKubernetes struct {
 type FilterAws struct {
 	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'; 'v2' is the default.
 	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
+	// Match filtered records (default:*)
+	Match string `json:"Match,omitempty" plugin:"default:*"`
 }
 
 // VolumeMount defines source and destination folders of a hostPath type pod mount

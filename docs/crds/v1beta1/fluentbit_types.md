@@ -103,6 +103,7 @@
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | imds_version | string | No | v2 | Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'; 'v2' is the default.<br> |
+| Match | string | No | * | Match filtered records (default:*)<br> |
 ### VolumeMount
 #### VolumeMount defines source and destination folders of a hostPath type pod mount
 

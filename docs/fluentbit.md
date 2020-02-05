@@ -70,6 +70,7 @@ spec:
   fluentd: {}
   fluentbit:
     filterAws:
+      match: "*"
       imds_version: "v1"
   controlNamespace: logging
 ```
