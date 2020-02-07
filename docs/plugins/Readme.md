@@ -14,6 +14,7 @@ For more information please click on the plugin name
 | **[Grep](filters/grep.md)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Parser](filters/parser.md)** | filters | Parses" string field in event records and mutates its | GA | [more info](https://docs.fluentd.org/filter/parser) |
 | **[Prometheus](filters/prometheus.md)** | filters | Prometheus Filter Plugin to count Incoming Records | GA | [more info](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin) |
+| **[Record Modifier](filters/record_modifier.md)** | filters | Modify each event record. | GA | [more info](https://github.com/repeatedly/fluent-plugin-record-modifier) |
 | **[Record Transformer](filters/record_transformer.md)** | filters | Mutates/transforms incoming event streams. | GA | [more info](https://docs.fluentd.org/filter/record_transformer) |
 | **[Stdout](filters/stdout.md)** | filters | Prints events to stdout | GA | [more info](https://docs.fluentd.org/filter/stdout) |
 | **[Tag Normaliser](filters/tagnormaliser.md)** | filters | Re-tag based on log metadata | GA | [more info](https://github.com/banzaicloud/fluent-plugin-tag-normaliser) |
