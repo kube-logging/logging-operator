@@ -68,9 +68,9 @@ bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
 	@which etcd
-	bin/kubebuilder version
+	kubebuilder version
 	cd pkg/sdk && go test ./...
-	go test ./pkg/sdk/model/filter/record_modifier_test.go -coverprofile cover.out -v
+	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
 
 # Build manager binary
 manager: generate fmt vet
