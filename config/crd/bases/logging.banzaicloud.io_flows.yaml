@@ -425,6 +425,56 @@ spec:
                           type: object
                         type: array
                     type: object
+                  record_modifier:
+                    properties:
+                      char_encoding:
+                        description: Fluentd including some plugins treats logs as
+                          a BINARY by default to forward. To overide that, use a target
+                          encoding or a from:to encoding here.
+                        type: string
+                      prepare_value:
+                        description: Prepare values for filtering in configure phase.
+                          Prepared values can be used in <record>. You can write any
+                          ruby code.
+                        type: string
+                      records:
+                        description: 'Add records docs at: https://github.com/repeatedly/fluent-plugin-record-modifier
+                          Records are represented as maps: `key: value`'
+                        items:
+                          additionalProperties:
+                            type: string
+                          description: Parameters inside record directives are considered
+                            to be new key-value pairs
+                          type: object
+                        type: array
+                      remove_keys:
+                        description: A comma-delimited list of keys to delete
+                        type: string
+                      replaces:
+                        description: Replace specific value for keys
+                        items:
+                          description: Specify replace rule. This directive contains
+                            three parameters.
+                          properties:
+                            expression:
+                              description: Regular expression
+                              type: string
+                            key:
+                              description: Key to search for
+                              type: string
+                            replace:
+                              description: Value to replace with
+                              type: string
+                          required:
+                          - expression
+                          - key
+                          - replace
+                          type: object
+                        type: array
+                      whitelist_keys:
+                        description: This is exclusive with remove_keys
+                        type: string
+                    type: object
                   record_transformer:
                     properties:
                       auto_typecast:

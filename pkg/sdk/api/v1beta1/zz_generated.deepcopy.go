@@ -207,6 +207,11 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 		*out = new(filter.RecordTransformer)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.RecordModifier != nil {
+		in, out := &in.RecordModifier, &out.RecordModifier
+		*out = new(filter.RecordModifier)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.GeoIP != nil {
 		in, out := &in.GeoIP, &out.GeoIP
 		*out = new(filter.GeoIP)
