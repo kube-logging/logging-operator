@@ -17,6 +17,7 @@
 | tag_normaliser | *filter.TagNormaliser | No | - |  |
 | dedot | *filter.DedotFilterConfig | No | - |  |
 | record_transformer | *filter.RecordTransformer | No | - |  |
+| record_modifier | *filter.RecordModifier | No | - |  |
 | geoip | *filter.GeoIP | No | - |  |
 | concat | *filter.Concat | No | - |  |
 | detectExceptions | *filter.DetectExceptions | No | - |  |
