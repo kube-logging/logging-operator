@@ -66,6 +66,9 @@ type LogZOutput struct {
 	OutputIncludeTime bool `json:"output_include_time,omitempty"`
 	OutputIncludeTags bool `json:"output_include_tags,omitempty"`
 	HTTPIdleTimeout   int  `json:"http_idle_timeout,omitempty"`
+	RetryCount        int  `json:"retry_count,omitempty"`
+	RetrySleep        int  `json:"retry_sleep,omitempty"`
+	Gzip              bool `json:"gzip,omitempty"`
 
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
@@ -118,7 +121,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		if e.Endpoint.URL != "" {
 			url = e.Endpoint.URL
 		}
-		connectionString = fmt.Sprintf("%s:%d?type=my_type", url, port)
+		connectionString = fmt.Sprintf("%s:%d", url, port)
 
 		// decrypt token secrent
 		endpoint, err := e.Endpoint.ToDirective(secretLoader)
@@ -126,7 +129,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			return nil, err
 		}
 		if token, ok := endpoint.GetParams()["token"]; ok {
-			connectionString = fmt.Sprintf("%s&token=%s", connectionString, token)
+			connectionString = fmt.Sprintf("%s?token=%s", connectionString, token)
 		}
 	}
 

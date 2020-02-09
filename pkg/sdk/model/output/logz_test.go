@@ -25,14 +25,16 @@ import (
 func TestLogZ(t *testing.T) {
 	CONFIG := []byte(`
 endpoint:
-  port: 8107
+  port: 8071
 http_idle_timeout: 10
 output_include_tags: true
 output_include_time: true
+retry_count: 4
+retry_sleep: 2
+gzip: true
 buffer:
-  tags: tag
-  type: memory
-  chunk_limit_size: 187m
+  type: file
+  chunk_limit_size: 16m
   flush_interval: 3s
   flush_thread_count: 4
   queue_limit_length: 4096
@@ -41,10 +43,13 @@ buffer:
   <match **>
 	@type logzio_buffered
 	@id test_logzio_buffered
-	endpoint_url https://listener.logz.io:8071?token=ekXLvrbriwkuTmhZrELsYbSznxqnhyQj\u0026type=my_type
+	endpoint_url https://listener.logz.io:8071
+	gzip true
 	http_idle_timeout 10
 	output_include_tags true
 	output_include_time true
+	retry_count 4
+	retry_sleep 2
     <buffer tag,time>
 	  @type file
 	  chunk_limit_size 16m
