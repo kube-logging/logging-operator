@@ -29,28 +29,29 @@ import (
 // ```
 // spec:
 //   logz:
-//     url: https://listener.logz.io
-//     port: 8071
-//     token: 12345
-//     output:
-//       include_time: true
-//       include_tags: false
-//       tags_fieldname: @log_name
+//     endpoint:
+//       url: https://listener.logz.io
+//       port: 8071
+//       token:
+//         valueFrom:
+//          secretKeyRef:
+//      	  name: logz-token
+//            key: token
+//     output_include_tags: true
+//     output_include_time: true
 //     buffer:
 //       type: file
 //       flush_thread_count: 4
 //       flush_interval: 3s
 //       chunk_limit_size: 16m
 //       queue_limit_length: 4096
-//     http:
-//       idle_timeout: 10
 // ```
 type _docLogZ interface{}
 
 // +name:"LogZ"
-// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.7.0"
-// +version:"3.7.0"
-// +description:"Send your logs to LogZ"
+// +url:"https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20"
+// +version:"0.0.20"
+// +description:"Store logs in LogZ.io"
 // +status:"GA"
 type _metaLogZ interface{}
 
@@ -74,7 +75,7 @@ type LogZOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-// Endpoint thing
+// Endpoint defines connection details for LogZ.io.
 // +kubebuilder:object:generate=true
 // +docName:"Endpoint"
 type Endpoint struct {
@@ -123,7 +124,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 		connectionString = fmt.Sprintf("%s:%d", url, port)
 
-		// decrypt token secrent
+		// decrypt token secret
 		endpoint, err := e.Endpoint.ToDirective(secretLoader)
 		if err != nil {
 			return nil, err
@@ -133,7 +134,6 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 	}
 
-	//n := map[string]string{"endpoint_url": connectionString}
 	// add endpoint_url to parameters
 	logz.Params.Merge(map[string]string{"endpoint_url": connectionString})
 
