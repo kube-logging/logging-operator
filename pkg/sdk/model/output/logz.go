@@ -59,18 +59,20 @@ type _metaLogZ interface{}
 // +docName:"Logzio"
 // LogZ Send your logs to LogZ.io
 type LogZOutput struct {
-	// +docLink:"Shared Credentials,#Shared-Credentials"
+	// Define LogZ endpoint URL
 	Endpoint *Endpoint `json:"endpoint"`
-	// Token (LogZ API Token).
-	// +docLink:"Secret,./secret.md"
-	//Token             *secret.Secret `json:"token,omitempty"`
+	// Should the appender add a timestamp to your logs on their process time (recommended).
 	OutputIncludeTime bool `json:"output_include_time,omitempty"`
+	// Should the appender add the fluentd tag to the document, called "fluentd_tag"
 	OutputIncludeTags bool `json:"output_include_tags,omitempty"`
-	HTTPIdleTimeout   int  `json:"http_idle_timeout,omitempty"`
-	RetryCount        int  `json:"retry_count,omitempty"`
-	RetrySleep        int  `json:"retry_sleep,omitempty"`
-	Gzip              bool `json:"gzip,omitempty"`
-
+	// Timeout in seconds that the http persistent connection will stay open without traffic.
+	HTTPIdleTimeout int `json:"http_idle_timeout,omitempty"`
+	// How many times to resend failed bulks.
+	RetryCount int `json:"retry_count,omitempty"`
+	// How long to sleep initially between retries, exponential step-off.
+	RetrySleep int `json:"retry_sleep,omitempty"`
+	// Should the plugin ship the logs in gzip compression. Default is false.
+	Gzip bool `json:"gzip,omitempty"`
 	// +docLink:"Buffer,./buffer.md"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
@@ -79,8 +81,10 @@ type LogZOutput struct {
 // +kubebuilder:object:generate=true
 // +docName:"Endpoint"
 type Endpoint struct {
-	URL  string `json:"url,omitempty" plugin:"default:"https://listener.logz.io"`
-	Port int    `json:"port,omitempty" plugin:"default:8071"`
+	// LogZ URL.
+	URL string `json:"url,omitempty" plugin:"default:"https://listener.logz.io"`
+	// Port over which to connect to LogZ URL.
+	Port int `json:"port,omitempty" plugin:"default:8071"`
 	// LogZ API Token.
 	// +docLink:"Secret,./secret.md"
 	Token *secret.Secret `json:"token,omitempty"`
@@ -94,6 +98,7 @@ func (e *Endpoint) ToDirective(secretLoader secret.SecretLoader) (types.Directiv
 	return types.NewFlatDirective(metadata, endpoint, secretLoader)
 }
 
+// ToDirective converts LogZOutput to fluentd configuration.
 func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "logzio_buffered"
 	pluginID := id + "_" + pluginType

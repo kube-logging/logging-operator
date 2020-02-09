@@ -3154,9 +3154,10 @@ spec:
                       type: string
                   type: object
                 endpoint:
-                  description: Endpoint thing
+                  description: Define LogZ endpoint URL
                   properties:
                     port:
+                      description: Port over which to connect to LogZ URL.
                       type: integer
                     token:
                       description: LogZ API Token.
@@ -3213,16 +3214,32 @@ spec:
                           type: object
                       type: object
                     url:
+                      description: LogZ URL.
                       type: string
                   type: object
+                gzip:
+                  description: Should the plugin ship the logs in gzip compression.
+                    Default is false.
+                  type: boolean
                 http_idle_timeout:
+                  description: Timeout in seconds that the http persistent connection
+                    will stay open without traffic.
                   type: integer
                 output_include_tags:
+                  description: Should the appender add the fluentd tag to the document,
+                    called "fluentd_tag"
                   type: boolean
                 output_include_time:
-                  description: Token (LogZ API Token). Token             *secret.Secret
-                    `json:"token,omitempty"`
+                  description: Should the appender add a timestamp to your logs on
+                    their process time (recommended).
                   type: boolean
+                retry_count:
+                  description: How many times to resend failed bulks.
+                  type: integer
+                retry_sleep:
+                  description: How long to sleep initially between retries, exponential
+                    step-off.
+                  type: integer
               required:
               - endpoint
               type: object
