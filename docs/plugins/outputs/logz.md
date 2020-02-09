@@ -44,6 +44,6 @@ More info at https://github.com/logzio/fluent-plugin-logzio
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| url | string | No | "https://listener.logz.io | LogZ URL.<br> |
+| url | string | No | https://listener.logz.io | LogZ URL.<br> |
 | port | int | No | 8071 | Port over which to connect to LogZ URL.<br> |
 | token | *secret.Secret | No | - | LogZ API Token.<br>[Secret](./secret.md)<br> |

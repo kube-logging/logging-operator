@@ -82,7 +82,7 @@ type LogZOutput struct {
 // +docName:"Endpoint"
 type Endpoint struct {
 	// LogZ URL.
-	URL string `json:"url,omitempty" plugin:"default:"https://listener.logz.io"`
+	URL string `json:"url,omitempty" plugin:"default:https://listener.logz.io"`
 	// Port over which to connect to LogZ URL.
 	Port int `json:"port,omitempty" plugin:"default:8071"`
 	// LogZ API Token.
