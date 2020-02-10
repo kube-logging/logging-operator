@@ -34,6 +34,7 @@ type Filter struct {
 	TagNormaliser     *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
 	Dedot             *filter.DedotFilterConfig  `json:"dedot,omitempty"`
 	RecordTransformer *filter.RecordTransformer  `json:"record_transformer,omitempty"`
+	RecordModifier    *filter.RecordModifier     `json:"record_modifier,omitempty"`
 	GeoIP             *filter.GeoIP              `json:"geoip,omitempty"`
 	Concat            *filter.Concat             `json:"concat,omitempty"`
 	DetectExceptions  *filter.DetectExceptions   `json:"detectExceptions,omitempty"`
