@@ -9,6 +9,7 @@
 | gcs | *output.GCSOutput | No | - |  |
 | oss | *output.OSSOutput | No | - |  |
 | elasticsearch | *output.ElasticsearchOutput | No | - |  |
+| logz | *output.LogZOutput | No | - |  |
 | loki | *output.LokiOutput | No | - |  |
 | sumologic | *output.SumologicOutput | No | - |  |
 | forward | *output.ForwardOutput | No | - |  |
