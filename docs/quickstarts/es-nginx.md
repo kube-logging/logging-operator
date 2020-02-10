@@ -194,3 +194,4 @@ To validate that the deployment was successful, complete the following steps.
 1. Open the Kibana dashboard in your browser: [https://localhost:5601](https://localhost:5601). You should see the dashboard and some sample log messages from the demo application.
 
 <p align="center"><img src="../img/es_kibana.png" width="660"></p>
+> If you don't get the expected result you can find help in the [troubleshooting-guideline](../troubleshooting.md).

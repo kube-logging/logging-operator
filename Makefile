@@ -128,7 +128,7 @@ docker-push:
 controller-gen: bin/gobin
 ifeq (, $(shell which controller-gen))
 	@mkdir -p bin
-	GOBIN=bin/ GOFLAGS="" bin/gobin sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.1
+	GOBIN=bin/ GOFLAGS="" bin/gobin sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.4
 CONTROLLER_GEN=$(abspath bin/controller-gen)
 else
 CONTROLLER_GEN=$(shell which controller-gen)

@@ -30,6 +30,7 @@ The Logging operator is a core part of the [Banzai Cloud Pipeline](https://banza
 - **[Scaling](./scaling.md)**
 - **[CPU and memory requirements](./requirements.md)**
 - **[Contributing](../README.md#contributing)**
+- **[Frequently Asked Questions (FAQ)](./faq.md)**
 - **[Blogs](./blogs.md)**
 - **[License](./license.md)**
 ---
