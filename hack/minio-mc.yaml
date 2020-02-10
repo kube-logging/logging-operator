@@ -1,9 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio-mc-deployment
   namespace: logging
 spec:
+  selector:
+    matchLabels:
+      app: minio-mc
   strategy:
     type: Recreate
   template:
