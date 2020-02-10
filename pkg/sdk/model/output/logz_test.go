@@ -26,6 +26,8 @@ func TestLogZ(t *testing.T) {
 	CONFIG := []byte(`
 endpoint:
   port: 8071
+  token:
+    value: 1234
 http_idle_timeout: 10
 output_include_tags: true
 output_include_time: true
@@ -43,7 +45,7 @@ buffer:
   <match **>
 	@type logzio_buffered
 	@id test_logzio_buffered
-	endpoint_url https://listener.logz.io:8071
+	endpoint_url https://listener.logz.io:8071?token=1234
 	gzip true
 	http_idle_timeout 10
 	output_include_tags true
