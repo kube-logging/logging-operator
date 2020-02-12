@@ -6,7 +6,7 @@ Fluent Bit is an open source and multi-platform Log Processor and Forwarder whic
 
 Fluent Bit is written in C, have a pluggable architecture supporting around 30 extensions. It's fast and lightweight and provide the required security for network operations through TLS.
 
-Current Version: [v1.3.2](https://github.com/fluent/fluent-bit/releases/tag/v1.3.2)
+Current Version: [v1.3.6](https://github.com/fluent/fluent-bit/releases/tag/v1.3.6)
 
 ## Filters
 ### Kubernetes (filterKubernetes)
@@ -45,12 +45,12 @@ The plugin supports the following configuration parameters:
 | Merge\_Log\_Trim | When `Merge_Log` is enabled, trim (remove possible \n or \r) field values. | On |
 | Merge\_Parser | Optional parser name to specify how to parse the data contained in the _log_ key. Recommended use is for developers or testing only.  | |
 | Keep\_Log | When `Keep_Log` is disabled, the `log` field is removed from the incoming message once it has been successfully merged (`Merge_Log` must be enabled as well). | On |
-| tls.debug | Debug level between 0 \(nothing\) and 4 \(every detail\). | -1 |
-| tls.verify | When enabled, turns on certificate validation when connecting to the Kubernetes API server. | On |
+| tls\_debug | Debug level between 0 \(nothing\) and 4 \(every detail\). | -1 |
+| tls\_verify | When enabled, turns on certificate validation when connecting to the Kubernetes API server. | On |
 | Use\_Journal | When enabled, the filter reads logs coming in Journald format. | Off |
 | Regex\_Parser | Set an alternative Parser to process record Tag and extract pod\_name, namespace\_name, container\_name and docker\_id. The parser must be registered in a [parsers file](https://github.com/fluent/fluent-bit/blob/master/conf/parsers.conf) \(refer to parser _filter-kube-test_ as an example\). |  |
-| K8S-Logging.Parser | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) | Off |
-| K8S-Logging.Exclude | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). | Off |
+| K8S\_Logging\_Parser | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) | Off |
+| K8S\_Logging\_Exclude | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). | Off |
 | Labels | Include Kubernetes resource labels in the extra metadata. | On |
 | Annotations | Include Kubernetes resource annotations in the extra metadata. | On |
 | Kube\_meta_preload_cache_dir | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta | |
