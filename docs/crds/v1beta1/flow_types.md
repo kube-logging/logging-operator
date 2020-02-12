@@ -3,10 +3,24 @@
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| selectors | map[string]string | Yes | - |  |
+| selectors | map[string]string | No | - | Deprecated<br> |
+| match | []Match | No | - |  |
 | filters | []Filter | No | - |  |
 | loggingRef | string | No | - |  |
 | outputRefs | []string | Yes | - |  |
+### Match
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| select | *Select | No | - |  |
+| exclude | *Exclude | No | - |  |
+### Select
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| labels | map[string]string | No | - |  |
+### Exclude
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| labels | map[string]string | No | - |  |
 ### Filter
 #### Filter definition for FlowSpec
 
