@@ -86,12 +86,12 @@
 | Merge_Log_Trim | string | No | On | When Merge_Log is enabled, trim (remove possible \n or \r) field values.  <br> |
 | Merge_Parser | string | No | - | Optional parser name to specify how to parse the data contained in the log key. Recommended use is for developers or testing only.<br> |
 | Keep_Log | string | No | On | When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well). <br> |
-| tls_debug | string | No | -1 | Debug level between 0 (nothing) and 4 (every detail). <br> |
-| tls_verify | string | No | On | When enabled, turns on certificate validation when connecting to the Kubernetes API server. <br> |
+| tls.debug | string | No | -1 | Debug level between 0 (nothing) and 4 (every detail). <br> |
+| tls.verify | string | No | On | When enabled, turns on certificate validation when connecting to the Kubernetes API server. <br> |
 | Use_Journal | string | No | Off | When enabled, the filter reads logs coming in Journald format. <br> |
 | Regex_Parser | string | No | - | Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).<br> |
-| K8S_Logging_Parser | string | No | Off | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) <br> |
-| K8S_Logging_Exclude | string | No | Off | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). <br> |
+| K8S-Logging.Parser | string | No | Off | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) <br> |
+| K8S-Logging.Exclude | string | No | Off | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). <br> |
 | Labels | string | No | On | Include Kubernetes resource labels in the extra metadata. <br> |
 | Annotations | string | No | On | Include Kubernetes resource annotations in the extra metadata. <br> |
 | Kube_meta_preload_cache_dir | string | No | - | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta<br> |
