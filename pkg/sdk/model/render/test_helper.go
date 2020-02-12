@@ -82,8 +82,9 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 	suite.System = types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{})
+		[]types.FlowMatch{
+			{Namespaces: []string{"ns-test"}},
+		})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -20,7 +20,6 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta2"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
@@ -49,7 +48,7 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	}
 }
 
-func CreateFilter(filter v1beta2.Filter, flowName string, index int, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, flowName string, index int, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {

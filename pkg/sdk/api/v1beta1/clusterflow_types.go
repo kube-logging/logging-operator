@@ -30,6 +30,29 @@ type ClusterFlow struct {
 	Status FlowStatus `json:"status,omitempty"`
 }
 
+type ClusterMatch struct {
+	*ClusterSelect  `json:"select,omitempty"`
+	*ClusterExclude `json:"exclude,omitempty"`
+}
+
+type ClusterSelect struct {
+	Namespaces []string          `json:"namespaces,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
+}
+
+type ClusterExclude struct {
+	Namespaces []string          `json:"namespaces,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
+}
+
+// FlowSpec is the Kubernetes spec for Flows
+type ClusterFlowSpec struct {
+	Match      []ClusterMatch `json:"match,omitempty"`
+	Filters    []Filter       `json:"filters,omitempty"`
+	LoggingRef string         `json:"loggingRef,omitempty"`
+	OutputRefs []string       `json:"outputRefs"`
+}
+
 // +kubebuilder:object:root=true
 
 // ClusterFlowList contains a list of ClusterFlow

@@ -18,7 +18,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
@@ -49,24 +48,28 @@ type FlowMatch struct {
 	Negate bool `json:"negate,omitempty"`
 }
 
-func (f *FlowMatch) toDirective() (Directive, error) {
-	match := &GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Directive: "match",
-		},
-		Params: map[string]string{
-			"namespaces": strings.Join(f.Namespaces, ","),
-			"negate":     strconv.FormatBool(f.Negate),
-		},
+func (f FlowMatch) GetPluginMeta() *PluginMeta {
+	return &PluginMeta{
+		Directive: "match",
+	}
+}
+func (f FlowMatch) GetParams() map[string]string {
+	params := map[string]string{
+		"namespaces": strings.Join(f.Namespaces, ","),
+		"negate":     strconv.FormatBool(f.Negate),
 	}
 	if len(f.Labels) > 0 {
 		var sb []string
 		for _, key := range util.OrderedStringMap(f.Labels).Keys() {
 			sb = append(sb, key+":"+f.Labels[key])
 		}
-		match.Params["labels"] = strings.Join(sb, ",")
+		params["labels"] = strings.Join(sb, ",")
 	}
-	return match, nil
+	return params
+}
+
+func (f FlowMatch) GetSections() []Directive {
+	return nil
 }
 
 type FlowRoute struct {
@@ -78,17 +81,25 @@ func (f *FlowRoute) GetPluginMeta() *PluginMeta {
 	return &f.PluginMeta
 }
 
-func (f *FlowRoute) GetSections() []Directive {
+func (f *FlowRoute) GetParams() map[string]string {
 	return nil
 }
 
+func (f *FlowRoute) GetSections() []Directive {
+	return f.Matches
+}
+
 func (r *Router) AddRoute(flow *Flow) *Router {
-	r.Routes = append(r.Routes, &FlowRoute{
+	route := &FlowRoute{
 		PluginMeta: PluginMeta{
 			Directive: "route",
 			Label:     flow.FlowLabel,
 		},
-	})
+	}
+	for _, f := range flow.Matches {
+		route.Matches = append(route.Matches, f)
+	}
+	r.Routes = append(r.Routes, route)
 	return r
 }
 

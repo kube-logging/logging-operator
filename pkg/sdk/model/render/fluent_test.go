@@ -272,10 +272,11 @@ func TestMultipleOutput(t *testing.T) {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
 		})
 	if err != nil {
 		t.Fatal(err)
@@ -347,10 +348,11 @@ func TestRenderFullFluentConfig(t *testing.T) {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
 		})
 	if err != nil {
 		t.Fatal(err)
@@ -517,10 +519,11 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 		return err
 	}
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
 		})
 	if err != nil {
 		return err
@@ -574,7 +577,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 }
 
 func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
-	flowObj, err := types.NewFlow(namespace, labels)
+	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}})
 	if err != nil {
 		panic(err)
 	}

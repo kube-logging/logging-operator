@@ -92,7 +92,7 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(namespace string, matches []FlowMatch) (*Flow, error) {
+func NewFlow(matches []FlowMatch) (*Flow, error) {
 	flowLabel, err := calculateFlowLabel(matches)
 	if err != nil {
 		return nil, err
@@ -103,6 +103,7 @@ func NewFlow(namespace string, matches []FlowMatch) (*Flow, error) {
 			Tag:       flowLabel,
 		},
 		FlowLabel: flowLabel,
+		Matches:   matches,
 	}, nil
 }
 

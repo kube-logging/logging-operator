@@ -41,7 +41,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	loggingv1beta2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta2"
 )
 
 // LoggingReconciler reconciles a Logging object
@@ -146,7 +145,6 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
 	clusterOutputSource := &source.Kind{Type: &loggingv1beta1.ClusterOutput{}}
 	clusterFlowSource := &source.Kind{Type: &loggingv1beta1.ClusterFlow{}}
-	clusterFlowSource := &source.Kind{Type: &loggingv1beta2.ClusterFlow{}}
 	outputSource := &source.Kind{Type: &loggingv1beta1.Output{}}
 	flowSource := &source.Kind{Type: &loggingv1beta1.Flow{}}
 	secretSource := &source.Kind{Type: &corev1.Secret{}}
