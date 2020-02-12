@@ -209,6 +209,10 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @d41d8cd98f00b204e9800998ecf8427e
+				<match>
+				  namespaces
+				  negate false
+				</match>
               </route>
             </match>`,
 			),
@@ -225,7 +229,10 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @098f6bcd4621d373cade4e832627b4f6
-                namespace test
+				  <match>
+				    namespaces test
+				    negate false
+				  </match>
               </route>
             </match>`,
 			),
@@ -242,8 +249,11 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @092f5fa58e4f619d739f5b65f2ed38bc
-                labels a:b,c:d
-                namespace test
+        		  <match>
+        		    labels a:b,c:d
+        		    namespaces test
+        		    negate false
+        		  </match>
               </route>
             </match>`,
 			),
@@ -317,8 +327,11 @@ func TestMultipleOutput(t *testing.T) {
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+        	<match>
+        	  labels key1:val1,key2:val2
+        	  namespaces ns-test
+        	  negate false
+        	</match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>
@@ -392,8 +405,11 @@ func TestRenderFullFluentConfig(t *testing.T) {
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+			  <match>
+			    labels key1:val1,key2:val2
+			    namespaces ns-test
+			    negate false
+			  </match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>
@@ -561,8 +577,11 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+			<match>
+			  labels key1:val1,key2:val2
+			  namespaces ns-test
+			  negate false
+			</match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>

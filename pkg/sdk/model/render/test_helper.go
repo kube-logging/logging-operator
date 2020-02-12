@@ -74,7 +74,10 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
   @id test_label_router
   <route>
     @label @a42fd8d29c181fcf9887280c4a51bd1e
-    namespace ns-test
+    <match>
+      namespaces ns-test
+      negate false
+    </match>
   </route>
 </match>
 <label @a42fd8d29c181fcf9887280c4a51bd1e>`,
