@@ -6,7 +6,7 @@ Fluent Bit is an open source and multi-platform Log Processor and Forwarder whic
 
 Fluent Bit is written in C, have a pluggable architecture supporting around 30 extensions. It's fast and lightweight and provide the required security for network operations through TLS.
 
-Current Version: [v1.3.2](https://github.com/fluent/fluent-bit/releases/tag/v1.3.2)
+Current Version: [v1.3.6](https://github.com/fluent/fluent-bit/releases/tag/v1.3.6)
 
 ## Filters
 ### Kubernetes (filterKubernetes)
