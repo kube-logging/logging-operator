@@ -12,19 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1beta2
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta2"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Match struct {
+	*Select  `json:"select,omitempty"`
+	*Exclude `json:"exclude,omitempty"`
+}
+
+type Select struct {
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
+type Exclude struct {
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
-	Selectors  map[string]string `json:"selectors"`
-	Filters    []v1beta2.Filter  `json:"filters,omitempty"`
-	LoggingRef string            `json:"loggingRef,omitempty"`
-	OutputRefs []string          `json:"outputRefs"`
+	Match      []Match  `json:"match,omitempty"`
+	Filters    []Filter `json:"filters,omitempty"`
+	LoggingRef string   `json:"loggingRef,omitempty"`
+	OutputRefs []string `json:"outputRefs"`
+}
+
+// Filter definition for FlowSpec
+type Filter struct {
+	StdOut            *filter.StdOutFilterConfig `json:"stdout,omitempty"`
+	Parser            *filter.ParserConfig       `json:"parser,omitempty"`
+	TagNormaliser     *filter.TagNormaliser      `json:"tag_normaliser,omitempty"`
+	Dedot             *filter.DedotFilterConfig  `json:"dedot,omitempty"`
+	RecordTransformer *filter.RecordTransformer  `json:"record_transformer,omitempty"`
+	RecordModifier    *filter.RecordModifier     `json:"record_modifier,omitempty"`
+	GeoIP             *filter.GeoIP              `json:"geoip,omitempty"`
+	Concat            *filter.Concat             `json:"concat,omitempty"`
+	DetectExceptions  *filter.DetectExceptions   `json:"detectExceptions,omitempty"`
+	Grep              *filter.GrepConfig         `json:"grep,omitempty"`
+	Prometheus        *filter.PrometheusConfig   `json:"prometheus,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow

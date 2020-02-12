@@ -15,9 +15,12 @@
 package model
 
 import (
+	"fmt"
+
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta2"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
@@ -104,21 +107,70 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	return system, nil
 }
 
-func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespaces []string) (*types.Flow, error) {
-	flow, err := types.NewFlow(namespace, flowCr.Spec.Match)
+type CommonFlow struct {
+	Name       string
+	Namespace  string
+	OutputRefs []string
+	Filters    []v1beta2.Filter
+	Flow       *types.Flow
+}
+
+func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
+	var commonFlow *CommonFlow
+	switch f := flowCr.(type) {
+	case v1beta1.Flow:
+		//TODO transform old format into CommonFlow and FlowMatch
+		return nil, nil
+	case v1beta2.Flow:
+		commonFlow = &CommonFlow{
+			Name:       f.Name,
+			Namespace:  f.Namespace,
+			OutputRefs: f.Spec.OutputRefs,
+			Filters:    f.Spec.Filters,
+		}
+
+		flowMatches := types.GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+		flow, err := types.NewFlow(f.Namespace, flowMatches)
+		if err != nil {
+			return nil, err
+		}
+		commonFlow.Flow = flow
+		return commonFlow, nil
+	case v1beta2.ClusterFlow:
+		commonFlow = &CommonFlow{
+			Name:       f.Name,
+			Namespace:  f.Namespace,
+			OutputRefs: f.Spec.OutputRefs,
+			Filters:    f.Spec.Filters,
+		}
+
+		flowMatches := types.GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+		flow, err := types.NewFlow(f.Namespace, flowMatches)
+		if err != nil {
+			return nil, err
+		}
+		commonFlow.Flow = flow
+		return commonFlow, nil
+	}
+	return nil, fmt.Errorf("unsupported type: %t", flowCr)
+}
+
+func (l *LoggingResources) CreateFlowFromCustomResource(flowCr interface{}, namespace string) (*types.Flow, error) {
+	commonFlow, err := FlowDispatcher(flowCr)
 	if err != nil {
 		return nil, err
 	}
+	flow := commonFlow.Flow
 	outputs := []types.Output{}
 	var multierr error
 FindOutputForAllRefs:
-	for _, outputRef := range flowCr.Spec.OutputRefs {
+	for _, outputRef := range commonFlow.OutputRefs {
 		// only namespaced flows should use namespaced outputs
 		if namespace != "" {
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
 				if output.Namespace == namespace && outputRef == output.Name {
-					outputId := namespace + "_" + flowCr.Name + "_" + output.Name
+					outputId := namespace + "_" + commonFlow.Name + "_" + output.Name
 					plugin, err := plugins.CreateOutput(output.Spec, outputId, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -131,7 +183,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				outputId := namespace + "_" + flowCr.Name + "_" + clusterOutput.Name
+				outputId := namespace + "_" + commonFlow.Name + "_" + clusterOutput.Name
 				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputId, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -147,10 +199,10 @@ FindOutputForAllRefs:
 
 	// Filter
 	var filters []types.Filter
-	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, flowCr.Name, i, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
+	for i, f := range commonFlow.Filters {
+		filter, err := plugins.CreateFilter(f, commonFlow.Name, i, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
-			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowCr.Name))
+			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, commonFlow.Name))
 			continue
 		}
 		filters = append(filters, filter)

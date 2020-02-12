@@ -15,8 +15,10 @@
 package types
 
 import (
+	"strconv"
 	"strings"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
@@ -38,33 +40,42 @@ func (r *Router) GetSections() []Directive {
 	return r.Routes
 }
 
-type FlowRoute struct {
-	PluginMeta
+type FlowMatch struct {
 	// Optional set of kubernetes labels
 	Labels map[string]string `json:"labels,omitempty"`
 	// Optional namespace
-	Namespaces []string `json:"namespace,omitempty"`
+	Namespaces []string `json:"namespaces,omitempty"`
 	// Negate
 	Negate bool `json:"negate,omitempty"`
 }
 
-func (f *FlowRoute) GetPluginMeta() *PluginMeta {
-	return &f.PluginMeta
-}
-
-func (f *FlowRoute) GetParams() map[string]string {
-	params := map[string]string{}
-	if f.Namespaces != "" {
-		params["namespace"] = f.Namespace
+func (f *FlowMatch) toDirective() (Directive, error) {
+	match := &GenericDirective{
+		PluginMeta: types.PluginMeta{
+			Directive: "match",
+		},
+		Params: map[string]string{
+			"namespaces": strings.Join(f.Namespaces, ","),
+			"negate":     strconv.FormatBool(f.Negate),
+		},
 	}
 	if len(f.Labels) > 0 {
 		var sb []string
 		for _, key := range util.OrderedStringMap(f.Labels).Keys() {
 			sb = append(sb, key+":"+f.Labels[key])
 		}
-		params["labels"] = strings.Join(sb, ",")
+		match.Params["labels"] = strings.Join(sb, ",")
 	}
-	return params
+	return match, nil
+}
+
+type FlowRoute struct {
+	PluginMeta
+	Matches []Directive
+}
+
+func (f *FlowRoute) GetPluginMeta() *PluginMeta {
+	return &f.PluginMeta
 }
 
 func (f *FlowRoute) GetSections() []Directive {
@@ -77,8 +88,6 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 			Directive: "route",
 			Label:     flow.FlowLabel,
 		},
-		Labels:     flow.Labels,
-		Namespaces: flow.Namespace,
 	})
 	return r
 }

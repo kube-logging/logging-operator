@@ -50,10 +50,8 @@ type Flow struct {
 	// List of Outputs that will emit the event, at least one output is required.
 	Outputs []Output `json:"outputs"`
 
-	// Optional set of kubernetes labels
-	Labels map[string]string `json:"-"`
-	// Optional namespace
-	Namespace string `json:"-"`
+	// Matches for select or exclude
+	Matches []FlowMatch `json:"matches,omitempty"`
 
 	// Fluentd label
 	FlowLabel string `json:"-"`
@@ -94,8 +92,8 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(namespaces []string, labels map[string]string) (*Flow, error) {
-	flowLabel, err := calculateFlowLabel(namespaces, labels)
+func NewFlow(namespace string, matches []FlowMatch) (*Flow, error) {
+	flowLabel, err := calculateFlowLabel(matches)
 	if err != nil {
 		return nil, err
 	}
@@ -105,33 +103,34 @@ func NewFlow(namespaces []string, labels map[string]string) (*Flow, error) {
 			Tag:       flowLabel,
 		},
 		FlowLabel: flowLabel,
-		Labels:    labels,
-		Namespace: namespace,
 	}, nil
 }
 
-func calculateFlowLabel(namespaces []string, labels map[string]string) (string, error) {
+func calculateFlowLabel(matches []FlowMatch) (string, error) {
 	b := md5.New()
-	sort.Strings(namespaces)
-	for _, n := range namespaces {
-		if _, err := io.WriteString(b, n); err != nil {
-			return "", err
+	for _, match := range matches {
+		sort.Strings(match.Namespaces)
+		for _, n := range match.Namespaces {
+			if _, err := io.WriteString(b, n); err != nil {
+				return "", err
+			}
 		}
-	}
-	// Make sure the generated label is consistent
-	keys := []string{}
-	for k := range labels {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+		// Make sure the generated label is consistent
+		keys := []string{}
+		for k := range match.Labels {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
 
-	for _, k := range keys {
-		if _, err := io.WriteString(b, k); err != nil {
-			return "", err
-		}
-		if _, err := io.WriteString(b, labels[k]); err != nil {
-			return "", err
+		for _, k := range keys {
+			if _, err := io.WriteString(b, k); err != nil {
+				return "", err
+			}
+			if _, err := io.WriteString(b, match.Labels[k]); err != nil {
+				return "", err
+			}
 		}
 	}
+
 	return fmt.Sprintf("@%x", b.Sum(nil)), nil
 }

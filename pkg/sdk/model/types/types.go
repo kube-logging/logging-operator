@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"emperror.dev/errors"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta2"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
@@ -154,6 +155,49 @@ func (p Params) Merge(input map[string]string) Params {
 		p[k] = v
 	}
 	return p
+}
+
+// Create []FlowMatch from v1beta2.Match and v1beta2.ClusterMatch
+func GetFlowMatchFromSpec(namespace string, matches interface{}) []FlowMatch {
+	var flowMatches []FlowMatch
+	switch matchList := matches.(type) {
+	case []v1beta2.Match:
+		for _, match := range matchList {
+			if match.Select != nil {
+				flowMatches = append(flowMatches, FlowMatch{
+					Labels:     match.Select.Labels,
+					Namespaces: []string{namespace},
+					Negate:     false,
+				})
+			}
+			if match.Exclude != nil {
+				flowMatches = append(flowMatches, FlowMatch{
+					Labels:     match.Select.Labels,
+					Namespaces: []string{namespace},
+					Negate:     true,
+				})
+			}
+		}
+		return nil
+	case []v1beta2.ClusterMatch:
+		for _, match := range matchList {
+			if match.ClusterSelect != nil {
+				flowMatches = append(flowMatches, FlowMatch{
+					Labels:     match.ClusterSelect.Labels,
+					Namespaces: match.ClusterSelect.Namespaces,
+					Negate:     false,
+				})
+			}
+			if match.ClusterExclude != nil {
+				flowMatches = append(flowMatches, FlowMatch{
+					Labels:     match.ClusterExclude.Labels,
+					Namespaces: match.ClusterSelect.Namespaces,
+					Negate:     true,
+				})
+			}
+		}
+	}
+	return flowMatches
 }
 
 func NewFlatDirective(meta PluginMeta, config interface{}, secretLoader secret.SecretLoader) (Directive, error) {
