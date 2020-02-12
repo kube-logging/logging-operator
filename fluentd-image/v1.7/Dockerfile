@@ -52,6 +52,7 @@ RUN apk update \
          fluent-plugin-record-modifier \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
+ && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-websocket.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
 
@@ -77,4 +78,3 @@ EXPOSE 24224 5140
 USER fluent
 ENTRYPOINT ["tini",  "--", "/bin/entrypoint.sh"]
 CMD ["fluentd"]
-

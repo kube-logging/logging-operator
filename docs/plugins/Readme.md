@@ -32,5 +32,6 @@ For more information please click on the plugin name
 | **[Alibaba Cloud Storage](outputs/oss.md)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
 | **[Amazon S3](outputs/s3.md)** | outputs | Store logs in Amazon S3 | GA | [1.2.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1) |
 | **[SumoLogic](outputs/sumologic.md)** | outputs | Send your logs to Sumologic | GA | [0.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1) |
+| **[Websocket](outputs/websocket.md)** | outputs | Websocket server to send logs to connected clients | GA | [0.1.8](https://github.com/banzaicloud/fluent-plugin-websocket) |
 </center>
 

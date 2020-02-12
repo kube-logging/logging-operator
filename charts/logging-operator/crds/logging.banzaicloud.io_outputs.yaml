@@ -4385,6 +4385,82 @@ spec:
               - endpoint
               - source_name
               type: object
+            websocket:
+              properties:
+                add_tag:
+                  description: 'Add fluentd tag to the data. (default: true)'
+                  type: boolean
+                add_time:
+                  description: 'Add timestamp to the data. (default: false)'
+                  type: boolean
+                buffered_messages:
+                  description: 'The number of messages to be buffered. The new connection
+                    receives them. (default: 0)'
+                  type: integer
+                host:
+                  description: 'WebSocket server IP address. (default: 0.0.0.0 (ANY))'
+                  type: string
+                port:
+                  description: 'WebSocket server port. (default: 8080)'
+                  type: integer
+                token:
+                  description: 'Authentication token. Passed as get param. If set
+                    to nil, authentication is disabled. (default: nil)'
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
+                use_msgpack:
+                  description: 'Send MessagePack format binary. Otherwise, you send
+                    JSON format text. (default: false)'
+                  type: boolean
+              type: object
           type: object
         status:
           description: OutputStatus defines the observed state of Output
