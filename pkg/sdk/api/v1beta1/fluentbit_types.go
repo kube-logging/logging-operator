@@ -157,17 +157,17 @@ type FilterKubernetes struct {
 	// When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well). (default:On)
 	KeepLog string `json:"Keep_Log,omitempty"`
 	// Debug level between 0 (nothing) and 4 (every detail). (default:-1)
-	TLSDebug string `json:"tls_debug,omitempty"`
+	TLSDebug string `json:"tls.debug,omitempty"`
 	// When enabled, turns on certificate validation when connecting to the Kubernetes API server. (default:On)
-	TLSVerify string `json:"tls_verify,omitempty"`
+	TLSVerify string `json:"tls.verify,omitempty"`
 	// When enabled, the filter reads logs coming in Journald format. (default:Off)
 	UseJournal string `json:"Use_Journal,omitempty"`
 	// Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).
 	RegexParser string `json:"Regex_Parser,omitempty"`
 	// Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) (default:Off)
-	K8SLoggingParser string `json:"K8S_Logging_Parser,omitempty"`
+	K8SLoggingParser string `json:"K8S-Logging.Parser,omitempty"`
 	// Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). (default:Off)
-	K8SLoggingExclude string `json:"K8S_Logging_Exclude,omitempty"`
+	K8SLoggingExclude string `json:"K8S-Logging.Exclude,omitempty"`
 	// Include Kubernetes resource labels in the extra metadata. (default:On)
 	Labels string `json:"Labels,omitempty"`
 	// Include Kubernetes resource annotations in the extra metadata. (default:On)
