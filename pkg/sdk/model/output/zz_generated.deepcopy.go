@@ -337,6 +337,31 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.SSLCACert != nil {
+		in, out := &in.SSLCACert, &out.SSLCACert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCert != nil {
+		in, out := &in.SSLClientCert, &out.SSLClientCert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCertChain != nil {
+		in, out := &in.SSLClientCertChain, &out.SSLClientCertChain
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCertKey != nil {
+		in, out := &in.SSLClientCertKey, &out.SSLClientCertKey
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLVerifyHostname != nil {
+		in, out := &in.SSLVerifyHostname, &out.SSLVerifyHostname
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Format != nil {
 		in, out := &in.Format, &out.Format
 		*out = new(Format)
