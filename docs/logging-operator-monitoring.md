@@ -93,7 +93,7 @@ kubectl -n logging create secret generic logging-s3 --from-literal=accesskey='AK
 #### Deploy Minio
 ```bash
 kubectl -n logging apply -f - <<"EOF" 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio-deployment
