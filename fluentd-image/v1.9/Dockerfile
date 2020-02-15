@@ -13,6 +13,17 @@ RUN apk update \
  && apk add --no-cache --virtual .build-deps \
         build-base linux-headers \
         ruby-dev gnupg \
+        libmaxminddb geoip\
+ && buildDeps=" \
+      make gcc g++ libc-dev \
+      wget bzip2 zlib-dev git linux-headers \
+      automake autoconf libtool build-base \
+      ruby-dev libc6-compat geoip-dev \
+    " \
+ && apk add --no-cache --virtual .build-deps \
+        build-base \
+        ruby-dev gnupg \
+ && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install oj -v 3.8.1 \
  && gem install json -v 2.3.0 \
@@ -20,7 +31,33 @@ RUN apk update \
  && gem install ext_monitor -v 0.1.2 \
  && gem install fluentd -v 1.9.2 \
  && gem install bigdecimal -v 1.4.4 \
- && apk del .build-deps \
+ && gem install \
+         specific_install \
+         fluent-plugin-remote-syslog \
+         fluent-plugin-kubernetes_metadata_filter \
+         fluent-plugin-webhdfs \
+         fluent-plugin-elasticsearch \
+         fluent-plugin-prometheus \
+         fluent-plugin-s3 \
+         fluent-plugin-rewrite-tag-filter \
+         fluent-plugin-azurestorage \
+         fluent-plugin-oss \
+         fluent-plugin-dedot_filter \
+         fluent-plugin-sumologic_output \
+         fluent-plugin-kafka \
+         fluent-plugin-geoip \
+         fluent-plugin-label-router \
+         fluent-plugin-tag-normaliser \
+         fluent-plugin-grafana-loki \
+         fluent-plugin-concat \
+         fluent-plugin-kinesis \
+         fluent-plugin-parser-logfmt \
+         fluent-plugin-detect-exceptions \
+         fluent-plugin-multi-format-parser \
+         fluent-plugin-record-modifier \
+ && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
+ && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
+ && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
 
 RUN addgroup -S fluent && adduser -S -g fluent fluent \
@@ -33,6 +70,7 @@ RUN addgroup -S fluent && adduser -S -g fluent fluent \
 
 COPY fluent.conf /fluentd/etc/
 COPY entrypoint.sh /bin/
+COPY healthy.sh /bin/
 
 
 ENV FLUENTD_CONF="fluent.conf"
