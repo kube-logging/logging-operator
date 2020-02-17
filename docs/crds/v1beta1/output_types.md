@@ -9,6 +9,7 @@
 | gcs | *output.GCSOutput | No | - |  |
 | oss | *output.OSSOutput | No | - |  |
 | elasticsearch | *output.ElasticsearchOutput | No | - |  |
+| logz | *output.LogZOutput | No | - |  |
 | loki | *output.LokiOutput | No | - |  |
 | sumologic | *output.SumologicOutput | No | - |  |
 | forward | *output.ForwardOutput | No | - |  |
@@ -17,6 +18,7 @@
 | kafka | *output.KafkaOutputConfig | No | - |  |
 | cloudwatch | *output.CloudWatchOutput | No | - |  |
 | kinesisStream | *output.KinesisStreamOutputConfig | No | - |  |
+| newrelic | *output.NewRelicOutputConfig | No | - |  |
 ### OutputStatus
 #### OutputStatus defines the observed state of Output
 

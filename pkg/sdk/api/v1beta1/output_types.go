@@ -27,6 +27,7 @@ type OutputSpec struct {
 	GCSOutput                 *output.GCSOutput                 `json:"gcs,omitempty"`
 	OSSOutput                 *output.OSSOutput                 `json:"oss,omitempty"`
 	ElasticsearchOutput       *output.ElasticsearchOutput       `json:"elasticsearch,omitempty"`
+	LogZOutput                *output.LogZOutput                `json:"logz,omitempty"`
 	LokiOutput                *output.LokiOutput                `json:"loki,omitempty"`
 	SumologicOutput           *output.SumologicOutput           `json:"sumologic,omitempty"`
 	ForwardOutput             *output.ForwardOutput             `json:"forward,omitempty"`
@@ -35,6 +36,7 @@ type OutputSpec struct {
 	KafkaOutputConfig         *output.KafkaOutputConfig         `json:"kafka,omitempty"`
 	CloudWatchOutput          *output.CloudWatchOutput          `json:"cloudwatch,omitempty"`
 	KinesisStreamOutputConfig *output.KinesisStreamOutputConfig `json:"kinesisStream,omitempty"`
+	NewRelicOutputConfig      *output.NewRelicOutputConfig      `json:"newrelic,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

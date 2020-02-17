@@ -828,6 +828,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.ElasticsearchOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LogZOutput != nil {
+		in, out := &in.LogZOutput, &out.LogZOutput
+		*out = new(output.LogZOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LokiOutput != nil {
 		in, out := &in.LokiOutput, &out.LokiOutput
 		*out = new(output.LokiOutput)
@@ -866,6 +871,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.KinesisStreamOutputConfig != nil {
 		in, out := &in.KinesisStreamOutputConfig, &out.KinesisStreamOutputConfig
 		*out = new(output.KinesisStreamOutputConfig)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.NewRelicOutputConfig != nil {
+		in, out := &in.NewRelicOutputConfig, &out.NewRelicOutputConfig
+		*out = new(output.NewRelicOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
 }
