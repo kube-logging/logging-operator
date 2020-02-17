@@ -50,6 +50,7 @@ RUN apk update \
          fluent-plugin-detect-exceptions \
          fluent-plugin-multi-format-parser \
          fluent-plugin-record-modifier \
+         fluent-plugin-logzio \
          fluent-plugin-newrelic \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \

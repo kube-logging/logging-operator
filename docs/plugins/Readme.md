@@ -28,6 +28,7 @@ For more information please click on the plugin name
 | **[Google Cloud Storage](outputs/gcs.md)** | outputs | Store logs in Google Cloud Storage | GA | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs) |
 | **[Kafka](outputs/kafka.md)** | outputs | Send your logs to Kafka | GA | [0.12.1](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1) |
 | **[Amazon Kinesis](outputs/kinesis_stream.md)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.0](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.0) |
+| **[LogZ](outputs/logz.md)** | outputs | Store logs in LogZ.io | GA | [0.0.20](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20) |
 | **[Grafana Loki](outputs/loki.md)** | outputs | Transfer logs to Loki | GA | [1.2.2](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[NewRelic Logs](outputs/newrelic.md)** | outputs | Send logs to New Relic Logs | GA | [more info](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Alibaba Cloud Storage](outputs/oss.md)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
