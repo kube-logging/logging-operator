@@ -17,6 +17,7 @@
 | kafka | *output.KafkaOutputConfig | No | - |  |
 | cloudwatch | *output.CloudWatchOutput | No | - |  |
 | kinesisStream | *output.KinesisStreamOutputConfig | No | - |  |
+| newrelic | *output.NewRelicOutputConfig | No | - |  |
 ### OutputStatus
 #### OutputStatus defines the observed state of Output
 
