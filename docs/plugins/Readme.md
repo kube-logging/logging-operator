@@ -30,6 +30,7 @@ For more information please click on the plugin name
 | **[Amazon Kinesis](outputs/kinesis_stream.md)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.0](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.0) |
 | **[LogZ](outputs/logz.md)** | outputs | Store logs in LogZ.io | GA | [0.0.20](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20) |
 | **[Grafana Loki](outputs/loki.md)** | outputs | Transfer logs to Loki | GA | [1.2.2](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
+| **[NewRelic Logs](outputs/newrelic.md)** | outputs | Send logs to New Relic Logs | GA | [more info](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Alibaba Cloud Storage](outputs/oss.md)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
 | **[Amazon S3](outputs/s3.md)** | outputs | Store logs in Amazon S3 | GA | [1.2.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1) |
 | **[SumoLogic](outputs/sumologic.md)** | outputs | Send your logs to Sumologic | GA | [0.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1) |
