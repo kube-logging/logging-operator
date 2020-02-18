@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.11
 LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.7.4"
 
 # Do not split this into multiple RUN!
