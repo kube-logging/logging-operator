@@ -78,7 +78,7 @@ If you encounter any problems that the documentation does not address, [open an 
  You can find the complete documentation of Logging operator v2 [here](./docs/Readme.md) :blue_book: <br>
 
 ## Commercial support
-If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/products/logging-operator/), the company backing the development of the Logging operator.
+If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/contact/), the company backing the development of the Logging operator. If you are looking for the ultimate observability tool for multi-cluster Kubernetes infrastructures to automate the collection, correlation, and storage of logs and metrics, check out [One Eye](https://banzaicloud.com/products/one-eye/).
 
 ## Contributing
 
