@@ -26,7 +26,7 @@ import (
 
 func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) {
 	desired := &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName, ComponentFluentd),
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
@@ -42,7 +42,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector: r.getFluentdLabels(),
+			Selector: r.getFluentdLabels(ComponentFluentd),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
 	}
@@ -62,7 +62,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
+			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -72,21 +72,21 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Metrics.Port},
 					},
 				},
-				Selector:  r.getFluentdLabels(),
+				Selector:  r.getFluentdLabels(ComponentFluentd),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-monitor"),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-monitor", ComponentFluentd),
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
 		return &v1.ServiceMonitor{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
+			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -97,14 +97,14 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					Interval:      r.Logging.Spec.FluentdSpec.Metrics.Interval,
 					ScrapeTimeout: r.Logging.Spec.FluentdSpec.Metrics.Timeout,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: r.getFluentdLabels()},
+				Selector:          v12.LabelSelector{MatchLabels: r.getFluentdLabels(ComponentFluentd)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName + "-metrics"),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }

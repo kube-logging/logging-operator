@@ -26,7 +26,7 @@ import (
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: r.FluentdObjectMetaClusterScope(r.Logging.QualifiedName(PodSecurityPolicyName)),
+			ObjectMeta: r.FluentdObjectMetaClusterScope(r.Logging.QualifiedName(PodSecurityPolicyName), ComponentFluentd),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
 				Volumes: []policyv1beta1.FSType{
 					"configMap",
@@ -53,7 +53,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 		}, reconciler.StatePresent, nil
 	}
 	return &policyv1beta1.PodSecurityPolicy{
-		ObjectMeta: r.FluentdObjectMeta(PodSecurityPolicyName),
+		ObjectMeta: r.FluentdObjectMeta(PodSecurityPolicyName, ComponentFluentd),
 		Spec:       policyv1beta1.PodSecurityPolicySpec{},
 	}, reconciler.StateAbsent, nil
 }
@@ -61,7 +61,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 func (r *Reconciler) pspRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.Role{
-			ObjectMeta: r.FluentdObjectMeta(roleName + "-psp"),
+			ObjectMeta: r.FluentdObjectMeta(roleName+"-psp", ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups:     []string{"policy"},
@@ -73,14 +73,14 @@ func (r *Reconciler) pspRole() (runtime.Object, reconciler.DesiredState, error) 
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.Role{
-		ObjectMeta: r.FluentdObjectMeta(roleName + "-psp"),
+		ObjectMeta: r.FluentdObjectMeta(roleName+"-psp", ComponentFluentd),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) pspRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.RoleBinding{
-			ObjectMeta: r.FluentdObjectMeta(roleBindingName + "-psp"),
+			ObjectMeta: r.FluentdObjectMeta(roleBindingName+"-psp", ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "Role",
 				APIGroup: "rbac.authorization.k8s.io",
@@ -96,6 +96,6 @@ func (r *Reconciler) pspRoleBinding() (runtime.Object, reconciler.DesiredState, 
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
-		ObjectMeta: r.FluentdObjectMeta(roleBindingName + "-psp"),
+		ObjectMeta: r.FluentdObjectMeta(roleBindingName+"-psp", ComponentFluentd),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
