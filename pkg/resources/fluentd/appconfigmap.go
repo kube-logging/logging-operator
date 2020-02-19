@@ -39,7 +39,7 @@ func (r *Reconciler) appconfigMap() (runtime.Object, reconciler.DesiredState, er
 	data := make(map[string][]byte)
 	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName),
+		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd),
 		Data:       data,
 	}, reconciler.StatePresent, nil
 }
@@ -151,7 +151,7 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 
 func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	return &v1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
+		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentFluentd),
 		Data: map[string][]byte{
 			ConfigKey: []byte(*r.config),
 		},
@@ -164,7 +164,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
 		return nil, err
 	}
 	if secret, ok := obj.(*v1.Secret); ok {
-		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey))
+		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey), ComponentFluentd)
 		return secret, nil
 	}
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
@@ -172,7 +172,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
 
 func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 	pod := &v1.Pod{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
+		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: v1.PodSpec{
 			RestartPolicy: v1.RestartPolicyNever,
 			Volumes: []v1.Volume{

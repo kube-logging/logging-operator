@@ -63,9 +63,15 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
-func (r *Reconciler) getFluentdLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Spec.FluentdSpec.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentd"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+func (r *Reconciler) getFluentdLabels(component string) map[string]string {
+	return util.MergeLabels(
+		r.Logging.Spec.FluentdSpec.Labels,
+		map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": component,
+		},
+		generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()),
+	)
 }
 
 func (r *Reconciler) getServiceAccount() string {
