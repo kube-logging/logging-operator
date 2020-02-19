@@ -30,7 +30,14 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
+					Name:       "tcp-fluentd",
 					Protocol:   corev1.ProtocolTCP,
+					Port:       24240,
+					TargetPort: intstr.IntOrString{IntVal: 24240},
+				},
+				{
+					Name:       "udp-fluentd",
+					Protocol:   corev1.ProtocolUDP,
 					Port:       24240,
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
