@@ -19,6 +19,8 @@ spec:
             country_name: ${country.names.en["remote"]}
             postal_code:  ${postal.code["remote"]}
   outputRefs:
-    - forward-output-sample
-  selectors:
-    app: nginx
+    - null-output-sample
+  match:
+    - select:
+        labels:
+          app: nginx
