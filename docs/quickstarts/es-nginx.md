@@ -150,8 +150,10 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
              reserve_data: true
              parse:
                type: nginx
-       selectors:
-         app.kubernetes.io/name: log-generator
+        match:
+          - select:
+              labels:
+                app.kubernetes.io/name: log-generator
        outputRefs:
          - es-output
      EOF
@@ -164,9 +166,10 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
     metadata:
       name: log-generator
     spec:
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: log-generator
+      match:
+        - select:
+            labels:
+              app.kubernetes.io/name: log-generator
       replicas: 1
       template:
         metadata:
