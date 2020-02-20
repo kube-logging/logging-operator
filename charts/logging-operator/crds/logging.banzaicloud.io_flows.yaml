@@ -527,6 +527,25 @@ spec:
               type: array
             loggingRef:
               type: string
+            match:
+              items:
+                properties:
+                  exclude:
+                    properties:
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  select:
+                    properties:
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                type: object
+              type: array
             outputRefs:
               items:
                 type: string
@@ -534,10 +553,10 @@ spec:
             selectors:
               additionalProperties:
                 type: string
+              description: Deprecated
               type: object
           required:
           - outputRefs
-          - selectors
           type: object
         status:
           description: FlowStatus defines the observed state of Flow

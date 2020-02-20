@@ -16,6 +16,8 @@ spec:
       reserve_data: true
   outputRefs:
   - s3-output
-  selectors:
-    app.kubernetes.io/instance: nginx-demo
-    app.kubernetes.io/name: nginx-logging-demo
+  match:
+    - select:
+        labels:
+          app.kubernetes.io/instance: nginx-demo
+          app.kubernetes.io/name: nginx-logging-demo

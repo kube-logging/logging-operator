@@ -139,8 +139,10 @@ Or set up the secret manually.
              reserve_data: true
              parse:
                type: nginx
-       selectors:
-         app.kubernetes.io/name: log-generator
+        match:
+          - select:
+              labels:
+                app.kubernetes.io/name: log-generator         
        outputRefs:
          - cloudwatch-output
      EOF

@@ -16,7 +16,6 @@ package types
 
 import (
 	"errors"
-	"reflect"
 )
 
 type Builder struct {
@@ -34,7 +33,7 @@ func NewSystem(input Input, router *Router) *Builder {
 
 func (s *Builder) RegisterFlow(f *Flow) error {
 	for _, e := range s.flows {
-		if e.Namespace == f.Namespace && reflect.DeepEqual(e.Labels, f.Labels) {
+		if e.FlowLabel == f.FlowLabel {
 			return errors.New("Flow already exists")
 		}
 	}

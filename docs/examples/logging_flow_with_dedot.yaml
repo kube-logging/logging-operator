@@ -14,5 +14,7 @@ spec:
     - dedot: {}
   outputRefs:
     - s3-output
-  selectors:
-    app: nginx
+  match:
+    - select:
+        labels:
+          app: nginx
