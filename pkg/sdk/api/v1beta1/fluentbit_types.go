@@ -36,12 +36,16 @@ type FluentbitSpec struct {
 	Metrics     *Metrics                    `json:"metrics,omitempty"`
 	Security    *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB        volume.KubernetesVolume `json:"positiondb,omitempty"`
-	MountPath         string                  `json:"mountPath,omitempty"`
-	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
-	InputTail         InputTail               `json:"inputTail,omitempty"`
-	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
-	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
+	PositionDB        volume.KubernetesVolume  `json:"positiondb,omitempty"`
+	// Deprecated, use positiondb
+	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
+	MountPath         string                   `json:"mountPath,omitempty"`
+	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
+	InputTail         InputTail                `json:"inputTail,omitempty"`
+	// Deprecated, use inputTail.parser
+	Parser           string           `json:"parser,omitempty"`
+	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
+	BufferStorage    BufferStorage    `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
