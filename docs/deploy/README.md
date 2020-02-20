@@ -60,7 +60,8 @@ Complete the following steps to deploy the Logging operator using Helm. Alternat
     ```
   - Helm v3
     ```bash
-    helm install --namespace logging --name logging banzaicloud-stable/logging-operator --set createCustomResource=false
+    kubectl create ns logging
+    helm install --namespace logging logging banzaicloud-stable/logging-operator --set createCustomResource=false
     ```
     > You can install the `logging` resource with built-in TLS generation using a [Helm chart](/charts/logging-operator-logging).
 
