@@ -51,7 +51,9 @@ type ParserConfig struct {
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
 	// +docLink:"Parse Section,#Parse-Section"
-	Parse ParseSection `json:"parse,omitempty"`
+	Parse   ParseSection   `json:"parse,omitempty"`
+	// Deprecated, use `parse` instead
+	Parsers []ParseSection `json:"parsers,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -189,6 +191,7 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 		},
 	}
 	parserConfig := p.DeepCopy()
+
 	if parserConfig.KeyName == "" {
 		parserConfig.KeyName = types.GetLogKey()
 	}
@@ -196,6 +199,10 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 		return nil, err
 	} else {
 		parser.Params = params
+	}
+
+	if len(parserConfig.Parsers) > 0 {
+		return nil, errors.Errorf("`parsers` field is deprecated, use `parse`")
 	}
 
 	if meta, err := parserConfig.Parse.ToDirective(secretLoader, ""); err != nil {
