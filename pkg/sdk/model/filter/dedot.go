@@ -26,7 +26,7 @@ type _docDedot interface{}
 
 // +name:"Dedot"
 // +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
-// +version:"more info"
+// +version:"1.0.0"
 // +description:"Concatenate multiline log separated in multiple events"
 // +status:"GA"
 type _metaDedot interface{}
