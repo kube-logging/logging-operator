@@ -26,9 +26,15 @@ var fluentBitConfigTemplate = `
     HTTP_Port    {{ .Monitor.Port }}
     {{- end }}
     {{- range $key, $value := .BufferStorage }}
-    {{- if $value }}
+      {{- if eq $key "Parse_N" }}
+        {{- range $id, $v := $value }}
+    Parse_{{ $id}} $v
+        {{- end }}
+      {{- else }}
+        {{- if $value }}
     {{ $key }}  {{$value}}
-    {{- end }}
+        {{- end }}
+      {{- end }}
     {{- end }}
 
 [INPUT]
