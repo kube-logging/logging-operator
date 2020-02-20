@@ -37,7 +37,7 @@ type _docTagNormaliser interface{}
 
 // +name:"Tag Normaliser"
 // +url:"https://github.com/banzaicloud/fluent-plugin-tag-normaliser"
-// +version:"more info"
+// +version:"0.1.1"
 // +description:"Re-tag based on log metadata"
 // +status:"GA"
 type _metaTagNormaliser interface{}

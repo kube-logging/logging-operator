@@ -40,8 +40,8 @@ import (
 type _docElasticsearch interface{}
 
 // +name:"Elasticsearch"
-// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v3.7.0"
-// +version:"3.7.0"
+// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.0.4"
+// +version:"4.0.4"
 // +description:"Send your logs to Elasticsearch"
 // +status:"GA"
 type _metaElasticsearch interface{}
