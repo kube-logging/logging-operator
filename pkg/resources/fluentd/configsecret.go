@@ -73,7 +73,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	configs := &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(SecretConfigName),
+		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data: map[string][]byte{
 			"fluent.conf":  []byte(fluentdDefaultTemplate),
 			"input.conf":   []byte(inputConfig),

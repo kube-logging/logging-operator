@@ -32,7 +32,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
 			{
-				ObjectMeta: r.FluentdObjectMeta(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName),
+				ObjectMeta: r.FluentdObjectMeta(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName, ComponentFluentd),
 				Spec:       r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec,
 				Status: corev1.PersistentVolumeClaimStatus{
 					Phase: corev1.ClaimPending,
@@ -40,8 +40,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			},
 		}
 	}
+
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.FluentdObjectMeta(StatefulSetName),
+		ObjectMeta: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd),
 		Spec:       spec,
 	}
 
@@ -69,7 +70,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	return &appsv1.StatefulSetSpec{
 		Replicas: util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
 		Selector: &metav1.LabelSelector{
-			MatchLabels: r.getFluentdLabels(),
+			MatchLabels: r.getFluentdLabels(ComponentFluentd),
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: r.generatePodMeta(),
@@ -134,7 +135,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
-		Labels: r.getFluentdLabels(),
+		Labels: r.getFluentdLabels(ComponentFluentd),
 	}
 	if r.Logging.Spec.FluentdSpec.Annotations != nil {
 		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations
