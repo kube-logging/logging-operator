@@ -15,6 +15,7 @@
 package types
 
 import (
+	"strconv"
 	"strings"
 
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
@@ -38,22 +39,24 @@ func (r *Router) GetSections() []Directive {
 	return r.Routes
 }
 
-type FlowRoute struct {
-	PluginMeta
+type FlowMatch struct {
 	// Optional set of kubernetes labels
 	Labels map[string]string `json:"labels,omitempty"`
 	// Optional namespace
-	Namespace string `json:"namespace,omitempty"`
+	Namespaces []string `json:"namespaces,omitempty"`
+	// Negate
+	Negate bool `json:"negate,omitempty"`
 }
 
-func (f *FlowRoute) GetPluginMeta() *PluginMeta {
-	return &f.PluginMeta
+func (f FlowMatch) GetPluginMeta() *PluginMeta {
+	return &PluginMeta{
+		Directive: "match",
+	}
 }
-
-func (f *FlowRoute) GetParams() map[string]string {
-	params := map[string]string{}
-	if f.Namespace != "" {
-		params["namespace"] = f.Namespace
+func (f FlowMatch) GetParams() map[string]string {
+	params := map[string]string{
+		"namespaces": strings.Join(f.Namespaces, ","),
+		"negate":     strconv.FormatBool(f.Negate),
 	}
 	if len(f.Labels) > 0 {
 		var sb []string
@@ -65,19 +68,38 @@ func (f *FlowRoute) GetParams() map[string]string {
 	return params
 }
 
-func (f *FlowRoute) GetSections() []Directive {
+func (f FlowMatch) GetSections() []Directive {
 	return nil
 }
 
+type FlowRoute struct {
+	PluginMeta
+	Matches []Directive
+}
+
+func (f *FlowRoute) GetPluginMeta() *PluginMeta {
+	return &f.PluginMeta
+}
+
+func (f *FlowRoute) GetParams() map[string]string {
+	return nil
+}
+
+func (f *FlowRoute) GetSections() []Directive {
+	return f.Matches
+}
+
 func (r *Router) AddRoute(flow *Flow) *Router {
-	r.Routes = append(r.Routes, &FlowRoute{
+	route := &FlowRoute{
 		PluginMeta: PluginMeta{
 			Directive: "route",
 			Label:     flow.FlowLabel,
 		},
-		Labels:    flow.Labels,
-		Namespace: flow.Namespace,
-	})
+	}
+	for _, f := range flow.Matches {
+		route.Matches = append(route.Matches, f)
+	}
+	r.Routes = append(r.Routes, route)
 	return r
 }
 

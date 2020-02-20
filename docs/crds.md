@@ -413,7 +413,7 @@ Flows define a `logging flow` that defines the `filters` and `outputs`.
 ### Parameters
 | Name                    | Type              | Default | Description |
 |-------------------------|-------------------|---------|-------------|
-| selectors               | map[string]string | {}      | Kubernetes label selectors for the log. |
+| selectors (DEPRECATED)  | map[string]string | {}      | DEPRECATED inf favor of match. Kubernetes label selectors for the log. |
 | filters                 | [][Filter](./plugins/filters)          | []      | List of applied [filter](./plugins/filters).  |
 | loggingRef              | string | "" | Specified `logging` resource reference to connect `FLow` and `ClusterFlow` to |
 | outputRefs              | []string | [] | List of [Outputs](#Defining-outputs) or [ClusterOutputs](#Defining-outputs) names |
@@ -435,8 +435,10 @@ spec:
         format: ${namespace_name}.${pod_name}.${container_name}
   outputRefs:
     - s3-output
-  selectors:
-    app: nginx
+  match:
+    - select:
+        labels:
+          app: nginx
 ```
 
 
