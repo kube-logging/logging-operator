@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"errors"
 	"fmt"
 
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
@@ -87,6 +88,9 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		copy.Spec.WatchNamespaces = []string{}
 	}
 	if copy.Spec.FluentdSpec != nil {
+		if copy.Spec.FluentdSpec.FluentdPvcSpec != nil {
+			return nil, errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")
+		}
 		if copy.Spec.FluentdSpec.Image.Repository == "" {
 			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
 		}
@@ -228,6 +232,12 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 	}
 	if copy.Spec.FluentbitSpec != nil {
+		if copy.Spec.FluentbitSpec.PosisionDBLegacy != nil {
+			return nil, errors.New("`position_db` field is deprecated, use `positiondb`")
+		}
+		if copy.Spec.FluentbitSpec.Parser != "" {
+			return nil, errors.New("`parser` field is deprecated, use `inputTail.Parser`")
+		}
 		if copy.Spec.FluentbitSpec.Image.Repository == "" {
 			copy.Spec.FluentbitSpec.Image.Repository = "fluent/fluent-bit"
 		}
