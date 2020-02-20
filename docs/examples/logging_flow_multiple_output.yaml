@@ -7,5 +7,7 @@ spec:
   outputRefs:
     - gcs-output-sample
     - s3-output-example
-  selectors:
-    app: nginx
+  match:
+    - select:
+        labels:
+          app: nginx

@@ -13,9 +13,11 @@ spec:
         reserve_data: true
         parse:
           type: nginx
-  selectors:
-    app.kubernetes.io/name: log-generator
-    app.kubernetes.io/instance: {{ .Release.Name }}
+  match:
+    - select:
+        labels:
+          app.kubernetes.io/name: log-generator
+          app.kubernetes.io/instance: {{ .Release.Name }}
   outputRefs:
 
 {{- if or .Values.file.enabled (and (not .Values.cloudwatch.enabled) (not .Values.elasticsearch.enabled) (not .Values.kafka.enabled) (not .Values.loki.enabled) (not .Values.minio.enabled)) }}

@@ -6,5 +6,7 @@ metadata:
 spec:
   outputRefs:
     - forward-output-sample
-  selectors:
-    app: nginx
+  match:
+    - select:
+        labels:
+          app: nginx

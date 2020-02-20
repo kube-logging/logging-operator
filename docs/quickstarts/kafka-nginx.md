@@ -102,8 +102,10 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
              reserve_data: true
              parse:
                type: nginx
-       selectors:
-         app.kubernetes.io/name: log-generator
+       match:
+         - select:
+             labels:
+               app.kubernetes.io/name: log-generator
        outputRefs:
          - kafka-output
      EOF

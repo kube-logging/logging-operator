@@ -122,8 +122,10 @@ Or set up the secret manually.
      spec:
        filters:
          - tag_normaliser: {}
-       selectors: {}
-         app.kubernetes.io/name: log-generator
+       match:
+         - select:
+             labels:
+               app.kubernetes.io/name: log-generator
        outputRefs:
          - s3-output
      EOF

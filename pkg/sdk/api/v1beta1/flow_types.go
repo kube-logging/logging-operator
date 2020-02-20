@@ -21,10 +21,25 @@ import (
 
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
-	Selectors  map[string]string `json:"selectors"`
+	// Deprecated
+	Selectors  map[string]string `json:"selectors,omitempty"`
+	Match      []Match           `json:"match,omitempty"`
 	Filters    []Filter          `json:"filters,omitempty"`
 	LoggingRef string            `json:"loggingRef,omitempty"`
 	OutputRefs []string          `json:"outputRefs"`
+}
+
+type Match struct {
+	*Select  `json:"select,omitempty"`
+	*Exclude `json:"exclude,omitempty"`
+}
+
+type Select struct {
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
+type Exclude struct {
+	Labels map[string]string `json:"labels,omitempty"`
 }
 
 // Filter definition for FlowSpec
