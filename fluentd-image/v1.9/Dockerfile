@@ -1,12 +1,12 @@
 FROM alpine:3.11
-LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.7.4"
+LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.9.2"
 
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
 # therefore an 'apk delete' has no effect
 RUN apk update \
  && apk add --no-cache \
-        ca-certificates linux-headers \
+        ca-certificates \
         ruby ruby-irb ruby-etc ruby-webrick \
         tini libmaxminddb geoip \
  && buildDeps=" \
@@ -20,12 +20,13 @@ RUN apk update \
         ruby-dev gnupg \
  && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
- && gem install oj -v 3.3.10 \
- && gem install json -v 2.2.0 \
- && gem install async-http -v 0.46.3 \
- && gem install fluentd -v 1.7.4 \
- && gem install prometheus-client -v 0.10.0 \
- && gem install bigdecimal -v 1.3.5 \
+ && gem install oj -v 3.8.1 \
+ && gem install json -v 2.3.0 \
+ && gem install async-http -v 0.50.0 \
+ && gem install ext_monitor -v 0.1.2 \
+ && gem install fluentd -v 1.9.2 \
+ && gem install prometheus-client -v 2.0.0 \
+ && gem install bigdecimal -v 1.4.4 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -79,4 +80,3 @@ EXPOSE 24224 5140
 USER fluent
 ENTRYPOINT ["tini",  "--", "/bin/entrypoint.sh"]
 CMD ["fluentd"]
-
