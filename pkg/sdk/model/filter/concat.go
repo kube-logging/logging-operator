@@ -26,7 +26,7 @@ type _docConcat interface{}
 
 // +name:"Concat"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-concat"
-// +version:"more info"
+// +version:"2.4.0"
 // +description:"Fluentd Filter plugin to concatenate multiline log separated in multiple events."
 // +status:"GA"
 type _metaConcat interface{}

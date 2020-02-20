@@ -26,7 +26,7 @@ type _docGeoIP interface{}
 
 // +name:"Geo IP"
 // +url:"https://github.com/y-ken/fluent-plugin-geoip"
-// +version:"more info"
+// +version:"1.3.1"
 // +description:"Fluentd GeoIP filter"
 // +status:"GA"
 type _metaGeoIP interface{}
