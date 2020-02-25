@@ -535,7 +535,8 @@ func beforeEach(t *testing.T) func() {
 	var wrappedReconciler reconcile.Reconciler
 	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
 
-	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).Complete(wrappedReconciler)
+	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).
+		Named(uuid.New()[:8]).Complete(wrappedReconciler)
 
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
