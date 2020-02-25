@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.7.0
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/banzaicloud/operator-tools v0.7.1-0.20200225092921-954ac5206655
+	github.com/banzaicloud/operator-tools v0.7.1-0.20200225134428-d5081d8f0d71
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/zapr v0.1.1
 	github.com/onsi/ginkgo v1.8.0
@@ -19,3 +19,5 @@ require (
 	k8s.io/client-go v0.16.4
 	sigs.k8s.io/controller-runtime v0.4.0
 )
+
+//replace github.com/banzaicloud/operator-tools => ../../../operator-tools
