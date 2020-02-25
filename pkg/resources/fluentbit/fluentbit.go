@@ -35,6 +35,7 @@ const (
 	fluentbitDaemonSetName         = "fluentbit"
 	fluentbitPodSecurityPolicyName = "fluentbit"
 	fluentbitServiceName           = "fluentbit"
+	containerName                  = "fluent-bit"
 )
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {

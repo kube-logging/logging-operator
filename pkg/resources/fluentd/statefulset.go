@@ -28,22 +28,28 @@ import (
 )
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
-	spec := *r.statefulsetSpec()
+	spec := r.statefulsetSpec()
+
+	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
+	)
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
-		spec.VolumeClaimTemplates = []corev1.PersistentVolumeClaim{
-			{
-				ObjectMeta: r.FluentdObjectMeta(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName, ComponentFluentd),
-				Spec:       r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec,
-				Status: corev1.PersistentVolumeClaimStatus{
-					Phase: corev1.ClaimPending,
-				},
-			},
+		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
+			return r.FluentdObjectMeta(name, ComponentFluentd)
+		})
+		if err != nil {
+			return nil, reconciler.StatePresent, err
+		}
+	} else {
+		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(bufferVolumeName, containerName, bufferPath, &spec.Template.Spec)
+		if err != nil {
+			return nil, reconciler.StatePresent, err
 		}
 	}
 
 	desired := &appsv1.StatefulSet{
 		ObjectMeta: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd),
-		Spec:       spec,
+		Spec:       *spec,
 	}
 
 	return desired, reconciler.StatePresent, nil
@@ -57,11 +63,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			Name:            "volume-mount-hack",
 			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777 " + BufferPath},
+			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.QualifiedName(bufferVolumeName),
-					MountPath: BufferPath,
+					MountPath: bufferPath,
 				},
 			},
 		})
@@ -106,7 +112,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 		Env: []corev1.EnvVar{
 			{
 				Name:  "BUFFER_PATH",
-				Value: BufferPath,
+				Value: bufferPath,
 			},
 		},
 		SecurityContext: &corev1.SecurityContext{
@@ -202,10 +208,6 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			Name:      "output-secret",
 			MountPath: OutputSecretPath,
 		},
-		{
-			Name:      r.Logging.QualifiedName(bufferVolumeName),
-			MountPath: BufferPath,
-		},
 	}
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := []corev1.VolumeMount{
@@ -246,12 +248,6 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-
-	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
-	)
-
-	v = append(v, r.Logging.Spec.FluentdSpec.BufferStorageVolume.GetVolume(r.Logging.QualifiedName(bufferVolumeName)))
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",
