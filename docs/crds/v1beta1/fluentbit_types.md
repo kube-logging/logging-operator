@@ -14,9 +14,11 @@
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | positiondb | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
+| position_db | *volume.KubernetesVolume | No | - | Deprecated, use positiondb<br> |
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
+| parser | string | No | - | Deprecated, use inputTail.parser<br> |
 | filterKubernetes | FilterKubernetes | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
 | bufferStorageVolume | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
