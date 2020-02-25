@@ -36,7 +36,7 @@ type FluentbitSpec struct {
 	Metrics     *Metrics                    `json:"metrics,omitempty"`
 	Security    *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB        volume.KubernetesVolume  `json:"positiondb,omitempty"`
+	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
 	// Deprecated, use positiondb
 	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
 	MountPath         string                   `json:"mountPath,omitempty"`

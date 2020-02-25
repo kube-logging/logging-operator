@@ -51,7 +51,7 @@ type ParserConfig struct {
 	// Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error
 	EmitInvalidRecordToError bool `json:"emit_invalid_record_to_error,omitempty"`
 	// +docLink:"Parse Section,#Parse-Section"
-	Parse   ParseSection   `json:"parse,omitempty"`
+	Parse ParseSection `json:"parse,omitempty"`
 	// Deprecated, use `parse` instead
 	Parsers []ParseSection `json:"parsers,omitempty"`
 }
