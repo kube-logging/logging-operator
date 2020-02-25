@@ -21,6 +21,7 @@ package v1beta1
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
+	"github.com/banzaicloud/operator-tools/pkg/volume"
 	"k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -574,6 +575,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.PositionDB.DeepCopyInto(&out.PositionDB)
+	if in.PosisionDBLegacy != nil {
+		in, out := &in.PosisionDBLegacy, &out.PosisionDBLegacy
+		*out = new(volume.KubernetesVolume)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ExtraVolumeMounts != nil {
 		in, out := &in.ExtraVolumeMounts, &out.ExtraVolumeMounts
 		*out = make([]VolumeMount, len(*in))
@@ -655,6 +661,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	out.TLS = in.TLS
 	out.Image = in.Image
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
+	if in.FluentdPvcSpec != nil {
+		in, out := &in.FluentdPvcSpec, &out.FluentdPvcSpec
+		*out = new(volume.KubernetesVolume)
+		(*in).DeepCopyInto(*out)
+	}
 	out.VolumeModImage = in.VolumeModImage
 	out.ConfigReloaderImage = in.ConfigReloaderImage
 	in.Resources.DeepCopyInto(&out.Resources)

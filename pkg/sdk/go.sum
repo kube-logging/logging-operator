@@ -36,6 +36,8 @@ github.com/banzaicloud/k8s-objectmatcher v1.1.0/go.mod h1:gGaElvgkqa0Lk1khRr+jel
 github.com/banzaicloud/logging-operator v0.0.0-20200212081810-c4fd64a8ce42 h1:sl4WPmvEYDoZameWb8c9PexCw2JGn0QC5y4ha2u74CE=
 github.com/banzaicloud/operator-tools v0.4.1 h1:+pAQ67l7eGTNR/D2FMKyLEgNv9l6U6H21qFNrp1VhnQ=
 github.com/banzaicloud/operator-tools v0.4.1/go.mod h1:12rKcmPZkK8CaESI6YI3UGFBBBQvYZH9i8Gn5cfCi+U=
+github.com/banzaicloud/operator-tools v0.7.1-0.20200225092921-954ac5206655 h1:fnHGZMLr3PGcSTFmuLFfccpM7c0oFbrZ19jF4xC8nOI=
+github.com/banzaicloud/operator-tools v0.7.1-0.20200225092921-954ac5206655/go.mod h1:64+rDAroHZuOYQ3gcT28SORwG/Sg0PL5T9NGq8rRme8=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/blang/semver v3.5.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
