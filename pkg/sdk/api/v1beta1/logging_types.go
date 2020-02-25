@@ -140,26 +140,28 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			}
 		}
 
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
-				PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
+		if !copy.Spec.FluentdSpec.DisablePvc {
+			if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
+				copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
+					PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
+				}
 			}
-		}
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []v1.PersistentVolumeAccessMode{
-				v1.ReadWriteOnce,
+			if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes == nil {
+				copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []v1.PersistentVolumeAccessMode{
+					v1.ReadWriteOnce,
+				}
 			}
-		}
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
-				"storage": resource.MustParse("20Gi"),
+			if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests == nil {
+				copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
+					"storage": resource.MustParse("20Gi"),
+				}
 			}
-		}
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
-		}
-		if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
-			copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = "fluentd-buffer"
+			if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
+				copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
+			}
+			if copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
+				copy.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = "fluentd-buffer"
+			}
 		}
 		if copy.Spec.FluentdSpec.VolumeModImage.Repository == "" {
 			copy.Spec.FluentdSpec.VolumeModImage.Repository = "busybox"
