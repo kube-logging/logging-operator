@@ -107,7 +107,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	if err := r.Logging.Spec.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err
 	}
-	if err := r.Logging.Spec.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+	if err := r.Logging.Spec.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err
 	}
 
