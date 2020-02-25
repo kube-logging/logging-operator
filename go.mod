@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.7.0
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
-	github.com/banzaicloud/operator-tools v0.7.1-0.20200225092921-954ac5206655
+	github.com/banzaicloud/operator-tools v0.7.1-0.20200225134428-d5081d8f0d71
 	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.1.0
 	github.com/onsi/gomega v1.5.0
@@ -24,3 +24,5 @@ replace (
 	github.com/banzaicloud/logging-operator/pkg/sdk => ./pkg/sdk
 	k8s.io/client-go => k8s.io/client-go v0.16.4
 )
+
+//replace github.com/banzaicloud/operator-tools => ../operator-tools
