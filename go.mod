@@ -9,15 +9,15 @@ require (
 	github.com/banzaicloud/operator-tools v0.7.1-0.20200225134428-d5081d8f0d71
 	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.1.0
-	github.com/onsi/gomega v1.5.0
+	github.com/onsi/gomega v1.8.1
 	github.com/pborman/uuid v1.2.0
 	github.com/spf13/cast v1.3.0
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
-	k8s.io/api v0.16.4
-	k8s.io/apiextensions-apiserver v0.16.4
-	k8s.io/apimachinery v0.16.4
+	k8s.io/api v0.17.2
+	k8s.io/apiextensions-apiserver v0.17.2
+	k8s.io/apimachinery v0.17.2
 	k8s.io/client-go v12.0.0+incompatible
-	sigs.k8s.io/controller-runtime v0.4.0
+	sigs.k8s.io/controller-runtime v0.5.0
 )
 
 replace (
