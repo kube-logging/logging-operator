@@ -5,7 +5,7 @@
 |---|---|---|---|---|
 |  | metav1.TypeMeta | Yes | - |  |
 | metadata | metav1.ObjectMeta | No | - |  |
-| spec | FlowSpec | No | - | Name of the logging cluster to be attached<br> |
+| spec | ClusterFlowSpec | No | - | Name of the logging cluster to be attached<br> |
 | status | FlowStatus | No | - |  |
 ### ClusterMatch
 | Variable Name | Type | Required | Default | Description |
@@ -27,6 +27,7 @@
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
+| selectors | map[string]string | No | - |  |
 | match | []ClusterMatch | No | - |  |
 | filters | []Filter | No | - |  |
 | loggingRef | string | No | - |  |

@@ -294,7 +294,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 			Name:      "test-flow",
 			Namespace: controlNamespace,
 		},
-		Spec: v1beta1.FlowSpec{
+		Spec: v1beta1.ClusterFlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},

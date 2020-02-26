@@ -596,6 +596,10 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
+                      namespaces:
+                        items:
+                          type: string
+                        type: array
                     type: object
                   select:
                     properties:
@@ -603,6 +607,10 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
+                      namespaces:
+                        items:
+                          type: string
+                        type: array
                     type: object
                 type: object
               type: array
@@ -613,7 +621,6 @@ spec:
             selectors:
               additionalProperties:
                 type: string
-              description: Deprecated
               type: object
           required:
           - outputRefs
