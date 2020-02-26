@@ -145,7 +145,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 				} else {
 					r.Log.Info("still waiting for the configcheck result...")
 				}
-				return &reconcile.Result{RequeueAfter: time.Second}, nil
+				return &reconcile.Result{RequeueAfter: time.Minute}, nil
 			}
 		}
 	}
