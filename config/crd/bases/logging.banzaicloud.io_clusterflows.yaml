@@ -553,6 +553,10 @@ spec:
               items:
                 type: string
               type: array
+            selectors:
+              additionalProperties:
+                type: string
+              type: object
           required:
           - outputRefs
           type: object
