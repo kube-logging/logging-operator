@@ -109,16 +109,17 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			var removedHashes []string
 			if removedHashes, err = r.configCheckCleanup(hash); err != nil {
 				r.Log.Error(err, "failed to cleanup resources")
-			}
-			if len(removedHashes) > 0 {
-				for _, removedHash := range removedHashes {
-					delete(r.Logging.Status.ConfigCheckResults, removedHash)
-				}
-				if err := r.Client.Status().Update(context.TODO(), r.Logging); err != nil {
-					return nil, errors.WrapWithDetails(err, "failed to update status", "logging", r.Logging)
-				} else {
-					// explicitly ask for a requeue to short circuit the controller loop after the status update
-					return &reconcile.Result{Requeue: true}, nil
+			} else {
+				if len(removedHashes) > 0 {
+					for _, removedHash := range removedHashes {
+						delete(r.Logging.Status.ConfigCheckResults, removedHash)
+					}
+					if err := r.Client.Status().Update(context.TODO(), r.Logging); err != nil {
+						return nil, errors.WrapWithDetails(err, "failed to update status", "logging", r.Logging)
+					} else {
+						// explicitly ask for a requeue to short circuit the controller loop after the status update
+						return &reconcile.Result{Requeue: true}, nil
+					}
 				}
 			}
 		} else {
@@ -138,7 +139,11 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 					return &reconcile.Result{Requeue: true}, nil
 				}
 			} else {
-				r.Log.Info("still waiting for the configcheck result...")
+				if result.Message != "" {
+					r.Log.Info(result.Message)
+				} else {
+					r.Log.Info("still waiting for the configcheck result...")
+				}
 				return &reconcile.Result{RequeueAfter: time.Second}, nil
 			}
 		}
