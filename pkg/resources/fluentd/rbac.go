@@ -29,7 +29,7 @@ func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 				{
 					APIGroups: []string{""},
 					Resources: []string{"configmaps", "secrets"},
-					Verbs:     []string{"*"},
+					Verbs:     []string{"get", "list", "watch", "create", "update", "patch", "delete"},
 				},
 			},
 		}, reconciler.StatePresent, nil
