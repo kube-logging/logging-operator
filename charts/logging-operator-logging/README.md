@@ -42,3 +42,5 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.tolerations`                               | Tolerations for fluentd statefulset                                      | none                                                       |
 | `fluentd.nodeSelector`                              | Node selector for fluentd pods                                           | none                                                       |
 | `fluentd.podPriorityClassName`                      | Priority class name for fluentd pods                                     | none                                                       |
+| `clusterFlows`                                      | Array of ClusterFlows to be created                                      | []                                                         |
+| `clusterOutputs`                                    | Array of ClusterOutputs to be created                                    | []                                                         |
