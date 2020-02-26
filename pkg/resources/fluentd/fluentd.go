@@ -39,12 +39,13 @@ const (
 	ServiceName           = "fluentd"
 	OutputSecretName      = "fluentd-output"
 	OutputSecretPath      = "/fluentd/secret"
-	BufferPath            = "/buffers"
 
+	bufferPath                = "/buffers"
 	bufferVolumeName          = "fluentd-buffer"
 	defaultServiceAccountName = "fluentd"
 	roleBindingName           = "fluentd"
 	roleName                  = "fluentd"
+	containerName             = "fluentd"
 )
 
 // Reconciler holds info what resource to reconcile

@@ -54,9 +54,11 @@ bin/gobin-${GOBIN_VERSION}:
 
 .PHONY: bin/kubebuilder_${KUBEBUILDER_VERSION}
 bin/kubebuilder_${KUBEBUILDER_VERSION}:
-	@mkdir -p bin
-	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin
-	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
+	@ if ! test -L bin/kubebuilder_${KUBEBUILDER_VERSION}; then \
+		mkdir -p bin; \
+		curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin; \
+		ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}; \
+	fi
 
 bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder bin/kubebuilder
@@ -134,7 +136,7 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
-check-diff:
+check-diff: check
 	go mod tidy
 	$(MAKE) generate manifests docs
 	git diff --exit-code ':(exclude)./ADOPTERS.md'

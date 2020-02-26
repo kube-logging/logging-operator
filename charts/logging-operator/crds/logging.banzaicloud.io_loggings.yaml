@@ -106,6 +106,21 @@ spec:
                             is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                           type: string
                       type: object
+                    host_path:
+                      description: Deprecated, use hostPath
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
                     hostPath:
                       description: Represents a host path mapped into a pod. Host
                         path volumes do not support ownership management or SELinux
@@ -660,8 +675,215 @@ spec:
                   type: object
                 mountPath:
                   type: string
+                parser:
+                  description: Deprecated, use inputTail.parser
+                  type: string
                 podPriorityClassName:
                   type: string
+                position_db:
+                  description: Deprecated, use positiondb
+                  properties:
+                    emptyDir:
+                      description: Represents an empty directory for a pod. Empty
+                        directory volumes support ownership management and SELinux
+                        relabeling.
+                      properties:
+                        medium:
+                          description: 'What type of storage medium should back this
+                            directory. The default is "" which means to use the node''s
+                            default medium. Must be an empty string (default) or Memory.
+                            More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir'
+                          type: string
+                        sizeLimit:
+                          description: 'Total amount of local storage required for
+                            this EmptyDir volume. The size limit is also applicable
+                            for memory medium. The maximum usage on memory medium
+                            EmptyDir would be the minimum value between the SizeLimit
+                            specified here and the sum of memory limits of all containers
+                            in a pod. The default is nil which means that the limit
+                            is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
+                          type: string
+                      type: object
+                    host_path:
+                      description: Deprecated, use hostPath
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                    hostPath:
+                      description: Represents a host path mapped into a pod. Host
+                        path volumes do not support ownership management or SELinux
+                        relabeling.
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                    pvc:
+                      description: PersistentVolumeClaim defines the Spec and the
+                        Source at the same time. The PVC will be created with the
+                        configured spec and the name defined in the source.
+                      properties:
+                        source:
+                          description: PersistentVolumeClaimVolumeSource references
+                            the user's PVC in the same namespace. This volume finds
+                            the bound PV and mounts that volume for the pod. A PersistentVolumeClaimVolumeSource
+                            is, essentially, a wrapper around another type of volume
+                            that is owned by someone else (the system).
+                          properties:
+                            claimName:
+                              description: 'ClaimName is the name of a PersistentVolumeClaim
+                                in the same namespace as the pod using this volume.
+                                More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims'
+                              type: string
+                            readOnly:
+                              description: Will force the ReadOnly setting in VolumeMounts.
+                                Default false.
+                              type: boolean
+                          required:
+                          - claimName
+                          type: object
+                        spec:
+                          description: PersistentVolumeClaimSpec describes the common
+                            attributes of storage devices and allows a Source for
+                            provider-specific attributes
+                          properties:
+                            accessModes:
+                              description: 'AccessModes contains the desired access
+                                modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                              items:
+                                type: string
+                              type: array
+                            dataSource:
+                              description: This field requires the VolumeSnapshotDataSource
+                                alpha feature gate to be enabled and currently VolumeSnapshot
+                                is the only supported data source. If the provisioner
+                                can support VolumeSnapshot data source, it will create
+                                a new volume and data will be restored to the volume
+                                at the same time. If the provisioner does not support
+                                VolumeSnapshot data source, volume will not be created
+                                and the failure will be reported as an event. In the
+                                future, we plan to support more data source types
+                                and the behavior of the provisioner may change.
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                            resources:
+                              description: 'Resources represents the minimum resources
+                                the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                              properties:
+                                limits:
+                                  additionalProperties:
+                                    type: string
+                                  description: 'Limits describes the maximum amount
+                                    of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                  type: object
+                                requests:
+                                  additionalProperties:
+                                    type: string
+                                  description: 'Requests describes the minimum amount
+                                    of compute resources required. If Requests is
+                                    omitted for a container, it defaults to Limits
+                                    if that is explicitly specified, otherwise to
+                                    an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                  type: object
+                              type: object
+                            selector:
+                              description: A label query over volumes to consider
+                                for binding.
+                              properties:
+                                matchExpressions:
+                                  description: matchExpressions is a list of label
+                                    selector requirements. The requirements are ANDed.
+                                  items:
+                                    description: A label selector requirement is a
+                                      selector that contains values, a key, and an
+                                      operator that relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: operator represents a key's relationship
+                                          to a set of values. Valid operators are
+                                          In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: values is an array of string
+                                          values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the
+                                          operator is Exists or DoesNotExist, the
+                                          values array must be empty. This array is
+                                          replaced during a strategic merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: matchLabels is a map of {key,value}
+                                    pairs. A single {key,value} in the matchLabels
+                                    map is equivalent to an element of matchExpressions,
+                                    whose key field is "key", the operator is "In",
+                                    and the values array contains only "value". The
+                                    requirements are ANDed.
+                                  type: object
+                              type: object
+                            storageClassName:
+                              description: 'Name of the StorageClass required by the
+                                claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                              type: string
+                            volumeMode:
+                              description: volumeMode defines what type of volume
+                                is required by the claim. Value of Filesystem is implied
+                                when not included in claim spec. This is a beta feature.
+                              type: string
+                            volumeName:
+                              description: VolumeName is the binding reference to
+                                the PersistentVolume backing this claim.
+                              type: string
+                          type: object
+                      type: object
+                  type: object
                 positiondb:
                   properties:
                     emptyDir:
@@ -684,6 +906,21 @@ spec:
                             in a pod. The default is nil which means that the limit
                             is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                           type: string
+                      type: object
+                    host_path:
+                      description: Deprecated, use hostPath
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
                       type: object
                     hostPath:
                       description: Represents a host path mapped into a pod. Host
@@ -1109,9 +1346,9 @@ spec:
                                 in image metadata if unspecified. May also be set
                                 in PodSecurityContext. If set in both SecurityContext
                                 and PodSecurityContext, the value specified in SecurityContext
-                                takes precedence. This field is alpha-level and it
-                                is only honored by servers that enable the WindowsRunAsUserName
-                                feature flag.
+                                takes precedence. This field is beta-level and may
+                                be disabled with the WindowsRunAsUserName feature
+                                flag.
                               type: string
                           type: object
                       type: object
@@ -1246,9 +1483,9 @@ spec:
                                 in image metadata if unspecified. May also be set
                                 in PodSecurityContext. If set in both SecurityContext
                                 and PodSecurityContext, the value specified in SecurityContext
-                                takes precedence. This field is alpha-level and it
-                                is only honored by servers that enable the WindowsRunAsUserName
-                                feature flag.
+                                takes precedence. This field is beta-level and may
+                                be disabled with the WindowsRunAsUserName feature
+                                flag.
                               type: string
                           type: object
                       type: object
@@ -1344,6 +1581,21 @@ spec:
                             in a pod. The default is nil which means that the limit
                             is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                           type: string
+                      type: object
+                    host_path:
+                      description: Deprecated, use hostPath
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
                       type: object
                     hostPath:
                       description: Represents a host path mapped into a pod. Host
@@ -1538,6 +1790,210 @@ spec:
                       type: string
                   required:
                   - enabled
+                  type: object
+                fluentdPvcSpec:
+                  description: Deprecated, use bufferStorageVolume
+                  properties:
+                    emptyDir:
+                      description: Represents an empty directory for a pod. Empty
+                        directory volumes support ownership management and SELinux
+                        relabeling.
+                      properties:
+                        medium:
+                          description: 'What type of storage medium should back this
+                            directory. The default is "" which means to use the node''s
+                            default medium. Must be an empty string (default) or Memory.
+                            More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir'
+                          type: string
+                        sizeLimit:
+                          description: 'Total amount of local storage required for
+                            this EmptyDir volume. The size limit is also applicable
+                            for memory medium. The maximum usage on memory medium
+                            EmptyDir would be the minimum value between the SizeLimit
+                            specified here and the sum of memory limits of all containers
+                            in a pod. The default is nil which means that the limit
+                            is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
+                          type: string
+                      type: object
+                    host_path:
+                      description: Deprecated, use hostPath
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                    hostPath:
+                      description: Represents a host path mapped into a pod. Host
+                        path volumes do not support ownership management or SELinux
+                        relabeling.
+                      properties:
+                        path:
+                          description: 'Path of the directory on the host. If the
+                            path is a symlink, it will follow the link to the real
+                            path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                        type:
+                          description: 'Type for HostPath Volume Defaults to "" More
+                            info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
+                          type: string
+                      required:
+                      - path
+                      type: object
+                    pvc:
+                      description: PersistentVolumeClaim defines the Spec and the
+                        Source at the same time. The PVC will be created with the
+                        configured spec and the name defined in the source.
+                      properties:
+                        source:
+                          description: PersistentVolumeClaimVolumeSource references
+                            the user's PVC in the same namespace. This volume finds
+                            the bound PV and mounts that volume for the pod. A PersistentVolumeClaimVolumeSource
+                            is, essentially, a wrapper around another type of volume
+                            that is owned by someone else (the system).
+                          properties:
+                            claimName:
+                              description: 'ClaimName is the name of a PersistentVolumeClaim
+                                in the same namespace as the pod using this volume.
+                                More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims'
+                              type: string
+                            readOnly:
+                              description: Will force the ReadOnly setting in VolumeMounts.
+                                Default false.
+                              type: boolean
+                          required:
+                          - claimName
+                          type: object
+                        spec:
+                          description: PersistentVolumeClaimSpec describes the common
+                            attributes of storage devices and allows a Source for
+                            provider-specific attributes
+                          properties:
+                            accessModes:
+                              description: 'AccessModes contains the desired access
+                                modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                              items:
+                                type: string
+                              type: array
+                            dataSource:
+                              description: This field requires the VolumeSnapshotDataSource
+                                alpha feature gate to be enabled and currently VolumeSnapshot
+                                is the only supported data source. If the provisioner
+                                can support VolumeSnapshot data source, it will create
+                                a new volume and data will be restored to the volume
+                                at the same time. If the provisioner does not support
+                                VolumeSnapshot data source, volume will not be created
+                                and the failure will be reported as an event. In the
+                                future, we plan to support more data source types
+                                and the behavior of the provisioner may change.
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                            resources:
+                              description: 'Resources represents the minimum resources
+                                the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                              properties:
+                                limits:
+                                  additionalProperties:
+                                    type: string
+                                  description: 'Limits describes the maximum amount
+                                    of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                  type: object
+                                requests:
+                                  additionalProperties:
+                                    type: string
+                                  description: 'Requests describes the minimum amount
+                                    of compute resources required. If Requests is
+                                    omitted for a container, it defaults to Limits
+                                    if that is explicitly specified, otherwise to
+                                    an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                  type: object
+                              type: object
+                            selector:
+                              description: A label query over volumes to consider
+                                for binding.
+                              properties:
+                                matchExpressions:
+                                  description: matchExpressions is a list of label
+                                    selector requirements. The requirements are ANDed.
+                                  items:
+                                    description: A label selector requirement is a
+                                      selector that contains values, a key, and an
+                                      operator that relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: operator represents a key's relationship
+                                          to a set of values. Valid operators are
+                                          In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: values is an array of string
+                                          values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the
+                                          operator is Exists or DoesNotExist, the
+                                          values array must be empty. This array is
+                                          replaced during a strategic merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: matchLabels is a map of {key,value}
+                                    pairs. A single {key,value} in the matchLabels
+                                    map is equivalent to an element of matchExpressions,
+                                    whose key field is "key", the operator is "In",
+                                    and the values array contains only "value". The
+                                    requirements are ANDed.
+                                  type: object
+                              type: object
+                            storageClassName:
+                              description: 'Name of the StorageClass required by the
+                                claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                              type: string
+                            volumeMode:
+                              description: volumeMode defines what type of volume
+                                is required by the claim. Value of Filesystem is implied
+                                when not included in claim spec. This is a beta feature.
+                              type: string
+                            volumeName:
+                              description: VolumeName is the binding reference to
+                                the PersistentVolume backing this claim.
+                              type: string
+                          type: object
+                      type: object
                   type: object
                 image:
                   description: ImageSpec struct hold information about image specification
@@ -1964,9 +2420,9 @@ spec:
                                 in image metadata if unspecified. May also be set
                                 in PodSecurityContext. If set in both SecurityContext
                                 and PodSecurityContext, the value specified in SecurityContext
-                                takes precedence. This field is alpha-level and it
-                                is only honored by servers that enable the WindowsRunAsUserName
-                                feature flag.
+                                takes precedence. This field is beta-level and may
+                                be disabled with the WindowsRunAsUserName feature
+                                flag.
                               type: string
                           type: object
                       type: object
@@ -2101,9 +2557,9 @@ spec:
                                 in image metadata if unspecified. May also be set
                                 in PodSecurityContext. If set in both SecurityContext
                                 and PodSecurityContext, the value specified in SecurityContext
-                                takes precedence. This field is alpha-level and it
-                                is only honored by servers that enable the WindowsRunAsUserName
-                                feature flag.
+                                takes precedence. This field is beta-level and may
+                                be disabled with the WindowsRunAsUserName feature
+                                flag.
                               type: string
                           type: object
                       type: object

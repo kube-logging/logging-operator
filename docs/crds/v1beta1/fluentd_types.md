@@ -9,6 +9,7 @@
 | image | ImageSpec | No | - |  |
 | disablePvc | bool | No | - |  |
 | bufferStorageVolume | volume.KubernetesVolume | No | - | BufferStorageVolume is by default configured as PVC using FluentdPvcSpec<br>[volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
+| fluentdPvcSpec | *volume.KubernetesVolume | No | - | Deprecated, use bufferStorageVolume<br> |
 | volumeMountChmod | bool | No | - |  |
 | volumeModImage | ImageSpec | No | - |  |
 | configReloaderImage | ImageSpec | No | - |  |
