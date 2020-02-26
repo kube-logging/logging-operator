@@ -57,7 +57,7 @@ var _ = Describe("ClusterFlow", func() {
 					Name:      "foo",
 					Namespace: "foo",
 				},
-				Spec: FlowSpec{
+				Spec: ClusterFlowSpec{
 					Selectors:  nil,
 					OutputRefs: []string{},
 				},
