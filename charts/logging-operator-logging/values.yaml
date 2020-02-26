@@ -51,3 +51,22 @@ tls:
 watchNamespaces: []
 # Control namespace that contains ClusterOutput and ClusterFlow resources
 controlNamespace: ""
+
+# ClusterFlows to deploy
+clusterFlows: []
+
+# ClusterOutputs to deploy
+clusterOutputs: []
+
+# Send all pod logs to kafka
+# clusterFlows:
+#   - name: all-pods
+#     spec:
+#       outputRefs:
+#         - kafka
+# clusterOutputs:
+#   - name: kafka
+#     spec:
+#       kafka:
+#         brokers: kafka-headless.kafka.svc.cluster.local:29092
+#         default_topic: topic
