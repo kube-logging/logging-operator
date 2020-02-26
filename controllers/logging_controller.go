@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"regexp"
+	"sort"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -257,8 +258,19 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 	if err != nil {
 		return nil, err
 	}
+
 	if len(clusterFlows.Items) > 0 {
-		for _, i := range clusterFlows.Items {
+		items := clusterFlows.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, i := range items {
 			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 				loggingResources.ClusterFlows = append(loggingResources.ClusterFlows, i)
 			}
@@ -270,8 +282,19 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 	if err != nil {
 		return nil, err
 	}
+
 	if len(clusterOutputs.Items) > 0 {
-		for _, i := range clusterOutputs.Items {
+		items := clusterOutputs.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, i := range items {
 			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 				loggingResources.ClusterOutputs = append(loggingResources.ClusterOutputs, i)
 			}
@@ -286,7 +309,17 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to list all namespaces")
 		}
-		for _, ns := range nsList.Items {
+		items := nsList.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, ns := range items {
 			watchNamespaces = append(watchNamespaces, ns.Name)
 		}
 	}
@@ -297,20 +330,42 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 		if err != nil {
 			return nil, err
 		}
+
 		if len(flows.Items) > 0 {
-			for _, i := range flows.Items {
+			items := flows.Items
+			sort.Slice(items, func(i, j int) bool {
+				if items[i].GetNamespace() < items[j].GetNamespace() {
+					return true
+				}
+				if items[i].GetNamespace() == items[j].GetNamespace() {
+					return items[i].GetName() < items[j].GetName()
+				}
+				return false
+			})
+			for _, i := range items {
 				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 					loggingResources.Flows = append(loggingResources.Flows, i)
 				}
 			}
 		}
+
 		outputs := &loggingv1beta1.OutputList{}
 		err = r.List(context.TODO(), outputs, client.InNamespace(ns))
 		if err != nil {
 			return nil, err
 		}
 		if len(outputs.Items) > 0 {
-			for _, i := range outputs.Items {
+			items := outputs.Items
+			sort.Slice(items, func(i, j int) bool {
+				if items[i].GetNamespace() < items[j].GetNamespace() {
+					return true
+				}
+				if items[i].GetNamespace() == items[j].GetNamespace() {
+					return items[i].GetName() < items[j].GetName()
+				}
+				return false
+			})
+			for _, i := range items {
 				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 					loggingResources.Outputs = append(loggingResources.Outputs, i)
 				}
