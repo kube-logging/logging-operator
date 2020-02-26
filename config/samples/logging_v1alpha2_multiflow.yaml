@@ -1,0 +1,72 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: output-sample
+spec:
+  nullout: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: sample1
+spec:
+  selectors:
+    sampleKey: sampleValue1
+  filters:
+    - tag_normaliser: {}
+    - stdout: {}
+  outputRefs:
+    - "output-sample"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: sample2
+spec:
+  selectors:
+    sampleKey: sampleValue2
+  filters:
+    - tag_normaliser: {}
+    - stdout: {}
+  outputRefs:
+    - "output-sample"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: sample3
+spec:
+  selectors:
+    sampleKey: sampleValue3
+  filters:
+    - tag_normaliser: {}
+    - stdout: {}
+  outputRefs:
+    - "output-sample"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: sample4
+spec:
+  selectors:
+    sampleKey: sampleValue4
+  filters:
+    - tag_normaliser: {}
+    - stdout: {}
+  outputRefs:
+    - "output-sample"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: sample5
+spec:
+  selectors:
+    sampleKey: sampleValue5
+  filters:
+    - tag_normaliser: {}
+    - stdout: {}
+  outputRefs:
+    - "output-sample"
+---
