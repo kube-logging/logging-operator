@@ -99,6 +99,9 @@ metadata:
   name: minio-deployment
   namespace: logging
 spec:
+  selector:
+    matchLabels:
+      app: minio
   strategy:
     type: Recreate
   template:
@@ -220,9 +223,11 @@ spec:
         reserve_data: true
         parse:
           type: nginx
-  selectors:
-    app.kubernetes.io/instance: nginx-demo
-    app.kubernetes.io/name: nginx-logging-demo
+  match:
+    - select:
+        labels:
+          app.kubernetes.io/instance: nginx-demo
+          app.kubernetes.io/name: nginx-logging-demo
   outputRefs:
     - demo-output
 EOF
@@ -260,7 +265,7 @@ kubectl -n logging get secrets logging-s3 -o json | jq '.data | map_values(@base
 ```
 #### Forward Service
 ```bash
-kubectl -n logging port-forward svc/logging-demo-minio 9000
+kubectl -n logging port-forward svc/nginx-demo-minio 9000
 ```
 [Minio Dashboard: http://localhost:9000](http://localhost:9000)
 <p align="center"><img src="./img/servicemonitor_minio.png" width="660"></p>
