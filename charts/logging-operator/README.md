@@ -53,6 +53,7 @@ The following tables lists the configurable parameters of the logging-operator c
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
+| `namespaceOverride`                                 | Override namespace of app                              | ``                             |
 | `watchNamespace`                                    | Namespace to watch for LoggingOperator CRD             | ``                             |
 | `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                         |
 | `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.              | `false`                        |

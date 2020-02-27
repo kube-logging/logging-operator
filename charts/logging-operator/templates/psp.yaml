@@ -4,6 +4,7 @@ kind: PodSecurityPolicy
 metadata:
   creationTimestamp: null
   name: psp.logging-operator
+  namespace: {{ include "logging-operator.namespace" . }}
   annotations:
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'

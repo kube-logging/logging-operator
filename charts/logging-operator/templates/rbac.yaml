@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ template "logging-operator.fullname" . }}
+  namespace: {{ include "logging-operator.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "logging-operator.name" . }}
     helm.sh/chart: {{ include "logging-operator.chart" . }}
@@ -129,7 +130,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ template "logging-operator.fullname" . }}
-    namespace: {{ .Release.Namespace }}
+    namespace: {{ include "logging-operator.namespace" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

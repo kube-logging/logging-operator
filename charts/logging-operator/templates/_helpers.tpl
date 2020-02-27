@@ -25,6 +25,19 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Provides the namespace the chart will be installed in using the builtin .Release.Namespace,
+or, if provided, and manually overwritten namespace value.
+*/}}
+{{- define "logging-operator.namespace" -}}
+{{- if .Values.namespaceOverride -}}
+{{ .Values.namespaceOverride -}}
+{{- else -}}
+{{ .Release.Namespace }}
+{{- end -}}
+{{- end -}}
+
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "logging-operator.chart" -}}
