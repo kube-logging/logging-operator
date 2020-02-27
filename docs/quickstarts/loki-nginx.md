@@ -108,7 +108,7 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
      > Note: In production environment, use a longer `timekey` interval to avoid generating too many objects.
 1. Create a `flow` resource.
      ```bash
-     kubectl -n logging apply -f - <<"EOF" 
+     kubectl -n logging apply -f - <<"EOF"
      apiVersion: logging.banzaicloud.io/v1beta1
      kind: Flow
      metadata:
@@ -123,8 +123,8 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
                type: nginx
        match:
          - select:
-           labels:
-             app.kubernetes.io/name: log-generator
+             labels:
+               app.kubernetes.io/name: log-generator
        outputRefs:
          - loki-output
      EOF
