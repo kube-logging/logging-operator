@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: logging-operator
-          image: "banzaicloud/logging-operator:3.0.0-rc.1"
+          image: "banzaicloud/logging-operator:3.0.0-rc.2"
           imagePullPolicy: IfNotPresent
           resources:
             {}

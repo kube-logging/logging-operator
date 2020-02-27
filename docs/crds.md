@@ -413,7 +413,9 @@ Flows define a `logging flow` that defines the `filters` and `outputs`.
 ### Parameters
 | Name                    | Type              | Default | Description |
 |-------------------------|-------------------|---------|-------------|
-| selectors (DEPRECATED)  | map[string]string | {}      | DEPRECATED inf favor of match. Kubernetes label selectors for the log. |
+| selectors (DEPRECATED)  | map[string]string | {}      | DEPRECATED inf favor of [match](./log-routing.md). Kubernetes label selectors for the log. |
+| match                   | [][Match](./crds/v1beta1/flow_types.md#match) | {}      | Applicable to `Flow` resources, [see](./log-routing.md) |
+| match                   | [][ClusterMatch](./crds/v1beta1/clusterflow_types.md#match) | {}      | Applicable to `ClusterFlow` resources, [see](./log-routing.md) |
 | filters                 | [][Filter](./plugins/filters)          | []      | List of applied [filter](./plugins/filters).  |
 | loggingRef              | string | "" | Specified `logging` resource reference to connect `FLow` and `ClusterFlow` to |
 | outputRefs              | []string | [] | List of [Outputs](#Defining-outputs) or [ClusterOutputs](#Defining-outputs) names |
