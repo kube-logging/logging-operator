@@ -18,10 +18,142 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
+	"github.com/andreyvit/diff"
+	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func TestFlowMatch(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := testLogging()
+	output := testOutput()
+
+	flow := &v1beta1.Flow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: output.Namespace,
+		},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{
+					Select: &v1beta1.Select{
+						Labels: map[string]string{
+							"c": "d",
+						},
+					},
+				},
+			},
+			OutputRefs: []string{output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(diff.TrimLinesInString(string(secret.Data[fluentd.AppConfigKey]))).Should(gomega.ContainSubstring(diff.TrimLinesInString(heredoc.Docf(`
+		<match>
+		  labels c:d
+		  namespaces %s
+		  negate false
+		</match>
+	`, flow.Namespace))))
+}
+
+func TestClusterFlowMatch(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := testLogging()
+	output := testClusterOutput()
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Match: []v1beta1.ClusterMatch{
+				{
+					ClusterSelect: &v1beta1.ClusterSelect{
+						Labels: map[string]string{
+							"c": "d",
+						},
+					},
+				},
+			},
+			OutputRefs: []string{output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(diff.TrimLinesInString(string(secret.Data[fluentd.AppConfigKey]))).Should(gomega.ContainSubstring(diff.TrimLinesInString(heredoc.Docf(`
+		<match>
+		  labels c:d
+		  namespaces
+		  negate false
+		</match>
+	`))))
+}
+
+func TestClusterFlowMatchWithNamespaces(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := testLogging()
+	output := testClusterOutput()
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Match: []v1beta1.ClusterMatch{
+				{
+					ClusterSelect: &v1beta1.ClusterSelect{
+						Labels: map[string]string{
+							"c": "d",
+						},
+						Namespaces: []string{"a", "b"},
+					},
+				},
+			},
+			OutputRefs: []string{output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(diff.TrimLinesInString(string(secret.Data[fluentd.AppConfigKey]))).Should(gomega.ContainSubstring(diff.TrimLinesInString(heredoc.Docf(`
+		<match>
+		  labels c:d
+		  namespaces a,b
+		  negate false
+		</match>
+	`))))
+}
 
 func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	defer beforeEach(t)()

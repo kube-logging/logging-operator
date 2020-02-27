@@ -551,7 +551,6 @@ func ensureCreatedEventually(t *testing.T, ns, name string, object runtime.Objec
 	}
 }
 
-
 func expectError(t *testing.T, expected string) {
 	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
 		select {
@@ -579,6 +578,20 @@ func testOutput() *v1beta1.Output {
 		},
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
+		},
+	}
+}
+
+func testClusterOutput() *v1beta1.ClusterOutput {
+	return &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: controlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: output.NewNullOutputConfig(),
+			},
 		},
 	}
 }
