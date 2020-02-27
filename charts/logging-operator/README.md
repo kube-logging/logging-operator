@@ -49,11 +49,11 @@ The following tables lists the configurable parameters of the logging-operator c
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `image.repository`                                  | Container image repository                             | `banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `2.7.0`                        |
+| `image.tag`                                         | Container image tag                                    | `3.0.0-rc.2`                   |
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
-| `watchNamespace`                                    | Namespace to watch fot LoggingOperator CRD             | ``                             |
+| `watchNamespace`                                    | Namespace to watch for LoggingOperator CRD             | ``                             |
 | `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                         |
 | `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.              | `false`                        |
 | `affinity`                                          | Node Affinity                                          | `{}`                           |
@@ -75,7 +75,7 @@ $ helm install --name my-release -f values.yaml banzaicloud-stable/logging-opera
 
 ## Installing Fluentd and Fluent-bit via logging
 
-The previous chart does **not** install `logging` resource to deploy Fluentd and Fluent-bit on luster. To install them please use the [Logging Operator Logging](https://github.com/banzaicloud/logging-operator/tree/master/charts/logging-operator-logging) chart.
+The previous chart does **not** install `logging` resource to deploy Fluentd and Fluent-bit on cluster. To install them please use the [Logging Operator Logging](https://github.com/banzaicloud/logging-operator/tree/master/charts/logging-operator-logging) chart.
 
 ## tl;dr:
 
