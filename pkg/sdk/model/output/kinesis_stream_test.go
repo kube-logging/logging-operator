@@ -28,6 +28,9 @@ stream_name: test
 region: us-east-1
 format:
   type: json
+assume_role_credentials:
+  role_arn: arn:aws:iam::1111/IAM_ROLE_NAME
+  role_session_name: logging-operator
 buffer:
   timekey: 1m
   timekey_wait: 30s
@@ -39,6 +42,10 @@ buffer:
     @id test_kinesis_streams    
     region us-east-1
     stream_name test
+    <assume_role_credentials>
+      role_arn arn:aws:iam::1111/IAM_ROLE_NAME
+      role_session_name logging-operator
+    </assume_role_credentials>
     <buffer tag,time>
       @type file
       path /buffers/test_kinesis_streams.*.buffer
