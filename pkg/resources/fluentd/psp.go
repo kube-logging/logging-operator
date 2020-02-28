@@ -26,7 +26,7 @@ import (
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: r.FluentdObjectMetaClusterScope(r.Logging.QualifiedName(PodSecurityPolicyName), ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMetaClusterScope(PodSecurityPolicyName, ComponentFluentd),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
 				Volumes: []policyv1beta1.FSType{
 					"configMap",
