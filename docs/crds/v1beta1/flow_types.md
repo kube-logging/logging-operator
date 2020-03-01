@@ -17,10 +17,14 @@
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
 ### Exclude
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
 ### Filter
 #### Filter definition for FlowSpec
 
