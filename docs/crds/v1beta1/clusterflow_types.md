@@ -17,11 +17,15 @@
 |---|---|---|---|---|
 | namespaces | []string | No | - |  |
 | labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
 ### ClusterExclude
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | namespaces | []string | No | - |  |
 | labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
 ### ClusterFlowSpec
 #### FlowSpec is the Kubernetes spec for Flows
 
