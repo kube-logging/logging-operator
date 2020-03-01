@@ -35,11 +35,15 @@ type Match struct {
 }
 
 type Select struct {
-	Labels map[string]string `json:"labels,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
 }
 
 type Exclude struct {
-	Labels map[string]string `json:"labels,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
 }
 
 // Filter definition for FlowSpec

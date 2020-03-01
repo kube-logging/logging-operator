@@ -597,6 +597,14 @@ spec:
                 properties:
                   exclude:
                     properties:
+                      container_names:
+                        items:
+                          type: string
+                        type: array
+                      hosts:
+                        items:
+                          type: string
+                        type: array
                       labels:
                         additionalProperties:
                           type: string
@@ -604,6 +612,14 @@ spec:
                     type: object
                   select:
                     properties:
+                      container_names:
+                        items:
+                          type: string
+                        type: array
+                      hosts:
+                        items:
+                          type: string
+                        type: array
                       labels:
                         additionalProperties:
                           type: string
