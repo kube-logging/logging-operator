@@ -44,6 +44,10 @@ type FlowMatch struct {
 	Labels map[string]string `json:"labels,omitempty"`
 	// Optional namespace
 	Namespaces []string `json:"namespaces,omitempty"`
+	// ContainerNames
+	ContainerNames []string `json:"container_names,omitempty"`
+	// Hosts
+	Hosts []string `json:"hosts,omitempty"`
 	// Negate
 	Negate bool `json:"negate,omitempty"`
 }
@@ -55,8 +59,16 @@ func (f FlowMatch) GetPluginMeta() *PluginMeta {
 }
 func (f FlowMatch) GetParams() map[string]string {
 	params := map[string]string{
-		"namespaces": strings.Join(f.Namespaces, ","),
-		"negate":     strconv.FormatBool(f.Negate),
+		"negate": strconv.FormatBool(f.Negate),
+	}
+	if len(f.Namespaces) > 0 {
+		params["namespaces"] = strings.Join(f.Namespaces, ",")
+	}
+	if len(f.ContainerNames) > 0 {
+		params["container_names"] = strings.Join(f.ContainerNames, ",")
+	}
+	if len(f.Hosts) > 0 {
+		params["hosts"] = strings.Join(f.Hosts, ",")
 	}
 	if len(f.Labels) > 0 {
 		var sb []string

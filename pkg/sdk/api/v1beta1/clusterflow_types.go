@@ -36,13 +36,17 @@ type ClusterMatch struct {
 }
 
 type ClusterSelect struct {
-	Namespaces []string          `json:"namespaces,omitempty"`
-	Labels     map[string]string `json:"labels,omitempty"`
+	Namespaces     []string          `json:"namespaces,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
 }
 
 type ClusterExclude struct {
-	Namespaces []string          `json:"namespaces,omitempty"`
-	Labels     map[string]string `json:"labels,omitempty"`
+	Namespaces     []string          `json:"namespaces,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
 }
 
 // FlowSpec is the Kubernetes spec for Flows
