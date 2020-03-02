@@ -106,7 +106,6 @@ func TestClusterFlowMatch(t *testing.T) {
 	g.Expect(diff.TrimLinesInString(string(secret.Data[fluentd.AppConfigKey]))).Should(gomega.ContainSubstring(diff.TrimLinesInString(heredoc.Docf(`
 		<match>
 		  labels c:d
-		  namespaces
 		  negate false
 		</match>
 	`))))
