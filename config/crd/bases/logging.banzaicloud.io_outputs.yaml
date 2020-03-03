@@ -598,6 +598,14 @@ spec:
                   type: string
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -1376,6 +1384,14 @@ spec:
                   type: object
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -2311,6 +2327,14 @@ spec:
                   type: string
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -2552,6 +2576,14 @@ spec:
                   type: boolean
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -3172,6 +3204,14 @@ spec:
                   type: object
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -4134,6 +4174,14 @@ spec:
                   type: string
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
@@ -4497,6 +4545,14 @@ spec:
                   type: string
                 format:
                   properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
                     type:
                       description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
                         (default: json)'
