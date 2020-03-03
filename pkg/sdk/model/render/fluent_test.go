@@ -498,14 +498,6 @@ func TestRenderS3(t *testing.T) {
 							profile_name f
 						</shared_credentials>`,
 		},
-		{
-			name: "missing auth",
-			s3Config: output.S3OutputConfig{
-				Path:     "/var/buffer",
-				S3Bucket: "test_bucket",
-			},
-			err: "One of AssumeRoleCredentials or SharedCredentials or InstanceProfileCredentials must be configured",
-		},
 	}
 	for _, item := range table {
 		t.Logf("> %s\n", item.name)

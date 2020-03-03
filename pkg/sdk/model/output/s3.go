@@ -257,11 +257,5 @@ func (c *S3OutputConfig) validateAndSetCredentials(s3 *types.OutputPlugin, secre
 			s3.SubDirectives = append(s3.SubDirectives, directive)
 		}
 	}
-	if c.AssumeRoleCredentials == nil &&
-		c.InstanceProfileCredentials == nil &&
-		c.SharedCredentials == nil &&
-		(c.AwsAccessKey == nil || c.AwsSecretKey == nil) {
-		return errors.New("One of AssumeRoleCredentials or SharedCredentials or InstanceProfileCredentials must be configured")
-	}
 	return nil
 }
