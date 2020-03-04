@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: banzaicloud/logging-operator
-  tag: 3.0.0-rc.2
+  tag: 3.0.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
