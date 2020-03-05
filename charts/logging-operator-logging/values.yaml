@@ -20,24 +20,16 @@ enableRecreateWorkloadOnImmutableFieldChange: false
 fluentbit: {}
 # Fluentd configurations
 fluentd: {}
-# Send internal fluentd logs to stdout instead of circulating it internally without kubernetes labels. Use null to omit these logs.
-#  fluentLogDestination: stdout
-#  fluentdPvcSpec:
-#    accessModes:
-#      - ReadWriteOnce
-#    resources:
-#      requests:
-#        storage: 40Gi
-#    storageClassName: fast
-# If specified, the pod's tolerations.
-# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-#     tolerations:
-#      - key: "node-role.kubernetes.io/master"
-#        operator: "Equal"
-#        effect: "NoSchedule"
-#      - key: "node.kubernetes.io/unschedulable"
-#        operator: "Equal"
-#        effect: "NoSchedule"
+# 20Gi persistent storage is configured for fluentd by default.
+# Here is an example, on how to override it:
+#  bufferStorageVolume:
+#    pvc:
+#      spec:
+#        accessModes:
+#          - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 40Gi
 
 # Enable secure connection between fluentd and fluent-bit
 tls:
