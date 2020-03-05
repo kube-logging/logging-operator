@@ -16,9 +16,9 @@ fullnameOverride: ""
 # and recreate it with the new configuration.
 enableRecreateWorkloadOnImmutableFieldChange: false
 
-# Fluent-bit configurations
+# Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/crds/#fluent-bit-spec
 fluentbit: {}
-# Fluentd configurations
+# Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/crds/#fluentd-spec
 fluentd: {}
 # 20Gi persistent storage is configured for fluentd by default.
 # Here is an example, on how to override it:
