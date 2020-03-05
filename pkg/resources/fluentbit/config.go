@@ -38,7 +38,7 @@ var fluentBitConfigTemplate = `
     {{ $key }}  {{$value}}
  	{{- end }}
     {{- end }}
-    {{- range $id, $v := .Input.Parser_N }}
+    {{- range $id, $v := .Input.ParserN }}
     {{- if $v }}
     Parse_{{ $id}} {{$v}}
 	{{- end }}

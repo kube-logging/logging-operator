@@ -28,8 +28,8 @@ import (
 )
 
 type fluentbitInputConfig struct {
-	Values   map[string]string
-	Parser_N []string
+	Values  map[string]string
+	ParserN []string
 }
 
 type fluentBitConfig struct {
@@ -85,7 +85,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	fluentbitInput := fluentbitInputConfig{}
 	inputTail := r.Logging.Spec.FluentbitSpec.InputTail
 	if len(inputTail.ParserN) > 0 {
-		fluentbitInput.Parser_N = r.Logging.Spec.FluentbitSpec.InputTail.ParserN
+		fluentbitInput.ParserN = r.Logging.Spec.FluentbitSpec.InputTail.ParserN
 		inputTail.ParserN = nil
 	}
 	fluentbitInputValues, err := mapper.StringsMap(inputTail)

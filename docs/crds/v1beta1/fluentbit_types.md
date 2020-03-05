@@ -68,7 +68,7 @@
 | Multiline | string | No | Off | If enabled, the plugin will try to discover multiline messages and use the proper parsers to compose the outgoing messages. Note that when this option is enabled the Parser option is not used. <br> |
 | Multiline_Flush | string | No | 4 | Wait period time in seconds to process queued multiline messages <br> |
 | Parser_Firstline | string | No | - | Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture)<br> |
-| Parser_N | string | No | - | Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.<br> |
+| Parser_N | []string | No | - | Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.<br> |
 | Docker_Mode | string | No | Off | If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. <br> |
 | Docker_Mode_Flush | string | No | 4 | Wait period time in seconds to flush queued unfinished split lines. <br> |
 ### FilterKubernetes
