@@ -131,7 +131,7 @@ type InputTail struct {
 	// Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture)
 	ParserFirstline string `json:"Parser_Firstline,omitempty"`
 	// Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.
-	ParserN string `json:"Parser_N,omitempty"`
+	ParserN []string `json:"Parser_N,omitempty"`
 	// If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. (default:Off)
 	DockerMode string `json:"Docker_Mode,omitempty"`
 	//Wait period time in seconds to flush queued unfinished split lines. (default:4)
