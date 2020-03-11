@@ -501,7 +501,9 @@ spec:
                       description: 'Optional-extra parser to interpret and structure
                         multiline entries. This option can be used to define multiple
                         parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.'
-                      type: string
+                      items:
+                        type: string
+                      type: array
                     Path:
                       description: Pattern specifying a specific log files or multiple
                         ones through the use of common wildcards.
