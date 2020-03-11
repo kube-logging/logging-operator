@@ -20,7 +20,7 @@
 | delayed_commit_timeout | string | No | - | The timeout seconds until output plugin decides that async write operation fails<br> |
 | overflow_action | string | No | - | How output plugin behaves when its buffer queue is full<br>throw_exception: raise exception to show this error in log<br>block: block processing of input plugin to emit events into that buffer<br>drop_oldest_chunk: drop/purge oldest chunk to accept newly incoming chunk<br> |
 | retry_timeout | string | No | - | The maximum seconds to retry to flush while failing, until plugin discards buffer chunks<br> |
-| retry_forever | bool | No | true | If true, plugin will ignore retry_timeout and retry_max_times options and retry flushing forever<br> |
+| retry_forever | *bool | No | true | If true, plugin will ignore retry_timeout and retry_max_times options and retry flushing forever<br> |
 | retry_max_times | int | No | - | The maximum number of times to retry to flush while failing<br> |
 | retry_secondary_threshold | string | No | - | The ratio of retry_timeout to switch to use secondary while failing (Maximum valid value is 1.0)<br> |
 | retry_type | string | No | - | exponential_backoff: wait seconds will become large exponentially per failures<br>periodic: output plugin will retry periodically with fixed intervals (configured via retry_wait)<br> |
