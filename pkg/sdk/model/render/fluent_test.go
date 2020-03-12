@@ -28,6 +28,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 func TestRenderDirective(t *testing.T) {
@@ -441,7 +442,7 @@ func TestRenderS3(t *testing.T) {
 				Path:     "/var/buffer",
 				S3Bucket: "test_bucket",
 				Buffer: &output.Buffer{
-					RetryForever: true,
+					RetryForever: util.BoolPointer(true),
 					Path:         "asd",
 				},
 				AssumeRoleCredentials: &output.S3AssumeRoleCredentials{
