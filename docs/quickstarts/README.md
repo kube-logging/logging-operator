@@ -1,12 +1,1 @@
-<p align="center"><img src="../img/lo.svg" width="260"></p>
-<p align="center">
-
-### Logging Operator quick start guides
-
-Try out Logging Operator with these quickstart guides!
-
-1. [S3 Output](./example-s3.md)
-1. [Elasticsearch Output](./es-nginx.md)
-1. [Kafka Output](./kafka-nginx.md)
-1. [Loki Output](./loki-nginx.md)
-1. [Cloudwatch Output](./cloudwatch-nginx.md)
+The documentation of the Logging operator project is available at the [Banzai Cloud Documentation Page](https://banzaicloud.com/docs/one-eye/logging-operator/quickstarts/).

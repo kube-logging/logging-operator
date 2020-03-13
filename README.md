@@ -57,28 +57,29 @@ You can configure the Logging operator using the following Custom Resource Descr
 - [clusteroutput](/docs/crds.md#outputs-clusteroutputs) - Defines an output without namespace restriction. Only effective in `controlNamespace`.
 - [clusterflow](/docs/crds.md#flows-clusterflows) - Defines a logging flow without namespace restriction.
 
-The detailed CRD documentation can be found [here](/docs/crds.md).
+See the [detailed CRD documentation](https://banzaicloud.com/docs/one-eye/logging-operator/crds/).
 
 <p align="center"><img src="docs/img/logging-operator-v2-architecture.png" ></p>
 
 ## Quickstart
 
-Follow these [quickstart guides](docs/quickstarts) to try out the Logging operator!
+Follow these [quickstart guides](https://banzaicloud.com/docs/one-eye/logging-operator/quickstarts/) to try out the Logging operator!
 
 ### Install
 
-Deploy Logging Operator with [Kubernetes manifests](/docs/deploy/README.md) or [Helm chart](/docs/deploy/README.md#Deploy-logging-operator-with-Helm).
+Deploy Logging Operator with [Kubernetes manifests](https://banzaicloud.com/docs/one-eye/logging-operator/deploy/) or [Helm chart](https://banzaicloud.com/docs/one-eye/logging-operator/deploy/#deploy-logging-operator-with-helm).
 
 > Caution: The **master branch** is under heavy development. Use [releases](https://github.com/banzaicloud/logging-operator/releases) instead of the master branch to get stable software.
+
+## Support
+
+If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/contact/), the company backing the development of the Logging operator. If you are looking for the ultimate observability tool for multi-cluster Kubernetes infrastructures to automate the collection, correlation, and storage of logs and metrics, check out [One Eye](https://banzaicloud.com/products/one-eye/).
 
 If you encounter any problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://pages.banzaicloud.com/invite-slack).
 
 ## Documentation
 
- You can find the complete documentation of Logging operator v2 [here](./docs/Readme.md) :blue_book: <br>
-
-## Commercial support
-If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/contact/), the company backing the development of the Logging operator. If you are looking for the ultimate observability tool for multi-cluster Kubernetes infrastructures to automate the collection, correlation, and storage of logs and metrics, check out [One Eye](https://banzaicloud.com/products/one-eye/).
+ You can find the complete documentation of the Logging operator on the [Banzai Cloud Documentation Page](https://banzaicloud.com/docs/one-eye/logging-operator) :blue_book: <br>
 
 ## Contributing
 
@@ -89,7 +90,7 @@ If you find this project useful, help us:
 - Help new users with issues they may encounter :muscle:
 - Send a pull request with your new features and bug fixes :rocket: 
 
-*For more information, read the [developer documentation](./docs/developers.md)*.
+*For more information, read the [developer documentation](https://banzaicloud.com/docs/one-eye/logging-operator/developers)*.
 
 ## License
 
