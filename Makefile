@@ -139,4 +139,4 @@ endif
 check-diff: check
 	go mod tidy
 	$(MAKE) generate manifests docs
-	git diff --exit-code ':(exclude)./ADOPTERS.md'
+	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
