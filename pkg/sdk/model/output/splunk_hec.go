@@ -15,6 +15,8 @@
 package output
 
 import (
+	"errors"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
@@ -43,24 +45,26 @@ type _metaSplunkHec interface{}
 // +docName:"SplunkHecOutput"
 // SplunkHecOutput sends your logs to Splunk via Hec
 type SplunkHecOutput struct {
+	// The type of data that will be sent to Sumo Logic, either event or metric (default: event)
+	DataType string `json:"data_type,omitempty"`
 	// You can specify SplunkHec host by this parameter.
 	HecHost string `json:"hec_host"`
-	// The port number for the Hec token or the Hec load balancer. (default:8088)
+	// The port number for the Hec token or the Hec load balancer. (default: 8088)
 	HecPort int `json:"hec_port,omitempty"`
-	// This is the protocol to use for calling the Hec API. Available values are: http, https. (default:https)
+	// This is the protocol to use for calling the Hec API. Available values are: http, https. (default: https)
 	Protocol string `json:"protocol,omitempty"`
 	// Identifier for the Hec token.
 	// +docLink:"Secret,./secret.md"
 	HecToken *secret.Secret `json:"hec_token"`
 	// When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)
 	MetricsFromEvent bool `json:"metrics_from_event,omitempty"`
-	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event paramter. When this prameter is set, the metrics_from_event parameter is automatically set to false.
+	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event paramter. When this prameter is set, the metrics_from_event parameter is automatically set to false. (default: true)
 	MetricsNameKey string `json:"metrics_name_key,omitempty"`
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
 	MetricsValueKey string `json:"metrics_value_key,omitempty"`
-	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (Default:true).
-	CoerceToUtf bool `json:"coerce_to_utf8,omitempty"`
-	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (Default:'').
+	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (default: true).
+	CoerceToUtf8 bool `json:"coerce_to_utf8,omitempty"`
+	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (default: ' ').
 	NonUtf8ReplacementString string `json:"non_utf_8_replacement_string,omitempty"`
 	// Identifier for the Splunk index to be used for indexing events. If this parameter is not set, the indexer is chosen by HEC. Cannot set both index and index_key parameters at the same time.
 	Index string `json:"index,omitempty"`
@@ -105,6 +109,10 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 		splunkHec.Params = params
 	}
 
+	if err := c.validateConflictingFields(); err != nil {
+		return nil, err
+	}
+
 	if c.Buffer != nil {
 		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
 			return nil, err
@@ -122,4 +130,25 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 	}
 
 	return splunkHec, nil
+}
+
+func (c *SplunkHecOutput) validateConflictingFields() error {
+
+	if c.Index != "" && c.IndexKey != "" {
+		return errors.New("index and index_key cannot be set simultaneously")
+	}
+
+	if c.Host != "" && c.HostKey != "" {
+		return errors.New("host and host_key cannot be set simultaneously")
+	}
+
+	if c.Source != "" && c.SourceKey != "" {
+		return errors.New("source and source_key cannot be set simultaneously")
+	}
+
+	if c.SourceType != "" && c.SourceTypeKey != "" {
+		return errors.New("sourcetype and sourcetype_key cannot be set simultaneously")
+	}
+
+	return nil
 }
