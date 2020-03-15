@@ -37,6 +37,7 @@ type OutputSpec struct {
 	CloudWatchOutput          *output.CloudWatchOutput          `json:"cloudwatch,omitempty"`
 	KinesisStreamOutputConfig *output.KinesisStreamOutputConfig `json:"kinesisStream,omitempty"`
 	NewRelicOutputConfig      *output.NewRelicOutputConfig      `json:"newrelic,omitempty"`
+	SplunkHecOutput           *output.SplunkHecOutput           `json:"splunkHec,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output
