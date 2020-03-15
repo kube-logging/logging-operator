@@ -58,12 +58,40 @@ type SplunkHecOutput struct {
 	MetricsNameKey string `json:"metrics_name_key,omitempty"`
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
 	MetricsValueKey string `json:"metrics_value_key,omitempty"`
+	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (Default:true).
+	CoerceToUtf bool `json:"coerce_to_utf8,omitempty"`
+	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (Default:'').
+	NonUtf8ReplacementString string `json:"non_utf_8_replacement_string,omitempty"`
+	// Identifier for the Splunk index to be used for indexing events. If this parameter is not set, the indexer is chosen by HEC. Cannot set both index and index_key parameters at the same time.
+	Index string `json:"index,omitempty"`
+	// The field name that contains the Splunk index name. Cannot set both index and index_key parameters at the same time.
+	IndexKey string `json:"index_key,omitempty"`
+	// The host location for events. Cannot set both host and host_key parameters at the same time. (Default:hostname)
+	Host string `json:"host,omitempty"`
+	// Key for the host location. Cannot set both host and host_key parameters at the same time.
+	HostKey string `json:"host_key,omitempty"`
+	// The source field for events. If this parameter is not set, the source will be decided by HEC. Cannot set both source and source_key parameters at the same time.
+	Source string `json:"source,omitempty"`
+	// Field name to contain source. Cannot set both source and source_key parameters at the same time.
+	SourceKey string `json:"source_key,omitempty"`
+	// The sourcetype field for events. When not set, the sourcetype is decided by HEC. Cannot set both source and source_key parameters at the same time.
+	SourceType string `json:"source_type,omitempty"`
+	// Field name that contains the sourcetype. Cannot set both source and source_key parameters at the same time.
+	SourceTypeKey string `json:"sourcetype_key,omitempty"`
+	// By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in index_key, host_key, source_key, sourcetype_key, metric_name_key, and metric_value_key are saved in the original event.
+	KeepKeys bool `json:"keep_keys,omitempty"`
+	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
+	Fields map[string]string `json:"fields,omitempty"`
+	// +docLink:"Format,./format.md"
+	Format *Format `json:"format,omitempty"`
+	// +docLink:"Buffer,./buffer.md"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "splunk_hec"
 	pluginID := id + "_" + pluginType
-	SplunkHec := &types.OutputPlugin{
+	splunkHec := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
@@ -74,7 +102,24 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
 		return nil, err
 	} else {
-		SplunkHec.Params = params
+		splunkHec.Params = params
 	}
-	return SplunkHec, nil
+
+	if c.Buffer != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+			return nil, err
+		} else {
+			splunkHec.SubDirectives = append(splunkHec.SubDirectives, buffer)
+		}
+	}
+
+	if c.Format != nil {
+		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			splunkHec.SubDirectives = append(splunkHec.SubDirectives, format)
+		}
+	}
+
+	return splunkHec, nil
 }
