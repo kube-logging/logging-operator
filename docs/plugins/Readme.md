@@ -33,6 +33,7 @@ For more information please click on the plugin name
 | **[NewRelic Logs](outputs/newrelic.md)** | outputs | Send logs to New Relic Logs | GA | [1.1.5](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Alibaba Cloud Storage](outputs/oss.md)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
 | **[Amazon S3](outputs/s3.md)** | outputs | Store logs in Amazon S3 | GA | [1.3.0](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.3.0) |
+| **[Splunk Hec](outputs/splunk_hec.md)** | outputs | Fluent Plugin Splunk Hec Release 1.2.1 | GA | [1.2.1]() |
 | **[SumoLogic](outputs/sumologic.md)** | outputs | Send your logs to Sumologic | GA | [0.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1) |
 </center>
 
