@@ -65,7 +65,7 @@ type SplunkHecOutput struct {
 	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (default: true).
 	CoerceToUtf8 bool `json:"coerce_to_utf8,omitempty"`
 	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (default: ' ').
-	NonUtf8ReplacementString string `json:"non_utf_8_replacement_string,omitempty"`
+	NonUtf8ReplacementString string `json:"non_utf8_replacement_string,omitempty"`
 	// Identifier for the Splunk index to be used for indexing events. If this parameter is not set, the indexer is chosen by HEC. Cannot set both index and index_key parameters at the same time.
 	Index string `json:"index,omitempty"`
 	// The field name that contains the Splunk index name. Cannot set both index and index_key parameters at the same time.
@@ -79,7 +79,7 @@ type SplunkHecOutput struct {
 	// Field name to contain source. Cannot set both source and source_key parameters at the same time.
 	SourceKey string `json:"source_key,omitempty"`
 	// The sourcetype field for events. When not set, the sourcetype is decided by HEC. Cannot set both source and source_key parameters at the same time.
-	SourceType string `json:"source_type,omitempty"`
+	SourceType string `json:"sourcetype,omitempty"`
 	// Field name that contains the sourcetype. Cannot set both source and source_key parameters at the same time.
 	SourceTypeKey string `json:"sourcetype_key,omitempty"`
 	// By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in index_key, host_key, source_key, sourcetype_key, metric_name_key, and metric_value_key are saved in the original event.
