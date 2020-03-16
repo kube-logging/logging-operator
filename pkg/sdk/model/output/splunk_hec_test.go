@@ -26,17 +26,34 @@ func TestSplunkHEC(t *testing.T) {
 	CONFIG := []byte(`
 hec_host: splunk.default.svc.cluster.local
 hec_port: 8088
+index: foo
+host: foo
 protocol: http
-
+metrics_from_event: true
+metrics_name_key: foo
+metrics_value_key: foo
+coerce_to_utf8: true
+non_utf8_replacement_string: bar
+sourcetype: foo
+source: foo
 `)
 	expected := `
-  <match **>
-	@type splunk_hec
-	@id test_splunk_hec
-	hec_host splunk.default.svc.cluster.local
-	hec_port 8088
-	protocol http
-  </match>
+	<match **>
+		@type splunk_hec
+		@id test_splunk_hec
+		coerce_to_utf8 true
+		hec_host splunk.default.svc.cluster.local
+		hec_port 8088
+		host foo
+		index foo
+		metrics_from_event true
+		metrics_name_key foo
+		metrics_value_key foo
+		non_utf8_replacement_string bar
+		protocol http
+		source foo
+		sourcetype foo
+	</match>
 `
 	es := &output.SplunkHecOutput{}
 	yaml.Unmarshal(CONFIG, es)

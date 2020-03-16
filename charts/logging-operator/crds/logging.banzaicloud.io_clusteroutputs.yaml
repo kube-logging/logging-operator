@@ -4835,12 +4835,16 @@ spec:
                       type: string
                   type: object
                 coerce_to_utf8:
-                  description: Indicates whether to allow non-UTF-8 characters in
+                  description: 'Indicates whether to allow non-UTF-8 characters in
                     user logs. If set to true, any non-UTF-8 character is replaced
                     by the string specified in non_utf8_replacement_string. If set
                     to false, the Ingest API errors out any non-UTF-8 characters.
-                    (Default:true).
+                    (default: true).'
                   type: boolean
+                data_type:
+                  description: 'The type of data that will be sent to Sumo Logic,
+                    either event or metric (default: event)'
+                  type: string
                 fields:
                   additionalProperties:
                     type: string
@@ -4874,8 +4878,8 @@ spec:
                   description: You can specify SplunkHec host by this parameter.
                   type: string
                 hec_port:
-                  description: The port number for the Hec token or the Hec load balancer.
-                    (default:8088)
+                  description: 'The port number for the Hec token or the Hec load
+                    balancer. (default: 8088)'
                   type: integer
                 hec_token:
                   description: Identifier for the Hec token.
@@ -4963,22 +4967,23 @@ spec:
                     (Default:true)
                   type: boolean
                 metrics_name_key:
-                  description: Field name that contains the metric name. This parameter
+                  description: 'Field name that contains the metric name. This parameter
                     only works in conjunction with the metrics_from_event paramter.
                     When this prameter is set, the metrics_from_event parameter is
-                    automatically set to false.
+                    automatically set to false. (default: true)'
                   type: string
                 metrics_value_key:
                   description: Field name that contains the metric value, this parameter
                     is required when metric_name_key is configured.
                   type: string
-                non_utf_8_replacement_string:
-                  description: If coerce_to_utf8 is set to true, any non-UTF-8 character
-                    is replaced by the string you specify in this parameter. (Default:'').
+                non_utf8_replacement_string:
+                  description: 'If coerce_to_utf8 is set to true, any non-UTF-8 character
+                    is replaced by the string you specify in this parameter. (default:
+                    '' '').'
                   type: string
                 protocol:
                   description: 'This is the protocol to use for calling the Hec API.
-                    Available values are: http, https. (default:https)'
+                    Available values are: http, https. (default: https)'
                   type: string
                 source:
                   description: The source field for events. If this parameter is not
@@ -4989,7 +4994,7 @@ spec:
                   description: Field name to contain source. Cannot set both source
                     and source_key parameters at the same time.
                   type: string
-                source_type:
+                sourcetype:
                   description: The sourcetype field for events. When not set, the
                     sourcetype is decided by HEC. Cannot set both source and source_key
                     parameters at the same time.
