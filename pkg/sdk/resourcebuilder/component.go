@@ -148,7 +148,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 				Containers: []corev1.Container{
 					config.ContainerOverrides.Override(corev1.Container{
 						Name:    "logging-operator",
-						Image:   "banzaicloud/logging-operator",
+						Image:   "banzaicloud/logging-operator:3.0.0",
 						Command: []string{"/manager"},
 						Args:    []string{"--enable-leader-election"},
 						Resources: corev1.ResourceRequirements{
