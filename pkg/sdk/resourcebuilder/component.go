@@ -1,10 +1,10 @@
-// Copyright 2020 Banzai Cloud
+// Copyright © 2020 Banzai Cloud
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -150,7 +150,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 						Name:    "logging-operator",
 						Image:   "banzaicloud/logging-operator",
 						Command: []string{"/manager"},
-						//Args:    []string{"--enable-leader-election"},
+						Args:    []string{"--enable-leader-election"},
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
 								corev1.ResourceCPU:    resource.MustParse("100m"),
