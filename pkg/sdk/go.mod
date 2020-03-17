@@ -15,11 +15,10 @@ require (
 	github.com/spf13/cast v1.3.0
 	go.uber.org/zap v1.13.0
 	golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
-	k8s.io/api v0.17.2
-	k8s.io/apiextensions-apiserver v0.17.2
-	k8s.io/apimachinery v0.17.2
-	k8s.io/client-go v0.17.2
-	k8s.io/utils v0.0.0-20191114184206-e782cd3c129f
+	k8s.io/api v0.17.4
+	k8s.io/apiextensions-apiserver v0.17.4
+	k8s.io/apimachinery v0.17.4
+	k8s.io/client-go v0.17.4
 	sigs.k8s.io/controller-runtime v0.5.0
 )
 
