@@ -69,6 +69,7 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
 		MapperProvider:     k8sutil.NewCached,
 		Port:               9443,
 	})
