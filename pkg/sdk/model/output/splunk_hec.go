@@ -58,7 +58,7 @@ type SplunkHecOutput struct {
 	HecToken *secret.Secret `json:"hec_token"`
 	// When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)
 	MetricsFromEvent bool `json:"metrics_from_event,omitempty"`
-	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event paramter. When this prameter is set, the metrics_from_event parameter is automatically set to false. (default: true)
+	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false. (default: true)
 	MetricsNameKey string `json:"metrics_name_key,omitempty"`
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
 	MetricsValueKey string `json:"metrics_value_key,omitempty"`
@@ -133,19 +133,15 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 }
 
 func (c *SplunkHecOutput) validateConflictingFields() error {
-
 	if c.Index != "" && c.IndexKey != "" {
 		return errors.New("index and index_key cannot be set simultaneously")
 	}
-
 	if c.Host != "" && c.HostKey != "" {
 		return errors.New("host and host_key cannot be set simultaneously")
 	}
-
 	if c.Source != "" && c.SourceKey != "" {
 		return errors.New("source and source_key cannot be set simultaneously")
 	}
-
 	if c.SourceType != "" && c.SourceTypeKey != "" {
 		return errors.New("sourcetype and sourcetype_key cannot be set simultaneously")
 	}
