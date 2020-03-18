@@ -51,7 +51,7 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
