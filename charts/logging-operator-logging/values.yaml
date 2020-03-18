@@ -53,12 +53,12 @@ clusterOutputs: []
 # Send all pod logs to kafka
 # clusterFlows:
 #   - name: all-pods
-#     spec:
+#     spec: |
 #       outputRefs:
 #         - kafka
 # clusterOutputs:
 #   - name: kafka
-#     spec:
+#     spec: |
 #       kafka:
 #         brokers: kafka-headless.kafka.svc.cluster.local:29092
 #         default_topic: topic
