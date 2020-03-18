@@ -4968,7 +4968,7 @@ spec:
                   type: boolean
                 metrics_name_key:
                   description: 'Field name that contains the metric name. This parameter
-                    only works in conjunction with the metrics_from_event paramter.
+                    only works in conjunction with the metrics_from_event parameter.
                     When this prameter is set, the metrics_from_event parameter is
                     automatically set to false. (default: true)'
                   type: string

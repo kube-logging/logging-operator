@@ -23,7 +23,7 @@ More info at https://github.com/splunk/fluent-plugin-splunk-hec
 | protocol | string | No |  https | This is the protocol to use for calling the Hec API. Available values are: http, https. <br> |
 | hec_token | *secret.Secret | Yes | - | Identifier for the Hec token.<br>[Secret](./secret.md)<br> |
 | metrics_from_event | bool | No | - | When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)<br> |
-| metrics_name_key | string | No |  true | Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event paramter. When this prameter is set, the metrics_from_event parameter is automatically set to false. <br> |
+| metrics_name_key | string | No |  true | Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false. <br> |
 | metrics_value_key | string | No | - | Field name that contains the metric value, this parameter is required when metric_name_key is configured.<br> |
 | coerce_to_utf8 | bool | No |  true | Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. .<br> |
 | non_utf8_replacement_string | string | No |  ' ' | If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. .<br> |
