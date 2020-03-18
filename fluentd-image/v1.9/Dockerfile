@@ -21,6 +21,8 @@ RUN apk update \
  && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install oj -v 3.8.1 \
+ && gem install http_parser.rb -v 0.5.3 \
+ && gem install tzinfo -v 1.2.6 \
  && gem install json -v 2.3.0 \
  && gem install async-http -v 0.50.0 \
  && gem install ext_monitor -v 0.1.2 \
