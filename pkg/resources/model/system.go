@@ -190,7 +190,7 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		flow, err := types.NewFlow(matches)
+		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +223,7 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		flow, err := types.NewFlow(matches)
+		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
 		commonFlow.Flow = flow
 		if err != nil {
 			return nil, err
