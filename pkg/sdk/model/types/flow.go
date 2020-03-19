@@ -92,8 +92,8 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(matches []FlowMatch) (*Flow, error) {
-	flowLabel, err := calculateFlowLabel(matches)
+func NewFlow(matches []FlowMatch, name, namespace string) (*Flow, error) {
+	flowLabel, err := calculateFlowLabel(matches, name, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -107,8 +107,16 @@ func NewFlow(matches []FlowMatch) (*Flow, error) {
 	}, nil
 }
 
-func calculateFlowLabel(matches []FlowMatch) (string, error) {
+func calculateFlowLabel(matches []FlowMatch, name, namespace string) (string, error) {
 	b := md5.New()
+	_, err := io.WriteString(b, name)
+	if err != nil {
+		return "", err
+	}
+	_, err = io.WriteString(b, namespace)
+	if err != nil {
+		return "", err
+	}
 	for _, match := range matches {
 		sort.Strings(match.Namespaces)
 		for _, n := range match.Namespaces {
