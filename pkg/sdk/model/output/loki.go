@@ -64,7 +64,7 @@ type LokiOutput struct {
 	// Format to use when flattening the record to a log line: json, key_value (default: key_value)
 	LineFormat string `json:"line_format,omitempty" plugin:"default:json"`
 	// Extract kubernetes labels as loki labels (default: false)
-	ExtractKubernetesLabels *bool `json:"extract_kubernetes_labels,omitempty" plugin:"default:false"`
+	ExtractKubernetesLabels *bool `json:"extract_kubernetes_labels,omitempty"`
 	// Comma separated list of needless record keys to remove (default: [])
 	RemoveKeys []string `json:"remove_keys,omitempty"`
 	// If a record only has 1 key, then just set the log line to the value and discard the key. (default: false)
