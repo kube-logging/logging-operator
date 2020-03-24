@@ -4830,6 +4830,20 @@ spec:
                         party plugins are also available when installed.
                       type: string
                   type: object
+                ca_file:
+                  description: The path to a file containing a PEM-format CA certificate.
+                  type: string
+                ca_path:
+                  description: The path to a directory containing CA certificates
+                    in PEM format.
+                  type: string
+                client_cert:
+                  description: The path to a file containing a PEM-format CA certificate
+                    for this client.
+                  type: string
+                client_key:
+                  description: The private key for this client.'
+                  type: string
                 coerce_to_utf8:
                   description: 'Indicates whether to allow non-UTF-8 characters in
                     user logs. If set to true, any non-UTF-8 character is replaced
@@ -4937,6 +4951,11 @@ spec:
                   description: Key for the host location. Cannot set both host and
                     host_key parameters at the same time.
                   type: string
+                idle_timeout:
+                  description: If a connection has not been used for this number of
+                    seconds it will automatically be reset upon the next use to avoid
+                    attempting to send to a closed connection. nil means no timeout.
+                  type: integer
                 index:
                   description: Identifier for the Splunk index to be used for indexing
                     events. If this parameter is not set, the indexer is chosen by
@@ -4947,6 +4966,9 @@ spec:
                   description: The field name that contains the Splunk index name.
                     Cannot set both index and index_key parameters at the same time.
                   type: string
+                insecure_ssl:
+                  description: Indicates if insecure SSL connection is allowed (default:true)
+                  type: boolean
                 keep_keys:
                   description: By default, all the fields used by the *_key parameters
                     are removed from the original input events. To change this behavior,
@@ -4977,10 +4999,17 @@ spec:
                     is replaced by the string you specify in this parameter. (default:
                     '' '').'
                   type: string
+                open_timeout:
+                  description: The amount of time to wait for a connection to be opened.
+                  type: integer
                 protocol:
                   description: 'This is the protocol to use for calling the Hec API.
                     Available values are: http, https. (default: https)'
                   type: string
+                read_timeout:
+                  description: The amount of time allowed between reading two chunks
+                    from the socket.
+                  type: integer
                 source:
                   description: The source field for events. If this parameter is not
                     set, the source will be decided by HEC. Cannot set both source
@@ -4998,6 +5027,9 @@ spec:
                 sourcetype_key:
                   description: Field name that contains the sourcetype. Cannot set
                     both source and source_key parameters at the same time.
+                  type: string
+                ssl_ciphers:
+                  description: List of SSL ciphers allowed.
                   type: string
               required:
               - hec_host
