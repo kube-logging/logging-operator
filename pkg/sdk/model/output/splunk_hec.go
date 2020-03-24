@@ -57,7 +57,7 @@ type SplunkHecOutput struct {
 	// +docLink:"Secret,./secret.md"
 	HecToken *secret.Secret `json:"hec_token"`
 	// When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)
-	MetricsFromEvent bool `json:"metrics_from_event,omitempty"`
+	MetricsFromEvent *bool `json:"metrics_from_event,omitempty"`
 	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false. (default: true)
 	MetricsNameKey string `json:"metrics_name_key,omitempty"`
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
