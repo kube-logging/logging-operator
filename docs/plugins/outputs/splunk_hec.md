@@ -36,6 +36,15 @@ More info at https://github.com/splunk/fluent-plugin-splunk-hec
 | sourcetype | string | No | - | The sourcetype field for events. When not set, the sourcetype is decided by HEC. Cannot set both source and source_key parameters at the same time.<br> |
 | sourcetype_key | string | No | - | Field name that contains the sourcetype. Cannot set both source and source_key parameters at the same time.<br> |
 | keep_keys | bool | No | - | By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in index_key, host_key, source_key, sourcetype_key, metric_name_key, and metric_value_key are saved in the original event.<br> |
+| idle_timeout | int | No | - | If a connection has not been used for this number of seconds it will automatically be reset upon the next use to avoid attempting to send to a closed connection. nil means no timeout.<br> |
+| read_timeout | int | No | - | The amount of time allowed between reading two chunks from the socket.<br> |
+| open_timeout | int | No | - | The amount of time to wait for a connection to be opened.<br> |
+| client_cert | string | No | - | The path to a file containing a PEM-format CA certificate for this client.<br> |
+| client_key | string | No | - | The private key for this client.'<br> |
+| ca_file | string | No | - | The path to a file containing a PEM-format CA certificate.<br> |
+| ca_path | string | No | - | The path to a directory containing CA certificates in PEM format.<br> |
+| ssl_ciphers | string | No | - | List of SSL ciphers allowed.<br> |
+| insecure_ssl | bool | No | true | Indicates if insecure SSL connection is allowed <br> |
 | fields | map[string]string | No | - | In this case, parameters inside <fields> are used as indexed fields and removed from the original input events<br> |
 | format | *Format | No | - | [Format](./format.md)<br> |
 | buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
