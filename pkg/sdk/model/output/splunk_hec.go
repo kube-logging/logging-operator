@@ -84,6 +84,24 @@ type SplunkHecOutput struct {
 	SourceTypeKey string `json:"sourcetype_key,omitempty"`
 	// By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in index_key, host_key, source_key, sourcetype_key, metric_name_key, and metric_value_key are saved in the original event.
 	KeepKeys bool `json:"keep_keys,omitempty"`
+	//If a connection has not been used for this number of seconds it will automatically be reset upon the next use to avoid attempting to send to a closed connection. nil means no timeout.
+	IdleTimeout int `json:"idle_timeout,omitempty"`
+	// The amount of time allowed between reading two chunks from the socket.
+	ReadTimeout int `json:"read_timeout,omitempty"`
+	// The amount of time to wait for a connection to be opened.
+	OpenTimeout int `json:"open_timeout,omitempty"`
+	// The path to a file containing a PEM-format CA certificate for this client.
+	ClientCert string `json:"client_cert,omitempty"`
+	// The private key for this client.'
+	ClientKey string `json:"client_key,omitempty"`
+	// The path to a file containing a PEM-format CA certificate.
+	CAFile string `json:"ca_file,omitempty"`
+	// The path to a directory containing CA certificates in PEM format.
+	CAPath string `json:"ca_path,omitempty"`
+	// List of SSL ciphers allowed.
+	SSLCiphers string `json:"ssl_ciphers,omitempty"`
+	// Indicates if insecure SSL connection is allowed (default:true)
+	InsecureSSL bool `json:"insecure_ssl,omitempty"`
 	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
 	Fields map[string]string `json:"fields,omitempty"`
 	// +docLink:"Format,./format.md"
