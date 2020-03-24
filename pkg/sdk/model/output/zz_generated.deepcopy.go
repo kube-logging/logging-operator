@@ -731,6 +731,21 @@ func (in *SplunkHecOutput) DeepCopyInto(out *SplunkHecOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MetricsFromEvent != nil {
+		in, out := &in.MetricsFromEvent, &out.MetricsFromEvent
+		*out = new(bool)
+		**out = **in
+	}
+	if in.CoerceToUtf8 != nil {
+		in, out := &in.CoerceToUtf8, &out.CoerceToUtf8
+		*out = new(bool)
+		**out = **in
+	}
+	if in.InsecureSSL != nil {
+		in, out := &in.InsecureSSL, &out.InsecureSSL
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Fields != nil {
 		in, out := &in.Fields, &out.Fields
 		*out = make(map[string]string, len(*in))
