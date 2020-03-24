@@ -100,7 +100,7 @@ type SplunkHecOutput struct {
 	CAPath string `json:"ca_path,omitempty"`
 	// List of SSL ciphers allowed.
 	SSLCiphers string `json:"ssl_ciphers,omitempty"`
-	// Indicates if insecure SSL connection is allowed (default:true)
+	// Indicates if insecure SSL connection is allowed (default:false)
 	InsecureSSL *bool `json:"insecure_ssl,omitempty"`
 	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
 	Fields map[string]string `json:"fields,omitempty"`
