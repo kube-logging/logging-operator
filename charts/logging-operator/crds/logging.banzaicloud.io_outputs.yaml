@@ -4967,7 +4967,7 @@ spec:
                     Cannot set both index and index_key parameters at the same time.
                   type: string
                 insecure_ssl:
-                  description: Indicates if insecure SSL connection is allowed (default:true)
+                  description: Indicates if insecure SSL connection is allowed (default:false)
                   type: boolean
                 keep_keys:
                   description: By default, all the fields used by the *_key parameters
