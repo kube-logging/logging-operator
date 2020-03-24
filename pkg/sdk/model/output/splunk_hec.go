@@ -101,7 +101,7 @@ type SplunkHecOutput struct {
 	// List of SSL ciphers allowed.
 	SSLCiphers string `json:"ssl_ciphers,omitempty"`
 	// Indicates if insecure SSL connection is allowed (default:true)
-	InsecureSSL bool `json:"insecure_ssl,omitempty"`
+	InsecureSSL *bool `json:"insecure_ssl,omitempty"`
 	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
 	Fields map[string]string `json:"fields,omitempty"`
 	// +docLink:"Format,./format.md"
