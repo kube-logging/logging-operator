@@ -63,7 +63,7 @@ type SplunkHecOutput struct {
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
 	MetricsValueKey string `json:"metrics_value_key,omitempty"`
 	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (default: true).
-	CoerceToUtf8 bool `json:"coerce_to_utf8,omitempty"`
+	CoerceToUtf8 *bool `json:"coerce_to_utf8,omitempty"`
 	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (default: ' ').
 	NonUtf8ReplacementString string `json:"non_utf8_replacement_string,omitempty"`
 	// Identifier for the Splunk index to be used for indexing events. If this parameter is not set, the indexer is chosen by HEC. Cannot set both index and index_key parameters at the same time.
