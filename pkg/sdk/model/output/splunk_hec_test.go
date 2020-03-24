@@ -26,6 +26,7 @@ func TestSplunkHEC(t *testing.T) {
 	CONFIG := []byte(`
 hec_host: splunk.default.svc.cluster.local
 hec_port: 8088
+insecure_ssl: true
 index: foo
 host: foo
 protocol: http
@@ -46,6 +47,7 @@ source: foo
 		hec_port 8088
 		host foo
 		index foo
+		insecure_ssl true
 		metrics_from_event true
 		metrics_name_key foo
 		metrics_value_key foo
