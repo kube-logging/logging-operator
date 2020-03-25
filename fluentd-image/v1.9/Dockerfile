@@ -21,6 +21,8 @@ RUN apk update \
  && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install oj -v 3.8.1 \
+ && gem install http_parser.rb -v 0.5.3 \
+ && gem install tzinfo -v 1.2.6 \
  && gem install json -v 2.3.0 \
  && gem install async-http -v 0.50.0 \
  && gem install ext_monitor -v 0.1.2 \
@@ -53,6 +55,7 @@ RUN apk update \
          fluent-plugin-record-modifier \
          fluent-plugin-logzio \
          fluent-plugin-newrelic \
+         fluent-plugin-splunk-hec \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
