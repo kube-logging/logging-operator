@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	"fmt"
 	"reflect"
 
 	"emperror.dev/errors"
@@ -48,7 +47,7 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	}
 }
 
-func CreateFilter(filter v1beta1.Filter, flowName string, index int, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -62,7 +61,7 @@ func CreateFilter(filter v1beta1.Filter, flowName string, index int, secretLoade
 	case 0:
 		return nil, errors.New("no plugin config available for filter")
 	case 1:
-		return converters[0].ToDirective(secretLoader, fmt.Sprintf("%s_%d", flowName, index))
+		return converters[0].ToDirective(secretLoader, id)
 	default:
 		return nil, errors.Errorf("more then one plugin config is not allowed for a filter")
 	}
