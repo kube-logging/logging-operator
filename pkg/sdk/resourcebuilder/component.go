@@ -36,6 +36,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 )
 
+const Image = "banzaicloud/logging-operator:3.0.2"
+
 // +kubebuilder:object:generate=true
 
 type ComponentConfig struct {
@@ -148,7 +150,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 				Containers: []corev1.Container{
 					config.ContainerOverrides.Override(corev1.Container{
 						Name:    "logging-operator",
-						Image:   "banzaicloud/logging-operator:3.0.1",
+						Image:   Image,
 						Command: []string{"/manager"},
 						Args:    []string{"--enable-leader-election"},
 						Resources: corev1.ResourceRequirements{
