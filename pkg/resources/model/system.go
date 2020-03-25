@@ -278,7 +278,8 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range commonFlow.Filters {
-		filter, err := plugins.CreateFilter(f, commonFlow.Name, i, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
+		id := fmt.Sprintf("%s_%s_%d", commonFlow.Namespace, commonFlow.Name, i)
+		filter, err := plugins.CreateFilter(f, id, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, commonFlow.Name))
 			continue
