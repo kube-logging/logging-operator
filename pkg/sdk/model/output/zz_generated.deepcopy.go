@@ -526,6 +526,11 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 			(*out)[key] = val
 		}
 	}
+	if in.ExtractKubernetesLabels != nil {
+		in, out := &in.ExtractKubernetesLabels, &out.ExtractKubernetesLabels
+		*out = new(bool)
+		**out = **in
+	}
 	if in.RemoveKeys != nil {
 		in, out := &in.RemoveKeys, &out.RemoveKeys
 		*out = make([]string, len(*in))
