@@ -8,5 +8,5 @@ metadata:
   labels:
 {{ include "logging-operator-logging.labels" $ | indent 4 }}
 spec:
-{{ $clusteroutput.spec | indent 2 }}
+{{ toYaml $clusteroutput.spec | indent 2 }}
 {{- end -}}
