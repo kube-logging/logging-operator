@@ -2,12 +2,13 @@
 
 set -eufo pipefail
 
-SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
+SCRIPT_PATH="hack"
 BUCKET='minio/test'
 
 function main()
 {
     local mc_pod="$(get_mc_pod_name)"
+    remove_test_bucket "${mc_pod}"
     create_test_bucket "${mc_pod}"
     kubectl apply -f "${SCRIPT_PATH}/secret.yaml"
     helm_deploy_logging_operator
@@ -15,6 +16,13 @@ function main()
 
     wait_for_log_files "${mc_pod}" 300
     print_logs "${mc_pod}"
+}
+
+function remove_test_bucket()
+{
+    local mc_pod="$1"
+    kubectl exec --namespace logging "${mc_pod}" -- \
+        mc rb "${BUCKET}" || true
 }
 
 function create_test_bucket()
