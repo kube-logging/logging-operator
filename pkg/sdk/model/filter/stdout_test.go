@@ -29,7 +29,7 @@ output_type: json
 	expected := `
 <filter **>
   @type stdout
-  @id test_stdout
+  @id test
   output_type json
 </filter>
 `

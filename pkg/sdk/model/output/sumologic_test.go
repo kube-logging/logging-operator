@@ -33,7 +33,7 @@ source_name: AppA
 	expected := `
   <match **>
     @type sumologic
-    @id test_sumologic
+    @id test
     data_type metrics
     log_format json
     metric_data_format carbon2

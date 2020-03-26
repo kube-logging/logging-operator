@@ -32,7 +32,7 @@ languages:
 	expected := `
 <match kubernetes.**>
   @type detect_exceptions
-  @id test_detect_exceptions
+  @id test
   languages ["java","python"]
   multiline_flush_interval 0.1
   remove_tag_prefix kubernetes

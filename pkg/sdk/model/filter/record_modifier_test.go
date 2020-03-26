@@ -30,7 +30,7 @@ records:
 	expected := `
 <filter **>
   @type record_modifier
-  @id test_record_modifier
+  @id test
   <record>
     foo bar
   </record>
@@ -58,7 +58,7 @@ records:
 	expected := `
 <filter **>
   @type record_modifier
-	@id test_record_modifier
+	@id test
 	char_encoding utf-8:euc-jp
 	prepare_value require 'foo'; @foo = Foo.new
 	remove_keys key1, key2

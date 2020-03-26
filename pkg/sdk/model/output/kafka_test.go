@@ -38,14 +38,14 @@ buffer:
 	expected := `
   <match **>
     @type kafka2
-    @id test_kafka2
+    @id test
     brokers kafka-headless.kafka.svc.cluster.local:29092
     default_topic topic
     sasl_over_ssl false
     ssl_verify_hostname false
     <buffer tag,time>
       @type file
-      path /buffers/test_kafka2.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

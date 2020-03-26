@@ -31,7 +31,7 @@ de_dot_nested: true
 	expected := `
 <filter **>
   @type dedot
-  @id test_dedot
+  @id test
   de_dot_nested true
   de_dot_separator -
 </filter>

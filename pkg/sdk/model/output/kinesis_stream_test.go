@@ -39,7 +39,7 @@ buffer:
 	expected := `
   <match **>
     @type kinesis_streams
-    @id test_kinesis_streams    
+    @id test   
     region us-east-1
     stream_name test
     <assume_role_credentials>
@@ -48,7 +48,7 @@ buffer:
     </assume_role_credentials>
     <buffer tag,time>
       @type file
-      path /buffers/test_kinesis_streams.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

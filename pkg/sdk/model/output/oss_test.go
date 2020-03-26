@@ -35,13 +35,13 @@ buffer:
 	expected := `
   <match **>
     @type oss
-    @id test_oss
+    @id test
     bucket logs2019
     endpoint oss-cn-hangzhou.aliyuncs.com
     path fluent-oss/logs
     <buffer tag,time>
       @type file
-      path /buffers/test_oss.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

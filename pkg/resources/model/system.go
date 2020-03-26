@@ -16,6 +16,7 @@ package model
 
 import (
 	"fmt"
+	"strconv"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
@@ -73,7 +74,11 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
-	system := types.NewSystem(rootInput, types.NewRouter("main"))
+	router := types.NewRouter("main",
+		map[string]string{
+			"metrics": strconv.FormatBool(l.logging.Spec.FluentdSpec.Metrics != nil),
+		})
+	system := types.NewSystem(rootInput, router)
 	for _, flowCr := range l.Flows {
 		flow, err := l.CreateFlowFromCustomResource(flowCr)
 		if err != nil {

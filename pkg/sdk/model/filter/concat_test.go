@@ -32,7 +32,7 @@ n_lines: 10
 	expected := `
 <filter **>
   @type concat
-  @id test_concat
+  @id test
   key message
   n_lines 10
   partial_key partial_message
