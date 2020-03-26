@@ -101,13 +101,12 @@ func (e *Endpoint) ToDirective(secretLoader secret.SecretLoader) (types.Directiv
 // ToDirective converts LogZOutput to fluentd configuration.
 func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "logzio_buffered"
-	pluginID := id + "_" + pluginType
 	logz := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -144,7 +143,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 
 	// logz.Params = params
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			logz.SubDirectives = append(logz.SubDirectives, buffer)

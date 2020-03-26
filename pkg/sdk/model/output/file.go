@@ -88,13 +88,12 @@ type _expFile interface{}
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "file"
-	pluginID := id + "_" + pluginType
 	file := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
@@ -103,7 +102,7 @@ func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id stri
 		file.Params = params
 	}
 	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			file.SubDirectives = append(file.SubDirectives, buffer)

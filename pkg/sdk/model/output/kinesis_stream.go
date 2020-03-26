@@ -111,13 +111,12 @@ func (o *KinesisStreamAssumeRoleCredentials) ToDirective(secretLoader secret.Sec
 
 func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "kinesis_streams"
-	pluginID := id + "_" + pluginType
 	kinesis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -126,14 +125,14 @@ func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader
 		kinesis.Params = params
 	}
 	if e.AssumeRoleCredentials != nil {
-		if assumeRoleCredentials, err := e.AssumeRoleCredentials.ToDirective(secretLoader, pluginID); err != nil {
+		if assumeRoleCredentials, err := e.AssumeRoleCredentials.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			kinesis.SubDirectives = append(kinesis.SubDirectives, assumeRoleCredentials)
 		}
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			kinesis.SubDirectives = append(kinesis.SubDirectives, buffer)

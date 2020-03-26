@@ -60,13 +60,12 @@ type AzureStorage struct {
 
 func (a *AzureStorage) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "azurestorage"
-	pluginID := id + "_" + pluginType
 	azure := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(a); err != nil {
@@ -75,7 +74,7 @@ func (a *AzureStorage) ToDirective(secretLoader secret.SecretLoader, id string) 
 		azure.Params = params
 	}
 	if a.Buffer != nil {
-		if buffer, err := a.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := a.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			azure.SubDirectives = append(azure.SubDirectives, buffer)

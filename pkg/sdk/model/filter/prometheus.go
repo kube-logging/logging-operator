@@ -152,7 +152,7 @@ func (p *PrometheusConfig) ToDirective(secretLoader secret.SecretLoader, id stri
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "_" + pluginType,
+			Id:        id,
 		},
 	}
 

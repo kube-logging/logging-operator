@@ -45,6 +45,8 @@ func (s *System) GetDirectives() []Directive {
 type Flow struct {
 	PluginMeta
 
+	//Flow id for metrics
+	FlowID string
 	// Chain of Filters that will process the event. Can be zero or more.
 	Filters []Filter `json:"filters,omitempty"`
 	// List of Outputs that will emit the event, at least one output is required.
@@ -92,7 +94,7 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(matches []FlowMatch, name, namespace string) (*Flow, error) {
+func NewFlow(matches []FlowMatch, id, name, namespace string) (*Flow, error) {
 	flowLabel, err := calculateFlowLabel(matches, name, namespace)
 	if err != nil {
 		return nil, err
@@ -102,6 +104,7 @@ func NewFlow(matches []FlowMatch, name, namespace string) (*Flow, error) {
 			Directive: "label",
 			Tag:       flowLabel,
 		},
+		FlowID:    id,
 		FlowLabel: flowLabel,
 		Matches:   matches,
 	}, nil

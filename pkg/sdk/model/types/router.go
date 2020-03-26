@@ -15,6 +15,7 @@
 package types
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -25,6 +26,7 @@ import (
 type Router struct {
 	PluginMeta
 	Routes []Directive `json:"routes"`
+	Params map[string]string
 }
 
 func (r *Router) GetPluginMeta() *PluginMeta {
@@ -32,7 +34,7 @@ func (r *Router) GetPluginMeta() *PluginMeta {
 }
 
 func (r *Router) GetParams() map[string]string {
-	return nil
+	return r.Params
 }
 
 func (r *Router) GetSections() []Directive {
@@ -86,6 +88,7 @@ func (f FlowMatch) GetSections() []Directive {
 
 type FlowRoute struct {
 	PluginMeta
+	Params  map[string]string
 	Matches []Directive
 }
 
@@ -94,7 +97,7 @@ func (f *FlowRoute) GetPluginMeta() *PluginMeta {
 }
 
 func (f *FlowRoute) GetParams() map[string]string {
-	return nil
+	return f.Params
 }
 
 func (f *FlowRoute) GetSections() []Directive {
@@ -102,10 +105,14 @@ func (f *FlowRoute) GetSections() []Directive {
 }
 
 func (r *Router) AddRoute(flow *Flow) *Router {
+	metrics_labels, _ := json.Marshal(map[string]string{"id": flow.FlowID})
 	route := &FlowRoute{
 		PluginMeta: PluginMeta{
 			Directive: "route",
 			Label:     flow.FlowLabel,
+		},
+		Params: map[string]string{
+			"metrics_labels": string(metrics_labels),
 		},
 	}
 	for _, f := range flow.Matches {
@@ -123,6 +130,9 @@ func NewRouter(id string) *Router {
 			Directive: "match",
 			Tag:       "**",
 			Id:        id + "_" + pluginType,
+		},
+		Params: map[string]string{
+			"metrics": "true",
 		},
 	}
 }

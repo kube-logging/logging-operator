@@ -87,7 +87,7 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
 			{Namespaces: []string{"ns-test"}},
-		}, "flow-test", "ns-test")
+		}, "test", "flow-test", "ns-test")
 	if err != nil {
 		t.Fatal(err)
 	}

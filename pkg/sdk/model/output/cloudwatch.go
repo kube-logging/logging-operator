@@ -139,13 +139,12 @@ type CloudWatchOutput struct {
 
 func (c *CloudWatchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "cloudwatch_logs"
-	pluginID := id + "_" + pluginType
 	cloudwatch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
@@ -154,7 +153,7 @@ func (c *CloudWatchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 		cloudwatch.Params = params
 	}
 	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			cloudwatch.SubDirectives = append(cloudwatch.SubDirectives, buffer)
