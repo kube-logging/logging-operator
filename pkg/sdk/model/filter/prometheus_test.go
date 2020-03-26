@@ -39,7 +39,7 @@ labels:
 	expected := `
 <filter **>
   @type prometheus
-  @id test_prometheus
+  @id test
 	<metric>
 	  desc The total number of foo in message.
 	  key foo

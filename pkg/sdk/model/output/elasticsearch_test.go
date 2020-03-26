@@ -37,7 +37,7 @@ buffer:
 	expected := `
   <match **>
 	@type elasticsearch
-	@id test_elasticsearch
+	@id test
 	exception_backup true
 	fail_on_putting_template_retry_exceed true
 	host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
@@ -50,7 +50,7 @@ buffer:
 	verify_es_version_at_startup true
     <buffer tag,time>
       @type file
-      path /buffers/test_elasticsearch.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true
