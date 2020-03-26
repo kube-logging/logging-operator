@@ -33,7 +33,7 @@ format:
 	expected := `
   <match **>
 	@type file
-	@id test_file
+	@id test
 	add_path_suffix true
 	path /tmp/logs/${tag}/%Y/%m/%d.%H.%M
     <format>

@@ -31,7 +31,7 @@ regexp:
 	expected := `
 <filter **>
 @type grep
-@id test_grep
+@id test
 <regexp>
   key first
   pattern /^5\d\d$/
@@ -53,7 +53,7 @@ exclude:
 	expected := `
 <filter **>
 @type grep
-@id test_grep
+@id test
 <exclude>
   key first
   pattern /^5\d\d$/
@@ -78,7 +78,7 @@ or:
 	expected := `
 <filter **>
 @type grep
-@id test_grep
+@id test
 <or>
   <regexp>
 	key first
@@ -109,7 +109,7 @@ and:
 	expected := `
 <filter **>
 @type grep
-@id test_grep
+@id test
 <and>
   <exclude>
 	key first
@@ -145,7 +145,7 @@ and:
 	expected := `
 <filter **>
 @type grep
-@id test_grep
+@id test
 <exclude>
   key first
   pattern /^5\d\d$/

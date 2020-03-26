@@ -36,7 +36,7 @@ buffer:
 	expected := `
   <match **>
     @type cloudwatch_logs
-    @id test_cloudwatch
+    @id test
     log_group_name operator-log-group
     log_stream_name operator-log-stream
     region us-east-1

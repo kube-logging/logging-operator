@@ -41,7 +41,7 @@ source: foo
 	expected := `
 	<match **>
 		@type splunk_hec
-		@id test_splunk_hec
+		@id test
 		coerce_to_utf8 true
 		hec_host splunk.default.svc.cluster.local
 		hec_port 8088

@@ -34,13 +34,13 @@ buffer:
 	expected := `
   <match **>
     @type azurestorage
-    @id test_azurestorage
+    @id test
     azure_container example-azure-container
     format json
     path logs/${tag}/%Y/%m/%d/
     <buffer tag,time>
       @type file
-      path /buffers/test_azurestorage.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

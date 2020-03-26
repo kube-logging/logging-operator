@@ -32,7 +32,7 @@ parse:
 	expected := `
 <filter **>
   @type parser
-  @id test_parser
+  @id test
   key_name message
   remove_key_name_field true
   reserve_data true
@@ -62,7 +62,7 @@ parse:
 	expected := `
 <filter **>
   @type parser
-  @id test_parser
+  @id test
   key_name message
   remove_key_name_field true
   reserve_data true
