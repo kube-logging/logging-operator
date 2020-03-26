@@ -96,13 +96,12 @@ type _expDetectExceptions interface{}
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "detect_exceptions"
-	pluginID := id + "_" + pluginType
 	detector := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "kubernetes.**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	detect := d.DeepCopy()

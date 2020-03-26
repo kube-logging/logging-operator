@@ -216,13 +216,12 @@ type ElasticsearchOutput struct {
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "elasticsearch"
-	pluginID := id + "_" + pluginType
 	elasticsearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
@@ -231,7 +230,7 @@ func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id s
 		elasticsearch.Params = params
 	}
 	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			elasticsearch.SubDirectives = append(elasticsearch.SubDirectives, buffer)

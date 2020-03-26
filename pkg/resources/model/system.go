@@ -190,7 +190,8 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
+		id := fmt.Sprintf("clusterflow" + ":" + f.Namespace + ":" + f.Name)
+		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +224,8 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
+		id := fmt.Sprintf("flow" + ":" + f.Namespace + ":" + f.Name)
+		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
 		commonFlow.Flow = flow
 		if err != nil {
 			return nil, err
@@ -240,6 +242,12 @@ func (l *LoggingResources) CreateFlowFromCustomResource(flowCr interface{}) (*ty
 	}
 	flow := commonFlow.Flow
 	outputs := []types.Output{}
+	var flowType string
+	if commonFlow.Scope != "" {
+		flowType = "flow"
+	} else {
+		flowType = "clusterflow"
+	}
 	var multierr error
 FindOutputForAllRefs:
 	for _, outputRef := range commonFlow.OutputRefs {
@@ -247,8 +255,9 @@ FindOutputForAllRefs:
 		if commonFlow.Scope != "" {
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
+				// flow -> output (matching)
 				if output.Namespace == commonFlow.Scope && outputRef == output.Name {
-					outputId := commonFlow.Scope + "_" + commonFlow.Name + "_" + output.Name
+					outputId := fmt.Sprintf("%s:%s:%s:output:%s:%s", flowType, commonFlow.Namespace, commonFlow.Name, output.Namespace, output.Name)
 					plugin, err := plugins.CreateOutput(output.Spec, outputId, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -261,7 +270,9 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				outputId := commonFlow.Namespace + "_" + commonFlow.Name + "_" + clusterOutput.Name
+				// flow, clusterflow -> clusterOutput
+				// diff flow / clusterflow based on scope
+				outputId := fmt.Sprintf("%s:%s:%s:clusteroutput:%s:%s", flowType, commonFlow.Namespace, commonFlow.Name, clusterOutput.Namespace, clusterOutput.Name)
 				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputId, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -278,7 +289,7 @@ FindOutputForAllRefs:
 	// Filter
 	var filters []types.Filter
 	for i, f := range commonFlow.Filters {
-		id := fmt.Sprintf("%s_%s_%d", commonFlow.Namespace, commonFlow.Name, i)
+		id := fmt.Sprintf("%s:%s:%s:%d", flowType, commonFlow.Namespace, commonFlow.Name, i)
 		filter, err := plugins.CreateFilter(f, id, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
 			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, commonFlow.Name))
