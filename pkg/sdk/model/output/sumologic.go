@@ -72,11 +72,10 @@ type SumologicOutput struct {
 
 func (s *SumologicOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "sumologic"
-	pluginID := id + "_" + pluginType
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "match",
 		Tag:       "**",
-		Id:        pluginID,
+		Id:        id,
 	}, s, secretLoader)
 }

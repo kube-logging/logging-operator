@@ -191,7 +191,7 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "_" + pluginType,
+			Id:        id,
 		},
 	}
 	parserConfig := p.DeepCopy()
