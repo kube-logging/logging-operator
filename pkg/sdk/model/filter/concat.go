@@ -101,7 +101,7 @@ func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "_" + pluginType,
+			Id:        id,
 		},
 	}
 	concatConfig := c.DeepCopy()

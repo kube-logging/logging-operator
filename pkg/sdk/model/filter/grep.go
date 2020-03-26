@@ -294,7 +294,7 @@ func (g *GrepConfig) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "_" + pluginType,
+			Id:        id,
 		},
 	}
 	if len(g.Regexp) > 0 {

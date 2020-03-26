@@ -74,13 +74,12 @@ type GCSOutput struct {
 
 func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "gcs"
-	pluginID := id + "_" + pluginType
 	gcs := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(g); err != nil {
@@ -89,7 +88,7 @@ func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 		gcs.Params = params
 	}
 	if g.Buffer != nil {
-		if buffer, err := g.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := g.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			gcs.SubDirectives = append(gcs.SubDirectives, buffer)

@@ -98,13 +98,12 @@ type ForwardOutput struct {
 
 func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "forward"
-	pluginID := id + "_" + pluginType
 	forward := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(f); err != nil {
@@ -113,7 +112,7 @@ func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string)
 		forward.Params = params
 	}
 	if f.Buffer != nil {
-		if buffer, err := f.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := f.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			forward.SubDirectives = append(forward.SubDirectives, buffer)

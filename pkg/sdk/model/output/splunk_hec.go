@@ -112,13 +112,12 @@ type SplunkHecOutput struct {
 
 func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "splunk_hec"
-	pluginID := id + "_" + pluginType
 	splunkHec := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
 			Tag:       "**",
-			Id:        pluginID,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
@@ -132,7 +131,7 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 	}
 
 	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
 			splunkHec.SubDirectives = append(splunkHec.SubDirectives, buffer)

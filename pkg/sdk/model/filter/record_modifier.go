@@ -102,7 +102,7 @@ func (r *RecordModifier) ToDirective(secretLoader secret.SecretLoader, id string
 			Type:      pluginType,
 			Directive: "filter",
 			Tag:       "**",
-			Id:        id + "_" + pluginType,
+			Id:        id,
 		},
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(r); err != nil {
