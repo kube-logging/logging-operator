@@ -30,7 +30,7 @@ records:
 	expected := `
 <filter **>
   @type record_transformer
-  @id test_record_transformer
+  @id test
   <record>
     foo bar
   </record>

@@ -38,7 +38,7 @@ buffer:
 	expected := `
   <match **>
     @type loki
-    @id test_loki
+    @id test
     extra_labels {"testing":"testing"}
     extract_kubernetes_labels true
     line_format json
@@ -55,7 +55,7 @@ buffer:
     </label>
     <buffer tag,time>
       @type file
-      path /buffers/test_loki.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

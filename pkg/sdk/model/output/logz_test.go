@@ -44,7 +44,7 @@ buffer:
 	expected := `
   <match **>
 	@type logzio_buffered
-	@id test_logzio_buffered
+	@id test
 	endpoint_url https://listener.logz.io:8071?token=1234
 	gzip true
 	http_idle_timeout 10
@@ -57,7 +57,7 @@ buffer:
 	  chunk_limit_size 16m
 	  flush_interval 3s
 	  flush_thread_count 4
-	  path /buffers/test_logzio_buffered.*.buffer
+	  path /buffers/test.*.buffer
 	  queue_limit_length 4096
 	  retry_forever true
       timekey 10m

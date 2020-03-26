@@ -30,7 +30,7 @@ license_key:
 	expected := `
 	<match **>
 		@type newrelic
-		@id test_newrelic
+		@id test
 		base_uri https://log-api.newrelic.com/log/v1
 		license_key 000000000000000000000000
 	</match>

@@ -36,13 +36,13 @@ buffer:
 	expected := `
   <match **>
     @type s3
-    @id test_s3
+    @id test
     path logs/${tag}/%Y/%m/%d/
     s3_bucket logging-amazon-s3
     s3_region eu-central-1
     <buffer tag,time>
       @type file
-      path /buffers/test_s3.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

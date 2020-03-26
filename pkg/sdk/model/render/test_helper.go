@@ -66,14 +66,15 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 		Prefix: `
 <source>
   @type tail
-  @id test_tail
+  @id test
   path input.log
 </source>
 <match **>
   @type label_router
-  @id test_label_router
+  @id test
   <route>
     @label @2ab46f3b156b31e1c808ac53885394fb
+    metrics_labels {"id":"test"}
     <match>
       namespaces ns-test
       negate false
@@ -82,7 +83,7 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 </match>
 <label @2ab46f3b156b31e1c808ac53885394fb>`,
 	}
-	suite.System = types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
+	suite.System = types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{

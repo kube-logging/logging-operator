@@ -35,13 +35,13 @@ buffer:
 	expected := `
   <match **>
     @type gcs
-    @id test_gcs
+    @id test
     bucket banzai-log-test
     path logs/${tag}/%Y/%m/%d/
     project logging-example
     <buffer tag,time>
       @type file
-      path /buffers/test_gcs.*.buffer
+      path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
       timekey_use_utc true

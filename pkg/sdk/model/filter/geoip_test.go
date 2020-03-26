@@ -35,7 +35,7 @@ records:
 	expected := `
 <filter **>
   @type geoip
-  @id test_geoip
+  @id test
   geoip_lookup_keys remote_addr
   skip_adding_null_record true
   <record>

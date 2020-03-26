@@ -29,7 +29,7 @@ format: cluster1.${namespace_name}.${pod_name}.${labels.app}
 	expected := `
 <match kubernetes.**>
   @type tag_normaliser
-  @id test_tag_normaliser
+  @id test
   format cluster1.${namespace_name}.${pod_name}.${labels.app}
 </match>
 `
