@@ -42,7 +42,7 @@ type FluentbitSpec struct {
 	MountPath         string                   `json:"mountPath,omitempty"`
 	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
-	FilterAws         *FilterAws              `json:"filterAws,omitempty"`
+	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser           string           `json:"parser,omitempty"`
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`

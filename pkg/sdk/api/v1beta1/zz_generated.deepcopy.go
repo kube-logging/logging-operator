@@ -631,12 +631,12 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		copy(*out, *in)
 	}
 	in.InputTail.DeepCopyInto(&out.InputTail)
-	out.FilterKubernetes = in.FilterKubernetes
 	if in.FilterAws != nil {
 		in, out := &in.FilterAws, &out.FilterAws
 		*out = new(FilterAws)
 		**out = **in
 	}
+	out.FilterKubernetes = in.FilterKubernetes
 	out.BufferStorage = in.BufferStorage
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
 	if in.LivenessProbe != nil {
