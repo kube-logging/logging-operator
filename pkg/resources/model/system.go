@@ -195,7 +195,7 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		id := fmt.Sprintf("clusterflow" + ":" + f.Namespace + ":" + f.Name)
+		id := fmt.Sprintf("clusterflow:%s:%s", f.Namespace, f.Name)
 		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
 		if err != nil {
 			return nil, err
@@ -229,7 +229,7 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 				},
 			}
 		}
-		id := fmt.Sprintf("flow" + ":" + f.Namespace + ":" + f.Name)
+		id := fmt.Sprintf("flow:%s:%s", f.Namespace, f.Name)
 		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
 		commonFlow.Flow = flow
 		if err != nil {
