@@ -22,12 +22,12 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.enabled`                                 | Install fluent-bit                                                       | true                                                       |
 | `fluentbit.namespace`                               | Specified fluentbit installation namespace                               | same as operator namespace                                 |
 | `fluentbit.tolerations`                             | Tolerations for fluentbit daemonset                                      | none                                                       |
-| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.3.2`                                                    |
+| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.3.8`                                                    |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                                     | `fluent/fluent-bit`                                        |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                                          | `IfNotPresent`                                             |
 | `fluentbit.podPriorityClassName`                    | Priority class name for fluentbit pods                                   | none                                                       |
 | `fluentd.enabled`                                   | Install fluentd                                                          | true                                                       |
-| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.7.4-alpine-12`                                          |
+| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.9.2-alpine-7`                                          |
 | `fluentd.image.repository`                          | Fluentd container image repository                                       | `banzaicloud/fluentd`                                      |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                                            | `IfNotPresent`                                             |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag                               | `latest`                                                   |
@@ -42,3 +42,5 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.tolerations`                               | Tolerations for fluentd statefulset                                      | none                                                       |
 | `fluentd.nodeSelector`                              | Node selector for fluentd pods                                           | none                                                       |
 | `fluentd.podPriorityClassName`                      | Priority class name for fluentd pods                                     | none                                                       |
+| `clusterFlows`                                      | Array of ClusterFlows to be created                                      | []                                                         |
+| `clusterOutputs`                                    | Array of ClusterOutputs to be created                                    | []                                                         |

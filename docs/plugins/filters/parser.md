@@ -15,6 +15,7 @@
 | hash_value_field | string | No | - | Store parsed values as a hash value in a field.<br> |
 | emit_invalid_record_to_error | bool | No | - | Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error<br> |
 | parse | ParseSection | No | - | [Parse Section](#Parse-Section)<br> |
+| parsers | []ParseSection | No | - | Deprecated, use `parse` instead<br> |
 ### Parse Section
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

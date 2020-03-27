@@ -76,7 +76,7 @@ type Buffer struct {
 	// The maximum seconds to retry to flush while failing, until plugin discards buffer chunks
 	RetryTimeout string `json:"retry_timeout,omitempty"`
 	// If true, plugin will ignore retry_timeout and retry_max_times options and retry flushing forever
-	RetryForever bool `json:"retry_forever,omitempty" plugin:"default:true"`
+	RetryForever *bool `json:"retry_forever,omitempty" plugin:"default:true"`
 	// The maximum number of times to retry to flush while failing
 	RetryMaxTimes int `json:"retry_max_times,omitempty"`
 	// The ratio of retry_timeout to switch to use secondary while failing (Maximum valid value is 1.0)

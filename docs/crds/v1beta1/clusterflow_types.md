@@ -5,8 +5,37 @@
 |---|---|---|---|---|
 |  | metav1.TypeMeta | Yes | - |  |
 | metadata | metav1.ObjectMeta | No | - |  |
-| spec | FlowSpec | No | - | Name of the logging cluster to be attached<br> |
+| spec | ClusterFlowSpec | No | - | Name of the logging cluster to be attached<br> |
 | status | FlowStatus | No | - |  |
+### ClusterMatch
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| select | *ClusterSelect | No | - |  |
+| exclude | *ClusterExclude | No | - |  |
+### ClusterSelect
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| namespaces | []string | No | - |  |
+| labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
+### ClusterExclude
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| namespaces | []string | No | - |  |
+| labels | map[string]string | No | - |  |
+| hosts | []string | No | - |  |
+| container_names | []string | No | - |  |
+### ClusterFlowSpec
+#### FlowSpec is the Kubernetes spec for Flows
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| selectors | map[string]string | No | - |  |
+| match | []ClusterMatch | No | - |  |
+| filters | []Filter | No | - |  |
+| loggingRef | string | No | - |  |
+| outputRefs | []string | Yes | - |  |
 ### ClusterFlowList
 #### ClusterFlowList contains a list of ClusterFlow
 

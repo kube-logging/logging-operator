@@ -36,13 +36,17 @@ type FluentbitSpec struct {
 	Metrics     *Metrics                    `json:"metrics,omitempty"`
 	Security    *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB        volume.KubernetesVolume `json:"positiondb,omitempty"`
-	MountPath         string                  `json:"mountPath,omitempty"`
-	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
-	InputTail         InputTail               `json:"inputTail,omitempty"`
-	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
+	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
+	// Deprecated, use positiondb
+	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
+	MountPath         string                   `json:"mountPath,omitempty"`
+	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
+	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws              `json:"filterAws,omitempty"`
-	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
+	// Deprecated, use inputTail.parser
+	Parser           string           `json:"parser,omitempty"`
+	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
+	BufferStorage    BufferStorage    `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
@@ -128,7 +132,7 @@ type InputTail struct {
 	// Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture)
 	ParserFirstline string `json:"Parser_Firstline,omitempty"`
 	// Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.
-	ParserN string `json:"Parser_N,omitempty"`
+	ParserN []string `json:"Parser_N,omitempty"`
 	// If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. (default:Off)
 	DockerMode string `json:"Docker_Mode,omitempty"`
 	//Wait period time in seconds to flush queued unfinished split lines. (default:4)
@@ -162,17 +166,17 @@ type FilterKubernetes struct {
 	// When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well). (default:On)
 	KeepLog string `json:"Keep_Log,omitempty"`
 	// Debug level between 0 (nothing) and 4 (every detail). (default:-1)
-	TLSDebug string `json:"tls_debug,omitempty"`
+	TLSDebug string `json:"tls.debug,omitempty"`
 	// When enabled, turns on certificate validation when connecting to the Kubernetes API server. (default:On)
-	TLSVerify string `json:"tls_verify,omitempty"`
+	TLSVerify string `json:"tls.verify,omitempty"`
 	// When enabled, the filter reads logs coming in Journald format. (default:Off)
 	UseJournal string `json:"Use_Journal,omitempty"`
 	// Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).
 	RegexParser string `json:"Regex_Parser,omitempty"`
 	// Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) (default:Off)
-	K8SLoggingParser string `json:"K8S_Logging_Parser,omitempty"`
+	K8SLoggingParser string `json:"K8S-Logging.Parser,omitempty"`
 	// Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). (default:Off)
-	K8SLoggingExclude string `json:"K8S_Logging_Exclude,omitempty"`
+	K8SLoggingExclude string `json:"K8S-Logging.Exclude,omitempty"`
 	// Include Kubernetes resource labels in the extra metadata. (default:On)
 	Labels string `json:"Labels,omitempty"`
 	// Include Kubernetes resource annotations in the extra metadata. (default:On)

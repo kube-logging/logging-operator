@@ -26,7 +26,7 @@ type _docRecordModifier interface{}
 
 // +name:"Record Modifier"
 // +url:"https://github.com/repeatedly/fluent-plugin-record-modifier"
-// +version:"more info"
+// +version:"2.1.0"
 // +description:"Modify each event record."
 // +status:"GA"
 type _metaRecordModifier interface{}

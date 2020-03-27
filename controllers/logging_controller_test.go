@@ -294,7 +294,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 			Name:      "test-flow",
 			Namespace: controlNamespace,
 		},
-		Spec: v1beta1.FlowSpec{
+		Spec: v1beta1.ClusterFlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
 			},
@@ -306,23 +306,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
-		select {
-		case err := <-reconcilerErrors:
-			expected := "referenced output not found: test-output"
-			if !strings.Contains(err.Error(), expected) {
-				return false, errors.Errorf("expected `%s` but received `%s`", expected, err.Error())
-			} else {
-				return true, nil
-			}
-		case <-time.After(100 * time.Millisecond):
-			return false, nil
-		}
-	})
-
-	if err != nil {
-		t.Fatalf("%+v", err)
-	}
+	expectError(t, "referenced output not found: test-output")
 }
 
 func TestSingleFlowWithOutputRef(t *testing.T) {
@@ -408,23 +392,8 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	defer ensureCreated(t, logging)()
 	defer ensureCreated(t, flow)()
 
-	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
-		select {
-		case err := <-reconcilerErrors:
-			expected := "referenced output not found: test-output-nonexistent"
-			if !strings.Contains(err.Error(), expected) {
-				return false, errors.Errorf("expected `%s` but received `%s`", expected, err.Error())
-			} else {
-				return true, nil
-			}
-		case <-time.After(100 * time.Millisecond):
-			return false, nil
-		}
-	})
-
-	if err != nil {
-		t.Fatalf("%+v", err)
-	}
+	expected := "referenced output not found: test-output-nonexistent"
+	expectError(t, expected)
 }
 
 func TestSingleFlowWithSecretInOutput(t *testing.T) {
@@ -535,7 +504,8 @@ func beforeEach(t *testing.T) func() {
 	var wrappedReconciler reconcile.Reconciler
 	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
 
-	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).Complete(wrappedReconciler)
+	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).
+		Named(uuid.New()[:8]).Complete(wrappedReconciler)
 
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
@@ -578,5 +548,64 @@ func ensureCreatedEventually(t *testing.T, ns, name string, object runtime.Objec
 		if err != nil {
 			t.Fatalf("%+v", errors.WithStack(err))
 		}
+	}
+}
+
+func expectError(t *testing.T, expected string) {
+	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
+		select {
+		case err := <-reconcilerErrors:
+
+			if !strings.Contains(err.Error(), expected) {
+				return false, errors.Errorf("expected `%s` but received `%s`", expected, err.Error())
+			} else {
+				return true, nil
+			}
+		case <-time.After(100 * time.Millisecond):
+			return false, nil
+		}
+	})
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+}
+
+func testOutput() *v1beta1.Output {
+	return &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			NullOutputConfig: output.NewNullOutputConfig(),
+		},
+	}
+}
+
+func testClusterOutput() *v1beta1.ClusterOutput {
+	return &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: controlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: output.NewNullOutputConfig(),
+			},
+		},
+	}
+}
+
+func testLogging() *v1beta1.Logging {
+	return &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			WatchNamespaces:         []string{testNamespace},
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			ControlNamespace:        controlNamespace,
+		},
 	}
 }

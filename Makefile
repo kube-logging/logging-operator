@@ -54,9 +54,11 @@ bin/gobin-${GOBIN_VERSION}:
 
 .PHONY: bin/kubebuilder_${KUBEBUILDER_VERSION}
 bin/kubebuilder_${KUBEBUILDER_VERSION}:
-	@mkdir -p bin
-	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin
-	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}
+	@ if ! test -L bin/kubebuilder_${KUBEBUILDER_VERSION}; then \
+		mkdir -p bin; \
+		curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin; \
+		ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin bin/kubebuilder_${KUBEBUILDER_VERSION}; \
+	fi
 
 bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 	@ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder bin/kubebuilder
@@ -96,6 +98,7 @@ deploy: manifests
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
 	cp config/crd/bases/* charts/logging-operator/crds/
 
 # Run go fmt against code
@@ -112,6 +115,8 @@ vet:
 generate: controller-gen
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./model/...
+	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./resourcebuilder/...
+	cd pkg/sdk && go generate ./static
 
 # Build the docker image
 docker-build:
@@ -134,7 +139,7 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
-check-diff:
+check-diff: check
 	go mod tidy
 	$(MAKE) generate manifests docs
-	git diff --exit-code ':(exclude)./ADOPTERS.md'
+	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'

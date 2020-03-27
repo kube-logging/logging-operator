@@ -14,9 +14,11 @@
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | positiondb | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
+| position_db | *volume.KubernetesVolume | No | - | Deprecated, use positiondb<br> |
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
+| parser | string | No | - | Deprecated, use inputTail.parser<br> |
 | filterKubernetes | FilterKubernetes | No | - |  |
 | filterAws | *FilterAws | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
@@ -67,7 +69,7 @@
 | Multiline | string | No | Off | If enabled, the plugin will try to discover multiline messages and use the proper parsers to compose the outgoing messages. Note that when this option is enabled the Parser option is not used. <br> |
 | Multiline_Flush | string | No | 4 | Wait period time in seconds to process queued multiline messages <br> |
 | Parser_Firstline | string | No | - | Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture)<br> |
-| Parser_N | string | No | - | Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.<br> |
+| Parser_N | []string | No | - | Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN.<br> |
 | Docker_Mode | string | No | Off | If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. <br> |
 | Docker_Mode_Flush | string | No | 4 | Wait period time in seconds to flush queued unfinished split lines. <br> |
 ### FilterKubernetes
@@ -87,12 +89,12 @@
 | Merge_Log_Trim | string | No | On | When Merge_Log is enabled, trim (remove possible \n or \r) field values.  <br> |
 | Merge_Parser | string | No | - | Optional parser name to specify how to parse the data contained in the log key. Recommended use is for developers or testing only.<br> |
 | Keep_Log | string | No | On | When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well). <br> |
-| tls_debug | string | No | -1 | Debug level between 0 (nothing) and 4 (every detail). <br> |
-| tls_verify | string | No | On | When enabled, turns on certificate validation when connecting to the Kubernetes API server. <br> |
+| tls.debug | string | No | -1 | Debug level between 0 (nothing) and 4 (every detail). <br> |
+| tls.verify | string | No | On | When enabled, turns on certificate validation when connecting to the Kubernetes API server. <br> |
 | Use_Journal | string | No | Off | When enabled, the filter reads logs coming in Journald format. <br> |
 | Regex_Parser | string | No | - | Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).<br> |
-| K8S_Logging_Parser | string | No | Off | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) <br> |
-| K8S_Logging_Exclude | string | No | Off | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). <br> |
+| K8S-Logging.Parser | string | No | Off | Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) <br> |
+| K8S-Logging.Exclude | string | No | Off | Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). <br> |
 | Labels | string | No | On | Include Kubernetes resource labels in the extra metadata. <br> |
 | Annotations | string | No | On | Include Kubernetes resource annotations in the extra metadata. <br> |
 | Kube_meta_preload_cache_dir | string | No | - | If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta<br> |

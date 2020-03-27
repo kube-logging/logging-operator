@@ -26,8 +26,36 @@ type ClusterFlow struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Name of the logging cluster to be attached
-	Spec   FlowSpec   `json:"spec,omitempty"`
-	Status FlowStatus `json:"status,omitempty"`
+	Spec   ClusterFlowSpec `json:"spec,omitempty"`
+	Status FlowStatus      `json:"status,omitempty"`
+}
+
+type ClusterMatch struct {
+	*ClusterSelect  `json:"select,omitempty"`
+	*ClusterExclude `json:"exclude,omitempty"`
+}
+
+type ClusterSelect struct {
+	Namespaces     []string          `json:"namespaces,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
+}
+
+type ClusterExclude struct {
+	Namespaces     []string          `json:"namespaces,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	ContainerNames []string          `json:"container_names,omitempty"`
+}
+
+// FlowSpec is the Kubernetes spec for Flows
+type ClusterFlowSpec struct {
+	Selectors  map[string]string `json:"selectors,omitempty"`
+	Match      []ClusterMatch    `json:"match,omitempty"`
+	Filters    []Filter          `json:"filters,omitempty"`
+	LoggingRef string            `json:"loggingRef,omitempty"`
+	OutputRefs []string          `json:"outputRefs"`
 }
 
 // +kubebuilder:object:root=true

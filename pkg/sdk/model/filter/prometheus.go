@@ -26,7 +26,7 @@ type _docPrometheus interface{}
 
 // +name:"Prometheus"
 // +url:"https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin"
-// +version:"more info"
+// +version:"1.7.3"
 // +description:"Prometheus Filter Plugin to count Incoming Records"
 // +status:"GA"
 type _metaPrometheus interface{}

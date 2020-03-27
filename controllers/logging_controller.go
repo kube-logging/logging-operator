@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"regexp"
+	"sort"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -40,7 +41,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 )
 
 // LoggingReconciler reconciles a Logging object
@@ -49,15 +50,25 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=extensions;policy,resources=podsecuritypolicies,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=apps,resources=statefulsets;daemonsets,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=services;persistentvolumeclaims;serviceaccounts;pods,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=nodes;namespaces,verbs=get;list;watch
+// +kubebuilder:rbac:groups="",resources=events,verbs=create
+// +kubebuilder:rbac:groups="rbac.authorization.k8s.io",resources=clusterroles;clusterrolebindings;roles;rolebindings,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=monitoring.coreos.com,resources=servicemonitors,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	log := r.Log.WithValues("logging", req.NamespacedName)
 
-	logging := &loggingv1alpha2.Logging{}
+	logging := &loggingv1beta1.Logging{}
 	err := r.Client.Get(context.TODO(), req.NamespacedName, logging)
 	if err != nil {
 		// Object not found, return.  Created objects are automatically garbage collected.
@@ -113,7 +124,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Logging) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging) (string, *secret.MountSecrets, error) {
 	if logging.Spec.FlowConfigOverride != "" {
 		return logging.Spec.FlowConfigOverride, nil, nil
 	}
@@ -143,10 +154,10 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1alpha2.Loggin
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	clusterOutputSource := &source.Kind{Type: &loggingv1alpha2.ClusterOutput{}}
-	clusterFlowSource := &source.Kind{Type: &loggingv1alpha2.ClusterFlow{}}
-	outputSource := &source.Kind{Type: &loggingv1alpha2.Output{}}
-	flowSource := &source.Kind{Type: &loggingv1alpha2.Flow{}}
+	clusterOutputSource := &source.Kind{Type: &loggingv1beta1.ClusterOutput{}}
+	clusterFlowSource := &source.Kind{Type: &loggingv1beta1.ClusterFlow{}}
+	outputSource := &source.Kind{Type: &loggingv1beta1.Output{}}
+	flowSource := &source.Kind{Type: &loggingv1beta1.Flow{}}
 	secretSource := &source.Kind{Type: &corev1.Secret{}}
 
 	requestMapper := &handler.EnqueueRequestsFromMapFunc{
@@ -156,7 +167,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				return nil
 			}
 			// get all the logging resources from the cache
-			loggingList := &loggingv1alpha2.LoggingList{}
+			loggingList := &loggingv1beta1.LoggingList{}
 			err = mgr.GetCache().List(context.TODO(), loggingList)
 			if err != nil {
 				logger.Error(err, "failed to list logging resources")
@@ -179,16 +190,16 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				}
 				return requestList
 			}
-			if o, ok := object.(*loggingv1alpha2.ClusterOutput); ok {
+			if o, ok := object.(*loggingv1beta1.ClusterOutput); ok {
 				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
 			}
-			if o, ok := object.(*loggingv1alpha2.Output); ok {
+			if o, ok := object.(*loggingv1beta1.Output); ok {
 				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
 			}
-			if o, ok := object.(*loggingv1alpha2.Flow); ok {
+			if o, ok := object.(*loggingv1beta1.Flow); ok {
 				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
 			}
-			if o, ok := object.(*loggingv1alpha2.ClusterFlow); ok {
+			if o, ok := object.(*loggingv1beta1.ClusterFlow); ok {
 				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
 			}
 			return nil
@@ -196,7 +207,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	}
 
 	builder := ctrl.NewControllerManagedBy(mgr).
-		For(&loggingv1alpha2.Logging{}).
+		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
 		Watches(clusterOutputSource, requestMapper).
 		Watches(clusterFlowSource, requestMapper).
@@ -210,7 +221,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	return builder
 }
 
-func reconcileRequestsForLoggingRef(loggingList *loggingv1alpha2.LoggingList, loggingRef string) []reconcile.Request {
+func reconcileRequestsForLoggingRef(loggingList *loggingv1beta1.LoggingList, loggingRef string) []reconcile.Request {
 	filtered := make([]reconcile.Request, 0)
 	for _, l := range loggingList.Items {
 		if l.Spec.LoggingRef == loggingRef {
@@ -248,30 +259,52 @@ func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
 }
 
 // GetResources collect all resources referenced by logging resource
-func (r *LoggingReconciler) GetResources(logging *loggingv1alpha2.Logging) (*model.LoggingResources, error) {
+func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*model.LoggingResources, error) {
 	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
 	var err error
 
-	clusterFlows := &loggingv1alpha2.ClusterFlowList{}
+	clusterFlows := &loggingv1beta1.ClusterFlowList{}
 	err = r.List(context.TODO(), clusterFlows, client.InNamespace(logging.Spec.ControlNamespace))
 	if err != nil {
 		return nil, err
 	}
+
 	if len(clusterFlows.Items) > 0 {
-		for _, i := range clusterFlows.Items {
+		items := clusterFlows.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, i := range items {
 			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 				loggingResources.ClusterFlows = append(loggingResources.ClusterFlows, i)
 			}
 		}
 	}
 
-	clusterOutputs := &loggingv1alpha2.ClusterOutputList{}
+	clusterOutputs := &loggingv1beta1.ClusterOutputList{}
 	err = r.List(context.TODO(), clusterOutputs, client.InNamespace(logging.Spec.ControlNamespace))
 	if err != nil {
 		return nil, err
 	}
+
 	if len(clusterOutputs.Items) > 0 {
-		for _, i := range clusterOutputs.Items {
+		items := clusterOutputs.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, i := range items {
 			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 				loggingResources.ClusterOutputs = append(loggingResources.ClusterOutputs, i)
 			}
@@ -286,31 +319,63 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1alpha2.Logging) (*mod
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to list all namespaces")
 		}
-		for _, ns := range nsList.Items {
+		items := nsList.Items
+		sort.Slice(items, func(i, j int) bool {
+			if items[i].GetNamespace() < items[j].GetNamespace() {
+				return true
+			}
+			if items[i].GetNamespace() == items[j].GetNamespace() {
+				return items[i].GetName() < items[j].GetName()
+			}
+			return false
+		})
+		for _, ns := range items {
 			watchNamespaces = append(watchNamespaces, ns.Name)
 		}
 	}
 
 	for _, ns := range watchNamespaces {
-		flows := &loggingv1alpha2.FlowList{}
+		flows := &loggingv1beta1.FlowList{}
 		err = r.List(context.TODO(), flows, client.InNamespace(ns))
 		if err != nil {
 			return nil, err
 		}
+
 		if len(flows.Items) > 0 {
-			for _, i := range flows.Items {
+			items := flows.Items
+			sort.Slice(items, func(i, j int) bool {
+				if items[i].GetNamespace() < items[j].GetNamespace() {
+					return true
+				}
+				if items[i].GetNamespace() == items[j].GetNamespace() {
+					return items[i].GetName() < items[j].GetName()
+				}
+				return false
+			})
+			for _, i := range items {
 				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 					loggingResources.Flows = append(loggingResources.Flows, i)
 				}
 			}
 		}
-		outputs := &loggingv1alpha2.OutputList{}
+
+		outputs := &loggingv1beta1.OutputList{}
 		err = r.List(context.TODO(), outputs, client.InNamespace(ns))
 		if err != nil {
 			return nil, err
 		}
 		if len(outputs.Items) > 0 {
-			for _, i := range outputs.Items {
+			items := outputs.Items
+			sort.Slice(items, func(i, j int) bool {
+				if items[i].GetNamespace() < items[j].GetNamespace() {
+					return true
+				}
+				if items[i].GetNamespace() == items[j].GetNamespace() {
+					return items[i].GetName() < items[j].GetName()
+				}
+				return false
+			})
+			for _, i := range items {
 				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 					loggingResources.Outputs = append(loggingResources.Outputs, i)
 				}

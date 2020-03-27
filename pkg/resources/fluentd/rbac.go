@@ -24,25 +24,25 @@ import (
 func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
-			ObjectMeta: r.FluentdObjectMeta(roleName),
+			ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{""},
 					Resources: []string{"configmaps", "secrets"},
-					Verbs:     []string{"*"},
+					Verbs:     []string{"get", "list", "watch", "create", "update", "patch", "delete"},
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.Role{
-		ObjectMeta: r.FluentdObjectMeta(roleName),
+		ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
-			ObjectMeta: r.FluentdObjectMeta(roleBindingName),
+			ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "Role",
 				APIGroup: "rbac.authorization.k8s.io",
@@ -51,24 +51,24 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.Logging.QualifiedName(defaultServiceAccountName),
+					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
-		ObjectMeta: r.FluentdObjectMeta(roleBindingName),
+		ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
-			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
+			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
-		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName),
+		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
 	}, reconciler.StateAbsent, nil
 }

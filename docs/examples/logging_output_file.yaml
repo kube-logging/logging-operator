@@ -3,9 +3,8 @@ kind: Output
 metadata:
   name: file-output-sample
 spec:
-spec:
   file:
-    path: /tmp/logs/
+    path: /tmp/logs/${tag}/%Y/%m/%d/%H.%M
     buffer:
       timekey: 1m
       timekey_wait: 10s

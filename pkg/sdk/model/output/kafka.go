@@ -41,8 +41,8 @@ import (
 type _docKafka interface{}
 
 // +name:"Kafka"
-// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.1"
-// +version:"0.12.1"
+// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.3"
+// +version:"0.12.3"
 // +description:"Send your logs to Kafka"
 // +status:"GA"
 type _metaKafka interface{}
@@ -93,6 +93,16 @@ type KafkaOutputConfig struct {
 	AckTimeout int `json:"ack_timeout,omitempty"`
 	// The codec the producer uses to compress messages (default: nil). The available options are gzip and snappy.
 	CompressionCodec string `json:"compression_codec,omitempty"`
+	// CA certificate
+	SSLCACert *secret.Secret `json:"ssl_ca_cert,omitempty"`
+	// Client certificate
+	SSLClientCert *secret.Secret `json:"ssl_client_cert,omitempty"`
+	// Client certificate chain
+	SSLClientCertChain *secret.Secret `json:"ssl_client_cert_chain,omitempty"`
+	// Client certificate key
+	SSLClientCertKey *secret.Secret `json:"ssl_client_cert_key,omitempty"`
+	// Verify certificate hostname
+	SSLVerifyHostname *bool `json:"ssl_verify_hostname,omitempty"`
 	// +docLink:"Format,./format.md"
 	Format *Format `json:"format"`
 	// +docLink:"Buffer,./buffer.md"

@@ -31,6 +31,10 @@ type Format struct {
 	// Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value (default: json)
 	// +kubebuilder:validation:Enum=out_file;json;ltsv;csv;msgpack;hash;single_value
 	Type string `json:"type,omitempty"`
+	// When type is single_value add '\n' to the end of the message (default: true)
+	AddNewline *bool `json:"add_newline,omitempty"`
+	// When type is single_value specify the key holding information
+	MessageKey string `json:"message_key,omitempty"`
 }
 
 func (f *Format) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

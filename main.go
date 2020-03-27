@@ -22,7 +22,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	loggingv1alpha2 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -43,11 +43,11 @@ var (
 )
 
 func init() {
-	clientgoscheme.AddToScheme(scheme)
-	_ = loggingv1alpha2.AddToScheme(scheme)
+	_ = clientgoscheme.AddToScheme(scheme)
+	_ = loggingv1beta1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
-	prometheusOperator.AddToScheme(scheme)
-	apiextensions.AddToScheme(scheme)
+	_ = prometheusOperator.AddToScheme(scheme)
+	_ = apiextensions.AddToScheme(scheme)
 }
 
 func main() {
@@ -69,6 +69,7 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
 		MapperProvider:     k8sutil.NewCached,
 		Port:               9443,
 	})

@@ -28,6 +28,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 func TestRenderDirective(t *testing.T) {
@@ -209,6 +210,10 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @d41d8cd98f00b204e9800998ecf8427e
+				<match>
+				  namespaces
+				  negate false
+				</match>
               </route>
             </match>`,
 			),
@@ -225,7 +230,10 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @098f6bcd4621d373cade4e832627b4f6
-                namespace test
+				  <match>
+				    namespaces test
+				    negate false
+				  </match>
               </route>
             </match>`,
 			),
@@ -242,8 +250,11 @@ func TestRenderDirective(t *testing.T) {
               @id test_label_router
               <route>
                 @label @092f5fa58e4f619d739f5b65f2ed38bc
-                labels a:b,c:d
-                namespace test
+        		  <match>
+        		    labels a:b,c:d
+        		    namespaces test
+        		    negate false
+        		  </match>
               </route>
             </match>`,
 			),
@@ -272,11 +283,12 @@ func TestMultipleOutput(t *testing.T) {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
-		})
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
+		}, "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -316,8 +328,11 @@ func TestMultipleOutput(t *testing.T) {
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+        	<match>
+        	  labels key1:val1,key2:val2
+        	  namespaces ns-test
+        	  negate false
+        	</match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>
@@ -347,11 +362,12 @@ func TestRenderFullFluentConfig(t *testing.T) {
 	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test"))
 
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
-		})
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
+		}, "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,8 +406,11 @@ func TestRenderFullFluentConfig(t *testing.T) {
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+			  <match>
+			    labels key1:val1,key2:val2
+			    namespaces ns-test
+			    negate false
+			  </match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>
@@ -423,7 +442,7 @@ func TestRenderS3(t *testing.T) {
 				Path:     "/var/buffer",
 				S3Bucket: "test_bucket",
 				Buffer: &output.Buffer{
-					RetryForever: true,
+					RetryForever: util.BoolPointer(true),
 					Path:         "asd",
 				},
 				AssumeRoleCredentials: &output.S3AssumeRoleCredentials{
@@ -480,14 +499,6 @@ func TestRenderS3(t *testing.T) {
 							profile_name f
 						</shared_credentials>`,
 		},
-		{
-			name: "missing auth",
-			s3Config: output.S3OutputConfig{
-				Path:     "/var/buffer",
-				S3Bucket: "test_bucket",
-			},
-			err: "One of AssumeRoleCredentials or SharedCredentials or InstanceProfileCredentials must be configured",
-		},
 	}
 	for _, item := range table {
 		t.Logf("> %s\n", item.name)
@@ -517,11 +528,12 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 		return err
 	}
 	flowObj, err := types.NewFlow(
-		"ns-test",
-		map[string]string{
-			"key1": "val1",
-			"key2": "val2",
-		})
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
+		}, "", "")
 	if err != nil {
 		return err
 	}
@@ -558,8 +570,11 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
           @id test_label_router
           <route>
             @label @901f778f9602a78e8fd702c1973d8d8d
-            labels key1:val1,key2:val2
-            namespace ns-test
+			<match>
+			  labels key1:val1,key2:val2
+			  namespaces ns-test
+			  negate false
+			</match>
           </route>
         </match>
         <label @901f778f9602a78e8fd702c1973d8d8d>
@@ -574,7 +589,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 }
 
 func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
-	flowObj, err := types.NewFlow(namespace, labels)
+	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "")
 	if err != nil {
 		panic(err)
 	}

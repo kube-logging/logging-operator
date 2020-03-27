@@ -30,7 +30,9 @@ type FluentdSpec struct {
 	DisablePvc  bool              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	BufferStorageVolume  volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`
+	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
+	// Deprecated, use bufferStorageVolume
+	FluentdPvcSpec       *volume.KubernetesVolume    `json:"fluentdPvcSpec,omitempty"`
 	VolumeMountChmod     bool                        `json:"volumeMountChmod,omitempty"`
 	VolumeModImage       ImageSpec                   `json:"volumeModImage,omitempty"`
 	ConfigReloaderImage  ImageSpec                   `json:"configReloaderImage,omitempty"`

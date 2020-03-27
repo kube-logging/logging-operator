@@ -50,8 +50,8 @@ import (
 type _docS3 interface{}
 
 // +name:"Amazon S3"
-// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.2.1"
-// +version:"1.2.1"
+// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.3.0"
+// +version:"1.3.0"
 // +description:"Store logs in Amazon S3"
 // +status:"GA"
 type _metaS3 interface{}
@@ -256,12 +256,6 @@ func (c *S3OutputConfig) validateAndSetCredentials(s3 *types.OutputPlugin, secre
 		} else {
 			s3.SubDirectives = append(s3.SubDirectives, directive)
 		}
-	}
-	if c.AssumeRoleCredentials == nil &&
-		c.InstanceProfileCredentials == nil &&
-		c.SharedCredentials == nil &&
-		(c.AwsAccessKey == nil || c.AwsSecretKey == nil) {
-		return errors.New("One of AssumeRoleCredentials or SharedCredentials or InstanceProfileCredentials must be configured")
 	}
 	return nil
 }

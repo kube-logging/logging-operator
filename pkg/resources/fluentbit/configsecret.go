@@ -27,6 +27,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+type fluentbitInputConfig struct {
+	Values  map[string]string
+	ParserN []string
+}
+
 type fluentBitConfig struct {
 	Namespace string
 	TLS       struct {
@@ -38,13 +43,13 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
-	Output           map[string]string
-	TargetHost       string
-	TargetPort       int32
-	Input            map[string]string
-	KubernetesFilter map[string]string
-	AwsFilter        map[string]string
-	BufferStorage    map[string]string
+	Output        map[string]string
+	TargetHost    string
+	TargetPort    int32
+	Input         fluentbitInputConfig
+	Filter        map[string]string
+	BufferStorage map[string]string
+	AwsFilter     map[string]string
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
@@ -76,10 +81,19 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	mapper := types.NewStructToStringMapper(nil)
-	fluentbitInput, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.InputTail)
+
+	// FluentBit input Values
+	fluentbitInput := fluentbitInputConfig{}
+	inputTail := r.Logging.Spec.FluentbitSpec.InputTail
+	if len(inputTail.ParserN) > 0 {
+		fluentbitInput.ParserN = r.Logging.Spec.FluentbitSpec.InputTail.ParserN
+		inputTail.ParserN = nil
+	}
+	fluentbitInputValues, err := mapper.StringsMap(inputTail)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
+	fluentbitInput.Values = fluentbitInputValues
 
 	fluentbitKubernetesFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {

@@ -27,6 +27,7 @@ func TestKafka(t *testing.T) {
 brokers: kafka-headless.kafka.svc.cluster.local:29092
 default_topic: topic
 sasl_over_ssl: false
+ssl_verify_hostname: false
 format:
   type: json
 buffer:
@@ -41,6 +42,7 @@ buffer:
     brokers kafka-headless.kafka.svc.cluster.local:29092
     default_topic topic
     sasl_over_ssl false
+    ssl_verify_hostname false
     <buffer tag,time>
       @type file
       path /buffers/test_kafka2.*.buffer

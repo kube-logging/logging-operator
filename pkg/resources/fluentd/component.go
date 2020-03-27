@@ -12,36 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package render
+package fluentd
 
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
-
-	"emperror.dev/errors"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+const (
+	ComponentFluentd     = "fluentd"
+	ComponentConfigCheck = "fluentd-configcheck"
 )
-
-type JsonRender struct {
-	out    io.Writer
-	indent int
-}
-
-func (t *JsonRender) Render(config types.FluentConfig) error {
-	var out []byte
-	var err error
-	if t.indent > 0 {
-		out, err = json.MarshalIndent(config, "", strings.Repeat(" ", t.indent))
-	} else {
-		out, err = json.Marshal(config)
-	}
-
-	if err != nil {
-		return errors.WrapIf(err, "Failed to marshal model into yaml")
-	}
-	fmt.Fprintf(t.out, "%s", out)
-	return nil
-}

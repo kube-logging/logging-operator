@@ -26,11 +26,13 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type ConfigCheckResult struct {
-	Valid bool
-	Ready bool
+	Valid   bool
+	Ready   bool
+	Message string
 }
 
 const ConfigKey = "generated.conf"
@@ -39,7 +41,7 @@ func (r *Reconciler) appconfigMap() (runtime.Object, reconciler.DesiredState, er
 	data := make(map[string][]byte)
 	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName),
+		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd),
 		Data:       data,
 	}, reconciler.StatePresent, nil
 }
@@ -58,7 +60,36 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	pod := r.newCheckPod(hashKey)
+
+	existingPods := &v1.PodList{}
+	err = r.Client.List(context.TODO(), existingPods, client.MatchingLabels(pod.Labels))
+	if err != nil {
+		return nil, errors.WrapIf(err, "failed to list existing configcheck pods")
+	}
+
+	podsByPhase := make(map[v1.PodPhase]int)
+	for _, p := range existingPods.Items {
+		if actual, ok := podsByPhase[p.Status.Phase]; ok {
+			podsByPhase[p.Status.Phase] = actual + 1
+		} else {
+			podsByPhase[p.Status.Phase] = 1
+		}
+	}
+
+	if podsByPhase[v1.PodPending] > 0 {
+		return &ConfigCheckResult{
+			Ready:   false,
+			Message: "there are pending configcheck pods, need to back off",
+		}, nil
+	}
+	if podsByPhase[v1.PodRunning] > 0 {
+		return &ConfigCheckResult{
+			Ready:   false,
+			Message: "there are running configcheck pods, need to back off",
+		}, nil
+	}
 
 	err = r.Client.Get(context.TODO(), types.NamespacedName{Namespace: pod.Namespace, Name: pod.Name}, pod)
 	if err == nil {
@@ -151,7 +182,7 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 
 func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	return &v1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
+		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Data: map[string][]byte{
 			ConfigKey: []byte(*r.config),
 		},
@@ -164,7 +195,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
 		return nil, err
 	}
 	if secret, ok := obj.(*v1.Secret); ok {
-		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey))
+		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey), ComponentConfigCheck)
 		return secret, nil
 	}
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
@@ -172,7 +203,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
 
 func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 	pod := &v1.Pod{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
+		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: v1.PodSpec{
 			RestartPolicy: v1.RestartPolicyNever,
 			Volumes: []v1.Volume{

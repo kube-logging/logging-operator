@@ -15,6 +15,8 @@
 package model
 
 import (
+	"fmt"
+
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
@@ -23,6 +25,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -71,8 +74,8 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
 	system := types.NewSystem(rootInput, types.NewRouter("main"))
-	for _, flow := range l.Flows {
-		flow, err := l.CreateFlowFromCustomResource(flow, flow.Namespace)
+	for _, flowCr := range l.Flows {
+		flow, err := l.CreateFlowFromCustomResource(flowCr)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
@@ -83,12 +86,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		}
 	}
 	for _, flowCr := range l.ClusterFlows {
-		flow, err := l.CreateFlowFromCustomResource(v1beta1.Flow{
-			TypeMeta:   flowCr.TypeMeta,
-			ObjectMeta: flowCr.ObjectMeta,
-			Spec:       flowCr.Spec,
-			Status:     flowCr.Status,
-		}, "")
+		flow, err := l.CreateFlowFromCustomResource(flowCr)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
@@ -104,21 +102,153 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	return system, nil
 }
 
-func (l *LoggingResources) CreateFlowFromCustomResource(flowCr v1beta1.Flow, namespace string) (*types.Flow, error) {
-	flow, err := types.NewFlow(namespace, flowCr.Spec.Selectors)
+type CommonFlow struct {
+	Name       string
+	Namespace  string
+	Scope      string
+	OutputRefs []string
+	Filters    []v1beta1.Filter
+	Flow       *types.Flow
+}
+
+// Create []FlowMatch from v1beta1.Match and v1beta1.ClusterMatch
+func GetFlowMatchFromSpec(namespace string, matches interface{}) ([]types.FlowMatch, error) {
+	var flowMatches []types.FlowMatch
+	switch matchList := matches.(type) {
+	case []v1beta1.Match:
+		for _, match := range matchList {
+			if match.Select != nil && match.Exclude != nil {
+				return nil, errors.Errorf("select and exclude cannot be set simultaneously")
+			}
+			if match.Select != nil {
+				flowMatches = append(flowMatches, types.FlowMatch{
+					Labels:     match.Select.Labels,
+					Namespaces: []string{namespace},
+					Negate:     false,
+				})
+			}
+			if match.Exclude != nil {
+				flowMatches = append(flowMatches, types.FlowMatch{
+					Labels:     match.Exclude.Labels,
+					Namespaces: []string{namespace},
+					Negate:     true,
+				})
+			}
+		}
+	case []v1beta1.ClusterMatch:
+		for _, match := range matchList {
+			if match.ClusterSelect != nil && match.ClusterExclude != nil {
+				return nil, errors.Errorf("select and exclude cannot be set simultaneously")
+			}
+			if match.ClusterSelect != nil {
+				flowMatches = append(flowMatches, types.FlowMatch{
+					Labels:     match.ClusterSelect.Labels,
+					Namespaces: match.ClusterSelect.Namespaces,
+					Negate:     false,
+				})
+			}
+			if match.ClusterExclude != nil {
+				flowMatches = append(flowMatches, types.FlowMatch{
+					Labels:     match.ClusterExclude.Labels,
+					Namespaces: match.ClusterExclude.Namespaces,
+					Negate:     true,
+				})
+			}
+		}
+	}
+	return flowMatches, nil
+}
+
+func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
+	var commonFlow *CommonFlow
+	var err error
+	switch f := flowCr.(type) {
+	case v1beta1.ClusterFlow:
+		var matches []types.FlowMatch
+		commonFlow = &CommonFlow{
+			Name:       f.Name,
+			Namespace:  f.Namespace,
+			Scope:      "",
+			OutputRefs: f.Spec.OutputRefs,
+			Filters:    f.Spec.Filters,
+		}
+		if f.Spec.Match != nil && f.Spec.Selectors != nil {
+			return nil, errors.Errorf("match and selectors cannot be defined simultaneously for clusterflow %s",
+				utils.ObjectKeyFromObjectMeta(&f).String())
+		}
+		if f.Spec.Match != nil {
+			matches, err = GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+			if err != nil {
+				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
+			}
+		} else {
+			matches = []types.FlowMatch{
+				{
+					Labels:     f.Spec.Selectors,
+					Namespaces: []string{""},
+					Negate:     false,
+				},
+			}
+		}
+		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
+		if err != nil {
+			return nil, err
+		}
+		commonFlow.Flow = flow
+		return commonFlow, nil
+	case v1beta1.Flow:
+		var matches []types.FlowMatch
+		commonFlow = &CommonFlow{
+			Name:       f.Name,
+			Namespace:  f.Namespace,
+			Scope:      f.Namespace,
+			OutputRefs: f.Spec.OutputRefs,
+			Filters:    f.Spec.Filters,
+		}
+		if f.Spec.Match != nil && f.Spec.Selectors != nil {
+			return nil, errors.Errorf("match and selectors cannot be defined simultaneously for flow %s",
+				utils.ObjectKeyFromObjectMeta(&f).String())
+		}
+		if f.Spec.Match != nil {
+			matches, err = GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+			if err != nil {
+				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
+			}
+		} else {
+			matches = []types.FlowMatch{
+				{
+					Labels:     f.Spec.Selectors,
+					Namespaces: []string{f.Namespace},
+					Negate:     false,
+				},
+			}
+		}
+		flow, err := types.NewFlow(matches, f.Name, f.Namespace)
+		commonFlow.Flow = flow
+		if err != nil {
+			return nil, err
+		}
+		return commonFlow, nil
+	}
+	return nil, fmt.Errorf("unsupported type: %t", flowCr)
+}
+
+func (l *LoggingResources) CreateFlowFromCustomResource(flowCr interface{}) (*types.Flow, error) {
+	commonFlow, err := FlowDispatcher(flowCr)
 	if err != nil {
 		return nil, err
 	}
+	flow := commonFlow.Flow
 	outputs := []types.Output{}
 	var multierr error
 FindOutputForAllRefs:
-	for _, outputRef := range flowCr.Spec.OutputRefs {
+	for _, outputRef := range commonFlow.OutputRefs {
 		// only namespaced flows should use namespaced outputs
-		if namespace != "" {
+		if commonFlow.Scope != "" {
 			for _, output := range l.Outputs {
 				// only an output from the same namespace can be used with a matching name
-				if output.Namespace == namespace && outputRef == output.Name {
-					outputId := namespace + "_" + flowCr.Name + "_" + output.Name
+				if output.Namespace == commonFlow.Scope && outputRef == output.Name {
+					outputId := commonFlow.Scope + "_" + commonFlow.Name + "_" + output.Name
 					plugin, err := plugins.CreateOutput(output.Spec, outputId, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
 					if err != nil {
 						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -131,7 +261,7 @@ FindOutputForAllRefs:
 		}
 		for _, clusterOutput := range l.ClusterOutputs {
 			if outputRef == clusterOutput.Name {
-				outputId := namespace + "_" + flowCr.Name + "_" + clusterOutput.Name
+				outputId := commonFlow.Namespace + "_" + commonFlow.Name + "_" + clusterOutput.Name
 				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputId, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
 				if err != nil {
 					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
@@ -147,10 +277,11 @@ FindOutputForAllRefs:
 
 	// Filter
 	var filters []types.Filter
-	for i, f := range flowCr.Spec.Filters {
-		filter, err := plugins.CreateFilter(f, flowCr.Name, i, secret.NewSecretLoader(l.client, flowCr.Namespace, fluentd.OutputSecretPath, l.Secrets))
+	for i, f := range commonFlow.Filters {
+		id := fmt.Sprintf("%s_%s_%d", commonFlow.Namespace, commonFlow.Name, i)
+		filter, err := plugins.CreateFilter(f, id, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
 		if err != nil {
-			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowCr.Name))
+			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, commonFlow.Name))
 			continue
 		}
 		filters = append(filters, filter)

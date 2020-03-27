@@ -13,5 +13,7 @@ spec:
         format: ${namespace_name}.${pod_name}.${container_name}
   outputRefs:
     - s3-output
-  selectors:
-    app: nginx
+  match:
+    - select:
+        labels:
+          app: nginx

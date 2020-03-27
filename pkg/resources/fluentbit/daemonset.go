@@ -77,7 +77,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					},
 					Containers: []corev1.Container{
 						{
-							Name:            "fluent-bit",
+							Name:            containerName,
 							Image:           r.Logging.Spec.FluentbitSpec.Image.Repository + ":" + r.Logging.Spec.FluentbitSpec.Image.Tag,
 							ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
 							Ports:           containerPorts,
@@ -99,6 +99,18 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		},
 	}
 
+	r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+	r.Logging.Spec.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume))
+
+	if err := r.Logging.Spec.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
+		return desired, reconciler.StatePresent, err
+	}
+	if err := r.Logging.Spec.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+		return desired, reconciler.StatePresent, err
+	}
+
 	return desired, reconciler.StatePresent, nil
 }
 
@@ -108,14 +120,6 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			Name:      "varlibcontainers",
 			ReadOnly:  true,
 			MountPath: "/var/lib/docker/containers",
-		},
-		{
-			Name:      TailPositionVolume,
-			MountPath: "/tail-db",
-		},
-		{
-			Name:      BufferStorageVolume,
-			MountPath: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
 		},
 		{
 			Name:      "varlogs",
@@ -223,12 +227,5 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
-	r.Logging.Spec.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume))
-
-	v = append(v, r.Logging.Spec.FluentbitSpec.PositionDB.GetVolume(TailPositionVolume))
-	v = append(v, r.Logging.Spec.FluentbitSpec.BufferStorageVolume.GetVolume(BufferStorageVolume))
 	return
 }
