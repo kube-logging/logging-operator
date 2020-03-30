@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Tag Normaliser"
+// +weight:"200"
+type _hugoTagNormaliser interface{}
+
 // +docName:"Fluentd Plugin to re-tag based on log metadata"
 //More info at https://github.com/banzaicloud/fluent-plugin-tag-normaliser
 //

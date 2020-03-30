@@ -1,3 +1,8 @@
+---
+title: Exception Detector
+weight: 200
+---
+
 # Exception Detector
 ## Overview
 This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
