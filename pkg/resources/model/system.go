@@ -32,14 +32,15 @@ import (
 )
 
 type LoggingResources struct {
-	client         client.Client
-	logger         logr.Logger
-	logging        *v1beta1.Logging
-	Outputs        []v1beta1.Output
-	Flows          []v1beta1.Flow
-	ClusterOutputs []v1beta1.ClusterOutput
-	ClusterFlows   []v1beta1.ClusterFlow
-	Secrets        *secret.MountSecrets
+	client             client.Client
+	logger             logr.Logger
+	logging            *v1beta1.Logging
+	Outputs            []v1beta1.Output
+	Flows              []v1beta1.Flow
+	ClusterOutputs     []v1beta1.ClusterOutput
+	ClusterFlows       []v1beta1.ClusterFlow
+	DefaultClusterFlow *v1beta1.DefaultClusterFlow
+	Secrets            *secret.MountSecrets
 }
 
 func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger logr.Logger) *LoggingResources {
@@ -101,7 +102,18 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			return nil, err
 		}
 	}
-	if len(l.Flows) == 0 && len(l.ClusterFlows) == 0 {
+	if l.DefaultClusterFlow != nil {
+		flow, err := l.CreateFlowFromCustomResource(*l.DefaultClusterFlow)
+		if err != nil {
+			// TODO set flow status to error?
+			return nil, err
+		}
+		err = system.RegisterDefaultFlow(flow)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(l.Flows) == 0 && len(l.ClusterFlows) == 0 && l.DefaultClusterFlow == nil {
 		l.logger.Info("no flows found, generating empty model")
 	}
 	return system, nil
@@ -168,6 +180,20 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 	var commonFlow *CommonFlow
 	var err error
 	switch f := flowCr.(type) {
+	case v1beta1.DefaultClusterFlow:
+		id := fmt.Sprintf("defaultclusterflow:%s:%s", f.Namespace, f.Name)
+		flow, err := types.NewFlow([]types.FlowMatch{}, id, f.Name, f.Namespace)
+		if err != nil {
+			return nil, err
+		}
+		return &CommonFlow{
+			Name:       f.Name,
+			Namespace:  f.Namespace,
+			Scope:      "",
+			OutputRefs: f.Spec.OutputRefs,
+			Filters:    f.Spec.Filters,
+			Flow:       flow,
+		}, nil
 	case v1beta1.ClusterFlow:
 		var matches []types.FlowMatch
 		commonFlow = &CommonFlow{
