@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Prometheus"
+// +weight:"200"
+type _hugoPrometheus interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Prometheus Filter](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin)"
 // Prometheus Filter Plugin to count Incoming Records

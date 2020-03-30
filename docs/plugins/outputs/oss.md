@@ -1,3 +1,8 @@
+---
+title: Alibaba Cloud
+weight: 200
+---
+
 # Aliyun OSS plugin for Fluentd
 ## Overview
 **Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
@@ -19,8 +24,8 @@ More info at https://github.com/aliyun/fluent-plugin-oss
 |---|---|---|---|---|
 | endpoint | string | Yes | - | OSS endpoint to connect to'<br> |
 | bucket | string | Yes | - | Your bucket name<br> |
-| access_key_id | *secret.Secret | Yes | - | Your access key id<br>[Secret](./secret.md)<br> |
-| aaccess_key_secret | *secret.Secret | Yes | - | Your access secret key<br>[Secret](./secret.md)<br> |
+| access_key_id | *secret.Secret | Yes | - | Your access key id<br>[Secret](../secret/)<br> |
+| aaccess_key_secret | *secret.Secret | Yes | - | Your access secret key<br>[Secret](../secret/)<br> |
 | path | string | No |  fluent/logs | Path prefix of the files on OSS <br> |
 | upload_crc_enable | bool | No |  true | Upload crc enabled <br> |
 | download_crc_enable | bool | No |  true | Download crc enabled <br> |
@@ -36,5 +41,5 @@ More info at https://github.com/aliyun/fluent-plugin-oss
 | hex_random_length | int | No |  4 | The length of `%{hex_random}` placeholder(4-16) <br> |
 | index_format | string | No |  %d | `sprintf` format for `%{index}` <br> |
 | warn_for_delay | string | No | - | Given a threshold to treat events as delay, output warning logs if delayed events were put into OSS<br> |
-| format | *Format | No | - | [Format](./format.md)<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| format | *Format | No | - | [Format](../format/)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |

@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Alibaba Cloud"
+// +weight:"200"
+type _hugoOss interface{}
+
 // +docName:"Aliyun OSS plugin for Fluentd"
 //**Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
 //
@@ -49,10 +53,10 @@ type OSSOutput struct {
 	// Your bucket name
 	Bucket string `json:"bucket"`
 	// Your access key id
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AccessKeyId *secret.Secret `json:"access_key_id"`
 	// Your access secret key
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AaccessKeySecret *secret.Secret `json:"aaccess_key_secret"`
 	// Path prefix of the files on OSS (default: fluent/logs)
 	Path string `json:"path,omitempty"`
@@ -84,9 +88,9 @@ type OSSOutput struct {
 	IndexFormat string `json:"index_format,omitempty"`
 	// Given a threshold to treat events as delay, output warning logs if delayed events were put into OSS
 	WarnForDelay string `json:"warn_for_delay,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
