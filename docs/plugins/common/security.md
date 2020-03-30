@@ -1,3 +1,8 @@
+---
+title: Security
+weight: 200
+---
+
 ### Security
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
