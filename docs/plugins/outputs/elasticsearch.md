@@ -6,7 +6,7 @@ weight: 200
 # Elasticsearch output plugin for Fluentd
 ## Overview
 More info at https://github.com/uken/fluent-plugin-elasticsearch
->Example Deployment: [Save all logs to ElasticSearch](../../../docs/example-es.md)
+>Example Deployment: [Save all logs to ElasticSearch](../../../quickstarts/es-nginx/)
 
  #### Example output configurations
  ```
@@ -33,7 +33,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | port | int | No |  9200 | You can specify Elasticsearch port by this parameter.<br> |
 | hosts | string | No | - | You can specify multiple Elasticsearch hosts with separator ",". If you specify hosts option, host and port options are ignored.<br> |
 | user | string | No | - | User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+}<br> |
-| password | *secret.Secret | No | - | Password for HTTP Basic authentication.<br>[Secret](./secret.md)<br> |
+| password | *secret.Secret | No | - | Password for HTTP Basic authentication.<br>[Secret](../secret/)<br> |
 | path | string | No | - | Path for HTTP Basic authentication.<br> |
 | scheme | string | No |  http | Connection scheme <br> |
 | ssl_verify | *bool | No | true | Skip ssl verification (default: true)<br> |
@@ -95,4 +95,4 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | ignore_exceptions | string | No | - | A list of exception that will be ignored - when the exception occurs the chunk will be discarded and the buffer retry mechanism won't be called. It is possible also to specify classes at higher level in the hierarchy. For example<br>`ignore_exceptions ["Elasticsearch::Transport::Transport::ServerError"]`<br>will match all subclasses of ServerError - Elasticsearch::Transport::Transport::Errors::BadRequest, Elasticsearch::Transport::Transport::Errors::ServiceUnavailable, etc.<br> |
 | exception_backup | *bool | No | true | Indicates whether to backup chunk when ignore exception occurs. (default: true)<br> |
 | bulk_message_request_threshold | string | No |  20MB | Configure bulk_message request splitting threshold size.<br>Default value is 20MB. (20 * 1024 * 1024)<br>If you specify this size as negative number, bulk_message request splitting feature will be disabled. <br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |

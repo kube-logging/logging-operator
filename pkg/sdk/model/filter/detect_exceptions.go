@@ -27,7 +27,7 @@ type _hugoExceptionDetector interface{}
 //This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
 //More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
 //
-// > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](./tagnormaliser.md)
+// > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
 //
 // #### Example output configurations
 // ```

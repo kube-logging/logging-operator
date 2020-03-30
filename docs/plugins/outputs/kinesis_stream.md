@@ -35,8 +35,8 @@ weight: 200
 | reset_backoff_if_success | bool | No | - | Boolean, default true. If enabled, when after retrying, the next retrying checks the number of succeeded records on the former batch request and reset exponential backoff if there is any success. Because batch request could be composed by requests across shards, simple exponential backoff for the batch request wouldn't work some cases.<br> |
 | batch_request_max_count | int | No | - | Integer, default 500. The number of max count of making batch request from record chunk. It can't exceed the default value because it's API limit.<br> |
 | batch_request_max_size | int | No | - | Integer. The number of max size of making batch request from record chunk. It can't exceed the default value because it's API limit.<br> |
-| format | *Format | No | - | [Format](./format.md)<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| format | *Format | No | - | [Format](../format/)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
 ### Assume Role Credentials
 #### assume_role_credentials
 

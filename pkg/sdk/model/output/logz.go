@@ -27,7 +27,7 @@ type _hugoLogZ interface{}
 
 // +docName:"LogZ output plugin for Fluentd"
 //More info at https://github.com/logzio/fluent-plugin-logzio
-//>Example Deployment: [Save all logs to LogZ](../../../docs/example-logz.md)
+//>Example Deployment: [Save all logs to LogZ](../../..//quickstarts/example-logz/)
 //
 // #### Example output configurations
 // ```
@@ -77,7 +77,7 @@ type LogZOutput struct {
 	RetrySleep int `json:"retry_sleep,omitempty"`
 	// Should the plugin ship the logs in gzip compression. Default is false.
 	Gzip bool `json:"gzip,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
@@ -90,7 +90,7 @@ type Endpoint struct {
 	// Port over which to connect to LogZ URL.
 	Port int `json:"port,omitempty" plugin:"default:8071"`
 	// LogZ API Token.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	Token *secret.Secret `json:"token,omitempty"`
 }
 

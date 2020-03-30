@@ -85,9 +85,9 @@ type KinesisStreamOutputConfig struct {
 	// Integer. The number of max size of making batch request from record chunk. It can't exceed the default value because it's API limit.
 	BatchRequestMaxSize int `json:"batch_request_max_size,omitempty"`
 
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

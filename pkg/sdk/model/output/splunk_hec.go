@@ -58,7 +58,7 @@ type SplunkHecOutput struct {
 	// This is the protocol to use for calling the Hec API. Available values are: http, https. (default: https)
 	Protocol string `json:"protocol,omitempty"`
 	// Identifier for the Hec token.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	HecToken *secret.Secret `json:"hec_token"`
 	// When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)
 	MetricsFromEvent *bool `json:"metrics_from_event,omitempty"`
@@ -108,9 +108,9 @@ type SplunkHecOutput struct {
 	InsecureSSL *bool `json:"insecure_ssl,omitempty"`
 	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
 	Fields map[string]string `json:"fields,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

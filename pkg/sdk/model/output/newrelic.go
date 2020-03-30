@@ -27,7 +27,7 @@ type _hugoNewRelic interface{}
 
 // +docName:"New Relic Logs plugin for Fluentd"
 //**newrelic** output plugin send log data to New Relic Logs
-//>Example: [New Relic Output Deployment](../../../docs/example-newrelic.md)
+//>Example: [New Relic Output Deployment](../../../quickstarts/example-newrelic/)
 //
 // #### Example output configurations
 // ```
@@ -52,14 +52,14 @@ type _metaNewRelic interface{}
 // +docName:"Output Config"
 type NewRelicOutputConfig struct {
 	// New Relic API Insert key
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	APIKey *secret.Secret `json:"api_key,omitempty"`
 	// New Relic License Key (recommended)
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	// LicenseKey *secret.Secret `json:"license_key,omitempty"`
 	LicenseKey *secret.Secret `json:"license_key,omitempty"`
 	// New Relic ingestion endpoint
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	BaseURI string `json:"base_uri,omitempty" plugin:"default:https://log-api.newrelic.com/log/v1"`
 }
 

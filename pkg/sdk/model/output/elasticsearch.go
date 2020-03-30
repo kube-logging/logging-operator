@@ -25,7 +25,7 @@ type _hugoElasticsearch interface{}
 
 // +docName:"Elasticsearch output plugin for Fluentd"
 //More info at https://github.com/uken/fluent-plugin-elasticsearch
-//>Example Deployment: [Save all logs to ElasticSearch](../../../docs/example-es.md)
+//>Example Deployment: [Save all logs to ElasticSearch](../../../quickstarts/es-nginx/)
 //
 // #### Example output configurations
 // ```
@@ -63,7 +63,7 @@ type ElasticsearchOutput struct {
 	// User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+}
 	User string `json:"user,omitempty"`
 	// Password for HTTP Basic authentication.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	Password *secret.Secret `json:"password,omitempty"`
 	// Path for HTTP Basic authentication.
 	Path string `json:"path,omitempty"`
@@ -204,7 +204,7 @@ type ElasticsearchOutput struct {
 	// Default value is 20MB. (20 * 1024 * 1024)
 	// If you specify this size as negative number, bulk_message request splitting feature will be disabled. (default: 20MB)
 	BulkMessageRequestThreshold string `json:"bulk_message_request_threshold,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

@@ -27,7 +27,7 @@ type _hugoLoki interface{}
 // +docName:"Loki output plugin "
 //Fluentd output plugin to ship logs to a Loki server.
 //More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
-//>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../docs/example-loki-nginx.md)
+//>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../quickstarts/loki-nginx/)
 //
 // #### Example output configurations
 // ```
@@ -54,10 +54,10 @@ type LokiOutput struct {
 	// The url of the Loki server to send logs to. (default:https://logs-us-west1.grafana.net)
 	Url string `json:"url,omitempty"`
 	// Specify a username if the Loki server requires authentication.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	Username *secret.Secret `json:"username,omitempty"`
 	// Specify password if the Loki server requires authentication.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	Password *secret.Secret `json:"password,omitempty"`
 	// Loki is a multi-tenant log storage platform and all requests sent must include a tenant.
 	Tenant string `json:"tenant,omitempty"`
@@ -75,7 +75,7 @@ type LokiOutput struct {
 	DropSingleKey bool `json:"drop_single_key,omitempty"`
 	// Configure Kubernetes metadata in a Prometheus like format
 	ConfigureKubernetesLabels bool `json:"configure_kubernetes_labels,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

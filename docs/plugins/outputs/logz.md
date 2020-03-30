@@ -6,7 +6,7 @@ weight: 200
 # LogZ output plugin for Fluentd
 ## Overview
 More info at https://github.com/logzio/fluent-plugin-logzio
->Example Deployment: [Save all logs to LogZ](../../../docs/example-logz.md)
+>Example Deployment: [Save all logs to LogZ](../../..//quickstarts/example-logz/)
 
  #### Example output configurations
  ```
@@ -43,7 +43,7 @@ More info at https://github.com/logzio/fluent-plugin-logzio
 | retry_count | int | No | - | How many times to resend failed bulks.<br> |
 | retry_sleep | int | No | - | How long to sleep initially between retries, exponential step-off.<br> |
 | gzip | bool | No | - | Should the plugin ship the logs in gzip compression. Default is false.<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
 ### Endpoint
 #### Endpoint defines connection details for LogZ.io.
 
@@ -51,4 +51,4 @@ More info at https://github.com/logzio/fluent-plugin-logzio
 |---|---|---|---|---|
 | url | string | No | https://listener.logz.io | LogZ URL.<br> |
 | port | int | No | 8071 | Port over which to connect to LogZ URL.<br> |
-| token | *secret.Secret | No | - | LogZ API Token.<br>[Secret](./secret.md)<br> |
+| token | *secret.Secret | No | - | LogZ API Token.<br>[Secret](../secret/)<br> |

@@ -37,7 +37,7 @@ type GCSOutput struct {
 	// Path of GCS service account credentials JSON file
 	Keyfile string `json:"keyfile,omitempty"`
 	// GCS service account credentials in JSON format
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	CredentialsJson *secret.Secret `json:"credentials_json,omitempty"`
 	// Number of times to retry requests on server error
 	ClientRetries int `json:"client_retries,omitempty"`
@@ -68,11 +68,11 @@ type GCSOutput struct {
 	// Customer-supplied, AES-256 encryption key
 	EncryptionKey string `json:"encryption_key,omitempty"`
 	// User provided web-safe keys and arbitrary string values that will returned with requests for the file as "x-goog-meta-" response headers.
-	// +docLink:"Object Metadata,#ObjectMetadata"
+	// +docLink:"Object Metadata,#objectmetadata"
 	ObjectMetadata []ObjectMetadata `json:"object_metadata,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

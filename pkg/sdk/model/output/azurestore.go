@@ -41,10 +41,10 @@ type AzureStorage struct {
 	// Path prefix of the files on Azure
 	Path string `json:"path,omitempty"`
 	// Your azure storage account
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AzureStorageAccount *secret.Secret `json:"azure_storage_account"`
 	// Your azure storage access key
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AzureStorageAccessKey *secret.Secret `json:"azure_storage_access_key"`
 	// Your azure storage container
 	AzureContainer string `json:"azure_container"`
@@ -58,7 +58,7 @@ type AzureStorage struct {
 	AutoCreateContainer bool `json:"auto_create_container,omitempty"`
 	// Compat format type: out_file, json, ltsv (default: out_file)
 	Format string `json:"format,omitempty" plugin:"default:json"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

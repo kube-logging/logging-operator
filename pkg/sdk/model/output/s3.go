@@ -27,7 +27,7 @@ type _hugoS3 interface{}
 
 // +docName:"Amazon S3 plugin for Fluentd"
 //**s3** output plugin buffers event logs in local file and upload it to S3 periodically. This plugin splits files exactly by using the time of event logs (not the time when the logs are received). For example, a log '2011-01-02 message B' is reached, and then another log '2011-01-03 message B' is reached in this order, the former one is stored in "20110102.gz" file, and latter one in "20110103.gz" file.
-//>Example: [S3 Output Deployment](../../../docs/example-s3.md)
+//>Example: [S3 Output Deployment](../../../quickstarts/example-s3/)
 //
 // #### Example output configurations
 // ```
@@ -64,10 +64,10 @@ type _metaS3 interface{}
 // +docName:"Output Config"
 type S3OutputConfig struct {
 	// AWS access key id
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AwsAccessKey *secret.Secret `json:"aws_key_id,omitempty"`
 	// AWS secret key.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AwsSecretKey *secret.Secret `json:"aws_sec_key,omitempty"`
 	// Check AWS key on start
 	CheckApikeyOnStart string `json:"check_apikey_on_start,omitempty"`
@@ -137,15 +137,15 @@ type S3OutputConfig struct {
 	StorageClass string `json:"storage_class,omitempty"`
 	// The number of attempts to load instance profile credentials from the EC2 metadata service using IAM role
 	AwsIamRetries string `json:"aws_iam_retries,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Assume Role Credentials,#Assume-Role-Credentials"
+	// +docLink:"Assume Role Credentials,#assume_role_credentials"
 	AssumeRoleCredentials *S3AssumeRoleCredentials `json:"assume_role_credentials,omitempty"`
-	// +docLink:"Instance Profile Credentials,#Instance-Profile-Credentials"
+	// +docLink:"Instance Profile Credentials,#instance_profile_credentials"
 	InstanceProfileCredentials *S3InstanceProfileCredentials `json:"instance_profile_credentials,omitempty"`
-	// +docLink:"Shared Credentials,#Shared-Credentials"
+	// +docLink:"Shared Credentials,#shared_credentials"
 	SharedCredentials *S3SharedCredentials `json:"shared_credentials,omitempty"`
 }
 

@@ -16,8 +16,8 @@ weight: 200
 | add_path_suffix | *bool | No | true | Add path suffix(default: true)<br> |
 | path_suffix | string | No |  ".log" | The suffix of output result.<br> |
 | symlink_path | bool | No |  false | Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.<br> |
-| format | *Format | No | - | [Format](./format.md)<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| format | *Format | No | - | [Format](../format/)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
  #### Example `File` output configurations
  ```
 apiVersion: logging.banzaicloud.io/v1beta1
