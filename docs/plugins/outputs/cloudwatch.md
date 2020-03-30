@@ -1,3 +1,8 @@
+---
+title: Amazon CloudWatch
+weight: 200
+---
+
 # CloudWatch output plugin for Fluentd
 ## Overview
 This plugin has been designed to output logs or metrics to Amazon CloudWatch.
@@ -32,8 +37,8 @@ More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | auto_create_stream | bool | No |  false | Create log group and stream automatically. <br> |
-| aws_key_id | *secret.Secret | No | - | AWS access key id<br>[Secret](./secret.md)<br> |
-| aws_sec_key | *secret.Secret | No | - | AWS secret key.<br>[Secret](./secret.md)<br> |
+| aws_key_id | *secret.Secret | No | - | AWS access key id<br>[Secret](../secret/)<br> |
+| aws_sec_key | *secret.Secret | No | - | AWS secret key.<br>[Secret](../secret/)<br> |
 | aws_instance_profile_credentials_retries | int | No |  nil | Instance Profile Credentials call retries <br> |
 | aws_use_sts | bool | No | - | Enable AssumeRoleCredentials to authenticate, rather than the default credential hierarchy. See 'Cross-Account Operation' below for more detail.<br> |
 | aws_sts_role_arn | string | No | - | The role ARN to assume when using cross-account sts authentication<br> |
@@ -66,5 +71,5 @@ More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-
 | retention_in_days_key | string | No | - | Use specified field of records as retention period<br> |
 | use_tag_as_group | bool | No | - | Use tag as a group name<br> |
 | use_tag_as_stream | bool | No | - | Use tag as a stream name<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
-| format | *Format | No | - | [Format](./format.md)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
+| format | *Format | No | - | [Format](../format/)<br> |

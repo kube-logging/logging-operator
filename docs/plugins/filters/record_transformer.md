@@ -1,3 +1,8 @@
+---
+title: Record Transformer
+weight: 200
+---
+
 # [Record Transformer](https://docs.fluentd.org/filter/record_transformer)
 ## Overview
  Mutates/transforms incoming event streams.

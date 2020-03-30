@@ -1,28 +1,37 @@
-# Developers documentation
+---
+title: Developers documentation
+weight: 800
+---
 
-This documentation helps to set-up a developer environment and writing plugins for the operator.
+{{< contents >}}
+
+This documentation helps to set-up a developer environment and writing plugins for the Logging operator.
 
 ## Setting up Kind
 
-Install Kind on your computer
-```
-go get sigs.k8s.io/kind@v0.5.1
-```
+1. Install Kind on your computer
 
-Create cluster
-```
-kind create cluster --name logging
-```
+    ```bash
+    go get sigs.k8s.io/kind@v0.5.1
+    ```
 
-Install prerequisites (this is a Kubebuilder makefile that will generate and install crds)
-```
-make install
-```
+1. Create cluster
 
-Run the Operator
-```
-go run main.go
-```
+    ```bash
+    kind create cluster --name logging
+    ```
+
+1. Install prerequisites (this is a Kubebuilder makefile that will generate and install crds)
+
+    ```bash
+    make install
+    ```
+
+1. Run the Operator
+
+    ```bash
+    go run main.go
+    ```
 
 ## Writing a plugin
 
@@ -42,12 +51,15 @@ The plugin uses the **JSON** tags to parse and validate configuration. Without t
 ### Implement `ToDirective`
 
 To render the configuration you have to implement the `ToDirective` function.
+
 ```go
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
 	...
 }
 ```
+
 For simple Plugins you can use the `NewFlatDirective` function.
+
 ```go
 func (c *ExampleOutput) ToDirective(secretLoader secret.SecretLoader) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
@@ -57,6 +69,7 @@ func (c *ExampleOutput) ToDirective(secretLoader secret.SecretLoader) (types.Dir
 	}, c, secretLoader)
 }
 ```
+
 For more example please check the available plugins.
 
 ### Reuse existing Plugin sections
@@ -81,22 +94,28 @@ if c.Buffer != nil {
 ```
 
 ### Special plugin tags
+
 To document the plugins logging-operator uses the Go `tags` (like JSON tags). Logging operator uses `plugin` named tags for special instructions.
 
-Special tag `default`
+#### Special tag `default`
+
 The default tag helps to give `default` values for parameters. These parameters are explicitly set in the generated fluentd configuration.
+
 ```go
 RetryForever bool `json:"retry_forever" plugin:"default:true"`
 ```
-Special tag `required`
-The required tag ensures that the attribute can **not** be empty
+
+#### Special tag `required`
+
+The required tag ensures that the attribute **cannot** be empty
+
 ```go
 RetryForever bool `json:"retry_forever" plugin:"required"`
 ```
 
 ## Generate documentation for Plugin
 
-The operator parse the `docstrings` for the documentation. 
+The operator parse the `docstrings` for the documentation.
 
 ```go
 ...
@@ -112,6 +131,7 @@ Will generate the following Markdown
 |AwsAccessKey| | AWS access key id|
 
 You can *hint* default values in docstring via `(default: value)`. This is useful if you don't want to set default explicitly with `tag`. However during rendering defaults in `tags` have priority over docstring.
+
 ```go
 ...
 // The format of S3 object keys (default: %{path}%{time_slice}_%{index}.%{file_extension})
@@ -127,6 +147,7 @@ S3ObjectKeyFormat string `json:"s3_object_key_format,omitempty"`
 You can declare document **title** and **description** above the `type _doc* interface{}` variable declaration.
 
 Example Document headings:
+
 ```go
 // +docName:"Amazon S3 plugin for Fluentd"
 // **s3** output plugin buffers event logs in local file and upload it to S3 periodically. This plugin splits files exactly by using the time of event logs (not the time when the logs are received). For example, a log '2011-01-02 message B' is reached, and then another log '2011-01-03 message B' is reached in this order, the former one is stored in "20110102.gz" file, and latter one in "20110103.gz" file.
@@ -134,6 +155,7 @@ type _docS3 interface{}
 ```
 
 Example Plugin headings:
+
 ```go
 // +kubebuilder:object:generate=true
 // +docName:"Shared Credentials"
@@ -142,6 +164,7 @@ type S3SharedCredentials struct {
 ```
 
 Example linking embedded sections
+
 ```go
 // +docLink:"Buffer,./buffer.md"
 Buffer *Buffer `json:"buffer,omitempty"`
@@ -149,6 +172,6 @@ Buffer *Buffer `json:"buffer,omitempty"`
 
 ### Generate docs for your Plugin
 
-```
+```bash
 make docs
 ```

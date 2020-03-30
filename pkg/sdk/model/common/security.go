@@ -19,6 +19,10 @@ import (
 )
 
 // +name:"Security"
+// +weight:"200"
+type _hugoSecurity interface{}
+
+// +name:"Security"
 type _metaSecurity interface{}
 
 type Security struct {

@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Geo IP"
+// +weight:"200"
+type _hugoGeoIP interface{}
+
 // +docName:"Fluentd GeoIP filter"
 // Fluentd Filter plugin to add information about geographical location of IP addresses with Maxmind GeoIP databases.
 // More information at https://github.com/y-ken/fluent-plugin-geoip
