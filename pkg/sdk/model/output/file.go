@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"File"
+// +weight:"200"
+type _hugoFile interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[File Output](https://docs.fluentd.org/output/file)"
 // This plugin has been designed to output logs or metrics to File.

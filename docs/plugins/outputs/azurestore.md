@@ -1,3 +1,8 @@
+---
+title: Azure Storage
+weight: 200
+---
+
 # Azure Storage output plugin for Fluentd
 ## Overview
 Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.

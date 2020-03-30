@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Amazon Kinesis"
+// +weight:"200"
+type _hugoKinesisStream interface{}
+
 // +docName:"Kinesis Stream output plugin for Fluentd"
 //  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
 //

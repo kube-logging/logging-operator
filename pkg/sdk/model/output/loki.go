@@ -20,6 +20,10 @@ import (
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
+// +name:"Grafana Loki"
+// +weight:"200"
+type _hugoLoki interface{}
+
 // +docName:"Loki output plugin "
 //Fluentd output plugin to ship logs to a Loki server.
 //More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki

@@ -21,6 +21,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"LogZ"
+// +weight:"200"
+type _hugoLogZ interface{}
+
 // +docName:"LogZ output plugin for Fluentd"
 //More info at https://github.com/logzio/fluent-plugin-logzio
 //>Example Deployment: [Save all logs to LogZ](../../../docs/example-logz.md)

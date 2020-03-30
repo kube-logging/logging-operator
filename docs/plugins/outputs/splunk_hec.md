@@ -1,3 +1,8 @@
+---
+title: Splunk
+weight: 200
+---
+
 # Splunk via Hec output plugin for Fluentd
 ## Overview
 More info at https://github.com/splunk/fluent-plugin-splunk-hec

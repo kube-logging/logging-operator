@@ -1,3 +1,8 @@
+---
+title: Kafka
+weight: 200
+---
+
 # Kafka output plugin for Fluentd
 ## Overview
   More info at https://github.com/fluent/fluent-plugin-kafka

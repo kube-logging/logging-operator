@@ -1,3 +1,8 @@
+---
+title: Google Cloud Storage
+weight: 200
+---
+
 ### GCSOutput
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

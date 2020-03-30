@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Alibaba Cloud"
+// +weight:"200"
+type _hugoOss interface{}
+
 // +docName:"Aliyun OSS plugin for Fluentd"
 //**Fluent OSS output plugin** buffers event logs in local files and uploads them to OSS periodically in background threads.
 //

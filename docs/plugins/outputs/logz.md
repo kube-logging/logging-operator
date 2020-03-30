@@ -1,3 +1,8 @@
+---
+title: LogZ
+weight: 200
+---
+
 # LogZ output plugin for Fluentd
 ## Overview
 More info at https://github.com/logzio/fluent-plugin-logzio

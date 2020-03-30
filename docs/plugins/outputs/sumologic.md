@@ -1,3 +1,8 @@
+---
+title: SumoLogic
+weight: 200
+---
+
 # SumoLogic output plugin for Fluentd
 ## Overview
 This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint

@@ -1,3 +1,8 @@
+---
+title: Elasticsearch
+weight: 200
+---
+
 # Elasticsearch output plugin for Fluentd
 ## Overview
 More info at https://github.com/uken/fluent-plugin-elasticsearch

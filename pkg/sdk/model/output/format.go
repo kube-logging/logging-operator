@@ -20,6 +20,10 @@ import (
 )
 
 // +name:"Format"
+// +weight:"200"
+type _hugoFormat interface{}
+
+// +name:"Format"
 // +url:"https://docs.fluentd.org/configuration/format-section"
 // +version:"more info"
 // +description:"Specify how to format output record."

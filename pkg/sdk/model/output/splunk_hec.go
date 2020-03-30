@@ -21,6 +21,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Splunk"
+// +weight:"200"
+type _hugoSplunk interface{}
+
 // +docName:"Splunk via Hec output plugin for Fluentd"
 //More info at https://github.com/splunk/fluent-plugin-splunk-hec
 //

@@ -20,6 +20,10 @@ import (
 )
 
 // +name:"Google Cloud Storage"
+// +weight:"200"
+type _hugoGCS interface{}
+
+// +name:"Google Cloud Storage"
 // +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
 // +version:"0.4.0"
 // +description:"Store logs in Google Cloud Storage"

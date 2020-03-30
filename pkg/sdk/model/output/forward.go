@@ -21,6 +21,10 @@ import (
 )
 
 // +name:"Forward"
+// +weight:"200"
+type _hugoForward interface{}
+
+// +name:"Forward"
 // +url:"https://docs.fluentd.org/output/forward"
 // +version:"more info"
 // +description:"Forwards events to other fluentd nodes."

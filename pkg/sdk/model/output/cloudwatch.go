@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Amazon CloudWatch"
+// +weight:"200"
+type _hugoCloudWatch interface{}
+
 // +docName:"CloudWatch output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to Amazon CloudWatch.
 //More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs

@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Azure Storage"
+// +weight:"200"
+type _hugoAzure interface{}
+
 // +docName:"Azure Storage output plugin for Fluentd"
 //Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
 //More info at https://github.com/htgc/fluent-plugin-azurestorage

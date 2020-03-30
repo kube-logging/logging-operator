@@ -1,3 +1,8 @@
+---
+title: NewRelic
+weight: 200
+---
+
 # New Relic Logs plugin for Fluentd
 ## Overview
 **newrelic** output plugin send log data to New Relic Logs

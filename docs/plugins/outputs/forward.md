@@ -1,3 +1,8 @@
+---
+title: Forward
+weight: 200
+---
+
 ### ForwardOutput
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

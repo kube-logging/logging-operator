@@ -20,6 +20,10 @@ import (
 )
 
 // +name:"Null"
+// +weight:"200"
+type _hugoNull interface{}
+
+// +name:"Null"
 // +url:"https://docs.fluentd.org/output/null"
 // +version:"more info"
 // +description:"Null output plugin just throws away events."

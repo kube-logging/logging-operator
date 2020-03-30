@@ -1,3 +1,8 @@
+---
+title: File
+weight: 200
+---
+
 # [File Output](https://docs.fluentd.org/output/file)
 ## Overview
  This plugin has been designed to output logs or metrics to File.
