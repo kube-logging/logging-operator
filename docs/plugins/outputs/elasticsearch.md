@@ -43,6 +43,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | logstash_prefix | string | No |  logstash | Set the Logstash prefix.<br> |
 | logstash_prefix_separator | string | No |  - | Set the Logstash prefix separator.<br> |
 | logstash_dateformat | string | No |  %Y.%m.%d | Set the Logstash date format.<br> |
+| index_name | string | No |  fluentd | The index name to write events to <br> |
 | type_name | string | No |  fluentd | Set the index type for elasticsearch. This is the fallback if `target_type_key` is missing. <br> |
 | pipeline | string | No | - | This param is to set a pipeline id of your elasticsearch to be added into the request, you can configure ingest node.<br> |
 | time_key_format | string | No | - | The format of the time stamp field (@timestamp or what you specify with time_key). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to.<br> |
