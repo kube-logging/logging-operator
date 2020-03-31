@@ -1,3 +1,8 @@
+---
+title: Format
+weight: 200
+---
+
 ### Format
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

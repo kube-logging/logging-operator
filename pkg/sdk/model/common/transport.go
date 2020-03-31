@@ -19,6 +19,10 @@ import (
 )
 
 // +name:"Transport"
+// +weight:"200"
+type _hugoTransport interface{}
+
+// +name:"Transport"
 type _metaTransport interface{}
 
 type Transport struct {

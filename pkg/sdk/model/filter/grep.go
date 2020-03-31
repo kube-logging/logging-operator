@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Grep"
+// +weight:"200"
+type _hugoGrep interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Grep Filter](https://docs.fluentd.org/filter/grep)"
 // The grep filter plugin "greps" events by the values of specified fields.

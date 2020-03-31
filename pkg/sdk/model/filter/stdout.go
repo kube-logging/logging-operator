@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"StdOut"
+// +weight:"200"
+type _hugoStdOut interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Stdout Filter](https://docs.fluentd.org/filter/stdout)"
 // Fluentd Filter plugin to print events to stdout

@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Record Transformer"
+// +weight:"200"
+type _hugoRecordTransformer interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Record Transformer](https://docs.fluentd.org/filter/record_transformer)"
 // Mutates/transforms incoming event streams.

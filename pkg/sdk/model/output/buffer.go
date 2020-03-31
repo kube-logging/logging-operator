@@ -22,6 +22,10 @@ import (
 )
 
 // +name:"Buffer"
+// +weight:"200"
+type _hugoBuffer interface{}
+
+// +name:"Buffer"
 // +url:"https://docs.fluentd.org/configuration/buffer-section"
 // +version:"mode info"
 // +description:"Fluentd event buffer"

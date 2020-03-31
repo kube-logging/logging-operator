@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Amazon CloudWatch"
+// +weight:"200"
+type _hugoCloudWatch interface{}
+
 // +docName:"CloudWatch output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to Amazon CloudWatch.
 //More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs
@@ -62,10 +66,10 @@ type CloudWatchOutput struct {
 	//  Create log group and stream automatically. (default: false)
 	AutoCreateStream bool `json:"auto_create_stream,omitempty"`
 	// AWS access key id
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AwsAccessKey *secret.Secret `json:"aws_key_id,omitempty"`
 	// AWS secret key.
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AwsSecretKey *secret.Secret `json:"aws_sec_key,omitempty"`
 	// Instance Profile Credentials call retries (default: nil)
 	AwsInstanceProfileCredentialsRetries int `json:"aws_instance_profile_credentials_retries,omitempty"`
@@ -131,9 +135,9 @@ type CloudWatchOutput struct {
 	UseTagAsGroup bool `json:"use_tag_as_group,omitempty"`
 	// Use tag as a stream name
 	UseTagAsStream bool `json:"use_tag_as_stream,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 }
 

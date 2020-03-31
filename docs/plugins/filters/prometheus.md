@@ -1,3 +1,8 @@
+---
+title: Prometheus
+weight: 200
+---
+
 # [Prometheus Filter](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin)
 ## Overview
  Prometheus Filter Plugin to count Incoming Records

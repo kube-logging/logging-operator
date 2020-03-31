@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"File"
+// +weight:"200"
+type _hugoFile interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[File Output](https://docs.fluentd.org/output/file)"
 // This plugin has been designed to output logs or metrics to File.
@@ -44,9 +48,9 @@ type FileOutputConfig struct {
 	PathSuffix string `json:"path_suffix,omitempty"`
 	// Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.(default: false)
 	SymlinkPath bool `json:"symlink_path,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Record Modifier"
+// +weight:"200"
+type _hugoRecordModifier interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Record Modifier](https://github.com/repeatedly/fluent-plugin-record-modifier)"
 // Modify each event record.

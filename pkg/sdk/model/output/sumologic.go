@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"SumoLogic"
+// +weight:"200"
+type _hugoSumoLogic interface{}
+
 // +docName:"SumoLogic output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
 //More info at https://github.com/SumoLogic/fluentd-output-sumologic
