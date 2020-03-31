@@ -960,6 +960,9 @@ spec:
                   description: 'Specify this to override the index date pattern for
                     creating a rollover index.(default: now/d)'
                   type: string
+                index_name:
+                  description: 'The index name to write events to (default: fluentd)'
+                  type: string
                 index_prefix:
                   description: 'Specify the index prefix for the rollover index to
                     be created.(default: logstash)'
