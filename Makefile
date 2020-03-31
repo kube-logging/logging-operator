@@ -16,6 +16,9 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -
 GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/sdk/model/filter/*"  -not -path "./pkg/sdk/model/output/*"  -not -path "./pkg/sdk/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
+CONTROLLER_GEN_VERSION = v0.2.4
+CONTROLLER_GEN = $(PWD)/bin/controller-gen
+
 GOLANGCI_VERSION = 1.21.0
 GOBIN_VERSION = 0.0.13
 
@@ -96,7 +99,7 @@ deploy: manifests
 	kustomize build config/default | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests: controller-gen
+manifests: bin/controller-gen
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
 	cp config/crd/bases/* charts/logging-operator/crds/
@@ -112,7 +115,7 @@ vet:
 	cd pkg/sdk && go vet ./...
 
 # Generate code
-generate: controller-gen
+generate: bin/controller-gen
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./model/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./resourcebuilder/...
@@ -128,16 +131,16 @@ docker-build:
 docker-push:
 	docker push ${IMG}
 
-# find or download controller-gen
-# download controller-gen if necessary
-controller-gen: bin/gobin
-ifeq (, $(shell which controller-gen))
-	@mkdir -p bin
-	GOBIN=bin/ GOFLAGS="" bin/gobin sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.4
-CONTROLLER_GEN=$(abspath bin/controller-gen)
-else
-CONTROLLER_GEN=$(shell which controller-gen)
-endif
+.PHONY: bin/controller-gen
+bin/controller-gen:
+	@ if ! test -x bin/controller-gen; then \
+		set -ex ;\
+		CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
+		cd $$CONTROLLER_GEN_TMP_DIR ;\
+		go mod init tmp ;\
+		GOBIN=$(PWD)/bin go get sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION} ;\
+		rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
+	fi
 
 check-diff: check
 	go mod tidy
