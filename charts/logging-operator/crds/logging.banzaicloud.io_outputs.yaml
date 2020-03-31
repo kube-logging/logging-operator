@@ -1070,6 +1070,11 @@ spec:
                     only on "host unreachable exceptions". We recommended to set this
                     true in the presence of elasticsearch shield.(default: false)'
                   type: boolean
+                reload_after:
+                  description: When reload_connections true, this is the integer number
+                    of operations after which the plugin will reload the connections.
+                    The default value is 10000.
+                  type: string
                 reload_connections:
                   description: 'You can tune how the elasticsearch-transport host
                     reloading feature works.(default: true)'
@@ -1114,6 +1119,18 @@ spec:
                   type: string
                 scheme:
                   description: 'Connection scheme (default: http)'
+                  type: string
+                sniffer_class_name:
+                  description: The default Sniffer used by the Elasticsearch::Transport
+                    class works well when Fluentd has a direct connection to all of
+                    the Elasticsearch servers and can make effective use of the _nodes
+                    API. This doesn't work well when Fluentd must connect through
+                    a load balancer or proxy. The parameter sniffer_class_name gives
+                    you the ability to provide your own Sniffer class to implement
+                    whatever connection reload logic you require. In addition, there
+                    is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which
+                    reuses the hosts given in the configuration, which is typically
+                    the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name
                   type: string
                 ssl_verify:
                   description: 'Skip ssl verification (default: true)'
