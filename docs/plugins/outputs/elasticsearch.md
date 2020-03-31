@@ -43,6 +43,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | logstash_prefix | string | No |  logstash | Set the Logstash prefix.<br> |
 | logstash_prefix_separator | string | No |  - | Set the Logstash prefix separator.<br> |
 | logstash_dateformat | string | No |  %Y.%m.%d | Set the Logstash date format.<br> |
+| index_name | string | No |  fluentd | The index name to write events to <br> |
 | type_name | string | No |  fluentd | Set the index type for elasticsearch. This is the fallback if `target_type_key` is missing. <br> |
 | pipeline | string | No | - | This param is to set a pipeline id of your elasticsearch to be added into the request, you can configure ingest node.<br> |
 | time_key_format | string | No | - | The format of the time stamp field (@timestamp or what you specify with time_key). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to.<br> |
@@ -67,6 +68,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | request_timeout | string | No |  5s | You can specify HTTP request timeout.<br> |
 | reload_connections | *bool | No | true | You can tune how the elasticsearch-transport host reloading feature works.(default: true)<br> |
 | reload_on_failure | bool | No |  false | Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.<br> |
+| reload_after | string | No | - | When reload_connections true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000.<br> |
 | resurrect_after | string | No |  60s | You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.<br> |
 | include_tag_key | bool | No |  false | This will add the Fluentd tag in the JSON record.<br> |
 | tag_key | string | No |  tag | This will add the Fluentd tag in the JSON record.<br> |
@@ -95,4 +97,5 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | ignore_exceptions | string | No | - | A list of exception that will be ignored - when the exception occurs the chunk will be discarded and the buffer retry mechanism won't be called. It is possible also to specify classes at higher level in the hierarchy. For example<br>`ignore_exceptions ["Elasticsearch::Transport::Transport::ServerError"]`<br>will match all subclasses of ServerError - Elasticsearch::Transport::Transport::Errors::BadRequest, Elasticsearch::Transport::Transport::Errors::ServiceUnavailable, etc.<br> |
 | exception_backup | *bool | No | true | Indicates whether to backup chunk when ignore exception occurs. (default: true)<br> |
 | bulk_message_request_threshold | string | No |  20MB | Configure bulk_message request splitting threshold size.<br>Default value is 20MB. (20 * 1024 * 1024)<br>If you specify this size as negative number, bulk_message request splitting feature will be disabled. <br> |
+| sniffer_class_name | string | No | - | The default Sniffer used by the Elasticsearch::Transport class works well when Fluentd has a direct connection to all of the Elasticsearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name<br> |
 | buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |

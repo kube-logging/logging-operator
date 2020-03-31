@@ -84,6 +84,8 @@ type ElasticsearchOutput struct {
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty"`
 	// Set the Logstash date format.(default: %Y.%m.%d)
 	LogstashDateformat string `json:"logstash_dateformat,omitempty"`
+	// The index name to write events to (default: fluentd)
+	IndexName string `json:"index_name,omitempty"`
 	// Set the index type for elasticsearch. This is the fallback if `target_type_key` is missing. (default: fluentd)
 	TypeName string `json:"type_name,omitempty"`
 	// This param is to set a pipeline id of your elasticsearch to be added into the request, you can configure ingest node.
@@ -135,6 +137,8 @@ type ElasticsearchOutput struct {
 	ReloadConnections *bool `json:"reload_connections,omitempty" plugin:"default:true"`
 	//Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.(default: false)
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
+	// When reload_connections true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000.
+	ReloadAfter string `json:"reload_after,omitempty"`
 	// You can set in the elasticsearch-transport how often dead connections from the elasticsearch-transport's pool will be resurrected.(default: 60s)
 	ResurrectAfter string `json:"resurrect_after,omitempty"`
 	// This will add the Fluentd tag in the JSON record.(default: false)
@@ -204,6 +208,8 @@ type ElasticsearchOutput struct {
 	// Default value is 20MB. (20 * 1024 * 1024)
 	// If you specify this size as negative number, bulk_message request splitting feature will be disabled. (default: 20MB)
 	BulkMessageRequestThreshold string `json:"bulk_message_request_threshold,omitempty"`
+	// The default Sniffer used by the Elasticsearch::Transport class works well when Fluentd has a direct connection to all of the Elasticsearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name
+	SnifferClassName string `json:"sniffer_class_name,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
