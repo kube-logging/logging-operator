@@ -156,7 +156,6 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
 	clusterOutputSource := &source.Kind{Type: &loggingv1beta1.ClusterOutput{}}
 	clusterFlowSource := &source.Kind{Type: &loggingv1beta1.ClusterFlow{}}
-	defaultClusterFlowSource := &source.Kind{Type: &loggingv1beta1.DefaultClusterFlow{}}
 	outputSource := &source.Kind{Type: &loggingv1beta1.Output{}}
 	flowSource := &source.Kind{Type: &loggingv1beta1.Flow{}}
 	secretSource := &source.Kind{Type: &corev1.Secret{}}
@@ -212,7 +211,6 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Owns(&corev1.Pod{}).
 		Watches(clusterOutputSource, requestMapper).
 		Watches(clusterFlowSource, requestMapper).
-		Watches(defaultClusterFlowSource, requestMapper).
 		Watches(outputSource, requestMapper).
 		Watches(flowSource, requestMapper).
 		Watches(secretSource, requestMapper)
@@ -264,28 +262,6 @@ func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
 func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*model.LoggingResources, error) {
 	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
 	var err error
-
-	var defaultClusterFlow *loggingv1beta1.DefaultClusterFlow
-	defaultClusterFlows := &loggingv1beta1.DefaultClusterFlowList{}
-	err = r.List(context.TODO(), defaultClusterFlows, client.InNamespace(logging.Spec.ControlNamespace))
-	if err != nil {
-		return nil, err
-	}
-
-	if len(defaultClusterFlows.Items) > 0 {
-		for _, i := range defaultClusterFlows.Items {
-			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-				if defaultClusterFlow != nil {
-					return nil, errors.New("there can only be one DefaultClusterFlow per Logging")
-				}
-				defaultClusterFlow = &i
-			}
-		}
-	}
-
-	if defaultClusterFlow != nil {
-		loggingResources.DefaultClusterFlow = defaultClusterFlow
-	}
 
 	clusterFlows := &loggingv1beta1.ClusterFlowList{}
 	err = r.List(context.TODO(), clusterFlows, client.InNamespace(logging.Spec.ControlNamespace))
