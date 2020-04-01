@@ -18,9 +18,9 @@
 | mountPath | string | No | - |  |
 | extraVolumeMounts | []VolumeMount | No | - |  |
 | inputTail | InputTail | No | - |  |
+| filterAws | *FilterAws | No | - |  |
 | parser | string | No | - | Deprecated, use inputTail.parser<br> |
 | filterKubernetes | FilterKubernetes | No | - |  |
-| filterAws | *FilterAws | No | - |  |
 | bufferStorage | BufferStorage | No | - |  |
 | bufferStorageVolume | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |
 | customConfigSecret | string | No | - |  |
