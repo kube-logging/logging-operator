@@ -42,6 +42,7 @@ type FluentbitSpec struct {
 	MountPath         string                   `json:"mountPath,omitempty"`
 	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
+	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser           string           `json:"parser,omitempty"`
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
@@ -184,6 +185,14 @@ type FilterKubernetes struct {
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
 	DummyMeta string `json:"Dummy_Meta,omitempty"`
+}
+
+// FilterAws The AWS Filter Enriches logs with AWS Metadata.
+type FilterAws struct {
+	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default).
+	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
+	// Match filtered records (default:*)
+	Match string `json:"Match,omitempty" plugin:"default:*"`
 }
 
 // VolumeMount defines source and destination folders of a hostPath type pod mount
