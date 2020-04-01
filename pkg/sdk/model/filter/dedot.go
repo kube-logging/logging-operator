@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Dedot"
+// +weight:"200"
+type _hugoDedot interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Dedot Filter](https://github.com/lunardial/fluent-plugin-dedot_filter)"
 // Fluentd Filter plugin to de-dot field name for elasticsearch.

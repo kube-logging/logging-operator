@@ -1,3 +1,8 @@
+---
+title: Tag Normaliser
+weight: 200
+---
+
 # Fluentd Plugin to re-tag based on log metadata
 ## Overview
 More info at https://github.com/banzaicloud/fluent-plugin-tag-normaliser

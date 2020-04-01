@@ -20,6 +20,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Parser"
+// +weight:"200"
+type _hugoParser interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Parser Filter](https://docs.fluentd.org/filter/parser)"
 // Parses" string field in event records and mutates its

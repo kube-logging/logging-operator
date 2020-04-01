@@ -56,7 +56,8 @@ The following tables lists the configurable parameters of the logging-operator c
 | `namespaceOverride`                                 | Override namespace of app                              | ``                             |
 | `watchNamespace`                                    | Namespace to watch for LoggingOperator CRD             | ``                             |
 | `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                         |
-| `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.              | `false`                        |
+| `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.    | `false`                        |
+| `priorityClassName`                                 | Operator priorityClassName                             | `{}`                           |
 | `affinity`                                          | Node Affinity                                          | `{}`                           |
 | `resources`                                         | CPU/Memory resource requests/limits                    | `{}`                           |
 | `tolerations`                                       | Node Tolerations                                       | `[]`                           |

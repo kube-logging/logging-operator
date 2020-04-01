@@ -67,3 +67,7 @@ securityContext: {}
 #  readOnlyRootFilesystem: true
   # capabilities:
   #   drop: ["ALL"]
+
+## Operator priorityClassName
+##
+priorityClassName: {}

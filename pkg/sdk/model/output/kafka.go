@@ -19,9 +19,13 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Kafka"
+// +weight:"200"
+type _hugoKafka interface{}
+
 // +docName:"Kafka output plugin for Fluentd"
 //  More info at https://github.com/fluent/fluent-plugin-kafka
-//>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../docs/example-kafka-nginx.md)
+//>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../quickstarts/kafka-nginx/)
 //
 // #### Example output configurations
 // ```
@@ -103,9 +107,9 @@ type KafkaOutputConfig struct {
 	SSLClientCertKey *secret.Secret `json:"ssl_client_cert_key,omitempty"`
 	// Verify certificate hostname
 	SSLVerifyHostname *bool `json:"ssl_verify_hostname,omitempty"`
-	// +docLink:"Format,./format.md"
+	// +docLink:"Format,../format/"
 	Format *Format `json:"format"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

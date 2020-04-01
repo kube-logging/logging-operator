@@ -1,9 +1,14 @@
+---
+title: Google Cloud Storage
+weight: 200
+---
+
 ### GCSOutput
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | project | string | Yes | - | Project identifier for GCS<br> |
 | keyfile | string | No | - | Path of GCS service account credentials JSON file<br> |
-| credentials_json | *secret.Secret | No | - | GCS service account credentials in JSON format<br>[Secret](./secret.md)<br> |
+| credentials_json | *secret.Secret | No | - | GCS service account credentials in JSON format<br>[Secret](../secret/)<br> |
 | client_retries | int | No | - | Number of times to retry requests on server error<br> |
 | client_timeout | int | No | - | Default timeout to use in requests<br> |
 | bucket | string | Yes | - | Name of a GCS bucket<br> |
@@ -17,9 +22,9 @@
 | acl | string | No | - | Permission for the object in GCS: auth_read owner_full owner_read private project_private public_read<br> |
 | storage_class | string | No | - | Storage class of the file: dra nearline coldline multi_regional regional standard<br> |
 | encryption_key | string | No | - | Customer-supplied, AES-256 encryption key<br> |
-| object_metadata | []ObjectMetadata | No | - | User provided web-safe keys and arbitrary string values that will returned with requests for the file as "x-goog-meta-" response headers.<br>[Object Metadata](#ObjectMetadata)<br> |
-| format | *Format | No | - | [Format](./format.md)<br> |
-| buffer | *Buffer | No | - | [Buffer](./buffer.md)<br> |
+| object_metadata | []ObjectMetadata | No | - | User provided web-safe keys and arbitrary string values that will returned with requests for the file as "x-goog-meta-" response headers.<br>[Object Metadata](#objectmetadata)<br> |
+| format | *Format | No | - | [Format](../format/)<br> |
+| buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
 ### ObjectMetadata
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|

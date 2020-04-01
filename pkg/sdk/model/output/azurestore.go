@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Azure Storage"
+// +weight:"200"
+type _hugoAzure interface{}
+
 // +docName:"Azure Storage output plugin for Fluentd"
 //Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
 //More info at https://github.com/htgc/fluent-plugin-azurestorage
@@ -37,10 +41,10 @@ type AzureStorage struct {
 	// Path prefix of the files on Azure
 	Path string `json:"path,omitempty"`
 	// Your azure storage account
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AzureStorageAccount *secret.Secret `json:"azure_storage_account"`
 	// Your azure storage access key
-	// +docLink:"Secret,./secret.md"
+	// +docLink:"Secret,../secret/"
 	AzureStorageAccessKey *secret.Secret `json:"azure_storage_access_key"`
 	// Your azure storage container
 	AzureContainer string `json:"azure_container"`
@@ -54,7 +58,7 @@ type AzureStorage struct {
 	AutoCreateContainer bool `json:"auto_create_container,omitempty"`
 	// Compat format type: out_file, json, ltsv (default: out_file)
 	Format string `json:"format,omitempty" plugin:"default:json"`
-	// +docLink:"Buffer,./buffer.md"
+	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 

@@ -1,3 +1,8 @@
+---
+title: Buffer
+weight: 200
+---
+
 ### Buffer
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
