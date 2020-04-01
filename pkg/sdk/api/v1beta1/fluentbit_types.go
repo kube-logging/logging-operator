@@ -189,7 +189,7 @@ type FilterKubernetes struct {
 
 // FilterAws The AWS Filter Enriches logs with AWS Metadata.
 type FilterAws struct {
-	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2'; 'v2' is the default.
+	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default).
 	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
 	// Match filtered records (default:*)
 	Match string `json:"Match,omitempty" plugin:"default:*"`
