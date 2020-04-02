@@ -10,6 +10,8 @@ metadata:
 spec:
   group: logging.banzaicloud.io
   names:
+    categories:
+    - logging-all
     kind: ClusterOutput
     listKind: ClusterOutputList
     plural: clusteroutputs
