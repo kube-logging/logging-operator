@@ -68,7 +68,7 @@ type FlowStatus struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:printcolumn:name="Logging",type=string,JSONPath=`.spec.loggingRef`
+// +kubebuilder:resource:categories=logging-all
 
 // Flow Kubernetes object
 type Flow struct {

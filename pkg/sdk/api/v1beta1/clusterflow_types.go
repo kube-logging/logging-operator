@@ -19,6 +19,7 @@ import (
 )
 
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=logging-all
 
 // ClusterFlow is the Schema for the clusterflows API
 type ClusterFlow struct {

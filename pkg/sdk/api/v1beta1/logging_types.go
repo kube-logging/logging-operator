@@ -58,7 +58,7 @@ type LoggingStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=loggings,scope=Cluster
+// +kubebuilder:resource:path=loggings,scope=Cluster,categories=logging-all
 
 // Logging is the Schema for the loggings API
 type Logging struct {
