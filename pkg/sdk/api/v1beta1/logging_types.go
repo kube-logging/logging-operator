@@ -24,6 +24,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -312,7 +313,31 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", copy.Spec.FluentbitSpec.Metrics.Port)
 			}
+		} else if copy.Spec.FluentbitSpec.LivenessDefaultCheck {
+			copy.Spec.FluentbitSpec.Metrics = &Metrics{
+				Port: 2020,
+				Path: "/",
+			}
 		}
+		if copy.Spec.FluentbitSpec.LivenessProbe == nil {
+			if copy.Spec.FluentbitSpec.LivenessDefaultCheck {
+				copy.Spec.FluentbitSpec.LivenessProbe = &v1.Probe{
+					Handler: v1.Handler{
+						HTTPGet: &v1.HTTPGetAction{
+							Path: copy.Spec.FluentbitSpec.Metrics.Path,
+							Port: intstr.IntOrString{
+								IntVal: copy.Spec.FluentbitSpec.Metrics.Port,
+							},
+						}},
+					InitialDelaySeconds: 10,
+					TimeoutSeconds:      0,
+					PeriodSeconds:       3,
+					SuccessThreshold:    0,
+					FailureThreshold:    1,
+				}
+			}
+		}
+
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
