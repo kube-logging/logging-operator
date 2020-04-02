@@ -1,3 +1,8 @@
+---
+title: ClusterFlow
+weight: 200
+---
+
 ### ClusterFlow
 #### ClusterFlow is the Schema for the clusterflows API
 
