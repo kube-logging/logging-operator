@@ -8,18 +8,15 @@ metadata:
   creationTimestamp: null
   name: flows.logging.banzaicloud.io
 spec:
-  additionalPrinterColumns:
-  - JSONPath: .spec.loggingRef
-    name: Logging
-    type: string
   group: logging.banzaicloud.io
   names:
+    categories:
+    - logging-all
     kind: Flow
     listKind: FlowList
     plural: flows
     singular: flow
   scope: Namespaced
-  subresources: {}
   validation:
     openAPIV3Schema:
       description: Flow Kubernetes object
