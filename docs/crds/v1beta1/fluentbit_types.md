@@ -1,3 +1,8 @@
+---
+title: FluentbitSpec
+weight: 200
+---
+
 ### FluentbitSpec
 #### FluentbitSpec defines the desired state of Fluentbit
 

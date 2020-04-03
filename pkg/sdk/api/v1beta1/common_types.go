@@ -18,6 +18,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// +name:"Common"
+// +weight:"200"
+type _hugoCommon interface{}
+
+// +name:"Common"
+// +version:"v1beta1"
+// +description:"ImageSpec Metrics Security"
+type _metaCommon interface{}
+
 const (
 	HostPath = "/opt/logging-operator/%s/%s"
 )

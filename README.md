@@ -63,6 +63,8 @@ See the [detailed CRD documentation](https://banzaicloud.com/docs/one-eye/loggin
 
 ## Quickstart
 
+[![asciicast](https://asciinema.org/a/315998.svg)](https://asciinema.org/a/315998)
+
 Follow these [quickstart guides](https://banzaicloud.com/docs/one-eye/logging-operator/quickstarts/) to try out the Logging operator!
 
 ### Install

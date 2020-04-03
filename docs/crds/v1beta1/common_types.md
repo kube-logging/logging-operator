@@ -1,3 +1,8 @@
+---
+title: Common
+weight: 200
+---
+
 ### ImageSpec
 #### ImageSpec struct hold information about image specification
 

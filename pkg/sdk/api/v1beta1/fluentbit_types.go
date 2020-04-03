@@ -21,6 +21,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// +name:"FluentbitSpec"
+// +weight:"200"
+type _hugoFluentbitSpec interface{}
+
+// +name:"FluentbitSpec"
+// +version:"v1beta1"
+// +description:"FluentbitSpec defines the desired state of Fluentbit"
+type _metaFluentbitSpec interface{}
+
 // +kubebuilder:object:generate=true
 
 // FluentbitSpec defines the desired state of Fluentbit
