@@ -10,6 +10,8 @@ metadata:
 spec:
   group: logging.banzaicloud.io
   names:
+    categories:
+    - logging-all
     kind: Logging
     listKind: LoggingList
     plural: loggings
@@ -309,6 +311,17 @@ spec:
                     - source
                     type: object
                   type: array
+                filterAws:
+                  description: FilterAws The AWS Filter Enriches logs with AWS Metadata.
+                  properties:
+                    Match:
+                      description: Match filtered records (default:*)
+                      type: string
+                    imds_version:
+                      description: Specify which version of the instance metadata
+                        service to use. Valid values are 'v1' or 'v2' (default).
+                      type: string
+                  type: object
                 filterKubernetes:
                   description: FilterKubernetes Fluent Bit Kubernetes Filter allows
                     to enrich your log files with Kubernetes metadata.
@@ -545,6 +558,8 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                livenessDefaultCheck:
+                  type: boolean
                 livenessProbe:
                   description: Probe describes a health check to be performed against
                     a container to determine whether it is alive or ready to receive

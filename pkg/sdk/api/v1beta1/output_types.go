@@ -19,6 +19,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +name:"OutputSpec"
+// +weight:"200"
+type _hugoOutputSpec interface{}
+
+// +name:"OutputSpec"
+// +version:"v1beta1"
+// +description:"OutputSpec defines the desired state of Output"
+type _metaOutputSpec interface{}
+
 // OutputSpec defines the desired state of Output
 type OutputSpec struct {
 	LoggingRef                string                            `json:"loggingRef,omitempty"`
@@ -47,6 +56,7 @@ type OutputStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=logging-all
 
 // Output is the Schema for the outputs API
 type Output struct {

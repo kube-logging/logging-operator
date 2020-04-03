@@ -1,3 +1,8 @@
+---
+title: OutputSpec
+weight: 200
+---
+
 ### OutputSpec
 #### OutputSpec defines the desired state of Output
 

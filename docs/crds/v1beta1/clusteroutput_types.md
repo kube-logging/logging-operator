@@ -1,3 +1,8 @@
+---
+title: ClusterOutput
+weight: 200
+---
+
 ### ClusterOutput
 #### ClusterOutput is the Schema for the clusteroutputs API
 

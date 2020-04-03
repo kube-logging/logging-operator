@@ -21,6 +21,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// +name:"FluentbitSpec"
+// +weight:"200"
+type _hugoFluentbitSpec interface{}
+
+// +name:"FluentbitSpec"
+// +version:"v1beta1"
+// +description:"FluentbitSpec defines the desired state of Fluentbit"
+type _metaFluentbitSpec interface{}
+
 // +kubebuilder:object:generate=true
 
 // FluentbitSpec defines the desired state of Fluentbit
@@ -42,6 +51,7 @@ type FluentbitSpec struct {
 	MountPath         string                   `json:"mountPath,omitempty"`
 	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
+	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser           string           `json:"parser,omitempty"`
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
@@ -51,6 +61,7 @@ type FluentbitSpec struct {
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                  `json:"podPriorityClassName,omitempty"`
 	LivenessProbe        *corev1.Probe           `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
 }
 
@@ -184,6 +195,14 @@ type FilterKubernetes struct {
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
 	DummyMeta string `json:"Dummy_Meta,omitempty"`
+}
+
+// FilterAws The AWS Filter Enriches logs with AWS Metadata.
+type FilterAws struct {
+	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default).
+	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
+	// Match filtered records (default:*)
+	Match string `json:"Match,omitempty" plugin:"default:*"`
 }
 
 // VolumeMount defines source and destination folders of a hostPath type pod mount

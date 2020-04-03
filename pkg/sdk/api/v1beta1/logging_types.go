@@ -24,7 +24,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
+
+// +name:"LoggingSpec"
+// +weight:"200"
+type _hugoLoggingSpec interface{}
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
@@ -32,7 +37,7 @@ import (
 // +name:"Logging"
 // +version:"v1beta1"
 // +description:"Logging system configuration"
-type _metaDetectExceptions interface{}
+type _metaLoggingSpec interface{}
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
@@ -58,7 +63,7 @@ type LoggingStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=loggings,scope=Cluster
+// +kubebuilder:resource:path=loggings,scope=Cluster,categories=logging-all
 
 // Logging is the Schema for the loggings API
 type Logging struct {
@@ -244,7 +249,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentbitSpec.Image.Repository = "fluent/fluent-bit"
 		}
 		if copy.Spec.FluentbitSpec.Image.Tag == "" {
-			copy.Spec.FluentbitSpec.Image.Tag = "1.3.8"
+			copy.Spec.FluentbitSpec.Image.Tag = "1.4.1"
 		}
 		if copy.Spec.FluentbitSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"
@@ -312,7 +317,31 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = copy.Spec.FluentbitSpec.Metrics.Path
 				copy.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", copy.Spec.FluentbitSpec.Metrics.Port)
 			}
+		} else if copy.Spec.FluentbitSpec.LivenessDefaultCheck {
+			copy.Spec.FluentbitSpec.Metrics = &Metrics{
+				Port: 2020,
+				Path: "/",
+			}
 		}
+		if copy.Spec.FluentbitSpec.LivenessProbe == nil {
+			if copy.Spec.FluentbitSpec.LivenessDefaultCheck {
+				copy.Spec.FluentbitSpec.LivenessProbe = &v1.Probe{
+					Handler: v1.Handler{
+						HTTPGet: &v1.HTTPGetAction{
+							Path: copy.Spec.FluentbitSpec.Metrics.Path,
+							Port: intstr.IntOrString{
+								IntVal: copy.Spec.FluentbitSpec.Metrics.Port,
+							},
+						}},
+					InitialDelaySeconds: 10,
+					TimeoutSeconds:      0,
+					PeriodSeconds:       10,
+					SuccessThreshold:    0,
+					FailureThreshold:    3,
+				}
+			}
+		}
+
 		if copy.Spec.FluentbitSpec.MountPath == "" {
 			copy.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}

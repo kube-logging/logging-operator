@@ -19,6 +19,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// +name:"FluentdSpec"
+// +weight:"200"
+type _hugoFluentdSpec interface{}
+
+// +name:"FluentdSpec"
+// +version:"v1beta1"
+// +description:"FluentdSpec defines the desired state of Fluentd"
+type _metaFluentdSpec interface{}
+
 // +kubebuilder:object:generate=true
 
 // FluentdSpec defines the desired state of Fluentd
