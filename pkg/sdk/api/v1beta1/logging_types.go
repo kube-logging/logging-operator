@@ -335,7 +335,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 						}},
 					InitialDelaySeconds: 10,
 					TimeoutSeconds:      0,
-					PeriodSeconds:       3,
+					PeriodSeconds:       10,
 					SuccessThreshold:    0,
 					FailureThreshold:    1,
 				}
