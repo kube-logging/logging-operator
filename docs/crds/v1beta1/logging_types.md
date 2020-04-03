@@ -1,3 +1,8 @@
+---
+title: LoggingSpec
+weight: 200
+---
+
 ### LoggingSpec
 #### LoggingSpec defines the desired state of Logging
 

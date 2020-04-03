@@ -19,6 +19,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +name:"FlowSpec"
+// +weight:"200"
+type _hugoFlowSpec interface{}
+
+// +name:"FlowSpec"
+// +version:"v1beta1"
+// +description:"FlowSpec is the Kubernetes spec for Flows"
+type _metaFlowSpec interface{}
+
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
 	// Deprecated

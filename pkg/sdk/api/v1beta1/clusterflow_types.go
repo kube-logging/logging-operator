@@ -18,6 +18,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +name:"ClusterFlow"
+// +weight:"200"
+type _hugoClusterFlow interface{}
+
+// +name:"ClusterFlow"
+// +version:"v1beta1"
+// +description:"ClusterFlow is the Schema for the clusterflows API"
+type _metaClusterFlow interface{}
+
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 
