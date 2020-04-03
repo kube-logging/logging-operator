@@ -208,6 +208,16 @@ jobs:
           image: <<parameters.image>>
           tag: latest
 
+  trigger-docs-update:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Trigger
+          command: scripts/trigger-docs-update.sh "${CIRCLE_TAG}"
+
 workflows:
   version: 2
   build:
@@ -238,6 +248,12 @@ workflows:
           filters:
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+(?:-(?:dev|rc)\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+      - trigger-docs-update:
+          filters:
+            tags:
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
             branches:
               ignore: /.*/
 
