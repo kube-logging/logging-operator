@@ -61,6 +61,7 @@ type FluentbitSpec struct {
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                  `json:"podPriorityClassName,omitempty"`
 	LivenessProbe        *corev1.Probe           `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
 }
 
