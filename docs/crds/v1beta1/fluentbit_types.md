@@ -31,6 +31,7 @@ weight: 200
 | customConfigSecret | string | No | - |  |
 | podPriorityClassName | string | No | - |  |
 | livenessProbe | *corev1.Probe | No | - |  |
+| livenessDefaultCheck | bool | No | - |  |
 | readinessProbe | *corev1.Probe | No | - |  |
 ### FluentbitTLS
 #### FluentbitTLS defines the TLS configs

@@ -558,6 +558,8 @@ spec:
                   additionalProperties:
                     type: string
                   type: object
+                livenessDefaultCheck:
+                  type: boolean
                 livenessProbe:
                   description: Probe describes a health check to be performed against
                     a container to determine whether it is alive or ready to receive
