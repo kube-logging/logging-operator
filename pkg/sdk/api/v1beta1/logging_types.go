@@ -26,13 +26,17 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +name:"LoggingSpec"
+// +weight:"200"
+type _hugoLoggingSpec interface{}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // +name:"Logging"
 // +version:"v1beta1"
 // +description:"Logging system configuration"
-type _metaDetectExceptions interface{}
+type _metaLoggingSpec interface{}
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {

@@ -115,7 +115,7 @@ func crds() {
 
 	lister.Index = docgen.NewDoc(docgen.DocItem{
 		Name:     "_index",
-		DestPath: "docs/crds",
+		DestPath: "docs/crds/v1beta1",
 	}, logger.WithName("crds"))
 
 	lister.Header = heredoc.Doc(`
@@ -123,9 +123,7 @@ func crds() {
 		title: Available CRDs
 		generated_file: true
 		---
-
-		# Available CRDs
-		
+	
 		For more information please click on the name
 		<center>
 

@@ -18,6 +18,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +name:"ClusterOutput"
+// +weight:"200"
+type _hugoClusterOutput interface{}
+
+// +name:"ClusterOutput"
+// +version:"v1beta1"
+// +description:"ClusterOutput is the Schema for the clusteroutputs API"
+type _metaClusterOutput interface{}
+
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 
