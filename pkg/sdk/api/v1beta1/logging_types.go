@@ -337,7 +337,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 					TimeoutSeconds:      0,
 					PeriodSeconds:       10,
 					SuccessThreshold:    0,
-					FailureThreshold:    1,
+					FailureThreshold:    3,
 				}
 			}
 		}
