@@ -32,7 +32,7 @@ For more information please click on the plugin name
 | **[Forward](outputs/forward/)** | outputs | Forwards events to other fluentd nodes. | GA | [more info](https://docs.fluentd.org/output/forward) |
 | **[Google Cloud Storage](outputs/gcs/)** | outputs | Store logs in Google Cloud Storage | GA | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs) |
 | **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.13.0](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.12.3) |
-| **[Amazon Kinesis](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.1](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.0) |
+| **[Amazon Kinesis](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.1](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.1) |
 | **[LogZ](outputs/logz/)** | outputs | Store logs in LogZ.io | GA | [0.0.20](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20) |
 | **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.11](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.1.8](https://github.com/newrelic/newrelic-fluentd-output) |
