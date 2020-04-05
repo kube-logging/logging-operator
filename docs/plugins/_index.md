@@ -26,7 +26,7 @@ For more information please click on the plugin name
 | **[Azure Storage](outputs/azurestore/)** | outputs | Store logs in Azure Storage | GA | [0.1.0](https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0) |
 | **[Buffer](outputs/buffer/)** | outputs | Fluentd event buffer | GA | [mode info](https://docs.fluentd.org/configuration/buffer-section) |
 | **[Amazon CloudWatch](outputs/cloudwatch/)** | outputs | Send your logs to AWS CloudWatch | GA | [0.7.6](https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.6) |
-| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.0.7](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.0.4) |
+| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.0.7](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.0.7) |
 | **[File](outputs/file/)** | outputs | Output plugin writes events to files | GA | [more info](https://docs.fluentd.org/output/file) |
 | **[Format](outputs/format/)** | outputs | Specify how to format output record. | GA | [more info](https://docs.fluentd.org/configuration/format-section) |
 | **[Forward](outputs/forward/)** | outputs | Forwards events to other fluentd nodes. | GA | [more info](https://docs.fluentd.org/output/forward) |
@@ -41,4 +41,3 @@ For more information please click on the plugin name
 | **[Splunk Hec](outputs/splunk_hec/)** | outputs | Fluent Plugin Splunk Hec Release 1.2.1 | GA | [1.2.1]() |
 | **[SumoLogic](outputs/sumologic/)** | outputs | Send your logs to Sumologic | GA | [1.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1) |
 </center>
-
