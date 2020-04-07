@@ -16,6 +16,7 @@ spec:
     listKind: ClusterOutputList
     plural: clusteroutputs
     singular: clusteroutput
+  preserveUnknownFields: false
   scope: Namespaced
   validation:
     openAPIV3Schema:
