@@ -16,6 +16,7 @@ spec:
     listKind: LoggingList
     plural: loggings
     singular: logging
+  preserveUnknownFields: false
   scope: Cluster
   subresources:
     status: {}

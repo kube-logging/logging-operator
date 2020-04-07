@@ -90,8 +90,41 @@ type ParseSection struct {
 	// Use specified timezone. one can parse/format the time value in the specified timezone. (default: nil)
 	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
+	Format string `json:"format,omitempty"`
+	// Only available when using type: multi_format
 	// +docLink:"Parse Section,#Parse-Section"
-	Patterns []ParseSection `json:"patterns,omitempty"`
+	Patterns []SingleParseSection `json:"patterns,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+// +docName:"Parse Section (single)"
+type SingleParseSection struct {
+	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt
+	Type string `json:"type,omitempty"`
+	// Regexp expression to evaluate
+	Expression string `json:"expression,omitempty"`
+	// Specify time field for event time. If the event doesn't have this field, current time is used.
+	TimeKey string `json:"time_key,omitempty"`
+	//  Specify null value pattern.
+	NullValuePattern string `json:"null_value_pattern,omitempty"`
+	// If true, empty string field is replaced with nil
+	NullEmptyString bool `json:"null_empty_string,omitempty"`
+	// If true, use Fluent::EventTime.now(current time) as a timestamp when time_key is specified.
+	EstimateCurrentEvent bool `json:"estimate_current_event,omitempty"`
+	// If true, keep time field in the record.
+	KeepTimeKey bool `json:"keep_time_key,omitempty"`
+	// Types casting the fields to proper types example: field1:type, field2:type
+	Types string `json:"types,omitempty"`
+	// Process value using specified format. This is available only when time_type is string
+	TimeFormat string `json:"time_format,omitempty"`
+	// Parse/format value according to this type available values: float, unixtime, string (default: string)
+	TimeType string `json:"time_type,omitempty"`
+	// Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
+	LocalTime bool `json:"local_time,omitempty"`
+	// If true, use UTC. Otherwise, local time is used. This is exclusive with localtime (default: false)
+	UTC bool `json:"utc,omitempty"`
+	// Use specified timezone. one can parse/format the time value in the specified timezone. (default: nil)
+	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
 }
@@ -144,7 +177,7 @@ type ParseSection struct {
 // ```
 type _expParser interface{}
 
-func (p *ParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseMeta := types.PluginMeta{
 		Directive: "pattern",
 	}

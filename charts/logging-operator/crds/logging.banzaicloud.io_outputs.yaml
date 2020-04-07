@@ -16,6 +16,7 @@ spec:
     listKind: OutputList
     plural: outputs
     singular: output
+  preserveUnknownFields: false
   scope: Namespaced
   validation:
     openAPIV3Schema:
