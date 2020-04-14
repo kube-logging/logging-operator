@@ -106,7 +106,8 @@ type ElasticsearchOutput struct {
 	// The name of the template to define. If a template by the name given is already present, it will be left unchanged, unless template_overwrite is set, in which case the template will be updated.
 	TemplateName string `json:"template_name,omitempty"`
 	// The path to the file containing the template to install.
-	TemplateFile string `json:"template_file,omitempty"`
+	// +docLink:"Secret,../secret/"
+	TemplateFile *secret.Secret `json:"template_file,omitempty"`
 	// Specify index templates in form of hash. Can contain multiple templates.
 	Templates string `json:"templates,omitempty"`
 	// Specify the string and its value to be replaced in form of hash. Can contain multiple key value pair that would be replaced in the specified template_file. This setting only creates template and to add rollover index please check the rollover_index configuration.
