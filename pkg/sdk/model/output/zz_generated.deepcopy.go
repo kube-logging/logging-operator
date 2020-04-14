@@ -126,6 +126,11 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.TemplateFile != nil {
+		in, out := &in.TemplateFile, &out.TemplateFile
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.IndexDatePattern != nil {
 		in, out := &in.IndexDatePattern, &out.IndexDatePattern
 		*out = new(string)
