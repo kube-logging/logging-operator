@@ -99,3 +99,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | bulk_message_request_threshold | string | No |  20MB | Configure bulk_message request splitting threshold size.<br>Default value is 20MB. (20 * 1024 * 1024)<br>If you specify this size as negative number, bulk_message request splitting feature will be disabled. <br> |
 | sniffer_class_name | string | No | - | The default Sniffer used by the Elasticsearch::Transport class works well when Fluentd has a direct connection to all of the Elasticsearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name<br> |
 | buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
+| enable_ilm | bool | No |  false | Enable Index Lifecycle Management (ILM). <br> |
+| ilm_policy | string | No |  {} | Specify ILM policy contents as Hash. <br> |
+| ilm_policy_id | string | No | logstash-policy | Specify ILM policy id. <br> |
+| ilm_policy_overwrite | bool | No |  false | Specify whether overwriting ilm policy or not. <br> |
