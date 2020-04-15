@@ -57,10 +57,10 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | templates | string | No | - | Specify index templates in form of hash. Can contain multiple templates.<br> |
 | customize_template | string | No | - | Specify the string and its value to be replaced in form of hash. Can contain multiple key value pair that would be replaced in the specified template_file. This setting only creates template and to add rollover index please check the rollover_index configuration.<br> |
 | rollover_index | bool | No |  false | Specify this as true when an index with rollover capability needs to be created. https://github.com/uken/fluent-plugin-elasticsearch#rollover_index<br> |
-| index_date_pattern | string | No |  now/d | Specify this to override the index date pattern for creating a rollover index.<br> |
+| index_date_pattern | *string | No |  now/d | Specify this to override the index date pattern for creating a rollover index.<br> |
 | deflector_alias | string | No | - | Specify the deflector alias which would be assigned to the rollover index created. This is useful in case of using the Elasticsearch rollover API<br> |
 | index_prefix | string | No |  logstash | Specify the index prefix for the rollover index to be created.<br> |
-| application_name | string | No |  default | Specify the application name for the rollover index to be created.<br> |
+| application_name | *string | No |  default | Specify the application name for the rollover index to be created.<br> |
 | template_overwrite | bool | No |  false | Always update the template, even if it already exists.<br> |
 | max_retry_putting_template | string | No |  10 | You can specify times of retry putting template.<br> |
 | fail_on_putting_template_retry_exceed | *bool | No | true | Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)<br> |
@@ -99,7 +99,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | bulk_message_request_threshold | string | No |  20MB | Configure bulk_message request splitting threshold size.<br>Default value is 20MB. (20 * 1024 * 1024)<br>If you specify this size as negative number, bulk_message request splitting feature will be disabled. <br> |
 | sniffer_class_name | string | No | - | The default Sniffer used by the Elasticsearch::Transport class works well when Fluentd has a direct connection to all of the Elasticsearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name<br> |
 | buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
-| enable_ilm | bool | No |  false | Enable Index Lifecycle Management (ILM). <br> |
-| ilm_policy | string | No |  {} | Specify ILM policy contents as Hash. <br> |
-| ilm_policy_id | string | No | logstash-policy | Specify ILM policy id. <br> |
-| ilm_policy_overwrite | bool | No |  false | Specify whether overwriting ilm policy or not. <br> |
+| enable_ilm | bool | No | - | Enable Index Lifecycle Management (ILM).<br> |
+| ilm_policy_id | string | No | - | Specify ILM policy id.<br> |
+| ilm_policy | string | No | - | Specify ILM policy contents as Hash.<br> |
+| ilm_policy_overwrite | bool | No | - | Specify whether overwriting ilm policy or not.<br> |
