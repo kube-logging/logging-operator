@@ -114,13 +114,13 @@ type ElasticsearchOutput struct {
 	// Specify this as true when an index with rollover capability needs to be created.(default: false) https://github.com/uken/fluent-plugin-elasticsearch#rollover_index
 	RolloverIndex bool `json:"rollover_index,omitempty"`
 	// Specify this to override the index date pattern for creating a rollover index.(default: now/d)
-	IndexDatePattern string `json:"index_date_pattern,omitempty"`
+	IndexDatePattern *string `json:"index_date_pattern,omitempty"`
 	// Specify the deflector alias which would be assigned to the rollover index created. This is useful in case of using the Elasticsearch rollover API
 	DeflectorAlias string `json:"deflector_alias,omitempty"`
 	// Specify the index prefix for the rollover index to be created.(default: logstash)
 	IndexPrefix string `json:"index_prefix,omitempty"`
 	// Specify the application name for the rollover index to be created.(default: default)
-	ApplicationName string `json:"application_name,omitempty"`
+	ApplicationName *string `json:"application_name,omitempty"`
 	// Always update the template, even if it already exists.(default: false)
 	TemplateOverwrite bool `json:"template_overwrite,omitempty"`
 	// You can specify times of retry putting template.(default: 10)
@@ -212,6 +212,14 @@ type ElasticsearchOutput struct {
 	SnifferClassName string `json:"sniffer_class_name,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// Enable Index Lifecycle Management (ILM).
+	EnableIlm bool `json:"enable_ilm,omitempty"`
+	// Specify ILM policy id.
+	IlmPolicyID string `json:"ilm_policy_id,omitempty"`
+	// Specify ILM policy contents as Hash.
+	IlmPolicy string `json:"ilm_policy,omitempty"`
+	// Specify whether overwriting ilm policy or not.
+	IlmPolicyOverwrite bool `json:"ilm_policy_overwrite,omitempty"`
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
