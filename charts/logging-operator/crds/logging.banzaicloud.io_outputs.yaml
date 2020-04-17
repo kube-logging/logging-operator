@@ -897,6 +897,9 @@ spec:
                     to the rollover index created. This is useful in case of using
                     the Elasticsearch rollover API
                   type: string
+                enable_ilm:
+                  description: Enable Index Lifecycle Management (ILM).
+                  type: boolean
                 exception_backup:
                   description: 'Indicates whether to backup chunk when ignore exception
                     occurs. (default: true)'
@@ -944,6 +947,15 @@ spec:
                     Elasticsearch::Transport::Transport::Errors::ServiceUnavailable,
                     etc.
                   type: string
+                ilm_policy:
+                  description: Specify ILM policy contents as Hash.
+                  type: string
+                ilm_policy_id:
+                  description: Specify ILM policy id.
+                  type: string
+                ilm_policy_overwrite:
+                  description: Specify whether overwriting ilm policy or not.
+                  type: boolean
                 include_index_in_url:
                   description: With this option set to true, Fluentd manifests the
                     index name in the request URL (rather than in the request body).

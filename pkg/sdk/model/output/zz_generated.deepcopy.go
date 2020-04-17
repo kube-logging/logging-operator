@@ -126,6 +126,16 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.IndexDatePattern != nil {
+		in, out := &in.IndexDatePattern, &out.IndexDatePattern
+		*out = new(string)
+		**out = **in
+	}
+	if in.ApplicationName != nil {
+		in, out := &in.ApplicationName, &out.ApplicationName
+		*out = new(string)
+		**out = **in
+	}
 	if in.FailOnPuttingTemplateRetryExceed != nil {
 		in, out := &in.FailOnPuttingTemplateRetryExceed, &out.FailOnPuttingTemplateRetryExceed
 		*out = new(bool)
