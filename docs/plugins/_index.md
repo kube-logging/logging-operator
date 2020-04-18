@@ -41,3 +41,4 @@ For more information please click on the plugin name
 | **[Splunk Hec](outputs/splunk_hec/)** | outputs | Fluent Plugin Splunk Hec Release 1.2.1 | GA | [1.2.1]() |
 | **[SumoLogic](outputs/sumologic/)** | outputs | Send your logs to Sumologic | GA | [1.6.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.6.1) |
 </center>
+
