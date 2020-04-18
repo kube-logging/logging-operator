@@ -47,7 +47,7 @@ metadata:
   name: demo-flow
 spec:
   filters:
-    - parse:
+    - parser:
         remove_key_name_field: true
         reserve_data: true
         parse:
