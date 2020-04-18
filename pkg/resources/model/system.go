@@ -101,7 +101,18 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			return nil, err
 		}
 	}
-	if len(l.Flows) == 0 && len(l.ClusterFlows) == 0 {
+	if l.logging.Spec.DefaultFlowSpec != nil {
+		flow, err := l.CreateFlowFromCustomResource(l.logging.Spec.DefaultFlowSpec)
+		if err != nil {
+			// TODO set flow status to error?
+			return nil, err
+		}
+		err = system.RegisterDefaultFlow(flow)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(l.Flows) == 0 && len(l.ClusterFlows) == 0 && l.logging.Spec.DefaultFlowSpec == nil {
 		l.logger.Info("no flows found, generating empty model")
 	}
 	return system, nil
@@ -164,10 +175,24 @@ func GetFlowMatchFromSpec(namespace string, matches interface{}) ([]types.FlowMa
 	return flowMatches, nil
 }
 
-func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
+func (l *LoggingResources) FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 	var commonFlow *CommonFlow
 	var err error
 	switch f := flowCr.(type) {
+	case *v1beta1.DefaultFlowSpec:
+		id := fmt.Sprintf("logging:%s:%s", l.logging.Namespace, l.logging.Name)
+		flow, err := types.NewFlow([]types.FlowMatch{}, id, l.logging.Name, l.logging.Namespace)
+		if err != nil {
+			return nil, err
+		}
+		return &CommonFlow{
+			Name:       l.logging.Name,
+			Namespace:  l.logging.Namespace,
+			Scope:      "",
+			OutputRefs: f.OutputRefs,
+			Filters:    f.Filters,
+			Flow:       flow,
+		}, nil
 	case v1beta1.ClusterFlow:
 		var matches []types.FlowMatch
 		commonFlow = &CommonFlow{
@@ -241,7 +266,7 @@ func FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
 }
 
 func (l *LoggingResources) CreateFlowFromCustomResource(flowCr interface{}) (*types.Flow, error) {
-	commonFlow, err := FlowDispatcher(flowCr)
+	commonFlow, err := l.FlowDispatcher(flowCr)
 	if err != nil {
 		return nil, err
 	}

@@ -41,13 +41,14 @@ type _metaLoggingSpec interface{}
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
-	LoggingRef              string         `json:"loggingRef,omitempty"`
-	FlowConfigCheckDisabled bool           `json:"flowConfigCheckDisabled,omitempty"`
-	FlowConfigOverride      string         `json:"flowConfigOverride,omitempty"`
-	FluentbitSpec           *FluentbitSpec `json:"fluentbit,omitempty"`
-	FluentdSpec             *FluentdSpec   `json:"fluentd,omitempty"`
-	WatchNamespaces         []string       `json:"watchNamespaces,omitempty"`
-	ControlNamespace        string         `json:"controlNamespace"`
+	LoggingRef              string           `json:"loggingRef,omitempty"`
+	FlowConfigCheckDisabled bool             `json:"flowConfigCheckDisabled,omitempty"`
+	FlowConfigOverride      string           `json:"flowConfigOverride,omitempty"`
+	FluentbitSpec           *FluentbitSpec   `json:"fluentbit,omitempty"`
+	FluentdSpec             *FluentdSpec     `json:"fluentd,omitempty"`
+	DefaultFlowSpec         *DefaultFlowSpec `json:"defaultFlow,omitempty"`
+	WatchNamespaces         []string         `json:"watchNamespaces,omitempty"`
+	ControlNamespace        string           `json:"controlNamespace"`
 
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
@@ -81,6 +82,14 @@ type LoggingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Logging `json:"items"`
+}
+
+// +kubebuilder:object:generate=true
+
+// DefaultFlowSpec is a Flow for logs that did not match any other Flow
+type DefaultFlowSpec struct {
+	Filters    []Filter `json:"filters,omitempty"`
+	OutputRefs []string `json:"outputRefs"`
 }
 
 // SetDefaults fill empty attributes
