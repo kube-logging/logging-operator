@@ -42,6 +42,17 @@ func (s *Builder) RegisterFlow(f *Flow) error {
 	return nil
 }
 
+func (s *Builder) RegisterDefaultFlow(f *Flow) error {
+	for _, e := range s.flows {
+		if e.FlowLabel == f.FlowLabel {
+			return errors.New("Flow already exists")
+		}
+	}
+	s.flows = append(s.flows, f)
+	s.router.Params["default_route"] = f.FlowLabel
+	return nil
+}
+
 func (s *Builder) Build() (*System, error) {
 	return &System{
 		Input:  s.input,
