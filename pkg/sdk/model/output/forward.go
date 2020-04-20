@@ -34,7 +34,7 @@ type _metaForward interface{}
 // +kubebuilder:object:generate=true
 type ForwardOutput struct {
 	// Server definitions at least one is required
-	// +docLink:"Server,#Fluentd-Server"
+	// +docLink:"Server,#fluentd-server"
 	FluentdServers []FluentdServer `json:"servers"`
 	// Change the protocol to at-least-once. The plugin waits the ack from destination's in_forward plugin.
 	RequireAckResponse bool `json:"require_ack_response,omitempty"`
