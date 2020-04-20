@@ -27,7 +27,6 @@ type _hugoLogZ interface{}
 
 // +docName:"LogZ output plugin for Fluentd"
 //More info at https://github.com/logzio/fluent-plugin-logzio
-//>Example Deployment: [Save all logs to LogZ](../../..//quickstarts/example-logz/)
 //
 // #### Example output configurations
 // ```
