@@ -92,7 +92,7 @@ type ForwardOutput struct {
 	Keepalive bool `json:"keepalive,omitempty"`
 	// Expired time of keepalive. Default value is nil, which means to keep connection as long as possible. (default: 0)
 	KeepaliveTimeout int `json:"keepalive_timeout,omitempty"`
-	// +docLink:"Security,/docs/plugins/common/security/"
+	// +docLink:"Security,../../common/security/"
 	Security *common.Security `json:"security,omitempty"`
 	// Verify that a connection can be made with one of out_forward nodes at the time of startup. (default: false)
 	VerifyConnectionAtStartup bool `json:"verify_connection_at_startup,omitempty"`
