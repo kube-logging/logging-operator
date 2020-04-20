@@ -16,7 +16,7 @@ if [ ! -e ${BUFFER_PATH} ];
 then
   exit 1;
 fi;
-touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
+touch -d date -d "@$(($(date +%s) - $LIVENESS_THRESHOLD_SECONDS))" /tmp/marker-liveness;
 if [ -z "$(find ${BUFFER_PATH} -type d -newer /tmp/marker-liveness -print -quit)" ];
 then
   exit 1;
