@@ -37,7 +37,7 @@ type _metaPrometheus interface{}
 
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
-	// +docLink:"Metrics Section,#Metrics-Section"
+	// +docLink:"Metrics Section,#metrics-section"
 	Metrics []MetricSection `json:"metrics,omitempty"`
 	Labels  Label           `json:"labels,omitempty"`
 }
