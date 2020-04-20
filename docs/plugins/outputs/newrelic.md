@@ -6,7 +6,6 @@ weight: 200
 # New Relic Logs plugin for Fluentd
 ## Overview
 **newrelic** output plugin send log data to New Relic Logs
->Example: [New Relic Output Deployment](../../../quickstarts/example-newrelic/)
 
  #### Example output configurations
  ```
