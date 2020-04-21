@@ -13,6 +13,7 @@ weight: 200
 | flowConfigOverride | string | No | - |  |
 | fluentbit | *FluentbitSpec | No | - |  |
 | fluentd | *FluentdSpec | No | - |  |
+| defaultFlow | *DefaultFlowSpec | No | - |  |
 | watchNamespaces | []string | No | - |  |
 | controlNamespace | string | Yes | - |  |
 | enableRecreateWorkloadOnImmutableFieldChange | bool | No | - | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the<br>fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)<br>in case there is a change in an immutable field<br>that otherwise couldn't be managed with a simple update.<br> |
@@ -39,3 +40,10 @@ weight: 200
 |  | metav1.TypeMeta | Yes | - |  |
 | metadata | metav1.ListMeta | No | - |  |
 | items | []Logging | Yes | - |  |
+### DefaultFlowSpec
+#### DefaultFlowSpec is a Flow for logs that did not match any other Flow
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| filters | []Filter | No | - |  |
+| outputRefs | []string | Yes | - |  |

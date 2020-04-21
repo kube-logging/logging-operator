@@ -53,7 +53,7 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | target_index_key | string | No | - | Tell this plugin to find the index name to write to in the record under this key in preference to other mechanisms. Key can be specified as path to nested record using dot ('.') as a separator. https://github.com/uken/fluent-plugin-elasticsearch#target_index_key<br> |
 | target_type_key | string | No |  fluentd | Similar to target_index_key config, find the type name to write to in the record under this key (or nested record). If key not found in record - fallback to type_name.<br> |
 | template_name | string | No | - | The name of the template to define. If a template by the name given is already present, it will be left unchanged, unless template_overwrite is set, in which case the template will be updated.<br> |
-| template_file | string | No | - | The path to the file containing the template to install.<br> |
+| template_file | *secret.Secret | No | - | The path to the file containing the template to install.<br>[Secret](../secret/)<br> |
 | templates | string | No | - | Specify index templates in form of hash. Can contain multiple templates.<br> |
 | customize_template | string | No | - | Specify the string and its value to be replaced in form of hash. Can contain multiple key value pair that would be replaced in the specified template_file. This setting only creates template and to add rollover index please check the rollover_index configuration.<br> |
 | rollover_index | bool | No |  false | Specify this as true when an index with rollover capability needs to be created. https://github.com/uken/fluent-plugin-elasticsearch#rollover_index<br> |

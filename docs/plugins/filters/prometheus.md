@@ -11,7 +11,7 @@ weight: 200
 ### PrometheusConfig
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| metrics | []MetricSection | No | - | [Metrics Section](#Metrics-Section)<br> |
+| metrics | []MetricSection | No | - | [Metrics Section](#metrics-section)<br> |
 | labels | Label | No | - |  |
 ### Metrics Section
 | Variable Name | Type | Required | Default | Description |

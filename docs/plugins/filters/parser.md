@@ -19,7 +19,7 @@ weight: 200
 | inject_key_prefix | string | No | - | Store parsed values with specified key name prefix.<br> |
 | hash_value_field | string | No | - | Store parsed values as a hash value in a field.<br> |
 | emit_invalid_record_to_error | bool | No | - | Emit invalid record to @ERROR label. Invalid cases are: key not exist, format is not matched, unexpected error<br> |
-| parse | ParseSection | No | - | [Parse Section](#Parse-Section)<br> |
+| parse | ParseSection | No | - | [Parse Section](#parse-section)<br> |
 | parsers | []ParseSection | No | - | Deprecated, use `parse` instead<br> |
 ### Parse Section
 | Variable Name | Type | Required | Default | Description |
@@ -38,7 +38,7 @@ weight: 200
 | utc | bool | No |  false | If true, use UTC. Otherwise, local time is used. This is exclusive with localtime <br> |
 | timezone | string | No |  nil | Use specified timezone. one can parse/format the time value in the specified timezone. <br> |
 | format | string | No | - | Only available when using type: multi_format<br> |
-| patterns | []SingleParseSection | No | - | Only available when using type: multi_format<br>[Parse Section](#Parse-Section)<br> |
+| patterns | []SingleParseSection | No | - | Only available when using type: multi_format<br>[Parse Section](#parse-section)<br> |
 ### Parse Section (single)
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
