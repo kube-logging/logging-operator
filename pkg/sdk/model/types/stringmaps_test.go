@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"emperror.dev/errors"
@@ -71,6 +72,67 @@ func TestJsonTagsWithDefaultsAndOmitempty(t *testing.T) {
 	}
 	if !reflect.DeepEqual(expected, actual) {
 		t.Fatalf("failed to match expected %+v with %+v", expected, actual)
+	}
+}
+
+func TestSliceFields(t *testing.T) {
+	type Asd struct {
+		Field1 []string `json:"field1,omitempty"`
+		Field2 []string `json:"field2" plugin:"default:item1"`
+		Field3 []int    `json:"field3,omitempty"`
+		Field4 []int    `json:"field4" plugin:"default:1"`
+	}
+
+	tests := []struct {
+		source   Asd
+		expected map[string]string
+	}{
+		{
+			source: Asd{},
+			expected: map[string]string{
+				"field2": `["item1"]`,
+				"field4": "[1]",
+			},
+		},
+		{
+			source: Asd{
+				Field1: []string{"item1", "item2"},
+				Field2: []string{"item3"},
+				Field3: []int{1, 2},
+				Field4: []int{3},
+			},
+			expected: map[string]string{
+				"field1": `["item1","item2"]`,
+				"field2": `["item3"]`,
+				"field3": "[1,2]",
+				"field4": "[3]",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(tt.source)
+		if err != nil {
+			t.Fatalf("%+v", err)
+		}
+		if !reflect.DeepEqual(tt.expected, actual) {
+			t.Fatalf("failed to match expected %+v with %+v", tt.expected, actual)
+		}
+	}
+}
+
+func TestInvalidSliceDefault(t *testing.T) {
+	expectedError := `can't unmarshal field: "field1" value: "[str]"`
+	type Asd struct {
+		Field1 []int `json:"field1" plugin:"default:str"`
+	}
+	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	if err == nil {
+		t.Fatalf("required error is expected")
+	} else {
+		if !strings.HasPrefix(err.Error(), expectedError) {
+			t.Fatalf("error message `%s` does not have expected prefix `%s`", err.Error(), expectedError)
+		}
 	}
 }
 
