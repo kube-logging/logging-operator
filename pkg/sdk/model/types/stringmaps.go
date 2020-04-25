@@ -150,20 +150,31 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 				out[name] = finalVal
 			}
 		case reflect.Slice:
-			if stringSlice, ok := v.Interface().([]string); ok {
-				if len(stringSlice) > 0 {
-					b, err := json.Marshal(stringSlice)
+			switch actual := v.Interface().(type) {
+			case []string, []int:
+				if v.Len() > 0 {
+					b, err := json.Marshal(actual)
 					if err != nil {
-						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, stringSlice), err)
+						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, actual), err)
 					}
 					out[name] = string(b)
 				} else {
 					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
-						b, err := json.Marshal(strings.Split(def, ","))
-						if err != nil {
-							multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
+						if _, ok := actual.([]string); ok {
+							b, err := json.Marshal(strings.Split(def, ","))
+							if err != nil {
+								multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
+							} else {
+								out[name] = string(b)
+							}
+						} else {
+							sliceStr := fmt.Sprintf("[%s]", def)
+							if err := json.Unmarshal([]byte(sliceStr), &actual); err != nil {
+								multierror = errors.Combine(multierror, errors.Errorf("can't unmarshal field: %q value: %q", name, sliceStr), err)
+							} else {
+								out[name] = sliceStr
+							}
 						}
-						out[name] = string(b)
 					}
 				}
 			}

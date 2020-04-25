@@ -25,6 +25,7 @@ weight: 200
 | kinesisStream | *output.KinesisStreamOutputConfig | No | - |  |
 | newrelic | *output.NewRelicOutputConfig | No | - |  |
 | splunkHec | *output.SplunkHecOutput | No | - |  |
+| http | *output.HTTPOutputConfig | No | - |  |
 ### OutputStatus
 #### OutputStatus defines the observed state of Output
 
