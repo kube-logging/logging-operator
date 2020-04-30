@@ -138,16 +138,20 @@ func GetFlowMatchFromSpec(namespace string, matches interface{}) ([]types.FlowMa
 			}
 			if match.Select != nil {
 				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:     match.Select.Labels,
-					Namespaces: []string{namespace},
-					Negate:     false,
+					Labels:         match.Select.Labels,
+					ContainerNames: match.Select.ContainerNames,
+					Hosts:          match.Select.Hosts,
+					Namespaces:     []string{namespace},
+					Negate:         false,
 				})
 			}
 			if match.Exclude != nil {
 				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:     match.Exclude.Labels,
-					Namespaces: []string{namespace},
-					Negate:     true,
+					Labels:         match.Exclude.Labels,
+					ContainerNames: match.Exclude.ContainerNames,
+					Hosts:          match.Exclude.Hosts,
+					Namespaces:     []string{namespace},
+					Negate:         true,
 				})
 			}
 		}
@@ -158,16 +162,20 @@ func GetFlowMatchFromSpec(namespace string, matches interface{}) ([]types.FlowMa
 			}
 			if match.ClusterSelect != nil {
 				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:     match.ClusterSelect.Labels,
-					Namespaces: match.ClusterSelect.Namespaces,
-					Negate:     false,
+					Labels:         match.ClusterSelect.Labels,
+					ContainerNames: match.ClusterSelect.ContainerNames,
+					Hosts:          match.ClusterSelect.Hosts,
+					Namespaces:     match.ClusterSelect.Namespaces,
+					Negate:         false,
 				})
 			}
 			if match.ClusterExclude != nil {
 				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:     match.ClusterExclude.Labels,
-					Namespaces: match.ClusterExclude.Namespaces,
-					Negate:     true,
+					Labels:         match.ClusterExclude.Labels,
+					ContainerNames: match.ClusterExclude.ContainerNames,
+					Hosts:          match.ClusterExclude.Hosts,
+					Namespaces:     match.ClusterExclude.Namespaces,
+					Negate:         true,
 				})
 			}
 		}
