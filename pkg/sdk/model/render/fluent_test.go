@@ -261,6 +261,31 @@ func TestRenderDirective(t *testing.T) {
 			// run multiple times to make sure the label is stable
 			reproduce: 10,
 		},
+		{
+			name: "namespaced router with labels",
+			directive: types.NewRouter("test", nil).
+				AddRoute(
+					newComplexFlow("test", map[string]string{"a": "b", "c": "d"}, []string{"host1", "host2"}, []string{"container1", "c2"}, false),
+				),
+			expected: heredoc.Doc(`
+            <match **>
+              @type label_router
+              @id test
+              <route>
+                @label @092f5fa58e4f619d739f5b65f2ed38bc
+        		  <match>
+                    container_names container1,c2
+                    hosts host1,host2
+        		    labels a:b,c:d
+        		    namespaces test
+        		    negate false
+        		  </match>
+              </route>
+            </match>`,
+			),
+			// run multiple times to make sure the label is stable
+			reproduce: 10,
+		},
 	}
 	for _, test := range tests {
 		for i := 0; i <= test.reproduce; i++ {
@@ -590,6 +615,24 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 
 func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
 	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "", "")
+	if err != nil {
+		panic(err)
+	}
+	return flowObj
+}
+
+func newComplexFlow(namespace string, labels map[string]string, hosts []string, containerNames []string, negate bool) *types.Flow {
+	flowObj, err := types.NewFlow(
+		[]types.FlowMatch{
+			{
+				Labels:         labels,
+				Namespaces:     []string{namespace},
+				ContainerNames: containerNames,
+				Hosts:          hosts,
+				Negate:         negate,
+			},
+		},
+		"", "", "")
 	if err != nil {
 		panic(err)
 	}
