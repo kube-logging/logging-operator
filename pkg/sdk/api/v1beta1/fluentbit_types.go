@@ -34,16 +34,18 @@ type _metaFluentbitSpec interface{}
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations map[string]string           `json:"annotations,omitempty"`
-	Labels      map[string]string           `json:"labels,omitempty"`
-	Image       ImageSpec                   `json:"image,omitempty"`
-	TLS         FluentbitTLS                `json:"tls,omitempty"`
-	TargetHost  string                      `json:"targetHost,omitempty"`
-	TargetPort  int32                       `json:"targetPort,omitempty"`
-	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
-	Tolerations []corev1.Toleration         `json:"tolerations,omitempty"`
-	Metrics     *Metrics                    `json:"metrics,omitempty"`
-	Security    *Security                   `json:"security,omitempty"`
+	Annotations  map[string]string           `json:"annotations,omitempty"`
+	Labels       map[string]string           `json:"labels,omitempty"`
+	Image        ImageSpec                   `json:"image,omitempty"`
+	TLS          FluentbitTLS                `json:"tls,omitempty"`
+	TargetHost   string                      `json:"targetHost,omitempty"`
+	TargetPort   int32                       `json:"targetPort,omitempty"`
+	Resources    corev1.ResourceRequirements `json:"resources,omitempty"`
+	Tolerations  []corev1.Toleration         `json:"tolerations,omitempty"`
+	NodeSelector map[string]string           `json:"nodeSelector,omitempty"`
+	Affinity     *corev1.Affinity            `json:"affinity,omitempty"`
+	Metrics      *Metrics                    `json:"metrics,omitempty"`
+	Security     *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
 	// Deprecated, use positiondb

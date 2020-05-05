@@ -68,6 +68,8 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
 					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
+					NodeSelector:       r.Logging.Spec.FluentbitSpec.NodeSelector,
+					Affinity:           r.Logging.Spec.FluentbitSpec.Affinity,
 					PriorityClassName:  r.Logging.Spec.FluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.FSGroup,

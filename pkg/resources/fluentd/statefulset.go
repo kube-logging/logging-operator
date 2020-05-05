@@ -90,6 +90,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				},
 				NodeSelector:      r.Logging.Spec.FluentdSpec.NodeSelector,
 				Tolerations:       r.Logging.Spec.FluentdSpec.Tolerations,
+				Affinity:          r.Logging.Spec.FluentdSpec.Affinity,
 				PriorityClassName: r.Logging.Spec.FluentdSpec.PodPriorityClassName,
 				SecurityContext: &corev1.PodSecurityContext{
 					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
