@@ -52,6 +52,7 @@ type FluentdSpec struct {
 	Port                 int32                       `json:"port,omitempty"`
 	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
 	NodeSelector         map[string]string           `json:"nodeSelector,omitempty"`
+	Affinity             *corev1.Affinity            `json:"affinity,omitempty"`
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
