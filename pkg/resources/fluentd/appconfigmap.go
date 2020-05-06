@@ -249,6 +249,9 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 			},
 		},
 	}
+	if r.Logging.Spec.FluentdSpec.ConfigCheckAnnotations != nil {
+		pod.Annotations = r.Logging.Spec.FluentdSpec.ConfigCheckAnnotations
+	}
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
 			Name: "fluentd-tls",

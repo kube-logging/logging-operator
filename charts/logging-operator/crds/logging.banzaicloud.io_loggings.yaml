@@ -3683,6 +3683,10 @@ spec:
                           type: object
                       type: object
                   type: object
+                configCheckAnnotations:
+                  additionalProperties:
+                    type: string
+                  type: object
                 configReloaderImage:
                   description: ImageSpec struct hold information about image specification
                   properties:
