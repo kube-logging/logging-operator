@@ -16,6 +16,8 @@ weight: 200
 | targetPort | int32 | No | - |  |
 | resources | corev1.ResourceRequirements | No | - |  |
 | tolerations | []corev1.Toleration | No | - |  |
+| nodeSelector | map[string]string | No | - |  |
+| affinity | *corev1.Affinity | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | positiondb | volume.KubernetesVolume | No | - | [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types)<br> |

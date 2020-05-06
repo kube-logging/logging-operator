@@ -25,6 +25,7 @@ weight: 200
 | port | int32 | No | - |  |
 | tolerations | []corev1.Toleration | No | - |  |
 | nodeSelector | map[string]string | No | - |  |
+| affinity | *corev1.Affinity | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | scaling | *FluentdScaling | No | - |  |
