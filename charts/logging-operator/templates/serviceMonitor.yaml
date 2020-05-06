@@ -1,0 +1,19 @@
+{{ if .Values.monitoring.serviceMonitor.Enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "logging-operator.fullname" . }}
+  namespace: {{ include "logging-operator.namespace" . }}
+  labels:
+{{ include "logging-operator.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+{{ include "logging-operator.labels" . | indent 6 }}
+  endpoints:
+  - port: http
+    path: /metrics
+  namespaceSelector:
+    matchNames:
+    - {{ include "logging-operator.namespace" . }}
+{{- end }}
