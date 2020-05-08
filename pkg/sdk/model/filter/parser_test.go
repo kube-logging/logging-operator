@@ -86,3 +86,42 @@ parse:
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }
+
+func TestParserMultiLineParser(t *testing.T) {
+	CONFIG := []byte(`
+remove_key_name_field: true
+reserve_data: true
+parse:
+  type: multiline
+  format_firstline: '/^Started/'
+  multiline:
+  - '/Started (?<method>[^ ]+) "(?<path>[^"]+)" for (?<host>[^ ]+) at (?<time>[^ ]+ [^ ]+ [^ ]+)\n/'
+  - '/Processing by (?<controller>[^\u0023]+)\u0023(?<controller_method>[^ ]+) as (?<format>[^ ]+?)\n/'
+  - '/(  Parameters: (?<parameters>[^ ]+)\n)?/'
+  - '/  Rendered (?<template>[^ ]+) within (?<layout>.+) \([\d\.]+ms\)\n/'
+  - '/Completed (?<code>[^ ]+) [^ ]+ in (?<runtime>[\d\.]+)ms \(Views: (?<view_runtime>[\d\.]+)ms \| ActiveRecord: (?<ar_runtime>[\d\.]+)ms\)/'
+`)
+
+	expected := `
+<filter **>
+  @type parser
+  @id test
+  key_name message
+  remove_key_name_field true
+  reserve_data true
+  <parse>
+    @type multiline
+    format1 /Started (?<method>[^ ]+) "(?<path>[^"]+)" for (?<host>[^ ]+) at (?<time>[^ ]+ [^ ]+ [^ ]+)\n/
+    format2 /Processing by (?<controller>[^\u0023]+)\u0023(?<controller_method>[^ ]+) as (?<format>[^ ]+?)\n/
+    format3 /(  Parameters: (?<parameters>[^ ]+)\n)?/
+    format4 /  Rendered (?<template>[^ ]+) within (?<layout>.+) \([\d\.]+ms\)\n/
+    format5 /Completed (?<code>[^ ]+) [^ ]+ in (?<runtime>[\d\.]+)ms \(Views: (?<view_runtime>[\d\.]+)ms \| ActiveRecord: (?<ar_runtime>[\d\.]+)ms\)/
+    format_firstline /^Started/
+  </parse>
+</filter>
+`
+	parser := &filter.ParserConfig{}
+	yaml.Unmarshal(CONFIG, parser)
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
+}
