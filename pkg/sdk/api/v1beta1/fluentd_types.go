@@ -32,11 +32,12 @@ type _metaFluentdSpec interface{}
 
 // FluentdSpec defines the desired state of Fluentd
 type FluentdSpec struct {
-	Annotations map[string]string `json:"annotations,omitempty"`
-	Labels      map[string]string `json:"labels,omitempty"`
-	TLS         FluentdTLS        `json:"tls,omitempty"`
-	Image       ImageSpec         `json:"image,omitempty"`
-	DisablePvc  bool              `json:"disablePvc,omitempty"`
+	Annotations            map[string]string `json:"annotations,omitempty"`
+	ConfigCheckAnnotations map[string]string `json:"configCheckAnnotations,omitempty"`
+	Labels                 map[string]string `json:"labels,omitempty"`
+	TLS                    FluentdTLS        `json:"tls,omitempty"`
+	Image                  ImageSpec         `json:"image,omitempty"`
+	DisablePvc             bool              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
@@ -52,6 +53,7 @@ type FluentdSpec struct {
 	Port                 int32                       `json:"port,omitempty"`
 	Tolerations          []corev1.Toleration         `json:"tolerations,omitempty"`
 	NodeSelector         map[string]string           `json:"nodeSelector,omitempty"`
+	Affinity             *corev1.Affinity            `json:"affinity,omitempty"`
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`

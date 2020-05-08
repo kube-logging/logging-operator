@@ -9,6 +9,7 @@ weight: 200
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | annotations | map[string]string | No | - |  |
+| configCheckAnnotations | map[string]string | No | - |  |
 | labels | map[string]string | No | - |  |
 | tls | FluentdTLS | No | - |  |
 | image | ImageSpec | No | - |  |
@@ -25,6 +26,7 @@ weight: 200
 | port | int32 | No | - |  |
 | tolerations | []corev1.Toleration | No | - |  |
 | nodeSelector | map[string]string | No | - |  |
+| affinity | *corev1.Affinity | No | - |  |
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | scaling | *FluentdScaling | No | - |  |

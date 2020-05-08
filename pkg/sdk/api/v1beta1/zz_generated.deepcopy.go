@@ -636,6 +636,18 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.NodeSelector != nil {
+		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.Affinity != nil {
+		in, out := &in.Affinity, &out.Affinity
+		*out = new(v1.Affinity)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Metrics != nil {
 		in, out := &in.Metrics, &out.Metrics
 		*out = new(Metrics)
@@ -728,6 +740,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 			(*out)[key] = val
 		}
 	}
+	if in.ConfigCheckAnnotations != nil {
+		in, out := &in.ConfigCheckAnnotations, &out.ConfigCheckAnnotations
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
 		*out = make(map[string]string, len(*in))
@@ -769,6 +788,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		for key, val := range *in {
 			(*out)[key] = val
 		}
+	}
+	if in.Affinity != nil {
+		in, out := &in.Affinity, &out.Affinity
+		*out = new(v1.Affinity)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Metrics != nil {
 		in, out := &in.Metrics, &out.Metrics
