@@ -15,6 +15,9 @@
 package fluentbit
 
 import (
+	"fmt"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
@@ -39,6 +42,14 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 				ReadOnly:   vMnt.ReadOnly,
 			})
 		}
+
+		r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
+			fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+
+		allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+			PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
+			ReadOnly:   false,
+		})
 
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
