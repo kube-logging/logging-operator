@@ -38,6 +38,8 @@ weight: 200
 | utc | bool | No |  false | If true, use UTC. Otherwise, local time is used. This is exclusive with localtime <br> |
 | timezone | string | No |  nil | Use specified timezone. one can parse/format the time value in the specified timezone. <br> |
 | format | string | No | - | Only available when using type: multi_format<br> |
+| format_firstline | string | No | - | Only available when using type: multi_format<br> |
+| multiline | []string | No | - | The multiline parser plugin parses multiline logs.<br> |
 | patterns | []SingleParseSection | No | - | Only available when using type: multi_format<br>[Parse Section](#parse-section)<br> |
 ### Parse Section (single)
 | Variable Name | Type | Required | Default | Description |
