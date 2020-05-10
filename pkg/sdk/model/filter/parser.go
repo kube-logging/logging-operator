@@ -15,6 +15,8 @@
 package filter
 
 import (
+	"fmt"
+
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
@@ -91,6 +93,10 @@ type ParseSection struct {
 	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
+	// Only available when using type: multi_format
+	FormatFirstline string `json:"format_firstline,omitempty"`
+	// The multiline parser plugin parses multiline logs.
+	Multiline []string `json:"multiline,omitempty"`
 	// Only available when using type: multi_format
 	// +docLink:"Parse Section,#parse-section"
 	Patterns []SingleParseSection `json:"patterns,omitempty"`
@@ -194,10 +200,19 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 	}
 	section := p.DeepCopy()
 	section.Type = ""
+	section.Multiline = nil
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(section); err != nil {
 		return nil, err
 	} else {
 		parseSection.Params = params
+	}
+	if len(p.Multiline) > 0 && p.Type == "multiline" {
+		parseSection.Params["format_firstline"] = p.FormatFirstline
+		for i, v := range p.Multiline {
+			var key string
+			key = fmt.Sprintf("format%d", i+1)
+			parseSection.Params[key] = v
+		}
 	}
 	if len(section.Patterns) > 0 {
 		for _, parseRule := range section.Patterns {
