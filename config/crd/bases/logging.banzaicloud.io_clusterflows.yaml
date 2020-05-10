@@ -322,6 +322,9 @@ spec:
                           format:
                             description: 'Only available when using type: multi_format'
                             type: string
+                          format_firstline:
+                            description: 'Only available when using type: multi_format'
+                            type: string
                           keep_time_key:
                             description: If true, keep time field in the record.
                             type: boolean
@@ -329,6 +332,12 @@ spec:
                             description: 'Ff true, use local time. Otherwise, UTC
                               is used. This is exclusive with utc. (default: true)'
                             type: boolean
+                          multiline:
+                            description: The multiline parser plugin parses multiline
+                              logs.
+                            items:
+                              type: string
+                            type: array
                           null_empty_string:
                             description: If true, empty string field is replaced with
                               nil
@@ -446,6 +455,9 @@ spec:
                             format:
                               description: 'Only available when using type: multi_format'
                               type: string
+                            format_firstline:
+                              description: 'Only available when using type: multi_format'
+                              type: string
                             keep_time_key:
                               description: If true, keep time field in the record.
                               type: boolean
@@ -453,6 +465,12 @@ spec:
                               description: 'Ff true, use local time. Otherwise, UTC
                                 is used. This is exclusive with utc. (default: true)'
                               type: boolean
+                            multiline:
+                              description: The multiline parser plugin parses multiline
+                                logs.
+                              items:
+                                type: string
+                              type: array
                             null_empty_string:
                               description: If true, empty string field is replaced
                                 with nil
