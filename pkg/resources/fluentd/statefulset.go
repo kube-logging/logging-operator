@@ -162,7 +162,7 @@ func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
 			"-volume-dir=/fluentd/app-config/",
-			"-webhook-url=http://127.0.0.1:24444/api/config.gracefulReload",
+			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
 		},
 		VolumeMounts: []corev1.VolumeMount{
 			{
