@@ -44,6 +44,7 @@ http:
   # Service definition for query http service
   service:
     type: ClusterIP
+    clusterIP: ""
     # Annotations to query http service
     annotations: {}
     # Labels to query http service
@@ -71,3 +72,8 @@ securityContext: {}
 ## Operator priorityClassName
 ##
 priorityClassName: {}
+
+monitoring:
+  # Create a Prometheus Operator ServiceMonitor object
+  serviceMonitor:
+    enabled: false
