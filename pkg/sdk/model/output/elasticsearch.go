@@ -74,6 +74,17 @@ type ElasticsearchOutput struct {
 	SslVerify *bool `json:"ssl_verify,omitempty" plugin:"default:true"`
 	// If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
 	SslVersion string `json:"ssl_version,omitempty"`
+	// Specify min/max SSL/TLS version
+	SslMaxVersion string `json:"ssl_max_version,omitempty"`
+	SslMInVersion string `json:"ssl_min_version,omitempty"`
+	// CA certificate
+	SSLCACert *secret.Secret `json:"ca_file,omitempty"`
+	// Client certificate
+	SSLClientCert *secret.Secret `json:"client_cert,omitempty"`
+	// Client certificate key
+	SSLClientCertKey *secret.Secret `json:"client_key,omitempty"`
+	// Client key password
+	SSLClientCertKeyPass *secret.Secret `json:"client_key_pass,omitempty"`
 	// Enable Logstash log format.(default: false)
 	LogstashFormat bool `json:"logstash_format,omitempty"`
 	// Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.(default: false)

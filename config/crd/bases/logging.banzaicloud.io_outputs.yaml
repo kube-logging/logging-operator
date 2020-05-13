@@ -872,6 +872,214 @@ spec:
                     this size as negative number, bulk_message request splitting feature
                     will be disabled. (default: 20MB)'
                   type: string
+                ca_file:
+                  description: CA certificate
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
+                client_cert:
+                  description: Client certificate
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
+                client_key:
+                  description: Client certificate key
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
+                client_key_pass:
+                  description: Client key password
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
                 content_type:
                   description: 'With content_type application/x-ndjson, elasticsearch
                     plugin adds application/x-ndjson as Content-Type in payload. (default:
@@ -1146,6 +1354,11 @@ spec:
                     is a new Fluent::Plugin::ElasticsearchSimpleSniffer class which
                     reuses the hosts given in the configuration, which is typically
                     the hostname of the load balancer or proxy. https://github.com/uken/fluent-plugin-elasticsearch#sniffer-class-name
+                  type: string
+                ssl_max_version:
+                  description: Specify min/max SSL/TLS version
+                  type: string
+                ssl_min_version:
                   type: string
                 ssl_verify:
                   description: 'Skip ssl verification (default: true)'
