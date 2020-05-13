@@ -76,7 +76,7 @@ type ElasticsearchOutput struct {
 	SslVersion string `json:"ssl_version,omitempty"`
 	// Specify min/max SSL/TLS version
 	SslMaxVersion string `json:"ssl_max_version,omitempty"`
-	SslMInVersion string `json:"ssl_min_version,omitempty"`
+	SslMinVersion string `json:"ssl_min_version,omitempty"`
 	// CA certificate
 	SSLCACert *secret.Secret `json:"ca_file,omitempty"`
 	// Client certificate
