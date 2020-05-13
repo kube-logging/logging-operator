@@ -44,6 +44,9 @@ watchNamespaces: []
 # Control namespace that contains ClusterOutput and ClusterFlow resources
 controlNamespace: ""
 
+# defaultFlow
+defaultFlow: {}
+
 # ClusterFlows to deploy
 clusterFlows: []
 
