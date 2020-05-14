@@ -29,10 +29,11 @@ RUN apk update \
  && gem install fluentd -v 1.10.3 \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
+ # Until this lock fluentd '< 1.10' https://github.com/fabric8io/fluent-plugin-kubernetes_metadata_filter/blob/master/fluent-plugin-kubernetes_metadata_filter.gemspec#L22
+ && gem install fluent-plugin-kubernetes_metadata_filter -v 2.4.5 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
-         fluent-plugin-kubernetes_metadata_filter \
          fluent-plugin-webhdfs \
          fluent-plugin-elasticsearch \
          fluent-plugin-prometheus \
