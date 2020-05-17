@@ -38,6 +38,12 @@ More info at https://github.com/uken/fluent-plugin-elasticsearch
 | scheme | string | No |  http | Connection scheme <br> |
 | ssl_verify | *bool | No | true | Skip ssl verification (default: true)<br> |
 | ssl_version | string | No | - | If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]<br> |
+| ssl_max_version | string | No | - | Specify min/max SSL/TLS version<br> |
+| ssl_min_version | string | No | - |  |
+| ca_file | *secret.Secret | No | - | CA certificate<br> |
+| client_cert | *secret.Secret | No | - | Client certificate<br> |
+| client_key | *secret.Secret | No | - | Client certificate key<br> |
+| client_key_pass | *secret.Secret | No | - | Client key password<br> |
 | logstash_format | bool | No |  false | Enable Logstash log format.<br> |
 | include_timestamp | bool | No |  false | Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in Elasticsearch and utilize the rollover API.<br> |
 | logstash_prefix | string | No |  logstash | Set the Logstash prefix.<br> |
