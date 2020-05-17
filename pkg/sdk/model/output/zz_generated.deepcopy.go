@@ -121,6 +121,26 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.SSLCACert != nil {
+		in, out := &in.SSLCACert, &out.SSLCACert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCert != nil {
+		in, out := &in.SSLClientCert, &out.SSLClientCert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCertKey != nil {
+		in, out := &in.SSLClientCertKey, &out.SSLClientCertKey
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SSLClientCertKeyPass != nil {
+		in, out := &in.SSLClientCertKeyPass, &out.SSLClientCertKeyPass
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.UtcIndex != nil {
 		in, out := &in.UtcIndex, &out.UtcIndex
 		*out = new(bool)
