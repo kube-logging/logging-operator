@@ -53,8 +53,8 @@ type _hugoCloudWatch interface{}
 type _docCloudWatch interface{}
 
 // +name:"Amazon CloudWatch"
-// +url:"https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/tag/v0.7.6"
-// +version:"0.7.6"
+// +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.9.4"
+// +version:"0.9.4"
 // +description:"Send your logs to AWS CloudWatch"
 // +status:"GA"
 type _metaCloudWatch interface{}

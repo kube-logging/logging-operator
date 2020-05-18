@@ -39,9 +39,9 @@ type _hugoSplunk interface{}
 type _docSplunkHec interface{}
 
 // +name:"Splunk Hec"
-// +url:"https://github.com/splunk/fluent-plugin-splunk-hec/releases/tag/1.2.1
-// +version:"1.2.1"
-// +description:"Fluent Plugin Splunk Hec Release 1.2.1"
+// +url:"https://github.com/splunk/fluent-plugin-splunk-hec/releases/tag/1.2.2
+// +version:"1.2.2"
+// +description:"Fluent Plugin Splunk Hec Release 1.2.2"
 // +status:"GA"
 type _metaSplunkHec interface{}
 
