@@ -54,8 +54,8 @@ type _hugoS3 interface{}
 type _docS3 interface{}
 
 // +name:"Amazon S3"
-// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.3.0"
-// +version:"1.3.0"
+// +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.3.1"
+// +version:"1.3.1"
 // +description:"Store logs in Amazon S3"
 // +status:"GA"
 type _metaS3 interface{}
