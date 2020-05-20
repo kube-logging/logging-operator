@@ -43,13 +43,15 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 			})
 		}
 
-		r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
-			fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+		if r.Logging.Spec.FluentbitSpec.PositionDB.HostPath != nil {
+			r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
+				fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
 
-		allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-			PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
-			ReadOnly:   false,
-		})
+			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+				PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
+				ReadOnly:   false,
+			})
+		}
 
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
