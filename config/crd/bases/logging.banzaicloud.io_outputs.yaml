@@ -3469,6 +3469,58 @@ spec:
                 partition_key_key:
                   description: 'Partition Key (default: "partition_key")'
                   type: string
+                password:
+                  description: Password when using PLAIN/SCRAM SASL authentication
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
                 required_acks:
                   description: 'The number of acks required per request (default:
                     -1).'
@@ -3476,6 +3528,10 @@ spec:
                 sasl_over_ssl:
                   description: 'SASL over SSL (default: true)'
                   type: boolean
+                scram_mechanism:
+                  description: If set, use SCRAM authentication with specified mechanism.
+                    When unset, default to PLAIN authentication
+                  type: string
                 ssl_ca_cert:
                   description: CA certificate
                   properties:
@@ -3693,6 +3749,58 @@ spec:
                 use_default_for_unknown_topic:
                   description: 'Use default for unknown topics (default: false)'
                   type: boolean
+                username:
+                  description: Username when using PLAIN/SCRAM SASL authentication
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
               required:
               - brokers
               - format
