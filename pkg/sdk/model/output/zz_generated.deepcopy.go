@@ -494,6 +494,16 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.Username != nil {
+		in, out := &in.Username, &out.Username
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Password != nil {
+		in, out := &in.Password, &out.Password
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.SSLCACert != nil {
 		in, out := &in.SSLCACert, &out.SSLCACert
 		*out = new(secret.Secret)

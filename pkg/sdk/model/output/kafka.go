@@ -89,6 +89,12 @@ type KafkaOutputConfig struct {
 	// SASL over SSL (default: true)
 	// +kubebuilder:validation:Optional
 	SaslOverSSL bool `json:"sasl_over_ssl"`
+	// Username when using PLAIN/SCRAM SASL authentication
+	Username *secret.Secret `json:"username,omitempty"`
+	// Password when using PLAIN/SCRAM SASL authentication
+	Password *secret.Secret `json:"password,omitempty"`
+	// If set, use SCRAM authentication with specified mechanism. When unset, default to PLAIN authentication
+	ScramMechanism string `json:"scram_mechanism,omitempty"`
 	// Number of times to retry sending of messages to a leader (default: 1)
 	MaxSendRetries int `json:"max_send_retries,omitempty"`
 	// The number of acks required per request (default: -1).
