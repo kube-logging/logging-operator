@@ -7,7 +7,9 @@ metadata:
 {{ include "logging-operator.labels" . | indent 4 }}
 spec:
   type: ClusterIP
+  {{- with  .Values.http.service.clusterIP }}
   clusterIP: {{ .Values.http.service.clusterIP }}
+  {{- end }}
   ports:
     - port: {{ .Values.http.port }}
       targetPort: http
