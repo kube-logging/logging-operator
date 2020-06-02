@@ -8,7 +8,7 @@ metadata:
 spec:
   type: ClusterIP
   {{- with  .Values.http.service.clusterIP }}
-  clusterIP: {{ .Values.http.service.clusterIP }}
+  clusterIP: {{ . }}
   {{- end }}
   ports:
     - port: {{ .Values.http.port }}

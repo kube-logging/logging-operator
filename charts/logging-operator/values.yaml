@@ -44,7 +44,7 @@ http:
   # Service definition for query http service
   service:
     type: ClusterIP
-    clusterIP: ""
+    clusterIP: None
     # Annotations to query http service
     annotations: {}
     # Labels to query http service
