@@ -264,6 +264,58 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
 }
 
+func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			WatchNamespaces:                        []string{testNamespace},
+			FluentdSpec:                            &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled:                true,
+			ControlNamespace:                       controlNamespace,
+			AllowClusterResourcesFromAllNamespaces: true,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-cluster-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: output.NewNullOutputConfig(),
+			},
+		},
+	}
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Selectors: map[string]string{
+				"a": "b",
+			},
+			OutputRefs: []string{"test-cluster-output"},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
+}
+
 func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer beforeEach(t)()
 

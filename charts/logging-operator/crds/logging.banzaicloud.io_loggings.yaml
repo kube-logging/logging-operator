@@ -39,6 +39,8 @@ spec:
         spec:
           description: LoggingSpec defines the desired state of Logging
           properties:
+            allowClusterResourcesFromAllNamespaces:
+              type: boolean
             controlNamespace:
               type: string
             defaultFlow:
