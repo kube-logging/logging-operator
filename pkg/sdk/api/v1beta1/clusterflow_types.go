@@ -61,6 +61,7 @@ type ClusterExclude struct {
 
 // FlowSpec is the Kubernetes spec for Flows
 type ClusterFlowSpec struct {
+	// Deprecated
 	Selectors  map[string]string `json:"selectors,omitempty"`
 	Match      []ClusterMatch    `json:"match,omitempty"`
 	Filters    []Filter          `json:"filters,omitempty"`

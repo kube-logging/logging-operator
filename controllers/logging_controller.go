@@ -263,8 +263,14 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
 	var err error
 
+	listOptsForClusterResources := []client.ListOption{}
+
+	if !logging.Spec.AllowClusterResourcesFromAllNamespaces {
+		listOptsForClusterResources = append(listOptsForClusterResources, client.InNamespace(logging.Spec.ControlNamespace))
+	}
+
 	clusterFlows := &loggingv1beta1.ClusterFlowList{}
-	err = r.List(context.TODO(), clusterFlows, client.InNamespace(logging.Spec.ControlNamespace))
+	err = r.List(context.TODO(), clusterFlows, listOptsForClusterResources...)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +294,7 @@ func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*mode
 	}
 
 	clusterOutputs := &loggingv1beta1.ClusterOutputList{}
-	err = r.List(context.TODO(), clusterOutputs, client.InNamespace(logging.Spec.ControlNamespace))
+	err = r.List(context.TODO(), clusterOutputs, listOptsForClusterResources...)
 	if err != nil {
 		return nil, err
 	}

@@ -41,14 +41,15 @@ type _metaLoggingSpec interface{}
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
-	LoggingRef              string           `json:"loggingRef,omitempty"`
-	FlowConfigCheckDisabled bool             `json:"flowConfigCheckDisabled,omitempty"`
-	FlowConfigOverride      string           `json:"flowConfigOverride,omitempty"`
-	FluentbitSpec           *FluentbitSpec   `json:"fluentbit,omitempty"`
-	FluentdSpec             *FluentdSpec     `json:"fluentd,omitempty"`
-	DefaultFlowSpec         *DefaultFlowSpec `json:"defaultFlow,omitempty"`
-	WatchNamespaces         []string         `json:"watchNamespaces,omitempty"`
-	ControlNamespace        string           `json:"controlNamespace"`
+	LoggingRef                             string           `json:"loggingRef,omitempty"`
+	FlowConfigCheckDisabled                bool             `json:"flowConfigCheckDisabled,omitempty"`
+	FlowConfigOverride                     string           `json:"flowConfigOverride,omitempty"`
+	FluentbitSpec                          *FluentbitSpec   `json:"fluentbit,omitempty"`
+	FluentdSpec                            *FluentdSpec     `json:"fluentd,omitempty"`
+	DefaultFlowSpec                        *DefaultFlowSpec `json:"defaultFlow,omitempty"`
+	WatchNamespaces                        []string         `json:"watchNamespaces,omitempty"`
+	ControlNamespace                       string           `json:"controlNamespace"`
+	AllowClusterResourcesFromAllNamespaces bool             `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
 
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
