@@ -779,6 +779,7 @@ spec:
             selectors:
               additionalProperties:
                 type: string
+              description: Deprecated
               type: object
           required:
           - outputRefs
