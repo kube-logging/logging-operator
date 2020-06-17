@@ -504,6 +504,11 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.SSLCACertsFromSystem != nil {
+		in, out := &in.SSLCACertsFromSystem, &out.SSLCACertsFromSystem
+		*out = new(bool)
+		**out = **in
+	}
 	if in.SSLCACert != nil {
 		in, out := &in.SSLCACert, &out.SSLCACert
 		*out = new(secret.Secret)

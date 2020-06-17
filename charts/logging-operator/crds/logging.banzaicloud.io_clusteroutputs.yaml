@@ -3536,6 +3536,9 @@ spec:
                   description: If set, use SCRAM authentication with specified mechanism.
                     When unset, default to PLAIN authentication
                   type: string
+                ssl_ca_certs_from_system:
+                  description: 'Use the CA certs from your system''s default certificate store (default: false)'
+                  type: boolean
                 ssl_ca_cert:
                   description: CA certificate
                   properties:
