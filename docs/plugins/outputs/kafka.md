@@ -53,6 +53,7 @@ weight: 200
 | required_acks | int | No |  -1 | The number of acks required per request .<br> |
 | ack_timeout | int | No |  nil => Uses default of ruby-kafka library | How long the producer waits for acks. The unit is seconds <br> |
 | compression_codec | string | No |  nil | The codec the producer uses to compress messages . The available options are gzip and snappy.<br> |
+| ssl_ca_certs_from_system | *bool | No |  false | System's CA cert store <br> |
 | ssl_ca_cert | *secret.Secret | No | - | CA certificate<br> |
 | ssl_client_cert | *secret.Secret | No | - | Client certificate<br> |
 | ssl_client_cert_chain | *secret.Secret | No | - | Client certificate chain<br> |

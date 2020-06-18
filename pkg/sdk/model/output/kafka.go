@@ -103,6 +103,8 @@ type KafkaOutputConfig struct {
 	AckTimeout int `json:"ack_timeout,omitempty"`
 	// The codec the producer uses to compress messages (default: nil). The available options are gzip and snappy.
 	CompressionCodec string `json:"compression_codec,omitempty"`
+	// System's CA cert store (default: false)
+	SSLCACertsFromSystem *bool `json:"ssl_ca_certs_from_system,omitempty"`
 	// CA certificate
 	SSLCACert *secret.Secret `json:"ssl_ca_cert,omitempty"`
 	// Client certificate

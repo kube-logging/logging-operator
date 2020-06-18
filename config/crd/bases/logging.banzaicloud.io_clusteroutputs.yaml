@@ -3588,6 +3588,9 @@ spec:
                           type: object
                       type: object
                   type: object
+                ssl_ca_certs_from_system:
+                  description: 'System''s CA cert store (default: false)'
+                  type: boolean
                 ssl_client_cert:
                   description: Client certificate
                   properties:
