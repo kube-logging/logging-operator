@@ -95,6 +95,12 @@ type ParseSection struct {
 	Format string `json:"format,omitempty"`
 	// Only available when using type: multi_format
 	FormatFirstline string `json:"format_firstline,omitempty"`
+	// Only available when using type: ltsv (default: "\t")
+	Delimiter string `json:"delimiter,omitempty"`
+	// Only available when using type: ltsv
+	DelimiterPattern string `json:"delimiter_pattern,omitempty"`
+	// Only available when using type: ltsv (default: ":")
+	LabelDelimiter string `json:"label_delimiter,omitempty"`
 	// The multiline parser plugin parses multiline logs.
 	Multiline []string `json:"multiline,omitempty"`
 	// Only available when using type: multi_format
