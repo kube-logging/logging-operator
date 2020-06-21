@@ -331,6 +331,13 @@ spec:
                             type: string
                           parse:
                             properties:
+                              delimiter:
+                                description: 'Only available when using type: ltsv
+                                  (default: "\t")'
+                                type: string
+                              delimiter_pattern:
+                                description: 'Only available when using type: ltsv'
+                                type: string
                               estimate_current_event:
                                 description: If true, use Fluent::EventTime.now(current
                                   time) as a timestamp when time_key is specified.
@@ -347,6 +354,10 @@ spec:
                               keep_time_key:
                                 description: If true, keep time field in the record.
                                 type: boolean
+                              label_delimiter:
+                                description: 'Only available when using type: ltsv
+                                  (default: ":")'
+                                type: string
                               local_time:
                                 description: 'Ff true, use local time. Otherwise,
                                   UTC is used. This is exclusive with utc. (default:
@@ -468,6 +479,13 @@ spec:
                             description: Deprecated, use `parse` instead
                             items:
                               properties:
+                                delimiter:
+                                  description: 'Only available when using type: ltsv
+                                    (default: "\t")'
+                                  type: string
+                                delimiter_pattern:
+                                  description: 'Only available when using type: ltsv'
+                                  type: string
                                 estimate_current_event:
                                   description: If true, use Fluent::EventTime.now(current
                                     time) as a timestamp when time_key is specified.
@@ -484,6 +502,10 @@ spec:
                                 keep_time_key:
                                   description: If true, keep time field in the record.
                                   type: boolean
+                                label_delimiter:
+                                  description: 'Only available when using type: ltsv
+                                    (default: ":")'
+                                  type: string
                                 local_time:
                                   description: 'Ff true, use local time. Otherwise,
                                     UTC is used. This is exclusive with utc. (default:
