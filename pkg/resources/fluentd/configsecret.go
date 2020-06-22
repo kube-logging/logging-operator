@@ -32,6 +32,7 @@ type fluentdConfig struct {
 		Port    int32
 		Path    string
 	}
+	Workers int32
 }
 
 func generateConfig(input fluentdConfig) (string, error) {
@@ -65,6 +66,12 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 		input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
 	} else {
 		input.LogLevel = "info"
+	}
+
+	if r.Logging.Spec.FluentdSpec.Workers > 0 {
+		input.Workers = r.Logging.Spec.FluentdSpec.Workers
+	} else {
+		input.Workers = 1
 	}
 
 	inputConfig, err := generateConfig(input)
