@@ -4597,6 +4597,9 @@ spec:
                   type: object
                 volumeMountChmod:
                   type: boolean
+                workers:
+                  format: int32
+                  type: integer
               type: object
             loggingRef:
               type: string
