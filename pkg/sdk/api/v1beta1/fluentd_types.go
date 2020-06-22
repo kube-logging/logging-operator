@@ -57,6 +57,7 @@ type FluentdSpec struct {
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
+	Workers              int32                       `json:"workers,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel             string `json:"logLevel,omitempty"`
 	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
