@@ -1,5 +1,5 @@
 FROM alpine:3.11
-LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.10.3"
+LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.10.4"
 
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
@@ -26,7 +26,7 @@ RUN apk update \
  && gem install json -v 2.3.0 \
  && gem install async-http -v 0.50.7 \
  && gem install ext_monitor -v 0.1.2 \
- && gem install fluentd -v 1.10.3 \
+ && gem install fluentd -v 1.10.4 \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
  # Until this lock fluentd '< 1.10' https://github.com/fabric8io/fluent-plugin-kubernetes_metadata_filter/blob/master/fluent-plugin-kubernetes_metadata_filter.gemspec#L22
