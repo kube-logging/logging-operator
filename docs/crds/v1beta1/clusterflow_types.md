@@ -36,7 +36,7 @@ weight: 200
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| selectors | map[string]string | No | - |  |
+| selectors | map[string]string | No | - | Deprecated<br> |
 | match | []ClusterMatch | No | - |  |
 | filters | []Filter | No | - |  |
 | loggingRef | string | No | - |  |
