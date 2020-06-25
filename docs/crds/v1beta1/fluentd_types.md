@@ -30,6 +30,7 @@ weight: 200
 | metrics | *Metrics | No | - |  |
 | security | *Security | No | - |  |
 | scaling | *FluentdScaling | No | - |  |
+| workers | int32 | No | - |  |
 | logLevel | string | No | - |  |
 | podPriorityClassName | string | No | - |  |
 | fluentLogDestination | string | No | - |  |

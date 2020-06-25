@@ -16,6 +16,7 @@ weight: 200
 | defaultFlow | *DefaultFlowSpec | No | - |  |
 | watchNamespaces | []string | No | - |  |
 | controlNamespace | string | Yes | - |  |
+| allowClusterResourcesFromAllNamespaces | bool | No | - |  |
 | enableRecreateWorkloadOnImmutableFieldChange | bool | No | - | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the<br>fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)<br>in case there is a change in an immutable field<br>that otherwise couldn't be managed with a simple update.<br> |
 ### LoggingStatus
 #### LoggingStatus defines the observed state of Logging

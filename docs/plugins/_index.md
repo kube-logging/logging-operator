@@ -15,27 +15,27 @@ For more information please click on the plugin name
 | **[Concat](filters/concat/)** | filters | Fluentd Filter plugin to concatenate multiline log separated in multiple events. | GA | [2.4.0](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
 | **[Dedot](filters/dedot/)** | filters | Concatenate multiline log separated in multiple events | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](filters/detect_exceptions/)** | filters | Exception Detector | GA | [0.0.13](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
-| **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.1](https://github.com/y-ken/fluent-plugin-geoip) |
+| **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.2](https://github.com/y-ken/fluent-plugin-geoip) |
 | **[Grep](filters/grep/)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Parser](filters/parser/)** | filters | Parses" string field in event records and mutates its | GA | [more info](https://docs.fluentd.org/filter/parser) |
-| **[Prometheus](filters/prometheus/)** | filters | Prometheus Filter Plugin to count Incoming Records | GA | [1.7.3](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin) |
+| **[Prometheus](filters/prometheus/)** | filters | Prometheus Filter Plugin to count Incoming Records | GA | [1.8.0](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin) |
 | **[Record Modifier](filters/record_modifier/)** | filters | Modify each event record. | GA | [2.1.0](https://github.com/repeatedly/fluent-plugin-record-modifier) |
 | **[Record Transformer](filters/record_transformer/)** | filters | Mutates/transforms incoming event streams. | GA | [more info](https://docs.fluentd.org/filter/record_transformer) |
 | **[Stdout](filters/stdout/)** | filters | Prints events to stdout | GA | [more info](https://docs.fluentd.org/filter/stdout) |
 | **[Tag Normaliser](filters/tagnormaliser/)** | filters | Re-tag based on log metadata | GA | [0.1.1](https://github.com/banzaicloud/fluent-plugin-tag-normaliser) |
 | **[Azure Storage](outputs/azurestore/)** | outputs | Store logs in Azure Storage | GA | [0.1.0](https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0) |
 | **[Buffer](outputs/buffer/)** | outputs | Fluentd event buffer | GA | [mode info](https://docs.fluentd.org/configuration/buffer-section) |
-| **[Amazon CloudWatch](outputs/cloudwatch/)** | outputs | Send your logs to AWS CloudWatch | GA | [0.9.4](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.9.4) |
-| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.0.8](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.0.8) |
+| **[Amazon CloudWatch](outputs/cloudwatch/)** | outputs | Send your logs to AWS CloudWatch | GA | [0.10.0](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.10.0) |
+| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.0.9](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.0.9) |
 | **[File](outputs/file/)** | outputs | Output plugin writes events to files | GA | [more info](https://docs.fluentd.org/output/file) |
 | **[Format](outputs/format/)** | outputs | Specify how to format output record. | GA | [more info](https://docs.fluentd.org/configuration/format-section) |
 | **[Forward](outputs/forward/)** | outputs | Forwards events to other fluentd nodes. | GA | [more info](https://docs.fluentd.org/output/forward) |
 | **[Google Cloud Storage](outputs/gcs/)** | outputs | Store logs in Google Cloud Storage | GA | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs) |
 | **[Http](outputs/http/)** | outputs | Sends logs to HTTP/HTTPS endpoints. | GA | [more info](https://docs.fluentd.org/output/http) |
 | **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.13.0](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.13.0) |
-| **[Amazon Kinesis](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.1](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.1) |
+| **[Amazon Kinesis](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.2) |
 | **[LogZ](outputs/logz/)** | outputs | Store logs in LogZ.io | GA | [0.0.20](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20) |
-| **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.11](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
+| **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.12](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.1.8](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Alibaba Cloud Storage](outputs/oss/)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
 | **[Amazon S3](outputs/s3/)** | outputs | Store logs in Amazon S3 | GA | [1.3.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.3.1) |
