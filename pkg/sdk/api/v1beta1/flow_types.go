@@ -68,6 +68,7 @@ type Filter struct {
 	DetectExceptions  *filter.DetectExceptions   `json:"detectExceptions,omitempty"`
 	Grep              *filter.GrepConfig         `json:"grep,omitempty"`
 	Prometheus        *filter.PrometheusConfig   `json:"prometheus,omitempty"`
+	Throttle          *filter.Throttle           `json:"throttle,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow

@@ -59,6 +59,7 @@ RUN apk update \
          fluent-plugin-splunk-hec \
          elasticsearch-xpack \
          fluent-plugin-cloudwatch-logs \
+         fluent-plugin-throttle \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
