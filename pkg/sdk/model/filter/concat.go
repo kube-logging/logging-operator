@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Concat"
+// +weight:"200"
+type _hugoConcat interface{}
+
 // +kubebuilder:object:generate=true
 // +docName:"[Concat Filter](https://github.com/fluent-plugins-nursery/fluent-plugin-concat)"
 // Fluentd Filter plugin to concatenate multiline log separated in multiple events.
