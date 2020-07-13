@@ -50,15 +50,22 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitor {
+		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
+		if r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+				objectMetadata.Labels[k] = v
+			}
+		}
 		return &v1.ServiceMonitor{
-			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
+			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
-					Port: "metrics",
-					Path: r.Logging.Spec.FluentbitSpec.Metrics.Path,
+					Port:        "metrics",
+					Path:        r.Logging.Spec.FluentbitSpec.Metrics.Path,
+					HonorLabels: r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),

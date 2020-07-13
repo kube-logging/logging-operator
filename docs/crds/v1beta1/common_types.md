@@ -21,7 +21,15 @@ weight: 200
 | port | int32 | No | - |  |
 | path | string | No | - |  |
 | serviceMonitor | bool | No | - |  |
+| serviceMonitorConfig | ServiceMonitorConfig | No | - |  |
 | prometheusAnnotations | bool | No | - |  |
+### ServiceMonitorConfig
+#### ServiceMonitorConfig defines the ServiceMonitor properties
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| additionalLabels | map[string]string | No | - |  |
+| honorLabels | bool | No | - |  |
 ### Security
 #### Security defines Fluentd, Fluentbit deployment security properties
 

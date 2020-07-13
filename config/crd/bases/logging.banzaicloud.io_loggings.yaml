@@ -2030,6 +2030,17 @@ spec:
                       type: boolean
                     serviceMonitor:
                       type: boolean
+                    serviceMonitorConfig:
+                      description: ServiceMonitorConfig defines the ServiceMonitor
+                        properties
+                      properties:
+                        additionalLabels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        honorLabels:
+                          type: boolean
+                      type: object
                     timeout:
                       type: string
                   type: object
@@ -4107,6 +4118,17 @@ spec:
                       type: boolean
                     serviceMonitor:
                       type: boolean
+                    serviceMonitorConfig:
+                      description: ServiceMonitorConfig defines the ServiceMonitor
+                        properties
+                      properties:
+                        additionalLabels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        honorLabels:
+                          type: boolean
+                      type: object
                     timeout:
                       type: string
                   type: object
