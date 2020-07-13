@@ -40,12 +40,19 @@ type ImageSpec struct {
 
 // Metrics defines the service monitor endpoints
 type Metrics struct {
-	Interval              string `json:"interval,omitempty"`
-	Timeout               string `json:"timeout,omitempty"`
-	Port                  int32  `json:"port,omitempty"`
-	Path                  string `json:"path,omitempty"`
-	ServiceMonitor        bool   `json:"serviceMonitor,omitempty"`
-	PrometheusAnnotations bool   `json:"prometheusAnnotations,omitempty"`
+	Interval              string               `json:"interval,omitempty"`
+	Timeout               string               `json:"timeout,omitempty"`
+	Port                  int32                `json:"port,omitempty"`
+	Path                  string               `json:"path,omitempty"`
+	ServiceMonitor        bool                 `json:"serviceMonitor,omitempty"`
+	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
+	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
+}
+
+// ServiceMonitorConfig defines the ServiceMonitor properties
+type ServiceMonitorConfig struct {
+	AdditionalLabels map[string]string `json:"additionalLabels,omitempty"`
+	HonorLabels      bool              `json:"honorLabels,omitempty"`
 }
 
 // Security defines Fluentd, Fluentbit deployment security properties

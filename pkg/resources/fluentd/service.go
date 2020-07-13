@@ -85,8 +85,15 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
+		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
+		if r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+				objectMetadata.Labels[k] = v
+			}
+		}
+
 		return &v1.ServiceMonitor{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
+			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
@@ -96,6 +103,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					Path:          r.Logging.Spec.FluentdSpec.Metrics.Path,
 					Interval:      r.Logging.Spec.FluentdSpec.Metrics.Interval,
 					ScrapeTimeout: r.Logging.Spec.FluentdSpec.Metrics.Timeout,
+					HonorLabels:   r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.getFluentdLabels(ComponentFluentd)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
