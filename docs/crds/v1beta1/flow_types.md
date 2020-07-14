@@ -46,6 +46,7 @@ weight: 200
 | detectExceptions | *filter.DetectExceptions | No | - |  |
 | grep | *filter.GrepConfig | No | - |  |
 | prometheus | *filter.PrometheusConfig | No | - |  |
+| throttle | *filter.Throttle | No | - |  |
 ### FlowStatus
 #### FlowStatus defines the observed state of Flow
 

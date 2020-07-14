@@ -775,6 +775,37 @@ spec:
                             description: Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)
                             type: string
                         type: object
+                      throttle:
+                        properties:
+                          group_bucket_limit:
+                            description: 'Maximum number logs allowed per groups over
+                              the period of group_bucket_period_s (default: 6000)'
+                            type: integer
+                          group_bucket_period_s:
+                            description: 'This is the period of of time over which
+                              group_bucket_limit applies (default: 60)'
+                            type: integer
+                          group_drop_logs:
+                            description: 'When a group reaches its limit, logs will
+                              be dropped from further processing if this value is
+                              true (default: true)'
+                            type: boolean
+                          group_key:
+                            description: 'Used to group logs. Groups are rate limited
+                              independently (default: kubernetes.container_name)'
+                            type: string
+                          group_reset_rate_s:
+                            description: 'After a group has exceeded its bucket limit,
+                              logs are dropped until the rate per second falls below
+                              or equal to group_reset_rate_s. (default: group_bucket_limit/group_bucket_period_s)'
+                            type: integer
+                          group_warning_delay_s:
+                            description: 'When a group reaches its limit and as long
+                              as it is not reset, a warning message with the current
+                              log rate of the group is emitted repeatedly. This is
+                              the delay between every repetition. (default: 10 seconds)'
+                            type: integer
+                        type: object
                     type: object
                   type: array
                 outputRefs:
