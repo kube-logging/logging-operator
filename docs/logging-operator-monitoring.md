@@ -19,7 +19,17 @@ weight: 800
 | port | int | No | - | Metrics Port. |
 | path | int | No | - | Metrics Path. |
 | serviceMonitor | bool | No | false | Enable to create ServiceMonitor for Prometheus operator |
+| serviceMonitorConfig | [ServiceMonitorConfig](#ServiceMonitorConfig) | No | {} | Prometheus Service monitor config |
 | prometheusAnnotations | bool | No | false | Add prometheus labels to fluent pods. |
+
+#### ServiceMonitorConfig
+
+| Variable Name | Type | Required | Default | Description |
+|---|---|---|---|---|
+| additionalLabels | map[string]string | No | {} | Prometheus Additional labels |
+| honorLabels | string | No | - |  Honor Labels |
+
+
 
 ## Install Prometheus Operator with Helm
 
