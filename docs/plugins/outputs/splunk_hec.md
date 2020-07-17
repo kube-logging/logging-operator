@@ -50,6 +50,6 @@ More info at https://github.com/splunk/fluent-plugin-splunk-hec
 | ca_path | string | No | - | The path to a directory containing CA certificates in PEM format.<br> |
 | ssl_ciphers | string | No | - | List of SSL ciphers allowed.<br> |
 | insecure_ssl | *bool | No | false | Indicates if insecure SSL connection is allowed <br> |
-| fields | map[string]string | No | - | In this case, parameters inside <fields> are used as indexed fields and removed from the original input events<br> |
+| fields | Fields | No | - | In this case, parameters inside <fields> are used as indexed fields and removed from the original input events<br> |
 | format | *Format | No | - | [Format](../format/)<br> |
 | buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |

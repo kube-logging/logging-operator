@@ -107,11 +107,24 @@ type SplunkHecOutput struct {
 	// Indicates if insecure SSL connection is allowed (default:false)
 	InsecureSSL *bool `json:"insecure_ssl,omitempty"`
 	// In this case, parameters inside <fields> are used as indexed fields and removed from the original input events
-	Fields map[string]string `json:"fields,omitempty"`
+	Fields Fields `json:"fields,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+}
+
+type Fields map[string]string
+
+func (r Fields) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	recordSet := types.PluginMeta{
+		Directive: "fields",
+	}
+	directive := &types.GenericDirective{
+		PluginMeta: recordSet,
+		Params:     r,
+	}
+	return directive, nil
 }
 
 func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
@@ -147,6 +160,14 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 			return nil, err
 		} else {
 			splunkHec.SubDirectives = append(splunkHec.SubDirectives, format)
+		}
+	}
+
+	if c.Fields != nil {
+		if meta, err := c.Fields.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			splunkHec.SubDirectives = append(splunkHec.SubDirectives, meta)
 		}
 	}
 
