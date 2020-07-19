@@ -1,6 +1,7 @@
 ---
 title: Google Cloud Storage
 weight: 200
+generated_file: true
 ---
 
 ### GCSOutput

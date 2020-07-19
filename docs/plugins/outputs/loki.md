@@ -1,6 +1,7 @@
 ---
 title: Grafana Loki
 weight: 200
+generated_file: true
 ---
 
 # Loki output plugin 

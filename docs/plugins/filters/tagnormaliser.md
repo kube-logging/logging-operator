@@ -1,6 +1,7 @@
 ---
 title: Tag Normaliser
 weight: 200
+generated_file: true
 ---
 
 # Fluentd Plugin to re-tag based on log metadata

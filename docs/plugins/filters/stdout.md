@@ -1,6 +1,7 @@
 ---
 title: StdOut
 weight: 200
+generated_file: true
 ---
 
 # [Stdout Filter](https://docs.fluentd.org/filter/stdout)

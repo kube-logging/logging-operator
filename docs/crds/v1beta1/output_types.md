@@ -1,6 +1,7 @@
 ---
 title: OutputSpec
 weight: 200
+generated_file: true
 ---
 
 ### OutputSpec

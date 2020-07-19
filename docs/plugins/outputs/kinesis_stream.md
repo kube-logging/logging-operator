@@ -1,6 +1,7 @@
 ---
 title: Amazon Kinesis
 weight: 200
+generated_file: true
 ---
 
 # Kinesis Stream output plugin for Fluentd
