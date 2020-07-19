@@ -1,4 +1,4 @@
-{{- if or .Values.file.enabled (and (not .Values.cloudwatch.enabled) (not .Values.elasticsearch.enabled) (not .Values.kafka.enabled) (not .Values.loki.enabled) (not .Values.minio.enabled)) }}
+{{- if or .Values.file.enabled (and (not .Values.cloudwatch.enabled) (not .Values.elasticsearch.enabled) (not .Values.kafka.enabled) (not .Values.loki.enabled) (not .Values.minio.enabled) (not .Values.logdna.enabled)) }}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:

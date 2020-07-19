@@ -23,6 +23,7 @@ weight: 200
 | kafka | *output.KafkaOutputConfig | No | - |  |
 | cloudwatch | *output.CloudWatchOutput | No | - |  |
 | kinesisStream | *output.KinesisStreamOutputConfig | No | - |  |
+| logdna | *output.LogDNAOutput | No | - |  |
 | newrelic | *output.NewRelicOutputConfig | No | - |  |
 | splunkHec | *output.SplunkHecOutput | No | - |  |
 | http | *output.HTTPOutputConfig | No | - |  |

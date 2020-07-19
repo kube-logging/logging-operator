@@ -79,6 +79,13 @@ cloudwatch:
     log_group_name: ""
     log_stream_name: ""
 
+# Enable LogDNA logging output
+logdna:
+  enabled: false
+  api_key: ""
+  app: ""
+  hostname: ""
+
 # Enable Demo Log-Gen application
 logGenerator:
   enabled: true

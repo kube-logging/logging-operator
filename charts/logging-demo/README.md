@@ -73,6 +73,10 @@ The following tables lists the configurable parameters of the logging-demo chart
 | `cloudwatch.aws.region`                                           | AWS CLoudWatch Region                                   | ``             |
 | `cloudwatch.aws.log_group_name`                                   | AWS CLoudWatch Log Group                                | ``             |
 | `cloudwatch.aws.log_stream_name`                                  | AWS CLoudWatch Log Stream                               | ``             |
+| `logdna.enabled`                                                  | Enable LogDNA logging output                            | `false`        |
+| `logdna.api_key`                                                  | LogDNA Api key                                          | ``             |
+| `logdna.hostname`                                                 | Hostname                                                | ``             |
+| `logdna.app`                                                      | Application name                                        | ``             |
 | `logGenerator.enabled`                                            | Enable Demo Log-Gen application                         | `true`         |
 | `loggingOperator.tls.enabled`                                     | Enabled TLS communication between components            | `true`         |
 | `loggingOperator.tls.fluentdSecretName`                           | Specified secret name, which contain tls certs          | This will overwrite automatic Helm certificate generation. |
