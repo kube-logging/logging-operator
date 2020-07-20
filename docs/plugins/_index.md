@@ -37,6 +37,7 @@ For more information please click on the plugin name
 | **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.13.0](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.13.0) |
 | **[Amazon Kinesis Firehose](outputs/kinesis_firehose/)** | outputs | Fluent plugin for Amazon Kinesis | Testing | [3.2.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.2) |
 | **[Amazon Kinesis Stream](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.2) |
+| **[LogDNA](outputs/logdna/)** | outputs | Send your logs to LogDNA | GA | [more info](https://github.com/logdna/fluent-plugin-logdna) |
 | **[LogZ](outputs/logz/)** | outputs | Store logs in LogZ.io | GA | [0.0.20](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20) |
 | **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.13](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.1.8](https://github.com/newrelic/newrelic-fluentd-output) |

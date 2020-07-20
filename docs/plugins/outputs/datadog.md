@@ -1,6 +1,7 @@
 ---
 title: Datadog
 weight: 200
+generated_file: true
 ---
 
 # Datadog output plugin for Fluentd

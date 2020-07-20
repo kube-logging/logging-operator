@@ -39,6 +39,7 @@ github.com/banzaicloud/k8s-objectmatcher v1.1.0 h1:KHWn9Oxh21xsaGKBHWElkaRrr4ypC
 github.com/banzaicloud/k8s-objectmatcher v1.1.0/go.mod h1:gGaElvgkqa0Lk1khRr+jel/nsCLfzhLnD3CEWozpk9k=
 github.com/banzaicloud/k8s-objectmatcher v1.2.2 h1:WekhVqrRa/wUCPuESExwRjy5R+BDTf/s7DKP99y8MvY=
 github.com/banzaicloud/k8s-objectmatcher v1.2.2/go.mod h1:+kRcvF2kyA0u8k9AvTYgtt8zhv30Gi8ITKdMWqh7j+A=
+github.com/banzaicloud/logging-operator v0.0.0-20200719191036-ad05e64b4043 h1:MItNAUMULlCTVALvc0gMo7Y28PuCUfldoZa+SybyYNc=
 github.com/banzaicloud/operator-tools v0.8.0 h1:44mHThJ+8oMxpQSIFzhEdZ4tp+D9tqRlcyY3hf5N3y0=
 github.com/banzaicloud/operator-tools v0.8.0/go.mod h1:Cw9CxFuWK7Dim6yZGJ0h3nvb2x1NmkBvbRLyoJyj1oA=
 github.com/banzaicloud/operator-tools v0.10.1 h1:mko2X+TcLT3hDXJehO1JvUZp3lT8PN3JnINQ60TunZg=

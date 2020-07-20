@@ -1,0 +1,15 @@
+{{- if and .Values.logdna.enabled }}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ include "output.fullname" . }}-logdna
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "logging-demo.labels" . | indent 4 }}
+spec:
+  logdna:
+    api_key: {{ .Values.logdna.api_key }}
+{{/*    hostname: {{ .Values.logdna.hostname }}*/}}
+    hostname: "$.kubernetes.host"
+    app: {{ .Values.logdna.app }}
+{{- end }}

@@ -20,7 +20,7 @@ spec:
           app.kubernetes.io/instance: {{ .Release.Name }}
   outputRefs:
 
-{{- if or .Values.file.enabled (and (not .Values.cloudwatch.enabled) (not .Values.elasticsearch.enabled) (not .Values.kafka.enabled) (not .Values.loki.enabled) (not .Values.minio.enabled)) }}
+{{- if or .Values.file.enabled (and (not .Values.cloudwatch.enabled) (not .Values.elasticsearch.enabled) (not .Values.kafka.enabled) (not .Values.loki.enabled) (not .Values.minio.enabled) (not .Values.logdna.enabled)) }}
     - {{ include "output.fullname" . }}-file
 {{- end }}
 {{- if .Values.cloudwatch.enabled }}
@@ -37,5 +37,8 @@ spec:
 {{- end }}
 {{- if .Values.minio.enabled }}
     - {{ include "output.fullname" . }}-minio
+{{- end }}
+{{- if .Values.logdna.enabled }}
+    - {{ include "output.fullname" . }}-logdna
 {{- end }}
 

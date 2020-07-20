@@ -1,6 +1,7 @@
 ---
 title: Amazon Kinesis
 weight: 200
+generated_file: true
 ---
 
 # Kinesis Firehose output plugin for Fluentd
