@@ -980,7 +980,7 @@ func (in *SplunkHecOutput) DeepCopyInto(out *SplunkHecOutput) {
 	}
 	if in.Fields != nil {
 		in, out := &in.Fields, &out.Fields
-		*out = make(map[string]string, len(*in))
+		*out = make(Fields, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
 		}
