@@ -1,6 +1,7 @@
 ---
 title: FluentbitSpec
 weight: 200
+generated_file: true
 ---
 
 ### FluentbitSpec

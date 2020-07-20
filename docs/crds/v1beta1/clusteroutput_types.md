@@ -1,6 +1,7 @@
 ---
 title: ClusterOutput
 weight: 200
+generated_file: true
 ---
 
 ### ClusterOutput

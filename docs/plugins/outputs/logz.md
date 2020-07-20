@@ -1,6 +1,7 @@
 ---
 title: LogZ
 weight: 200
+generated_file: true
 ---
 
 # LogZ output plugin for Fluentd

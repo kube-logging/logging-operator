@@ -1,6 +1,7 @@
 ---
 title: Elasticsearch
 weight: 200
+generated_file: true
 ---
 
 # Elasticsearch output plugin for Fluentd

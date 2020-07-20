@@ -1,6 +1,7 @@
 ---
 title: NewRelic
 weight: 200
+generated_file: true
 ---
 
 # New Relic Logs plugin for Fluentd

@@ -1,6 +1,7 @@
 ---
 title: ClusterFlow
 weight: 200
+generated_file: true
 ---
 
 ### ClusterFlow
