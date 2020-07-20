@@ -45,7 +45,7 @@ type LogDNAOutput struct {
 	BufferQueueLimit string `json:"buffer_chunk_limit,omitempty" default:"1m"`
 }
 
-// #### Example `Regexp` filter configurations
+// #### Example `LogDNA` filter configurations
 // ```
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: Output
