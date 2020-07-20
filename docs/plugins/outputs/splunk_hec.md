@@ -1,6 +1,7 @@
 ---
 title: Splunk
 weight: 200
+generated_file: true
 ---
 
 # Splunk via Hec output plugin for Fluentd

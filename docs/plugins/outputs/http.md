@@ -1,6 +1,7 @@
 ---
 title: Http
 weight: 200
+generated_file: true
 ---
 
 # Http plugin for Fluentd

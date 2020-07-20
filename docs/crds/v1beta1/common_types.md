@@ -1,6 +1,7 @@
 ---
 title: Common
 weight: 200
+generated_file: true
 ---
 
 ### ImageSpec

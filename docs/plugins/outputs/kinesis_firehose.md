@@ -1,18 +1,17 @@
 ---
 title: Amazon Kinesis
 weight: 200
-generated_file: true
 ---
 
-# Kinesis Stream output plugin for Fluentd
+# Kinesis Firehose output plugin for Fluentd
 ## Overview
-  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
+  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose
 
  #### Example output configurations
  ```
  spec:
-   kinesisStream:
-     stream_name: example-stream-name
+   kinesisFirehose:
+     delivery_stream_name: example-stream-name
      region: us-east-1
      format:
        type: json
@@ -24,8 +23,8 @@ generated_file: true
 
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
-| stream_name | string | Yes | - | Name of the stream to put data.<br> |
-| partition_key | string | No | - | A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly.<br> |
+| delivery_stream_name | string | Yes | - | Name of the delivery stream to put data.<br> |
+| append_new_line | *bool | No | - | If it is enabled, the plugin adds new line character (\n) to each serialized record.<br>Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true)<br> |
 | aws_key_id | *secret.Secret | No | - | AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.<br> |
 | aws_sec_key | *secret.Secret | No | - | AWS secret key. This parameter is required when your agent is not running on EC2 instance with an IAM Role.<br> |
 | aws_ses_token | *secret.Secret | No | - | AWS session token. This parameter is optional, but can be provided if using MFA or temporary credentials when your agent is not running on EC2 instance with an IAM Role.<br> |

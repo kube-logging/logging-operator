@@ -1,6 +1,7 @@
 ---
 title: Record Modifier
 weight: 200
+generated_file: true
 ---
 
 # [Record Modifier](https://github.com/repeatedly/fluent-plugin-record-modifier)

@@ -1,6 +1,7 @@
 ---
 title: FlowSpec
 weight: 200
+generated_file: true
 ---
 
 ### FlowSpec

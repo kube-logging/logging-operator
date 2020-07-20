@@ -1,6 +1,7 @@
 ---
 title: Exception Detector
 weight: 200
+generated_file: true
 ---
 
 # Exception Detector

@@ -1,6 +1,7 @@
 ---
 title: SumoLogic
 weight: 200
+generated_file: true
 ---
 
 # SumoLogic output plugin for Fluentd

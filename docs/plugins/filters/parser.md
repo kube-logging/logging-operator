@@ -1,6 +1,7 @@
 ---
 title: Parser
 weight: 200
+generated_file: true
 ---
 
 # [Parser Filter](https://docs.fluentd.org/filter/parser)

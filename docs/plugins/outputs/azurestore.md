@@ -1,6 +1,7 @@
 ---
 title: Azure Storage
 weight: 200
+generated_file: true
 ---
 
 # Azure Storage output plugin for Fluentd
