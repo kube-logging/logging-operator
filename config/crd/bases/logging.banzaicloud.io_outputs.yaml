@@ -4489,6 +4489,26 @@ spec:
               required:
               - stream_name
               type: object
+            logdna:
+              description: Send your logs to LogDNA
+              properties:
+                api_key:
+                  description: LogDNA Api key
+                  type: string
+                app:
+                  description: Application name
+                  type: string
+                buffer_chunk_limit:
+                  description: Do not increase past 8m (8MB) or your logs will be
+                    rejected by LogDNA server.
+                  type: string
+                hostname:
+                  description: Hostname
+                  type: string
+              required:
+              - api_key
+              - hostname
+              type: object
             loggingRef:
               type: string
             logz:

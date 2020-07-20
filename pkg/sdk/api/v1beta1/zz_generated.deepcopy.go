@@ -1180,6 +1180,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.KinesisStreamOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LogDNAOutput != nil {
+		in, out := &in.LogDNAOutput, &out.LogDNAOutput
+		*out = new(output.LogDNAOutput)
+		**out = **in
+	}
 	if in.NewRelicOutputConfig != nil {
 		in, out := &in.NewRelicOutputConfig, &out.NewRelicOutputConfig
 		*out = new(output.NewRelicOutputConfig)

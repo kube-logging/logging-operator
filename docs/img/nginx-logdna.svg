@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3941.049" height="965.513" viewBox="0 0 3941.049 965.513">
+  <defs>
+    <filter id="S3" x="3389.918" y="350.262" width="439.023" height="439.023" filterUnits="userSpaceOnUse">
+      <feOffset dy="8" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feFlood flood-color="#b8c6e6" flood-opacity="0.302"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="nginx-logdna" transform="translate(-12795 -3816.28)">
+    <g id="Host_Cluster" data-name="Host Cluster" transform="translate(13401 1587.28)">
+      <g id="kocka_host" transform="translate(-606 2229)" fill="#fafafd" stroke="#3f428b" stroke-width="1">
+        <rect width="3941.048" height="965.513" rx="40" stroke="none"/>
+        <rect x="0.5" y="0.5" width="3940.048" height="964.513" rx="39.5" fill="none"/>
+      </g>
+      <g id="Project-1" transform="translate(106 26)">
+        <g id="NS1" transform="translate(-469 2418)" fill="#f4f7fb" stroke="#76a1d6" stroke-width="2">
+          <rect width="2918.28" height="635" rx="18" stroke="none"/>
+          <rect x="1" y="1" width="2916.28" height="633" rx="17" fill="none"/>
+        </g>
+        <text id="Default" transform="translate(-172.151 2500.634)" fill="#76a1d6" font-size="67" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-104.453" y="0">Default</tspan></text>
+        <g id="NS1-2" data-name="NS1" transform="translate(-469 2418)" fill="#76a1d6" stroke="#76a1d6" stroke-width="2">
+          <rect width="160" height="100" rx="5" stroke="none"/>
+          <rect x="1" y="1" width="158" height="98" rx="4" fill="none"/>
+        </g>
+        <text id="NS" transform="translate(-389.151 2486.634)" fill="#fff" font-size="74" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-44.77" y="0">NS</tspan></text>
+        <g id="app-1_-Frontend" data-name="app-1 -Frontend" transform="translate(-90 -2)">
+          <g id="Rectangle_141" data-name="Rectangle 141" transform="translate(-219 2595.72)" fill="#fff" stroke="#3f428b" stroke-width="1">
+            <rect width="651" height="294" rx="18" stroke="none"/>
+            <rect x="0.5" y="0.5" width="650" height="293" rx="17.5" fill="none"/>
+          </g>
+          <g id="Label-2" transform="translate(-181)">
+            <rect id="Rectangle_144" data-name="Rectangle 144" width="229" height="55" rx="27.5" transform="translate(355 2813.72)" fill="#476db8"/>
+            <text id="Push_REcon" data-name="Push REcon" transform="translate(475.849 2851.634)" fill="#fff" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-91.46" y="0">app: nginx </tspan></text>
+          </g>
+          <g id="Rectangle_142" data-name="Rectangle 142" transform="translate(-219 2595.72)" fill="#476db8" stroke="#476db8" stroke-width="1">
+            <rect width="651" height="108" stroke="none"/>
+            <rect x="0.5" y="0.5" width="650" height="107" fill="none"/>
+          </g>
+          <text id="Push_REcon-2" data-name="Push REcon" transform="translate(-14.151 2799.634)" fill="#476db8" font-size="56" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-134.652" y="0">FRONTEND</tspan></text>
+          <g id="POD" transform="translate(217 -195)">
+            <rect id="CR" width="100" height="55" rx="27.5" transform="translate(84 2816.72)" fill="#fff"/>
+            <text id="CR-2" data-name="CR" transform="translate(133.849 2857.634)" fill="#476db8" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-35.92" y="0">POD</tspan></text>
+          </g>
+          <g id="Rocket" transform="translate(-193 2609.456)">
+            <g id="Group_79" data-name="Group 79" transform="translate(0 75.767)">
+              <g id="Group_78" data-name="Group 78">
+                <circle id="Ellipse_44" data-name="Ellipse 44" cx="1.971" cy="1.971" r="1.971" fill="#fff"/>
+              </g>
+            </g>
+            <g id="Group_81" data-name="Group 81" transform="translate(39.827 36.23)">
+              <g id="Group_80" data-name="Group 80">
+                <circle id="Ellipse_45" data-name="Ellipse 45" cx="1.967" cy="1.967" r="1.967" fill="#fff"/>
+              </g>
+            </g>
+            <g id="Group_83" data-name="Group 83" transform="translate(48.416 15.464)">
+              <g id="Group_82" data-name="Group 82">
+                <path id="Path_139" data-name="Path 139" d="M339.839,107.968a8.368,8.368,0,1,0,0,11.84A8.316,8.316,0,0,0,339.839,107.968Zm-2.781,9.058a4.438,4.438,0,1,1,0-6.277A4.444,4.444,0,0,1,337.058,117.026Z" transform="translate(-325.551 -105.516)" fill="#fff"/>
+              </g>
+            </g>
+            <g id="Group_85" data-name="Group 85" transform="translate(6.338 54.261)">
+              <g id="Group_84" data-name="Group 84">
+                <path id="Path_140" data-name="Path 140" d="M50.582,386.657a1.967,1.967,0,0,0-2.637.884l-2.343,4.7a6.491,6.491,0,0,1-5.348,3.569L37.529,396a1.166,1.166,0,0,1-1.242-1.243l.187-2.725a6.492,6.492,0,0,1,3.569-5.348l4.7-2.343a1.967,1.967,0,0,0-1.753-3.521l-4.7,2.343a10.44,10.44,0,0,0-5.741,8.6l-.187,2.725a5.1,5.1,0,0,0,5.087,5.448c.116,0,.232,0,.349-.012l2.725-.187a10.439,10.439,0,0,0,8.6-5.741l2.343-4.7A1.967,1.967,0,0,0,50.582,386.657Z" transform="translate(-32.35 -380.616)" fill="#fff"/>
+              </g>
+            </g>
+            <g id="Group_87" data-name="Group 87" transform="translate(0.004)">
+              <g id="Group_86" data-name="Group 86">
+                <path id="Path_141" data-name="Path 141" d="M79.105,2.54A3.64,3.64,0,0,0,76.319,1.5l-1.464.093a47.434,47.434,0,0,0-33.7,17.382l-3.446,4.242-9.017-.265h-.046A26.6,26.6,0,0,0,9.714,30.794L.478,40.03a1.572,1.572,0,0,0,1.031,2.682l19.55,1-.8.981a1.572,1.572,0,0,0-.161,1.742q.459.845.962,1.663l-4.636,5.5a1.573,1.573,0,0,0-.219,1.685,20.47,20.47,0,0,0,9.828,9.828,1.572,1.572,0,0,0,1.663-.2c1-.81,2.15-1.771,3.264-2.7.794-.662,1.606-1.34,2.365-1.965q.68.409,1.377.79a1.572,1.572,0,0,0,1.715-.139l1.072-.832L38.5,79.706a1.572,1.572,0,0,0,2.682,1.031L50.418,71.5A26.6,26.6,0,0,0,58.26,52.57V43.958L61.9,41.131A47.246,47.246,0,0,0,80.148,6.075l.037-.765A3.643,3.643,0,0,0,79.105,2.54ZM5.2,39.753l6.735-6.735A23.475,23.475,0,0,1,28.623,26.1l6.59.194-11.7,14.4ZM28.949,59.8c-.821.685-1.662,1.387-2.443,2.029a17.271,17.271,0,0,1-7-7l3.394-4.03a36.448,36.448,0,0,0,3.363,3.9l0,0h0a36.449,36.449,0,0,0,4.328,3.721C30.051,58.885,29.5,59.349,28.949,59.8ZM55.116,52.57A23.474,23.474,0,0,1,48.2,69.278L41.46,76.013l-.94-18.289L55.116,46.4V52.57ZM77.008,5.922A44.105,44.105,0,0,1,59.976,38.647L35.319,57.781a33.289,33.289,0,0,1-5.695-4.2l8.313-8.313a1.572,1.572,0,1,0-2.223-2.223l-8.305,8.305a33.286,33.286,0,0,1-4.031-5.5l20.217-24.89A44.28,44.28,0,0,1,75.055,4.731l1.464-.093a.5.5,0,0,1,.527.519Z" transform="translate(-0.018 -1.492)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <path id="nginx-ar21" d="M51.264,58.844a5.712,5.712,0,0,1-4.031-1.664L13.605,23.551v29.48a5.7,5.7,0,0,1-5.683,5.683A5.6,5.6,0,0,1,2.24,53.031V9.858a5.681,5.681,0,0,1,9.7-4.018L45.569,39.468V9.858a5.683,5.683,0,1,1,11.365,0V53.031a5.7,5.7,0,0,1-5.683,5.683M77.558,4.1,76,7.01,63.9,28.961l-1.56,2.77L63.9,34.5,76,55.736l1.625,2.913h31.6l1.56-3.2,9.025-18.179,4.031-8.244h-9.155L91.6,29.091a5.916,5.916,0,0,0-5.761,5.683A5.906,5.906,0,0,0,91.6,40.456l13.914-.065-3.407,6.892H84.242L75.361,31.653l8.947-16.19h19.038l4.421,9.1H119.21L112.005,7.3l-1.56-3.2h-32.9M135.1,4.032a5.869,5.869,0,0,0-5.592,5.748V24.6h11.365V9.78a5.817,5.817,0,0,0-5.748-5.748m18.205,54.811a5.7,5.7,0,0,1-5.683-5.683V9.949a5.683,5.683,0,1,1,11.365,0v29.61L192.642,5.931a5.681,5.681,0,0,1,9.7,4.018V53.291a5.683,5.683,0,0,1-11.365,0V23.668L157.35,57.3a5.686,5.686,0,0,1-4.031,1.665m91.092-27.386L262.1,13.967a5.683,5.683,0,0,0-8.023-8.049L236.387,23.564,218.7,5.918a5.683,5.683,0,0,0-8.023,8.049l17.685,17.607L210.692,49.13a5.71,5.71,0,0,0-.013,8.036,5.589,5.589,0,0,0,3.9,1.69,5.7,5.7,0,0,0,4.005-1.664L236.231,39.6l17.646,17.594a5.671,5.671,0,0,0,4.005,1.664,5.093,5.093,0,0,0,3.9-1.69,5.686,5.686,0,0,0-.013-8.036L244.15,31.575M134.84,58.8a5.869,5.869,0,0,1-5.592-5.748V29.26h11.365V53.031a5.817,5.817,0,0,1-5.748,5.748" transform="translate(-89.445 2618.746)" fill="#f4f7fb"/>
+        </g>
+        <g id="Logging-1" transform="translate(735 14)">
+          <g id="Rectangle_141-2" data-name="Rectangle 141" transform="translate(-219 2595.72)" fill="#fff" stroke="#3f428b" stroke-width="1">
+            <rect width="778" height="262" rx="18" stroke="none"/>
+            <rect x="0.5" y="0.5" width="777" height="261" rx="17.5" fill="none"/>
+          </g>
+          <g id="Label-1" transform="translate(-305 -56)">
+            <rect id="Rectangle_144-2" data-name="Rectangle 144" width="223" height="55" rx="27.5" transform="translate(469 2813.72)" fill="#476db8"/>
+            <text id="Push_REcon-3" data-name="Push REcon" transform="translate(580.849 2851.634)" fill="#fff" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-86.96" y="0">app: nginx</tspan></text>
+          </g>
+          <g id="Rectangle_142-2" data-name="Rectangle 142" transform="translate(-219 2595.72)" fill="#324cb5" stroke="#414e97" stroke-width="1">
+            <rect width="778" height="108" stroke="none"/>
+            <rect x="0.5" y="0.5" width="777" height="107" fill="none"/>
+          </g>
+          <text id="FEDERATION_CONTROL_PALNE" data-name="FEDERATION CONTROL PALNE" transform="translate(60.849 2662.634)" fill="#fff" font-size="56" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-146.888" y="0">logging-flow</tspan></text>
+          <text id="Push_REcon-4" data-name="Push REcon" transform="translate(-14.151 2799.634)" fill="#324cb5" font-size="56" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-147.672" y="0">SELECTORS:</tspan></text>
+          <g id="POD-2" data-name="POD" transform="translate(236 -195)">
+            <rect id="CR-3" data-name="CR" width="130" height="55" rx="27.5" transform="translate(69 2816.72)" fill="#fff"/>
+            <text id="CR-4" data-name="CR" transform="translate(133.849 2857.634)" fill="#324cb5" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-39.94" y="0">Flow</tspan></text>
+          </g>
+          <g id="Group_330" data-name="Group 330" transform="translate(-196.669 2601.543)">
+            <rect id="Rectangle_243" data-name="Rectangle 243" width="67.484" height="67.484" rx="7.986" transform="translate(0 47.718) rotate(-45)" fill="#fff"/>
+            <rect id="Rectangle_243-2" data-name="Rectangle 243" width="58.217" height="58.217" rx="7.986" transform="translate(6.178 47.718) rotate(-45)" fill="#324cb5"/>
+            <g id="Group_4" data-name="Group 4" transform="translate(23.928 35.222)">
+              <rect id="Rectangle_244" data-name="Rectangle 244" width="13.67" height="3.154" transform="translate(16.583 5.679)" fill="#fff"/>
+              <rect id="Rectangle_245" data-name="Rectangle 245" width="13.67" height="3.154" transform="translate(16.583 10.937)" fill="#fff"/>
+              <rect id="Rectangle_246" data-name="Rectangle 246" width="13.67" height="3.154" transform="translate(16.583 16.194)" fill="#fff"/>
+              <path id="Path_1540" data-name="Path 1540" d="M-4389.653,354.884l-2.973-2.975,9.559-9.558-9.559-9.559,2.973-2.975,11.038,11.05a2.1,2.1,0,0,1,0,2.974h0Z" transform="translate(4424.824 -329.818)" fill="#fff"/>
+              <path id="Path_1541" data-name="Path 1541" d="M-4422.663,354.886l-11.043-11.041a2.1,2.1,0,0,1,0-2.974h0l11.042-11.041,2.974,2.975-9.559,9.558,9.559,9.559Z" transform="translate(4434.321 -329.82)" fill="#fff"/>
+            </g>
+          </g>
+          <g id="POD-3" data-name="POD" transform="translate(366 -195)">
+            <rect id="CR-5" data-name="CR" width="100" height="55" rx="27.5" transform="translate(84 2816.72)" fill="#fff"/>
+            <text id="CR-6" data-name="CR" transform="translate(133.849 2857.634)" fill="#324cb5" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-35.3" y="0">CRD</tspan></text>
+          </g>
+        </g>
+        <g id="output-1" transform="translate(1687 -64)">
+          <g id="Rectangle_141-3" data-name="Rectangle 141" transform="translate(-219 2595.72)" fill="#fff" stroke="#3f428b" stroke-width="1">
+            <rect width="925" height="399" rx="18" stroke="none"/>
+            <rect x="0.5" y="0.5" width="924" height="398" rx="17.5" fill="none"/>
+          </g>
+          <g id="Rectangle_142-3" data-name="Rectangle 142" transform="translate(-219 2595.72)" fill="#1b3296" stroke="#414e97" stroke-width="1">
+            <rect width="925" height="108" stroke="none"/>
+            <rect x="0.5" y="0.5" width="924" height="107" fill="none"/>
+          </g>
+          <text id="FEDERATION_CONTROL_PALNE-2" data-name="FEDERATION CONTROL PALNE" transform="translate(72.849 2663.634)" fill="#fff" font-size="56" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-171.136" y="0">logdna-output</tspan></text>
+          <g id="POD-4" data-name="POD" transform="translate(340 -195)">
+            <rect id="CR-7" data-name="CR" width="164" height="55" rx="27.5" transform="translate(53 2816.72)" fill="#fff"/>
+            <text id="CR-8" data-name="CR" transform="translate(133.849 2857.634)" fill="#1b3296" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-59.98" y="0">Output</tspan></text>
+          </g>
+          <g id="Group_330-2" data-name="Group 330" transform="translate(-196.669 2601.543)">
+            <rect id="Rectangle_243-3" data-name="Rectangle 243" width="67.484" height="67.484" rx="7.986" transform="translate(0 47.718) rotate(-45)" fill="#fff"/>
+            <rect id="Rectangle_243-4" data-name="Rectangle 243" width="58.217" height="58.217" rx="7.986" transform="translate(6.178 47.718) rotate(-45)" fill="#1b3296"/>
+            <g id="Group_4-2" data-name="Group 4" transform="translate(23.928 35.222)">
+              <rect id="Rectangle_244-2" data-name="Rectangle 244" width="13.67" height="3.154" transform="translate(16.583 5.679)" fill="#fff"/>
+              <rect id="Rectangle_245-2" data-name="Rectangle 245" width="13.67" height="3.154" transform="translate(16.583 10.937)" fill="#fff"/>
+              <rect id="Rectangle_246-2" data-name="Rectangle 246" width="13.67" height="3.154" transform="translate(16.583 16.194)" fill="#fff"/>
+              <path id="Path_1540-2" data-name="Path 1540" d="M-4389.653,354.884l-2.973-2.975,9.559-9.558-9.559-9.559,2.973-2.975,11.038,11.05a2.1,2.1,0,0,1,0,2.974h0Z" transform="translate(4424.824 -329.818)" fill="#fff"/>
+              <path id="Path_1541-2" data-name="Path 1541" d="M-4422.663,354.886l-11.043-11.041a2.1,2.1,0,0,1,0-2.974h0l11.042-11.041,2.974,2.975-9.559,9.558,9.559,9.559Z" transform="translate(4434.321 -329.82)" fill="#fff"/>
+            </g>
+          </g>
+          <g id="POD-5" data-name="POD" transform="translate(488 -195)">
+            <rect id="CR-9" data-name="CR" width="100" height="55" rx="27.5" transform="translate(84 2816.72)" fill="#fff"/>
+            <text id="CR-10" data-name="CR" transform="translate(133.849 2857.634)" fill="#1b3296" font-size="40" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-35.3" y="0">CRD</tspan></text>
+          </g>
+          <g id="Env" transform="translate(-1018 -196)">
+            <text id="env-2" data-name="env" transform="translate(846.849 2978.634)" fill="#3f428b" font-size="40" font-family="FiraMonoForPowerline-Regular, Fira Mono for Powerline" letter-spacing="-0.095em"><tspan x="0" y="0">logdna:</tspan><tspan x="0" y="49" xml:space="preserve">  api_key: </tspan><tspan y="49" fill="#478cc4">asdas34jkasd23123mnkcaax</tspan><tspan x="0" y="98" xml:space="preserve">  hostname: </tspan><tspan y="98" fill="#478cc4">logging-operator</tspan><tspan fill="#478cc4"><tspan x="0" y="147" xml:space="preserve">  </tspan><tspan y="147" fill="#3f428b">app:</tspan><tspan y="147" xml:space="preserve"> my-app</tspan></tspan></text>
+          </g>
+        </g>
+      </g>
+      <text id="KUBERNETES_CLUSTER" data-name="KUBERNETES CLUSTER" transform="translate(-28.151 2381.634)" fill="#3f428b" font-size="67" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-334.966" y="0">KUBERNETES CLUSTER</tspan></text>
+      <g id="k8s" transform="translate(-533.272 2124.744)">
+        <g id="g3052" transform="translate(16.326 184.752)">
+          <path id="path3055" d="M73.634,184.762a7.723,7.723,0,0,0-2.94.744L30.569,204.678a7.622,7.622,0,0,0-4.152,5.162l-9.9,43.065a7.558,7.558,0,0,0,1.042,5.835q.2.313.436.606l27.772,34.531a7.7,7.7,0,0,0,6,2.863l44.538-.01a7.7,7.7,0,0,0,6-2.858l27.762-34.536a7.563,7.563,0,0,0,1.483-6.44l-9.914-43.065a7.622,7.622,0,0,0-4.152-5.162L77.354,185.506a7.727,7.727,0,0,0-3.72-.744Z" transform="translate(-16.326 -184.752)" fill="#3f428b" stroke="#fff" stroke-width="1"/>
+          <path id="path3059" d="M152.422,274.06a2.546,2.546,0,0,0-2.4,2.668c0,.023,0,.044.005.067,0,.2-.012.441-.005.616a20.036,20.036,0,0,0,.328,2.284,22.434,22.434,0,0,1,.267,4.357,2.62,2.62,0,0,1-.78,1.242l-.056,1.016a31.256,31.256,0,0,0-4.341.667,30.893,30.893,0,0,0-15.693,8.965c-.265-.181-.729-.514-.867-.616a1.9,1.9,0,0,1-1.427-.139,22.432,22.432,0,0,1-3.238-2.925,20.019,20.019,0,0,0-1.581-1.678c-.146-.126-.37-.3-.534-.426a2.856,2.856,0,0,0-1.673-.631,2.314,2.314,0,0,0-1.914.847,2.545,2.545,0,0,0,.59,3.541l.036.026c.158.128.352.293.5.4a20.025,20.025,0,0,0,1.991,1.165,22.42,22.42,0,0,1,3.572,2.509,2.671,2.671,0,0,1,.482,1.385l.77.688a31.078,31.078,0,0,0-4.9,21.666l-1.006.292a3.33,3.33,0,0,1-1.031,1.042,22.423,22.423,0,0,1-4.305.708,20.1,20.1,0,0,0-2.3.185c-.184.035-.44.1-.641.149l-.021.005-.036.01a2.41,2.41,0,1,0,1.067,4.68l.036-.005c.016,0,.03-.012.046-.015.2-.044.447-.092.621-.139a20.061,20.061,0,0,0,2.155-.826,22.452,22.452,0,0,1,4.187-1.232,2.652,2.652,0,0,1,1.38.487l1.047-.18a31.254,31.254,0,0,0,13.85,17.294l-.436,1.047a2.38,2.38,0,0,1,.214,1.358,23.471,23.471,0,0,1-2.174,3.907,20.117,20.117,0,0,0-1.288,1.919c-.1.18-.216.456-.308.647a2.411,2.411,0,1,0,4.336,2.058l.005-.005s0,0,0-.005c.091-.188.221-.434.3-.611a20.03,20.03,0,0,0,.693-2.2c.635-1.6.985-3.271,1.859-4.315a1.945,1.945,0,0,1,1.035-.5l.544-.985a31.082,31.082,0,0,0,22.164.056c.153.271.437.792.513.924a1.9,1.9,0,0,1,1.226.744,22.411,22.411,0,0,1,1.647,4.039,20.1,20.1,0,0,0,.7,2.2c.078.178.206.428.3.616a2.413,2.413,0,1,0,4.341-2.053c-.092-.19-.218-.467-.313-.647a20.025,20.025,0,0,0-1.288-1.914,22.443,22.443,0,0,1-2.13-3.813,1.884,1.884,0,0,1,.185-1.416,8.252,8.252,0,0,1-.4-.97,31.253,31.253,0,0,0,13.845-17.417c.311.049.851.144,1.026.18a1.9,1.9,0,0,1,1.344-.5,22.451,22.451,0,0,1,4.187,1.232,20.084,20.084,0,0,0,2.155.831c.174.046.422.09.621.133.016,0,.03.012.046.015l.036.005a2.41,2.41,0,1,0,1.067-4.68c-.206-.047-.5-.126-.7-.164a20.1,20.1,0,0,0-2.3-.185,22.422,22.422,0,0,1-4.305-.708,2.694,2.694,0,0,1-1.037-1.042l-.97-.282a31.2,31.2,0,0,0-5-21.615c.249-.226.719-.642.852-.765a1.9,1.9,0,0,1,.452-1.36,22.42,22.42,0,0,1,3.572-2.509,20.087,20.087,0,0,0,2-1.165c.155-.114.366-.3.529-.426a2.414,2.414,0,1,0-2.992-3.756c-.164.13-.386.3-.534.426a20.091,20.091,0,0,0-1.586,1.678,22.5,22.5,0,0,1-3.238,2.93,2.674,2.674,0,0,1-1.457.159l-.913.652a31.475,31.475,0,0,0-19.936-9.632c-.021-.32-.049-.9-.056-1.073a1.9,1.9,0,0,1-.785-1.2,22.474,22.474,0,0,1,.272-4.357,20.036,20.036,0,0,0,.328-2.284c.007-.193,0-.474-.005-.682A2.546,2.546,0,0,0,152.422,274.06Zm-3.007,18.628-.713,12.6-.051.026a2.117,2.117,0,0,1-3.361,1.622l-.021.01-10.33-7.323a24.74,24.74,0,0,1,11.916-6.492A25.327,25.327,0,0,1,149.415,292.688Zm6.019,0a24.948,24.948,0,0,1,14.389,6.938L159.56,306.9l-.036-.015a2.12,2.12,0,0,1-3.366-1.616l-.01-.005Zm-24.242,11.639,9.432,8.436-.01.051a2.116,2.116,0,0,1-.831,3.638l-.01.041-12.09,3.49A24.735,24.735,0,0,1,131.193,304.326Zm42.393.005a25.194,25.194,0,0,1,3.618,15.611l-12.152-3.5-.01-.051a2.118,2.118,0,0,1-.831-3.638l-.005-.026Zm-23.1,9.083h3.864l2.4,3-.862,3.746-3.469,1.668-3.479-1.673-.862-3.746Zm12.388,10.274a2.1,2.1,0,0,1,.488.036l.021-.026,12.506,2.114a24.767,24.767,0,0,1-10.012,12.578l-4.855-11.726.015-.021a2.125,2.125,0,0,1,1.837-2.956Zm-21,.051a2.118,2.118,0,0,1,1.914,2.951l.036.046-4.8,11.608a24.868,24.868,0,0,1-9.981-12.49l12.4-2.1.021.026A2.146,2.146,0,0,1,141.872,323.739Zm10.474,5.086a2.136,2.136,0,0,1,1.94,1.114h.046l6.112,11.043a25.34,25.34,0,0,1-2.443.683,24.835,24.835,0,0,1-13.553-.7l6.1-11.023h.01A2.12,2.12,0,0,1,152.345,328.825Z" transform="translate(-94.717 -259.394)" fill="#fff" stroke="#fff" stroke-width="0.25"/>
+        </g>
+      </g>
+      <line id="Line_126" data-name="Line 126" x1="174" transform="translate(447.5 2791.22)" fill="none" stroke="#476db8" stroke-width="6"/>
+      <line id="Line_130" data-name="Line 130" x1="157" transform="translate(1397.5 2791.22)" fill="none" stroke="#324cb5" stroke-width="6"/>
+      <path id="Polygon_95" data-name="Polygon 95" d="M15.124,5.076a2,2,0,0,1,3.752,0L33,43.307A2,2,0,0,1,31.129,46H2.871A2,2,0,0,1,1,43.307Z" transform="translate(629.5 2774.22) rotate(90)" fill="#476db8"/>
+      <g id="Ellipse_155" data-name="Ellipse 155" transform="translate(437 2780.72)" fill="#fff" stroke="#3f428b" stroke-width="3">
+        <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+        <circle cx="10.5" cy="10.5" r="9" fill="none"/>
+      </g>
+      <path id="Polygon_96" data-name="Polygon 96" d="M15.124,5.076a2,2,0,0,1,3.752,0L33,43.307A2,2,0,0,1,31.129,46H2.871A2,2,0,0,1,1,43.307Z" transform="translate(1577.5 2774.22) rotate(90)" fill="#324cb5"/>
+      <g id="Ellipse_156" data-name="Ellipse 156" transform="translate(1389 2779.72)" fill="#fff" stroke="#3f428b" stroke-width="3">
+        <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+        <circle cx="10.5" cy="10.5" r="9" fill="none"/>
+      </g>
+      <line id="Line_132" data-name="Line 132" x1="287" transform="translate(2497.5 2791.22)" fill="none" stroke="#3f428b" stroke-width="6"/>
+      <path id="Polygon_99" data-name="Polygon 99" d="M15.124,5.076a2,2,0,0,1,3.752,0L33,43.307A2,2,0,0,1,31.129,46H2.871A2,2,0,0,1,1,43.307Z" transform="translate(2798.5 2774.22) rotate(90)" fill="#3f428b"/>
+      <g id="logdna" transform="translate(2798.918 2586.262)">
+        <g transform="matrix(1, 0, 0, 1, -3404.92, -357.26)" filter="url(#S3)">
+          <g id="S3-2" data-name="S3" transform="translate(3404.92 357.26)" fill="#fff" stroke="#b8c6e6" stroke-miterlimit="10" stroke-width="2">
+            <rect width="409.024" height="409.024" rx="10" stroke="none"/>
+            <rect x="1" y="1" width="407.024" height="407.024" rx="9" fill="none"/>
+          </g>
+        </g>
+        <text id="ElasticSearch" transform="translate(204.694 330.573)" font-size="56" font-family="Klavika-Regular, Klavika" letter-spacing="0.01em"><tspan x="-95.704" y="0">LogDNA</tspan></text>
+        <g id="logdna-2" data-name="logdna" transform="translate(107.082 -130.542)">
+          <g id="Group_297" data-name="Group 297" transform="translate(0 0)">
+            <path id="Path_696" data-name="Path 696" d="M61.672,30.777l.379,3.322L112,35.479l.052-.815v.016l.088-1.453.078-1.453.036-.727L94.613,20.823a15.674,15.674,0,0,0-15.648,0ZM65.16,52.606l45,1.464.093-.685-.005.021.078-.561.14-1.038.1-.846.114-.851.145-1.168.14-1.178.384-3.669.327-3.856L63.1,41.577l2.066,11.065Zm5.4,18.336,36.423,1.365.908-4.411.446-2.476.078-.415.078-.436.3-1.765.187-1.22.192-1.038.28-1.713L67,60.214l1.339,4.552,2.2,6.244ZM93.409,93.165a8.978,8.978,0,0,0,2.636-1.059,12.431,12.431,0,0,0,1.837-1.329,15.564,15.564,0,0,0,1.868-1.92l.431-.545.259-.348.394-.545a22.006,22.006,0,0,0,1.178-1.884l.1-.182.114-.187,1.308-2.465.716-1.64.311-.778.5-1.329.664-2.034L73.853,78.115l1.541,2.673a39.3,39.3,0,0,0,3.348,4.583,18.788,18.788,0,0,0,6.124,4.847A13.63,13.63,0,0,0,86.952,91l.675.171.649.14.415.1,1.23.343a21.709,21.709,0,0,1,2.372.882l1.116.519ZM64.137,134.929l41.738-1.547-1.36-4.671-2.481-7.038-35.292-1.531-.182.763-.919,4.567-.477,2.714-.125.675-.228,1.349-.28,1.816-.171,1.038-.285,1.8Zm-2.232,18.559,48-1.474L107.93,141.79l-.171-.768-44.291-1.578-.519,4.36-1,9.684Zm-11.148,4.8.27-3.114.083-.778.083-.727.332-2.818.924-6.643.4-2.5.067-.394,1.3-6.259.208-.83.7-2.626.28-1.012.156-.545,1.261-3.737.088-.249,1.453-3.607.052-.1,1.972-4.048,1.266-2.361.1-.187,2.31-3.607.9-1.282.379-.519a43.389,43.389,0,0,1,3.628-4.183l.187-.176.171-.156.846-.737,1.246-1.007.363-.259.519-.322,1.557-1.007,1.074-.519,1.349-.592a14,14,0,0,1,1.92-.612,9.545,9.545,0,0,1,1.375-.244,4.9,4.9,0,0,1,.872-.031h.016l.067.073-.073.062-.14.005-.244.026a8.148,8.148,0,0,0-2.605.882,10.977,10.977,0,0,0-1.962,1.349l-.727.649a14.808,14.808,0,0,0-1.277,1.4l-.415.555-.135.187-.509.711L71.4,108.112l-.1.182-.1.187-.971,1.816-1.012,2.31-.208.535-.493,1.329-.441,1.329,30.595-1.329a42.585,42.585,0,0,0-2.543-4.183,30.531,30.531,0,0,0-2.906-3.633,16.873,16.873,0,0,0-5.086-3.82,7.57,7.57,0,0,0-1.723-.633l-1.152-.259-.415-.1-1.453-.4a24.364,24.364,0,0,1-2.595-.971,25.169,25.169,0,0,1-2.444-1.24l-1.775-1.116a36.043,36.043,0,0,1-9.165-9.482L66.343,87.01,64.89,84.586,63.146,81.28l-1.941-4.266L58.942,71.1l-2.424-7.826L54.027,52.855,51.754,39.621,51.38,36.8,24.118,52.538A15.622,15.622,0,0,0,16.3,66.032v63.354a15.622,15.622,0,0,0,7.821,13.546Zm71.227.415,27.4-15.819a15.622,15.622,0,0,0,7.821-13.494V66.069a15.622,15.622,0,0,0-7.821-13.546L122.669,37.1l-.13,1.521-1.868,13.888-.166.893-.82,3.981-.311,1.375-.2.778-.275,1.048-.841,3.026-.052.156-1.37,3.986-.182.519-.343.862-1.22,2.906-.187.389-.727,1.495-1.464,2.8-.727,1.3-.062.114-2.361,3.607L108.459,83l-.374.5a44.631,44.631,0,0,1-3.659,4.136l-.192.176-.519.457-1.65,1.349-.156.119a27.072,27.072,0,0,1-3.363,2.086l-.882.426-1.464.592a11.509,11.509,0,0,1-1.765.5l-.737.13.654.353,1.427.856a34.139,34.139,0,0,1,9.114,9.134l1.194,1.791,1.464,2.429,1.765,3.332,1.983,4.318,2.335,6.02,2.595,8.47,2.714,11.19,2.5,14.091.477,3.41Zm-60.743,5.6L78.96,174.523a15.622,15.622,0,0,0,15.648,0l17.127-9.892-.644-5.086L61.61,158.029l-.374,6.254Zm59.752-147,44.649,25.825a15.622,15.622,0,0,1,7.826,13.494V138.7a15.622,15.622,0,0,1-7.826,13.6L94.561,193.342a15.622,15.622,0,0,1-15.648,0L7.826,152.325A15.641,15.641,0,0,1,0,138.832V56.675A15.622,15.622,0,0,1,7.826,43.129L78.913,2.092a15.674,15.674,0,0,1,15.648,0L119.991,16.78l.291.067.716.519Z" transform="translate(11 183)" fill="#db0a5b" fill-rule="evenodd"/>
+          </g>
+        </g>
+      </g>
+      <g id="Ellipse_159" data-name="Ellipse 159" transform="translate(2487 2780.72)" fill="#fff" stroke="#b8c6e6" stroke-width="3">
+        <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+        <circle cx="10.5" cy="10.5" r="9" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>
