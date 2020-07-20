@@ -28,6 +28,8 @@ hec_host: splunk.default.svc.cluster.local
 hec_port: 8088
 insecure_ssl: true
 index: foo
+fields:
+  dummy: " "
 host: foo
 protocol: http
 metrics_from_event: true
@@ -55,6 +57,9 @@ source: foo
 		protocol http
 		source foo
 		sourcetype foo
+		<fields>
+		  dummy  
+		</fields>
 	</match>
 `
 	es := &output.SplunkHecOutput{}
