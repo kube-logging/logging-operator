@@ -18,6 +18,7 @@ generated_file: true
 | logz | *output.LogZOutput | No | - |  |
 | loki | *output.LokiOutput | No | - |  |
 | sumologic | *output.SumologicOutput | No | - |  |
+| datadog | *output.DatadogOutput | No | - |  |
 | forward | *output.ForwardOutput | No | - |  |
 | file | *output.FileOutputConfig | No | - |  |
 | nullout | *output.NullOutputConfig | No | - |  |
