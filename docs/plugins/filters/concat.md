@@ -1,6 +1,7 @@
 ---
 title: Concat
 weight: 200
+generated_file: true
 ---
 
 # [Concat Filter](https://github.com/fluent-plugins-nursery/fluent-plugin-concat)

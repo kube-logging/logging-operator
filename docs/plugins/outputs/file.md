@@ -1,6 +1,7 @@
 ---
 title: File
 weight: 200
+generated_file: true
 ---
 
 # [File Output](https://docs.fluentd.org/output/file)

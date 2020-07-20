@@ -1,6 +1,7 @@
 ---
 title: Amazon CloudWatch
 weight: 200
+generated_file: true
 ---
 
 # CloudWatch output plugin for Fluentd
