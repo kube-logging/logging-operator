@@ -1,6 +1,7 @@
 ---
 title: LoggingSpec
 weight: 200
+generated_file: true
 ---
 
 ### LoggingSpec

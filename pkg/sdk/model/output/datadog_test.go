@@ -22,48 +22,35 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func TestSplunkHEC(t *testing.T) {
+func TestDatadog(t *testing.T) {
 	CONFIG := []byte(`
-hec_host: splunk.default.svc.cluster.local
-hec_port: 8088
-insecure_ssl: true
-index: foo
-fields:
-  dummy: " "
-host: foo
-protocol: http
-metrics_from_event: true
-metrics_name_key: foo
-metrics_value_key: foo
-coerce_to_utf8: true
-non_utf8_replacement_string: bar
-sourcetype: foo
-source: foo
+dd_source: '<INTEGRATION_NAME>' 
+dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
+dd_sourcecategory: '<MY_SOURCE_CATEGORY>'
+buffer:
+  timekey: 1m
+  timekey_wait: 30s
+  timekey_use_utc: true
 `)
 	expected := `
-	<match **>
-		@type splunk_hec
-		@id test
-		coerce_to_utf8 true
-		hec_host splunk.default.svc.cluster.local
-		hec_port 8088
-		host foo
-		index foo
-		insecure_ssl true
-		metrics_from_event true
-		metrics_name_key foo
-		metrics_value_key foo
-		non_utf8_replacement_string bar
-		protocol http
-		source foo
-		sourcetype foo
-		<fields>
-		  dummy  
-		</fields>
-	</match>
+  <match **>
+	@type datadog
+	@id test
+	dd_source <INTEGRATION_NAME>
+	dd_sourcecategory <MY_SOURCE_CATEGORY>
+	dd_tags <KEY1:VALUE1>,<KEY2:VALUE2>
+	<buffer tag,time>
+	  @type file
+	  path /buffers/test.*.buffer
+	  retry_forever true
+	  timekey 1m
+	  timekey_use_utc true
+	  timekey_wait 30s
+	</buffer>
+  </match>
 `
-	es := &output.SplunkHecOutput{}
-	yaml.Unmarshal(CONFIG, es)
-	test := render.NewOutputPluginTest(t, es)
+	s := &output.DatadogOutput{}
+	yaml.Unmarshal(CONFIG, s)
+	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)
 }

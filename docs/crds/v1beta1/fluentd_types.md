@@ -1,6 +1,7 @@
 ---
 title: FluentdSpec
 weight: 200
+generated_file: true
 ---
 
 ### FluentdSpec

@@ -1145,6 +1145,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.SumologicOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.DatadogOutput != nil {
+		in, out := &in.DatadogOutput, &out.DatadogOutput
+		*out = new(output.DatadogOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ForwardOutput != nil {
 		in, out := &in.ForwardOutput, &out.ForwardOutput
 		*out = new(output.ForwardOutput)

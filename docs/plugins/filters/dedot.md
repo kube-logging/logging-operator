@@ -1,6 +1,7 @@
 ---
 title: Dedot
 weight: 200
+generated_file: true
 ---
 
 # [Dedot Filter](https://github.com/lunardial/fluent-plugin-dedot_filter)

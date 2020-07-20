@@ -1,6 +1,7 @@
 ---
 title: Record Transformer
 weight: 200
+generated_file: true
 ---
 
 # [Record Transformer](https://docs.fluentd.org/filter/record_transformer)

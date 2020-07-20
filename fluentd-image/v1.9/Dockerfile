@@ -58,6 +58,7 @@ RUN apk update \
          fluent-plugin-splunk-hec \
          elasticsearch-xpack \
          fluent-plugin-logdna \
+         fluent-plugin-datadog \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \

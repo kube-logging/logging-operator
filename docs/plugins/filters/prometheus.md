@@ -1,6 +1,7 @@
 ---
 title: Prometheus
 weight: 200
+generated_file: true
 ---
 
 # [Prometheus Filter](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin)

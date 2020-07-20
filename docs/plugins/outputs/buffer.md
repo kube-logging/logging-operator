@@ -1,6 +1,7 @@
 ---
 title: Buffer
 weight: 200
+generated_file: true
 ---
 
 ### Buffer

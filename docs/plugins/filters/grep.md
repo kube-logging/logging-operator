@@ -1,6 +1,7 @@
 ---
 title: Grep
 weight: 200
+generated_file: true
 ---
 
 # [Grep Filter](https://docs.fluentd.org/filter/grep)
