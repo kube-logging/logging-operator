@@ -21,39 +21,39 @@ import (
 
 // +name:"Amazon Kinesis"
 // +weight:"200"
-type _hugoKinesisStream interface{}
+type _hugoKinesisFirehose interface{}
 
-// +docName:"Kinesis Stream output plugin for Fluentd"
-//  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
+// +docName:"Kinesis Firehose output plugin for Fluentd"
+//  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose
 //
 // #### Example output configurations
 // ```
 // spec:
-//   kinesisStream:
-//     stream_name: example-stream-name
+//   kinesisFirehose:
+//     delivery_stream_name: example-stream-name
 //     region: us-east-1
 //     format:
 //       type: json
 // ```
-type _docKinesisStream interface{}
+type _docKinesisFirehose interface{}
 
-// +name:"Amazon Kinesis Stream"
+// +name:"Amazon Kinesis Firehose"
 // +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.2"
 // +version:"3.2.2"
 // +description:"Fluent plugin for Amazon Kinesis"
-// +status:"GA"
-type _metaKinesis interface{}
+// +status:"Testing"
+type _metaKinesisFirehose interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"KinesisStream"
 // Send your logs to a Kinesis Stream
-type KinesisStreamOutputConfig struct {
+type KinesisFirehoseOutputConfig struct {
+	// Name of the delivery stream to put data.
+	DeliveryStreamName string `json:"delivery_stream_name"`
 
-	// Name of the stream to put data.
-	StreamName string `json:"stream_name"`
-
-	// A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly.
-	PartitionKey string `json:"partition_key,omitempty"`
+	// If it is enabled, the plugin adds new line character (\n) to each serialized record.
+	//Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true)
+	AppendNewLine *bool `json:"append_new_line,omitempty"`
 
 	// AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.
 	AWSKeyId *secret.Secret `json:"aws_key_id,omitempty"`
@@ -94,7 +94,7 @@ type KinesisStreamOutputConfig struct {
 // +kubebuilder:object:generate=true
 // +docName:"Assume Role Credentials"
 // assume_role_credentials
-type KinesisStreamAssumeRoleCredentials struct {
+type KinesisFirehoseAssumeRoleCredentials struct {
 	// The Amazon Resource Name (ARN) of the role to assume
 	RoleArn string `json:"role_arn"`
 	// An identifier for the assumed role session
@@ -107,14 +107,14 @@ type KinesisStreamAssumeRoleCredentials struct {
 	ExternalId string `json:"external_id,omitempty"`
 }
 
-func (o *KinesisStreamAssumeRoleCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+func (o *KinesisFirehoseAssumeRoleCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "assume_role_credentials",
 	}, o, secretLoader)
 }
 
-func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "kinesis_streams"
+func (e *KinesisFirehoseOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	pluginType := "kinesis_firehose"
 	kinesis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
