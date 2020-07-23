@@ -123,6 +123,7 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
+			SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
 		},
 		LivenessProbe:  r.Logging.Spec.FluentdSpec.LivenessProbe,
 		ReadinessProbe: r.Logging.Spec.FluentdSpec.ReadinessProbe,
