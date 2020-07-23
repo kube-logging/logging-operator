@@ -12,7 +12,7 @@
 | hostname | string | Yes | - | Hostname<br> |
 | app | string | No | - | Application name<br> |
 | buffer_chunk_limit | string | No | - | Do not increase past 8m (8MB) or your logs will be rejected by LogDNA server.<br> |
- #### Example `Regexp` filter configurations
+ #### Example `LogDNA` filter configurations
  ```
  apiVersion: logging.banzaicloud.io/v1beta1
  kind: Output
