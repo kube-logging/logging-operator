@@ -29,6 +29,7 @@ generated_file: true
 | newrelic | *output.NewRelicOutputConfig | No | - |  |
 | splunkHec | *output.SplunkHecOutput | No | - |  |
 | http | *output.HTTPOutputConfig | No | - |  |
+| awsElasticsearch | *output.AwsElasticsearchOutputConfig | No | - |  |
 ### OutputStatus
 #### OutputStatus defines the observed state of Output
 
