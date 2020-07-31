@@ -61,6 +61,7 @@ RUN apk update \
          fluent-plugin-throttle \
          fluent-plugin-logdna \
          fluent-plugin-datadog \
+         fluent-plugin-aws-elasticsearch-service \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
