@@ -12,14 +12,7 @@ rules:
   - apiGroups:
       - monitoring.coreos.com
     resources:
-      - alertmanagers
-      - prometheuses
-      - prometheuses/finalizers
-      - alertmanagers/finalizers
       - servicemonitors
-      - podmonitors
-      - prometheusrules
-      - podmonitors
     verbs:
       - '*'
   - apiGroups:
@@ -61,33 +54,38 @@ rules:
       - policy
       - rbac.authorization.k8s.io
     resources:
-      - namespaces
-      - nodes
-      - persistentvolumeclaims
       - pods
       - services
-      - resourcequotas
-      - replicationcontrollers
-      - limitranges
       - persistentvolumeclaims
       - persistentvolumes
-      - endpoints
-      - secrets
       - configmaps
+      - daemonsets
+      - deployments
+      - statefulsets
       - serviceaccounts
       - roles
       - rolebindings
       - clusterroles
       - clusterrolebindings
+      - secrets
       - podsecuritypolicies
-      - daemonsets
-      - deployments
-      - replicasets
-      - statefulsets
-      - jobs
     verbs:
-      - "*"
-
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
 ---
 # Source: logging-operator/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
