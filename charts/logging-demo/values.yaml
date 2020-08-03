@@ -50,11 +50,16 @@ file:
 minio:
   enabled: false
   existingSecret: logging-s3
+  persistence:
+    enabled: false
   environment:
     MINIO_REGION: test_region
   defaultBucket:
     enabled: true
     name: demo
+  resources:
+    requests:
+      memory: 256Mi
 
 # Enable ElasticSearch logging output
 elasticsearch:
