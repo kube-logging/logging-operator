@@ -42,7 +42,7 @@ generated_file: true
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | enabled | bool | Yes | - |  |
-| secretName | string | Yes | - |  |
+| secretName | string | No | - |  |
 | sharedKey | string | No | - |  |
 ### BufferStorage
 #### BufferStorage is the Service Section Configuration of fluent-bit
