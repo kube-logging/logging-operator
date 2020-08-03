@@ -88,6 +88,6 @@ type FluentdScaling struct {
 // FluentdTLS defines the TLS configs
 type FluentdTLS struct {
 	Enabled    bool   `json:"enabled"`
-	SecretName string `json:"secretName"`
+	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
 }

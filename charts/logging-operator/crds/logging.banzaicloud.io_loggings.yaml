@@ -2914,7 +2914,6 @@ spec:
                       type: string
                   required:
                   - enabled
-                  - secretName
                   type: object
                 tolerations:
                   items:
@@ -4597,7 +4596,6 @@ spec:
                       type: string
                   required:
                   - enabled
-                  - secretName
                   type: object
                 tolerations:
                   items:
