@@ -29,8 +29,8 @@ type _hugoDatadog interface{}
 type _docDatadog interface{}
 
 // +name:"Datadog"
-// +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.12.0"
-// +version:"0.12.0"
+// +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.12.1"
+// +version:"0.12.1"
 // +description:"Send your logs to Datadog"
 // +status:"Testing"
 type _metaDatadog interface{}
