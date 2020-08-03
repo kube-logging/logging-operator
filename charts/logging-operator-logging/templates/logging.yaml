@@ -23,13 +23,9 @@ spec:
 {{ toYaml .Values.defaultFlow | indent 4}}
   {{- end }}
   fluentd:
-    tls:
     {{- if .Values.tls.enabled }}
+    tls:
       enabled: true
-      secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
-      sharedKey: "{{ .Values.tls.sharedKey }}"
-    {{- else }}
-      enabled: false
       secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
       sharedKey: "{{ .Values.tls.sharedKey }}"
     {{- end }}
@@ -37,13 +33,9 @@ spec:
 {{ toYaml .Values.fluentd | indent 4}}
     {{- end}}
   fluentbit:
-    tls:
     {{- if .Values.tls.enabled }}
+    tls:
       enabled: true
-      secretName: {{ .Values.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
-      sharedKey: "{{ .Values.tls.sharedKey }}"
-    {{- else }}
-      enabled: false
       secretName: {{ .Values.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
       sharedKey: "{{ .Values.tls.sharedKey }}"
     {{- end }}
