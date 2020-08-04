@@ -38,8 +38,8 @@ type _hugoKinesisFirehose interface{}
 type _docKinesisFirehose interface{}
 
 // +name:"Amazon Kinesis Firehose"
-// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.2"
-// +version:"3.2.2"
+// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.3"
+// +version:"3.2.3"
 // +description:"Fluent plugin for Amazon Kinesis"
 // +status:"Testing"
 type _metaKinesisFirehose interface{}
