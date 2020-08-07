@@ -30,6 +30,7 @@ generated_file: true
 | splunkHec | *output.SplunkHecOutput | No | - |  |
 | http | *output.HTTPOutputConfig | No | - |  |
 | awsElasticsearch | *output.AwsElasticsearchOutputConfig | No | - |  |
+| redis | *output.RedisOutputConfig | No | - |  |
 ### OutputStatus
 #### OutputStatus defines the observed state of Output
 
