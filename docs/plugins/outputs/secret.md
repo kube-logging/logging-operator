@@ -27,10 +27,9 @@ There are cases when you can't inject secret into the configuration because the 
 
 ```yaml
 tls_cert_path:
-  valueFrom:
-    mountFrom:
-      name: <kubernetes-secret-name>
-      key: <kubernetes-secret-key>
+  mountFrom:
+    name: <kubernetes-secret-name>
+    key: <kubernetes-secret-key>
 ```
 
 The operator will collect the secret and copy it to the `fluentd-output` secret. The fluentd configuration will contain the secret path.
