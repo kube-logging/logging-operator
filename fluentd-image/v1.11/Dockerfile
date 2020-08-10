@@ -27,7 +27,7 @@ RUN apk update \
  && gem install async-http -v 0.52.4 \
  && gem install ext_monitor -v 0.1.2 \
  && gem install fluentd -v 1.11.2 \
- && gem install prometheus-client -v 2.1.0 \
+ && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
  && gem install fluent-plugin-kubernetes_metadata_filter -v 2.5.2 \
  && gem install \
