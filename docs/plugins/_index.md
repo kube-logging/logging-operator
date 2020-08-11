@@ -43,6 +43,7 @@ For more information please click on the plugin name
 | **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.14](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.1.8](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Alibaba Cloud Storage](outputs/oss/)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
+| **[Http](outputs/redis/)** | outputs | Sends logs to Redis endpoints. | GA | [0.3.4](https://github.com/fluent-plugins-nursery/fluent-plugin-redis) |
 | **[Amazon S3](outputs/s3/)** | outputs | Store logs in Amazon S3 | GA | [1.4.0](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.4.0) |
 | **[Splunk Hec](outputs/splunk_hec/)** | outputs | Fluent Plugin Splunk Hec Release 1.2.3 | GA | [1.2.3]() |
 | **[SumoLogic](outputs/sumologic/)** | outputs | Send your logs to Sumologic | GA | [1.7.1](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.7.1) |

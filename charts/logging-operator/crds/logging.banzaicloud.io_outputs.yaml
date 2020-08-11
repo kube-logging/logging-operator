@@ -6075,6 +6075,254 @@ spec:
               - bucket
               - endpoint
               type: object
+            redis:
+              properties:
+                allow_duplicate_key:
+                  description: 'allow_duplicate_key Allow insert key duplicate. It
+                    will work as update values. (default: false)'
+                  type: boolean
+                buffer:
+                  properties:
+                    chunk_full_threshold:
+                      description: The percentage of chunk size threshold for flushing.
+                        output plugin will flush the chunk when actual size reaches
+                        chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in
+                        default)
+                      type: string
+                    chunk_limit_records:
+                      description: The max number of events that each chunks can store
+                        in it
+                      type: integer
+                    chunk_limit_size:
+                      description: 'The max size of each chunks: events will be written
+                        into chunks until the size of chunks become this size'
+                      type: string
+                    compress:
+                      description: If you set this option to gzip, you can get Fluentd
+                        to compress data records before writing to buffer chunks.
+                      type: string
+                    delayed_commit_timeout:
+                      description: The timeout seconds until output plugin decides
+                        that async write operation fails
+                      type: string
+                    disable_chunk_backup:
+                      description: Instead of storing unrecoverable chunks in the
+                        backup directory, just discard them. This option is new in
+                        Fluentd v1.2.6.
+                      type: boolean
+                    flush_at_shutdown:
+                      description: The value to specify to flush/write all buffer
+                        chunks at shutdown, or not
+                      type: boolean
+                    flush_interval:
+                      description: 'Default: 60s'
+                      type: string
+                    flush_mode:
+                      description: 'Default: default (equals to lazy if time is specified
+                        as chunk key, interval otherwise) lazy: flush/write chunks
+                        once per timekey interval: flush/write chunks per specified
+                        time via flush_interval immediate: flush/write chunks immediately
+                        after events are appended into chunks'
+                      type: string
+                    flush_thread_burst_interval:
+                      description: The sleep interval seconds of threads between flushes
+                        when output plugin flushes waiting chunks next to next
+                      type: string
+                    flush_thread_count:
+                      description: The number of threads of output plugins, which
+                        is used to write chunks in parallel
+                      type: integer
+                    flush_thread_interval:
+                      description: The sleep interval seconds of threads to wait next
+                        flush trial (when no chunks are waiting)
+                      type: string
+                    overflow_action:
+                      description: 'How output plugin behaves when its buffer queue
+                        is full throw_exception: raise exception to show this error
+                        in log block: block processing of input plugin to emit events
+                        into that buffer drop_oldest_chunk: drop/purge oldest chunk
+                        to accept newly incoming chunk'
+                      type: string
+                    path:
+                      description: 'The path where buffer chunks are stored. The ''*''
+                        is replaced with random characters. It''s highly recommended
+                        to leave this default. (default: operator generated)'
+                      type: string
+                    queue_limit_length:
+                      description: The queue length limitation of this buffer plugin
+                        instance
+                      type: integer
+                    queued_chunks_limit_size:
+                      description: Limit the number of queued chunks. If you set smaller
+                        flush_interval, e.g. 1s, there are lots of small queued chunks
+                        in buffer. This is not good with file buffer because it consumes
+                        lots of fd resources when output destination has a problem.
+                        This parameter mitigates such situations.
+                      type: integer
+                    retry_exponential_backoff_base:
+                      description: The base number of exponential backoff for retries
+                      type: string
+                    retry_forever:
+                      description: If true, plugin will ignore retry_timeout and retry_max_times
+                        options and retry flushing forever
+                      type: boolean
+                    retry_max_interval:
+                      description: The maximum interval seconds for exponential backoff
+                        between retries while failing
+                      type: string
+                    retry_max_times:
+                      description: The maximum number of times to retry to flush while
+                        failing
+                      type: integer
+                    retry_randomize:
+                      description: If true, output plugin will retry after randomized
+                        interval not to do burst retries
+                      type: boolean
+                    retry_secondary_threshold:
+                      description: The ratio of retry_timeout to switch to use secondary
+                        while failing (Maximum valid value is 1.0)
+                      type: string
+                    retry_timeout:
+                      description: The maximum seconds to retry to flush while failing,
+                        until plugin discards buffer chunks
+                      type: string
+                    retry_type:
+                      description: 'exponential_backoff: wait seconds will become
+                        large exponentially per failures periodic: output plugin will
+                        retry periodically with fixed intervals (configured via retry_wait)'
+                      type: string
+                    retry_wait:
+                      description: Seconds to wait before next retry to flush, or
+                        constant factor of exponential backoff
+                      type: string
+                    tags:
+                      description: 'When tag is specified as buffer chunk key, output
+                        plugin writes events into chunks separately per tags. (default:
+                        tag,time)'
+                      type: string
+                    timekey:
+                      description: Output plugin will flush chunks per specified time
+                        (enabled when time is specified in chunk keys)
+                      type: string
+                    timekey_use_utc:
+                      description: Output plugin decides to use UTC or not to format
+                        placeholders using timekey
+                      type: boolean
+                    timekey_wait:
+                      description: Output plugin writes chunks after timekey_wait
+                        seconds later after timekey expiration
+                      type: string
+                    timekey_zone:
+                      description: The timezone (-0700 or Asia/Tokyo) string for formatting
+                        timekey placeholders
+                      type: string
+                    total_limit_size:
+                      description: The size limitation of this buffer plugin instance.
+                        Once the total size of stored buffer reached this threshold,
+                        all append operations will fail with error (and data will
+                        be lost)
+                      type: string
+                    type:
+                      description: Fluentd core bundles memory and file plugins. 3rd
+                        party plugins are also available when installed.
+                      type: string
+                  type: object
+                db_number:
+                  description: 'DbNumber database number is optional. (default: 0)'
+                  type: integer
+                format:
+                  properties:
+                    add_newline:
+                      description: 'When type is single_value add ''\n'' to the end
+                        of the message (default: true)'
+                      type: boolean
+                    message_key:
+                      description: When type is single_value specify the key holding
+                        information
+                      type: string
+                    type:
+                      description: 'Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+                        (default: json)'
+                      enum:
+                      - out_file
+                      - json
+                      - ltsv
+                      - csv
+                      - msgpack
+                      - hash
+                      - single_value
+                      type: string
+                  type: object
+                host:
+                  description: 'Host Redis endpoint (default: localhost)'
+                  type: string
+                insert_key_prefix:
+                  description: 'insert_key_prefix (default: "${tag}")'
+                  type: string
+                password:
+                  description: Redis Server password
+                  properties:
+                    mountFrom:
+                      description: Refers to a secret value to be used through a volume
+                        mount
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      description: Refers to a non-secret value
+                      type: string
+                    valueFrom:
+                      description: Refers to a secret value to be used directly
+                      properties:
+                        secretKeyRef:
+                          description: SecretKeySelector selects a key of a Secret.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
+                port:
+                  description: 'Port of the Redis server (default: 6379)'
+                  type: integer
+                strftime_format:
+                  description: 'strftime_format Users can set strftime format. (default:
+                    "%s")'
+                  type: string
+                ttl:
+                  description: ttl If 0 or negative value is set, ttl is not set in
+                    each key.
+                  type: integer
+              type: object
             s3:
               properties:
                 acl:
