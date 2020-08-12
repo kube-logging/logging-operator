@@ -486,12 +486,15 @@ spec:
                         type: object
                     type: object
                   type: array
-                outputRefs:
+                globalOutputRefs:
                   items:
                     type: string
                   type: array
-              required:
-              - outputRefs
+                outputRefs:
+                  description: Deprecated
+                  items:
+                    type: string
+                  type: array
               type: object
             enableRecreateWorkloadOnImmutableFieldChange:
               type: boolean

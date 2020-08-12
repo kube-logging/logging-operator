@@ -59,7 +59,7 @@ var _ = Describe("Flow", func() {
 				},
 				Spec: FlowSpec{
 					Selectors:  nil,
-					OutputRefs: []string{},
+					OutputRefs: nil,
 				},
 				Status: FlowStatus{},
 			}
