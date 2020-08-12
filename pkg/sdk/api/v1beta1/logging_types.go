@@ -89,8 +89,10 @@ type LoggingList struct {
 
 // DefaultFlowSpec is a Flow for logs that did not match any other Flow
 type DefaultFlowSpec struct {
-	Filters    []Filter `json:"filters,omitempty"`
-	OutputRefs []string `json:"outputRefs"`
+	Filters []Filter `json:"filters,omitempty"`
+	// Deprecated
+	OutputRefs       []string `json:"outputRefs,omitempty"`
+	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
 }
 
 // SetDefaults fill empty attributes

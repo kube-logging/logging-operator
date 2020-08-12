@@ -66,7 +66,9 @@ type ClusterFlowSpec struct {
 	Match      []ClusterMatch    `json:"match,omitempty"`
 	Filters    []Filter          `json:"filters,omitempty"`
 	LoggingRef string            `json:"loggingRef,omitempty"`
-	OutputRefs []string          `json:"outputRefs"`
+	// Deprecated
+	OutputRefs       []string `json:"outputRefs,omitempty"`
+	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -478,6 +478,14 @@ spec:
                     type: object
                 type: object
               type: array
+            globalOutputRefs:
+              items:
+                type: string
+              type: array
+            localOutputRefs:
+              items:
+                type: string
+              type: array
             loggingRef:
               type: string
             match:
@@ -516,6 +524,7 @@ spec:
                 type: object
               type: array
             outputRefs:
+              description: Deprecated
               items:
                 type: string
               type: array
@@ -523,8 +532,6 @@ spec:
               additionalProperties:
                 type: string
               type: object
-          required:
-          - outputRefs
           type: object
         status:
           type: object
