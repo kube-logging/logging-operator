@@ -227,7 +227,7 @@ func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: failed to process match for %s: select and exclude cannot be set simultaneously",
+	expected := fmt.Sprintf("failed to create model: select and exclude cannot be set simultaneously for flow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
@@ -268,7 +268,7 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: failed to process match for %s: select and exclude cannot be set simultaneously",
+	expected := fmt.Sprintf("failed to create model: select and exclude cannot be set simultaneously for clusterflow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
