@@ -50,7 +50,7 @@ func TestFlowMatch(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			LocalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -92,7 +92,7 @@ func TestClusterFlowMatch(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			GlobalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -134,7 +134,7 @@ func TestClusterFlowMatchWithNamespaces(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			GlobalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -178,7 +178,7 @@ func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			LocalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -219,7 +219,7 @@ func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			LocalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -238,7 +238,7 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := testLogging()
-	output := testOutput()
+	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
 		ObjectMeta: v1.ObjectMeta{
@@ -260,7 +260,7 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			GlobalOutputRefs: []string{output.Name},
 		},
 	}
 
@@ -279,7 +279,7 @@ func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := testLogging()
-	output := testOutput()
+	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
 		ObjectMeta: v1.ObjectMeta{
@@ -299,7 +299,7 @@ func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
 					},
 				},
 			},
-			OutputRefs: []string{output.Name},
+			GlobalOutputRefs: []string{output.Name},
 		},
 	}
 
