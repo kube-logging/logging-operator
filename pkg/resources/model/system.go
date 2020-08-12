@@ -127,60 +127,60 @@ type CommonFlow struct {
 	Flow       *types.Flow
 }
 
-// Create []FlowMatch from v1beta1.Match and v1beta1.ClusterMatch
-func GetFlowMatchFromSpec(namespace string, matches interface{}) ([]types.FlowMatch, error) {
-	var flowMatches []types.FlowMatch
-	switch matchList := matches.(type) {
-	case []v1beta1.Match:
-		for _, match := range matchList {
-			if match.Select != nil && match.Exclude != nil {
-				return nil, errors.Errorf("select and exclude cannot be set simultaneously")
-			}
-			if match.Select != nil {
-				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:         match.Select.Labels,
-					ContainerNames: match.Select.ContainerNames,
-					Hosts:          match.Select.Hosts,
-					Namespaces:     []string{namespace},
-					Negate:         false,
-				})
-			}
-			if match.Exclude != nil {
-				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:         match.Exclude.Labels,
-					ContainerNames: match.Exclude.ContainerNames,
-					Hosts:          match.Exclude.Hosts,
-					Namespaces:     []string{namespace},
-					Negate:         true,
-				})
-			}
+func FlowMatchesFromMatches(namespace string, matches []v1beta1.Match) ([]types.FlowMatch, error) {
+	var result []types.FlowMatch
+	for _, match := range matches {
+		if match.Select != nil && match.Exclude != nil {
+			return nil, errors.Errorf("select and exclude cannot be set simultaneously")
 		}
-	case []v1beta1.ClusterMatch:
-		for _, match := range matchList {
-			if match.ClusterSelect != nil && match.ClusterExclude != nil {
-				return nil, errors.Errorf("select and exclude cannot be set simultaneously")
-			}
-			if match.ClusterSelect != nil {
-				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:         match.ClusterSelect.Labels,
-					ContainerNames: match.ClusterSelect.ContainerNames,
-					Hosts:          match.ClusterSelect.Hosts,
-					Namespaces:     match.ClusterSelect.Namespaces,
-					Negate:         false,
-				})
-			}
-			if match.ClusterExclude != nil {
-				flowMatches = append(flowMatches, types.FlowMatch{
-					Labels:         match.ClusterExclude.Labels,
-					ContainerNames: match.ClusterExclude.ContainerNames,
-					Hosts:          match.ClusterExclude.Hosts,
-					Namespaces:     match.ClusterExclude.Namespaces,
-					Negate:         true,
-				})
-			}
+		if match.Select != nil {
+			result = append(result, types.FlowMatch{
+				Labels:         match.Select.Labels,
+				ContainerNames: match.Select.ContainerNames,
+				Hosts:          match.Select.Hosts,
+				Namespaces:     []string{namespace},
+				Negate:         false,
+			})
+		}
+		if match.Exclude != nil {
+			result = append(result, types.FlowMatch{
+				Labels:         match.Exclude.Labels,
+				ContainerNames: match.Exclude.ContainerNames,
+				Hosts:          match.Exclude.Hosts,
+				Namespaces:     []string{namespace},
+				Negate:         true,
+			})
 		}
 	}
-	return flowMatches, nil
+	return result, nil
+}
+
+func FlowMatchesFromClusterMatches(namespace string, matches []v1beta1.ClusterMatch) ([]types.FlowMatch, error) {
+	var result []types.FlowMatch
+	for _, match := range matches {
+		if match.ClusterSelect != nil && match.ClusterExclude != nil {
+			return nil, errors.Errorf("select and exclude cannot be set simultaneously")
+		}
+		if match.ClusterSelect != nil {
+			result = append(result, types.FlowMatch{
+				Labels:         match.ClusterSelect.Labels,
+				ContainerNames: match.ClusterSelect.ContainerNames,
+				Hosts:          match.ClusterSelect.Hosts,
+				Namespaces:     match.ClusterSelect.Namespaces,
+				Negate:         false,
+			})
+		}
+		if match.ClusterExclude != nil {
+			result = append(result, types.FlowMatch{
+				Labels:         match.ClusterExclude.Labels,
+				ContainerNames: match.ClusterExclude.ContainerNames,
+				Hosts:          match.ClusterExclude.Hosts,
+				Namespaces:     match.ClusterExclude.Namespaces,
+				Negate:         true,
+			})
+		}
+	}
+	return result, nil
 }
 
 func (l *LoggingResources) FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
@@ -215,7 +215,7 @@ func (l *LoggingResources) FlowDispatcher(flowCr interface{}) (*CommonFlow, erro
 				utils.ObjectKeyFromObjectMeta(&f).String())
 		}
 		if f.Spec.Match != nil {
-			matches, err = GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+			matches, err = FlowMatchesFromClusterMatches(f.Namespace, f.Spec.Match)
 			if err != nil {
 				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
 			}
@@ -249,7 +249,7 @@ func (l *LoggingResources) FlowDispatcher(flowCr interface{}) (*CommonFlow, erro
 				utils.ObjectKeyFromObjectMeta(&f).String())
 		}
 		if f.Spec.Match != nil {
-			matches, err = GetFlowMatchFromSpec(f.Namespace, f.Spec.Match)
+			matches, err = FlowMatchesFromMatches(f.Namespace, f.Spec.Match)
 			if err != nil {
 				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
 			}
