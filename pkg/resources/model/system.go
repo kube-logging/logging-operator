@@ -210,18 +210,23 @@ func (l *LoggingResources) FlowFromFlow(flow v1beta1.Flow) (*types.Flow, error) 
 	var errs error
 
 	var outputs []types.Output
-	for _, outputRef := range flow.Spec.OutputRefs {
-		if output := l.OutputByNamespacedName(flow.Namespace, outputRef); output != nil {
-			outputID := fmt.Sprintf("%s:output:%s:%s", flowID, output.Namespace, output.Name)
-			plugin, err := plugins.CreateOutput(output.Spec, outputID, l.OutputSecretLoaderForNamespace(output.Namespace))
+	for _, outputRef := range flow.Spec.GlobalOutputRefs {
+		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
 			}
 			outputs = append(outputs, plugin)
-		} else if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
-			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
-			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+		} else {
+			errs = errors.Append(errs, errors.Errorf("referenced clusteroutput not found: %s", outputRef))
+		}
+	}
+	for _, outputRef := range flow.Spec.LocalOutputRefs {
+		if output := l.OutputByNamespacedName(flow.Namespace, outputRef); output != nil {
+			outputID := fmt.Sprintf("%s:output:%s:%s", flowID, output.Namespace, output.Name)
+			plugin, err := plugins.CreateOutput(output.Spec, outputID, l.OutputSecretLoaderForNamespace(output.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
@@ -293,7 +298,7 @@ func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types
 	var errs error
 
 	var outputs []types.Output
-	for _, outputRef := range flow.Spec.OutputRefs {
+	for _, outputRef := range flow.Spec.GlobalOutputRefs {
 		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
 			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
@@ -303,7 +308,7 @@ func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types
 			}
 			outputs = append(outputs, plugin)
 		} else {
-			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+			errs = errors.Append(errs, errors.Errorf("referenced clusteroutput not found: %s", outputRef))
 		}
 	}
 	result.WithOutputs(outputs...)
@@ -330,7 +335,7 @@ func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.
 	var errs error
 
 	var outputs []types.Output
-	for _, outputRef := range logging.Spec.DefaultFlowSpec.OutputRefs {
+	for _, outputRef := range logging.Spec.DefaultFlowSpec.GlobalOutputRefs {
 		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
 			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
@@ -340,7 +345,7 @@ func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.
 			}
 			outputs = append(outputs, plugin)
 		} else {
-			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+			errs = errors.Append(errs, errors.Errorf("referenced clusteroutput not found: %s", outputRef))
 		}
 	}
 	result.WithOutputs(outputs...)

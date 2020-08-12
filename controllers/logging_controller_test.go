@@ -110,7 +110,6 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{},
 		},
 	}
 
@@ -150,7 +149,6 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{},
 		},
 	}
 
@@ -199,7 +197,7 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-output"},
+			LocalOutputRefs: []string{"test-output"},
 		},
 	}
 
@@ -250,7 +248,7 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-cluster-output"},
+			GlobalOutputRefs: []string{"test-cluster-output"},
 		},
 	}
 
@@ -302,7 +300,7 @@ func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-cluster-output"},
+			GlobalOutputRefs: []string{"test-cluster-output"},
 		},
 	}
 
@@ -350,7 +348,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-output"},
+			GlobalOutputRefs: []string{"test-output"},
 		},
 	}
 
@@ -358,7 +356,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expectError(t, "referenced output not found: test-output")
+	expectError(t, "referenced clusteroutput not found: test-output")
 }
 
 func TestSingleFlowWithOutputRef(t *testing.T) {
@@ -399,7 +397,7 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-output"},
+			LocalOutputRefs: []string{"test-output"},
 		},
 	}
 
@@ -437,7 +435,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{"test-output-nonexistent"},
+			LocalOutputRefs: []string{"test-output-nonexistent"},
 		},
 	}
 
@@ -504,7 +502,7 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 			Selectors: map[string]string{
 				"a": "b",
 			},
-			OutputRefs: []string{
+			LocalOutputRefs: []string{
 				"test-output",
 			},
 		},
