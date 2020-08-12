@@ -70,7 +70,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
 	}
-	rootInput, err := forwardInput.ToDirective(secret.NewSecretLoader(l.client, l.logging.Spec.ControlNamespace, fluentd.OutputSecretPath, l.Secrets), "main")
+	rootInput, err := forwardInput.ToDirective(l.OutputSecretLoaderForNamespace(l.logging.Spec.ControlNamespace), "main")
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create root input")
 	}
@@ -80,7 +80,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		})
 	system := types.NewSystem(rootInput, router)
 	for _, flowCr := range l.Flows {
-		flow, err := l.CreateFlowFromCustomResource(flowCr)
+		flow, err := l.FlowFromFlow(flowCr)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
@@ -91,7 +91,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		}
 	}
 	for _, flowCr := range l.ClusterFlows {
-		flow, err := l.CreateFlowFromCustomResource(flowCr)
+		flow, err := l.FlowFromClusterFlow(flowCr)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
@@ -102,7 +102,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		}
 	}
 	if l.logging.Spec.DefaultFlowSpec != nil {
-		flow, err := l.CreateFlowFromCustomResource(l.logging.Spec.DefaultFlowSpec)
+		flow, err := l.FlowFromDefaultFlow(*l.logging)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
@@ -118,224 +118,236 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	return system, nil
 }
 
-type CommonFlow struct {
-	Name       string
-	Namespace  string
-	Scope      string
-	OutputRefs []string
-	Filters    []v1beta1.Filter
-	Flow       *types.Flow
-}
-
-func FlowMatchesFromMatches(namespace string, matches []v1beta1.Match) ([]types.FlowMatch, error) {
-	var result []types.FlowMatch
-	for _, match := range matches {
-		if match.Select != nil && match.Exclude != nil {
-			return nil, errors.Errorf("select and exclude cannot be set simultaneously")
-		}
-		if match.Select != nil {
-			result = append(result, types.FlowMatch{
-				Labels:         match.Select.Labels,
-				ContainerNames: match.Select.ContainerNames,
-				Hosts:          match.Select.Hosts,
-				Namespaces:     []string{namespace},
-				Negate:         false,
-			})
-		}
-		if match.Exclude != nil {
-			result = append(result, types.FlowMatch{
-				Labels:         match.Exclude.Labels,
-				ContainerNames: match.Exclude.ContainerNames,
-				Hosts:          match.Exclude.Hosts,
-				Namespaces:     []string{namespace},
-				Negate:         true,
-			})
+func (l *LoggingResources) ClusterOutputByName(name string) *v1beta1.ClusterOutput {
+	for _, output := range l.ClusterOutputs {
+		if output.Name == name {
+			return &output
 		}
 	}
-	return result, nil
+	return nil
 }
 
-func FlowMatchesFromClusterMatches(namespace string, matches []v1beta1.ClusterMatch) ([]types.FlowMatch, error) {
-	var result []types.FlowMatch
-	for _, match := range matches {
-		if match.ClusterSelect != nil && match.ClusterExclude != nil {
-			return nil, errors.Errorf("select and exclude cannot be set simultaneously")
-		}
-		if match.ClusterSelect != nil {
-			result = append(result, types.FlowMatch{
-				Labels:         match.ClusterSelect.Labels,
-				ContainerNames: match.ClusterSelect.ContainerNames,
-				Hosts:          match.ClusterSelect.Hosts,
-				Namespaces:     match.ClusterSelect.Namespaces,
-				Negate:         false,
-			})
-		}
-		if match.ClusterExclude != nil {
-			result = append(result, types.FlowMatch{
-				Labels:         match.ClusterExclude.Labels,
-				ContainerNames: match.ClusterExclude.ContainerNames,
-				Hosts:          match.ClusterExclude.Hosts,
-				Namespaces:     match.ClusterExclude.Namespaces,
-				Negate:         true,
-			})
+func (l *LoggingResources) OutputByNamespacedName(namespace string, name string) *v1beta1.Output {
+	for _, output := range l.Outputs {
+		if output.Namespace == namespace && output.Name == name {
+			return &output
 		}
 	}
-	return result, nil
+	return nil
 }
 
-func (l *LoggingResources) FlowDispatcher(flowCr interface{}) (*CommonFlow, error) {
-	var commonFlow *CommonFlow
-	var err error
-	switch f := flowCr.(type) {
-	case *v1beta1.DefaultFlowSpec:
-		id := fmt.Sprintf("logging:%s:%s", l.logging.Namespace, l.logging.Name)
-		flow, err := types.NewFlow([]types.FlowMatch{}, id, l.logging.Name, l.logging.Namespace)
+func (l *LoggingResources) FiltersForFilters(flowID string, flowName string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
+	var (
+		result []types.Filter
+		errs   error
+	)
+	for i, f := range filters {
+		id := fmt.Sprintf("%s:%d", flowID, i)
+		filter, err := plugins.CreateFilter(f, id, secretLoader)
 		if err != nil {
-			return nil, err
+			errs = errors.Append(errs, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowName))
+			continue
 		}
-		return &CommonFlow{
-			Name:       l.logging.Name,
-			Namespace:  l.logging.Namespace,
-			Scope:      "",
-			OutputRefs: f.OutputRefs,
-			Filters:    f.Filters,
-			Flow:       flow,
-		}, nil
-	case v1beta1.ClusterFlow:
-		var matches []types.FlowMatch
-		commonFlow = &CommonFlow{
-			Name:       f.Name,
-			Namespace:  f.Namespace,
-			Scope:      "",
-			OutputRefs: f.Spec.OutputRefs,
-			Filters:    f.Spec.Filters,
-		}
-		if f.Spec.Match != nil && f.Spec.Selectors != nil {
-			return nil, errors.Errorf("match and selectors cannot be defined simultaneously for clusterflow %s",
-				utils.ObjectKeyFromObjectMeta(&f).String())
-		}
-		if f.Spec.Match != nil {
-			matches, err = FlowMatchesFromClusterMatches(f.Namespace, f.Spec.Match)
-			if err != nil {
-				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
-			}
-		} else {
-			matches = []types.FlowMatch{
-				{
-					Labels:     f.Spec.Selectors,
-					Namespaces: []string{""},
-					Negate:     false,
-				},
-			}
-		}
-		id := fmt.Sprintf("clusterflow:%s:%s", f.Namespace, f.Name)
-		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
-		if err != nil {
-			return nil, err
-		}
-		commonFlow.Flow = flow
-		return commonFlow, nil
-	case v1beta1.Flow:
-		var matches []types.FlowMatch
-		commonFlow = &CommonFlow{
-			Name:       f.Name,
-			Namespace:  f.Namespace,
-			Scope:      f.Namespace,
-			OutputRefs: f.Spec.OutputRefs,
-			Filters:    f.Spec.Filters,
-		}
-		if f.Spec.Match != nil && f.Spec.Selectors != nil {
-			return nil, errors.Errorf("match and selectors cannot be defined simultaneously for flow %s",
-				utils.ObjectKeyFromObjectMeta(&f).String())
-		}
-		if f.Spec.Match != nil {
-			matches, err = FlowMatchesFromMatches(f.Namespace, f.Spec.Match)
-			if err != nil {
-				return nil, errors.WrapIff(err, "failed to process match for %s", utils.ObjectKeyFromObjectMeta(&f).String())
-			}
-		} else {
-			matches = []types.FlowMatch{
-				{
-					Labels:     f.Spec.Selectors,
-					Namespaces: []string{f.Namespace},
-					Negate:     false,
-				},
-			}
-		}
-		id := fmt.Sprintf("flow:%s:%s", f.Namespace, f.Name)
-		flow, err := types.NewFlow(matches, id, f.Name, f.Namespace)
-		commonFlow.Flow = flow
-		if err != nil {
-			return nil, err
-		}
-		return commonFlow, nil
+		result = append(result, filter)
 	}
-	return nil, fmt.Errorf("unsupported type: %t", flowCr)
+	return result, errs
 }
 
-func (l *LoggingResources) CreateFlowFromCustomResource(flowCr interface{}) (*types.Flow, error) {
-	commonFlow, err := l.FlowDispatcher(flowCr)
+func (l *LoggingResources) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
+	return secret.NewSecretLoader(l.client, namespace, fluentd.OutputSecretPath, l.Secrets)
+}
+
+func (l *LoggingResources) FlowFromFlow(flow v1beta1.Flow) (*types.Flow, error) {
+	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
+		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for flow %s",
+			utils.ObjectKeyFromObjectMeta(&flow).String())
+	}
+
+	var matches []types.FlowMatch
+	if flow.Spec.Match != nil {
+		for _, match := range flow.Spec.Match {
+			if match.Select != nil && match.Exclude != nil {
+				return nil, errors.Errorf("select and exclude cannot be set simultaneously for flow %s",
+					utils.ObjectKeyFromObjectMeta(&flow).String())
+			}
+
+			if match.Select != nil {
+				matches = append(matches, types.FlowMatch{
+					Labels:         match.Select.Labels,
+					ContainerNames: match.Select.ContainerNames,
+					Hosts:          match.Select.Hosts,
+					Namespaces:     []string{flow.Namespace},
+					Negate:         false,
+				})
+			}
+			if match.Exclude != nil {
+				matches = append(matches, types.FlowMatch{
+					Labels:         match.Exclude.Labels,
+					ContainerNames: match.Exclude.ContainerNames,
+					Hosts:          match.Exclude.Hosts,
+					Namespaces:     []string{flow.Namespace},
+					Negate:         true,
+				})
+			}
+		}
+	} else {
+		matches = []types.FlowMatch{
+			{
+				Labels:     flow.Spec.Selectors,
+				Namespaces: []string{flow.Namespace},
+				Negate:     false,
+			},
+		}
+	}
+
+	flowID := fmt.Sprintf("flow:%s:%s", flow.Namespace, flow.Name)
+
+	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace)
 	if err != nil {
 		return nil, err
 	}
-	flow := commonFlow.Flow
-	outputs := []types.Output{}
-	var flowType string
-	if commonFlow.Scope != "" {
-		flowType = "flow"
+
+	var errs error
+
+	var outputs []types.Output
+	for _, outputRef := range flow.Spec.OutputRefs {
+		if output := l.OutputByNamespacedName(flow.Namespace, outputRef); output != nil {
+			outputID := fmt.Sprintf("%s:output:%s:%s", flowID, output.Namespace, output.Name)
+			plugin, err := plugins.CreateOutput(output.Spec, outputID, l.OutputSecretLoaderForNamespace(output.Namespace))
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				continue
+			}
+			outputs = append(outputs, plugin)
+		} else if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				continue
+			}
+			outputs = append(outputs, plugin)
+		} else {
+			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+		}
+	}
+	result.WithOutputs(outputs...)
+
+	filters, err := l.FiltersForFilters(flowID, flow.Name, l.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	errs = errors.Append(errs, err)
+	result.WithFilters(filters...)
+
+	return result, errs
+}
+
+func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types.Flow, error) {
+	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
+		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for clusterflow %s",
+			utils.ObjectKeyFromObjectMeta(&flow).String())
+	}
+
+	var matches []types.FlowMatch
+	if flow.Spec.Match != nil {
+		for _, match := range flow.Spec.Match {
+			if match.ClusterSelect != nil && match.ClusterExclude != nil {
+				return nil, errors.Errorf("select and exclude cannot be set simultaneously for clusterflow %s",
+					utils.ObjectKeyFromObjectMeta(&flow).String())
+			}
+
+			if match.ClusterSelect != nil {
+				matches = append(matches, types.FlowMatch{
+					Labels:         match.ClusterSelect.Labels,
+					ContainerNames: match.ClusterSelect.ContainerNames,
+					Hosts:          match.ClusterSelect.Hosts,
+					Namespaces:     match.ClusterSelect.Namespaces,
+					Negate:         false,
+				})
+			}
+			if match.ClusterExclude != nil {
+				matches = append(matches, types.FlowMatch{
+					Labels:         match.ClusterExclude.Labels,
+					ContainerNames: match.ClusterExclude.ContainerNames,
+					Hosts:          match.ClusterExclude.Hosts,
+					Namespaces:     match.ClusterExclude.Namespaces,
+					Negate:         true,
+				})
+			}
+		}
 	} else {
-		flowType = "clusterflow"
-	}
-	var multierr error
-FindOutputForAllRefs:
-	for _, outputRef := range commonFlow.OutputRefs {
-		// only namespaced flows should use namespaced outputs
-		if commonFlow.Scope != "" {
-			for _, output := range l.Outputs {
-				// only an output from the same namespace can be used with a matching name
-				// flow -> output (matching)
-				if output.Namespace == commonFlow.Scope && outputRef == output.Name {
-					outputId := fmt.Sprintf("%s:%s:%s:output:%s:%s", flowType, commonFlow.Namespace, commonFlow.Name, output.Namespace, output.Name)
-					plugin, err := plugins.CreateOutput(output.Spec, outputId, secret.NewSecretLoader(l.client, output.Namespace, fluentd.OutputSecretPath, l.Secrets))
-					if err != nil {
-						multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
-						continue FindOutputForAllRefs
-					}
-					outputs = append(outputs, plugin)
-					continue FindOutputForAllRefs
-				}
-			}
+		matches = []types.FlowMatch{
+			{
+				Labels:     flow.Spec.Selectors,
+				Namespaces: []string{""},
+				Negate:     false,
+			},
 		}
-		for _, clusterOutput := range l.ClusterOutputs {
-			if outputRef == clusterOutput.Name {
-				// flow, clusterflow -> clusterOutput
-				// diff flow / clusterflow based on scope
-				outputId := fmt.Sprintf("%s:%s:%s:clusteroutput:%s:%s", flowType, commonFlow.Namespace, commonFlow.Name, clusterOutput.Namespace, clusterOutput.Name)
-				plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputId, secret.NewSecretLoader(l.client, clusterOutput.Namespace, fluentd.OutputSecretPath, l.Secrets))
-				if err != nil {
-					multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create configured output %s", outputRef))
-					continue FindOutputForAllRefs
-				}
-				outputs = append(outputs, plugin)
-				continue FindOutputForAllRefs
-			}
-		}
-		multierr = errors.Combine(multierr, errors.Errorf("referenced output not found: %s", outputRef))
 	}
-	flow.WithOutputs(outputs...)
 
-	// Filter
-	var filters []types.Filter
-	for i, f := range commonFlow.Filters {
-		id := fmt.Sprintf("%s:%s:%s:%d", flowType, commonFlow.Namespace, commonFlow.Name, i)
-		filter, err := plugins.CreateFilter(f, id, secret.NewSecretLoader(l.client, commonFlow.Namespace, fluentd.OutputSecretPath, l.Secrets))
-		if err != nil {
-			multierr = errors.Combine(multierr, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, commonFlow.Name))
-			continue
-		}
-		filters = append(filters, filter)
-	}
-	flow.WithFilters(filters...)
+	flowID := fmt.Sprintf("clusterflow:%s:%s", flow.Namespace, flow.Name)
 
-	return flow, multierr
+	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	var errs error
+
+	var outputs []types.Output
+	for _, outputRef := range flow.Spec.OutputRefs {
+		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				continue
+			}
+			outputs = append(outputs, plugin)
+		} else {
+			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+		}
+	}
+	result.WithOutputs(outputs...)
+
+	filters, err := l.FiltersForFilters(flowID, flow.Name, l.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	errs = errors.Append(errs, err)
+	result.WithFilters(filters...)
+
+	return result, errs
+}
+
+func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.Flow, error) {
+	if logging.Spec.DefaultFlowSpec == nil {
+		return nil, nil
+	}
+
+	flowID := fmt.Sprintf("logging:%s:%s", logging.Namespace, logging.Name)
+
+	result, err := types.NewFlow([]types.FlowMatch{}, flowID, logging.Name, logging.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	var errs error
+
+	var outputs []types.Output
+	for _, outputRef := range logging.Spec.DefaultFlowSpec.OutputRefs {
+		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				continue
+			}
+			outputs = append(outputs, plugin)
+		} else {
+			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+		}
+	}
+	result.WithOutputs(outputs...)
+
+	filters, err := l.FiltersForFilters(flowID, logging.Name, l.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
+	errs = errors.Append(errs, err)
+	result.WithFilters(filters...)
+
+	return result, errs
 }
