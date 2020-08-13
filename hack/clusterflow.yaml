@@ -7,5 +7,5 @@ spec:
   filters:
     - tag_normaliser: {}
   selectors: {}
-  outputRefs:
+  globalOutputRefs:
     - s3-output
