@@ -5047,6 +5047,16 @@ spec:
                   description: A key to extract partition key from JSON object. Default
                     nil, which means partition key will be generated randomly.
                   type: string
+                process_credentials:
+                  description: This loads AWS access credentials from an external
+                    process.
+                  properties:
+                    process:
+                      description: 'Command more info: https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/ProcessCredentials.html'
+                      type: string
+                  required:
+                  - process
+                  type: object
                 region:
                   description: AWS region of your stream. It should be in form like
                     us-east-1, us-west-2. Default nil, which means try to find from
