@@ -20,180 +20,107 @@ spec:
   scope: Namespaced
   validation:
     openAPIV3Schema:
-      description: Flow Kubernetes object
       properties:
         apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
         spec:
-          description: FlowSpec is the Kubernetes spec for Flows
           properties:
             filters:
               items:
-                description: Filter definition for FlowSpec
                 properties:
                   concat:
                     properties:
                       continuous_line_regexp:
-                        description: The regexp to match continuous lines. This is
-                          exclusive with n_lines.
                         type: string
                       flush_interval:
-                        description: The number of seconds after which the last received
-                          event log will be flushed. If specified 0, wait for next
-                          line forever.
                         type: integer
                       keep_partial_key:
-                        description: If true, keep partial_key in concatenated records
-                          (default:False)
                         type: boolean
                       keep_partial_metadata:
-                        description: If true, keep partial metadata
                         type: string
                       key:
-                        description: Specify field name in the record to parse. If
-                          you leave empty the Container Runtime default will be used.
                         type: string
                       multiline_end_regexp:
-                        description: The regexp to match ending of multiline. This
-                          is exclusive with n_lines.
                         type: string
                       multiline_start_regexp:
-                        description: The regexp to match beginning of multiline. This
-                          is exclusive with n_lines.
                         type: string
                       n_lines:
-                        description: The number of lines. This is exclusive with multiline_start_regex.
                         type: integer
                       partial_key:
-                        description: The field name that is the reference to concatenate
-                          records
                         type: string
                       partial_value:
-                        description: The value stored in the field specified by partial_key
-                          that represent partial log
                         type: string
                       separator:
-                        description: 'The separator of lines. (default: "\n")'
                         type: string
                       stream_identity_key:
-                        description: The key to determine which stream an event belongs
-                          to.
                         type: string
                       timeout_label:
-                        description: The label name to handle events caused by timeout.
                         type: string
                       use_first_timestamp:
-                        description: 'Use timestamp of first record when buffer is
-                          flushed. (default: False)'
                         type: boolean
                       use_partial_metadata:
-                        description: Use partial metadata to concatenate multiple
-                          records
                         type: string
                     type: object
                   dedot:
                     properties:
                       de_dot_nested:
-                        description: 'Will cause the plugin to recurse through nested
-                          structures (hashes and arrays), and remove dots in those
-                          key-names too.(default: false)'
                         type: boolean
                       de_dot_separator:
-                        description: Separator (default:_)
                         type: string
                     type: object
                   detectExceptions:
                     properties:
                       languages:
-                        description: 'Programming languages for which to detect exceptions.
-                          (default: [])'
                         items:
                           type: string
                         type: array
                       max_bytes:
-                        description: 'Maximum number of bytes to flush (0 means no
-                          limit) (default: 0)'
                         type: integer
                       max_lines:
-                        description: 'Maximum number of lines to flush (0 means no
-                          limit) (default: 1000)'
                         type: integer
                       message:
-                        description: 'The field which contains the raw message text
-                          in the input JSON data. (default: "")'
                         type: string
                       multiline_flush_interval:
-                        description: 'The interval of flushing the buffer for multiline
-                          format. (default: nil)'
                         type: string
                       remove_tag_prefix:
-                        description: 'The prefix to be removed from the input tag
-                          when outputting a record. (default: "")'
                         type: string
                       stream:
-                        description: 'Separate log streams by this field in the input
-                          JSON data. (default: "")'
                         type: string
                     type: object
                   geoip:
                     properties:
                       backend_library:
-                        description: Specify backend library (geoip2_c, geoip, geoip2_compat)
                         type: string
                       geoip_2_database:
-                        description: Specify optional geoip2 database (using bundled
-                          GeoLite2-City.mmdb by default)
                         type: string
                       geoip_database:
-                        description: Specify optional geoip database (using bundled
-                          GeoLiteCity databse by default)
                         type: string
                       geoip_lookup_keys:
-                        description: 'Specify one or more geoip lookup field which
-                          has ip address (default: host)'
                         type: string
                       records:
-                        description: 'Records are represented as maps: `key: value`'
                         items:
                           additionalProperties:
                             type: string
-                          description: Parameters inside record directives are considered
-                            to be new key-value pairs
                           type: object
                         type: array
                       skip_adding_null_record:
-                        description: To avoid get stacktrace error with `[null, null]`
-                          array for elasticsearch.
                         type: boolean
                     type: object
                   grep:
                     properties:
                       and:
                         items:
-                          description: Specify filtering rule. This directive contains
-                            either `regexp` or `exclude` directive.
                           properties:
                             exclude:
                               items:
-                                description: Specify filtering rule to reject events.
-                                  This directive contains two parameters.
                                 properties:
                                   key:
-                                    description: Specify field name in the record
-                                      to parse.
                                     type: string
                                   pattern:
-                                    description: Pattern expression to evaluate
                                     type: string
                                 required:
                                 - key
@@ -202,15 +129,10 @@ spec:
                               type: array
                             regexp:
                               items:
-                                description: Specify filtering rule. This directive
-                                  contains two parameters.
                                 properties:
                                   key:
-                                    description: Specify field name in the record
-                                      to parse.
                                     type: string
                                   pattern:
-                                    description: Pattern expression to evaluate
                                     type: string
                                 required:
                                 - key
@@ -221,14 +143,10 @@ spec:
                         type: array
                       exclude:
                         items:
-                          description: Specify filtering rule to reject events. This
-                            directive contains two parameters.
                           properties:
                             key:
-                              description: Specify field name in the record to parse.
                               type: string
                             pattern:
-                              description: Pattern expression to evaluate
                               type: string
                           required:
                           - key
@@ -237,20 +155,13 @@ spec:
                         type: array
                       or:
                         items:
-                          description: Specify filtering rule. This directive contains
-                            either `regexp` or `exclude` directive.
                           properties:
                             exclude:
                               items:
-                                description: Specify filtering rule to reject events.
-                                  This directive contains two parameters.
                                 properties:
                                   key:
-                                    description: Specify field name in the record
-                                      to parse.
                                     type: string
                                   pattern:
-                                    description: Pattern expression to evaluate
                                     type: string
                                 required:
                                 - key
@@ -259,15 +170,10 @@ spec:
                               type: array
                             regexp:
                               items:
-                                description: Specify filtering rule. This directive
-                                  contains two parameters.
                                 properties:
                                   key:
-                                    description: Specify field name in the record
-                                      to parse.
                                     type: string
                                   pattern:
-                                    description: Pattern expression to evaluate
                                     type: string
                                 required:
                                 - key
@@ -278,14 +184,10 @@ spec:
                         type: array
                       regexp:
                         items:
-                          description: Specify filtering rule. This directive contains
-                            two parameters.
                           properties:
                             key:
-                              description: Specify field name in the record to parse.
                               type: string
                             pattern:
-                              description: Pattern expression to evaluate
                               type: string
                           required:
                           - key
@@ -296,320 +198,174 @@ spec:
                   parser:
                     properties:
                       emit_invalid_record_to_error:
-                        description: 'Emit invalid record to @ERROR label. Invalid
-                          cases are: key not exist, format is not matched, unexpected
-                          error'
                         type: boolean
                       hash_value_field:
-                        description: Store parsed values as a hash value in a field.
                         type: string
                       inject_key_prefix:
-                        description: Store parsed values with specified key name prefix.
                         type: string
                       key_name:
-                        description: Specify field name in the record to parse. If
-                          you leave empty the Container Runtime default will be used.
                         type: string
                       parse:
                         properties:
                           delimiter:
-                            description: 'Only available when using type: ltsv (default:
-                              "\t")'
                             type: string
                           delimiter_pattern:
-                            description: 'Only available when using type: ltsv'
                             type: string
                           estimate_current_event:
-                            description: If true, use Fluent::EventTime.now(current
-                              time) as a timestamp when time_key is specified.
                             type: boolean
                           expression:
-                            description: Regexp expression to evaluate
                             type: string
                           format:
-                            description: 'Only available when using type: multi_format'
                             type: string
                           format_firstline:
-                            description: 'Only available when using type: multi_format'
                             type: string
                           keep_time_key:
-                            description: If true, keep time field in the record.
                             type: boolean
                           label_delimiter:
-                            description: 'Only available when using type: ltsv (default:
-                              ":")'
                             type: string
                           local_time:
-                            description: 'Ff true, use local time. Otherwise, UTC
-                              is used. This is exclusive with utc. (default: true)'
                             type: boolean
                           multiline:
-                            description: The multiline parser plugin parses multiline
-                              logs.
                             items:
                               type: string
                             type: array
                           null_empty_string:
-                            description: If true, empty string field is replaced with
-                              nil
                             type: boolean
                           null_value_pattern:
-                            description: ' Specify null value pattern.'
                             type: string
                           patterns:
-                            description: 'Only available when using type: multi_format'
                             items:
                               properties:
                                 estimate_current_event:
-                                  description: If true, use Fluent::EventTime.now(current
-                                    time) as a timestamp when time_key is specified.
                                   type: boolean
                                 expression:
-                                  description: Regexp expression to evaluate
                                   type: string
                                 format:
-                                  description: 'Only available when using type: multi_format'
                                   type: string
                                 keep_time_key:
-                                  description: If true, keep time field in the record.
                                   type: boolean
                                 local_time:
-                                  description: 'Ff true, use local time. Otherwise,
-                                    UTC is used. This is exclusive with utc. (default:
-                                    true)'
                                   type: boolean
                                 null_empty_string:
-                                  description: If true, empty string field is replaced
-                                    with nil
                                   type: boolean
                                 null_value_pattern:
-                                  description: ' Specify null value pattern.'
                                   type: string
                                 time_format:
-                                  description: Process value using specified format.
-                                    This is available only when time_type is string
                                   type: string
                                 time_key:
-                                  description: Specify time field for event time.
-                                    If the event doesn't have this field, current
-                                    time is used.
                                   type: string
                                 time_type:
-                                  description: 'Parse/format value according to this
-                                    type available values: float, unixtime, string
-                                    (default: string)'
                                   type: string
                                 timezone:
-                                  description: 'Use specified timezone. one can parse/format
-                                    the time value in the specified timezone. (default:
-                                    nil)'
                                   type: string
                                 type:
-                                  description: 'Parse type: apache2, apache_error,
-                                    nginx, syslog, csv, tsv, ltsv, json, multiline,
-                                    none, logfmt'
                                   type: string
                                 types:
-                                  description: 'Types casting the fields to proper
-                                    types example: field1:type, field2:type'
                                   type: string
                                 utc:
-                                  description: 'If true, use UTC. Otherwise, local
-                                    time is used. This is exclusive with localtime
-                                    (default: false)'
                                   type: boolean
                               type: object
                             type: array
                           time_format:
-                            description: Process value using specified format. This
-                              is available only when time_type is string
                             type: string
                           time_key:
-                            description: Specify time field for event time. If the
-                              event doesn't have this field, current time is used.
                             type: string
                           time_type:
-                            description: 'Parse/format value according to this type
-                              available values: float, unixtime, string (default:
-                              string)'
                             type: string
                           timezone:
-                            description: 'Use specified timezone. one can parse/format
-                              the time value in the specified timezone. (default:
-                              nil)'
                             type: string
                           type:
-                            description: 'Parse type: apache2, apache_error, nginx,
-                              syslog, csv, tsv, ltsv, json, multiline, none, logfmt'
                             type: string
                           types:
-                            description: 'Types casting the fields to proper types
-                              example: field1:type, field2:type'
                             type: string
                           utc:
-                            description: 'If true, use UTC. Otherwise, local time
-                              is used. This is exclusive with localtime (default:
-                              false)'
                             type: boolean
                         type: object
                       parsers:
-                        description: Deprecated, use `parse` instead
                         items:
                           properties:
                             delimiter:
-                              description: 'Only available when using type: ltsv (default:
-                                "\t")'
                               type: string
                             delimiter_pattern:
-                              description: 'Only available when using type: ltsv'
                               type: string
                             estimate_current_event:
-                              description: If true, use Fluent::EventTime.now(current
-                                time) as a timestamp when time_key is specified.
                               type: boolean
                             expression:
-                              description: Regexp expression to evaluate
                               type: string
                             format:
-                              description: 'Only available when using type: multi_format'
                               type: string
                             format_firstline:
-                              description: 'Only available when using type: multi_format'
                               type: string
                             keep_time_key:
-                              description: If true, keep time field in the record.
                               type: boolean
                             label_delimiter:
-                              description: 'Only available when using type: ltsv (default:
-                                ":")'
                               type: string
                             local_time:
-                              description: 'Ff true, use local time. Otherwise, UTC
-                                is used. This is exclusive with utc. (default: true)'
                               type: boolean
                             multiline:
-                              description: The multiline parser plugin parses multiline
-                                logs.
                               items:
                                 type: string
                               type: array
                             null_empty_string:
-                              description: If true, empty string field is replaced
-                                with nil
                               type: boolean
                             null_value_pattern:
-                              description: ' Specify null value pattern.'
                               type: string
                             patterns:
-                              description: 'Only available when using type: multi_format'
                               items:
                                 properties:
                                   estimate_current_event:
-                                    description: If true, use Fluent::EventTime.now(current
-                                      time) as a timestamp when time_key is specified.
                                     type: boolean
                                   expression:
-                                    description: Regexp expression to evaluate
                                     type: string
                                   format:
-                                    description: 'Only available when using type:
-                                      multi_format'
                                     type: string
                                   keep_time_key:
-                                    description: If true, keep time field in the record.
                                     type: boolean
                                   local_time:
-                                    description: 'Ff true, use local time. Otherwise,
-                                      UTC is used. This is exclusive with utc. (default:
-                                      true)'
                                     type: boolean
                                   null_empty_string:
-                                    description: If true, empty string field is replaced
-                                      with nil
                                     type: boolean
                                   null_value_pattern:
-                                    description: ' Specify null value pattern.'
                                     type: string
                                   time_format:
-                                    description: Process value using specified format.
-                                      This is available only when time_type is string
                                     type: string
                                   time_key:
-                                    description: Specify time field for event time.
-                                      If the event doesn't have this field, current
-                                      time is used.
                                     type: string
                                   time_type:
-                                    description: 'Parse/format value according to
-                                      this type available values: float, unixtime,
-                                      string (default: string)'
                                     type: string
                                   timezone:
-                                    description: 'Use specified timezone. one can
-                                      parse/format the time value in the specified
-                                      timezone. (default: nil)'
                                     type: string
                                   type:
-                                    description: 'Parse type: apache2, apache_error,
-                                      nginx, syslog, csv, tsv, ltsv, json, multiline,
-                                      none, logfmt'
                                     type: string
                                   types:
-                                    description: 'Types casting the fields to proper
-                                      types example: field1:type, field2:type'
                                     type: string
                                   utc:
-                                    description: 'If true, use UTC. Otherwise, local
-                                      time is used. This is exclusive with localtime
-                                      (default: false)'
                                     type: boolean
                                 type: object
                               type: array
                             time_format:
-                              description: Process value using specified format. This
-                                is available only when time_type is string
                               type: string
                             time_key:
-                              description: Specify time field for event time. If the
-                                event doesn't have this field, current time is used.
                               type: string
                             time_type:
-                              description: 'Parse/format value according to this type
-                                available values: float, unixtime, string (default:
-                                string)'
                               type: string
                             timezone:
-                              description: 'Use specified timezone. one can parse/format
-                                the time value in the specified timezone. (default:
-                                nil)'
                               type: string
                             type:
-                              description: 'Parse type: apache2, apache_error, nginx,
-                                syslog, csv, tsv, ltsv, json, multiline, none, logfmt'
                               type: string
                             types:
-                              description: 'Types casting the fields to proper types
-                                example: field1:type, field2:type'
                               type: string
                             utc:
-                              description: 'If true, use UTC. Otherwise, local time
-                                is used. This is exclusive with localtime (default:
-                                false)'
                               type: boolean
                           type: object
                         type: array
                       remove_key_name_field:
-                        description: Remove key_name field when parsing is succeeded
                         type: boolean
                       replace_invalid_sequence:
-                        description: If true, invalid string is replaced with safe
-                          characters and re-parse it.
                         type: boolean
                       reserve_data:
-                        description: Keep original key-value pair in parsed result.
                         type: boolean
                       reserve_time:
-                        description: Keep original event time in parsed result.
                         type: boolean
                     type: object
                   prometheus:
@@ -622,27 +378,18 @@ spec:
                         items:
                           properties:
                             buckets:
-                              description: Buckets of record for instrumentation
                               type: string
                             desc:
-                              description: Description of metric
                               type: string
                             key:
-                              description: Key name of record for instrumentation.
                               type: string
                             labels:
                               additionalProperties:
                                 type: string
-                              description: Additional labels for this metric
                               type: object
                             name:
-                              description: Metrics name
                               type: string
                             type:
-                              description: Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counter-type),
-                                [gauge](https://github.com/fluent/fluent-plugin-prometheus#gauge-type),
-                                [summary](https://github.com/fluent/fluent-plugin-prometheus#summary-type),
-                                [histogram](https://github.com/fluent/fluent-plugin-prometheus#histogram-type)
                               type: string
                           required:
                           - desc
@@ -654,42 +401,25 @@ spec:
                   record_modifier:
                     properties:
                       char_encoding:
-                        description: Fluentd including some plugins treats logs as
-                          a BINARY by default to forward. To overide that, use a target
-                          encoding or a from:to encoding here.
                         type: string
                       prepare_value:
-                        description: Prepare values for filtering in configure phase.
-                          Prepared values can be used in <record>. You can write any
-                          ruby code.
                         type: string
                       records:
-                        description: 'Add records docs at: https://github.com/repeatedly/fluent-plugin-record-modifier
-                          Records are represented as maps: `key: value`'
                         items:
                           additionalProperties:
                             type: string
-                          description: Parameters inside record directives are considered
-                            to be new key-value pairs
                           type: object
                         type: array
                       remove_keys:
-                        description: A comma-delimited list of keys to delete
                         type: string
                       replaces:
-                        description: Replace specific value for keys
                         items:
-                          description: Specify replace rule. This directive contains
-                            three parameters.
                           properties:
                             expression:
-                              description: Regular expression
                               type: string
                             key:
-                              description: Key to search for
                               type: string
                             replace:
-                              description: Value to replace with
                               type: string
                           required:
                           - expression
@@ -698,84 +428,52 @@ spec:
                           type: object
                         type: array
                       whitelist_keys:
-                        description: This is exclusive with remove_keys
                         type: string
                     type: object
                   record_transformer:
                     properties:
                       auto_typecast:
-                        description: 'Use original value type. (default: true)'
                         type: boolean
                       enable_ruby:
-                        description: 'When set to true, the full Ruby syntax is enabled
-                          in the ${...} expression. (default: false)'
                         type: boolean
                       keep_keys:
-                        description: A comma-delimited list of keys to keep.
                         type: string
                       records:
-                        description: 'Add records docs at: https://docs.fluentd.org/filter/record_transformer
-                          Records are represented as maps: `key: value`'
                         items:
                           additionalProperties:
                             type: string
-                          description: Parameters inside record directives are considered
-                            to be new key-value pairs
                           type: object
                         type: array
                       remove_keys:
-                        description: A comma-delimited list of keys to delete
                         type: string
                       renew_record:
-                        description: 'Create new Hash to transform incoming data (default:
-                          false)'
                         type: boolean
                       renew_time_key:
-                        description: Specify field name of the record to overwrite
-                          the time of events. Its value must be unix time.
                         type: string
                     type: object
                   stdout:
                     properties:
                       output_type:
-                        description: This is the option of stdout format.
                         type: string
                     type: object
                   tag_normaliser:
                     properties:
                       format:
-                        description: Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)
                         type: string
                     type: object
                   throttle:
                     properties:
                       group_bucket_limit:
-                        description: 'Maximum number logs allowed per groups over
-                          the period of group_bucket_period_s (default: 6000)'
                         type: integer
                       group_bucket_period_s:
-                        description: 'This is the period of of time over which group_bucket_limit
-                          applies (default: 60)'
                         type: integer
                       group_drop_logs:
-                        description: 'When a group reaches its limit, logs will be
-                          dropped from further processing if this value is true (default:
-                          true)'
                         type: boolean
                       group_key:
-                        description: 'Used to group logs. Groups are rate limited
-                          independently (default: kubernetes.container_name)'
                         type: string
                       group_reset_rate_s:
-                        description: 'After a group has exceeded its bucket limit,
-                          logs are dropped until the rate per second falls below or
-                          equal to group_reset_rate_s. (default: group_bucket_limit/group_bucket_period_s)'
                         type: integer
                       group_warning_delay_s:
-                        description: 'When a group reaches its limit and as long as
-                          it is not reset, a warning message with the current log
-                          rate of the group is emitted repeatedly. This is the delay
-                          between every repetition. (default: 10 seconds)'
                         type: integer
                     type: object
                 type: object
@@ -824,13 +522,11 @@ spec:
             selectors:
               additionalProperties:
                 type: string
-              description: Deprecated
               type: object
           required:
           - outputRefs
           type: object
         status:
-          description: FlowStatus defines the observed state of Flow
           type: object
       type: object
   version: v1beta1
