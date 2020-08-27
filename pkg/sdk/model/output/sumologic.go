@@ -26,6 +26,33 @@ type _hugoSumoLogic interface{}
 // +docName:"SumoLogic output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
 //More info at https://github.com/SumoLogic/fluentd-output-sumologic
+//
+// Example secret for HTTP input URL
+// ```
+//export URL='https://endpoint1.collection.eu.sumologic.com/receiver/v1/http/.......'
+//kubectl create secret generic sumo-output --from-literal "endpoint=$URL"
+//```
+//
+// Example ClusterOutput
+//
+//```
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: ClusterOutput
+//metadata:
+//  name: sumo-output
+//spec:
+//  sumologic:
+//    buffer:
+//      flush_interval: 10s
+//      flush_mode: interval
+//    compress: true
+//    endpoint:
+//      valueFrom:
+//        secretKeyRef:
+//          key: endpoint
+//          name: sumo-output
+//    source_name: test1
+//```
 type _docSumoLogic interface{}
 
 // +name:"SumoLogic"
