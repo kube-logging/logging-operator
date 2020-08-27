@@ -32,6 +32,6 @@ More info at https://github.com/SumoLogic/fluentd-output-sumologic
 | custom_fields | []string | No | - | Comma-separated key=value list of fields to apply to every log. [more information](https://help.sumologic.com/Manage/Fields#http-source-fields)<br> |
 | sumo_client | string | No |  fluentd-output | Name of sumo client which is send as X-Sumo-Client header <br> |
 | compress | *bool | No |  false | Compress payload <br> |
-| compress_encoding | string | No |  gzip | Encoding method of compresssion (either gzip or deflate) <br> |
+| compress_encoding | string | No |  gzip | Encoding method of compression (either gzip or deflate) <br> |
 | custom_dimensions | string | No | - | Dimensions string (eg "cluster=payment, service=credit_card") which is going to be added to every metric record.<br> |
 | buffer | *Buffer | No | - | [Buffer](../buffer/)<br> |
