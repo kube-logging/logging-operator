@@ -68,14 +68,43 @@ type SumologicOutput struct {
 	ProxyUri string `json:"proxy_uri,omitempty"`
 	// Option to disable cookies on the HTTP Client. (default: false)
 	DisableCookies bool `json:"disable_cookies,omitempty"`
+	// Delimiter (default: .)
+	Delimiter string `json:"delimiter,omitempty"`
+	// Comma-separated key=value list of fields to apply to every log. [more information](https://help.sumologic.com/Manage/Fields#http-source-fields)
+	CustomFields []string `json:"custom_fields,omitempty"`
+	// Name of sumo client which is send as X-Sumo-Client header (default: fluentd-output)
+	SumoClient string `json:"sumo_client,omitempty"`
+	// Compress payload (default: false)
+	Compress *bool `json:"compress,omitempty"`
+	// Encoding method of compression (either gzip or deflate) (default: gzip)
+	CompressEncoding string `json:"compress_encoding,omitempty"`
+	// Dimensions string (eg "cluster=payment, service=credit_card") which is going to be added to every metric record.
+	CustomDimensions string `json:"custom_dimensions,omitempty"`
+	// +docLink:"Buffer,../buffer/"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (s *SumologicOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "sumologic"
-	return types.NewFlatDirective(types.PluginMeta{
-		Type:      pluginType,
-		Directive: "match",
-		Tag:       "**",
-		Id:        id,
-	}, s, secretLoader)
+	sumologic := &types.OutputPlugin{
+		PluginMeta: types.PluginMeta{
+			Type:      pluginType,
+			Directive: "match",
+			Tag:       "**",
+			Id:        id,
+		},
+	}
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(s); err != nil {
+		return nil, err
+	} else {
+		sumologic.Params = params
+	}
+	if s.Buffer != nil {
+		if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
+			return nil, err
+		} else {
+			sumologic.SubDirectives = append(sumologic.SubDirectives, buffer)
+		}
+	}
+	return sumologic, nil
 }

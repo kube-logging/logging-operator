@@ -29,16 +29,29 @@ metric_data_format: carbon2
 log_format: json
 source_category: prod/someapp/logs
 source_name: AppA
+compress: true
+buffer:
+  type: file
+  timekey_wait: 5s
+  timekey: 30s
 `)
 	expected := `
   <match **>
     @type sumologic
     @id test
+    compress true
     data_type metrics
     log_format json
     metric_data_format carbon2
     source_category prod/someapp/logs
     source_name AppA
+    <buffer tag,time>
+      @type file
+      path /buffers/test.*.buffer
+      retry_forever true
+      timekey 30s
+      timekey_wait 5s
+    </buffer>
   </match>
 `
 	s := &output.SumologicOutput{}
