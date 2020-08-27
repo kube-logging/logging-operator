@@ -201,6 +201,11 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.SuppressTypeName != nil {
+		in, out := &in.SuppressTypeName, &out.SuppressTypeName
+		*out = new(bool)
+		**out = **in
+	}
 	if in.TemplateFile != nil {
 		in, out := &in.TemplateFile, &out.TemplateFile
 		*out = new(secret.Secret)

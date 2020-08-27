@@ -2237,6 +2237,10 @@ spec:
                     to suppress doc wrapping and allow record body to be untouched.
                     (default: false)'
                   type: boolean
+                suppress_type_name:
+                  description: Suppress type name to avoid warnings in Elasticsearch
+                    7.x
+                  type: boolean
                 tag_key:
                   description: 'This will add the Fluentd tag in the JSON record.(default:
                     tag)'

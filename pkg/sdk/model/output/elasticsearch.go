@@ -110,6 +110,8 @@ type ElasticsearchOutput struct {
 	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe utc_index to false.(default: true)
 	// +kubebuilder:validation:Optional
 	UtcIndex *bool `json:"utc_index,omitempty" plugin:"default:true"`
+	// Suppress type name to avoid warnings in Elasticsearch 7.x
+	SuppressTypeName *bool `json:"suppress_type_name,omitempty"`
 	// Tell this plugin to find the index name to write to in the record under this key in preference to other mechanisms. Key can be specified as path to nested record using dot ('.') as a separator. https://github.com/uken/fluent-plugin-elasticsearch#target_index_key
 	TargetIndexKey string `json:"target_index_key,omitempty"`
 	// Similar to target_index_key config, find the type name to write to in the record under this key (or nested record). If key not found in record - fallback to type_name.(default: fluentd)
