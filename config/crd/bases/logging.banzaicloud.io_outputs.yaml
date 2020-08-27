@@ -2813,11 +2813,8 @@ spec:
                 partition_key:
                   type: string
                 process_credentials:
-                  description: This loads AWS access credentials from an external
-                    process.
                   properties:
                     process:
-                      description: 'Command more info: https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/ProcessCredentials.html'
                       type: string
                   required:
                   - process
