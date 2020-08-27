@@ -76,7 +76,7 @@ type SumologicOutput struct {
 	SumoClient string `json:"sumo_client,omitempty"`
 	// Compress payload (default: false)
 	Compress *bool `json:"compress,omitempty"`
-	// Encoding method of compresssion (either gzip or deflate) (default: gzip)
+	// Encoding method of compression (either gzip or deflate) (default: gzip)
 	CompressEncoding string `json:"compress_encoding,omitempty"`
 	// Dimensions string (eg "cluster=payment, service=credit_card") which is going to be added to every metric record.
 	CustomDimensions string `json:"custom_dimensions,omitempty"`
