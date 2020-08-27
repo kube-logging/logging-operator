@@ -31,6 +31,8 @@ format:
 assume_role_credentials:
   role_arn: arn:aws:iam::1111/IAM_ROLE_NAME
   role_session_name: logging-operator
+process_credentials:
+  process: /usr/bin/credential_proc
 buffer:
   timekey: 1m
   timekey_wait: 30s
@@ -46,6 +48,9 @@ buffer:
       role_arn arn:aws:iam::1111/IAM_ROLE_NAME
       role_session_name logging-operator
     </assume_role_credentials>
+	<process_credentials>
+	  process /usr/bin/credential_proc
+	</process_credentials>
     <buffer tag,time>
       @type file
       path /buffers/test.*.buffer
