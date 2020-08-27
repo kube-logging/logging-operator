@@ -70,6 +70,9 @@ type KinesisStreamOutputConfig struct {
 	// Typically, you can use AssumeRole for cross-account access or federation.
 	AssumeRoleCredentials *KinesisStreamAssumeRoleCredentials `json:"assume_role_credentials,omitempty"`
 
+	// This loads AWS access credentials from an external process.
+	ProcessCredentials *KinesisStreamProcessCredentials `json:"process_credentials,omitempty"`
+
 	// AWS region of your stream. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION.
 	Region string `json:"region,omitempty"`
 
@@ -107,6 +110,19 @@ type KinesisStreamAssumeRoleCredentials struct {
 	ExternalId string `json:"external_id,omitempty"`
 }
 
+// +kubebuilder:object:generate=true
+// +docName:"Process Credentials"
+// process_credentials
+type KinesisStreamProcessCredentials struct {
+	// Command more info: https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/ProcessCredentials.html
+	Process string `json:"process"`
+}
+
+func (o *KinesisStreamProcessCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	return types.NewFlatDirective(types.PluginMeta{
+		Directive: "process_credentials",
+	}, o, secretLoader)
+}
 func (o *KinesisStreamAssumeRoleCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "assume_role_credentials",
@@ -133,6 +149,13 @@ func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader
 			return nil, err
 		} else {
 			kinesis.SubDirectives = append(kinesis.SubDirectives, assumeRoleCredentials)
+		}
+	}
+	if e.ProcessCredentials != nil {
+		if processCredentials, err := e.ProcessCredentials.ToDirective(secretLoader, id); err != nil {
+			return nil, err
+		} else {
+			kinesis.SubDirectives = append(kinesis.SubDirectives, processCredentials)
 		}
 	}
 	if e.Buffer != nil {
