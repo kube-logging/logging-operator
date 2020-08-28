@@ -72,7 +72,7 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
 
      > Note: You can use the `ClusterOutput` and `ClusterFlow` resources only in the `controlNamespace`.
 
-1. Get Splunk HEC Token
+1. Get a Splunk HEC Token.
 
      ```bash
      HEC_TOKEN=$(kubectl get secret -n logging  splunk-single-standalone-secrets -o jsonpath='{.data.hec_token}' | base64 --decode)
