@@ -10,7 +10,7 @@ weight: 300
 
 This guide describes how to collect application and container logs in Kubernetes using the Logging operator, and how to send them to Splunk.
 
-The following figure gives you an overview about how the system works. The Logging operator collects the logs from the application, selects which logs to forward to the output, and sends the selected log messages to the output (in this case, to Splunk). For more details about the Logging operator, see the [Logging operator overview]({{< relref "docs/one-eye/logging-operator/_index.md">}}).
+Logging operator collects the logs from the application, selects which logs to forward to the output, and sends the selected log messages to the output (in this case, to Splunk). For more details about the Logging operator, see the [Logging operator overview]({{< relref "docs/one-eye/logging-operator/_index.md">}}).
 
 ## Deploy Splunk
 
