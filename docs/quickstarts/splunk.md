@@ -78,7 +78,7 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
      HEC_TOKEN=$(kubectl get secret -n logging  splunk-single-standalone-secrets -o jsonpath='{.data.hec_token}' | base64 --decode)
      ```
 
-1. Create Splunk output secret
+1. Create a Splunk output secret from the token.
      ```bash
      kubectl  create secret generic splunk-token -n logging --from-literal "SplunkHecToken=${HEC_TOKEN}"
      ```
