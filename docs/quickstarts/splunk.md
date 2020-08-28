@@ -14,7 +14,7 @@ The following figure gives you an overview about how the system works. The Loggi
 
 ## Deploy Splunk
 
-First, deploy Splunk Standalone in your Kubernetes cluster. The following procedure is based on the [Splunk on Kubernetes quickstart](https://www.splunk.com/en_us/blog/it/an-insider-s-guide-to-splunk-on-containers-and-kubernetes.html)
+First, deploy Splunk Standalone in your Kubernetes cluster. The following procedure is based on the [Splunk on Kubernetes quickstart](https://www.splunk.com/en_us/blog/it/an-insider-s-guide-to-splunk-on-containers-and-kubernetes.html).
 
 1. Create the `logging` Namespace.
 
