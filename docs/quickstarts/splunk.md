@@ -170,7 +170,7 @@ To validate that the deployment was successful, complete the following steps.
     kubectl -n logging get secret splunk-single-standalone-secrets -o jsonpath='{.data.password}' | base64 --decode
     ```
 
-1. Enable port forwarding to the Kibana Dashboard Service.
+1. Enable port forwarding to the Splunk Dashboard Service.
 
     ```bash
     kubectl -n logging port-forward svc/splunk-single-standalone-headless 8000
