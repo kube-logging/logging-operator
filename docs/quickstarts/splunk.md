@@ -84,7 +84,7 @@ To deploy the Logging operator using Kubernetes manifests, complete these steps.
      ```
 
 
-1. Create an Splunk `output` definition.
+1. Define a Splunk `output`.
 
     ```bash
     kubectl -n logging apply -f - <<"EOF"
