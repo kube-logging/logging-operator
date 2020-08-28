@@ -55,7 +55,7 @@ Install the Logging operator and a demo application to provide sample log messag
 To deploy the Logging operator using Kubernetes manifests, complete these steps. If you want to install the Logging operator using Helm, see [Deploy the Logging operator with Helm](#deploy-the-logging-operator-with-helm).
 
 1. Install the Logging operator. For details, see [How to install Logging-operator from manifests]({{< relref "docs/one-eye/logging-operator/deploy/_index.md#deploy-the-logging-operator-from-kubernetes-manifests" >}}.
-1. Create the `logging` resource.\
+1. Create the `logging` resource.
 
     ```bash
     kubectl -n logging apply -f - <<"EOF" 
