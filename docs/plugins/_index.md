@@ -29,13 +29,13 @@ For more information please click on the plugin name
 | **[Buffer](outputs/buffer/)** | outputs | Fluentd event buffer | GA | [mode info](https://docs.fluentd.org/configuration/buffer-section) |
 | **[Amazon CloudWatch](outputs/cloudwatch/)** | outputs | Send your logs to AWS CloudWatch | GA | [0.10.2](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.10.2) |
 | **[Datadog](outputs/datadog/)** | outputs | Send your logs to Datadog | Testing | [0.12.1](https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.12.1) |
-| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.1.1](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.1.1) |
+| **[Elasticsearch](outputs/elasticsearch/)** | outputs | Send your logs to Elasticsearch | GA | [4.1.2](https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.1.2) |
 | **[File](outputs/file/)** | outputs | Output plugin writes events to files | GA | [more info](https://docs.fluentd.org/output/file) |
 | **[Format](outputs/format/)** | outputs | Specify how to format output record. | GA | [more info](https://docs.fluentd.org/configuration/format-section) |
 | **[Forward](outputs/forward/)** | outputs | Forwards events to other fluentd nodes. | GA | [more info](https://docs.fluentd.org/output/forward) |
 | **[Google Cloud Storage](outputs/gcs/)** | outputs | Store logs in Google Cloud Storage | GA | [0.4.0](https://github.com/banzaicloud/fluent-plugin-gcs) |
 | **[Http](outputs/http/)** | outputs | Sends logs to HTTP/HTTPS endpoints. | GA | [more info](https://docs.fluentd.org/output/http) |
-| **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.13.1](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.13.1) |
+| **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.14.2](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.14.2) |
 | **[Amazon Kinesis Firehose](outputs/kinesis_firehose/)** | outputs | Fluent plugin for Amazon Kinesis | Testing | [3.2.3](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.3) |
 | **[Amazon Kinesis Stream](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.2.3](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.2.3) |
 | **[LogDNA](outputs/logdna/)** | outputs | Send your logs to LogDNA | GA | [more info](https://github.com/logdna/fluent-plugin-logdna) |
