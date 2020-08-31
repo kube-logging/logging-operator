@@ -27,6 +27,7 @@ generated_file: true
 | http_method | string | No |  post | Method for HTTP request. [post, put] <br> |
 | proxy | string | No | - | Proxy for HTTP request.<br> |
 | content_type | string | No | - | Content-Type for HTTP request.<br> |
+| json_array | bool | No |  false | Using array format of JSON. This parameter is used and valid only for json format. When json_array as true, Content-Type should be application/json and be able to use JSON data for the HTTP request body.  <br> |
 | format | *Format | No | - | [Format](../format/)<br> |
 | headers | map[string]string | No | - | Additional headers for HTTP request.<br> |
 | open_timeout | int | No | - | Connection open timeout in seconds.<br> |
