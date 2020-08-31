@@ -41,7 +41,8 @@ generated_file: true
 | match | []ClusterMatch | No | - |  |
 | filters | []Filter | No | - |  |
 | loggingRef | string | No | - |  |
-| outputRefs | []string | Yes | - |  |
+| outputRefs | []string | No | - | Deprecated<br> |
+| globalOutputRefs | []string | No | - |  |
 ### ClusterFlowList
 #### ClusterFlowList contains a list of ClusterFlow
 
