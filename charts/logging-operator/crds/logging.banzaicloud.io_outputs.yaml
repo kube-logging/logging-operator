@@ -3943,12 +3943,12 @@ spec:
                   type: boolean
                 keep_keys:
                   type: boolean
+                metric_name_key:
+                  type: string
+                metric_value_key:
+                  type: string
                 metrics_from_event:
                   type: boolean
-                metrics_name_key:
-                  type: string
-                metrics_value_key:
-                  type: string
                 non_utf8_replacement_string:
                   type: string
                 open_timeout:

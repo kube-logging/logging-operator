@@ -33,8 +33,8 @@ fields:
 host: foo
 protocol: http
 metrics_from_event: true
-metrics_name_key: foo
-metrics_value_key: foo
+metric_name_key: foo
+metric_value_key: foo
 coerce_to_utf8: true
 non_utf8_replacement_string: bar
 sourcetype: foo
@@ -50,9 +50,9 @@ source: foo
 		host foo
 		index foo
 		insecure_ssl true
+		metric_name_key foo
+		metric_value_key foo
 		metrics_from_event true
-		metrics_name_key foo
-		metrics_value_key foo
 		non_utf8_replacement_string bar
 		protocol http
 		source foo
