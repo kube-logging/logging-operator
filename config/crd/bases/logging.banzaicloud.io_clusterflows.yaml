@@ -528,7 +528,6 @@ spec:
                 type: object
               type: array
             outputRefs:
-              description: Deprecated
               items:
                 type: string
               type: array
