@@ -48,4 +48,5 @@ generated_file: true
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | filters | []Filter | No | - |  |
-| outputRefs | []string | Yes | - |  |
+| outputRefs | []string | No | - | Deprecated<br> |
+| globalOutputRefs | []string | No | - |  |

@@ -13,7 +13,9 @@ generated_file: true
 | match | []Match | No | - |  |
 | filters | []Filter | No | - |  |
 | loggingRef | string | No | - |  |
-| outputRefs | []string | Yes | - |  |
+| outputRefs | []string | No | - | Deprecated<br> |
+| globalOutputRefs | []string | No | - |  |
+| localOutputRefs | []string | No | - |  |
 ### Match
 | Variable Name | Type | Required | Default | Description |
 |---|---|---|---|---|
