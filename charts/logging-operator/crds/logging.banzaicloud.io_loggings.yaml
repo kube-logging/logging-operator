@@ -491,7 +491,6 @@ spec:
                     type: string
                   type: array
                 outputRefs:
-                  description: Deprecated
                   items:
                     type: string
                   type: array
