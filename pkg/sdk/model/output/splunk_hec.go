@@ -63,9 +63,9 @@ type SplunkHecOutput struct {
 	// When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true)
 	MetricsFromEvent *bool `json:"metrics_from_event,omitempty"`
 	// Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false. (default: true)
-	MetricsNameKey string `json:"metrics_name_key,omitempty"`
+	MetricNameKey string `json:"metric_name_key,omitempty"`
 	// Field name that contains the metric value, this parameter is required when metric_name_key is configured.
-	MetricsValueKey string `json:"metrics_value_key,omitempty"`
+	MetricValueKey string `json:"metric_value_key,omitempty"`
 	// Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. (default: true).
 	CoerceToUtf8 *bool `json:"coerce_to_utf8,omitempty"`
 	// If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. (default: ' ').
