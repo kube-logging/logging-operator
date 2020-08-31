@@ -57,6 +57,8 @@ type HTTPOutputConfig struct {
 	Proxy string `json:"proxy,omitempty"`
 	// Content-Type for HTTP request.
 	ContentType string `json:"content_type,omitempty"`
+	// Using array format of JSON. This parameter is used and valid only for json format. When json_array as true, Content-Type should be application/json and be able to use JSON data for the HTTP request body.  (default: false)
+	JsonArray bool `json:"json_array,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 	// Additional headers for HTTP request.
