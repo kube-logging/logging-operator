@@ -44,8 +44,8 @@ type _hugoElasticsearch interface{}
 type _docElasticsearch interface{}
 
 // +name:"Elasticsearch"
-// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.1.1"
-// +version:"4.1.1"
+// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v4.1.2"
+// +version:"4.1.2"
 // +description:"Send your logs to Elasticsearch"
 // +status:"GA"
 type _metaElasticsearch interface{}
