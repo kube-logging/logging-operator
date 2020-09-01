@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 )
 
-const Image = "banzaicloud/logging-operator:3.5.2"
+const Image = "banzaicloud/logging-operator:3.6.0"
 
 // +kubebuilder:object:generate=true
 
