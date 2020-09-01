@@ -33,7 +33,7 @@ The Logging operator automates the deployment and configuration of a Kubernetes 
 
 This operator helps you bundle logging information with your applications: you can describe the behavior of your application in its charts, the Logging operator does the rest.
 
-<p align="center"><img src="docs/img/logging_operator_flow.png" ></p>
+<p align="center"><img src="https://banzaicloud.com/docs/one-eye/logging-operator/img/logging_operator_flow.png" ></p>
 
 ## Feature highlights
 
@@ -42,7 +42,7 @@ This operator helps you bundle logging information with your applications: you c
 - [x] Secure communication (TLS)
 - [x] Configuration validation
 - [x] Multiple flow support (multiply logs for different transformations)
-- [x] Multiple [output](docs/plugins/outputs) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
+- [x] Multiple [output](https://banzaicloud.com/docs/one-eye/logging-operator/plugins/outputs/) support (store the same logs in multiple storage: S3, GCS, ES, Loki and more...)
 - [x] Multiple logging system support (multiple fluentd, fluent-bit deployment on the same cluster)
 
 ## Architecture
@@ -51,15 +51,15 @@ You can define `outputs` (destinations where you want to send your log messages,
 
 You can configure the Logging operator using the following Custom Resource Descriptions.
 
-- [logging](/docs/crds.md#loggings) - Represents a logging system. Includes `Fluentd` and `Fluent-bit` configuration. Specifies the `controlNamespace`. Fluentd and Fluent-bit will be deployed in the `controlNamespace`
-- [output](/docs/crds.md#outputs-clusteroutputs) - Defines an Output for a logging flow. This is a namespaced resource. See also `clusteroutput`.
-- [flow](/docs/crds.md#flows-clusterflows) - Defines a logging flow with `filters` and `outputs`. You can specify `selectors` to filter logs by labels. Outputs can be `output` or `clusteroutput`.  This is a namespaced resource. See also `clusterflow`.
-- [clusteroutput](/docs/crds.md#outputs-clusteroutputs) - Defines an output without namespace restriction. Only effective in `controlNamespace`.
-- [clusterflow](/docs/crds.md#flows-clusterflows) - Defines a logging flow without namespace restriction.
+- [logging](https://banzaicloud.com/docs/one-eye/logging-operator/crds/v1beta1/logging_types/) - Represents a logging system. Includes `Fluentd` and `Fluent-bit` configuration. Specifies the `controlNamespace`. Fluentd and Fluent-bit will be deployed in the `controlNamespace`
+- [output](https://banzaicloud.com/docs/one-eye/logging-operator/crds/v1beta1/output_types/) - Defines an Output for a logging flow. This is a namespaced resource. See also `clusteroutput`.
+- [flow](https://banzaicloud.com/docs/one-eye/logging-operator/crds/v1beta1/flow_types/) - Defines a logging flow with `filters` and `outputs`. You can specify `selectors` to filter logs by labels. Outputs can be `output` or `clusteroutput`.  This is a namespaced resource. See also `clusterflow`.
+- [clusteroutput](https://banzaicloud.com/docs/one-eye/logging-operator/crds/v1beta1/clusteroutput_types/) - Defines an output without namespace restriction. Only effective in `controlNamespace`.
+- [clusterflow](https://banzaicloud.com/docs/one-eye/logging-operator/crds/v1beta1/output_types/) - Defines a logging flow without namespace restriction.
 
 See the [detailed CRD documentation](https://banzaicloud.com/docs/one-eye/logging-operator/crds/).
 
-<p align="center"><img src="docs/img/logging-operator-v2-architecture.png" ></p>
+<p align="center"><img src="https://banzaicloud.com/docs/one-eye/logging-operator/img/logging-operator-v2-architecture.png" ></p>
 
 ## Quickstart
 
