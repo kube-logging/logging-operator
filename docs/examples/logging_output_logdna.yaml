@@ -1,9 +1,0 @@
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Output
-metadata:
-  name: logdna-output-sample
-spec:
-  logdna:
-    api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    hostname: logging-operator
-    app: my-app
