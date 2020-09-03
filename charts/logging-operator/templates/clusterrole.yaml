@@ -95,13 +95,7 @@ rules:
   resources:
   - podsecuritypolicies
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
+  - "*"
 - apiGroups:
   - logging.banzaicloud.io
   resources:
