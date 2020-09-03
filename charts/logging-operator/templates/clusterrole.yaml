@@ -101,6 +101,7 @@ rules:
   - list
   - patch
   - update
+  - use
   - watch
 - apiGroups:
   - logging.banzaicloud.io
