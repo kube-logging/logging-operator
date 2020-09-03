@@ -26,6 +26,7 @@ func TestParser(t *testing.T) {
 	CONFIG := []byte(`
 remove_key_name_field: true
 reserve_data: true
+emit_invalid_record_to_error: false
 parse:
   type: nginx
 `)
@@ -33,6 +34,7 @@ parse:
 <filter **>
   @type parser
   @id test
+  emit_invalid_record_to_error false
   key_name message
   remove_key_name_field true
   reserve_data true
