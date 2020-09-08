@@ -50,13 +50,13 @@ var _ = Describe("ClusterOutput", func() {
 
 			key = types.NamespacedName{
 				Name:      "foo",
-				Namespace: "foo",
+				Namespace: "default",
 			}
 			created = &ClusterOutput{
 				TypeMeta: metav1.TypeMeta{},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
-					Namespace: "foo",
+					Namespace: "default",
 				},
 				Spec: ClusterOutputSpec{
 					OutputSpec: OutputSpec{
