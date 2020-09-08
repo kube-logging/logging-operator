@@ -49,13 +49,13 @@ var _ = Describe("ClusterFlow", func() {
 		It("should create an object successfully", func() {
 
 			key = types.NamespacedName{
-				Namespace: "foo",
+				Namespace: "default",
 				Name:      "foo",
 			}
 			created = &ClusterFlow{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
-					Namespace: "foo",
+					Namespace: "default",
 				},
 				Spec:   ClusterFlowSpec{},
 				Status: FlowStatus{},
