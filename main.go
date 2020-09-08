@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 	"strings"
@@ -105,7 +106,7 @@ func main() {
 func detectContainerRuntime() error {
 	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
 	runtime := "cri"
-	nodeList, err := client.CoreV1().Nodes().List(metav1.ListOptions{Limit: 1})
+	nodeList, err := client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{Limit: 1})
 	if err != nil {
 		return errors.WithStack(err)
 	}

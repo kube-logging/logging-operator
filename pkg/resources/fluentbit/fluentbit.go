@@ -70,7 +70,7 @@ type Reconciler struct {
 func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
-		GenericResourceReconciler: reconciler.NewReconciler(client, logger, opts),
+		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
 	}
 }
 
