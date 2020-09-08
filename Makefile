@@ -8,7 +8,7 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
-KUBEBUILDER_VERSION = 2.2.0
+KUBEBUILDER_VERSION = 2.3.1
 VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
