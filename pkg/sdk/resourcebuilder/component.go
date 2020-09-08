@@ -36,11 +36,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 )
 
-const Image = "banzaicloud/logging-operator:3.6.0"
+const (
+	Image            = "banzaicloud/logging-operator:3.6.0"
+	defaultNamespace = "logging-system"
+)
 
 // +kubebuilder:object:generate=true
 
 type ComponentConfig struct {
+	Namespace             string               `json:"namespace,omitempty"`
 	Disabled              bool                 `json:"disabled,omitempty"`
 	MetaOverrides         *types.MetaBase      `json:"metaOverrides,omitempty"`
 	WorkloadMetaOverrides *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
@@ -60,6 +64,9 @@ func ResourceBuilders(parent reconciler.ResourceOwner, object interface{}) []rec
 	}
 	if object != nil {
 		config = object.(*ComponentConfig)
+	}
+	if config.Namespace == "" {
+		config.Namespace = defaultNamespace
 	}
 	resources := []reconciler.ResourceBuilder{
 		config.build(parent, Operator),
@@ -206,7 +213,7 @@ func ClusterRoleBinding(parent reconciler.ResourceOwner, config ComponentConfig)
 		{
 			Kind:      rbacv1.ServiceAccountKind,
 			Name:      sa,
-			Namespace: parent.GetControlNamespace(),
+			Namespace: config.Namespace,
 		},
 	}
 	rb.RoleRef = rbacv1.RoleRef{
@@ -257,7 +264,7 @@ func ClusterRole(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 func (c *ComponentConfig) objectMeta(parent reconciler.ResourceOwner) v1.ObjectMeta {
 	meta := v1.ObjectMeta{
 		Name:      parent.GetName() + "-logging-operator",
-		Namespace: parent.GetControlNamespace(),
+		Namespace: c.Namespace,
 		Labels:    c.labelSelector(parent),
 	}
 	return meta
