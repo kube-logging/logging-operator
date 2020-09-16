@@ -9,6 +9,7 @@ IMG ?= controller:latest
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
 KUBEBUILDER_VERSION = 2.3.1
+LICENSEI_VERSION = 0.2.0
 VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
@@ -43,6 +44,22 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 lint: bin/golangci-lint ## Run linter
 	bin/golangci-lint run
 	cd pkg/sdk && golangci-lint run -c ../../.golangci.yml
+
+bin/licensei: bin/licensei-${LICENSEI_VERSION}
+	@ln -sf licensei-${LICENSEI_VERSION} bin/licensei
+bin/licensei-${LICENSEI_VERSION}:
+	@mkdir -p bin
+	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s v${LICENSEI_VERSION}
+	@mv bin/licensei $@
+
+.PHONY: license-check
+license-check: bin/licensei ## Run license check
+	bin/licensei check
+	./scripts/check-header.sh
+
+.PHONY: license-cache
+license-cache: bin/licensei ## Generate license cache
+	bin/licensei cache
 
 .PHONY: lint-fix
 lint-fix: bin/golangci-lint ## Run linter
