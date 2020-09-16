@@ -21,6 +21,8 @@ require (
 	sigs.k8s.io/controller-runtime v0.6.2
 )
 
+replace k8s.io/client-go => k8s.io/client-go v0.18.6
+
 replace github.com/banzaicloud/logging-operator/pkg/sdk => ./pkg/sdk
 
 //replace github.com/banzaicloud/operator-tools => ../operator-tools
