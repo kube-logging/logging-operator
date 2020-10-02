@@ -8,8 +8,9 @@ approved = [
 ]
 
 ignored = [
-
-# Unsupported VCS
+ "github.com/banzaicloud/logging-operator/pkg/sdk", # go submodule
+  "github.com/davecgh/go-spew", # ISC
+  # Unsupported VCS
   "google.golang.org/protobuf",
   "github.com/gogo/protobuf",
   "sigs.k8s.io/yaml",
@@ -19,14 +20,14 @@ ignored = [
 
 [header]
 ignorePaths = ["vendor"]
-ignoreFiles = ["zz_generated.*.go"]
+ignoreFiles = ["zz_generated.*.go", "generated.go","cache.go"]
 template = """// Copyright © :YEAR: Banzai Cloud
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
