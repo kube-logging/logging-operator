@@ -10,7 +10,6 @@ require (
 	github.com/banzaicloud/operator-tools v0.15.0
 	github.com/coreos/prometheus-operator v0.34.0
 	github.com/go-logr/logr v0.2.1
-	github.com/go-logr/zapr v0.2.0 // indirect
 	github.com/onsi/gomega v1.10.1
 	github.com/pborman/uuid v1.2.0
 	github.com/spf13/cast v1.3.1
