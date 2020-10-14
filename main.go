@@ -26,14 +26,13 @@ import (
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	// +kubebuilder:scaffold:imports
 )
@@ -62,6 +61,8 @@ func main() {
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
 	flag.Parse()
 
+	ctx := context.Background()
+
 	ctrl.SetLogger(zap.New(func(o *zap.Options) {
 		o.Development = verboseLogging
 	}))
@@ -80,7 +81,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := detectContainerRuntime(); err != nil {
+	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {
 		setupLog.Error(err, "failed to detect container runtime")
 		os.Exit(1)
 	}
@@ -100,14 +101,14 @@ func main() {
 	}
 }
 
-func detectContainerRuntime() error {
-	client := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
-	runtime := "cri"
-	nodeList, err := client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{Limit: 1})
-	if err != nil {
-		return errors.WithStack(err)
+func detectContainerRuntime(ctx context.Context, c client.Reader) error {
+	var nodeList corev1.NodeList
+	if err := c.List(ctx, &nodeList, client.Limit(1)); err != nil {
+		return errors.WithStackIf(err)
 	}
-	if nodeList != nil && len(nodeList.Items) > 0 {
+
+	runtime := "cri"
+	if len(nodeList.Items) > 0 {
 		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
 		runtime = strings.Split(runtimeWithVersion, "://")[0]
 		setupLog.Info("Detected cri", "cri", runtime)
