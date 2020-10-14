@@ -546,10 +546,7 @@ func beforeEach(t *testing.T) func() {
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	flowReconciler := &controllers.LoggingReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Flow"),
-	}
+	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Flow"))
 
 	var wrappedReconciler reconcile.Reconciler
 	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
