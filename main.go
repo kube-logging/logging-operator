@@ -107,14 +107,14 @@ func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 		return errors.WithStackIf(err)
 	}
 
-	runtime := "cri"
 	if len(nodeList.Items) > 0 {
 		runtimeWithVersion := nodeList.Items[0].Status.NodeInfo.ContainerRuntimeVersion
-		runtime = strings.Split(runtimeWithVersion, "://")[0]
-		setupLog.Info("Detected cri", "cri", runtime)
-	} else {
-		setupLog.Info("Unable to detect cri, falling back to default", "cri", runtime)
+		runtime := strings.Split(runtimeWithVersion, "://")[0]
+		setupLog.Info("Detected container runtime", "runtime", runtime)
+
+		types.ContainerRuntime = runtime
 	}
-	types.ContainerRuntime = runtime
+
+	setupLog.Info("Unable to detect container runtime, keeping default value", "runtime", types.ContainerRuntime)
 	return nil
 }
