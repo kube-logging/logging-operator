@@ -44,6 +44,14 @@ import (
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 )
 
+// NewLoggingReconciler returns a new LoggingReconciler instance
+func NewLoggingReconciler(client client.Client, log logr.Logger) *LoggingReconciler {
+	return &LoggingReconciler{
+		Client: client,
+		Log:    log,
+	}
+}
+
 // LoggingReconciler reconciles a Logging object
 type LoggingReconciler struct {
 	client.Client
