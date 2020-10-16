@@ -44,6 +44,14 @@ import (
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 )
 
+// NewLoggingReconciler returns a new LoggingReconciler instance
+func NewLoggingReconciler(client client.Client, log logr.Logger) *LoggingReconciler {
+	return &LoggingReconciler{
+		Client: client,
+		Log:    log,
+	}
+}
+
 // LoggingReconciler reconciles a Logging object
 type LoggingReconciler struct {
 	client.Client
@@ -65,12 +73,12 @@ type LoggingReconciler struct {
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
+	ctx := context.Background()
+
 	log := r.Log.WithValues("logging", req.NamespacedName)
 
 	logging := &loggingv1beta1.Logging{}
-	err := r.Client.Get(context.TODO(), req.NamespacedName, logging)
-	if err != nil {
+	if err := r.Client.Get(ctx, req.NamespacedName, logging); err != nil {
 		// Object not found, return.  Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
 		if apierrors.IsNotFound(err) {
@@ -79,7 +87,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcile.Result{}, err
 	}
 
-	logging, err = logging.SetDefaults()
+	logging, err := logging.SetDefaults()
 	if err != nil {
 		return reconcile.Result{}, err
 	}

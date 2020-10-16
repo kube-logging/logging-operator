@@ -94,6 +94,29 @@ func New(client client.Client, log logr.Logger,
 
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+	for _, res := range []resources.Resource{
+		r.serviceAccount,
+		r.role,
+		r.roleBinding,
+		r.clusterPodSecurityPolicy,
+		r.pspRole,
+		r.pspRoleBinding,
+	} {
+		o, state, err := res()
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to create desired object")
+		}
+		if o == nil {
+			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
+		}
+		result, err := r.ReconcileResource(o, state)
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to reconcile resource")
+		}
+		if result != nil {
+			return result, nil
+		}
+	}
 	// Config check and cleanup if enabled
 	if !r.Logging.Spec.FlowConfigCheckDisabled {
 		hash, err := r.configHash()
@@ -176,12 +199,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	for _, res := range []resources.Resource{
-		r.serviceAccount,
-		r.role,
-		r.roleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspRole,
-		r.pspRoleBinding,
 		r.secretConfig,
 		r.appconfigMap,
 		r.statefulset,
