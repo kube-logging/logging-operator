@@ -205,7 +205,18 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 	pod := &v1.Pod{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: v1.PodSpec{
-			RestartPolicy: v1.RestartPolicyNever,
+			RestartPolicy:      v1.RestartPolicyNever,
+			ServiceAccountName: r.getServiceAccount(),
+			NodeSelector:       r.Logging.Spec.FluentdSpec.NodeSelector,
+			Tolerations:        r.Logging.Spec.FluentdSpec.Tolerations,
+			Affinity:           r.Logging.Spec.FluentdSpec.Affinity,
+			PriorityClassName:  r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+			SecurityContext: &corev1.PodSecurityContext{
+				RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+				FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
+				RunAsUser:    r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
+				RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
+			},
 			Volumes: []v1.Volume{
 				{
 					Name: "config",
@@ -244,6 +255,15 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 							Name:      "output-secret",
 							MountPath: OutputSecretPath,
 						},
+					},
+					SecurityContext: &corev1.SecurityContext{
+						RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
+						RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
+						ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+						AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+						Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
+						RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
+						SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
 					},
 				},
 			},
