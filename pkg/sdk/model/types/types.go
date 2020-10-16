@@ -21,7 +21,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
-var ContainerRuntime = ""
+var ContainerRuntime = "containerd"
 
 func GetLogKey() string {
 	switch ContainerRuntime {
