@@ -55,7 +55,7 @@ func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger 
 	}
 }
 
-func (l *LoggingResources) CreateModel() (*types.Builder, error) {
+func (l *LoggingResources) CreateModel() (*types.SystemBuilder, error) {
 	forwardInput := input.NewForwardInputConfig()
 	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
@@ -78,7 +78,7 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		map[string]string{
 			"metrics": strconv.FormatBool(l.logging.Spec.FluentdSpec.Metrics != nil),
 		})
-	system := types.NewSystem(rootInput, router)
+	system := types.NewSystemBuilder(rootInput, router)
 	for _, flowCr := range l.Flows {
 		flow, err := l.FlowFromFlow(flowCr)
 		if err != nil {
