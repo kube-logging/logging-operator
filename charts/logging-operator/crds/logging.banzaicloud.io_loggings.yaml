@@ -2244,10 +2244,10 @@ spec:
                   type: object
                 scaling:
                   properties:
+                    podManagementPolicy:
+                      type: string
                     replicas:
                       type: integer
-                  required:
-                  - replicas
                   type: object
                 security:
                   properties:

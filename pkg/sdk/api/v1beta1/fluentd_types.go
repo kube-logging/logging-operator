@@ -80,7 +80,8 @@ type FluentOutLogrotate struct {
 
 // FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
 type FluentdScaling struct {
-	Replicas int `json:"replicas"`
+	Replicas            int    `json:"replicas,omitempty"`
+	PodManagementPolicy string `json:"podManagementPolicy,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

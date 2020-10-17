@@ -74,7 +74,8 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	return &appsv1.StatefulSetSpec{
-		Replicas: util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
+		Replicas:            util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
+		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.FluentdSpec.Scaling.PodManagementPolicy),
 		Selector: &metav1.LabelSelector{
 			MatchLabels: r.getFluentdLabels(ComponentFluentd),
 		},
