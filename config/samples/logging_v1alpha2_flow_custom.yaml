@@ -9,6 +9,6 @@ spec:
     sampleKey: customValue
   filters:
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-custom"
     - "output-custom-cluster"

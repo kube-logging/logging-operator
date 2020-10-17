@@ -63,7 +63,7 @@ type TagNormaliser struct {
 //    - tag_normaliser:
 //        format: cluster1.${namespace_name}.${pod_name}.${labels.app}
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

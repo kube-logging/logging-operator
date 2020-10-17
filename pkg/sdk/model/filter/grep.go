@@ -70,7 +70,7 @@ type RegexpSection struct {
 //        - key: first
 //          pattern: /^5\d\d$/
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //
@@ -110,7 +110,7 @@ type ExcludeSection struct {
 //        - key: first
 //          pattern: /^5\d\d$/
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //
@@ -154,7 +154,7 @@ type OrSection struct {
 //              pattern: /\.css$/
 //
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 //```
 //
@@ -200,7 +200,7 @@ type AndSection struct {
 //              pattern: /\.css$/
 //
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 //```
 //

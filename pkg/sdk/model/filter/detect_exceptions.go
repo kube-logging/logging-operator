@@ -78,7 +78,7 @@ type DetectExceptions struct {
 //          - java
 //          - python
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

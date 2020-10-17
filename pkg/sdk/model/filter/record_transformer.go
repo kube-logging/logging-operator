@@ -66,7 +66,7 @@ type RecordTransformer struct {
 //        records:
 //        - foo: "bar"
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //
