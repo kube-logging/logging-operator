@@ -15,7 +15,7 @@ spec:
   filters:
     - tag_normaliser: {}
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -28,7 +28,7 @@ spec:
   filters:
     - tag_normaliser: {}
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -41,7 +41,7 @@ spec:
   filters:
     - tag_normaliser: {}
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -54,7 +54,7 @@ spec:
   filters:
     - tag_normaliser: {}
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -67,6 +67,6 @@ spec:
   filters:
     - tag_normaliser: {}
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
 ---
