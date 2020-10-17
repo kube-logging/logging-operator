@@ -57,7 +57,7 @@ clusterOutputs: []
 # clusterFlows:
 #   - name: all-pods
 #     spec:
-#       outputRefs:
+#       globalOutputRefs:
 #         - kafka
 # clusterOutputs:
 #   - name: kafka

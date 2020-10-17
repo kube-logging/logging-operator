@@ -82,7 +82,7 @@ type Concat struct {
 //        separator: ""
 //        n_lines: 10
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

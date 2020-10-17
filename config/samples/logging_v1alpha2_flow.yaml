@@ -12,5 +12,5 @@ spec:
     sampleKey: sampleValue
   filters:
     - stdout: {}
-  outputRefs:
+  localOutputRefs:
     - "output-sample"
