@@ -52,7 +52,7 @@ type StdOutFilterConfig struct {
 //    - stdout:
 //        output_type: json
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

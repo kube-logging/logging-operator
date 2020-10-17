@@ -160,7 +160,7 @@ type SingleParseSection struct {
 //            expression: /foo/
 //          - format: none
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

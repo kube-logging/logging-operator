@@ -55,7 +55,7 @@ type DedotFilterConfig struct {
 //        de_dot_separator: "-"
 //        de_dot_nested: true
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

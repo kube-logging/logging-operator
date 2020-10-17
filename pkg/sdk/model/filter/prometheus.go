@@ -85,7 +85,7 @@ type MetricSection struct {
 //          tag: ${tag}
 //          namespace: $.kubernetes.namespace
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //
