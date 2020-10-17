@@ -215,8 +215,15 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentdSpec.Scaling == nil {
 			copy.Spec.FluentdSpec.Scaling = &FluentdScaling{
-				Replicas: 1,
+				Replicas:            1,
+				PodManagementPolicy: "OrderedReady",
 			}
+		}
+		if copy.Spec.FluentdSpec.Scaling.Replicas == 0 {
+			copy.Spec.FluentdSpec.Scaling.Replicas = 1
+		}
+		if copy.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
+			copy.Spec.FluentdSpec.Scaling.PodManagementPolicy = "OrderedReady"
 		}
 		if copy.Spec.FluentdSpec.FluentLogDestination == "" {
 			copy.Spec.FluentdSpec.FluentLogDestination = "null"
