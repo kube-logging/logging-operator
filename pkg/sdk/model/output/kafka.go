@@ -45,8 +45,8 @@ type _hugoKafka interface{}
 type _docKafka interface{}
 
 // +name:"Kafka"
-// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.14.2"
-// +version:"0.14.2"
+// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.15.2"
+// +version:"0.15.2"
 // +description:"Send your logs to Kafka"
 // +status:"GA"
 type _metaKafka interface{}
