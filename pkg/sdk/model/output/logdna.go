@@ -29,8 +29,8 @@ type _hugoLogDNA interface{}
 type _docLogDNA interface{}
 
 // +name:"LogDNA"
-// +url:"https://github.com/logdna/fluent-plugin-logdna"
-// +version:"more info"
+// +url:"https://github.com/logdna/fluent-plugin-logdna/releases/tag/v0.4.0"
+// +version:"0.4.0"
 // +description:"Send your logs to LogDNA"
 // +status:"GA"
 type _metaLogDNA interface{}
