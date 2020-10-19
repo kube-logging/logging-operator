@@ -86,8 +86,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcile.Result{}, err
 	}
 
-	logging, err := logging.SetDefaults()
-	if err != nil {
+	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
 
