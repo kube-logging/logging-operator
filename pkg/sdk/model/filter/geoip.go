@@ -68,7 +68,7 @@ type GeoIP struct {
 //            country_name: ${country.names.en["remote_addr"]}
 //            postal_code:  ${postal.code["remote_addr"]}
 //  selectors: {}
-//  outputRefs:
+//  localOutputRefs:
 //    - demo-output
 // ```
 //

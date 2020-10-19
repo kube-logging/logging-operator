@@ -109,10 +109,10 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			return nil, errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")
 		}
 		if copy.Spec.FluentdSpec.Image.Repository == "" {
-			copy.Spec.FluentdSpec.Image.Repository = "banzaicloud/fluentd"
+			copy.Spec.FluentdSpec.Image.Repository = "ghcr.io/banzaicloud/fluentd"
 		}
 		if copy.Spec.FluentdSpec.Image.Tag == "" {
-			copy.Spec.FluentdSpec.Image.Tag = "v1.11.2-alpine-3"
+			copy.Spec.FluentdSpec.Image.Tag = "v1.11.4-alpine-1"
 		}
 		if copy.Spec.FluentdSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentdSpec.Image.PullPolicy = "IfNotPresent"
@@ -215,8 +215,15 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 		}
 		if copy.Spec.FluentdSpec.Scaling == nil {
 			copy.Spec.FluentdSpec.Scaling = &FluentdScaling{
-				Replicas: 1,
+				Replicas:            1,
+				PodManagementPolicy: "OrderedReady",
 			}
+		}
+		if copy.Spec.FluentdSpec.Scaling.Replicas == 0 {
+			copy.Spec.FluentdSpec.Scaling.Replicas = 1
+		}
+		if copy.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
+			copy.Spec.FluentdSpec.Scaling.PodManagementPolicy = "OrderedReady"
 		}
 		if copy.Spec.FluentdSpec.FluentLogDestination == "" {
 			copy.Spec.FluentdSpec.FluentLogDestination = "null"
@@ -261,7 +268,7 @@ func (l *Logging) SetDefaults() (*Logging, error) {
 			copy.Spec.FluentbitSpec.Image.Repository = "fluent/fluent-bit"
 		}
 		if copy.Spec.FluentbitSpec.Image.Tag == "" {
-			copy.Spec.FluentbitSpec.Image.Tag = "1.5.4"
+			copy.Spec.FluentbitSpec.Image.Tag = "1.6.1"
 		}
 		if copy.Spec.FluentbitSpec.Image.PullPolicy == "" {
 			copy.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"

@@ -1,5 +1,5 @@
 FROM alpine:3.12
-LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.11.2"
+LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.11.4"
 
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
@@ -20,13 +20,13 @@ RUN apk update \
         ruby-dev gnupg \
  && apk add $buildDeps \
  && echo 'gem: --no-document' >> /etc/gemrc \
- && gem install oj -v 3.10.7 \
+ && gem install oj -v 3.10.15 \
  && gem install http_parser.rb -v 0.5.3 \
  && gem install tzinfo -v 1.2.7 \
  && gem install json -v 2.3.1 \
- && gem install async-http -v 0.52.4 \
+ && gem install async-http -v 0.52.5 \
  && gem install ext_monitor -v 0.1.2 \
- && gem install fluentd -v 1.11.2 \
+ && gem install fluentd -v 1.11.4 \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
  && gem install fluent-plugin-kubernetes_metadata_filter -v 2.5.2 \
