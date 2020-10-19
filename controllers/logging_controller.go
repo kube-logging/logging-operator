@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"regexp"
-	"sort"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -77,7 +76,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log := r.Log.WithValues("logging", req.NamespacedName)
 
-	logging := &loggingv1beta1.Logging{}
+	logging := new(loggingv1beta1.Logging)
 	if err := r.Client.Get(ctx, req.NamespacedName, logging); err != nil {
 		// Object not found, return.  Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
@@ -99,7 +98,7 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log.V(1).Info("flow configuration", "config", fluentdConfig)
 
-	reconcilers := make([]resources.ComponentReconciler, 0)
+	var reconcilers []resources.ComponentReconciler
 
 	reconcilerOpts := reconciler.ReconcilerOpts{
 		EnableRecreateWorkloadOnImmutableFieldChange: logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange,
@@ -136,15 +135,14 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging
 	if logging.Spec.FlowConfigOverride != "" {
 		return logging.Spec.FlowConfigOverride, nil, nil
 	}
-	loggingResources, err := r.GetResources(logging)
+	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(context.TODO(), *logging)
 	if err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
-	builder, err := loggingResources.CreateModel()
-	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to create model", "logging", logging)
+	slf := secretLoaderFactory{
+		Client: r.Client,
 	}
-	fluentConfig, err := builder.Build()
+	fluentConfig, err := model.CreateSystem(loggingResources, &slf, r.Log)
 	if err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", logging)
 	}
@@ -157,7 +155,16 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging
 	if err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
 	}
-	return output.String(), loggingResources.Secrets, nil
+	return output.String(), &slf.Secrets, nil
+}
+
+type secretLoaderFactory struct {
+	Client  client.Client
+	Secrets secret.MountSecrets
+}
+
+func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
+	return secret.NewSecretLoader(f.Client, namespace, fluentd.OutputSecretPath, &f.Secrets)
 }
 
 // SetupLoggingWithManager setup logging manager
@@ -175,40 +182,36 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				return nil
 			}
 			// get all the logging resources from the cache
-			loggingList := &loggingv1beta1.LoggingList{}
-			err = mgr.GetCache().List(context.TODO(), loggingList)
-			if err != nil {
+			var loggingList loggingv1beta1.LoggingList
+			if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
 				logger.Error(err, "failed to list logging resources")
 				return nil
 			}
 			if o, ok := object.(*corev1.Secret); ok {
-				requestList := []reconcile.Request{}
+				var requestList []reconcile.Request
+				r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
 				for key := range o.Annotations {
-					r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
 					result := r.FindStringSubmatch(key)
 					if len(result) > 1 {
 						loggingRef := result[1]
-						// When loggingRef is default we trigger "empty" and default loggingRef as well, because we can't use an empty string in the annotation, thus we refer to `default` in case the loggingRef is empty
+						// When loggingRef is "default" we also trigger for the empty ("") loggingRef as well, because the empty string cannot be used in the annotation, thus "default" refers to the empty case.
 						if loggingRef == "default" {
-							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
-							loggingRef = ""
+							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList.Items, "")...)
 						}
-						requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
+						requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList.Items, loggingRef)...)
 					}
 				}
 				return requestList
 			}
-			if o, ok := object.(*loggingv1beta1.ClusterOutput); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.Output); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.Flow); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.ClusterFlow); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
+			switch o := object.(type) {
+			case *loggingv1beta1.ClusterOutput:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Output:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Flow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.ClusterFlow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 			}
 			return nil
 		}),
@@ -229,20 +232,18 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	return builder
 }
 
-func reconcileRequestsForLoggingRef(loggingList *loggingv1beta1.LoggingList, loggingRef string) []reconcile.Request {
-	filtered := make([]reconcile.Request, 0)
-	for _, l := range loggingList.Items {
+func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRef string) (reqs []reconcile.Request) {
+	for _, l := range loggings {
 		if l.Spec.LoggingRef == loggingRef {
-			filtered = append(filtered, reconcile.Request{
+			reqs = append(reqs, reconcile.Request{
 				NamespacedName: types.NamespacedName{
-					// this happens to be empty as long as Logging is cluster scoped
-					Namespace: l.Namespace,
+					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
 					Name:      l.Name,
 				},
 			})
 		}
 	}
-	return filtered
+	return
 }
 
 // FluentdWatches for fluentd statefulset
@@ -264,138 +265,4 @@ func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
 		Owns(&rbacv1.ClusterRole{}).
 		Owns(&rbacv1.ClusterRoleBinding{}).
 		Owns(&corev1.ServiceAccount{})
-}
-
-// GetResources collect all resources referenced by logging resource
-func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*model.LoggingResources, error) {
-	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
-	var err error
-
-	listOptsForClusterResources := []client.ListOption{}
-
-	if !logging.Spec.AllowClusterResourcesFromAllNamespaces {
-		listOptsForClusterResources = append(listOptsForClusterResources, client.InNamespace(logging.Spec.ControlNamespace))
-	}
-
-	clusterFlows := &loggingv1beta1.ClusterFlowList{}
-	err = r.List(context.TODO(), clusterFlows, listOptsForClusterResources...)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(clusterFlows.Items) > 0 {
-		items := clusterFlows.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, i := range items {
-			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-				loggingResources.ClusterFlows = append(loggingResources.ClusterFlows, i)
-			}
-		}
-	}
-
-	clusterOutputs := &loggingv1beta1.ClusterOutputList{}
-	err = r.List(context.TODO(), clusterOutputs, listOptsForClusterResources...)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(clusterOutputs.Items) > 0 {
-		items := clusterOutputs.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, i := range items {
-			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-				loggingResources.ClusterOutputs = append(loggingResources.ClusterOutputs, i)
-			}
-		}
-	}
-
-	watchNamespaces := logging.Spec.WatchNamespaces
-
-	if len(watchNamespaces) == 0 {
-		nsList := &corev1.NamespaceList{}
-		err = r.List(context.TODO(), nsList)
-		if err != nil {
-			return nil, errors.WrapIf(err, "failed to list all namespaces")
-		}
-		items := nsList.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, ns := range items {
-			watchNamespaces = append(watchNamespaces, ns.Name)
-		}
-	}
-
-	for _, ns := range watchNamespaces {
-		flows := &loggingv1beta1.FlowList{}
-		err = r.List(context.TODO(), flows, client.InNamespace(ns))
-		if err != nil {
-			return nil, err
-		}
-
-		if len(flows.Items) > 0 {
-			items := flows.Items
-			sort.Slice(items, func(i, j int) bool {
-				if items[i].GetNamespace() < items[j].GetNamespace() {
-					return true
-				}
-				if items[i].GetNamespace() == items[j].GetNamespace() {
-					return items[i].GetName() < items[j].GetName()
-				}
-				return false
-			})
-			for _, i := range items {
-				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-					loggingResources.Flows = append(loggingResources.Flows, i)
-				}
-			}
-		}
-
-		outputs := &loggingv1beta1.OutputList{}
-		err = r.List(context.TODO(), outputs, client.InNamespace(ns))
-		if err != nil {
-			return nil, err
-		}
-		if len(outputs.Items) > 0 {
-			items := outputs.Items
-			sort.Slice(items, func(i, j int) bool {
-				if items[i].GetNamespace() < items[j].GetNamespace() {
-					return true
-				}
-				if items[i].GetNamespace() == items[j].GetNamespace() {
-					return items[i].GetName() < items[j].GetName()
-				}
-				return false
-			})
-			for _, i := range items {
-				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-					loggingResources.Outputs = append(loggingResources.Outputs, i)
-				}
-			}
-		}
-	}
-
-	return loggingResources, nil
 }
