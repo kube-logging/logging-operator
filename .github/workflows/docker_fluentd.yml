@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - "fluentd-v?[0-9]+.[0-9]+.[0-9].*"
+      - fluentd-v[0-9].[0-9]+.[0-9]+-[a-z]+-[0-9]+
 env:
   PLATFORMS: linux/amd64
 
