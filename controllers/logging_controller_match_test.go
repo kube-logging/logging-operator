@@ -186,7 +186,7 @@ func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: match and selectors cannot be defined simultaneously for flow %s",
+	expected := fmt.Sprintf("failed to build model: match and selectors cannot be defined simultaneously for flow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
@@ -227,7 +227,7 @@ func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: select and exclude cannot be set simultaneously for flow %s",
+	expected := fmt.Sprintf("failed to build model: select and exclude cannot be set simultaneously for flow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
@@ -268,7 +268,7 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: select and exclude cannot be set simultaneously for clusterflow %s",
+	expected := fmt.Sprintf("failed to build model: select and exclude cannot be set simultaneously for clusterflow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
@@ -307,7 +307,7 @@ func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("failed to create model: match and selectors cannot be defined simultaneously for clusterflow %s",
+	expected := fmt.Sprintf("failed to build model: match and selectors cannot be defined simultaneously for clusterflow %s",
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
