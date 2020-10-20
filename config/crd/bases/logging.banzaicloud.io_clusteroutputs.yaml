@@ -4125,6 +4125,13 @@ spec:
               type: object
           type: object
         status:
+          properties:
+            active:
+              type: boolean
+            problems:
+              items:
+                type: string
+              type: array
           type: object
       required:
       - spec
