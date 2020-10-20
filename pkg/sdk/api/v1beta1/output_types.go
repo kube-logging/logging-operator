@@ -56,8 +56,8 @@ type OutputSpec struct {
 
 // OutputStatus defines the observed state of Output
 type OutputStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Active   bool     `json:"active,omitempty"`
+	Problems []string `json:"problems,omitempty"`
 }
 
 // +kubebuilder:object:root=true
