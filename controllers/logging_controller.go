@@ -28,10 +28,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -76,28 +73,17 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log := r.Log.WithValues("logging", req.NamespacedName)
 
-	logging := new(loggingv1beta1.Logging)
-	if err := r.Client.Get(ctx, req.NamespacedName, logging); err != nil {
-		// Object not found, return.  Created objects are automatically garbage collected.
+	var logging loggingv1beta1.Logging
+	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
+		// If object is not found, return without error.
+		// Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
-		if apierrors.IsNotFound(err) {
-			return reconcile.Result{}, nil
-		}
-		return reconcile.Result{}, err
+		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
-
-	fluentdConfig, secretList, err := r.clusterConfiguration(logging)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	log.V(1).Info("flow configuration", "config", fluentdConfig)
-
-	var reconcilers []resources.ComponentReconciler
 
 	reconcilerOpts := reconciler.ReconcilerOpts{
 		EnableRecreateWorkloadOnImmutableFieldChange: logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange,
@@ -107,13 +93,21 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
+	var reconcilers []resources.ComponentReconciler
+
 	if logging.Spec.FluentdSpec != nil {
-		reconcilers = append(reconcilers,
-			fluentd.New(r.Client, r.Log, logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+		fluentdConfig, secretList, err := r.clusterConfiguration(&logging)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		log.V(1).Info("flow configuration", "config", fluentdConfig)
+
+		reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging, reconcilerOpts).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -150,8 +144,7 @@ func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging
 		Out:    output,
 		Indent: 2,
 	}
-	err = renderer.Render(fluentConfig)
-	if err != nil {
+	if err := renderer.Render(fluentConfig); err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
 	}
 	return output.String(), &slf.Secrets, nil
@@ -168,12 +161,6 @@ func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) s
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	clusterOutputSource := &source.Kind{Type: &loggingv1beta1.ClusterOutput{}}
-	clusterFlowSource := &source.Kind{Type: &loggingv1beta1.ClusterFlow{}}
-	outputSource := &source.Kind{Type: &loggingv1beta1.Output{}}
-	flowSource := &source.Kind{Type: &loggingv1beta1.Flow{}}
-	secretSource := &source.Kind{Type: &corev1.Secret{}}
-
 	requestMapper := &handler.EnqueueRequestsFromMapFunc{
 		ToRequests: handler.ToRequestsFunc(func(mapObject handler.MapObject) []reconcile.Request {
 			object, err := meta.Accessor(mapObject.Object)
@@ -186,9 +173,19 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				logger.Error(err, "failed to list logging resources")
 				return nil
 			}
-			if o, ok := object.(*corev1.Secret); ok {
-				var requestList []reconcile.Request
+
+			switch o := object.(type) {
+			case *loggingv1beta1.ClusterOutput:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Output:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Flow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.ClusterFlow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *corev1.Secret:
 				r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+				var requestList []reconcile.Request
 				for key := range o.Annotations {
 					result := r.FindStringSubmatch(key)
 					if len(result) > 1 {
@@ -202,16 +199,6 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				}
 				return requestList
 			}
-			switch o := object.(type) {
-			case *loggingv1beta1.ClusterOutput:
-				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-			case *loggingv1beta1.Output:
-				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-			case *loggingv1beta1.Flow:
-				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-			case *loggingv1beta1.ClusterFlow:
-				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-			}
 			return nil
 		}),
 	}
@@ -219,14 +206,14 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(clusterOutputSource, requestMapper).
-		Watches(clusterFlowSource, requestMapper).
-		Watches(outputSource, requestMapper).
-		Watches(flowSource, requestMapper).
-		Watches(secretSource, requestMapper)
+		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
+		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
 
-	FluentdWatches(builder)
-	FluentbitWatches(builder)
+	fluentd.RegisterWatches(builder)
+	fluentbit.RegisterWatches(builder)
 
 	return builder
 }
@@ -243,25 +230,4 @@ func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRe
 		}
 	}
 	return
-}
-
-// FluentdWatches for fluentd statefulset
-func FluentdWatches(builder *ctrl.Builder) *ctrl.Builder {
-	return builder.
-		Owns(&corev1.ConfigMap{}).
-		Owns(&corev1.Service{}).
-		Owns(&appsv1.Deployment{}).
-		Owns(&rbacv1.ClusterRole{}).
-		Owns(&rbacv1.ClusterRoleBinding{}).
-		Owns(&corev1.ServiceAccount{})
-}
-
-// FluentbitWatches for fluent-bit daemonset
-func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
-	return builder.
-		Owns(&corev1.ConfigMap{}).
-		Owns(&appsv1.DaemonSet{}).
-		Owns(&rbacv1.ClusterRole{}).
-		Owns(&rbacv1.ClusterRoleBinding{}).
-		Owns(&corev1.ServiceAccount{})
 }
