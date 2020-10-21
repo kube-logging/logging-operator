@@ -82,6 +82,7 @@ type FlowStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
 
 // Flow Kubernetes object
 type Flow struct {
