@@ -62,6 +62,7 @@ type OutputStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
 
 // Output is the Schema for the outputs API
 type Output struct {
