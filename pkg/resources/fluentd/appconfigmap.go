@@ -71,11 +71,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 
 	podsByPhase := make(map[v1.PodPhase]int)
 	for _, p := range existingPods.Items {
-		if actual, ok := podsByPhase[p.Status.Phase]; ok {
-			podsByPhase[p.Status.Phase] = actual + 1
-		} else {
-			podsByPhase[p.Status.Phase] = 1
-		}
+		podsByPhase[p.Status.Phase] += 1
 	}
 
 	if podsByPhase[v1.PodPending] > 0 {
