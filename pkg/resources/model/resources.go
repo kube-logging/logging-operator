@@ -29,9 +29,10 @@ type LoggingResources struct {
 type ClusterOutputs []v1beta1.ClusterOutput
 
 func (c ClusterOutputs) FindByName(name string) *v1beta1.ClusterOutput {
-	for _, output := range c {
+	for i := range c {
+		output := &c[i]
 		if output.Name == name {
-			return &output
+			return output
 		}
 	}
 	return nil
@@ -40,9 +41,10 @@ func (c ClusterOutputs) FindByName(name string) *v1beta1.ClusterOutput {
 type Outputs []v1beta1.Output
 
 func (c Outputs) FindByNamespacedName(namespace string, name string) *v1beta1.Output {
-	for _, output := range c {
+	for i := range c {
+		output := &c[i]
 		if output.Namespace == namespace && output.Name == name {
-			return &output
+			return output
 		}
 	}
 	return nil
