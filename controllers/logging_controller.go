@@ -93,17 +93,27 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	var reconcilers []resources.ComponentReconciler
+	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(ctx, logging)
+	if err != nil {
+		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+	}
+
+	reconcilers := []resources.ComponentReconciler{
+		model.NewReconciler(ctx, r.Client, loggingResources),
+	}
 
 	if logging.Spec.FluentdSpec != nil {
-		fluentdConfig, secretList, err := r.clusterConfiguration(&logging)
+		fluentdConfig, secretList, err := r.clusterConfiguration(loggingResources)
 		if err != nil {
-			return reconcile.Result{}, err
+			// TODO: move config generation into Fluentd reconciler
+			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+				return &reconcile.Result{}, err
+			})
+		} else {
+			log.V(1).Info("flow configuration", "config", fluentdConfig)
+
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
-
-		log.V(1).Info("flow configuration", "config", fluentdConfig)
-
-		reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
@@ -124,29 +134,29 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging) (string, *secret.MountSecrets, error) {
-	if logging.Spec.FlowConfigOverride != "" {
-		return logging.Spec.FlowConfigOverride, nil, nil
+func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
+		return cfg, nil, nil
 	}
-	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(context.TODO(), *logging)
-	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
-	}
+
 	slf := secretLoaderFactory{
 		Client: r.Client,
 	}
-	fluentConfig, err := model.CreateSystem(loggingResources, &slf, r.Log)
+
+	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
 	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", resources.Logging)
 	}
+
 	output := &bytes.Buffer{}
 	renderer := render.FluentRender{
 		Out:    output,
 		Indent: 2,
 	}
 	if err := renderer.Render(fluentConfig); err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", resources.Logging)
 	}
+
 	return output.String(), &slf.Secrets, nil
 }
 
