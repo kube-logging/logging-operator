@@ -39,6 +39,7 @@ buffer:
     @id test
     path logs/${tag}/%Y/%m/%d/
     s3_bucket logging-amazon-s3
+    s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
     s3_region eu-central-1
     <buffer tag,time>
       @type file

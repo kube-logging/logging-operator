@@ -479,6 +479,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+                                                s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<buffer tag,time>
 						@type file
 						path asd
@@ -502,6 +503,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+                                                s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<instance_profile_credentials>
 						</instance_profile_credentials>`,
 		},
@@ -519,6 +521,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+                                                s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<shared_credentials>
 							path e
 							profile_name f
