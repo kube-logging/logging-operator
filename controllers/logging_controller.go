@@ -55,7 +55,7 @@ type LoggingReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
