@@ -122,7 +122,11 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
+  - clusterflows/status
+  - clusteroutputs/status
+  - flows/status
   - loggings/status
+  - outputs/status
   verbs:
   - get
   - patch
