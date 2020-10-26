@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -51,8 +52,10 @@ type Metrics struct {
 
 // ServiceMonitorConfig defines the ServiceMonitor properties
 type ServiceMonitorConfig struct {
-	AdditionalLabels map[string]string `json:"additionalLabels,omitempty"`
-	HonorLabels      bool              `json:"honorLabels,omitempty"`
+	AdditionalLabels   map[string]string   `json:"additionalLabels,omitempty"`
+	HonorLabels        bool                `json:"honorLabels,omitempty"`
+	Relabelings        []*v1.RelabelConfig `json:"relabelings,omitempty"`
+	MetricsRelabelings []*v1.RelabelConfig `json:"metricRelabelings,omitempty"`
 }
 
 // Security defines Fluentd, Fluentbit deployment security properties

@@ -1103,6 +1103,50 @@ spec:
                           type: object
                         honorLabels:
                           type: boolean
+                        metricRelabelings:
+                          items:
+                            properties:
+                              action:
+                                type: string
+                              modulus:
+                                format: int64
+                                type: integer
+                              regex:
+                                type: string
+                              replacement:
+                                type: string
+                              separator:
+                                type: string
+                              sourceLabels:
+                                items:
+                                  type: string
+                                type: array
+                              targetLabel:
+                                type: string
+                            type: object
+                          type: array
+                        relabelings:
+                          items:
+                            properties:
+                              action:
+                                type: string
+                              modulus:
+                                format: int64
+                                type: integer
+                              regex:
+                                type: string
+                              replacement:
+                                type: string
+                              separator:
+                                type: string
+                              sourceLabels:
+                                items:
+                                  type: string
+                                type: array
+                              targetLabel:
+                                type: string
+                            type: object
+                          type: array
                       type: object
                     timeout:
                       type: string
@@ -2153,6 +2197,50 @@ spec:
                           type: object
                         honorLabels:
                           type: boolean
+                        metricRelabelings:
+                          items:
+                            properties:
+                              action:
+                                type: string
+                              modulus:
+                                format: int64
+                                type: integer
+                              regex:
+                                type: string
+                              replacement:
+                                type: string
+                              separator:
+                                type: string
+                              sourceLabels:
+                                items:
+                                  type: string
+                                type: array
+                              targetLabel:
+                                type: string
+                            type: object
+                          type: array
+                        relabelings:
+                          items:
+                            properties:
+                              action:
+                                type: string
+                              modulus:
+                                format: int64
+                                type: integer
+                              regex:
+                                type: string
+                              replacement:
+                                type: string
+                              separator:
+                                type: string
+                              sourceLabels:
+                                items:
+                                  type: string
+                                type: array
+                              targetLabel:
+                                type: string
+                            type: object
+                          type: array
                       type: object
                     timeout:
                       type: string

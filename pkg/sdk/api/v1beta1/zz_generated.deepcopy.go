@@ -22,7 +22,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
-	"k8s.io/api/core/v1"
+	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	corev1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -656,7 +657,7 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	in.Resources.DeepCopyInto(&out.Resources)
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
-		*out = make([]v1.Toleration, len(*in))
+		*out = make([]corev1.Toleration, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -670,7 +671,7 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	}
 	if in.Affinity != nil {
 		in, out := &in.Affinity, &out.Affinity
-		*out = new(v1.Affinity)
+		*out = new(corev1.Affinity)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Metrics != nil {
@@ -705,12 +706,12 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
-		*out = new(v1.Probe)
+		*out = new(corev1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.ReadinessProbe != nil {
 		in, out := &in.ReadinessProbe, &out.ReadinessProbe
-		*out = new(v1.Probe)
+		*out = new(corev1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -792,17 +793,17 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	in.Resources.DeepCopyInto(&out.Resources)
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
-		*out = new(v1.Probe)
+		*out = new(corev1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.ReadinessProbe != nil {
 		in, out := &in.ReadinessProbe, &out.ReadinessProbe
-		*out = new(v1.Probe)
+		*out = new(corev1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
-		*out = make([]v1.Toleration, len(*in))
+		*out = make([]corev1.Toleration, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -816,7 +817,7 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	}
 	if in.Affinity != nil {
 		in, out := &in.Affinity, &out.Affinity
-		*out = new(v1.Affinity)
+		*out = new(corev1.Affinity)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Metrics != nil {
@@ -1267,12 +1268,12 @@ func (in *Security) DeepCopyInto(out *Security) {
 	}
 	if in.SecurityContext != nil {
 		in, out := &in.SecurityContext, &out.SecurityContext
-		*out = new(v1.SecurityContext)
+		*out = new(corev1.SecurityContext)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.PodSecurityContext != nil {
 		in, out := &in.PodSecurityContext, &out.PodSecurityContext
-		*out = new(v1.PodSecurityContext)
+		*out = new(corev1.PodSecurityContext)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -1327,6 +1328,28 @@ func (in *ServiceMonitorConfig) DeepCopyInto(out *ServiceMonitorConfig) {
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
+		}
+	}
+	if in.Relabelings != nil {
+		in, out := &in.Relabelings, &out.Relabelings
+		*out = make([]*v1.RelabelConfig, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(v1.RelabelConfig)
+				(*in).DeepCopyInto(*out)
+			}
+		}
+	}
+	if in.MetricsRelabelings != nil {
+		in, out := &in.MetricsRelabelings, &out.MetricsRelabelings
+		*out = make([]*v1.RelabelConfig, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(v1.RelabelConfig)
+				(*in).DeepCopyInto(*out)
+			}
 		}
 	}
 }
