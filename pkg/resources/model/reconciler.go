@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-func NewReconciler(ctx context.Context, repo client.StatusClient, resources LoggingResources) func() (*reconcile.Result, error) {
+func NewValidationReconciler(ctx context.Context, repo client.StatusClient, resources LoggingResources) func() (*reconcile.Result, error) {
 	return func() (*reconcile.Result, error) {
 		var patchRequests []patchRequest
 		registerForPatching := func(obj runtime.Object) {
