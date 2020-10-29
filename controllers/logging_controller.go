@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"regexp"
-	"sort"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -29,10 +28,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -59,7 +55,7 @@ type LoggingReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
@@ -77,29 +73,17 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log := r.Log.WithValues("logging", req.NamespacedName)
 
-	logging := &loggingv1beta1.Logging{}
-	if err := r.Client.Get(ctx, req.NamespacedName, logging); err != nil {
-		// Object not found, return.  Created objects are automatically garbage collected.
+	var logging loggingv1beta1.Logging
+	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
+		// If object is not found, return without error.
+		// Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
-		if apierrors.IsNotFound(err) {
-			return reconcile.Result{}, nil
-		}
-		return reconcile.Result{}, err
+		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
-	logging, err := logging.SetDefaults()
-	if err != nil {
+	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
-
-	fluentdConfig, secretList, err := r.clusterConfiguration(logging)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	log.V(1).Info("flow configuration", "config", fluentdConfig)
-
-	reconcilers := make([]resources.ComponentReconciler, 0)
 
 	reconcilerOpts := reconciler.ReconcilerOpts{
 		EnableRecreateWorkloadOnImmutableFieldChange: logging.Spec.EnableRecreateWorkloadOnImmutableFieldChange,
@@ -109,13 +93,31 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
+	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(ctx, logging)
+	if err != nil {
+		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+	}
+
+	reconcilers := []resources.ComponentReconciler{
+		model.NewValidationReconciler(ctx, r.Client, loggingResources),
+	}
+
 	if logging.Spec.FluentdSpec != nil {
-		reconcilers = append(reconcilers,
-			fluentd.New(r.Client, r.Log, logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+		fluentdConfig, secretList, err := r.clusterConfiguration(loggingResources)
+		if err != nil {
+			// TODO: move config generation into Fluentd reconciler
+			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+				return &reconcile.Result{}, err
+			})
+		} else {
+			log.V(1).Info("flow configuration", "config", fluentdConfig)
+
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+		}
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, logging, reconcilerOpts).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -132,42 +134,43 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) clusterConfiguration(logging *loggingv1beta1.Logging) (string, *secret.MountSecrets, error) {
-	if logging.Spec.FlowConfigOverride != "" {
-		return logging.Spec.FlowConfigOverride, nil, nil
+func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
+		return cfg, nil, nil
 	}
-	loggingResources, err := r.GetResources(logging)
+
+	slf := secretLoaderFactory{
+		Client: r.Client,
+	}
+
+	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
 	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", resources.Logging)
 	}
-	builder, err := loggingResources.CreateModel()
-	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to create model", "logging", logging)
-	}
-	fluentConfig, err := builder.Build()
-	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", logging)
-	}
+
 	output := &bytes.Buffer{}
 	renderer := render.FluentRender{
 		Out:    output,
 		Indent: 2,
 	}
-	err = renderer.Render(fluentConfig)
-	if err != nil {
-		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", logging)
+	if err := renderer.Render(fluentConfig); err != nil {
+		return "", nil, errors.WrapIfWithDetails(err, "failed to render fluentd config", "logging", resources.Logging)
 	}
-	return output.String(), loggingResources.Secrets, nil
+
+	return output.String(), &slf.Secrets, nil
+}
+
+type secretLoaderFactory struct {
+	Client  client.Client
+	Secrets secret.MountSecrets
+}
+
+func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
+	return secret.NewSecretLoader(f.Client, namespace, fluentd.OutputSecretPath, &f.Secrets)
 }
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	clusterOutputSource := &source.Kind{Type: &loggingv1beta1.ClusterOutput{}}
-	clusterFlowSource := &source.Kind{Type: &loggingv1beta1.ClusterFlow{}}
-	outputSource := &source.Kind{Type: &loggingv1beta1.Output{}}
-	flowSource := &source.Kind{Type: &loggingv1beta1.Flow{}}
-	secretSource := &source.Kind{Type: &corev1.Secret{}}
-
 	requestMapper := &handler.EnqueueRequestsFromMapFunc{
 		ToRequests: handler.ToRequestsFunc(func(mapObject handler.MapObject) []reconcile.Request {
 			object, err := meta.Accessor(mapObject.Object)
@@ -175,40 +178,36 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				return nil
 			}
 			// get all the logging resources from the cache
-			loggingList := &loggingv1beta1.LoggingList{}
-			err = mgr.GetCache().List(context.TODO(), loggingList)
-			if err != nil {
+			var loggingList loggingv1beta1.LoggingList
+			if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
 				logger.Error(err, "failed to list logging resources")
 				return nil
 			}
-			if o, ok := object.(*corev1.Secret); ok {
-				requestList := []reconcile.Request{}
+
+			switch o := object.(type) {
+			case *loggingv1beta1.ClusterOutput:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Output:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.Flow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *loggingv1beta1.ClusterFlow:
+				return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+			case *corev1.Secret:
+				r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+				var requestList []reconcile.Request
 				for key := range o.Annotations {
-					r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
 					result := r.FindStringSubmatch(key)
 					if len(result) > 1 {
 						loggingRef := result[1]
-						// When loggingRef is default we trigger "empty" and default loggingRef as well, because we can't use an empty string in the annotation, thus we refer to `default` in case the loggingRef is empty
+						// When loggingRef is "default" we also trigger for the empty ("") loggingRef as well, because the empty string cannot be used in the annotation, thus "default" refers to the empty case.
 						if loggingRef == "default" {
-							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
-							loggingRef = ""
+							requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList.Items, "")...)
 						}
-						requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList, loggingRef)...)
+						requestList = append(requestList, reconcileRequestsForLoggingRef(loggingList.Items, loggingRef)...)
 					}
 				}
 				return requestList
-			}
-			if o, ok := object.(*loggingv1beta1.ClusterOutput); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.Output); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.Flow); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
-			}
-			if o, ok := object.(*loggingv1beta1.ClusterFlow); ok {
-				return reconcileRequestsForLoggingRef(loggingList, o.Spec.LoggingRef)
 			}
 			return nil
 		}),
@@ -217,185 +216,28 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(clusterOutputSource, requestMapper).
-		Watches(clusterFlowSource, requestMapper).
-		Watches(outputSource, requestMapper).
-		Watches(flowSource, requestMapper).
-		Watches(secretSource, requestMapper)
+		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
+		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
 
-	FluentdWatches(builder)
-	FluentbitWatches(builder)
+	fluentd.RegisterWatches(builder)
+	fluentbit.RegisterWatches(builder)
 
 	return builder
 }
 
-func reconcileRequestsForLoggingRef(loggingList *loggingv1beta1.LoggingList, loggingRef string) []reconcile.Request {
-	filtered := make([]reconcile.Request, 0)
-	for _, l := range loggingList.Items {
+func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRef string) (reqs []reconcile.Request) {
+	for _, l := range loggings {
 		if l.Spec.LoggingRef == loggingRef {
-			filtered = append(filtered, reconcile.Request{
+			reqs = append(reqs, reconcile.Request{
 				NamespacedName: types.NamespacedName{
-					// this happens to be empty as long as Logging is cluster scoped
-					Namespace: l.Namespace,
+					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
 					Name:      l.Name,
 				},
 			})
 		}
 	}
-	return filtered
-}
-
-// FluentdWatches for fluentd statefulset
-func FluentdWatches(builder *ctrl.Builder) *ctrl.Builder {
-	return builder.
-		Owns(&corev1.ConfigMap{}).
-		Owns(&corev1.Service{}).
-		Owns(&appsv1.Deployment{}).
-		Owns(&rbacv1.ClusterRole{}).
-		Owns(&rbacv1.ClusterRoleBinding{}).
-		Owns(&corev1.ServiceAccount{})
-}
-
-// FluentbitWatches for fluent-bit daemonset
-func FluentbitWatches(builder *ctrl.Builder) *ctrl.Builder {
-	return builder.
-		Owns(&corev1.ConfigMap{}).
-		Owns(&appsv1.DaemonSet{}).
-		Owns(&rbacv1.ClusterRole{}).
-		Owns(&rbacv1.ClusterRoleBinding{}).
-		Owns(&corev1.ServiceAccount{})
-}
-
-// GetResources collect all resources referenced by logging resource
-func (r *LoggingReconciler) GetResources(logging *loggingv1beta1.Logging) (*model.LoggingResources, error) {
-	loggingResources := model.NewLoggingResources(logging, r.Client, r.Log)
-	var err error
-
-	listOptsForClusterResources := []client.ListOption{}
-
-	if !logging.Spec.AllowClusterResourcesFromAllNamespaces {
-		listOptsForClusterResources = append(listOptsForClusterResources, client.InNamespace(logging.Spec.ControlNamespace))
-	}
-
-	clusterFlows := &loggingv1beta1.ClusterFlowList{}
-	err = r.List(context.TODO(), clusterFlows, listOptsForClusterResources...)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(clusterFlows.Items) > 0 {
-		items := clusterFlows.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, i := range items {
-			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-				loggingResources.ClusterFlows = append(loggingResources.ClusterFlows, i)
-			}
-		}
-	}
-
-	clusterOutputs := &loggingv1beta1.ClusterOutputList{}
-	err = r.List(context.TODO(), clusterOutputs, listOptsForClusterResources...)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(clusterOutputs.Items) > 0 {
-		items := clusterOutputs.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, i := range items {
-			if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-				loggingResources.ClusterOutputs = append(loggingResources.ClusterOutputs, i)
-			}
-		}
-	}
-
-	watchNamespaces := logging.Spec.WatchNamespaces
-
-	if len(watchNamespaces) == 0 {
-		nsList := &corev1.NamespaceList{}
-		err = r.List(context.TODO(), nsList)
-		if err != nil {
-			return nil, errors.WrapIf(err, "failed to list all namespaces")
-		}
-		items := nsList.Items
-		sort.Slice(items, func(i, j int) bool {
-			if items[i].GetNamespace() < items[j].GetNamespace() {
-				return true
-			}
-			if items[i].GetNamespace() == items[j].GetNamespace() {
-				return items[i].GetName() < items[j].GetName()
-			}
-			return false
-		})
-		for _, ns := range items {
-			watchNamespaces = append(watchNamespaces, ns.Name)
-		}
-	}
-
-	for _, ns := range watchNamespaces {
-		flows := &loggingv1beta1.FlowList{}
-		err = r.List(context.TODO(), flows, client.InNamespace(ns))
-		if err != nil {
-			return nil, err
-		}
-
-		if len(flows.Items) > 0 {
-			items := flows.Items
-			sort.Slice(items, func(i, j int) bool {
-				if items[i].GetNamespace() < items[j].GetNamespace() {
-					return true
-				}
-				if items[i].GetNamespace() == items[j].GetNamespace() {
-					return items[i].GetName() < items[j].GetName()
-				}
-				return false
-			})
-			for _, i := range items {
-				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-					loggingResources.Flows = append(loggingResources.Flows, i)
-				}
-			}
-		}
-
-		outputs := &loggingv1beta1.OutputList{}
-		err = r.List(context.TODO(), outputs, client.InNamespace(ns))
-		if err != nil {
-			return nil, err
-		}
-		if len(outputs.Items) > 0 {
-			items := outputs.Items
-			sort.Slice(items, func(i, j int) bool {
-				if items[i].GetNamespace() < items[j].GetNamespace() {
-					return true
-				}
-				if items[i].GetNamespace() == items[j].GetNamespace() {
-					return items[i].GetName() < items[j].GetName()
-				}
-				return false
-			})
-			for _, i := range items {
-				if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-					loggingResources.Outputs = append(loggingResources.Outputs, i)
-				}
-			}
-		}
-	}
-
-	return loggingResources, nil
+	return
 }

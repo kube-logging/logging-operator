@@ -29,6 +29,7 @@ type _metaClusterFlow interface{}
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
 
 // ClusterFlow is the Schema for the clusterflows API
 type ClusterFlow struct {
