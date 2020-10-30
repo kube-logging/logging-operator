@@ -479,6 +479,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<buffer tag,time>
 						@type file
 						path asd
@@ -502,6 +503,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<instance_profile_credentials>
 						</instance_profile_credentials>`,
 		},
@@ -519,10 +521,32 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path /var/buffer
 						s3_bucket test_bucket
+						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<shared_credentials>
 							path e
 							profile_name f
 						</shared_credentials>`,
+		},
+		{
+			name: "one-eye-format",
+			s3Config: output.S3OutputConfig{
+				Path:         "/var/buffer",
+				S3Bucket:     "oneeye_bucket",
+				OneEyeFormat: true,
+				ClusterName:  "one-eye",
+			},
+			expected: ` @type s3
+                        @id test
+						path one-eye/%Y/%m/%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/
+						s3_bucket oneeye_bucket
+						s3_object_key_format %{path}/%H:%M_%{index}.%{file_extension}
+						<buffer tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name>
+						@type file
+						path /buffers/test.*.buffer
+						retry_forever true
+						timekey 10m
+						timekey_wait 10m
+						</buffer>`,
 		},
 	}
 	for _, item := range table {
