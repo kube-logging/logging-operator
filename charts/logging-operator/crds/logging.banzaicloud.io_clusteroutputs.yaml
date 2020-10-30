@@ -3700,6 +3700,8 @@ spec:
                   type: string
                 check_object:
                   type: string
+                clustername:
+                  type: string
                 compute_checksums:
                   type: string
                 enable_transfer_acceleration:
@@ -3748,6 +3750,8 @@ spec:
                     retries:
                       type: string
                   type: object
+                oneeye_format:
+                  type: boolean
                 overwrite:
                   type: string
                 path:

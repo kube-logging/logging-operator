@@ -16,6 +16,7 @@ package output
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
@@ -59,6 +60,12 @@ type _docS3 interface{}
 // +description:"Store logs in Amazon S3"
 // +status:"GA"
 type _metaS3 interface{}
+
+const (
+	OneEyeTags            string = "tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name"
+	OneEyePathTemplate    string = "%v/%%Y/%%m/%%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/"
+	OneEyeObjectKeyFormat string = "%{path}/%H:%M_%{index}.%{file_extension}"
+)
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
@@ -127,8 +134,8 @@ type S3OutputConfig struct {
 	GrantFullControl string `json:"grant_full_control,omitempty"`
 	// The length of `%{hex_random}` placeholder(4-16)
 	HexRandomLength string `json:"hex_random_length,omitempty"`
-	// The format of S3 object keys (default: %{path}%{time_slice}_%{index}.%{file_extension})
-	S3ObjectKeyFormat string `json:"s3_object_key_format,omitempty"`
+	// The format of S3 object keys (default: %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension})
+	S3ObjectKeyFormat string `json:"s3_object_key_format,omitempty" plugin:"default:%{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}"`
 	// S3 bucket name
 	S3Bucket string `json:"s3_bucket"`
 	// Archive format on S3
@@ -147,6 +154,10 @@ type S3OutputConfig struct {
 	InstanceProfileCredentials *S3InstanceProfileCredentials `json:"instance_profile_credentials,omitempty"`
 	// +docLink:"Shared Credentials,#shared_credentials"
 	SharedCredentials *S3SharedCredentials `json:"shared_credentials,omitempty"`
+	// One-eye format trigger (default:false)
+	OneEyeFormat bool `json:"oneeye_format,omitempty"`
+	// Custom cluster name
+	ClusterName string `json:"clustername,omitempty" plugin:"default:one-eye"`
 }
 
 // +kubebuilder:object:generate=true
@@ -191,6 +202,18 @@ type S3SharedCredentials struct {
 	Path string `json:"path,omitempty"`
 }
 
+func (c *S3OutputConfig) oneeyeFormat(params map[string]string) (map[string]string, error) {
+	if c == nil {
+		return params, nil
+	}
+	(*c).Buffer = &Buffer{
+		Tags: OneEyeTags,
+	}
+	params["path"] = fmt.Sprintf(OneEyePathTemplate, params["clustername"])
+	params["s3_object_key_format"] = OneEyeObjectKeyFormat
+	return params, nil
+}
+
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "s3"
 	s3 := &types.OutputPlugin{
@@ -204,6 +227,14 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
 		return nil, err
 	} else {
+		if c.OneEyeFormat || params["oneeye_format"] == "true" {
+			params, err = c.oneeyeFormat(params)
+			if err != nil {
+				return nil, err
+			}
+		}
+		delete(params, "oneeye_format")
+		delete(params, "clustername")
 		s3.Params = params
 	}
 	if c.Buffer != nil {
