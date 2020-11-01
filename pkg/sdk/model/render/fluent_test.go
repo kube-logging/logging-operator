@@ -305,7 +305,7 @@ func TestRenderDirective(t *testing.T) {
 }
 
 func TestMultipleOutput(t *testing.T) {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
@@ -384,7 +384,7 @@ func TestMultipleOutput(t *testing.T) {
 }
 
 func TestRenderFullFluentConfig(t *testing.T) {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
@@ -549,7 +549,7 @@ func TestRenderS3(t *testing.T) {
 }
 
 func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expected string) error {
-	system := types.NewSystem(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
 
 	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", "", nil), "test")
 	if err != nil {

@@ -18,20 +18,20 @@ import (
 	"errors"
 )
 
-type Builder struct {
+type SystemBuilder struct {
 	input  Input
 	flows  []*Flow
 	router *Router
 }
 
-func NewSystem(input Input, router *Router) *Builder {
-	return &Builder{
+func NewSystemBuilder(input Input, router *Router) *SystemBuilder {
+	return &SystemBuilder{
 		input:  input,
 		router: router,
 	}
 }
 
-func (s *Builder) RegisterFlow(f *Flow) error {
+func (s *SystemBuilder) RegisterFlow(f *Flow) error {
 	for _, e := range s.flows {
 		if e.FlowLabel == f.FlowLabel {
 			return errors.New("Flow already exists")
@@ -42,7 +42,7 @@ func (s *Builder) RegisterFlow(f *Flow) error {
 	return nil
 }
 
-func (s *Builder) RegisterDefaultFlow(f *Flow) error {
+func (s *SystemBuilder) RegisterDefaultFlow(f *Flow) error {
 	for _, e := range s.flows {
 		if e.FlowLabel == f.FlowLabel {
 			return errors.New("Flow already exists")
@@ -53,7 +53,7 @@ func (s *Builder) RegisterDefaultFlow(f *Flow) error {
 	return nil
 }
 
-func (s *Builder) Build() (*System, error) {
+func (s *SystemBuilder) Build() (*System, error) {
 	return &System{
 		Input:  s.input,
 		Router: s.router,

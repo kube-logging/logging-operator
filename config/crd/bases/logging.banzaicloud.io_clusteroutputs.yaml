@@ -18,6 +18,8 @@ spec:
     singular: clusteroutput
   preserveUnknownFields: false
   scope: Namespaced
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       properties:
@@ -4125,6 +4127,13 @@ spec:
               type: object
           type: object
         status:
+          properties:
+            active:
+              type: boolean
+            problems:
+              items:
+                type: string
+              type: array
           type: object
       required:
       - spec

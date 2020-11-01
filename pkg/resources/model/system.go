@@ -19,7 +19,6 @@ import (
 	"strconv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
@@ -28,36 +27,13 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type LoggingResources struct {
-	client         client.Client
-	logger         logr.Logger
-	logging        *v1beta1.Logging
-	Outputs        []v1beta1.Output
-	Flows          []v1beta1.Flow
-	ClusterOutputs []v1beta1.ClusterOutput
-	ClusterFlows   []v1beta1.ClusterFlow
-	Secrets        *secret.MountSecrets
-}
+func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
+	logging := resources.Logging
 
-func NewLoggingResources(logging *v1beta1.Logging, client client.Client, logger logr.Logger) *LoggingResources {
-	return &LoggingResources{
-		client:         client,
-		logger:         logger,
-		logging:        logging,
-		Outputs:        make([]v1beta1.Output, 0),
-		ClusterOutputs: make([]v1beta1.ClusterOutput, 0),
-		Flows:          make([]v1beta1.Flow, 0),
-		ClusterFlows:   make([]v1beta1.ClusterFlow, 0),
-		Secrets:        &secret.MountSecrets{},
-	}
-}
-
-func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 	forwardInput := input.NewForwardInputConfig()
-	if l.logging.Spec.FluentdSpec != nil && l.logging.Spec.FluentdSpec.TLS.Enabled {
+	if logging.Spec.FluentdSpec != nil && logging.Spec.FluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
 			Version:        "TLSv1_2",
 			CaPath:         "/fluentd/tls/ca.crt",
@@ -67,76 +43,69 @@ func (l *LoggingResources) CreateModel() (*types.Builder, error) {
 		}
 		forwardInput.Security = &common.Security{
 			SelfHostname: "fluentd",
-			SharedKey:    l.logging.Spec.FluentdSpec.TLS.SharedKey,
+			SharedKey:    logging.Spec.FluentdSpec.TLS.SharedKey,
 		}
 	}
-	rootInput, err := forwardInput.ToDirective(l.OutputSecretLoaderForNamespace(l.logging.Spec.ControlNamespace), "main")
+
+	rootInput, err := forwardInput.ToDirective(secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace), "main")
 	if err != nil {
-		return nil, errors.WrapIf(err, "failed to create root input")
+		return nil, errors.WrapIf(err, "creating root input")
 	}
-	router := types.NewRouter("main",
-		map[string]string{
-			"metrics": strconv.FormatBool(l.logging.Spec.FluentdSpec.Metrics != nil),
-		})
-	system := types.NewSystem(rootInput, router)
-	for _, flowCr := range l.Flows {
-		flow, err := l.FlowFromFlow(flowCr)
+
+	router := types.NewRouter("main", map[string]string{
+		"metrics": strconv.FormatBool(logging.Spec.FluentdSpec.Metrics != nil),
+	})
+
+	builder := types.NewSystemBuilder(rootInput, router)
+
+	for _, flowCr := range resources.Flows {
+		flow, err := FlowForFlow(flowCr, resources.ClusterOutputs, resources.Outputs, secrets)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
 		}
-		err = system.RegisterFlow(flow)
+		err = builder.RegisterFlow(flow)
 		if err != nil {
 			return nil, err
 		}
 	}
-	for _, flowCr := range l.ClusterFlows {
-		flow, err := l.FlowFromClusterFlow(flowCr)
-		if err != nil {
-			// TODO set flow status to error?
-			return nil, err
-		}
-		err = system.RegisterFlow(flow)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if l.logging.Spec.DefaultFlowSpec != nil {
-		flow, err := l.FlowFromDefaultFlow(*l.logging)
+	for _, flowCr := range resources.ClusterFlows {
+		flow, err := FlowForClusterFlow(flowCr, resources.ClusterOutputs, secrets)
 		if err != nil {
 			// TODO set flow status to error?
 			return nil, err
 		}
-		err = system.RegisterDefaultFlow(flow)
+		err = builder.RegisterFlow(flow)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if len(l.Flows) == 0 && len(l.ClusterFlows) == 0 && l.logging.Spec.DefaultFlowSpec == nil {
-		l.logger.Info("no flows found, generating empty model")
-	}
-	return system, nil
-}
-
-func (l *LoggingResources) ClusterOutputByName(name string) *v1beta1.ClusterOutput {
-	for _, output := range l.ClusterOutputs {
-		if output.Name == name {
-			return &output
+	if resources.Logging.Spec.DefaultFlowSpec != nil {
+		flow, err := FlowForDefaultFlow(resources.Logging, resources.ClusterOutputs, secrets)
+		if err != nil {
+			// TODO set flow status to error?
+			return nil, err
+		}
+		err = builder.RegisterDefaultFlow(flow)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return nil
-}
 
-func (l *LoggingResources) OutputByNamespacedName(namespace string, name string) *v1beta1.Output {
-	for _, output := range l.Outputs {
-		if output.Namespace == namespace && output.Name == name {
-			return &output
-		}
+	system, err := builder.Build()
+
+	if system != nil && len(system.Flows) == 0 {
+		logger.Info("no flows found, generating empty model")
 	}
-	return nil
+
+	return system, err
 }
 
-func (l *LoggingResources) FiltersForFilters(flowID string, flowName string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
+type SecretLoaderFactory interface {
+	OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader
+}
+
+func filtersForFilters(flowID string, flowName string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
 	var (
 		result []types.Filter
 		errs   error
@@ -153,11 +122,7 @@ func (l *LoggingResources) FiltersForFilters(flowID string, flowName string, sec
 	return result, errs
 }
 
-func (l *LoggingResources) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
-	return secret.NewSecretLoader(l.client, namespace, fluentd.OutputSecretPath, l.Secrets)
-}
-
-func (l *LoggingResources) FlowFromFlow(flow v1beta1.Flow) (*types.Flow, error) {
+func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outputs, secrets SecretLoaderFactory) (*types.Flow, error) {
 	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
 		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for flow %s",
 			utils.ObjectKeyFromObjectMeta(&flow).String())
@@ -209,43 +174,43 @@ func (l *LoggingResources) FlowFromFlow(flow v1beta1.Flow) (*types.Flow, error) 
 
 	var errs error
 
-	var outputs []types.Output
+	var allOutputs []types.Output
 	for _, outputRef := range flow.Spec.GlobalOutputRefs {
-		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+		if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
-			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
 			}
-			outputs = append(outputs, plugin)
+			allOutputs = append(allOutputs, plugin)
 		} else {
 			errs = errors.Append(errs, errors.Errorf("referenced clusteroutput not found: %s", outputRef))
 		}
 	}
 	for _, outputRef := range flow.Spec.LocalOutputRefs {
-		if output := l.OutputByNamespacedName(flow.Namespace, outputRef); output != nil {
+		if output := outputs.FindByNamespacedName(flow.Namespace, outputRef); output != nil {
 			outputID := fmt.Sprintf("%s:output:%s:%s", flowID, output.Namespace, output.Name)
-			plugin, err := plugins.CreateOutput(output.Spec, outputID, l.OutputSecretLoaderForNamespace(output.Namespace))
+			plugin, err := plugins.CreateOutput(output.Spec, outputID, secrets.OutputSecretLoaderForNamespace(output.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
 			}
-			outputs = append(outputs, plugin)
+			allOutputs = append(allOutputs, plugin)
 		} else {
 			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
 		}
 	}
-	result.WithOutputs(outputs...)
+	result.WithOutputs(allOutputs...)
 
-	filters, err := l.FiltersForFilters(flowID, flow.Name, l.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
 	return result, errs
 }
 
-func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types.Flow, error) {
+func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
 	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
 		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for clusterflow %s",
 			utils.ObjectKeyFromObjectMeta(&flow).String())
@@ -299,9 +264,9 @@ func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types
 
 	var outputs []types.Output
 	for _, outputRef := range flow.Spec.GlobalOutputRefs {
-		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+		if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
-			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
@@ -313,14 +278,14 @@ func (l *LoggingResources) FlowFromClusterFlow(flow v1beta1.ClusterFlow) (*types
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := l.FiltersForFilters(flowID, flow.Name, l.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
 	return result, errs
 }
 
-func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.Flow, error) {
+func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
 	if logging.Spec.DefaultFlowSpec == nil {
 		return nil, nil
 	}
@@ -336,9 +301,9 @@ func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.
 
 	var outputs []types.Output
 	for _, outputRef := range logging.Spec.DefaultFlowSpec.GlobalOutputRefs {
-		if clusterOutput := l.ClusterOutputByName(outputRef); clusterOutput != nil {
+		if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
-			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, l.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {
 				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
 				continue
@@ -350,7 +315,7 @@ func (l *LoggingResources) FlowFromDefaultFlow(logging v1beta1.Logging) (*types.
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := l.FiltersForFilters(flowID, logging.Name, l.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
+	filters, err := filtersForFilters(flowID, logging.Name, secrets.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 

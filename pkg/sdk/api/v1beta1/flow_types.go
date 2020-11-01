@@ -76,12 +76,13 @@ type Filter struct {
 
 // FlowStatus defines the observed state of Flow
 type FlowStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Active   bool     `json:"active,omitempty"`
+	Problems []string `json:"problems,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
 
 // Flow Kubernetes object
 type Flow struct {

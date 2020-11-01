@@ -29,6 +29,7 @@ type _metaClusterOutput interface{}
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
 
 // ClusterOutput is the Schema for the clusteroutputs API
 type ClusterOutput struct {

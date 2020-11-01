@@ -32,7 +32,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				Ports: []corev1.ServicePort{
 					{
 						Protocol:   corev1.ProtocolTCP,
-						Name:       "metrics",
+						Name:       "http-metrics",
 						Port:       r.Logging.Spec.FluentbitSpec.Metrics.Port,
 						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentbitSpec.Metrics.Port},
 					},
@@ -63,9 +63,11 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
-					Port:        "metrics",
-					Path:        r.Logging.Spec.FluentbitSpec.Metrics.Path,
-					HonorLabels: r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+					Port:                 "http-metrics",
+					Path:                 r.Logging.Spec.FluentbitSpec.Metrics.Path,
+					HonorLabels:          r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
