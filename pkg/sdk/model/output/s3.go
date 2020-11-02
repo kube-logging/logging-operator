@@ -206,7 +206,7 @@ func (c *S3OutputConfig) oneeyeFormat(params map[string]string) (map[string]stri
 	if c == nil {
 		return params, nil
 	}
-	(*c).Buffer = &Buffer{
+	c.Buffer = &Buffer{
 		Tags: OneEyeTags,
 	}
 	params["path"] = fmt.Sprintf(OneEyePathTemplate, params["clustername"])
