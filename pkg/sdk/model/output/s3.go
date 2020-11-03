@@ -220,11 +220,6 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 			Id:        id,
 		},
 	}
-	params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c)
-	if err != nil {
-		return nil, err
-	}
-
 	// Overwrite values when One Eye format is used
 	if c.OneEyeFormat {
 		clusterName := "one-eye"
@@ -238,9 +233,14 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 				Tags: OneEyeTags,
 			}
 		}
-		params["path"] = fmt.Sprintf(OneEyePathTemplate, clusterName)
-		params["s3_object_key_format"] = OneEyeObjectKeyFormat
+		c.Path = fmt.Sprintf(OneEyePathTemplate, clusterName)
+		c.S3ObjectKeyFormat = OneEyeObjectKeyFormat
 	}
+	params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c)
+	if err != nil {
+		return nil, err
+	}
+
 	delete(params, "oneeye_format")
 	delete(params, "clustername")
 
