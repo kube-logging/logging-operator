@@ -99,9 +99,11 @@ type SplunkHecOutput struct {
 	// The private key for this client.'
 	ClientKey string `json:"client_key,omitempty"`
 	// The path to a file containing a PEM-format CA certificate.
-	CAFile string `json:"ca_file,omitempty"`
+	// +docLink:"Secret,../secret/"
+	CAFile *secret.Secret `json:"ca_file,omitempty"`
 	// The path to a directory containing CA certificates in PEM format.
-	CAPath string `json:"ca_path,omitempty"`
+	// +docLink:"Secret,../secret/"
+	CAPath *secret.Secret `json:"ca_path,omitempty"`
 	// List of SSL ciphers allowed.
 	SSLCiphers string `json:"ssl_ciphers,omitempty"`
 	// Indicates if insecure SSL connection is allowed (default:false)
