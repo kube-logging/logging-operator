@@ -156,8 +156,8 @@ type S3OutputConfig struct {
 	SharedCredentials *S3SharedCredentials `json:"shared_credentials,omitempty"`
 	// One-eye format trigger (default:false)
 	OneEyeFormat bool `json:"oneeye_format,omitempty"`
-	// Custom cluster name
-	ClusterName string `json:"clustername,omitempty" plugin:"default:one-eye"`
+	// Custom cluster name (default:one-eye)
+	ClusterName string `json:"clustername,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -206,11 +206,7 @@ func (c *S3OutputConfig) oneeyeFormat(params map[string]string) (map[string]stri
 	if c == nil {
 		return params, nil
 	}
-	c.Buffer = &Buffer{
-		Tags: OneEyeTags,
-	}
-	params["path"] = fmt.Sprintf(OneEyePathTemplate, params["clustername"])
-	params["s3_object_key_format"] = OneEyeObjectKeyFormat
+
 	return params, nil
 }
 
@@ -224,19 +220,32 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 			Id:        id,
 		},
 	}
-	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
+	params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c)
+	if err != nil {
 		return nil, err
-	} else {
-		if c.OneEyeFormat || params["oneeye_format"] == "true" {
-			params, err = c.oneeyeFormat(params)
-			if err != nil {
-				return nil, err
+	}
+
+	// Overwrite values when One Eye format is used
+	if c.OneEyeFormat {
+		clusterName := "one-eye"
+		if c.ClusterName != "" {
+			clusterName = c.ClusterName
+		}
+		if c.Buffer != nil {
+			c.Buffer.Tags = OneEyeTags
+		} else {
+			c.Buffer = &Buffer{
+				Tags: OneEyeTags,
 			}
 		}
-		delete(params, "oneeye_format")
-		delete(params, "clustername")
-		s3.Params = params
+		params["path"] = fmt.Sprintf(OneEyePathTemplate, clusterName)
+		params["s3_object_key_format"] = OneEyeObjectKeyFormat
 	}
+	delete(params, "oneeye_format")
+	delete(params, "clustername")
+
+	s3.Params = params
+
 	if c.Buffer != nil {
 		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
 			return nil, err
