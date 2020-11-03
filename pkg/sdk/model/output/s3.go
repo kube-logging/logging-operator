@@ -218,13 +218,10 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		if c.ClusterName != "" {
 			clusterName = c.ClusterName
 		}
-		if c.Buffer != nil {
-			c.Buffer.Tags = OneEyeTags
-		} else {
-			c.Buffer = &Buffer{
-				Tags: OneEyeTags,
-			}
+		if c.Buffer == nil {
+			c.Buffer = new(Buffer)
 		}
+		c.Buffer.Tags = OneEyeTags
 		c.Path = fmt.Sprintf(OneEyePathTemplate, clusterName)
 		c.S3ObjectKeyFormat = OneEyeObjectKeyFormat
 	}
