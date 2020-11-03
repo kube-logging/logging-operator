@@ -202,14 +202,6 @@ type S3SharedCredentials struct {
 	Path string `json:"path,omitempty"`
 }
 
-func (c *S3OutputConfig) oneeyeFormat(params map[string]string) (map[string]string, error) {
-	if c == nil {
-		return params, nil
-	}
-
-	return params, nil
-}
-
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "s3"
 	s3 := &types.OutputPlugin{
