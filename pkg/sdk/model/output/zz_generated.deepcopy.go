@@ -1143,6 +1143,16 @@ func (in *SplunkHecOutput) DeepCopyInto(out *SplunkHecOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.ClientCert != nil {
+		in, out := &in.ClientCert, &out.ClientCert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.ClientKey != nil {
+		in, out := &in.ClientKey, &out.ClientKey
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.CAFile != nil {
 		in, out := &in.CAFile, &out.CAFile
 		*out = new(secret.Secret)

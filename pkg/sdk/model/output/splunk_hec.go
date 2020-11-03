@@ -95,9 +95,11 @@ type SplunkHecOutput struct {
 	// The amount of time to wait for a connection to be opened.
 	OpenTimeout int `json:"open_timeout,omitempty"`
 	// The path to a file containing a PEM-format CA certificate for this client.
-	ClientCert string `json:"client_cert,omitempty"`
+	// +docLink:"Secret,../secret/"
+	ClientCert *secret.Secret `json:"client_cert,omitempty"`
 	// The private key for this client.'
-	ClientKey string `json:"client_key,omitempty"`
+	// +docLink:"Secret,../secret/"
+	ClientKey *secret.Secret `json:"client_key,omitempty"`
 	// The path to a file containing a PEM-format CA certificate.
 	// +docLink:"Secret,../secret/"
 	CAFile *secret.Secret `json:"ca_file,omitempty"`
