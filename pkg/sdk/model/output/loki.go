@@ -69,7 +69,7 @@ type LokiOutput struct {
 	// +docLink:"Secret,../secret/"
 	CaCert *secret.Secret `json:"ca_cert,omitempty"`
 	// TLS: disable server certificate verification (default: false)
-	InsecureTLS bool `json:"insecure_tls,omitempty"`
+	InsecureTLS *bool `json:"insecure_tls,omitempty"`
 	// Loki is a multi-tenant log storage platform and all requests sent must include a tenant.
 	Tenant string `json:"tenant,omitempty"`
 	// Set of labels to include with every Loki stream.
@@ -83,9 +83,9 @@ type LokiOutput struct {
 	// Comma separated list of needless record keys to remove (default: [])
 	RemoveKeys []string `json:"remove_keys,omitempty"`
 	// If a record only has 1 key, then just set the log line to the value and discard the key. (default: false)
-	DropSingleKey bool `json:"drop_single_key,omitempty"`
-	// Configure Kubernetes metadata in a Prometheus like format
-	ConfigureKubernetesLabels bool `json:"configure_kubernetes_labels,omitempty"`
+	DropSingleKey *bool `json:"drop_single_key,omitempty"`
+	// Configure Kubernetes metadata in a Prometheus like format (default: false)
+	ConfigureKubernetesLabels *bool `json:"configure_kubernetes_labels,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
@@ -119,7 +119,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        id,
 		},
 	}
-	if l.ConfigureKubernetesLabels {
+	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels {
 		if l.Labels == nil {
 			l.Labels = Label{}
 		}
@@ -143,7 +143,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			l.ExtractKubernetesLabels = util.BoolPointer(true)
 		}
 		// Prevent meta configuration from marshalling
-		l.ConfigureKubernetesLabels = false
+		l.ConfigureKubernetesLabels = nil
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(l); err != nil {
 		return nil, err
