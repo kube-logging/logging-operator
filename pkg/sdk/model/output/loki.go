@@ -59,6 +59,17 @@ type LokiOutput struct {
 	// Specify password if the Loki server requires authentication.
 	// +docLink:"Secret,../secret/"
 	Password *secret.Secret `json:"password,omitempty"`
+	// TLS: parameters for presenting a client certificate
+	// +docLink:"Secret,../secret/"
+	Cert *secret.Secret `json:"cert,omitempty"`
+	// TLS: parameters for presenting a client certificate
+	// +docLink:"Secret,../secret/"
+	Key *secret.Secret `json:"key,omitempty"`
+	// TLS: CA certificate file for server certificate verification
+	// +docLink:"Secret,../secret/"
+	CaCert *secret.Secret `json:"ca_cert,omitempty"`
+	// TLS: disable server certificate verification (default: false)
+	InsecureTLS bool `json:"insecure_tls,omitempty"`
 	// Loki is a multi-tenant log storage platform and all requests sent must include a tenant.
 	Tenant string `json:"tenant,omitempty"`
 	// Set of labels to include with every Loki stream.
