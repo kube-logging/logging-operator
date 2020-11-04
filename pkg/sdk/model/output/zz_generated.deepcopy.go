@@ -899,6 +899,11 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.InsecureTLS != nil {
+		in, out := &in.InsecureTLS, &out.InsecureTLS
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
 		*out = make(Label, len(*in))
@@ -922,6 +927,16 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 		in, out := &in.RemoveKeys, &out.RemoveKeys
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.DropSingleKey != nil {
+		in, out := &in.DropSingleKey, &out.DropSingleKey
+		*out = new(bool)
+		**out = **in
+	}
+	if in.ConfigureKubernetesLabels != nil {
+		in, out := &in.ConfigureKubernetesLabels, &out.ConfigureKubernetesLabels
+		*out = new(bool)
+		**out = **in
 	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
