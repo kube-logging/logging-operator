@@ -884,6 +884,21 @@ func (in *LokiOutput) DeepCopyInto(out *LokiOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Cert != nil {
+		in, out := &in.Cert, &out.Cert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Key != nil {
+		in, out := &in.Key, &out.Key
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.CaCert != nil {
+		in, out := &in.CaCert, &out.CaCert
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
 		*out = make(Label, len(*in))
