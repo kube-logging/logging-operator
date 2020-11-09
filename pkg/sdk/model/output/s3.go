@@ -64,7 +64,7 @@ type _metaS3 interface{}
 const (
 	OneEyeTags            string = "tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name"
 	OneEyePathTemplate    string = "%v/%%Y/%%m/%%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/"
-	OneEyeObjectKeyFormat string = "%{path}/%H:%M_%{index}.%{file_extension}"
+	OneEyeObjectKeyFormat string = "%{path}%H:%M_%{index}.%{file_extension}"
 )
 
 // +kubebuilder:object:generate=true
