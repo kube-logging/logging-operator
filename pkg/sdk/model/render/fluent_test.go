@@ -539,7 +539,7 @@ func TestRenderS3(t *testing.T) {
                         @id test
 						path one-eye/%Y/%m/%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/
 						s3_bucket oneeye_bucket
-						s3_object_key_format %{path}/%H:%M_%{index}.%{file_extension}
+						s3_object_key_format %{path}%H:%M_%{index}.%{file_extension}
 						<buffer tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name>
 						@type file
 						path /buffers/test.*.buffer
