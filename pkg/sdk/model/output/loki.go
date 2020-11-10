@@ -27,7 +27,7 @@ type _hugoLoki interface{}
 // +docName:"Loki output plugin "
 //Fluentd output plugin to ship logs to a Loki server.
 //More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
-//>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../quickstarts/loki-nginx/)
+//>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
 //
 // #### Example output configurations
 // ```
