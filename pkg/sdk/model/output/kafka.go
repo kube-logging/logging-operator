@@ -25,7 +25,7 @@ type _hugoKafka interface{}
 
 // +docName:"Kafka output plugin for Fluentd"
 //  More info at https://github.com/fluent/fluent-plugin-kafka
-//>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../quickstarts/kafka-nginx/)
+//>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
 //
 // #### Example output configurations
 // ```
