@@ -72,6 +72,7 @@ type Filter struct {
 	Grep              *filter.GrepConfig         `json:"grep,omitempty"`
 	Prometheus        *filter.PrometheusConfig   `json:"prometheus,omitempty"`
 	Throttle          *filter.Throttle           `json:"throttle,omitempty"`
+	SumoLogic         *filter.SumoLogic          `json:"sumologic,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
