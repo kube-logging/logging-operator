@@ -458,6 +458,61 @@ spec:
                       output_type:
                         type: string
                     type: object
+                  sumologic:
+                    properties:
+                      collector_key_name:
+                        type: string
+                      collector_value:
+                        type: string
+                      exclude_container_regex:
+                        type: string
+                      exclude_facility_regex:
+                        type: string
+                      exclude_host_regex:
+                        type: string
+                      exclude_namespace_regex:
+                        type: string
+                      exclude_pod_regex:
+                        type: string
+                      exclude_priority_regex:
+                        type: string
+                      exclude_unit_regex:
+                        type: string
+                      log_format:
+                        type: string
+                      source_category:
+                        type: string
+                      source_category_key_name:
+                        type: string
+                      source_category_prefix:
+                        type: string
+                      source_category_replace_dash:
+                        type: string
+                      source_host:
+                        type: string
+                      source_host_key_name:
+                        type: string
+                      source_name:
+                        type: string
+                      source_name_key_name:
+                        type: string
+                      tracing_annotation_prefix:
+                        type: string
+                      tracing_container_name:
+                        type: string
+                      tracing_format:
+                        type: boolean
+                      tracing_host:
+                        type: string
+                      tracing_label_prefix:
+                        type: string
+                      tracing_namespace:
+                        type: string
+                      tracing_pod:
+                        type: string
+                      tracing_pod_id:
+                        type: string
+                    type: object
                   tag_normaliser:
                     properties:
                       format:
