@@ -42,6 +42,7 @@ RUN apk update \
          fluent-plugin-oss \
          fluent-plugin-dedot_filter \
          fluent-plugin-sumologic_output \
+         fluent-plugin-kubernetes_sumologic \
          fluent-plugin-kafka \
          fluent-plugin-geoip \
          fluent-plugin-label-router \
