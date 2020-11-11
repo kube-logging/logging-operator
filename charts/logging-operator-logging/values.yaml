@@ -64,4 +64,6 @@ clusterOutputs: []
 #     spec:
 #       kafka:
 #         brokers: kafka-headless.kafka.svc.cluster.local:29092
+#         format:
+#           type: json
 #         default_topic: topic
