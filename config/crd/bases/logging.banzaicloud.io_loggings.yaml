@@ -1153,6 +1153,20 @@ spec:
                   type: object
                 mountPath:
                   type: string
+                network:
+                  properties:
+                    connectTimeout:
+                      format: int32
+                      type: integer
+                    keepalive:
+                      type: boolean
+                    keepaliveIdleTimeout:
+                      format: int32
+                      type: integer
+                    keepaliveMaxRecycle:
+                      format: int32
+                      type: integer
+                  type: object
                 nodeSelector:
                   additionalProperties:
                     type: string
