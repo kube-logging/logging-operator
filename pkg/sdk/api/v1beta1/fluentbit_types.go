@@ -65,6 +65,7 @@ type FluentbitSpec struct {
 	LivenessProbe        *corev1.Probe           `json:"livenessProbe,omitempty"`
 	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
+	Network              *FluentbitNetwork       `json:"network,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -74,6 +75,18 @@ type FluentbitTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
+}
+
+// FluentbitNetwork defines network configuration for fluentbit
+type FluentbitNetwork struct {
+	// Sets the timeout for connecting to an upstream (default: 10)
+	ConnectTimeout *uint32 `json:"connectTimeout,omitempty"`
+	// Whether or not TCP keepalive is used for the upstream connection (default: true)
+	Keepalive *bool `json:"keepalive,omitempty"`
+	// How long in seconds a TCP keepalive connection can be idle before being recycled (default: 30)
+	KeepaliveIdleTimeout *uint32 `json:"keepaliveIdleTimeout,omitempty"`
+	// How many times a TCP keepalive connection can be used before being recycled (default: 0, disabled)
+	KeepaliveMaxRecycle *uint32 `json:"keepaliveMaxRecycle,omitempty"`
 }
 
 // GetPrometheusPortFromAnnotation gets the port value from annotation
