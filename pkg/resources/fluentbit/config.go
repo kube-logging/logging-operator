@@ -80,5 +80,17 @@ var fluentBitConfigTemplate = `
     Empty_Shared_Key true
     {{- end }}
     {{- end }}
+    {{- if .Network.ConnectTimeoutSet }}
+    net.connect_timeout {{.Network.ConnectTimeout}}
+    {{- end }}
+    {{- if .Network.KeepaliveSet}}
+    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- end }}
+    {{- if .Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    {{- end }}
+    {{- if .Network.KeepaliveMaxRecycleSet  }}
+    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    {{- end }}
     Retry_Limit   False
 `
