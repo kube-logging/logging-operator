@@ -8,6 +8,11 @@ metadata:
   creationTimestamp: null
   name: outputs.logging.banzaicloud.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.active
+    description: Is the output active?
+    name: Active
+    type: boolean
   group: logging.banzaicloud.io
   names:
     categories:
