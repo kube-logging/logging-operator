@@ -63,6 +63,7 @@ type OutputStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the output active?"
 
 // Output is the Schema for the outputs API
 type Output struct {

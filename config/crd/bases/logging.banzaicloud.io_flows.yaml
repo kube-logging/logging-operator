@@ -8,6 +8,11 @@ metadata:
   creationTimestamp: null
   name: flows.logging.banzaicloud.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.active
+    description: Is the flow active?
+    name: Active
+    type: boolean
   group: logging.banzaicloud.io
   names:
     categories:
