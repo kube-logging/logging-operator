@@ -50,6 +50,16 @@ type fluentBitConfig struct {
 	KubernetesFilter map[string]string
 	AwsFilter        map[string]string
 	BufferStorage    map[string]string
+	Network          struct {
+		ConnectTimeoutSet       bool
+		ConnectTimeout          uint32
+		Keepalive               bool
+		KeepaliveSet            bool
+		KeepaliveIdleTimeout    uint32
+		KeepaliveIdleTimeoutSet bool
+		KeepaliveMaxRecycle     uint32
+		KeepaliveMaxRecycleSet  bool
+	}
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
@@ -133,6 +143,28 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	if r.Logging.Spec.FluentbitSpec.TargetPort != 0 {
 		input.TargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
+	}
+
+	if r.Logging.Spec.FluentbitSpec.Network != nil {
+		if r.Logging.Spec.FluentbitSpec.Network.ConnectTimeout != nil {
+			input.Network.ConnectTimeoutSet = true
+			input.Network.ConnectTimeout = *r.Logging.Spec.FluentbitSpec.Network.ConnectTimeout
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.Keepalive != nil {
+			input.Network.KeepaliveSet = true
+			input.Network.Keepalive = *r.Logging.Spec.FluentbitSpec.Network.Keepalive
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.KeepaliveIdleTimeout != nil {
+			input.Network.KeepaliveIdleTimeoutSet = true
+			input.Network.KeepaliveIdleTimeout = *r.Logging.Spec.FluentbitSpec.Network.KeepaliveIdleTimeout
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle != nil {
+			input.Network.KeepaliveMaxRecycleSet = true
+			input.Network.KeepaliveMaxRecycle = *r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle
+		}
 	}
 
 	r.desiredConfig, err = generateConfig(input)
