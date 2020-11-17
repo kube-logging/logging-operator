@@ -108,7 +108,7 @@ type SumoLogic struct {
 // #### Fluentd Config Result
 // ```yaml
 //<filter **>
-//  @type sumologic
+//  @type kubernetes_sumologic
 //  @id test_sumologic
 //  source_name elso
 //</filter>
@@ -116,7 +116,7 @@ type SumoLogic struct {
 type _expSumologic interface{}
 
 func (s *SumoLogic) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "sumologic"
+	pluginType := "kubernetes_sumologic"
 	sumologic := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
