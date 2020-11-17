@@ -29,7 +29,7 @@ source_host: "masodik"
 `)
 	expected := `
 <filter **>
-  @type sumologic
+  @type kubernetes_sumologic
   @id test
   source_host masodik
   source_name elso
