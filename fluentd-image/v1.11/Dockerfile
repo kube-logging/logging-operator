@@ -42,6 +42,7 @@ RUN apk update \
          fluent-plugin-oss \
          fluent-plugin-dedot_filter \
          fluent-plugin-sumologic_output \
+         fluent-plugin-kubernetes_sumologic \
          fluent-plugin-kafka \
          fluent-plugin-geoip \
          fluent-plugin-label-router \
@@ -63,6 +64,7 @@ RUN apk update \
          fluent-plugin-datadog \
          fluent-plugin-aws-elasticsearch-service \
          fluent-plugin-redis \
+ && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
