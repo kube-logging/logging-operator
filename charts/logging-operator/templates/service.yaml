@@ -16,5 +16,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name:  {{ include "logging-operator.name" . }}
+    app.kubernetes.io/name: {{ include "logging-operator.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
