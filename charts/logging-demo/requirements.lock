@@ -1,9 +1,9 @@
 dependencies:
 - name: minio
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 5.0.33
+  repository: https://helm.min.io/
+  version: 8.0.3
 - name: log-generator
   repository: https://kubernetes-charts.banzaicloud.com/
   version: 0.1.3
-digest: sha256:70e4c1a22dc53ae9a819b60db5d3feef56abfca8e9000bcfa5f15c102db6c664
-generated: "2020-08-01T23:38:05.22473+02:00"
+digest: sha256:6876ba4caf6f47c68d2d687a4d4bbfbdda590dd26127ac3f0dcc5adf26e05cd8
+generated: "2020-11-20T10:07:17.927076+01:00"
