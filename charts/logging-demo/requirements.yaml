@@ -1,6 +1,6 @@
 dependencies:
 - name: minio
-  version: 8.x.x
+  version: 5.x.x
   repository: https://helm.min.io/
   condition: minio.enabled
 
