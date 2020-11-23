@@ -56,7 +56,7 @@ type OutputSpec struct {
 
 // OutputStatus defines the observed state of Output
 type OutputStatus struct {
-	Active   bool     `json:"active,omitempty"`
+	Active   *bool    `json:"active,omitempty"`
 	Problems []string `json:"problems,omitempty"`
 }
 
