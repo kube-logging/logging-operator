@@ -31,6 +31,7 @@ type _metaClusterFlow interface{}
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the flow active?"
+// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 
 // ClusterFlow is the Schema for the clusterflows API
 type ClusterFlow struct {

@@ -31,6 +31,7 @@ type _metaClusterOutput interface{}
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the output active?"
+// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 
 // ClusterOutput is the Schema for the clusteroutputs API
 type ClusterOutput struct {

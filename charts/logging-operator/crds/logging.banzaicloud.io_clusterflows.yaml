@@ -13,6 +13,10 @@ spec:
     description: Is the flow active?
     name: Active
     type: boolean
+  - JSONPath: .status.problemsCount
+    description: Number of problems
+    name: Problems
+    type: integer
   group: logging.banzaicloud.io
   names:
     categories:
