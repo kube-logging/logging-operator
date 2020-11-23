@@ -77,7 +77,7 @@ type Filter struct {
 
 // FlowStatus defines the observed state of Flow
 type FlowStatus struct {
-	Active   bool     `json:"active,omitempty"`
+	Active   *bool    `json:"active,omitempty"`
 	Problems []string `json:"problems,omitempty"`
 }
 
