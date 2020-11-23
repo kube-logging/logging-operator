@@ -55,6 +55,7 @@ func NewValidationReconciler(
 
 			output.Status.Problems = append(output.Status.Problems,
 				validateOutputSpec(output.Spec.OutputSpec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
+			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
 		for i := range resources.Outputs {
@@ -66,6 +67,7 @@ func NewValidationReconciler(
 
 			output.Status.Problems = append(output.Status.Problems,
 				validateOutputSpec(output.Spec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
+			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
 		for i := range resources.ClusterFlows {
@@ -87,6 +89,7 @@ func NewValidationReconciler(
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
 				}
 			}
+			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
 		for i := range resources.Flows {
@@ -117,6 +120,7 @@ func NewValidationReconciler(
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
 			}
+			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
 		var errs error
