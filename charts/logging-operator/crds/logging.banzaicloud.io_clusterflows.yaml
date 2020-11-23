@@ -606,6 +606,8 @@ spec:
               items:
                 type: string
               type: array
+            problemsCount:
+              type: integer
           type: object
       type: object
   version: v1beta1
