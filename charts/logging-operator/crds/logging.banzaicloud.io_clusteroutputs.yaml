@@ -4368,6 +4368,8 @@ spec:
               items:
                 type: string
               type: array
+            problemsCount:
+              type: integer
           type: object
       required:
       - spec
