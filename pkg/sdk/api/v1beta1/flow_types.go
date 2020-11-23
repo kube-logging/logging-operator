@@ -77,8 +77,9 @@ type Filter struct {
 
 // FlowStatus defines the observed state of Flow
 type FlowStatus struct {
-	Active   *bool    `json:"active,omitempty"`
-	Problems []string `json:"problems,omitempty"`
+	Active        *bool    `json:"active,omitempty"`
+	Problems      []string `json:"problems,omitempty"`
+	ProblemsCount int      `json:"problemsCount,omitempty"`
 }
 
 // +kubebuilder:object:root=true
