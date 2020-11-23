@@ -23,6 +23,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -49,7 +50,7 @@ func NewValidationReconciler(
 			output := &resources.ClusterOutputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = false
+			output.Status.Active = utils.BoolPointer(false)
 			output.Status.Problems = nil
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -60,7 +61,7 @@ func NewValidationReconciler(
 			output := &resources.Outputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = false
+			output.Status.Active = utils.BoolPointer(false)
 			output.Status.Problems = nil
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -71,7 +72,7 @@ func NewValidationReconciler(
 			flow := &resources.ClusterFlows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = false
+			flow.Status.Active = utils.BoolPointer(false)
 			flow.Status.Problems = nil
 
 			if len(flow.Spec.GlobalOutputRefs) == 0 && len(flow.Spec.OutputRefs) > 0 {
@@ -80,8 +81,8 @@ func NewValidationReconciler(
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
 				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
-					flow.Status.Active = true
-					output.Status.Active = true
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
 				} else {
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
 				}
@@ -92,7 +93,7 @@ func NewValidationReconciler(
 			flow := &resources.Flows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = false
+			flow.Status.Active = utils.BoolPointer(false)
 			flow.Status.Problems = nil
 
 			if len(flow.Spec.LocalOutputRefs)+len(flow.Spec.GlobalOutputRefs) == 0 && len(flow.Spec.OutputRefs) > 0 {
@@ -101,8 +102,8 @@ func NewValidationReconciler(
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
 				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
-					flow.Status.Active = true
-					output.Status.Active = true
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
 				} else {
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
 				}
@@ -110,8 +111,8 @@ func NewValidationReconciler(
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
 				if output := resources.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
-					flow.Status.Active = true
-					output.Status.Active = true
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
 				} else {
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
