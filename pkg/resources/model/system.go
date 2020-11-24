@@ -32,7 +32,13 @@ import (
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
 	logging := resources.Logging
 
-	forwardInput := input.NewForwardInputConfig()
+	var forwardInput *input.ForwardInputConfig
+	if logging.Spec.FluentdSpec.ForwardInputConfig != nil {
+		forwardInput = logging.Spec.FluentdSpec.ForwardInputConfig
+	} else {
+		forwardInput = input.NewForwardInputConfig()
+	}
+
 	if logging.Spec.FluentdSpec != nil && logging.Spec.FluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
 			Version:        "TLSv1_2",

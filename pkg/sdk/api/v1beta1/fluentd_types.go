@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -64,7 +65,8 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
-	FluentOutLogrotate *FluentOutLogrotate `json:"fluentOutLogrotate,omitempty"`
+	FluentOutLogrotate *FluentOutLogrotate       `json:"fluentOutLogrotate,omitempty"`
+	ForwardInputConfig *input.ForwardInputConfig `json:"forwardInputConfig,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
