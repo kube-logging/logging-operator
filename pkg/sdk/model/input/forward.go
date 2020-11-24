@@ -23,8 +23,20 @@ import (
 // +kubebuilder:object:generate=true
 
 type ForwardInputConfig struct {
-	Port      string            `json:"port,omitempty" plugin:"default:24240"`
-	Bind      string            `json:"bind,omitempty" plugin:"default:0.0.0.0"`
+	Port                string `json:"port,omitempty" plugin:"default:24240"`
+	Bind                string `json:"bind,omitempty" plugin:"default:0.0.0.0"`
+	Tag                 string `json:"tag,omitempty"`
+	AddTagPrefix        string `json:"add_tag_prefix,omitempty"`
+	LingerTimeout       int    `json:"linger_timeout,omitempty"`
+	ResolveHostname     *bool  `json:"resolve_hostname,omitempty"`
+	DenyKeepalive       *bool  `json:"deny_keepalive,omitempty"`
+	SendKeepalivePacket *bool  `json:"send_keepalive_packet,omitempty"`
+	ChunkSizeLimit      string `json:"chunk_size_limit,omitempty"`
+	ChunkSizeWarnLimit  string `json:"chunk_size_warn_limit,omitempty"`
+	SkipInvalidEvent    *bool  `json:"skip_invalid_event,omitempty"`
+	SourceAddressKey    string `json:"source_address_key,omitempty"`
+	SourceHostnameKey   string `json:"sourceHostnameKey,omitempty"`
+
 	Transport *common.Transport `json:"transport,omitempty"`
 	Security  *common.Security  `json:"security,omitempty"`
 }
