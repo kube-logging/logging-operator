@@ -48,8 +48,7 @@ func generateConfig(input fluentdConfig) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to execute template")
 	}
-	outputString := fmt.Sprint(output.String())
-	return outputString, nil
+	return output.String(), nil
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
