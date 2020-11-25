@@ -46,7 +46,7 @@ func NewForwardInputConfig() *ForwardInputConfig {
 }
 
 func (f *ForwardInputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "forward"
+	const pluginType = "forward"
 	pluginID := id + "_" + pluginType
 	forward := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{

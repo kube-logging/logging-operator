@@ -130,7 +130,7 @@ func (o *KinesisStreamAssumeRoleCredentials) ToDirective(secretLoader secret.Sec
 }
 
 func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "kinesis_streams"
+	const pluginType = "kinesis_streams"
 	kinesis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -73,7 +73,7 @@ type Throttle struct {
 type _expThrottle interface{}
 
 func (t *Throttle) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "throttle"
+	const pluginType = "throttle"
 	throttle := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -108,7 +108,7 @@ func (o *EndpointCredentials) ToDirective(secretLoader secret.SecretLoader, id s
 }
 
 func (e *AwsElasticsearchOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "aws-elasticsearch-service"
+	const pluginType = "aws-elasticsearch-service"
 	kinesis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

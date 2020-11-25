@@ -292,7 +292,7 @@ func (r *AndSection) ToDirective(secretLoader secret.SecretLoader, id string) (t
 }
 
 func (g *GrepConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "grep"
+	const pluginType = "grep"
 	grep := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

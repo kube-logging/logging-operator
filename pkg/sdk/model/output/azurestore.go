@@ -63,7 +63,7 @@ type AzureStorage struct {
 }
 
 func (a *AzureStorage) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "azurestorage"
+	const pluginType = "azurestorage"
 	azure := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

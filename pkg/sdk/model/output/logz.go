@@ -103,7 +103,7 @@ func (e *Endpoint) ToDirective(secretLoader secret.SecretLoader) (types.Directiv
 
 // ToDirective converts LogZOutput to fluentd configuration.
 func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "logzio_buffered"
+	const pluginType = "logzio_buffered"
 	logz := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

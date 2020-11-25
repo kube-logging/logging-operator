@@ -91,7 +91,7 @@ type FileOutputConfig struct {
 type _expFile interface{}
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "file"
+	const pluginType = "file"
 	file := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

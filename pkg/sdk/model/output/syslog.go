@@ -97,7 +97,7 @@ type SyslogOutputConfig struct {
 type _expSyslog interface{}
 
 func (s *SyslogOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "syslog_rfc5424"
+	const pluginType = "syslog_rfc5424"
 	syslog := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

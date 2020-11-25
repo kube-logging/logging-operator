@@ -77,7 +77,7 @@ type GCSOutput struct {
 }
 
 func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "gcs"
+	const pluginType = "gcs"
 	gcs := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
