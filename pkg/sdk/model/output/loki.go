@@ -110,7 +110,7 @@ func (r Label) merge(input Label) {
 }
 
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "loki"
+	const pluginType = "loki"
 	loki := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

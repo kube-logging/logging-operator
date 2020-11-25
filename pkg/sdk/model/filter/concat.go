@@ -99,7 +99,7 @@ type Concat struct {
 type _expConcat interface{}
 
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "concat"
+	const pluginType = "concat"
 	concat := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

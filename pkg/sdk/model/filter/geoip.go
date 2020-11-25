@@ -91,7 +91,7 @@ type GeoIP struct {
 type _expGeoIP interface{}
 
 func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "geoip"
+	const pluginType = "geoip"
 	geoIP := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

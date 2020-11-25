@@ -239,7 +239,7 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 }
 
 func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "parser"
+	const pluginType = "parser"
 	parser := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

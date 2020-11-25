@@ -78,7 +78,7 @@ type TagNormaliser struct {
 type _expTagNormaliser interface{}
 
 func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "tag_normaliser"
+	const pluginType = "tag_normaliser"
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "match",

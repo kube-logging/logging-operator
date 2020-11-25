@@ -72,7 +72,7 @@ type RedisOutputConfig struct {
 }
 
 func (c *RedisOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "redis"
+	const pluginType = "redis"
 	redis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

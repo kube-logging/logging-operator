@@ -150,7 +150,7 @@ func (m *MetricSection) ToDirective(secretLoader secret.SecretLoader, id string)
 }
 
 func (p *PrometheusConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "prometheus"
+	const pluginType = "prometheus"
 	prometheus := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

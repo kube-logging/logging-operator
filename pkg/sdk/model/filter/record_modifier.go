@@ -100,7 +100,7 @@ func (r *Replace) ToDirective(secretLoader secret.SecretLoader, id string) (type
 }
 
 func (r *RecordModifier) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "record_modifier"
+	const pluginType = "record_modifier"
 	recordModifier := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
