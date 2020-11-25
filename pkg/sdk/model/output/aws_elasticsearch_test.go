@@ -31,7 +31,7 @@ flush_interval: 1s
 endpoint:
   url: https://CLUSTER_ENDPOINT_URL
   region: eu-west-1
-  access_key_id: 
+  access_key_id:
     value: aws-key
   secret_access_key:
     value: aws_secret

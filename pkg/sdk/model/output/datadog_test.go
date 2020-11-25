@@ -24,7 +24,7 @@ import (
 
 func TestDatadog(t *testing.T) {
 	CONFIG := []byte(`
-dd_source: '<INTEGRATION_NAME>' 
+dd_source: '<INTEGRATION_NAME>'
 dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
 dd_sourcecategory: '<MY_SOURCE_CATEGORY>'
 buffer:
