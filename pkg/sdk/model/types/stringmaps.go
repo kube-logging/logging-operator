@@ -33,9 +33,6 @@ type StructToStringMapper struct {
 	SecretLoader    secret.SecretLoader
 }
 
-type NullSecretLoader struct {
-}
-
 func NewStructToStringMapper(secretLoader secret.SecretLoader) *StructToStringMapper {
 	return &StructToStringMapper{
 		TagName:         "json",
