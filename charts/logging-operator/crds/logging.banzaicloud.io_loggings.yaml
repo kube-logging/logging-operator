@@ -956,8 +956,24 @@ spec:
                   properties:
                     Match:
                       type: string
+                    account_id:
+                      type: boolean
+                    ami_id:
+                      type: boolean
+                    az:
+                      type: boolean
+                    ec2_instance_id:
+                      type: boolean
+                    ec2_instance_type:
+                      type: boolean
+                    hostname:
+                      type: boolean
                     imds_version:
                       type: string
+                    private_ip:
+                      type: boolean
+                    vpc_id:
+                      type: boolean
                   type: object
                 filterKubernetes:
                   properties:
