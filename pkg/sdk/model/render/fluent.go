@@ -17,11 +17,12 @@ package render
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"emperror.dev/errors"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
@@ -54,7 +55,9 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 			f.indented(indent+f.Indent, "@log_level %s", meta.LogLevel)
 		}
 		if params := d.GetParams(); len(params) > 0 {
-			for _, k := range util.OrderedStringMap(params).Keys() {
+			keys := mapstrstr.Keys(params)
+			sort.Strings(keys)
+			for _, k := range keys {
 				f.indented(indent+f.Indent, "%s %s", k, params[k])
 			}
 		}
