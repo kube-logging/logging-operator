@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -894,6 +895,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		in, out := &in.FluentOutLogrotate, &out.FluentOutLogrotate
 		*out = new(FluentOutLogrotate)
 		**out = **in
+	}
+	if in.ForwardInputConfig != nil {
+		in, out := &in.ForwardInputConfig, &out.ForwardInputConfig
+		*out = new(input.ForwardInputConfig)
+		(*in).DeepCopyInto(*out)
 	}
 }
 

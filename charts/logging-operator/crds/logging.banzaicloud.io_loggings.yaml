@@ -2163,6 +2163,76 @@ spec:
                           type: object
                       type: object
                   type: object
+                forwardInputConfig:
+                  properties:
+                    add_tag_prefix:
+                      type: string
+                    bind:
+                      type: string
+                    chunk_size_limit:
+                      type: string
+                    chunk_size_warn_limit:
+                      type: string
+                    deny_keepalive:
+                      type: boolean
+                    linger_timeout:
+                      type: integer
+                    port:
+                      type: string
+                    resolve_hostname:
+                      type: boolean
+                    security:
+                      properties:
+                        allow_anonymous_source:
+                          type: boolean
+                        self_hostname:
+                          type: string
+                        shared_key:
+                          type: string
+                        user_auth:
+                          type: boolean
+                      required:
+                      - self_hostname
+                      - shared_key
+                      type: object
+                    send_keepalive_packet:
+                      type: boolean
+                    skip_invalid_event:
+                      type: boolean
+                    source_address_key:
+                      type: string
+                    sourceHostnameKey:
+                      type: string
+                    tag:
+                      type: string
+                    transport:
+                      properties:
+                        ca_cert_path:
+                          type: string
+                        ca_path:
+                          type: string
+                        ca_private_key_passphrase:
+                          type: string
+                        ca_private_key_path:
+                          type: string
+                        cert_path:
+                          type: string
+                        ciphers:
+                          type: string
+                        client_cert_auth:
+                          type: boolean
+                        insecure:
+                          type: boolean
+                        private_key_passphrase:
+                          type: string
+                        private_key_path:
+                          type: string
+                        protocol:
+                          type: string
+                        version:
+                          type: string
+                      type: object
+                  type: object
                 image:
                   properties:
                     pullPolicy:
