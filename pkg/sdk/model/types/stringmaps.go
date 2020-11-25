@@ -80,9 +80,7 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 					"tags for field %s are conflicting: required and omitempty cannot be set simultaneously", name))
 				continue
 			}
-			zero := reflect.Zero(val.Type()).Interface()
-			current := val.Interface()
-			if reflect.DeepEqual(current, zero) {
+			if val.IsZero() {
 				if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
 					out[name] = def
 				}
