@@ -199,12 +199,13 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	r.desiredConfig, err = generateConfig(input)
+	conf, err := generateConfig(input)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
 	}
 	confs := map[string][]byte{
-		"fluent-bit.conf": []byte(r.desiredConfig),
+		"config":       []byte(conf), // backward compatibility
+		BaseConfigName: []byte(conf),
 	}
 
 	if input.Upstream.Enabled {
@@ -214,6 +215,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 		confs[UpstreamConfigName] = []byte(upstreamConfig)
 	}
+
+	r.configs = confs
 
 	return &corev1.Secret{
 		ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),

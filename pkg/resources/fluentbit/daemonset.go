@@ -52,10 +52,12 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
 	}
 
-	if r.desiredConfig != "" {
-		h := sha256.New()
-		_, _ = h.Write([]byte(r.desiredConfig))
-		templates.Annotate(podMeta, "checksum/config", fmt.Sprintf("%x", h.Sum(nil)))
+	if r.configs != nil {
+		for key, config := range r.configs {
+			h := sha256.New()
+			_, _ = h.Write(config)
+			templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
+		}
 	}
 
 	desired := &appsv1.DaemonSet{
@@ -143,13 +145,13 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		v = append(v, corev1.VolumeMount{
 			Name:      "config",
 			MountPath: "/fluent-bit/etc/fluent-bit.conf",
-			SubPath:   "fluent-bit.conf",
+			SubPath:   BaseConfigName,
 		})
 		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
 			v = append(v, corev1.VolumeMount{
 				Name:      "config",
 				MountPath: "/fluent-bit/etc/upstream.conf",
-				SubPath:   "upstream.conf",
+				SubPath:   UpstreamConfigName,
 			})
 		}
 	} else {
@@ -209,8 +211,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 					SecretName: r.Logging.QualifiedName(fluentBitSecretConfigName),
 					Items: []corev1.KeyToPath{
 						{
-							Key:  "fluent-bit.conf",
-							Path: "fluent-bit.conf",
+							Key:  BaseConfigName,
+							Path: BaseConfigName,
 						},
 					},
 				},
