@@ -118,3 +118,39 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
+
+func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState, error) {
+	desired := &corev1.Service{
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-headless", ComponentFluentd),
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "tcp-fluentd",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       24240,
+					TargetPort: intstr.IntOrString{IntVal: 24240},
+				},
+				{
+					Name:       "udp-fluentd",
+					Protocol:   corev1.ProtocolUDP,
+					Port:       24240,
+					TargetPort: intstr.IntOrString{IntVal: 24240},
+				},
+			},
+			Selector:  r.getFluentdLabels(ComponentFluentd),
+			Type:      corev1.ServiceTypeClusterIP,
+			ClusterIP: corev1.ClusterIPNone,
+		},
+	}
+
+	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
+		if s, ok := current.(*corev1.Service); ok {
+			desired.Spec.ClusterIP = s.Spec.ClusterIP
+		} else {
+			return errors.Errorf("failed to cast service object %+v", current)
+		}
+		return nil
+	})
+
+	return desired, beforeUpdateHook, nil
+}
