@@ -32,6 +32,17 @@ type fluentbitInputConfig struct {
 	ParserN []string
 }
 
+type upstreamNode struct {
+	Name string
+	Host string
+	Port int
+}
+
+type upstream struct {
+	Name  string
+	Nodes []upstreamNode
+}
+
 type fluentBitConfig struct {
 	Namespace string
 	TLS       struct {
@@ -63,6 +74,10 @@ type fluentBitConfig struct {
 		KeepaliveIdleTimeoutSet bool
 		KeepaliveMaxRecycle     uint32
 		KeepaliveMaxRecycleSet  bool
+	}
+	Upstream struct {
+		Enabled bool
+		Config  upstream
 	}
 }
 
@@ -175,16 +190,35 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
+	if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+		input.Upstream.Enabled = true
+		input.Upstream.Config.Name = "fluentd-upstream"
+
+		for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, r.generateUpstreamNode(i))
+		}
+
+	}
+
 	r.desiredConfig, err = generateConfig(input)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
 	}
+	confs := map[string][]byte{
+		"fluent-bit.conf": []byte(r.desiredConfig),
+	}
+
+	if input.Upstream.Enabled {
+		upstreamConfig, err := generateUpstreamConfig(input)
+		if err != nil {
+			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate upstream config for fluentbit")
+		}
+		confs[UpstreamConfigName] = []byte(upstreamConfig)
+	}
 
 	return &corev1.Secret{
 		ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
-		Data: map[string][]byte{
-			"fluent-bit.conf": []byte(r.desiredConfig),
-		},
+		Data:       confs,
 	}, reconciler.StatePresent, nil
 }
 
@@ -200,4 +234,29 @@ func generateConfig(input fluentBitConfig) (string, error) {
 	}
 	outputString := output.String()
 	return outputString, nil
+}
+
+func generateUpstreamConfig(input fluentBitConfig) (string, error) {
+	output := new(bytes.Buffer)
+	tmpl, err := template.New("upstream").Parse(upstreamConfigTemplate)
+	if err != nil {
+		return "", err
+	}
+	err = tmpl.Execute(output, input.Upstream)
+	if err != nil {
+		return "", err
+	}
+	return output.String(), nil
+}
+
+func (r *Reconciler) generateUpstreamNode(index int) upstreamNode {
+	podName := r.Logging.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
+	return upstreamNode{
+		Name: podName,
+		Host: fmt.Sprintf("%s.%s.%s.svc.cluster.local",
+			podName,
+			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
+			r.Logging.Spec.ControlNamespace),
+		Port: 24240,
+	}
 }

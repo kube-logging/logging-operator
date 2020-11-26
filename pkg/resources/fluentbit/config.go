@@ -14,6 +14,8 @@
 
 package fluentbit
 
+const UpstreamConfigName = "upstream.conf"
+
 var fluentBitConfigTemplate = `
 [SERVICE]
     Flush        {{ .Flush }}
@@ -68,8 +70,12 @@ var fluentBitConfigTemplate = `
 [OUTPUT]
     Name          forward
     Match         *
+    {{- if .Upstream.Enabled }}
+    Upstream upstream.conf
+    {{- else }}
     Host          {{ .TargetHost }}
     Port          {{ .TargetPort }}
+    {{- end }}
     {{ if .TLS.Enabled }}
     tls           On
     tls.verify    Off
@@ -95,4 +101,15 @@ var fluentBitConfigTemplate = `
     net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
     {{- end }}
     Retry_Limit   False
+`
+
+var upstreamConfigTemplate = `
+[UPSTREAM]
+    Name {{ .Config.Name }}
+{{- range $idx, $element:= .Config.Nodes}}
+[NODE]
+    Name {{.Name}}
+    Host {{.Host}}
+    Port {{.Port}}
+{{- end}}
 `

@@ -75,6 +75,7 @@ type FluentbitSpec struct {
 	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
 	Network              *FluentbitNetwork       `json:"network,omitempty"`
+	EnableUpstream       bool                    `json:"enableUpstream,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

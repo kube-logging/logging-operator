@@ -100,6 +100,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup},
 			},
 		},
+		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 	}
 }
 
