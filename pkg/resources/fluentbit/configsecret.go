@@ -197,7 +197,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
 			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 		}
-
 	}
 
 	r.desiredConfig, err = generateConfig(input)
