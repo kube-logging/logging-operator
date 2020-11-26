@@ -216,6 +216,22 @@ type FilterKubernetes struct {
 type FilterAws struct {
 	// Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default).
 	ImdsVersion string `json:"imds_version,omitempty" plugin:"default:v2"`
+	// The availability zone (default:true).
+	AZ *bool `json:"az,omitempty" plugin:"default:true"`
+	// The EC2 instance ID. (default:true)
+	Ec2InstanceID *bool `json:"ec2_instance_id,omitempty" plugin:"default:true"`
+	// The EC2 instance type. (default:false)
+	Ec2InstanceType *bool `json:"ec2_instance_type,omitempty" plugin:"default:false"`
+	// The EC2 instance private ip. (default:false)
+	PrivateIP *bool `json:"private_ip,omitempty" plugin:"default:false"`
+	// The EC2 instance image id. (default:false)
+	AmiID *bool `json:"ami_id,omitempty" plugin:"default:false"`
+	// The account ID for current EC2 instance. (default:false)
+	AccountID *bool `json:"account_id,omitempty" plugin:"default:false"`
+	// The hostname for current EC2 instance. (default:false)
+	Hostname *bool `json:"hostname,omitempty" plugin:"default:false"`
+	// The VPC ID for current EC2 instance. (default:false)
+	VpcID *bool `json:"vpc_id,omitempty" plugin:"default:false"`
 	// Match filtered records (default:*)
 	Match string `json:"Match,omitempty" plugin:"default:*"`
 }
