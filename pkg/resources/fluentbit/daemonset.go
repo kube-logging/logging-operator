@@ -79,6 +79,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 						RunAsUser:    r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
 						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 					},
+					ImagePullSecrets: r.Logging.Spec.FluentbitSpec.Image.ImagePullSecrets,
 					Containers: []corev1.Container{
 						{
 							Name:            containerName,

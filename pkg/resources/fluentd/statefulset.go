@@ -85,6 +85,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				Volumes:            r.generateVolume(),
 				ServiceAccountName: r.getServiceAccount(),
 				InitContainers:     initContainers,
+				ImagePullSecrets:   r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
 				Containers: []corev1.Container{
 					*r.fluentContainer(),
 					*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),

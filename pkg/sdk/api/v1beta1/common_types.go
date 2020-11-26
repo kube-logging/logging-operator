@@ -34,9 +34,10 @@ const (
 
 // ImageSpec struct hold information about image specification
 type ImageSpec struct {
-	Repository string `json:"repository,omitempty"`
-	Tag        string `json:"tag,omitempty"`
-	PullPolicy string `json:"pullPolicy,omitempty"`
+	Repository       string                        `json:"Repository,omitempty"`
+	Tag              string                        `json:"tag,omitempty"`
+	PullPolicy       string                        `json:"pullPolicy,omitempty"`
+	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 }
 
 // Metrics defines the service monitor endpoints
