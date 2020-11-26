@@ -367,6 +367,35 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
 			l.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
 		}
+		if l.Spec.FluentbitSpec.FilterAws != nil {
+			if l.Spec.FluentbitSpec.FilterAws.ImdsVersion == "" {
+				l.Spec.FluentbitSpec.FilterAws.ImdsVersion = "v2"
+			}
+			if l.Spec.FluentbitSpec.FilterAws.AZ == nil {
+				l.Spec.FluentbitSpec.FilterAws.AZ = util.BoolPointer(true)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.Ec2InstanceID == nil {
+				l.Spec.FluentbitSpec.FilterAws.Ec2InstanceID = util.BoolPointer(true)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.Ec2InstanceType == nil {
+				l.Spec.FluentbitSpec.FilterAws.Ec2InstanceType = util.BoolPointer(false)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.PrivateIP == nil {
+				l.Spec.FluentbitSpec.FilterAws.PrivateIP = util.BoolPointer(false)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.AmiID == nil {
+				l.Spec.FluentbitSpec.FilterAws.AmiID = util.BoolPointer(false)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.AccountID == nil {
+				l.Spec.FluentbitSpec.FilterAws.AccountID = util.BoolPointer(false)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.Hostname == nil {
+				l.Spec.FluentbitSpec.FilterAws.Hostname = util.BoolPointer(false)
+			}
+			if l.Spec.FluentbitSpec.FilterAws.VpcID == nil {
+				l.Spec.FluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
+			}
+		}
 	}
 	return nil
 }
