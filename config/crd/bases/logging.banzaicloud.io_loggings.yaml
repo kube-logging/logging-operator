@@ -1035,9 +1035,16 @@ spec:
                   type: integer
                 image:
                   properties:
-                    pullPolicy:
+                    Repository:
                       type: string
-                    repository:
+                    imagePullSecrets:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    pullPolicy:
                       type: string
                     tag:
                       type: string
@@ -2069,9 +2076,16 @@ spec:
                   type: object
                 configReloaderImage:
                   properties:
-                    pullPolicy:
+                    Repository:
                       type: string
-                    repository:
+                    imagePullSecrets:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    pullPolicy:
                       type: string
                     tag:
                       type: string
@@ -2264,9 +2278,16 @@ spec:
                   type: object
                 image:
                   properties:
-                    pullPolicy:
+                    Repository:
                       type: string
-                    repository:
+                    imagePullSecrets:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    pullPolicy:
                       type: string
                     tag:
                       type: string
@@ -2664,9 +2685,16 @@ spec:
                   type: array
                 volumeModImage:
                   properties:
-                    pullPolicy:
+                    Repository:
                       type: string
-                    repository:
+                    imagePullSecrets:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    pullPolicy:
                       type: string
                     tag:
                       type: string
