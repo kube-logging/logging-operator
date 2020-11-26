@@ -8,6 +8,15 @@ metadata:
   creationTimestamp: null
   name: outputs.logging.banzaicloud.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.active
+    description: Is the output active?
+    name: Active
+    type: boolean
+  - JSONPath: .status.problemsCount
+    description: Number of problems
+    name: Problems
+    type: integer
   group: logging.banzaicloud.io
   names:
     categories:
@@ -4359,6 +4368,8 @@ spec:
               items:
                 type: string
               type: array
+            problemsCount:
+              type: integer
           type: object
       type: object
   version: v1beta1

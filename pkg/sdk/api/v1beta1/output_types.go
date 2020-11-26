@@ -56,13 +56,16 @@ type OutputSpec struct {
 
 // OutputStatus defines the observed state of Output
 type OutputStatus struct {
-	Active   bool     `json:"active,omitempty"`
-	Problems []string `json:"problems,omitempty"`
+	Active        *bool    `json:"active,omitempty"`
+	Problems      []string `json:"problems,omitempty"`
+	ProblemsCount int      `json:"problemsCount,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the output active?"
+// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 
 // Output is the Schema for the outputs API
 type Output struct {
