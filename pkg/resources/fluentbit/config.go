@@ -14,6 +14,7 @@
 
 package fluentbit
 
+const BaseConfigName = "fluent-bit.conf"
 const UpstreamConfigName = "upstream.conf"
 
 var fluentBitConfigTemplate = `
