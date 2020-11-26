@@ -16,10 +16,12 @@ package fluentbit
 
 var fluentBitConfigTemplate = `
 [SERVICE]
-    Flush        1
+    Flush        {{ .Flush }}
+    Grace        {{ .Grace }}
     Daemon       Off
-    Log_Level    info
+    Log_Level    {{ .LogLevel }}
     Parsers_File parsers.conf
+    Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
     HTTP_Listen  0.0.0.0

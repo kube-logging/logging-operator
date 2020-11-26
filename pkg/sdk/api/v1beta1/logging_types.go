@@ -273,6 +273,18 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.Image.PullPolicy == "" {
 			l.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"
 		}
+		if l.Spec.FluentbitSpec.Flush == 0 {
+			l.Spec.FluentbitSpec.Flush = 1
+		}
+		if l.Spec.FluentbitSpec.Grace == 0 {
+			l.Spec.FluentbitSpec.Grace = 5
+		}
+		if l.Spec.FluentbitSpec.LogLevel == "" {
+			l.Spec.FluentbitSpec.LogLevel = "info"
+		}
+		if l.Spec.FluentbitSpec.CoroStackSize == 0 {
+			l.Spec.FluentbitSpec.CoroStackSize = 24576
+		}
 		if l.Spec.FluentbitSpec.Resources.Limits == nil {
 			l.Spec.FluentbitSpec.Resources.Limits = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("100M"),

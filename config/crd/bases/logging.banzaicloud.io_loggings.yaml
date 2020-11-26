@@ -934,6 +934,9 @@ spec:
                           type: object
                       type: object
                   type: object
+                coroStackSize:
+                  format: int32
+                  type: integer
                 customConfigSecret:
                   type: string
                 extraVolumeMounts:
@@ -1022,6 +1025,12 @@ spec:
                     tls.verify:
                       type: string
                   type: object
+                flush:
+                  format: int32
+                  type: integer
+                grace:
+                  format: int32
+                  type: integer
                 image:
                   properties:
                     pullPolicy:
@@ -1153,6 +1162,8 @@ spec:
                       format: int32
                       type: integer
                   type: object
+                logLevel:
+                  type: string
                 metrics:
                   properties:
                     interval:
