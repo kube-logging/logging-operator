@@ -43,6 +43,10 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
+	Flush            int32
+	Grace            int32
+	LogLevel         string
+	CoroStackSize    int32
 	Output           map[string]string
 	TargetHost       string
 	TargetPort       int32
@@ -116,7 +120,11 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	input := fluentBitConfig{
-		Namespace: r.Logging.Spec.ControlNamespace,
+		Flush:         r.Logging.Spec.FluentbitSpec.Flush,
+		Grace:         r.Logging.Spec.FluentbitSpec.Grace,
+		LogLevel:      r.Logging.Spec.FluentbitSpec.LogLevel,
+		CoroStackSize: r.Logging.Spec.FluentbitSpec.CoroStackSize,
+		Namespace:     r.Logging.Spec.ControlNamespace,
 		TLS: struct {
 			Enabled   bool
 			SharedKey string
