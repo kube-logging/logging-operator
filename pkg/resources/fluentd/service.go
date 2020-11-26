@@ -142,15 +142,5 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 			ClusterIP: corev1.ClusterIPNone,
 		},
 	}
-
-	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
-		if s, ok := current.(*corev1.Service); ok {
-			desired.Spec.ClusterIP = s.Spec.ClusterIP
-		} else {
-			return errors.Errorf("failed to cast service object %+v", current)
-		}
-		return nil
-	})
-
-	return desired, beforeUpdateHook, nil
+	return desired, reconciler.StatePresent, nil
 }
