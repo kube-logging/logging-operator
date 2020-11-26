@@ -145,6 +145,13 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/fluent-bit/etc/fluent-bit.conf",
 			SubPath:   "fluent-bit.conf",
 		})
+		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+			v = append(v, corev1.VolumeMount{
+				Name:      "config",
+				MountPath: "/fluent-bit/etc/upstream.conf",
+				SubPath:   "upstream.conf",
+			})
+		}
 	} else {
 		v = append(v, corev1.VolumeMount{
 			Name:      "config",
@@ -195,7 +202,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	}
 
 	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
-		v = append(v, corev1.Volume{
+		volume := corev1.Volume{
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -208,7 +215,14 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 					},
 				},
 			},
-		})
+		}
+		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+			volume.VolumeSource.Secret.Items = append(volume.VolumeSource.Secret.Items, corev1.KeyToPath{
+				Key:  UpstreamConfigName,
+				Path: UpstreamConfigName,
+			})
+		}
+		v = append(v, volume)
 	} else {
 		v = append(v, corev1.Volume{
 			Name: "config",

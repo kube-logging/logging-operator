@@ -207,6 +207,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.appconfigMap,
 		r.statefulset,
 		r.service,
+		r.headlessService,
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
 	} {
