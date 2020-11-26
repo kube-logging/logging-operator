@@ -67,7 +67,7 @@ type DesiredObject struct {
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
-	desiredConfig string
+	configs map[string][]byte
 }
 
 // NewReconciler creates a new Fluentbit reconciler
