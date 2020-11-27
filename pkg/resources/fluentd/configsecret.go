@@ -32,7 +32,9 @@ type fluentdConfig struct {
 		Port    int32
 		Path    string
 	}
-	Workers int32
+	IgnoreSameLogInterval     string
+	IgnoreRepeatedLogInterval string
+	Workers                   int32
 }
 
 func generateConfig(input fluentdConfig) (string, error) {
@@ -73,6 +75,12 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	} else {
 		input.Workers = 1
 	}
+	//if r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval != nil {
+	input.IgnoreSameLogInterval = r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval
+	//}
+	//if r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval != nil {
+	input.IgnoreRepeatedLogInterval = r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval
+	//}
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
