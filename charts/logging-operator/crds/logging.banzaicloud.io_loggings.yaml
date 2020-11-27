@@ -1035,8 +1035,6 @@ spec:
                   type: integer
                 image:
                   properties:
-                    Repository:
-                      type: string
                     imagePullSecrets:
                       items:
                         properties:
@@ -1045,6 +1043,8 @@ spec:
                         type: object
                       type: array
                     pullPolicy:
+                      type: string
+                    repository:
                       type: string
                     tag:
                       type: string
@@ -2076,8 +2076,6 @@ spec:
                   type: object
                 configReloaderImage:
                   properties:
-                    Repository:
-                      type: string
                     imagePullSecrets:
                       items:
                         properties:
@@ -2086,6 +2084,8 @@ spec:
                         type: object
                       type: array
                     pullPolicy:
+                      type: string
+                    repository:
                       type: string
                     tag:
                       type: string
@@ -2278,8 +2278,6 @@ spec:
                   type: object
                 image:
                   properties:
-                    Repository:
-                      type: string
                     imagePullSecrets:
                       items:
                         properties:
@@ -2288,6 +2286,8 @@ spec:
                         type: object
                       type: array
                     pullPolicy:
+                      type: string
+                    repository:
                       type: string
                     tag:
                       type: string
@@ -2685,8 +2685,6 @@ spec:
                   type: array
                 volumeModImage:
                   properties:
-                    Repository:
-                      type: string
                     imagePullSecrets:
                       items:
                         properties:
@@ -2695,6 +2693,8 @@ spec:
                         type: object
                       type: array
                     pullPolicy:
+                      type: string
+                    repository:
                       type: string
                     tag:
                       type: string
