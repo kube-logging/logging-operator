@@ -204,7 +204,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
 	}
 	confs := map[string][]byte{
-		"config":       []byte(conf), // backward compatibility
 		BaseConfigName: []byte(conf),
 	}
 
