@@ -2276,6 +2276,10 @@ spec:
                           type: string
                       type: object
                   type: object
+                ignoreRepeatedLogInterval:
+                  type: string
+                ignoreSameLogInterval:
+                  type: string
                 image:
                   properties:
                     imagePullSecrets:

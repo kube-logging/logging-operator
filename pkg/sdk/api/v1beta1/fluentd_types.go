@@ -60,8 +60,14 @@ type FluentdSpec struct {
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
 	Workers              int32                       `json:"workers,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
-	LogLevel             string `json:"logLevel,omitempty"`
-	PodPriorityClassName string `json:"podPriorityClassName,omitempty"`
+	LogLevel string `json:"logLevel,omitempty"`
+	// Ignore same log lines
+	// +docLink:"more info, https://docs.fluentd.org/deployment/logging#ignore_same_log_interval"
+	IgnoreSameLogInterval string `json:"ignoreSameLogInterval,omitempty"`
+	// Ignore repeated log lines
+	// +docLink:"more info, https://docs.fluentd.org/deployment/logging#ignore_repeated_log_interval"
+	IgnoreRepeatedLogInterval string `json:"ignoreRepeatedLogInterval,omitempty"`
+	PodPriorityClassName      string `json:"podPriorityClassName,omitempty"`
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
