@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"io"
 	"sort"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
 )
 
 type FluentConfig interface {
@@ -68,7 +70,7 @@ func (f *Flow) GetParams() map[string]string {
 }
 
 func (f *Flow) GetSections() []Directive {
-	sections := []Directive{}
+	var sections []Directive
 	for _, filter := range f.Filters {
 		sections = append(sections, filter)
 	}
@@ -128,12 +130,8 @@ func calculateFlowLabel(matches []FlowMatch, name, namespace string) (string, er
 			}
 		}
 		// Make sure the generated label is consistent
-		keys := []string{}
-		for k := range match.Labels {
-			keys = append(keys, k)
-		}
+		keys := mapstrstr.Keys(match.Labels)
 		sort.Strings(keys)
-
 		for _, k := range keys {
 			if _, err := io.WriteString(b, k); err != nil {
 				return "", err
