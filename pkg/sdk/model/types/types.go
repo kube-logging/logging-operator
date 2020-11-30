@@ -146,14 +146,7 @@ func (p PluginParams) Equals(target PluginParams) error {
 	return nil
 }
 
-type Params map[string]string
-
-func (p Params) Merge(input map[string]string) Params {
-	for k, v := range input {
-		p[k] = v
-	}
-	return p
-}
+type Params = map[string]string
 
 func NewFlatDirective(meta PluginMeta, config interface{}, secretLoader secret.SecretLoader) (Directive, error) {
 	directive := &GenericDirective{

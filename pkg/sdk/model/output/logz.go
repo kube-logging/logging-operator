@@ -17,8 +17,10 @@ package output
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
 // +name:"LogZ"
@@ -142,7 +144,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	}
 
 	// add endpoint_url to parameters
-	logz.Params.Merge(map[string]string{"endpoint_url": connectionString})
+	logz.Params = mapstrstr.MergeInto(logz.Params, map[string]string{"endpoint_url": connectionString})
 
 	// logz.Params = params
 	if e.Buffer != nil {

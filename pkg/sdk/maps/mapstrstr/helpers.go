@@ -22,3 +22,15 @@ func Keys(m map[string]string) []string {
 	}
 	return keys
 }
+
+func MergeInto(dst, src map[string]string) map[string]string {
+	if len(src) > 0 {
+		if dst == nil {
+			dst = make(map[string]string)
+		}
+		for k, v := range src {
+			dst[k] = v
+		}
+	}
+	return dst
+}
