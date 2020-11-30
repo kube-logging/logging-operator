@@ -17,12 +17,15 @@ package controllers_test
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"emperror.dev/errors"
+	"github.com/MakeNowJust/heredoc"
+	"github.com/andreyvit/diff"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
@@ -533,6 +536,96 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.OutputSecretName), outputSecret)()
 
 	g.Expect(outputSecret.Data).Should(gomega.HaveKeyWithValue(secretKey, []byte("topsecretdata")))
+}
+
+func TestMultiProcessWorker(t *testing.T) {
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec: &v1beta1.FluentdSpec{
+				Workers: 2,
+				RootDir: "/var/log/testing-testing",
+			},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			FileOutput: &output.FileOutputConfig{
+				Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
+				Append: true,
+				Buffer: &output.Buffer{
+					Timekey:       "1m",
+					TimekeyWait:   "30s",
+					TimekeyUseUtc: true,
+					Path:          "asd",
+				},
+			},
+		},
+	}
+	flow := &v1beta1.Flow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.FlowSpec{
+			Selectors: map[string]string{
+				"a": "b",
+			},
+			LocalOutputRefs: []string{
+				"test-output",
+			},
+		},
+	}
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	{
+		var secret corev1.Secret
+		defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.SecretConfigName), &secret)()
+
+		expected := heredoc.Docf(`
+		# Enable RPC endpoint (this allows to trigger config reload without restart)
+		<system>
+		  rpc_endpoint 127.0.0.1:24444
+		  log_level info
+		  workers 2
+		  root_dir %s
+		</system>
+
+		# Prometheus monitoring
+		`, logging.Spec.FluentdSpec.RootDir)
+
+		if e, a := diff.TrimLinesInString(expected), diff.TrimLinesInString(string(secret.Data["input.conf"])); e != a {
+			t.Errorf("input.conf does not match (-actual vs +expected):\n%s\nActual:\n%s", diff.LineDiff(a, e), a)
+		}
+	}
+
+	{
+		var secret corev1.Secret
+		defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), &secret)()
+
+		config := string(secret.Data[fluentd.AppConfigKey])
+		t.Logf("%s:\n%s", fluentd.AppConfigKey, config)
+		matches := regexp.MustCompile(`[ \t]*<buffer[^>]*>((?s:.*))</buffer>`).FindAllString(config, -1)
+		pathRegexp := regexp.MustCompile(`[ \t]*path[ \t]+.*`)
+		for _, match := range matches {
+			if pathRegexp.MatchString(match) {
+				t.Errorf("Config shouldn't contain buffer directive with path parameter. Buffer:\n%s", match)
+			}
+		}
+	}
 }
 
 // TODO add following tests:
