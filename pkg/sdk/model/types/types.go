@@ -60,7 +60,6 @@ func Value(value string) *PluginParam {
 
 type OutputPlugin struct {
 	PluginMeta
-	Output
 	Params        Params
 	SubDirectives []Directive
 }
