@@ -59,6 +59,7 @@ type FluentdSpec struct {
 	Security             *Security                   `json:"security,omitempty"`
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
 	Workers              int32                       `json:"workers,omitempty"`
+	RootDir              string                      `json:"rootDir,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel string `json:"logLevel,omitempty"`
 	// Ignore same log lines
