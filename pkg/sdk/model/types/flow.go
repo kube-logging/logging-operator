@@ -65,7 +65,7 @@ func (f *Flow) GetPluginMeta() *PluginMeta {
 	return &f.PluginMeta
 }
 
-func (f *Flow) GetParams() map[string]string {
+func (f *Flow) GetParams() Params {
 	return nil
 }
 

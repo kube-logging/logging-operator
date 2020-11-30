@@ -19,14 +19,15 @@ import (
 	"strconv"
 
 	"emperror.dev/errors"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/go-logr/logr"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/go-logr/logr"
 )
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
@@ -58,7 +59,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		return nil, errors.WrapIf(err, "creating root input")
 	}
 
-	router := types.NewRouter("main", map[string]string{
+	router := types.NewRouter("main", types.Params{
 		"metrics": strconv.FormatBool(logging.Spec.FluentdSpec.Metrics != nil),
 	})
 
