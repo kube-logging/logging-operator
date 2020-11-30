@@ -1030,6 +1030,19 @@ spec:
                 flush:
                   format: int32
                   type: integer
+                forwardOptions:
+                  properties:
+                    Require_ack_response:
+                      type: boolean
+                    Retry_Limit:
+                      type: string
+                    Send_options:
+                      type: boolean
+                    Tag:
+                      type: string
+                    Time_as_Integer:
+                      type: boolean
+                  type: object
                 grace:
                   format: int32
                   type: integer

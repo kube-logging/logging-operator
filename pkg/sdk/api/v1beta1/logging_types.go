@@ -408,6 +408,12 @@ func (l *Logging) SetDefaults() error {
 				l.Spec.FluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
 			}
 		}
+		if l.Spec.FluentbitSpec.ForwardOptions == nil {
+			l.Spec.FluentbitSpec.ForwardOptions = &ForwardOptions{}
+		}
+		if l.Spec.FluentbitSpec.ForwardOptions.RetryLimit == "" {
+			l.Spec.FluentbitSpec.ForwardOptions.RetryLimit = "False"
+		}
 	}
 	return nil
 }

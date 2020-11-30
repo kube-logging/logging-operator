@@ -75,7 +75,8 @@ type fluentBitConfig struct {
 		KeepaliveMaxRecycle     uint32
 		KeepaliveMaxRecycleSet  bool
 	}
-	Upstream struct {
+	ForwardOptions map[string]string
+	Upstream       struct {
 		Enabled bool
 		Config  upstream
 	}
@@ -166,6 +167,13 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	if r.Logging.Spec.FluentbitSpec.TargetPort != 0 {
 		input.TargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
+	}
+	if r.Logging.Spec.FluentbitSpec.ForwardOptions != nil {
+		forwardOptions, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.ForwardOptions)
+		if err != nil {
+			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map forwardOptions for fluentbit")
+		}
+		input.ForwardOptions = forwardOptions
 	}
 
 	if r.Logging.Spec.FluentbitSpec.Network != nil {
