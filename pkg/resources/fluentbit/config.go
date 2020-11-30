@@ -41,12 +41,12 @@ var fluentBitConfigTemplate = `
     {{- range $key, $value := .Input.Values }}
     {{- if $value }}
     {{ $key }}  {{$value}}
- 	{{- end }}
+    {{- end }}
     {{- end }}
     {{- range $id, $v := .Input.ParserN }}
     {{- if $v }}
     Parse_{{ $id}} {{$v}}
-	{{- end }}
+    {{- end }}
     {{- end }}
 
 [FILTER]
@@ -55,8 +55,8 @@ var fluentBitConfigTemplate = `
     {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
-		{{- end }}
-		
+    {{- end }}
+
 {{- if .AwsFilter }}
 
 [FILTER]
@@ -65,7 +65,7 @@ var fluentBitConfigTemplate = `
     {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
-		{{- end }}
+    {{- end }}
 {{- end}}
 
 [OUTPUT]
@@ -83,9 +83,9 @@ var fluentBitConfigTemplate = `
     tls.ca_file   /fluent-bit/tls/ca.crt
     tls.crt_file  /fluent-bit/tls/tls.crt
     tls.key_file  /fluent-bit/tls/tls.key
-	{{- if .TLS.SharedKey }}
+    {{- if .TLS.SharedKey }}
     Shared_Key    {{ .TLS.SharedKey }}
-	{{- else }}
+    {{- else }}
     Empty_Shared_Key true
     {{- end }}
     {{- end }}
@@ -101,7 +101,13 @@ var fluentBitConfigTemplate = `
     {{- if .Network.KeepaliveMaxRecycleSet  }}
     net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
     {{- end }}
-    Retry_Limit   False
+    {{- if .ForwardOptions }}
+    {{- range $key, $value := .ForwardOptions }}
+    {{- if $value }}
+    {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 `
 
 var upstreamConfigTemplate = `

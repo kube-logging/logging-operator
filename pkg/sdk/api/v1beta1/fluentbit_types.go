@@ -75,6 +75,7 @@ type FluentbitSpec struct {
 	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
 	Network              *FluentbitNetwork       `json:"network,omitempty"`
+	ForwardOptions       *ForwardOptions         `json:"forwardOptions,omitempty"`
 	EnableUpstream       bool                    `json:"enableUpstream,omitempty"`
 }
 
@@ -256,4 +257,13 @@ type VolumeMount struct {
 	Destination string `json:"destination"`
 	// Mount Mode
 	ReadOnly bool `json:"readOnly,omitempty"`
+}
+
+// ForwardOptions defines custom forward output plugin options, see https://docs.fluentbit.io/manual/pipeline/outputs/forward
+type ForwardOptions struct {
+	TimeAsInteger      bool   `json:"Time_as_Integer,omitempty"`
+	SendOptions        bool   `json:"Send_options,omitempty"`
+	RequireAckResponse bool   `json:"Require_ack_response,omitempty"`
+	Tag                string `json:"Tag,omitempty"`
+	RetryLimit         string `json:"Retry_Limit,omitempty"`
 }
