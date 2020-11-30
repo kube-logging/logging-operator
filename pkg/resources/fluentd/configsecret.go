@@ -35,6 +35,7 @@ type fluentdConfig struct {
 	IgnoreSameLogInterval     string
 	IgnoreRepeatedLogInterval string
 	Workers                   int32
+	RootDir                   string
 }
 
 func generateConfig(input fluentdConfig) (string, error) {
@@ -52,11 +53,8 @@ func generateConfig(input fluentdConfig) (string, error) {
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
-	input := fluentdConfig{Monitor: struct {
-		Enabled bool
-		Port    int32
-		Path    string
-	}{},
+	input := fluentdConfig{
+		RootDir: r.Logging.Spec.FluentdSpec.RootDir,
 	}
 
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
