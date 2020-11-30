@@ -144,7 +144,7 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	}
 
 	// add endpoint_url to parameters
-	logz.Params = mapstrstr.MergeInto(logz.Params, map[string]string{"endpoint_url": connectionString})
+	logz.Params = mapstrstr.MergeInto(logz.Params, types.Params{"endpoint_url": connectionString})
 
 	// logz.Params = params
 	if e.Buffer != nil {

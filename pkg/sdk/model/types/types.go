@@ -36,7 +36,7 @@ func GetLogKey() string {
 
 type Directive interface {
 	GetPluginMeta() *PluginMeta
-	GetParams() map[string]string
+	GetParams() Params
 	GetSections() []Directive
 }
 
@@ -68,7 +68,7 @@ func (s *OutputPlugin) GetPluginMeta() *PluginMeta {
 	return &s.PluginMeta
 }
 
-func (s *OutputPlugin) GetParams() map[string]string {
+func (s *OutputPlugin) GetParams() Params {
 	return s.Params
 }
 
@@ -87,15 +87,15 @@ type PluginMeta struct {
 
 type GenericDirective struct {
 	PluginMeta
-	Params        map[string]string `json:"params,omitempty"`
-	SubDirectives []Directive       `json:"sections,omitempty"`
+	Params        Params      `json:"params,omitempty"`
+	SubDirectives []Directive `json:"sections,omitempty"`
 }
 
 func (d *GenericDirective) GetPluginMeta() *PluginMeta {
 	return &d.PluginMeta
 }
 
-func (d *GenericDirective) GetParams() map[string]string {
+func (d *GenericDirective) GetParams() Params {
 	return d.Params
 }
 
