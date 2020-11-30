@@ -27,6 +27,9 @@ var fluentdInputTemplate = `
   rpc_endpoint 127.0.0.1:24444
   log_level {{ .LogLevel }}
   workers {{ .Workers }}
+{{- if .RootDir }}
+  root_dir {{ .RootDir }}
+{{- end }}
 {{- if .IgnoreRepeatedLogInterval }}
   ignore_repeated_log_interval {{ .IgnoreRepeatedLogInterval }}
 {{- end }}

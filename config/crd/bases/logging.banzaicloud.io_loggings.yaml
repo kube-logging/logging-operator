@@ -2536,6 +2536,8 @@ spec:
                         type: string
                       type: object
                   type: object
+                rootDir:
+                  type: string
                 scaling:
                   properties:
                     podManagementPolicy:
