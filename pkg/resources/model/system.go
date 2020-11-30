@@ -104,7 +104,26 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		logger.Info("no flows found, generating empty model")
 	}
 
+	// TODO: wow such hack
+	if logging.Spec.FluentdSpec.Workers > 1 {
+		for _, flow := range system.Flows {
+			for _, output := range flow.Outputs {
+				unsetBufferPath(output)
+			}
+		}
+	}
+
 	return system, err
+}
+
+func unsetBufferPath(directive types.Directive) {
+	if gd, _ := directive.(*types.GenericDirective); gd != nil && gd.Directive == "buffer" {
+		delete(gd.Params, "path")
+		return
+	}
+	for _, d := range directive.GetSections() {
+		unsetBufferPath(d)
+	}
 }
 
 type SecretLoaderFactory interface {
