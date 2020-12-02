@@ -16,10 +16,11 @@ package types
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"strings"
 
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
 )
 
 // OutputPlugin plugin: https://github.com/banzaicloud/fluent-plugin-label-router
@@ -74,7 +75,9 @@ func (f FlowMatch) GetParams() map[string]string {
 	}
 	if len(f.Labels) > 0 {
 		var sb []string
-		for _, key := range util.OrderedStringMap(f.Labels).Keys() {
+		keys := mapstrstr.Keys(f.Labels)
+		sort.Strings(keys)
+		for _, key := range keys {
 			sb = append(sb, key+":"+f.Labels[key])
 		}
 		params["labels"] = strings.Join(sb, ",")
