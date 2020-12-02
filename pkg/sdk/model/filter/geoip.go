@@ -105,13 +105,11 @@ func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.
 	} else {
 		geoIP.Params = params
 	}
-	if len(g.Records) > 0 {
-		for _, record := range g.Records {
-			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				geoIP.SubDirectives = append(geoIP.SubDirectives, meta)
-			}
+	for _, record := range g.Records {
+		if meta, err := record.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			geoIP.SubDirectives = append(geoIP.SubDirectives, meta)
 		}
 	}
 	return geoIP, nil

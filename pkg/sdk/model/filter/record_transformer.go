@@ -111,13 +111,11 @@ func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader, id str
 	} else {
 		recordTransformer.Params = params
 	}
-	if len(r.Records) > 0 {
-		for _, record := range r.Records {
-			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)
-			}
+	for _, record := range r.Records {
+		if meta, err := record.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)
 		}
 	}
 	return recordTransformer, nil
