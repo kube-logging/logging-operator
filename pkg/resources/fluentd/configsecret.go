@@ -53,7 +53,9 @@ func generateConfig(input fluentdConfig) (string, error) {
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
 	input := fluentdConfig{
-		RootDir: r.Logging.Spec.FluentdSpec.RootDir,
+		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
+		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
+		RootDir:                   r.Logging.Spec.FluentdSpec.RootDir,
 	}
 
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
@@ -71,9 +73,6 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	if input.Workers <= 0 {
 		input.Workers = 1
 	}
-
-	input.IgnoreSameLogInterval = r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval
-	input.IgnoreRepeatedLogInterval = r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
