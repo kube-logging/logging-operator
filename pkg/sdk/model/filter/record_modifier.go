@@ -114,22 +114,18 @@ func (r *RecordModifier) ToDirective(secretLoader secret.SecretLoader, id string
 	} else {
 		recordModifier.Params = params
 	}
-	if len(r.Replaces) > 0 {
-		for _, replace := range r.Replaces {
-			if meta, err := replace.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				recordModifier.SubDirectives = append(recordModifier.SubDirectives, meta)
-			}
+	for _, replace := range r.Replaces {
+		if meta, err := replace.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			recordModifier.SubDirectives = append(recordModifier.SubDirectives, meta)
 		}
 	}
-	if len(r.Records) > 0 {
-		for _, record := range r.Records {
-			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				recordModifier.SubDirectives = append(recordModifier.SubDirectives, meta)
-			}
+	for _, record := range r.Records {
+		if meta, err := record.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			recordModifier.SubDirectives = append(recordModifier.SubDirectives, meta)
 		}
 	}
 	return recordModifier, nil

@@ -162,13 +162,11 @@ func (p *PrometheusConfig) ToDirective(secretLoader secret.SecretLoader, id stri
 
 	prometheusConfig := p.DeepCopy()
 
-	if len(p.Metrics) > 0 {
-		for _, metrics := range p.Metrics {
-			if meta, err := metrics.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				prometheus.SubDirectives = append(prometheus.SubDirectives, meta)
-			}
+	for _, metrics := range p.Metrics {
+		if meta, err := metrics.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			prometheus.SubDirectives = append(prometheus.SubDirectives, meta)
 		}
 	}
 
