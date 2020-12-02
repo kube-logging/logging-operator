@@ -71,12 +71,9 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	if input.Workers <= 0 {
 		input.Workers = 1
 	}
-	//if r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval != nil {
+
 	input.IgnoreSameLogInterval = r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval
-	//}
-	//if r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval != nil {
 	input.IgnoreRepeatedLogInterval = r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval
-	//}
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
