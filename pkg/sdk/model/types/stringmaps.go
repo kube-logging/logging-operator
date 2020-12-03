@@ -60,140 +60,125 @@ func (s *StructToStringMapper) fillMap(value reflect.Value, out map[string]strin
 
 	fields := s.structFields(value)
 
-	var multierror error
+	var errs error
 	for _, field := range fields {
-		name := field.Name
-		val := value.FieldByName(name)
-		var finalVal string
+		errs = errors.Append(errs, s.processField(field, value.FieldByIndex(field.Index), out))
+	}
+	return errs
+}
 
-		tagName, tagOpts := parseTagWithName(field.Tag.Get(s.TagName))
-		if tagName != "" {
-			name = tagName
+func (s *StructToStringMapper) processField(field reflect.StructField, value reflect.Value, out map[string]string) error {
+	name := field.Name
+
+	tagName, tagOpts := parseTagWithName(field.Tag.Get(s.TagName))
+	if tagName != "" {
+		name = tagName
+	}
+
+	pluginTagOpts := parseTag(field.Tag.Get(s.PluginTagName))
+	required := pluginTagOpts.Has("required")
+
+	if tagOpts.Has("omitempty") {
+		if required {
+			return errors.Errorf("tags for field %q are conflicting: required and omitempty cannot be set simultaneously", name)
 		}
-
-		pluginTagOpts := parseTag(field.Tag.Get(s.PluginTagName))
-		required := pluginTagOpts.Has("required")
-
-		if tagOpts.Has("omitempty") {
-			if pluginTagOpts.Has("required") {
-				multierror = errors.Combine(multierror, errors.Errorf(
-					"tags for field %s are conflicting: required and omitempty cannot be set simultaneously", name))
-				continue
+		if value.IsZero() {
+			if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
+				out[name] = def
 			}
-			if val.IsZero() {
-				if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
-					out[name] = def
-				}
-				continue
-			}
+			return nil
 		}
+	}
 
-		var v reflect.Value
-		if ok, converterName := pluginTagOpts.ValueForPrefix("converter:"); ok {
-			if hook, ok := s.ConversionHooks[converterName]; ok {
-				convertedValue, err := hook(val.Interface())
-				if err != nil {
-					multierror = errors.Combine(err, errors.Errorf(
-						"failed to convert field `%s` with converter %s", name, converterName))
-				} else {
-					v = reflect.ValueOf(convertedValue)
-				}
-			} else {
-				multierror = errors.Combine(multierror, errors.Errorf(
-					"unable to convert field `%s` as the specified converter `%s` is not registered", name, converterName))
-				continue
+	if ok, converterName := pluginTagOpts.ValueForPrefix("converter:"); ok {
+		if hook, ok := s.ConversionHooks[converterName]; ok {
+			convertedValue, err := hook(value.Interface())
+			if err != nil {
+				return errors.WrapIff(err, "failed to convert field %q with converter %q", name, converterName)
 			}
+			out[name] = convertedValue
+			return nil
 		} else {
-			v = reflect.ValueOf(val.Interface())
+			return errors.Errorf("unable to convert field %q as the specified converter %q is not registered", name, converterName)
 		}
+	}
 
-		if s.SecretLoader != nil {
-			if v.Kind() == reflect.Ptr && !v.IsNil() {
-				if secretItem, ok := val.Interface().(*secret.Secret); ok {
-					loadedSecret, err := s.SecretLoader.Load(secretItem)
-					if err != nil {
-						multierror = errors.Combine(multierror, errors.WrapIff(err, "failed to load secret for field %s", name))
-					}
-					if err == nil {
-						out[name] = loadedSecret
-					}
-					continue
-				}
+	if s.SecretLoader != nil {
+		if secretItem, _ := value.Interface().(*secret.Secret); secretItem != nil {
+			loadedSecret, err := s.SecretLoader.Load(secretItem)
+			if err != nil {
+				return errors.WrapIff(err, "failed to load secret for field %q", name)
+			}
+			out[name] = loadedSecret
+			return nil
+		}
+	}
+
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+
+	switch value.Kind() {
+	case reflect.String, reflect.Int, reflect.Bool:
+		val := fmt.Sprintf("%v", value.Interface())
+		if val == "" {
+			// check if default has been set and use it
+			if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
+				val = def
 			}
 		}
-
-		if v.Kind() == reflect.Ptr {
-			v = v.Elem()
+		// can't return an empty string when it's required
+		if val == "" && required {
+			return errors.Errorf("field %q is required", name)
 		}
-
-		// if the field is of string type and not empty, use it's value over the default
-		switch v.Kind() {
-		case reflect.String, reflect.Int, reflect.Bool:
-			stringVal := fmt.Sprintf("%v", v)
-			if stringVal != "" {
-				finalVal = stringVal
+		out[name] = val
+	case reflect.Slice:
+		switch actual := value.Interface().(type) {
+		case []string, []int:
+			if value.Len() > 0 {
+				b, err := json.Marshal(actual)
+				if err != nil {
+					return errors.WrapIff(err, "can't marshal field %q with value %v as json", name, actual)
+				}
+				out[name] = string(b)
 			} else {
-				// check if default has been set and use it
 				if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
-					finalVal = def
+					if _, ok := actual.([]string); ok {
+						def = strings.Join(strings.Split(def, ","), `","`)
+						if def != "" {
+							def = `"` + def + `"`
+						}
+					}
+					sliceStr := fmt.Sprintf("[%s]", def)
+					if _, ok := actual.([]string); !ok {
+						if err := json.Unmarshal([]byte(sliceStr), &actual); err != nil {
+							return errors.WrapIff(err, "can't unmarshal default value %q into field %q", sliceStr, name)
+						}
+					}
+					out[name] = sliceStr
 				}
 			}
-			// can't let to return an empty string when it's required
-			if finalVal == "" && required {
-				multierror = errors.Combine(multierror, errors.Errorf("field %s is required", name))
+		}
+	case reflect.Map:
+		if mapStringString, ok := value.Interface().(map[string]string); ok {
+			if len(mapStringString) > 0 {
+				b, err := json.Marshal(mapStringString)
+				if err != nil {
+					return errors.WrapIff(err, "can't marshal field %q with value %v as json", name, mapStringString)
+				}
+				out[name] = string(b)
 			} else {
-				out[name] = finalVal
-			}
-		case reflect.Slice:
-			switch actual := v.Interface().(type) {
-			case []string, []int:
-				if v.Len() > 0 {
-					b, err := json.Marshal(actual)
-					if err != nil {
-						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, actual), err)
+				if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
+					validate := map[string]string{}
+					if err := json.Unmarshal([]byte(def), &validate); err != nil {
+						return errors.WrapIff(err, "can't unmarshal default value %q into field %q", def, name)
 					}
-					out[name] = string(b)
-				} else {
-					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
-						if _, ok := actual.([]string); ok {
-							b, err := json.Marshal(strings.Split(def, ","))
-							if err != nil {
-								multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
-							} else {
-								out[name] = string(b)
-							}
-						} else {
-							sliceStr := fmt.Sprintf("[%s]", def)
-							if err := json.Unmarshal([]byte(sliceStr), &actual); err != nil {
-								multierror = errors.Combine(multierror, errors.Errorf("can't unmarshal field: %q value: %q", name, sliceStr), err)
-							} else {
-								out[name] = sliceStr
-							}
-						}
-					}
-				}
-			}
-		case reflect.Map:
-			if mapStringString, ok := v.Interface().(map[string]string); ok {
-				if len(mapStringString) > 0 {
-					b, err := json.Marshal(mapStringString)
-					if err != nil {
-						multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, mapStringString), err)
-					}
-					out[name] = string(b)
-				} else {
-					if ok, def := pluginTagOpts.ValueForPrefix("default:"); ok {
-						validate := map[string]string{}
-						if err := json.Unmarshal([]byte(def), &validate); err != nil {
-							multierror = errors.Combine(multierror, errors.Errorf("can't marshal field: %q value: %q as json", name, def), err)
-						}
-						out[name] = def
-					}
+					out[name] = def
 				}
 			}
 		}
 	}
-	return multierror
+	return nil
 }
 
 func strctVal(s interface{}) reflect.Value {
