@@ -58,23 +58,7 @@ func Value(value string) *PluginParam {
 	}
 }
 
-type OutputPlugin struct {
-	PluginMeta
-	Params        Params
-	SubDirectives []Directive
-}
-
-func (s *OutputPlugin) GetPluginMeta() *PluginMeta {
-	return &s.PluginMeta
-}
-
-func (s *OutputPlugin) GetParams() Params {
-	return s.Params
-}
-
-func (s *OutputPlugin) GetSections() []Directive {
-	return s.SubDirectives
-}
+type OutputPlugin = GenericDirective
 
 type PluginMeta struct {
 	Type      string `json:"type,omitempty"`
