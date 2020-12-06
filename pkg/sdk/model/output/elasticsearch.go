@@ -237,7 +237,7 @@ type ElasticsearchOutput struct {
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "elasticsearch"
+	const pluginType = "elasticsearch"
 	elasticsearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

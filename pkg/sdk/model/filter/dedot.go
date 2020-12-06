@@ -75,7 +75,7 @@ func NewDedotFilterConfig() *DedotFilterConfig {
 }
 
 func (c *DedotFilterConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "dedot"
+	const pluginType = "dedot"
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "filter",

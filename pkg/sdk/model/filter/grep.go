@@ -240,25 +240,21 @@ func (r *OrSection) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 		},
 	}
 
-	if len(r.Regexp) > 0 {
-		for _, regexp := range r.Regexp {
-			if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				or.SubDirectives = append(or.SubDirectives, meta)
-			}
+	for _, regexp := range r.Regexp {
+		if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			or.SubDirectives = append(or.SubDirectives, meta)
+		}
+	}
+	for _, exclude := range r.Exclude {
+		if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			or.SubDirectives = append(or.SubDirectives, meta)
 		}
 	}
 
-	if len(r.Exclude) > 0 {
-		for _, exclude := range r.Exclude {
-			if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				or.SubDirectives = append(or.SubDirectives, meta)
-			}
-		}
-	}
 	return or, nil
 }
 
@@ -269,30 +265,26 @@ func (r *AndSection) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		},
 	}
 
-	if len(r.Regexp) > 0 {
-		for _, regexp := range r.Regexp {
-			if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				and.SubDirectives = append(and.SubDirectives, meta)
-			}
+	for _, regexp := range r.Regexp {
+		if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			and.SubDirectives = append(and.SubDirectives, meta)
+		}
+	}
+	for _, exclude := range r.Exclude {
+		if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			and.SubDirectives = append(and.SubDirectives, meta)
 		}
 	}
 
-	if len(r.Exclude) > 0 {
-		for _, exclude := range r.Exclude {
-			if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				and.SubDirectives = append(and.SubDirectives, meta)
-			}
-		}
-	}
 	return and, nil
 }
 
 func (g *GrepConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "grep"
+	const pluginType = "grep"
 	grep := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
@@ -301,40 +293,32 @@ func (g *GrepConfig) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        id,
 		},
 	}
-	if len(g.Regexp) > 0 {
-		for _, regexp := range g.Regexp {
-			if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				grep.SubDirectives = append(grep.SubDirectives, meta)
-			}
+	for _, regexp := range g.Regexp {
+		if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			grep.SubDirectives = append(grep.SubDirectives, meta)
 		}
 	}
-	if len(g.Exclude) > 0 {
-		for _, exclude := range g.Exclude {
-			if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				grep.SubDirectives = append(grep.SubDirectives, meta)
-			}
+	for _, exclude := range g.Exclude {
+		if meta, err := exclude.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			grep.SubDirectives = append(grep.SubDirectives, meta)
 		}
 	}
-	if len(g.Or) > 0 {
-		for _, or := range g.Or {
-			if meta, err := or.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				grep.SubDirectives = append(grep.SubDirectives, meta)
-			}
+	for _, or := range g.Or {
+		if meta, err := or.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			grep.SubDirectives = append(grep.SubDirectives, meta)
 		}
 	}
-	if len(g.And) > 0 {
-		for _, and := range g.And {
-			if meta, err := and.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				grep.SubDirectives = append(grep.SubDirectives, meta)
-			}
+	for _, and := range g.And {
+		if meta, err := and.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			grep.SubDirectives = append(grep.SubDirectives, meta)
 		}
 	}
 

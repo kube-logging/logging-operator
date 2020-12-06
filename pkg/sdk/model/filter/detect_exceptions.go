@@ -95,7 +95,7 @@ type DetectExceptions struct {
 type _expDetectExceptions interface{}
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "detect_exceptions"
+	const pluginType = "detect_exceptions"
 	detector := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

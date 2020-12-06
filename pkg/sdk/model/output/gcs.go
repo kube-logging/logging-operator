@@ -77,7 +77,7 @@ type GCSOutput struct {
 }
 
 func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "gcs"
+	const pluginType = "gcs"
 	gcs := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
@@ -105,13 +105,11 @@ func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 			gcs.SubDirectives = append(gcs.SubDirectives, format)
 		}
 	}
-	if len(g.ObjectMetadata) > 0 {
-		for _, metadata := range g.ObjectMetadata {
-			if meta, err := metadata.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				gcs.SubDirectives = append(gcs.SubDirectives, meta)
-			}
+	for _, metadata := range g.ObjectMetadata {
+		if meta, err := metadata.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			gcs.SubDirectives = append(gcs.SubDirectives, meta)
 		}
 	}
 	return gcs, nil

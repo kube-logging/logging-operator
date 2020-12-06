@@ -36,7 +36,7 @@ func GetLogKey() string {
 
 type Directive interface {
 	GetPluginMeta() *PluginMeta
-	GetParams() map[string]string
+	GetParams() Params
 	GetSections() []Directive
 }
 
@@ -58,24 +58,7 @@ func Value(value string) *PluginParam {
 	}
 }
 
-type OutputPlugin struct {
-	PluginMeta
-	Output
-	Params        Params
-	SubDirectives []Directive
-}
-
-func (s *OutputPlugin) GetPluginMeta() *PluginMeta {
-	return &s.PluginMeta
-}
-
-func (s *OutputPlugin) GetParams() map[string]string {
-	return s.Params
-}
-
-func (s *OutputPlugin) GetSections() []Directive {
-	return s.SubDirectives
-}
+type OutputPlugin = GenericDirective
 
 type PluginMeta struct {
 	Type      string `json:"type,omitempty"`
@@ -88,15 +71,15 @@ type PluginMeta struct {
 
 type GenericDirective struct {
 	PluginMeta
-	Params        map[string]string `json:"params,omitempty"`
-	SubDirectives []Directive       `json:"sections,omitempty"`
+	Params        Params      `json:"params,omitempty"`
+	SubDirectives []Directive `json:"sections,omitempty"`
 }
 
 func (d *GenericDirective) GetPluginMeta() *PluginMeta {
 	return &d.PluginMeta
 }
 
-func (d *GenericDirective) GetParams() map[string]string {
+func (d *GenericDirective) GetParams() Params {
 	return d.Params
 }
 
@@ -147,14 +130,7 @@ func (p PluginParams) Equals(target PluginParams) error {
 	return nil
 }
 
-type Params map[string]string
-
-func (p Params) Merge(input map[string]string) Params {
-	for k, v := range input {
-		p[k] = v
-	}
-	return p
-}
+type Params = map[string]string
 
 func NewFlatDirective(meta PluginMeta, config interface{}, secretLoader secret.SecretLoader) (Directive, error) {
 	directive := &GenericDirective{

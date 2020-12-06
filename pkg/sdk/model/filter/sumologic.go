@@ -116,7 +116,7 @@ type SumoLogic struct {
 type _expSumologic interface{}
 
 func (s *SumoLogic) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "kubernetes_sumologic"
+	const pluginType = "kubernetes_sumologic"
 	sumologic := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

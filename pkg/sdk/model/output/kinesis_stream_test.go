@@ -41,7 +41,7 @@ buffer:
 	expected := `
   <match **>
     @type kinesis_streams
-    @id test   
+    @id test
     region us-east-1
     stream_name test
     <assume_role_credentials>

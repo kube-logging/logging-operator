@@ -131,7 +131,7 @@ func (o *KinesisFirehoseAssumeRoleCredentials) ToDirective(secretLoader secret.S
 }
 
 func (e *KinesisFirehoseOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "kinesis_firehose"
+	const pluginType = "kinesis_firehose"
 	kinesis := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

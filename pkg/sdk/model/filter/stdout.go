@@ -71,7 +71,7 @@ func NewStdOutFilterConfig() *StdOutFilterConfig {
 }
 
 func (c *StdOutFilterConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "stdout"
+	const pluginType = "stdout"
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "filter",

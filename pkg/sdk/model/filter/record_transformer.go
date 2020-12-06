@@ -97,7 +97,7 @@ func (r *Record) ToDirective(secretLoader secret.SecretLoader, id string) (types
 }
 
 func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "record_transformer"
+	const pluginType = "record_transformer"
 	recordTransformer := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
@@ -111,13 +111,11 @@ func (r *RecordTransformer) ToDirective(secretLoader secret.SecretLoader, id str
 	} else {
 		recordTransformer.Params = params
 	}
-	if len(r.Records) > 0 {
-		for _, record := range r.Records {
-			if meta, err := record.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)
-			}
+	for _, record := range r.Records {
+		if meta, err := record.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			recordTransformer.SubDirectives = append(recordTransformer.SubDirectives, meta)
 		}
 	}
 	return recordTransformer, nil

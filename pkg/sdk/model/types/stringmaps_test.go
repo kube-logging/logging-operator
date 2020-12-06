@@ -23,11 +23,11 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func TestRequired(t *testing.T) {
-	expectedError := "field field1 is required"
+	expectedError := "field \"field1\" is required"
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
@@ -42,7 +42,7 @@ func TestRequired(t *testing.T) {
 }
 
 func TestRequiredMeansItCannotEvenBeEmpty(t *testing.T) {
-	expectedError := "field field1 is required"
+	expectedError := "field \"field1\" is required"
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
@@ -122,7 +122,7 @@ func TestSliceFields(t *testing.T) {
 }
 
 func TestInvalidSliceDefault(t *testing.T) {
-	expectedError := `can't unmarshal field: "field1" value: "[str]"`
+	expectedError := `can't unmarshal default value "[str]" into field "field1"`
 	type Asd struct {
 		Field1 []int `json:"field1" plugin:"default:str"`
 	}
@@ -137,7 +137,7 @@ func TestInvalidSliceDefault(t *testing.T) {
 }
 
 func TestConflictingTags(t *testing.T) {
-	expectedError := "tags for field field2 are conflicting: required and omitempty cannot be set simultaneously"
+	expectedError := "tags for field \"field2\" are conflicting: required and omitempty cannot be set simultaneously"
 	type Asd struct {
 		Field2 string `json:"field2,omitempty" plugin:"required"`
 	}
@@ -267,8 +267,8 @@ func TestSecretValueFrom(t *testing.T) {
 	testStruct := Asd{
 		Field: &secret.Secret{
 			ValueFrom: &secret.ValueFrom{
-				SecretKeyRef: &v1.SecretKeySelector{
-					LocalObjectReference: v1.LocalObjectReference{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "a",
 					},
 					Key: "b",
@@ -305,7 +305,7 @@ func TestSecretErrorWhenEmpty(t *testing.T) {
 		t.Fatal("expected an error when secret contains no value or valuefrom")
 	}
 
-	expectedError := "failed to load secret for field field: no value found"
+	expectedError := "failed to load secret for field \"field\": no value found"
 	if err.Error() != expectedError {
 		t.Fatalf("Expected `%s` got `%s`", expectedError, err.Error())
 	}

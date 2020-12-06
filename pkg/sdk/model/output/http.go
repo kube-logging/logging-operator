@@ -94,7 +94,7 @@ type HTTPOutputConfig struct {
 }
 
 func (c *HTTPOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "http"
+	const pluginType = "http"
 	http := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
