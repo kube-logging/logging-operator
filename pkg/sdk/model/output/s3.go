@@ -203,7 +203,7 @@ type S3SharedCredentials struct {
 }
 
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "s3"
+	const pluginType = "s3"
 	s3 := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -16,24 +16,25 @@ package types
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"strings"
 
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
 )
 
 // OutputPlugin plugin: https://github.com/banzaicloud/fluent-plugin-label-router
 type Router struct {
 	PluginMeta
 	Routes []Directive `json:"routes"`
-	Params map[string]string
+	Params Params
 }
 
 func (r *Router) GetPluginMeta() *PluginMeta {
 	return &r.PluginMeta
 }
 
-func (r *Router) GetParams() map[string]string {
+func (r *Router) GetParams() Params {
 	return r.Params
 }
 
@@ -59,8 +60,8 @@ func (f FlowMatch) GetPluginMeta() *PluginMeta {
 		Directive: "match",
 	}
 }
-func (f FlowMatch) GetParams() map[string]string {
-	params := map[string]string{
+func (f FlowMatch) GetParams() Params {
+	params := Params{
 		"negate": strconv.FormatBool(f.Negate),
 	}
 	if len(f.Namespaces) > 0 {
@@ -74,7 +75,9 @@ func (f FlowMatch) GetParams() map[string]string {
 	}
 	if len(f.Labels) > 0 {
 		var sb []string
-		for _, key := range util.OrderedStringMap(f.Labels).Keys() {
+		keys := mapstrstr.Keys(f.Labels)
+		sort.Strings(keys)
+		for _, key := range keys {
 			sb = append(sb, key+":"+f.Labels[key])
 		}
 		params["labels"] = strings.Join(sb, ",")
@@ -88,7 +91,7 @@ func (f FlowMatch) GetSections() []Directive {
 
 type FlowRoute struct {
 	PluginMeta
-	Params  map[string]string
+	Params  Params
 	Matches []Directive
 }
 
@@ -96,7 +99,7 @@ func (f *FlowRoute) GetPluginMeta() *PluginMeta {
 	return &f.PluginMeta
 }
 
-func (f *FlowRoute) GetParams() map[string]string {
+func (f *FlowRoute) GetParams() Params {
 	return f.Params
 }
 
@@ -110,7 +113,7 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 			Directive: "route",
 			Label:     flow.FlowLabel,
 		},
-		Params: map[string]string{},
+		Params: Params{},
 	}
 	if flow.FlowID != "" {
 		metricsLabels, _ := json.Marshal(map[string]string{"id": flow.FlowID})
@@ -123,7 +126,7 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 	return r
 }
 
-func NewRouter(id string, params map[string]string) *Router {
+func NewRouter(id string, params Params) *Router {
 	return &Router{
 		PluginMeta: PluginMeta{
 			Type:      "label_router",

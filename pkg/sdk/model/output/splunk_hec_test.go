@@ -58,7 +58,7 @@ source: foo
 		source foo
 		sourcetype foo
 		<fields>
-		  dummy  
+		  dummy
 		</fields>
 	</match>
 `

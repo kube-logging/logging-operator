@@ -57,7 +57,7 @@ func TestRenderDirective(t *testing.T) {
 					Directive: "match",
 					Tag:       "tag",
 				},
-				Params: map[string]string{
+				Params: types.Params{
 					"path": "file",
 				},
 			},
@@ -86,7 +86,7 @@ func TestRenderDirective(t *testing.T) {
 				PluginMeta: types.PluginMeta{
 					Directive: "match",
 				},
-				Params: map[string]string{
+				Params: types.Params{
 					"path": "file",
 				},
 			},
@@ -102,7 +102,7 @@ func TestRenderDirective(t *testing.T) {
 				PluginMeta: types.PluginMeta{
 					Directive: "match",
 				},
-				Params: map[string]string{
+				Params: types.Params{
 					"path": "file",
 				},
 				SubDirectives: []types.Directive{
@@ -110,7 +110,7 @@ func TestRenderDirective(t *testing.T) {
 						PluginMeta: types.PluginMeta{
 							Directive: "router1",
 						},
-						Params: map[string]string{
+						Params: types.Params{
 							"namespace": "asd",
 							"labels":    "{\"a\":\"b\"}",
 						},
@@ -119,7 +119,7 @@ func TestRenderDirective(t *testing.T) {
 						PluginMeta: types.PluginMeta{
 							Directive: "router2",
 						},
-						Params: map[string]string{
+						Params: types.Params{
 							"namespace": "asd2",
 						},
 					},

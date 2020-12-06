@@ -84,7 +84,7 @@ type DatadogOutput struct {
 }
 
 func (a *DatadogOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "datadog"
+	const pluginType = "datadog"
 	datadog := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -142,7 +142,7 @@ type CloudWatchOutput struct {
 }
 
 func (c *CloudWatchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "cloudwatch_logs"
+	const pluginType = "cloudwatch_logs"
 	cloudwatch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

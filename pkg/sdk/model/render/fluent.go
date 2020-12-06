@@ -17,11 +17,12 @@ package render
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"emperror.dev/errors"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/maps/mapstrstr"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
@@ -53,15 +54,16 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 		if meta.LogLevel != "" {
 			f.indented(indent+f.Indent, "@log_level %s", meta.LogLevel)
 		}
-		if len(d.GetParams()) > 0 {
-			for _, k := range util.OrderedStringMap(d.GetParams()).Keys() {
-				f.indented(indent+f.Indent, "%s %s", k, d.GetParams()[k])
+		if params := d.GetParams(); len(params) > 0 {
+			keys := mapstrstr.Keys(params)
+			sort.Strings(keys)
+			for _, k := range keys {
+				f.indented(indent+f.Indent, "%s %s", k, params[k])
 			}
 		}
-		if len(d.GetSections()) > 0 {
-			err := f.RenderDirectives(d.GetSections(), indent+f.Indent)
-			if err != nil {
-				return errors.WrapIff(err, "failed to render sections for %s", d.GetPluginMeta().Directive)
+		if sections := d.GetSections(); len(sections) > 0 {
+			if err := f.RenderDirectives(sections, indent+f.Indent); err != nil {
+				return errors.WrapIff(err, "failed to render sections for %s", meta.Directive)
 			}
 		}
 		f.indented(indent, "</%s>", meta.Directive)

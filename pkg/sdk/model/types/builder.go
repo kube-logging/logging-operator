@@ -15,7 +15,7 @@
 package types
 
 import (
-	"errors"
+	"emperror.dev/errors"
 )
 
 type SystemBuilder struct {

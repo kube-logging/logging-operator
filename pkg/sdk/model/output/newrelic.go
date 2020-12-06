@@ -63,7 +63,7 @@ type NewRelicOutputConfig struct {
 }
 
 func (c *NewRelicOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "newrelic"
+	const pluginType = "newrelic"
 	newrelic := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

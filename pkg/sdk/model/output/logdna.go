@@ -75,7 +75,7 @@ type LogDNAOutput struct {
 type _expLogDNA interface{}
 
 func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "logdna"
+	const pluginType = "logdna"
 	pluginID := id + "_" + pluginType
 	logdna := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{

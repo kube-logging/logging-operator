@@ -101,7 +101,7 @@ type ForwardOutput struct {
 }
 
 func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "forward"
+	const pluginType = "forward"
 	forward := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
@@ -129,13 +129,11 @@ func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string)
 			forward.SubDirectives = append(forward.SubDirectives, format)
 		}
 	}
-	if len(f.FluentdServers) > 0 {
-		for _, server := range f.FluentdServers {
-			if serv, err := server.ToDirective(secretLoader, ""); err != nil {
-				return nil, err
-			} else {
-				forward.SubDirectives = append(forward.SubDirectives, serv)
-			}
+	for _, server := range f.FluentdServers {
+		if serv, err := server.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			forward.SubDirectives = append(forward.SubDirectives, serv)
 		}
 	}
 	return forward, nil

@@ -132,7 +132,7 @@ func (r Fields) ToDirective(secretLoader secret.SecretLoader, id string) (types.
 }
 
 func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	pluginType := "splunk_hec"
+	const pluginType = "splunk_hec"
 	splunkHec := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

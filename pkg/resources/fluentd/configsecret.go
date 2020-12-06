@@ -48,13 +48,14 @@ func generateConfig(input fluentdConfig) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to execute template")
 	}
-	outputString := fmt.Sprint(output.String())
-	return outputString, nil
+	return output.String(), nil
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
 	input := fluentdConfig{
-		RootDir: r.Logging.Spec.FluentdSpec.RootDir,
+		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
+		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
+		RootDir:                   r.Logging.Spec.FluentdSpec.RootDir,
 	}
 
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
@@ -62,23 +63,16 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
 		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
 	}
-	if r.Logging.Spec.FluentdSpec.LogLevel != "" {
-		input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
-	} else {
+
+	input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
+	if input.LogLevel == "" {
 		input.LogLevel = "info"
 	}
 
-	if r.Logging.Spec.FluentdSpec.Workers > 0 {
-		input.Workers = r.Logging.Spec.FluentdSpec.Workers
-	} else {
+	input.Workers = r.Logging.Spec.FluentdSpec.Workers
+	if input.Workers <= 0 {
 		input.Workers = 1
 	}
-	//if r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval != nil {
-	input.IgnoreSameLogInterval = r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval
-	//}
-	//if r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval != nil {
-	input.IgnoreRepeatedLogInterval = r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval
-	//}
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
