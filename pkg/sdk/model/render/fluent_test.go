@@ -305,7 +305,7 @@ func TestRenderDirective(t *testing.T) {
 }
 
 func TestMultipleOutput(t *testing.T) {
-	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
@@ -384,7 +384,7 @@ func TestMultipleOutput(t *testing.T) {
 }
 
 func TestRenderFullFluentConfig(t *testing.T) {
-	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
@@ -426,6 +426,82 @@ func TestRenderFullFluentConfig(t *testing.T) {
           @id test
           path input.log
         </source>
+        <match **>
+          @type label_router
+          @id test
+          <route>
+            @label @901f778f9602a78e8fd702c1973d8d8d
+			  <match>
+			    labels key1:val1,key2:val2
+			    namespaces ns-test
+			    negate false
+			  </match>
+          </route>
+        </match>
+        <label @901f778f9602a78e8fd702c1973d8d8d>
+          <filter **>
+            @type stdout
+            @id test
+          </filter>
+          <match **>
+            @type null
+            @id test
+          </match>
+        </label>`
+
+	if a, e := diff.TrimLinesInString(b.String()), diff.TrimLinesInString(expected); a != e {
+		t.Errorf("Result does not match (-actual vs +expected):\n%v\nActual: %s", diff.LineDiff(a, e), b.String())
+	}
+}
+
+func TestRenderFullFluentConfigWithGlobalFilter(t *testing.T) {
+	globalFilters := []types.Filter{toDirective(t, filter.NewStdOutFilterConfig())}
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), globalFilters, types.NewRouter("test", nil))
+
+	flowObj, err := types.NewFlow(
+		[]types.FlowMatch{
+			{Labels: map[string]string{
+				"key1": "val1",
+				"key2": "val2"},
+				Namespaces: []string{"ns-test"}},
+		}, "", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	flowObj.
+		WithFilters(toDirective(t, filter.NewStdOutFilterConfig())).
+		WithOutputs(toDirective(t, output.NewNullOutputConfig()))
+
+	err = system.RegisterFlow(flowObj)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fluentConfig, err := system.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b := &bytes.Buffer{}
+	renderer := render.FluentRender{
+		Out:    b,
+		Indent: 2,
+	}
+	err = renderer.Render(fluentConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `
+		<source>
+          @type tail
+          @id test
+          path input.log
+        </source>
+        <filter **>
+          @type stdout
+          @id test
+        </filter>
         <match **>
           @type label_router
           @id test
@@ -570,7 +646,7 @@ func TestRenderS3(t *testing.T) {
 }
 
 func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expected string) error {
-	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
 
 	s3Plugin, err := s3Config.ToDirective(secret.NewSecretLoader(nil, "", "", nil), "test")
 	if err != nil {

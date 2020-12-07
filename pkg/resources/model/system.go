@@ -63,7 +63,13 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		"metrics": strconv.FormatBool(logging.Spec.FluentdSpec.Metrics != nil),
 	})
 
-	builder := types.NewSystemBuilder(rootInput, router)
+	globalFilters, err := filtersForFilters(
+		"globalFilter",
+		"globalFilter",
+		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
+		logging.Spec.GlobalFilters)
+
+	builder := types.NewSystemBuilder(rootInput, globalFilters, router)
 
 	for _, flowCr := range resources.Flows {
 		flow, err := FlowForFlow(flowCr, resources.ClusterOutputs, resources.Outputs, secrets)

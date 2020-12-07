@@ -28,16 +28,24 @@ type FluentConfig interface {
 }
 
 type System struct {
-	Input  Input   `json:"input"`
-	Router *Router `json:"router"`
-	Flows  []*Flow `json:"flows"`
+	Input         Input    `json:"input"`
+	GlobalFilters []Filter `json:"globalFilters"`
+	Router        *Router  `json:"router"`
+	Flows         []*Flow  `json:"flows"`
 }
 
 func (s *System) GetDirectives() []Directive {
+	// First directive is input
 	directives := []Directive{
 		s.Input,
-		s.Router,
 	}
+	// Add GlobalFilters between input and router
+	for _, filter := range s.GlobalFilters {
+		directives = append(directives, filter)
+	}
+	// Add router directive
+	directives = append(directives, s.Router)
+	// Add Flows after router
 	for _, flow := range s.Flows {
 		directives = append(directives, flow)
 	}

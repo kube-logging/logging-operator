@@ -83,7 +83,7 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 </match>
 <label @2ab46f3b156b31e1c808ac53885394fb>`,
 	}
-	suite.System = types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), types.NewRouter("test", nil))
+	suite.System = types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
