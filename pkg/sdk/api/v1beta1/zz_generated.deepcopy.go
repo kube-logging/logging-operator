@@ -1110,6 +1110,13 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 		*out = new(DefaultFlowSpec)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.GlobalFilters != nil {
+		in, out := &in.GlobalFilters, &out.GlobalFilters
+		*out = make([]Filter, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.WatchNamespaces != nil {
 		in, out := &in.WatchNamespaces, &out.WatchNamespaces
 		*out = make([]string, len(*in))
