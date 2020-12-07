@@ -49,6 +49,7 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 
+{{- if not DisableKubernetesFilter }}
 [FILTER]
     Name        kubernetes
     {{- range $key, $value := .KubernetesFilter }}
@@ -56,6 +57,7 @@ var fluentBitConfigTemplate = `
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}
+{{- end}}
 
 {{- if .AwsFilter }}
 
