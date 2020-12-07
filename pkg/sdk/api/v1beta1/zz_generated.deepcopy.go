@@ -793,6 +793,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	out.FilterKubernetes = in.FilterKubernetes
+	if in.DisableKubernetesFilter != nil {
+		in, out := &in.DisableKubernetesFilter, &out.DisableKubernetesFilter
+		*out = new(bool)
+		**out = **in
+	}
 	out.BufferStorage = in.BufferStorage
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
 	if in.LivenessProbe != nil {

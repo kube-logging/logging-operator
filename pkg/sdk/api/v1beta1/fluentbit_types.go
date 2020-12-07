@@ -64,9 +64,12 @@ type FluentbitSpec struct {
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	// Deprecated, use inputTail.parser
-	Parser           string           `json:"parser,omitempty"`
+	Parser string `json:"parser,omitempty"`
+	// Parameters for Kubernetes metadata filter
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
-	BufferStorage    BufferStorage    `json:"bufferStorage,omitempty"`
+	// Disable Kubernetes metadata filter
+	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
+	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
