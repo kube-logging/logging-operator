@@ -47,6 +47,7 @@ type LoggingSpec struct {
 	FluentbitSpec                          *FluentbitSpec   `json:"fluentbit,omitempty"`
 	FluentdSpec                            *FluentdSpec     `json:"fluentd,omitempty"`
 	DefaultFlowSpec                        *DefaultFlowSpec `json:"defaultFlow,omitempty"`
+	GlobalFilters                          []Filter         `json:"globalFilters,omitempty"`
 	WatchNamespaces                        []string         `json:"watchNamespaces,omitempty"`
 	ControlNamespace                       string           `json:"controlNamespace"`
 	AllowClusterResourcesFromAllNamespaces bool             `json:"allowClusterResourcesFromAllNamespaces,omitempty"`

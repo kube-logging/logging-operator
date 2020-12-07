@@ -19,15 +19,17 @@ import (
 )
 
 type SystemBuilder struct {
-	input  Input
-	flows  []*Flow
-	router *Router
+	input         Input
+	globalFilters []Filter
+	flows         []*Flow
+	router        *Router
 }
 
-func NewSystemBuilder(input Input, router *Router) *SystemBuilder {
+func NewSystemBuilder(input Input, globalFilers []Filter, router *Router) *SystemBuilder {
 	return &SystemBuilder{
-		input:  input,
-		router: router,
+		input:         input,
+		globalFilters: globalFilers,
+		router:        router,
 	}
 }
 
@@ -55,8 +57,9 @@ func (s *SystemBuilder) RegisterDefaultFlow(f *Flow) error {
 
 func (s *SystemBuilder) Build() (*System, error) {
 	return &System{
-		Input:  s.input,
-		Router: s.router,
-		Flows:  s.flows,
+		Input:         s.input,
+		GlobalFilters: s.globalFilters,
+		Router:        s.router,
+		Flows:         s.flows,
 	}, nil
 }
