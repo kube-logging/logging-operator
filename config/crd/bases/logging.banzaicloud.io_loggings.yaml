@@ -939,6 +939,8 @@ spec:
                   type: integer
                 customConfigSecret:
                   type: string
+                disableKubernetesFilter:
+                  type: boolean
                 enableUpstream:
                   type: boolean
                 extraVolumeMounts:

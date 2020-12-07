@@ -54,18 +54,19 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
-	Flush            int32
-	Grace            int32
-	LogLevel         string
-	CoroStackSize    int32
-	Output           map[string]string
-	TargetHost       string
-	TargetPort       int32
-	Input            fluentbitInputConfig
-	KubernetesFilter map[string]string
-	AwsFilter        map[string]string
-	BufferStorage    map[string]string
-	Network          struct {
+	Flush                   int32
+	Grace                   int32
+	LogLevel                string
+	CoroStackSize           int32
+	Output                  map[string]string
+	TargetHost              string
+	TargetPort              int32
+	Input                   fluentbitInputConfig
+	DisableKubernetesFilter bool
+	KubernetesFilter        map[string]string
+	AwsFilter               map[string]string
+	BufferStorage           map[string]string
+	Network                 struct {
 		ConnectTimeoutSet       bool
 		ConnectTimeout          uint32
 		Keepalive               bool
@@ -125,6 +126,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	fluentbitInput.Values = fluentbitInputValues
 
+	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter == true
 	fluentbitKubernetesFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
@@ -148,12 +150,13 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			Enabled:   r.Logging.Spec.FluentbitSpec.TLS.Enabled,
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
-		Monitor:          monitor,
-		TargetHost:       fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
-		TargetPort:       r.Logging.Spec.FluentdSpec.Port,
-		Input:            fluentbitInput,
-		KubernetesFilter: fluentbitKubernetesFilter,
-		BufferStorage:    fluentbitBufferStorage,
+		Monitor:                 monitor,
+		TargetHost:              fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
+		TargetPort:              r.Logging.Spec.FluentdSpec.Port,
+		Input:                   fluentbitInput,
+		DisableKubernetesFilter: disableKubernetesFilter,
+		KubernetesFilter:        fluentbitKubernetesFilter,
+		BufferStorage:           fluentbitBufferStorage,
 	}
 	if r.Logging.Spec.FluentbitSpec.FilterAws != nil {
 		awsFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterAws)
