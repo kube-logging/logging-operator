@@ -41,24 +41,24 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 		if meta.Directive == "" {
 			return fmt.Errorf("Directive must have a name %s", meta)
 		}
-		f.indented(indent, "<%s%s>", meta.Directive, tag(meta.Tag))
+		f.indentedf(indent, "<%s%s>", meta.Directive, tag(meta.Tag))
 		if meta.Type != "" {
-			f.indented(indent+f.Indent, "@type %s", meta.Type)
+			f.indentedf(indent+f.Indent, "@type %s", meta.Type)
 		}
 		if meta.Id != "" {
-			f.indented(indent+f.Indent, "@id %s", meta.Id)
+			f.indentedf(indent+f.Indent, "@id %s", meta.Id)
 		}
 		if meta.Label != "" {
-			f.indented(indent+f.Indent, "@label %s", meta.Label)
+			f.indentedf(indent+f.Indent, "@label %s", meta.Label)
 		}
 		if meta.LogLevel != "" {
-			f.indented(indent+f.Indent, "@log_level %s", meta.LogLevel)
+			f.indentedf(indent+f.Indent, "@log_level %s", meta.LogLevel)
 		}
 		if params := d.GetParams(); len(params) > 0 {
 			keys := mapstrstr.Keys(params)
 			sort.Strings(keys)
 			for _, k := range keys {
-				f.indented(indent+f.Indent, "%s %s", k, params[k])
+				f.indentedf(indent+f.Indent, "%s %s", k, params[k])
 			}
 		}
 		if sections := d.GetSections(); len(sections) > 0 {
@@ -66,12 +66,12 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 				return errors.WrapIff(err, "failed to render sections for %s", meta.Directive)
 			}
 		}
-		f.indented(indent, "</%s>", meta.Directive)
+		f.indentedf(indent, "</%s>", meta.Directive)
 	}
 	return nil
 }
 
-func (f *FluentRender) indented(indent int, format string, values ...interface{}) {
+func (f *FluentRender) indentedf(indent int, format string, values ...interface{}) {
 	indentString := strings.Repeat(" ", indent)
 	in := fmt.Sprintf(format, values...)
 	for _, line := range strings.Split(in, "\n") {

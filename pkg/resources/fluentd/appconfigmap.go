@@ -105,6 +105,8 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 				Ready: true,
 				Valid: false,
 			}, nil
+		case v1.PodUnknown:
+			fallthrough
 		default:
 			return nil, errors.Errorf("invalid pod status %s, unable to a validate config", pod.Status.Phase)
 		}

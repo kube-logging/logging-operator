@@ -108,7 +108,7 @@ func (l *Logging) SetDefaults() error {
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
 	}
-	if l.Spec.FluentdSpec != nil {
+	if l.Spec.FluentdSpec != nil { // nolint:nestif
 		if l.Spec.FluentdSpec.FluentdPvcSpec != nil {
 			return errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")
 		}
@@ -258,7 +258,7 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 	}
-	if l.Spec.FluentbitSpec != nil {
+	if l.Spec.FluentbitSpec != nil { // nolint:nestif
 		if l.Spec.FluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
 		}

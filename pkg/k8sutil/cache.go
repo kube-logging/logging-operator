@@ -58,7 +58,7 @@ func (c *Cached) flush() error {
 }
 
 func (c *Cached) shouldFlushOn(err error) bool {
-	switch err.(type) {
+	switch err.(type) { //nolint:errorlint
 	case *meta.NoKindMatchError:
 		return true
 	}
