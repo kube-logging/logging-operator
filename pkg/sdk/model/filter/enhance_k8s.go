@@ -76,7 +76,7 @@ type EnhanceK8s struct {
 	CacheRefreshVariation int `json:"cache_refresh_variation,omitempty"`
 }
 
-// #### Example `Concat` filter configurations
+// #### Example `EnhanceK8s` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
@@ -94,14 +94,14 @@ type EnhanceK8s struct {
 // ```yaml
 //<filter **>
 //  @type enhance_k8s_metadata
-//  @id test_concat
+//  @id test_enhanceK8s
 //</filter>
 // ```
 type _expEnhanceK8s interface{}
 
 func (c *EnhanceK8s) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "enhance_k8s_metadata"
-	concat := &types.GenericDirective{
+	enhanceK8s := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "filter",
@@ -114,7 +114,7 @@ func (c *EnhanceK8s) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(enhanceK8sConfig); err != nil {
 		return nil, err
 	} else {
-		concat.Params = params
+		enhanceK8s.Params = params
 	}
-	return concat, nil
+	return enhanceK8s, nil
 }
