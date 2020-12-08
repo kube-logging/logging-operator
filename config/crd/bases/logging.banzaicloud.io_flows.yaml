@@ -102,6 +102,144 @@ spec:
                       stream:
                         type: string
                     type: object
+                  enhanceK8s:
+                    properties:
+                      api_groups:
+                        items:
+                          type: string
+                        type: array
+                      bearer_token_file:
+                        type: string
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cache_refresh:
+                        type: integer
+                      cache_refresh_variation:
+                        type: integer
+                      cache_size:
+                        type: integer
+                      cache_ttl:
+                        type: integer
+                      client_cert:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      client_key:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      core_api_versions:
+                        items:
+                          type: string
+                        type: array
+                      data_type:
+                        type: string
+                      in_namespace_path:
+                        items:
+                          type: string
+                        type: array
+                      in_pod_path:
+                        items:
+                          type: string
+                        type: array
+                      kubernetes_url:
+                        type: string
+                      secret_dir:
+                        type: string
+                      ssl_partial_chain:
+                        type: boolean
+                      verify_ssl:
+                        type: boolean
+                    type: object
                   geoip:
                     properties:
                       backend_library:
