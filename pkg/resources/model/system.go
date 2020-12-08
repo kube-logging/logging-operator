@@ -69,6 +69,10 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
 		logging.Spec.GlobalFilters)
 
+	if err != nil {
+		return nil, err
+	}
+
 	builder := types.NewSystemBuilder(rootInput, globalFilters, router)
 
 	for _, flowCr := range resources.Flows {
