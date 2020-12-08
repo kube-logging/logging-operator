@@ -20,6 +20,14 @@ linters:
         - wsl
 
         # TODO: fix these
+        - gci
+        - godot
+        - nlreturn
+        - gomnd
+        - goerr113
+        - gofumpt
+        - exhaustivestruct
+        - wrapcheck
         - deadcode
         - unused
         - goconst
@@ -43,3 +51,4 @@ issues:
     exclude:
         - if block ends with a return statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)
         - "`if` block ends with a `return` statement, so drop this `else` and outdent its block"
+        - "missing the call to method parallel"

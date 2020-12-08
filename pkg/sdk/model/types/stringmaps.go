@@ -118,7 +118,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 		value = value.Elem()
 	}
 
-	switch value.Kind() {
+	switch value.Kind() { // nolint:exhaustive
 	case reflect.String, reflect.Int, reflect.Bool:
 		val := fmt.Sprintf("%v", value.Interface())
 		if val == "" {
@@ -135,7 +135,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 	case reflect.Slice:
 		switch actual := value.Interface().(type) {
 		case []string, []int:
-			if value.Len() > 0 {
+			if value.Len() > 0 { // nolint:nestif
 				b, err := json.Marshal(actual)
 				if err != nil {
 					return errors.WrapIff(err, "can't marshal field %q with value %v as json", name, actual)
@@ -160,7 +160,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 			}
 		}
 	case reflect.Map:
-		if mapStringString, ok := value.Interface().(map[string]string); ok {
+		if mapStringString, ok := value.Interface().(map[string]string); ok { // nolint:nestif
 			if len(mapStringString) > 0 {
 				b, err := json.Marshal(mapStringString)
 				if err != nil {

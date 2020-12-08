@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1beta1_test
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -29,7 +30,7 @@ import (
 var _ = Describe("ClusterOutput", func() {
 	var (
 		key              types.NamespacedName
-		created, fetched *ClusterOutput
+		created, fetched *v1beta1.ClusterOutput
 	)
 
 	BeforeEach(func() {
@@ -52,31 +53,31 @@ var _ = Describe("ClusterOutput", func() {
 				Name:      "foo",
 				Namespace: "default",
 			}
-			created = &ClusterOutput{
+			created = &v1beta1.ClusterOutput{
 				TypeMeta: metav1.TypeMeta{},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
 					Namespace: "default",
 				},
-				Spec: ClusterOutputSpec{
-					OutputSpec: OutputSpec{
+				Spec: v1beta1.ClusterOutputSpec{
+					OutputSpec: v1beta1.OutputSpec{
 						S3OutputConfig:   nil,
 						NullOutputConfig: nil,
 					},
 				},
-				Status: OutputStatus{},
+				Status: v1beta1.OutputStatus{},
 			}
 
 			By("creating an API obj")
-			Expect(k8sClient.Create(context.TODO(), created)).To(Succeed())
+			Expect(K8sClient.Create(context.TODO(), created)).To(Succeed())
 
-			fetched = &ClusterOutput{}
-			Expect(k8sClient.Get(context.TODO(), key, fetched)).To(Succeed())
+			fetched = &v1beta1.ClusterOutput{}
+			Expect(K8sClient.Get(context.TODO(), key, fetched)).To(Succeed())
 			Expect(fetched).To(Equal(created))
 
 			By("deleting the created object")
-			Expect(k8sClient.Delete(context.TODO(), created)).To(Succeed())
-			Expect(k8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
+			Expect(K8sClient.Delete(context.TODO(), created)).To(Succeed())
+			Expect(K8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
 		})
 
 	})

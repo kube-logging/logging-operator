@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package types_test
 
 import (
 	"fmt"
@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"emperror.dev/errors"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -31,7 +32,7 @@ func TestRequired(t *testing.T) {
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	_, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -46,7 +47,7 @@ func TestRequiredMeansItCannotEvenBeEmpty(t *testing.T) {
 	type Asd struct {
 		Field1 string `json:"field1" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field1: ""})
+	_, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field1: ""})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -62,7 +63,7 @@ func TestJsonTagsWithDefaultsAndOmitempty(t *testing.T) {
 		Field2 string `json:"field2,omitempty" plugin:"default:http://asdf and some space"`
 		Field3 string `json:"field3,omitempty"`
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field1: "value"})
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field1: "value"})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -111,7 +112,7 @@ func TestSliceFields(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(tt.source)
+		actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(tt.source)
 		if err != nil {
 			t.Fatalf("%+v", err)
 		}
@@ -126,7 +127,7 @@ func TestInvalidSliceDefault(t *testing.T) {
 	type Asd struct {
 		Field1 []int `json:"field1" plugin:"default:str"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	_, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -141,7 +142,7 @@ func TestConflictingTags(t *testing.T) {
 	type Asd struct {
 		Field2 string `json:"field2,omitempty" plugin:"required"`
 	}
-	_, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	_, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
 	if err == nil {
 		t.Fatalf("required error is expected")
 	} else {
@@ -159,7 +160,7 @@ func TestIgnoreNestedStructs(t *testing.T) {
 		Field2 string  `json:"field2"`
 		Field3 *Nested `json:"nested"`
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field2: "val"})
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field2: "val"})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -174,7 +175,7 @@ func TestIgnoreNestedStructs(t *testing.T) {
 func TestEmptyStructStructs(t *testing.T) {
 	type Asd struct {
 	}
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -198,7 +199,7 @@ func TestConversion(t *testing.T) {
 
 	testStruct := Asd{Field: 2}
 
-	actual, err := NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).
 		WithConverter("magic", converter).
 		StringsMap(testStruct)
 	if err != nil {
@@ -246,7 +247,7 @@ func TestSecretValue(t *testing.T) {
 
 	testStruct := Asd{Field: &secret.Secret{Value: "asd"}}
 
-	actual, err := NewStructToStringMapper(&FakeLoader{}).
+	actual, err := types.NewStructToStringMapper(&FakeLoader{}).
 		StringsMap(testStruct)
 	if err != nil {
 		t.Fatalf("%+v", err)
@@ -277,7 +278,7 @@ func TestSecretValueFrom(t *testing.T) {
 		},
 	}
 
-	actual, err := NewStructToStringMapper(&FakeLoader{}).
+	actual, err := types.NewStructToStringMapper(&FakeLoader{}).
 		StringsMap(testStruct)
 	if err != nil {
 		t.Fatalf("%+v", err)
@@ -299,7 +300,7 @@ func TestSecretErrorWhenEmpty(t *testing.T) {
 		Field: &secret.Secret{},
 	}
 
-	_, err := NewStructToStringMapper(&FakeLoader{}).
+	_, err := types.NewStructToStringMapper(&FakeLoader{}).
 		StringsMap(testStruct)
 	if err == nil {
 		t.Fatal("expected an error when secret contains no value or valuefrom")
