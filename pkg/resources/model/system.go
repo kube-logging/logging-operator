@@ -63,7 +63,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		"metrics": strconv.FormatBool(logging.Spec.FluentdSpec.Metrics != nil),
 	})
 
-	globalFilters, err := filtersForFilters(
+	var globalFilters []types.Filter
+	globalFilters, err = filtersForFilters(
 		"globalFilter",
 		"globalFilter",
 		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
