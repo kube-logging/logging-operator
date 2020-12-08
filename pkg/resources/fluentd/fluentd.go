@@ -122,7 +122,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	// Config check and cleanup if enabled
-	if !r.Logging.Spec.FlowConfigCheckDisabled {
+	if !r.Logging.Spec.FlowConfigCheckDisabled { //nolint:nestif
 		hash, err := r.configHash()
 		if err != nil {
 			return nil, err

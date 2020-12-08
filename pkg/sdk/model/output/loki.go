@@ -119,7 +119,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        id,
 		},
 	}
-	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels {
+	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels { // nolint:nestif
 		if l.Labels == nil {
 			l.Labels = Label{}
 		}

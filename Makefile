@@ -20,7 +20,7 @@ PKGS=$(shell go list ./... | grep -v /vendor)
 CONTROLLER_GEN_VERSION = v0.2.4
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
 
-GOLANGCI_VERSION = 1.21.0
+GOLANGCI_VERSION = 1.33.0
 GOBIN_VERSION = 0.0.13
 
 export KUBEBUILDER_ASSETS := $(PWD)/bin
@@ -42,8 +42,8 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run
-	cd pkg/sdk && golangci-lint run -c ../../.golangci.yml
+	bin/golangci-lint run 
+	cd pkg/sdk && ../../bin/golangci-lint run  -c ../../.golangci.yml
 
 bin/licensei: bin/licensei-${LICENSEI_VERSION}
 	@ln -sf licensei-${LICENSEI_VERSION} bin/licensei
