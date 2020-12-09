@@ -6,6 +6,9 @@ metadata:
   namespace: {{ include "logging-operator.namespace" . }}
   labels:
 {{ include "logging-operator.labels" . | indent 4 }}
+{{- with .Values.monitoring.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   selector:
     matchLabels:
@@ -13,6 +16,14 @@ spec:
   endpoints:
   - port: http
     path: /metrics
+    {{- with .Values.monitoring.serviceMonitor.metricsRelabelings }}
+    metricRelabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.monitoring.serviceMonitor.relabelings }}
+    relabelings:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   namespaceSelector:
     matchNames:
     - {{ include "logging-operator.namespace" . }}
