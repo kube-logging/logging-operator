@@ -52,7 +52,6 @@ var (
 	stopMgr          chan struct{}
 	mgrStopped       *sync.WaitGroup
 	reconcilerErrors chan error
-	g                gomega.GomegaWithT
 )
 
 func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
@@ -633,6 +632,8 @@ func TestMultiProcessWorker(t *testing.T) {
 // - namespaced flow cannot use an output not enabled for the given namespace
 
 func beforeEach(t *testing.T) func() {
+	g := gomega.NewWithT(t)
+
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
 		MetricsBindAddress: "0",
