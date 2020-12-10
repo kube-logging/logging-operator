@@ -30,6 +30,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 	appsv1 "k8s.io/api/apps/v1"
@@ -622,6 +623,536 @@ func TestMultiProcessWorker(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestClusterOutputWithoutPlugin(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("no output target configured"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestOutputWithoutPlugin(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("no output target configured"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestClusterOutputWithMultiplePlugins(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				FileOutput: &output.FileOutputConfig{
+					Path: "/dev/null",
+				},
+				NullOutputConfig: &output.NullOutputConfig{},
+			},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestOutputWithMultiplePlugins(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			FileOutput: &output.FileOutputConfig{
+				Path: "/dev/null",
+			},
+			NullOutputConfig: &output.NullOutputConfig{},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestClusterOutputWithMissingSecret(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				SyslogOutputConfig: &output.SyslogOutputConfig{
+					Host: "localhost",
+					TrustedCaPath: &secret.Secret{
+						ValueFrom: &secret.ValueFrom{
+							SecretKeyRef: &corev1.SecretKeySelector{
+								LocalObjectReference: corev1.LocalObjectReference{
+									Name: "no-such-secret",
+								},
+								Key: "the-value",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestOutputWithMissingSecret(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			SyslogOutputConfig: &output.SyslogOutputConfig{
+				Host: "localhost",
+				TrustedCaPath: &secret.Secret{
+					ValueFrom: &secret.ValueFrom{
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "no-such-secret",
+							},
+							Key: "the-value",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
+		return output.Status.ProblemsCount == len(output.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: &output.NullOutputConfig{},
+			},
+		},
+	}
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Match: []v1beta1.ClusterMatch{
+				{
+					ClusterSelect: &v1beta1.ClusterSelect{},
+				},
+			},
+			OutputRefs: []string{output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestFlowWithLegacyOutputRef(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	clusterOutput := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-clusteroutput",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: &output.NullOutputConfig{},
+			},
+		},
+	}
+
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			NullOutputConfig: &output.NullOutputConfig{},
+		},
+	}
+
+	flow := &v1beta1.Flow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{
+					Select: &v1beta1.Select{},
+				},
+			},
+			OutputRefs: []string{clusterOutput.Name, output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, clusterOutput)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: &output.NullOutputConfig{},
+			},
+		},
+	}
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Match: []v1beta1.ClusterMatch{
+				{
+					ClusterSelect: &v1beta1.ClusterSelect{},
+				},
+			},
+			GlobalOutputRefs: []string{"no-such-output-1", output.Name, "no-such-output-2"},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf("dangling global output reference: no-such-output-1", "dangling global output reference: no-such-output-2"))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
+}
+
+func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FlowConfigCheckDisabled: true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	clusterOutput := &v1beta1.ClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-clusteroutput",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterOutputSpec{
+			OutputSpec: v1beta1.OutputSpec{
+				NullOutputConfig: &output.NullOutputConfig{},
+			},
+		},
+	}
+
+	output := &v1beta1.Output{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.OutputSpec{
+			NullOutputConfig: &output.NullOutputConfig{},
+		},
+	}
+
+	flow := &v1beta1.Flow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{
+					Select: &v1beta1.Select{},
+				},
+			},
+			GlobalOutputRefs: []string{"no-such-output-1", clusterOutput.Name, "no-such-output-2"},
+			LocalOutputRefs:  []string{"no-such-output-1", output.Name, "no-such-output-2"},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, clusterOutput)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.Problems, err
+	}, 1*time.Minute).Should(gomega.ConsistOf(
+		"dangling global output reference: no-such-output-1",
+		"dangling global output reference: no-such-output-2",
+		"dangling local output reference: no-such-output-1",
+		"dangling local output reference: no-such-output-2",
+	))
+
+	g.Eventually(func() (bool, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
+	}, 1*time.Minute).Should(gomega.BeTrue())
 }
 
 // TODO add following tests:
