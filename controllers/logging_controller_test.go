@@ -639,8 +639,9 @@ func beforeEach(t *testing.T) func() {
 
 	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Flow"))
 
+	var stopped bool
 	var wrappedReconciler reconcile.Reconciler
-	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler)
+	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler, &stopped)
 
 	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).
 		Named(uuid.New()[:8]).Complete(wrappedReconciler)
@@ -651,6 +652,7 @@ func beforeEach(t *testing.T) func() {
 
 	return func() {
 		close(stopMgr)
+		stopped = true
 		mgrStopped.Wait()
 	}
 }
