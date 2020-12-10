@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -49,8 +48,6 @@ var (
 	err              error
 	mgr              ctrl.Manager
 	requests         chan reconcile.Request
-	stopMgr          chan struct{}
-	mgrStopped       *sync.WaitGroup
 	reconcilerErrors chan error
 )
 
@@ -650,7 +647,7 @@ func beforeEach(t *testing.T) func() {
 
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	stopMgr, mgrStopped = startTestManager(t, mgr)
+	stopMgr, mgrStopped := startTestManager(t, mgr)
 
 	return func() {
 		close(stopMgr)
