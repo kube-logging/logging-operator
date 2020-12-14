@@ -64,8 +64,8 @@ RUN apk update \
          fluent-plugin-redis \
  && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
- && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-collection.git -d fluent-plugin-kubernetes-metadata-filter \
- && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-collection.git -d fluent-plugin-enhance-k8s-metadata \
+ && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
+ && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
 
