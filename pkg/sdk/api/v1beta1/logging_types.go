@@ -196,7 +196,7 @@ func (l *Logging) SetDefaults() error {
 			l.Spec.FluentdSpec.ConfigReloaderImage.Repository = "jimmidyson/configmap-reload"
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.Tag == "" {
-			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = "v0.2.2"
+			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = "v0.4.0"
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
