@@ -379,6 +379,8 @@ spec:
                   type: boolean
                 azure_container:
                   type: string
+                azure_imds_api_version:
+                  type: string
                 azure_object_key_format:
                   type: string
                 azure_storage_access_key:
@@ -447,8 +449,39 @@ spec:
                           type: object
                       type: object
                   type: object
-                azure_storage_type:
-                  type: string
+                azure_storage_sas_token:
+                  properties:
+                    mountFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              type: string
+                            name:
+                              type: string
+                            optional:
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    value:
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          properties:
+                            key:
+                              type: string
+                            name:
+                              type: string
+                            optional:
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                  type: object
                 buffer:
                   properties:
                     chunk_full_threshold:
@@ -520,12 +553,11 @@ spec:
                   type: string
                 path:
                   type: string
-                store_as:
-                  type: string
               required:
               - azure_container
               - azure_storage_access_key
               - azure_storage_account
+              - azure_storage_sas_token
               type: object
             cloudwatch:
               properties:

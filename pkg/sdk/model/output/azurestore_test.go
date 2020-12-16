@@ -33,7 +33,7 @@ buffer:
 `)
 	expected := `
   <match **>
-    @type azurestorage
+    @type azure-storage-append-blob
     @id test
     azure_container example-azure-container
     format json
