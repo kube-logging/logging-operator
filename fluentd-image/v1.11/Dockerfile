@@ -29,7 +29,6 @@ RUN apk update \
  && gem install fluentd -v 1.11.5 \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
- && gem install fluent-plugin-kubernetes_metadata_filter -v 2.5.2 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -42,7 +41,6 @@ RUN apk update \
          fluent-plugin-oss \
          fluent-plugin-dedot_filter \
          fluent-plugin-sumologic_output \
-         fluent-plugin-kubernetes_sumologic \
          fluent-plugin-kafka \
          fluent-plugin-geoip \
          fluent-plugin-label-router \
@@ -66,6 +64,8 @@ RUN apk update \
          fluent-plugin-redis \
  && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
+ && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
+ && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
 

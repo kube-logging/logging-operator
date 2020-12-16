@@ -99,7 +99,7 @@ const (
 	DefaultFluentbitImageRepository = "fluent/fluent-bit"
 	DefaultFluentbitImageTag        = "1.6.8"
 	DefaultFluentdImageRepository   = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag          = "v1.11.5-alpine-1"
+	DefaultFluentdImageTag          = "v1.11.5-alpine-3"
 )
 
 // SetDefaults fills empty attributes
@@ -196,7 +196,7 @@ func (l *Logging) SetDefaults() error {
 			l.Spec.FluentdSpec.ConfigReloaderImage.Repository = "jimmidyson/configmap-reload"
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.Tag == "" {
-			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = "v0.2.2"
+			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = "v0.4.0"
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
