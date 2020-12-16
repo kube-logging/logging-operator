@@ -37,7 +37,7 @@ RUN apk update \
          fluent-plugin-prometheus \
          fluent-plugin-s3 \
          fluent-plugin-rewrite-tag-filter \
-         fluent-plugin-azurestorage \
+         fluent-plugin-azure-storage-append-blob \
          fluent-plugin-oss \
          fluent-plugin-dedot_filter \
          fluent-plugin-sumologic_output \

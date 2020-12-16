@@ -25,12 +25,12 @@ type _hugoAzure interface{}
 
 // +docName:"Azure Storage output plugin for Fluentd"
 //Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
-//More info at https://github.com/htgc/fluent-plugin-azurestorage
+//More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
 type _docAzure interface{}
 
 // +name:"Azure Storage"
-// +url:"https://github.com/htgc/fluent-plugin-azurestorage/releases/tag/v0.1.0"
-// +version:"0.1.0"
+// +url:"https://github.com/microsoft/fluent-plugin-azure-storage-append-blob"
+// +version:"0.2.1"
 // +description:"Store logs in Azure Storage"
 // +status:"GA"
 type _metaAzure interface{}
@@ -46,14 +46,15 @@ type AzureStorage struct {
 	// Your azure storage access key
 	// +docLink:"Secret,../secret/"
 	AzureStorageAccessKey *secret.Secret `json:"azure_storage_access_key"`
+	// Your azure storage sas token
+	// +docLink:"Secret,../secret/"
+	AzureStorageSasToken *secret.Secret `json:"azure_storage_sas_token"`
 	// Your azure storage container
 	AzureContainer string `json:"azure_container"`
-	// Azure storage type currently only "blob" supported (default: blob)
-	AzureStorageType string `json:"azure_storage_type,omitempty"`
+	// Azure Instance Metadata Service API Version
+	AzureImdsApiVersion string `json:"azure_imds_api_version,omitempty"`
 	// Object key format (default: %{path}%{time_slice}_%{index}.%{file_extension})
 	AzureObjectKeyFormat string `json:"azure_object_key_format,omitempty"`
-	// Store as: gzip, json, text, lzo, lzma2 (default: gzip)
-	StoreAs string `json:"store_as,omitempty"`
 	// Automatically create container if not exists(default: true)
 	AutoCreateContainer bool `json:"auto_create_container,omitempty"`
 	// Compat format type: out_file, json, ltsv (default: out_file)
@@ -63,7 +64,7 @@ type AzureStorage struct {
 }
 
 func (a *AzureStorage) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	const pluginType = "azurestorage"
+	const pluginType = "azure-storage-append-blob"
 	azure := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -66,6 +66,11 @@ func (in *AzureStorage) DeepCopyInto(out *AzureStorage) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.AzureStorageSasToken != nil {
+		in, out := &in.AzureStorageSasToken, &out.AzureStorageSasToken
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)
