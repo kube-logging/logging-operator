@@ -49,7 +49,7 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 
-{{- if not DisableKubernetesFilter }}
+{{- if not .DisableKubernetesFilter }}
 [FILTER]
     Name        kubernetes
     {{- range $key, $value := .KubernetesFilter }}
