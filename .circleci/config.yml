@@ -120,7 +120,6 @@ jobs:
           name: Setup helm
           command: |
             bash <(curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3) -v v3.4.2
-            helm init
 
       - run:
           name: Create logging namespace
