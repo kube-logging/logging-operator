@@ -36,7 +36,7 @@ function helm_deploy_logging_operator()
 {
     helm install \
         --wait \
-        --name logging-operator \
+        logging-operator \
         --set image.tag='local' \
         --set image.repository='controller' \
         "${SCRIPT_PATH}/../charts/logging-operator"
@@ -46,8 +46,9 @@ function configure_logging()
 {
     helm install \
         --wait \
+        --create-namespace \
         --namespace logging \
-        --name 'logging-operator-logging-tls' \
+        'logging-operator-logging-tls' \
         "${SCRIPT_PATH}/../charts/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
     kubectl apply -f "${SCRIPT_PATH}/clusterflow.yaml"
