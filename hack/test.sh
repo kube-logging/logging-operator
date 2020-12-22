@@ -39,7 +39,8 @@ function helm_deploy_logging_operator()
         logging-operator \
         --set image.tag='local' \
         --set image.repository='controller' \
-        "${SCRIPT_PATH}/../charts/logging-operator"
+        "${SCRIPT_PATH}/../charts/logging-operator" \
+        --skip-crds 
 }
 
 function configure_logging()
