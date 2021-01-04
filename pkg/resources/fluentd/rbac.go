@@ -62,6 +62,55 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
+func (r *Reconciler) isEnhanceK8sFilter() bool {
+	for _, f := range r.Logging.Spec.GlobalFilters {
+		if f.EnhanceK8s != nil {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+		return &rbacv1.ClusterRole{
+			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups: []string{""},
+					Resources: []string{"namespaces", "pods"},
+					Verbs:     []string{"get", "list", "watch"},
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.ClusterRole{
+		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "ClusterRole",
+				APIGroup: "rbac.authorization.k8s.io",
+				Name:     r.Logging.QualifiedName(roleName),
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind: "ServiceAccount",
+					Name: r.getServiceAccount(),
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+}
+
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
