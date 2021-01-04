@@ -49,6 +49,8 @@ const (
 	defaultServiceAccountName = "fluentd"
 	roleBindingName           = "fluentd"
 	roleName                  = "fluentd"
+	clusterRoleBindingName    = "fluentd"
+	clusterRoleName           = "fluentd"
 	containerName             = "fluentd"
 )
 
