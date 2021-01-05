@@ -77,9 +77,21 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
 				{
-					APIGroups: []string{""},
-					Resources: []string{"namespaces", "pods"},
-					Verbs:     []string{"get", "list", "watch"},
+					APIGroups: []string{"", "apps", "extensions", "events.k8s.io"},
+					Resources: []string{
+						"configmaps",
+						"daemonsets",
+						"deployments",
+						"endpoints",
+						"events",
+						"namespaces",
+						"nodes",
+						"pods",
+						"replicasets",
+						"services",
+						"statefulsets",
+					},
+					Verbs: []string{"get", "list", "watch"},
 				},
 			},
 		}, reconciler.StatePresent, nil
