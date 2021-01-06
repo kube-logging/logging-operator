@@ -104,6 +104,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.role,
 		r.roleBinding,
+		r.clusterRole,
+		r.clusterRoleBinding,
 		r.clusterPodSecurityPolicy,
 		r.pspRole,
 		r.pspRoleBinding,
