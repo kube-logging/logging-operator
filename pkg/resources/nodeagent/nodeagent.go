@@ -43,10 +43,10 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-var NodeAgentFluentbitWindows = &v1beta1.NodeAgentFluentbit{
+var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentFluentbit{
 	Flush: 1,
 }
-var NodeAgentFluentbitLinux = &v1beta1.NodeAgentFluentbit{
+var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgentFluentbit{
 	Flush: 2,
 }
 
@@ -98,7 +98,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		var instance nodeAgentInstance
 		switch a.Type {
 		case "windows":
-			err := mergo.Merge(a, NodeAgentFluentbitWindows)
+			err := mergo.Merge(a, NodeAgentFluentbitWindowsDefaults)
 			if err != nil {
 				return nil, err
 			}
@@ -108,7 +108,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 				logging:    r.Logging,
 			}
 		default:
-			err := mergo.Merge(a, NodeAgentFluentbitLinux)
+			err := mergo.Merge(a, NodeAgentFluentbitLinuxDefaults)
 			if err != nil {
 				return nil, err
 			}

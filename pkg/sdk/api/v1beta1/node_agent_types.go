@@ -23,9 +23,9 @@ import (
 // +kubebuilder:object:generate=true
 
 type NodeAgent struct {
-	Name          string `json:"name,omitempty"`
-	Type          string `json:"type,omitempty"`
-	FluentbitSpec NodeAgentFluentbit
+	Name          string              `json:"name,omitempty"`
+	Type          string              `json:"type,omitempty"`
+	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
 }
 
 type NodeAgentFluentbit struct {
@@ -50,13 +50,13 @@ type NodeAgentFluentbit struct {
 	Metrics       *Metrics                    `json:"metrics,omitempty"`
 	Security      *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
-	MountPath         string                   `json:"mountPath,omitempty"`
-	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
-	InputTail         InputTail                `json:"inputTail,omitempty"`
-	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
-	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
-	BufferStorage    BufferStorage    `json:"bufferStorage,omitempty"`
+	PositionDB        volume.KubernetesVolume `json:"positiondb,omitempty"`
+	MountPath         string                  `json:"mountPath,omitempty"`
+	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
+	InputTail         InputTail               `json:"inputTail,omitempty"`
+	FilterAws         *FilterAws              `json:"filterAws,omitempty"`
+	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
+	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
