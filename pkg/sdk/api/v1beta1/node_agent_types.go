@@ -51,8 +51,6 @@ type NodeAgentFluentbit struct {
 	Security      *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
-	// Deprecated, use positiondb
-	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
 	MountPath         string                   `json:"mountPath,omitempty"`
 	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
