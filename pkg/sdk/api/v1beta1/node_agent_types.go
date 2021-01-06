@@ -55,8 +55,6 @@ type NodeAgentFluentbit struct {
 	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
-	// Deprecated, use inputTail.parser
-	Parser           string           `json:"parser,omitempty"`
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
 	BufferStorage    BufferStorage    `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
