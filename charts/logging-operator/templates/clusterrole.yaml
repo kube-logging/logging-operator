@@ -23,18 +23,19 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - events
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resources:
+  - endpoints
   - namespaces
   - nodes
   verbs:
   - get
   - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
 - apiGroups:
   - ""
   resources:
@@ -75,14 +76,6 @@ rules:
   - list
   - patch
   - update
-  - watch
-- apiGroups:
-  - events.k8s.io
-  resources:
-  - endpoints
-  verbs:
-  - get
-  - list
   - watch
 - apiGroups:
   - extensions
