@@ -33,15 +33,6 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - events
-  verbs:
-  - create
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - persistentvolumeclaims
   - pods
   - serviceaccounts
@@ -53,6 +44,16 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - ""
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
   - watch
 - apiGroups:
   - apps
@@ -80,15 +81,6 @@ rules:
   - list
   - patch
   - update
-  - watch
-- apiGroups:
-  - events.k8s.io
-  resources:
-  - events
-  verbs:
-  - create
-  - get
-  - list
   - watch
 - apiGroups:
   - extensions

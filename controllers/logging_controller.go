@@ -63,8 +63,7 @@ type LoggingReconciler struct {
 // +kubebuilder:rbac:groups=apps,resources=statefulsets;daemonsets;replicasets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=services;persistentvolumeclaims;serviceaccounts;pods,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=nodes;namespaces;endpoints,verbs=get;list;watch
-// +kubebuilder:rbac:groups="",resources=events,verbs=create;get;list;watch
-// +kubebuilder:rbac:groups="events.k8s.io",resources=events,verbs=create;get;list;watch
+// +kubebuilder:rbac:groups="";events.k8s.io,resources=events,verbs=create;get;list;watch
 // +kubebuilder:rbac:groups="rbac.authorization.k8s.io",resources=clusterroles;clusterrolebindings;roles;rolebindings,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=monitoring.coreos.com,resources=servicemonitors,verbs=get;list;watch;create;update;patch;delete
 
