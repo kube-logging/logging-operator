@@ -9,6 +9,7 @@ require (
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
 	github.com/banzaicloud/operator-tools v0.15.0
 	github.com/go-logr/logr v0.2.1
+	github.com/imdario/mergo v0.3.9
 	github.com/onsi/gomega v1.10.1
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.43.0

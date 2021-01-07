@@ -16,19 +16,11 @@ package nodeagent
 
 import (
 	"emperror.dev/errors"
-	"github.com/imdario/mergo"
-	"k8s.io/apimachinery/pkg/runtime"
-
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"github.com/imdario/mergo"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -92,7 +84,7 @@ type nodeAgentInstance struct {
 	logging    *v1beta1.Logging
 }
 
-// Reconcile reconciles the fluentBit resource
+// Reconcile reconciles the NodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	for _, a := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
@@ -129,9 +121,10 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return result, nil
 		}
 	}
-
+	return nil, nil
 }
 
+// Reconcile reconciles the nodeAgentInstance resource
 func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
 	for _, factory := range []resources.Resource{
 		n.serviceAccount,
