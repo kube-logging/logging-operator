@@ -22,6 +22,9 @@ import (
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -37,11 +40,82 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentFluentbit{
-	Flush: 1,
+var NodeAgentFluentbitDefaults = &v1beta1.NodeAgent{
+	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		Image: v1beta1.ImageSpec{
+			Repository: "fluent/fluent-bit",
+			Tag:        "1.6.8",
+			PullPolicy: "IfNotPresent",
+		},
+		Flush:         1,
+		Grace:         5,
+		LogLevel:      "info",
+		CoroStackSize: 24576,
+		Resources: v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("100M"),
+				v1.ResourceCPU:    resource.MustParse("200m"),
+			},
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("50M"),
+				v1.ResourceCPU:    resource.MustParse("100m"),
+			},
+		},
+		LivenessProbe: &v1.Probe{
+			Handler: v1.Handler{
+				HTTPGet: &v1.HTTPGetAction{
+					Path: "/api/v1/metrics/prometheus",
+					Port: intstr.IntOrString{
+						IntVal: 2020,
+					},
+				}},
+			InitialDelaySeconds: 10,
+			TimeoutSeconds:      0,
+			PeriodSeconds:       10,
+			SuccessThreshold:    0,
+			FailureThreshold:    3,
+		},
+		InputTail: v1beta1.InputTail{
+			Path:            "/var/log/containers/*.log",
+			RefreshInterval: "5",
+			SkipLongLines:   "On",
+			DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
+			MemBufLimit:     "5MB",
+			Tag:             "kubernetes.*",
+		},
+		Security: &v1beta1.Security{
+			RoleBasedAccessControlCreate: util.BoolPointer(true),
+			SecurityContext:              &v1.SecurityContext{},
+			PodSecurityContext:           &v1.PodSecurityContext{},
+		},
+		MountPath: "/var/lib/docker/containers",
+		BufferStorage: v1beta1.BufferStorage{
+			StoragePath: "/buffers",
+		},
+		FilterAws: &v1beta1.FilterAws{
+			ImdsVersion:     "v2",
+			AZ:              util.BoolPointer(true),
+			Ec2InstanceID:   util.BoolPointer(true),
+			Ec2InstanceType: util.BoolPointer(false),
+			PrivateIP:       util.BoolPointer(false),
+			AmiID:           util.BoolPointer(false),
+			AccountID:       util.BoolPointer(false),
+			Hostname:        util.BoolPointer(false),
+			VpcID:           util.BoolPointer(false),
+			Match:           "*",
+		},
+		ForwardOptions: &v1beta1.ForwardOptions{
+			RetryLimit: "False",
+		},
+	},
 }
-var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgentFluentbit{
-	Flush: 2,
+var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
+	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		Flush: 1},
+}
+var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgent{
+	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		Flush: 2},
 }
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {
@@ -90,6 +164,11 @@ type nodeAgentInstance struct {
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	for _, a := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
+		err := mergo.Merge(a, NodeAgentFluentbitDefaults)
+		if err != nil {
+			return nil, err
+		}
+
 		switch a.Type {
 		case "windows":
 			err := mergo.Merge(a, NodeAgentFluentbitWindowsDefaults)
