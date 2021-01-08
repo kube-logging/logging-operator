@@ -52,7 +52,6 @@ RUN apk update \
          fluent-plugin-detect-exceptions \
          fluent-plugin-multi-format-parser \
          fluent-plugin-record-modifier \
-         fluent-plugin-logzio \
          fluent-plugin-newrelic \
          fluent-plugin-splunk-hec \
          elasticsearch-xpack \
@@ -62,6 +61,7 @@ RUN apk update \
          fluent-plugin-datadog \
          fluent-plugin-aws-elasticsearch-service \
          fluent-plugin-redis \
+ && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
  && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
