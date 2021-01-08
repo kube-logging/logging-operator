@@ -120,7 +120,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
