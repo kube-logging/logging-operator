@@ -24,5 +24,7 @@ spec:
     {{- if .Values.loggingOperator.fluentbit }}
 {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
     {{- end}}
+  nodeAgents:
+    - name: testanyad
 
   controlNamespace: {{ .Values.loggingOperator.controlNamespace | default .Release.Namespace }}

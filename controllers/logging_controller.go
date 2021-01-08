@@ -24,6 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/model"
+	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
@@ -118,6 +119,10 @@ func (r *LoggingReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if logging.Spec.FluentbitSpec != nil {
 		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts).Reconcile)
+	}
+
+	if len(logging.Spec.NodeAgents) > 0 {
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, reconcilerOpts).Reconcile)
 	}
 
 	for _, rec := range reconcilers {

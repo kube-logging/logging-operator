@@ -20,7 +20,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -70,14 +72,14 @@ type Reconciler struct {
 	configs map[string][]byte
 }
 
-//
-//// NewReconciler creates a new Fluentbit reconciler
-//func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
-//	return &Reconciler{
-//		Logging:                   logging,
-//		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
-//	}
-//}
+// NewReconciler creates a new NodeAgent reconciler
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
+	return &Reconciler{
+		Logging:                   logging,
+		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
+	}
+}
+
 type nodeAgentInstance struct {
 	nodeAgent  *v1beta1.NodeAgent
 	reconciler *reconciler.GenericResourceReconciler

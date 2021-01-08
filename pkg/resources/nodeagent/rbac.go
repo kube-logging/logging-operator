@@ -23,10 +23,10 @@ import (
 func (n *nodeAgentInstance) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
-			ObjectMeta: n.nodeAgent.FluentbitSpec.MetaOverride.Merge(n.FluentbitObjectMeta(defaultServiceAccountName)),
+			ObjectMeta: n.nodeAgent.FluentbitSpec.MetaOverride.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
-		ObjectMeta: n.FluentbitObjectMeta(defaultServiceAccountName),
+		ObjectMeta: n.NodeAgentObjectMeta(defaultServiceAccountName),
 	}, reconciler.StateAbsent, nil
 }
