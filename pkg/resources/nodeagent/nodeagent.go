@@ -42,6 +42,8 @@ const (
 
 var NodeAgentFluentbitDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		Annotations: "",
+		Labels:      "",
 		Image: v1beta1.ImageSpec{
 			Repository: "fluent/fluent-bit",
 			Tag:        "1.6.8",
@@ -111,11 +113,11 @@ var NodeAgentFluentbitDefaults = &v1beta1.NodeAgent{
 }
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-		Flush: 1},
+		Flush: 2},
 }
 var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-		Flush: 2},
+		Flush: 3},
 }
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {
