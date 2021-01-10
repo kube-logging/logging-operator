@@ -43,8 +43,8 @@ const (
 
 var NodeAgentFluentbitDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-		Annotations: "",
-		Labels:      "",
+		Annotations: make(map[string]string),
+		Labels:      make(map[string]string),
 		Image: v1beta1.ImageSpec{
 			Repository: "fluent/fluent-bit",
 			Tag:        "1.6.8",
@@ -214,15 +214,15 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
 	for _, factory := range []resources.Resource{
 		n.serviceAccount,
-		//n.clusterRole,
-		//n.clusterRoleBinding,
-		//n.clusterPodSecurityPolicy,
-		//n.pspClusterRole,
-		//n.pspClusterRoleBinding,
-		//n.configSecret,
-		//n.daemonSet,
-		//n.serviceMetrics,
-		//n.monitorServiceMetrics,
+		n.clusterRole,
+		n.clusterRoleBinding,
+		n.clusterPodSecurityPolicy,
+		n.pspClusterRole,
+		n.pspClusterRoleBinding,
+		n.configSecret,
+		n.daemonSet,
+		n.serviceMetrics,
+		n.monitorServiceMetrics,
 	} {
 		o, state, err := factory()
 		if err != nil {

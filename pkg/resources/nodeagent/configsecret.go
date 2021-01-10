@@ -230,7 +230,6 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 
 	return &corev1.Secret{
 		ObjectMeta: n.NodeAgentObjectMeta(fluentBitSecretConfigName),
-		ObjectMeta: n.nodeAgent.FluentbitSpec.MetaOverride.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
 		Data:       confs,
 	}, reconciler.StatePresent, nil
 }

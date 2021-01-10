@@ -63,7 +63,7 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, n.getFluentBitLabels())},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
@@ -209,7 +209,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fluentBitSecretConfigName),
+					SecretName: n.logging.QualifiedName(fluentBitSecretConfigName),
 					Items: []corev1.KeyToPath{
 						{
 							Key:  BaseConfigName,

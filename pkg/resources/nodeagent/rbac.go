@@ -17,8 +17,50 @@ package nodeagent
 import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
+
+func (n *nodeAgentInstance) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
+	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+		return &rbacv1.ClusterRole{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups: []string{""},
+					Resources: []string{"pods", "namespaces"},
+					Verbs:     []string{"get", "list", "watch"},
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.ClusterRole{
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName),
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+}
+
+func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
+	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "ClusterRole",
+				APIGroup: "rbac.authorization.k8s.io",
+				Name:     n.logging.QualifiedName(clusterRoleName),
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      n.getServiceAccount(),
+					Namespace: n.logging.Spec.ControlNamespace,
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName),
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+}
 
 func (n *nodeAgentInstance) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {

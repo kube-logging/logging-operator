@@ -29,11 +29,13 @@ type NodeAgent struct {
 }
 
 type NodeAgentFluentbit struct {
-	MetaOverride types.MetaBase `json:"metaOverride,omitempty"`
-	Image        ImageSpec      `json:"image,omitempty"`
-	TLS          FluentbitTLS   `json:"tls,omitempty"`
-	TargetHost   string         `json:"targetHost,omitempty"`
-	TargetPort   int32          `json:"targetPort,omitempty"`
+	Annotations  map[string]string `json:"annotations,omitempty"`
+	Labels       map[string]string `json:"labels,omitempty"`
+	MetaOverride types.MetaBase    `json:"metaOverride,omitempty"`
+	Image        ImageSpec         `json:"image,omitempty"`
+	TLS          FluentbitTLS      `json:"tls,omitempty"`
+	TargetHost   string            `json:"targetHost,omitempty"`
+	TargetPort   int32             `json:"targetPort,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
@@ -50,13 +52,14 @@ type NodeAgentFluentbit struct {
 	Metrics       *Metrics                    `json:"metrics,omitempty"`
 	Security      *Security                   `json:"security,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	PositionDB        volume.KubernetesVolume `json:"positiondb,omitempty"`
-	MountPath         string                  `json:"mountPath,omitempty"`
-	ExtraVolumeMounts []VolumeMount           `json:"extraVolumeMounts,omitempty"`
-	InputTail         InputTail               `json:"inputTail,omitempty"`
-	FilterAws         *FilterAws              `json:"filterAws,omitempty"`
-	FilterKubernetes  FilterKubernetes        `json:"filterKubernetes,omitempty"`
-	BufferStorage     BufferStorage           `json:"bufferStorage,omitempty"`
+	PositionDB              volume.KubernetesVolume `json:"positiondb,omitempty"`
+	MountPath               string                  `json:"mountPath,omitempty"`
+	ExtraVolumeMounts       []VolumeMount           `json:"extraVolumeMounts,omitempty"`
+	InputTail               InputTail               `json:"inputTail,omitempty"`
+	FilterAws               *FilterAws              `json:"filterAws,omitempty"`
+	FilterKubernetes        FilterKubernetes        `json:"filterKubernetes,omitempty"`
+	DisableKubernetesFilter *bool                   `json:"disableKubernetesFilter,omitempty"`
+	BufferStorage           BufferStorage           `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`

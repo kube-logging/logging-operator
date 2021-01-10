@@ -45,7 +45,7 @@ func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconcil
 
 		if n.nodeAgent.FluentbitSpec.PositionDB.HostPath != nil {
 			n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
-				fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+				fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
 
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: n.nodeAgent.FluentbitSpec.PositionDB.HostPath.Path,

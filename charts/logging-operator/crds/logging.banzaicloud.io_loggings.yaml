@@ -3777,6 +3777,10 @@ spec:
                                 type: array
                             type: object
                         type: object
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        type: object
                       bufferStorage:
                         properties:
                           storage.backlog.mem_limit:
@@ -3892,6 +3896,8 @@ spec:
                         type: integer
                       customConfigSecret:
                         type: string
+                      disableKubernetesFilter:
+                        type: boolean
                       enableUpstream:
                         type: boolean
                       extraVolumeMounts:
@@ -4065,6 +4071,10 @@ spec:
                             type: string
                           storage.type:
                             type: string
+                        type: object
+                      labels:
+                        additionalProperties:
+                          type: string
                         type: object
                       livenessDefaultCheck:
                         type: boolean
