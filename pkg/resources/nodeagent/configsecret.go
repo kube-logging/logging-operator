@@ -86,7 +86,7 @@ type fluentBitConfig struct {
 func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
-			ObjectMeta: n.FluentbitObjectMeta(fluentBitSecretConfigName),
+			ObjectMeta: n.NodeAgentObjectMeta(fluentBitSecretConfigName),
 		}, reconciler.StateAbsent, nil
 	}
 	monitor := struct {
@@ -142,7 +142,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		Grace:         n.nodeAgent.FluentbitSpec.Grace,
 		LogLevel:      n.nodeAgent.FluentbitSpec.LogLevel,
 		CoroStackSize: n.nodeAgent.FluentbitSpec.CoroStackSize,
-		Namespace:     n.nodeAgent.ControlNamespace,
+		Namespace:     n.logging.Spec.ControlNamespace,
 		TLS: struct {
 			Enabled   bool
 			SharedKey string
@@ -151,8 +151,8 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
-		TargetPort:              r.Logging.Spec.FluentdSpec.Port,
+		TargetHost:              fmt.Sprintf("%s.%s.svc", n.logging.QualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
+		TargetPort:              n.logging.Spec.FluentdSpec.Port,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		KubernetesFilter:        fluentbitKubernetesFilter,
@@ -205,8 +205,8 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		input.Upstream.Enabled = true
 		input.Upstream.Config.Name = "fluentd-upstream"
 
-		for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
-			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, r.generateUpstreamNode(i))
+		for i := 0; i < n.logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, n.generateUpstreamNode(i))
 		}
 	}
 
@@ -226,10 +226,10 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		confs[UpstreamConfigName] = []byte(upstreamConfig)
 	}
 
-	r.configs = confs
+	n.configs = confs
 
 	return &corev1.Secret{
-		ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
+		ObjectMeta: n.NodeAgentObjectMeta(fluentBitSecretConfigName),
 		ObjectMeta: n.nodeAgent.FluentbitSpec.MetaOverride.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
 		Data:       confs,
 	}, reconciler.StatePresent, nil
@@ -262,14 +262,14 @@ func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (r *Reconciler) generateUpstreamNode(index int) upstreamNode {
-	podName := r.Logging.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
+func (n *nodeAgentInstance) generateUpstreamNode(index int) upstreamNode {
+	podName := n.logging.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
 		Host: fmt.Sprintf("%s.%s.%s.svc.cluster.local",
 			podName,
-			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
-			r.Logging.Spec.ControlNamespace),
+			n.logging.QualifiedName(fluentd.ServiceName+"-headless"),
+			n.logging.Spec.ControlNamespace),
 		Port: 24240,
 	}
 }

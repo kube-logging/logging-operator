@@ -46,14 +46,14 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 	}
 
 	labels := util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels())
-	meta := n.FluentbitObjectMeta(fluentbitDaemonSetName)
+	meta := n.NodeAgentObjectMeta(fluentbitDaemonSetName)
 	podMeta := metav1.ObjectMeta{
 		Labels:      labels,
 		Annotations: n.nodeAgent.FluentbitSpec.Annotations,
 	}
 
-	if r.configs != nil {
-		for key, config := range r.configs {
+	if n.configs != nil {
+		for key, config := range n.configs {
 			h := sha256.New()
 			_, _ = h.Write(config)
 			templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
@@ -63,7 +63,7 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, n.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
@@ -83,7 +83,7 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 					Containers: []corev1.Container{
 						{
 							Name:            containerName,
-							Image:           n.nodeAgent.FluentbitSpec.Image.Repository + ":" + r.Logging.Spec.FluentbitSpec.Image.Tag,
+							Image:           n.nodeAgent.FluentbitSpec.Image.Repository + ":" + n.nodeAgent.FluentbitSpec.Image.Tag,
 							ImagePullPolicy: corev1.PullPolicy(n.nodeAgent.FluentbitSpec.Image.PullPolicy),
 							Ports:           containerPorts,
 							Resources:       n.nodeAgent.FluentbitSpec.Resources,
@@ -106,9 +106,9 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 	}
 
 	n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
 	n.nodeAgent.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume))
+		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
 
 	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err

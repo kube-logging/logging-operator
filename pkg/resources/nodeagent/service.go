@@ -27,7 +27,7 @@ import (
 func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
+			ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -37,20 +37,20 @@ func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.Desired
 						TargetPort: intstr.IntOrString{IntVal: n.nodeAgent.FluentbitSpec.Metrics.Port},
 					},
 				},
-				Selector:  r.getFluentBitLabels(),
+				Selector:  n.getFluentBitLabels(),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
+		ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitor {
-		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
+		objectMetadata := n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics")
 		if n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -70,15 +70,15 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 				}},
 				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+					MatchLabels: util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
 				},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
 				SampleLimit:       0,
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
+		ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics"),
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }

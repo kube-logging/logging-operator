@@ -16,6 +16,7 @@ package nodeagent
 
 import (
 	"emperror.dev/errors"
+	"fmt"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
@@ -129,12 +130,13 @@ func (n *nodeAgentInstance) getFluentBitLabels() map[string]string {
 		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
 }
 
-//func (r *Reconciler) getServiceAccount() string {
-//	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
-//		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
-//	}
-//	return r.Logging.QualifiedName(defaultServiceAccountName)
-//}
+func (n *nodeAgentInstance) getServiceAccount() string {
+	if n.nodeAgent.FluentbitSpec.Security.ServiceAccount != "" {
+		return n.nodeAgent.FluentbitSpec.Security.ServiceAccount
+	}
+	return fmt.Sprintf("%s-%s", n.logging.QualifiedName(defaultServiceAccountName), n.nodeAgent.Name)
+}
+
 //
 //type DesiredObject struct {
 //	Object runtime.Object
@@ -160,6 +162,7 @@ type nodeAgentInstance struct {
 	nodeAgent  *v1beta1.NodeAgent
 	reconciler *reconciler.GenericResourceReconciler
 	logging    *v1beta1.Logging
+	configs    map[string][]byte
 }
 
 // Reconcile reconciles the NodeAgent resource

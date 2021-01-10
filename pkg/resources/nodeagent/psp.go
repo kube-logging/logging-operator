@@ -54,7 +54,7 @@ func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconcil
 		}
 
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
 				Volumes: []policyv1beta1.FSType{
 					"configMap",
@@ -80,7 +80,7 @@ func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconcil
 		}, reconciler.StatePresent, nil
 	}
 	return &policyv1beta1.PodSecurityPolicy{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitPodSecurityPolicyName),
+		ObjectMeta: n.NodeAgentObjectMeta(fluentbitPodSecurityPolicyName),
 		Spec:       policyv1beta1.PodSecurityPolicySpec{},
 	}, reconciler.StateAbsent, nil
 }
@@ -88,41 +88,41 @@ func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconcil
 func (n *nodeAgentInstance) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRole{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups:     []string{"policy"},
 					Resources:     []string{"podsecuritypolicies"},
-					ResourceNames: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
+					ResourceNames: []string{n.logging.QualifiedName(fluentbitPodSecurityPolicyName)},
 					Verbs:         []string{"use"},
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
-		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRoleBinding{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(clusterRoleName + "-psp"),
+				Name:     n.logging.QualifiedName(clusterRoleName + "-psp"),
 			},
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.getServiceAccount(),
-					Namespace: r.Logging.Spec.ControlNamespace,
+					Name:      n.getServiceAccount(),
+					Namespace: n.logging.Spec.ControlNamespace,
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
