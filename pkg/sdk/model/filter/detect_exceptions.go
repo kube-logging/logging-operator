@@ -32,8 +32,7 @@ type _hugoExceptionDetector interface{}
 // #### Example output configurations
 // ```
 //filters:
-//  spec:
-//    detectExceptions:
+//  - detectExceptions:
 //      languages: java, python
 //      multiline_flush_interval: 0.1
 // ```
