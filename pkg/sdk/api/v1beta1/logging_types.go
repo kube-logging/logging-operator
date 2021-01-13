@@ -41,16 +41,28 @@ type _metaLoggingSpec interface{}
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
-	LoggingRef                             string           `json:"loggingRef,omitempty"`
-	FlowConfigCheckDisabled                bool             `json:"flowConfigCheckDisabled,omitempty"`
-	FlowConfigOverride                     string           `json:"flowConfigOverride,omitempty"`
-	FluentbitSpec                          *FluentbitSpec   `json:"fluentbit,omitempty"`
-	FluentdSpec                            *FluentdSpec     `json:"fluentd,omitempty"`
-	DefaultFlowSpec                        *DefaultFlowSpec `json:"defaultFlow,omitempty"`
-	GlobalFilters                          []Filter         `json:"globalFilters,omitempty"`
-	WatchNamespaces                        []string         `json:"watchNamespaces,omitempty"`
-	ControlNamespace                       string           `json:"controlNamespace"`
-	AllowClusterResourcesFromAllNamespaces bool             `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
+	// Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset.
+	LoggingRef string `json:"loggingRef,omitempty"`
+	// Disable configuration check before applying new fluentd configuration.
+	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
+	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
+	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
+	// Fluentbit daemonset configuration.
+	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
+	// Fluentd statefulset configuration
+	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
+	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
+	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
+	// Global filters to apply on logs before any match or filter mechanism.
+	GlobalFilters []Filter `json:"globalFilters,omitempty"`
+	// Limit namespaces to watch Flow and Output custom reasources.
+	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
+	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
+	// This should be a protected namespace from regular users.
+	// Resources like fluentbit and fluentd will run in this namespace as well.
+	ControlNamespace string `json:"controlNamespace"`
+	// Allow configuration of cluster resources from any namespace. Mutually exclusive
+	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
 
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
