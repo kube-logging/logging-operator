@@ -22,8 +22,6 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,11 +43,10 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 		})
 	}
 
-	labels := util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels())
 	meta := n.NodeAgentObjectMeta(fluentbitDaemonSetName)
 	podMeta := metav1.ObjectMeta{
-		Labels:      labels,
-		Annotations: n.nodeAgent.FluentbitSpec.Annotations,
+		Labels:      n.getFluentBitLabels(),
+		Annotations: n.nodeAgent.Metadata.Annotations,
 	}
 
 	if n.configs != nil {
@@ -63,15 +60,12 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels())},
+			Selector: &metav1.LabelSelector{MatchLabels: n.getFluentBitLabels()},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
 					ServiceAccountName: n.getServiceAccount(),
 					Volumes:            n.generateVolume(),
-					Tolerations:        n.nodeAgent.FluentbitSpec.Tolerations,
-					NodeSelector:       n.nodeAgent.FluentbitSpec.NodeSelector,
-					Affinity:           n.nodeAgent.FluentbitSpec.Affinity,
 					PriorityClassName:  n.nodeAgent.FluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
@@ -79,15 +73,11 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 						RunAsUser:    n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
 						RunAsGroup:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 					},
-					ImagePullSecrets: n.nodeAgent.FluentbitSpec.Image.ImagePullSecrets,
 					Containers: []corev1.Container{
 						{
-							Name:            containerName,
-							Image:           n.nodeAgent.FluentbitSpec.Image.Repository + ":" + n.nodeAgent.FluentbitSpec.Image.Tag,
-							ImagePullPolicy: corev1.PullPolicy(n.nodeAgent.FluentbitSpec.Image.PullPolicy),
-							Ports:           containerPorts,
-							Resources:       n.nodeAgent.FluentbitSpec.Resources,
-							VolumeMounts:    n.generateVolumeMounts(),
+							Name:         containerName,
+							Ports:        containerPorts,
+							VolumeMounts: n.generateVolumeMounts(),
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:                n.nodeAgent.FluentbitSpec.Security.SecurityContext.RunAsUser,
 								RunAsNonRoot:             n.nodeAgent.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
@@ -96,28 +86,27 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 								Privileged:               n.nodeAgent.FluentbitSpec.Security.SecurityContext.Privileged,
 								SELinuxOptions:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
 							},
-							LivenessProbe:  n.nodeAgent.FluentbitSpec.LivenessProbe,
-							ReadinessProbe: n.nodeAgent.FluentbitSpec.ReadinessProbe,
 						},
 					},
 				},
 			},
 		},
 	}
+	desiredWithOverride := n.nodeAgent.FluentbitSpec.DaemonSetOverrides.Override(*desired)
 
 	n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
 	n.nodeAgent.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
 
-	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
-		return desired, reconciler.StatePresent, err
+	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desiredWithOverride.Spec.Template.Spec); err != nil {
+		return &desiredWithOverride, reconciler.StatePresent, err
 	}
-	if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
-		return desired, reconciler.StatePresent, err
+	if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desiredWithOverride.Spec.Template.Spec); err != nil {
+		return &desiredWithOverride, reconciler.StatePresent, err
 	}
 
-	return desired, reconciler.StatePresent, nil
+	return &desiredWithOverride, reconciler.StatePresent, nil
 }
 
 func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {

@@ -24,9 +24,10 @@ import (
 // NodeAgentObjectMeta creates an objectMeta for resource fluentbit
 func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:      fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
-		Namespace: n.logging.Spec.ControlNamespace,
-		Labels:    n.getFluentBitLabels(),
+		Name:        fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
+		Namespace:   n.logging.Spec.ControlNamespace,
+		Labels:      n.getFluentBitLabels(),
+		Annotations: n.nodeAgent.Metadata.Annotations,
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: n.logging.APIVersion,
@@ -43,8 +44,9 @@ func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 // NodeAgentObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
 func (n *nodeAgentInstance) NodeAgentObjectMetaClusterScope(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:   fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
-		Labels: n.getFluentBitLabels(),
+		Name:        fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
+		Labels:      n.getFluentBitLabels(),
+		Annotations: n.nodeAgent.Metadata.Annotations,
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: n.logging.APIVersion,

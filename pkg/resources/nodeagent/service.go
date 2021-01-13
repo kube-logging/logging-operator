@@ -70,7 +70,7 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 				}},
 				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(n.nodeAgent.FluentbitSpec.Labels, n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
+					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
 				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
 				SampleLimit:       0,

@@ -65,7 +65,7 @@ func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.Des
 func (n *nodeAgentInstance) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
-			ObjectMeta: n.nodeAgent.FluentbitSpec.MetaOverride.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
+			ObjectMeta: n.nodeAgent.Metadata.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{

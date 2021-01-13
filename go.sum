@@ -85,6 +85,8 @@ github.com/banzaicloud/k8s-objectmatcher v1.5.0 h1:mYrLzvRgxCHBlJZEcyIglDuoKpMhw
 github.com/banzaicloud/k8s-objectmatcher v1.5.0/go.mod h1:9MWY5HsM/OaTmoTirczhlO8UALbH722WgdpaaR7Y8OE=
 github.com/banzaicloud/operator-tools v0.15.0 h1:BxtRBJlHntpAq4dtgCkhTImAUiT9sdKxwlcYKoKR+uM=
 github.com/banzaicloud/operator-tools v0.15.0/go.mod h1:544x65QDUmKMTrnMs0lbJ/0jvBSGKkaP2Z4fcmUZeLg=
+github.com/banzaicloud/operator-tools v0.16.2 h1:tQd48oM20uIZXTkpquQmnH3wqKM7r9+lUL11HsToWDo=
+github.com/banzaicloud/operator-tools v0.16.2/go.mod h1:544x65QDUmKMTrnMs0lbJ/0jvBSGKkaP2Z4fcmUZeLg=
 github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 h1:xJ4a3vCFaGF/jqvzLMYoU8P317H5OQ+Via4RmuPwCS0=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=

@@ -15,11 +15,13 @@
 package nodeagent
 
 import (
-	"emperror.dev/errors"
 	"fmt"
+
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/types"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -41,77 +43,90 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-var NodeAgentFluentbitDefaults = &v1beta1.NodeAgent{
-	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-		Annotations: make(map[string]string),
-		Labels:      make(map[string]string),
-		Image: v1beta1.ImageSpec{
-			Repository: "fluent/fluent-bit",
-			Tag:        "1.6.8",
-			PullPolicy: "IfNotPresent",
-		},
-		Flush:         1,
-		Grace:         5,
-		LogLevel:      "info",
-		CoroStackSize: 24576,
-		Resources: v1.ResourceRequirements{
-			Limits: v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("100M"),
-				v1.ResourceCPU:    resource.MustParse("200m"),
-			},
-			Requests: v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("50M"),
-				v1.ResourceCPU:    resource.MustParse("100m"),
-			},
-		},
-		LivenessProbe: &v1.Probe{
-			Handler: v1.Handler{
-				HTTPGet: &v1.HTTPGetAction{
-					Path: "/api/v1/metrics/prometheus",
-					Port: intstr.IntOrString{
-						IntVal: 2020,
+func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
+	n = &v1beta1.NodeAgent{
+		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+			DaemonSetOverrides: &types.DaemonSetBase{
+				Spec: &types.DaemonSetSpecBase{
+					Template: &types.PodTemplateBase{
+						PodSpec: &types.PodSpecBase{
+							Containers: []types.ContainerBase{
+								{
+									Name:       containerName,
+									Image:      "fluent/fluent-bit:1.6.8",
+									PullPolicy: v1.PullIfNotPresent,
+									Resources: &v1.ResourceRequirements{
+										Limits: v1.ResourceList{
+											v1.ResourceMemory: resource.MustParse("100M"),
+											v1.ResourceCPU:    resource.MustParse("200m"),
+										},
+										Requests: v1.ResourceList{
+											v1.ResourceMemory: resource.MustParse("50M"),
+											v1.ResourceCPU:    resource.MustParse("100m"),
+										},
+									},
+									LivenessProbe: &v1.Probe{
+										Handler: v1.Handler{
+											HTTPGet: &v1.HTTPGetAction{
+												Path: "/api/v1/metrics/prometheus",
+												Port: intstr.IntOrString{
+													IntVal: 2020,
+												},
+											}},
+										InitialDelaySeconds: 10,
+										TimeoutSeconds:      0,
+										PeriodSeconds:       10,
+										SuccessThreshold:    0,
+										FailureThreshold:    3,
+									},
+								},
+							},
+						},
 					},
-				}},
-			InitialDelaySeconds: 10,
-			TimeoutSeconds:      0,
-			PeriodSeconds:       10,
-			SuccessThreshold:    0,
-			FailureThreshold:    3,
+				},
+			},
+			Flush:         1,
+			Grace:         5,
+			LogLevel:      "info",
+			CoroStackSize: 24576,
+			InputTail: v1beta1.InputTail{
+				Path:            "/var/log/containers/*.log",
+				RefreshInterval: "5",
+				SkipLongLines:   "On",
+				DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
+				MemBufLimit:     "5MB",
+				Tag:             "kubernetes.*",
+			},
+			Security: &v1beta1.Security{
+				RoleBasedAccessControlCreate: util.BoolPointer(true),
+				SecurityContext:              &v1.SecurityContext{},
+				PodSecurityContext:           &v1.PodSecurityContext{},
+			},
+			MountPath: "/var/lib/docker/containers",
+			BufferStorage: v1beta1.BufferStorage{
+				StoragePath: "/buffers",
+			},
+			FilterAws: &v1beta1.FilterAws{
+				ImdsVersion:     "v2",
+				AZ:              util.BoolPointer(true),
+				Ec2InstanceID:   util.BoolPointer(true),
+				Ec2InstanceType: util.BoolPointer(false),
+				PrivateIP:       util.BoolPointer(false),
+				AmiID:           util.BoolPointer(false),
+				AccountID:       util.BoolPointer(false),
+				Hostname:        util.BoolPointer(false),
+				VpcID:           util.BoolPointer(false),
+				Match:           "*",
+			},
+			ForwardOptions: &v1beta1.ForwardOptions{
+				RetryLimit: "False",
+			},
 		},
-		InputTail: v1beta1.InputTail{
-			Path:            "/var/log/containers/*.log",
-			RefreshInterval: "5",
-			SkipLongLines:   "On",
-			DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
-			MemBufLimit:     "5MB",
-			Tag:             "kubernetes.*",
-		},
-		Security: &v1beta1.Security{
-			RoleBasedAccessControlCreate: util.BoolPointer(true),
-			SecurityContext:              &v1.SecurityContext{},
-			PodSecurityContext:           &v1.PodSecurityContext{},
-		},
-		MountPath: "/var/lib/docker/containers",
-		BufferStorage: v1beta1.BufferStorage{
-			StoragePath: "/buffers",
-		},
-		FilterAws: &v1beta1.FilterAws{
-			ImdsVersion:     "v2",
-			AZ:              util.BoolPointer(true),
-			Ec2InstanceID:   util.BoolPointer(true),
-			Ec2InstanceType: util.BoolPointer(false),
-			PrivateIP:       util.BoolPointer(false),
-			AmiID:           util.BoolPointer(false),
-			AccountID:       util.BoolPointer(false),
-			Hostname:        util.BoolPointer(false),
-			VpcID:           util.BoolPointer(false),
-			Match:           "*",
-		},
-		ForwardOptions: &v1beta1.ForwardOptions{
-			RetryLimit: "False",
-		},
-	},
+	}
+
+	return n
 }
+
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		Flush: 2},
@@ -126,8 +141,10 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (n *nodeAgentInstance) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(n.logging.Spec.FluentbitSpec.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
+	return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
+		"app.kubernetes.io/name":     "fluentbit",
+		"app.kubernetes.io/instance": n.nodeAgent.Name,
+	}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
 }
 
 func (n *nodeAgentInstance) getServiceAccount() string {
@@ -169,7 +186,7 @@ type nodeAgentInstance struct {
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	for _, a := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
-		err := mergo.Merge(a, NodeAgentFluentbitDefaults)
+		err := mergo.Merge(a, NodeAgentFluentbitDefaults())
 		if err != nil {
 			return nil, err
 		}

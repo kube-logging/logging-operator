@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.0
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/banzaicloud/operator-tools v0.15.0
+	github.com/banzaicloud/operator-tools v0.16.2
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/zapr v0.2.0
 	github.com/onsi/ginkgo v1.12.1
@@ -25,3 +25,5 @@ require (
 )
 
 replace github.com/shurcooL/vfsgen => github.com/banzaicloud/vfsgen v0.0.0-20200203103248-c48ce8603af1
+
+replace github.com/banzaicloud/operator-tools => /Users/ahma/Projects/bc/operator-tools
