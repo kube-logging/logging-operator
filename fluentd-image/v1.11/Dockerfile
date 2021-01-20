@@ -7,7 +7,7 @@ LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.11.5"
 RUN apk update \
  && apk add --no-cache \
         ca-certificates \
-        ruby ruby-irb ruby-etc ruby-webrick \
+        ruby ruby-irb ruby-etc \
         tini libmaxminddb geoip \
  && buildDeps=" \
       make gcc g++ libc-dev \
@@ -29,6 +29,7 @@ RUN apk update \
  && gem install fluentd -v 1.11.5 \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
+ && gem install webrick \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
