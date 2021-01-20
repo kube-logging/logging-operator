@@ -55,8 +55,8 @@ type _hugoLogZ interface{}
 type _docLogZ interface{}
 
 // +name:"LogZ"
-// +url:"https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.20"
-// +version:"0.0.20"
+// +url:"https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.21"
+// +version:"0.0.21"
 // +description:"Store logs in LogZ.io"
 // +status:"GA"
 type _metaLogZ interface{}

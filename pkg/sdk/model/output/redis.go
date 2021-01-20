@@ -41,7 +41,7 @@ type _docRedis interface{}
 
 // +name:"Http"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-redis"
-// +version:"0.3.4"
+// +version:"0.3.5"
 // +description:"Sends logs to Redis endpoints."
 // +status:"GA"
 type _metaRedis interface{}
