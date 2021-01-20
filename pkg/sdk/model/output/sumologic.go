@@ -56,8 +56,8 @@ type _hugoSumoLogic interface{}
 type _docSumoLogic interface{}
 
 // +name:"SumoLogic"
-// +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.7.1"
-// +version:"1.7.1"
+// +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/2.0.0"
+// +version:"2.0.0"
 // +description:"Send your logs to Sumologic"
 // +status:"GA"
 type _metaSumologic interface{}

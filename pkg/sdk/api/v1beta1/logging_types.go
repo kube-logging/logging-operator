@@ -100,7 +100,7 @@ const (
 	DefaultFluentbitImageRepository = "fluent/fluent-bit"
 	DefaultFluentbitImageTag        = "1.6.10"
 	DefaultFluentdImageRepository   = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag          = "v1.11.5-alpine-9"
+	DefaultFluentdImageTag          = "v1.11.5-alpine-11"
 )
 
 // SetDefaults fills empty attributes
