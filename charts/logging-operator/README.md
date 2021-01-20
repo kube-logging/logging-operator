@@ -49,7 +49,7 @@ The following tables lists the configurable parameters of the logging-operator c
 |                      Parameter                      |                        Description                     |             Default            |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
 | `image.repository`                                  | Container image repository                             | `ghcr.io/banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `3.8.2`                        |
+| `image.tag`                                         | Container image tag                                    | `3.9.0`                        |
 | `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
 | `nameOverride`                                      | Override name of app                                   | ``                             |
 | `fullnameOverride`                                  | Override full name of app                              | ``                             |
