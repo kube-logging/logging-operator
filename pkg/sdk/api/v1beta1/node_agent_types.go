@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 )
@@ -29,11 +30,11 @@ type NodeAgent struct {
 }
 
 type NodeAgentFluentbit struct {
-	Enabled            *bool                `json:"enabled,omitempty"`
-	DaemonSetOverrides *types.DaemonSetBase `json:"daemonSetOverrides,omitempty"`
-	TLS                FluentbitTLS         `json:"tls,omitempty"`
-	TargetHost         string               `json:"targetHost,omitempty"`
-	TargetPort         int32                `json:"targetPort,omitempty"`
+	Enabled            *bool                   `json:"enabled,omitempty"`
+	DaemonSetOverrides *typeoverride.DaemonSet `json:"daemonSetOverrides,omitempty"`
+	TLS                FluentbitTLS            `json:"tls,omitempty"`
+	TargetHost         string                  `json:"targetHost,omitempty"`
+	TargetPort         int32                   `json:"targetPort,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)

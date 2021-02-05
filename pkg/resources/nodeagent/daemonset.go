@@ -19,8 +19,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -66,7 +68,6 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 				Spec: corev1.PodSpec{
 					ServiceAccountName: n.getServiceAccount(),
 					Volumes:            n.generateVolume(),
-					PriorityClassName:  n.nodeAgent.FluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
 						RunAsNonRoot: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
@@ -92,21 +93,25 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 			},
 		},
 	}
-	desiredWithOverride := n.nodeAgent.FluentbitSpec.DaemonSetOverrides.Override(*desired)
 
 	n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
 	n.nodeAgent.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
 
-	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desiredWithOverride.Spec.Template.Spec); err != nil {
-		return &desiredWithOverride, reconciler.StatePresent, err
+	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
+		return desired, reconciler.StatePresent, err
 	}
-	if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desiredWithOverride.Spec.Template.Spec); err != nil {
-		return &desiredWithOverride, reconciler.StatePresent, err
+	if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+		return desired, reconciler.StatePresent, err
 	}
 
-	return &desiredWithOverride, reconciler.StatePresent, nil
+	err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.DaemonSetOverrides)
+	if err != nil {
+		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+	}
+
+	return desired, reconciler.StatePresent, nil
 }
 
 func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
@@ -198,7 +203,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: n.logging.QualifiedName(fluentBitSecretConfigName),
+					SecretName: n.QualifiedName(fluentBitSecretConfigName),
 					Items: []corev1.KeyToPath{
 						{
 							Key:  BaseConfigName,

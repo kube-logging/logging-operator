@@ -15,8 +15,6 @@
 package nodeagent
 
 import (
-	"fmt"
-
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -24,7 +22,7 @@ import (
 // NodeAgentObjectMeta creates an objectMeta for resource fluentbit
 func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:        fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
+		Name:        n.QualifiedName(name),
 		Namespace:   n.logging.Spec.ControlNamespace,
 		Labels:      n.getFluentBitLabels(),
 		Annotations: n.nodeAgent.Metadata.Annotations,
@@ -44,7 +42,7 @@ func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 // NodeAgentObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
 func (n *nodeAgentInstance) NodeAgentObjectMetaClusterScope(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:        fmt.Sprintf("%s-%s", n.logging.QualifiedName(name), n.nodeAgent.Name),
+		Name:        n.QualifiedName(name),
 		Labels:      n.getFluentBitLabels(),
 		Annotations: n.nodeAgent.Metadata.Annotations,
 		OwnerReferences: []metav1.OwnerReference{

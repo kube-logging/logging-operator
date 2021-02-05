@@ -21,7 +21,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/types"
+	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -46,16 +46,16 @@ const (
 func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
 	n = &v1beta1.NodeAgent{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-			DaemonSetOverrides: &types.DaemonSetBase{
-				Spec: &types.DaemonSetSpecBase{
-					Template: &types.PodTemplateBase{
-						PodSpec: &types.PodSpecBase{
-							Containers: []types.ContainerBase{
+			DaemonSetOverrides: &typeoverride.DaemonSet{
+				Spec: typeoverride.DaemonSetSpec{
+					Template: typeoverride.PodTemplateSpec{
+						Spec: typeoverride.PodSpec{
+							Containers: []v1.Container{
 								{
-									Name:       containerName,
-									Image:      "fluent/fluent-bit:1.6.8",
-									PullPolicy: v1.PullIfNotPresent,
-									Resources: &v1.ResourceRequirements{
+									Name:            containerName,
+									Image:           "fluent/fluent-bit:1.6.8",
+									ImagePullPolicy: v1.PullIfNotPresent,
+									Resources: v1.ResourceRequirements{
 										Limits: v1.ResourceList{
 											v1.ResourceMemory: resource.MustParse("100M"),
 											v1.ResourceCPU:    resource.MustParse("200m"),
@@ -129,6 +129,24 @@ func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
 
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		MountPath: "C:\\ProgramData\\docker",
+		DaemonSetOverrides: &typeoverride.DaemonSet{
+			Spec: typeoverride.DaemonSetSpec{
+				Template: typeoverride.PodTemplateSpec{
+					Spec: typeoverride.PodSpec{
+						NodeSelector: map[string]string{
+							"kubernetes.io/os": "windows",
+						},
+						Tolerations: []v1.Toleration{{
+							Key:      "os",
+							Operator: "Equal",
+							Value:    "windows",
+							Effect:   "NoSchedule",
+						},
+						},
+					}},
+			}},
+
 		Flush: 2},
 }
 var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgent{
@@ -151,7 +169,7 @@ func (n *nodeAgentInstance) getServiceAccount() string {
 	if n.nodeAgent.FluentbitSpec.Security.ServiceAccount != "" {
 		return n.nodeAgent.FluentbitSpec.Security.ServiceAccount
 	}
-	return fmt.Sprintf("%s-%s", n.logging.QualifiedName(defaultServiceAccountName), n.nodeAgent.Name)
+	return n.QualifiedName(defaultServiceAccountName)
 }
 
 //
@@ -259,6 +277,11 @@ func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+// nodeAgent QualifiedName
+func (n *nodeAgentInstance) QualifiedName(name string) string {
+	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.nodeAgent.Name, name)
 }
 
 //

@@ -46,7 +46,7 @@ func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.Des
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     n.logging.QualifiedName(clusterRoleName),
+				Name:     n.QualifiedName(clusterRoleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{

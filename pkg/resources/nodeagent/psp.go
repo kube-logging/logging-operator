@@ -93,7 +93,7 @@ func (n *nodeAgentInstance) pspClusterRole() (runtime.Object, reconciler.Desired
 				{
 					APIGroups:     []string{"policy"},
 					Resources:     []string{"podsecuritypolicies"},
-					ResourceNames: []string{n.logging.QualifiedName(fluentbitPodSecurityPolicyName)},
+					ResourceNames: []string{n.QualifiedName(fluentbitPodSecurityPolicyName)},
 					Verbs:         []string{"use"},
 				},
 			},
@@ -111,7 +111,7 @@ func (n *nodeAgentInstance) pspClusterRoleBinding() (runtime.Object, reconciler.
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     n.logging.QualifiedName(clusterRoleName + "-psp"),
+				Name:     n.QualifiedName(clusterRoleName + "-psp"),
 			},
 			Subjects: []rbacv1.Subject{
 				{

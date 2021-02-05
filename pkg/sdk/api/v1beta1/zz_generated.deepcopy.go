@@ -22,7 +22,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
-	"github.com/banzaicloud/operator-tools/pkg/types"
+	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/api/core/v1"
@@ -1250,7 +1250,7 @@ func (in *NodeAgentFluentbit) DeepCopyInto(out *NodeAgentFluentbit) {
 	}
 	if in.DaemonSetOverrides != nil {
 		in, out := &in.DaemonSetOverrides, &out.DaemonSetOverrides
-		*out = new(types.DaemonSetBase)
+		*out = new(typeoverride.DaemonSet)
 		(*in).DeepCopyInto(*out)
 	}
 	out.TLS = in.TLS

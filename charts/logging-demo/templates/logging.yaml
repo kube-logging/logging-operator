@@ -15,6 +15,17 @@ spec:
     {{- end}}
 
   fluentbit:
+{{/*    security:*/}}
+{{/*      podSecurityContext:*/}}
+{{/*        runAsNonRoot: true*/}}
+{{/*    metrics:*/}}
+{{/*      serviceMonitor: true*/}}
+{{/*      prometheusAnnotations: true*/}}
+{{/*      port: 24231*/}}
+{{/*      path: "/metrics"*/}}
+{{/*      timeout: "30s"*/}}
+{{/*      interval: "15s"*/}}
+
     {{- if .Values.loggingOperator.tls.enabled }}
     tls:
       enabled: true
@@ -26,5 +37,17 @@ spec:
     {{- end}}
   nodeAgents:
     - name: testanyad
+      type: windows
+{{/*      nodeAgentFluentbit:*/}}
+{{/*        security:*/}}
+{{/*          podSecurityContext:*/}}
+{{/*            runAsNonRoot: true*/}}
+{{/*        metrics:*/}}
+{{/*          serviceMonitor: true*/}}
+{{/*          prometheusAnnotations: true*/}}
+{{/*          port: 24231*/}}
+{{/*          path: "/metrics"*/}}
+{{/*          timeout: "30s"*/}}
+{{/*          interval: "15s"*/}}
 
   controlNamespace: {{ .Values.loggingOperator.controlNamespace | default .Release.Namespace }}
