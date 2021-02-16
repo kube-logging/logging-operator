@@ -51,7 +51,7 @@ func generateConfig(input fluentdConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
+func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 	input := fluentdConfig{
 		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
 		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
@@ -76,16 +76,27 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 
 	inputConfig, err := generateConfig(input)
 	if err != nil {
-		return nil, reconciler.StatePresent, err
+		return nil, err
+	}
+
+	configs := map[string][]byte{
+		"fluent.conf":  []byte(fluentdDefaultTemplate),
+		"input.conf":   []byte(inputConfig),
+		"devnull.conf": []byte(fluentdOutputTemplate),
+	}
+	return configs, nil
+}
+
+func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
+
+	configMap, err := r.generateConfigSecret()
+	if err != nil {
+		return nil, nil, err
 	}
 
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
-		Data: map[string][]byte{
-			"fluent.conf":  []byte(fluentdDefaultTemplate),
-			"input.conf":   []byte(inputConfig),
-			"devnull.conf": []byte(fluentdOutputTemplate),
-		},
+		Data:       configMap,
 	}
 
 	configs.Data["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))

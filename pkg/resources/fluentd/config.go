@@ -14,6 +14,16 @@
 
 package fluentd
 
+const ConfigKey = "fluent.conf"
+
+var fluentdConfigCheckTemplate = `
+# include other config files
+@include /fluentd/etc/input.conf
+@include /fluentd/etc/generated.conf
+@include /fluentd/etc/devnull.conf
+@include /fluentd/etc/fluentlog.conf
+`
+
 var fluentdDefaultTemplate = `
 # include other config files
 @include /fluentd/etc/input.conf

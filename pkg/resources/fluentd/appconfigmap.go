@@ -35,11 +35,15 @@ type ConfigCheckResult struct {
 	Message string
 }
 
-const ConfigKey = "generated.conf"
-
-func (r *Reconciler) appconfigMap() (runtime.Object, reconciler.DesiredState, error) {
-	data := make(map[string][]byte)
-	data[AppConfigKey] = []byte(*r.config)
+func (r *Reconciler) configCheckConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
+	data, err := r.generateConfigSecret()
+	if err != nil {
+		return nil, nil, err
+	}
+	// Overwrite default includes
+	data["fluent.conf"] = []byte(fluentdConfigCheckTemplate)
+	// Add generated configuration
+	data["generated.conf"] = []byte(*r.config)
 	return &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd),
 		Data:       data,
@@ -182,7 +186,7 @@ func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
 	return &v1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Data: map[string][]byte{
-			ConfigKey: []byte(*r.config),
+			"generated.conf": []byte(*r.config),
 		},
 	}
 }
