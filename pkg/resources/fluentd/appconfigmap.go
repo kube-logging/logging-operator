@@ -190,7 +190,7 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*v1.Secret, error) {
 	if err != nil {
 		return nil, err
 	}
-	data["generated.conf"] = []byte(*r.config)
+	data[ConfigCheckKey] = []byte(*r.config)
 	data["fluent.conf"] = []byte(fluentdConfigCheckTemplate)
 	return &v1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),

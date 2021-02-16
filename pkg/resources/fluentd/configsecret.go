@@ -88,12 +88,10 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
-
 	configMap, err := r.generateConfigSecret()
 	if err != nil {
 		return nil, nil, err
 	}
-
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data:       configMap,

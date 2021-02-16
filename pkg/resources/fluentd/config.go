@@ -14,8 +14,6 @@
 
 package fluentd
 
-const ConfigKey = "fluent.conf"
-
 var fluentdConfigCheckTemplate = `
 # include other config files
 @include /fluentd/etc/input.conf

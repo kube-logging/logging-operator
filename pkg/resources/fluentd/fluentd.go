@@ -37,6 +37,8 @@ import (
 const (
 	SecretConfigName      = "fluentd"
 	AppSecretConfigName   = "fluentd-app"
+	ConfigCheckKey        = "generated.conf"
+	ConfigKey             = "fluent.conf"
 	AppConfigKey          = "fluentd.conf"
 	StatefulSetName       = "fluentd"
 	PodSecurityPolicyName = "fluentd"
