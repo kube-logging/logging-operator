@@ -35,15 +35,9 @@ type ConfigCheckResult struct {
 	Message string
 }
 
-func (r *Reconciler) configCheckConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
-	data, err := r.generateConfigSecret()
-	if err != nil {
-		return nil, nil, err
-	}
-	// Overwrite default includes
-	data["fluent.conf"] = []byte(fluentdConfigCheckTemplate)
-	// Add generated configuration
-	data["generated.conf"] = []byte(*r.config)
+func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
+	data := make(map[string][]byte)
+	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd),
 		Data:       data,
@@ -120,7 +114,10 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 		return nil, errors.WrapIff(err, "failed to get configcheck pod %s:%s", pod.Namespace, pod.Name)
 	}
 
-	checkSecret := r.newCheckSecret(hashKey)
+	checkSecret, err := r.newCheckSecret(hashKey)
+	if err != nil {
+		return nil, err
+	}
 	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
 	if err != nil {
 		return nil, err
@@ -150,7 +147,13 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 		if configHash == currentHash {
 			continue
 		}
-		if err := r.Client.Delete(context.TODO(), r.newCheckSecret(configHash)); err != nil {
+		newSecret, err := r.newCheckSecret(configHash)
+		if err != nil {
+			multierr = errors.Combine(multierr,
+				errors.Wrapf(err, "failed to create config check secret %s", configHash))
+			continue
+		}
+		if err := r.Client.Delete(context.TODO(), newSecret); err != nil {
 			if !apierrors.IsNotFound(err) {
 				multierr = errors.Combine(multierr,
 					errors.Wrapf(err, "failed to remove config check secret %s", configHash))
@@ -182,13 +185,17 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 	return removedHashes, multierr
 }
 
-func (r *Reconciler) newCheckSecret(hashKey string) *v1.Secret {
+func (r *Reconciler) newCheckSecret(hashKey string) (*v1.Secret, error) {
+	data, err := r.generateConfigSecret()
+	if err != nil {
+		return nil, err
+	}
+	data["generated.conf"] = []byte(*r.config)
+	data["fluent.conf"] = []byte(fluentdConfigCheckTemplate)
 	return &v1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
-		Data: map[string][]byte{
-			"generated.conf": []byte(*r.config),
-		},
-	}
+		Data:       data,
+	}, nil
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {

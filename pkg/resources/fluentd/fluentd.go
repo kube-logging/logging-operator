@@ -208,7 +208,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	}
 	for _, res := range []resources.Resource{
 		r.secretConfig,
-		r.configCheckConfigSecret,
+		r.appConfigSecret,
 		r.statefulset,
 		r.service,
 		r.headlessService,
