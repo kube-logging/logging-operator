@@ -92,12 +92,11 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	if err != nil {
 		return nil, nil, err
 	}
+	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data:       configMap,
 	}
-
-	configs.Data["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
 
 	return configs, reconciler.StatePresent, nil
 }
