@@ -37,6 +37,8 @@ import (
 const (
 	SecretConfigName      = "fluentd"
 	AppSecretConfigName   = "fluentd-app"
+	ConfigCheckKey        = "generated.conf"
+	ConfigKey             = "fluent.conf"
 	AppConfigKey          = "fluentd.conf"
 	StatefulSetName       = "fluentd"
 	PodSecurityPolicyName = "fluentd"
@@ -208,7 +210,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	}
 	for _, res := range []resources.Resource{
 		r.secretConfig,
-		r.appconfigMap,
+		r.appConfigSecret,
 		r.statefulset,
 		r.service,
 		r.headlessService,
