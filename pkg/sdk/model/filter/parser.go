@@ -28,13 +28,13 @@ type _hugoParser interface{}
 
 // +kubebuilder:object:generate=true
 // +docName:"[Parser Filter](https://docs.fluentd.org/filter/parser)"
-// Parses" string field in event records and mutates its
+// Parses a string field in event records and mutates its event record with the parsed result.
 type _docParser interface{}
 
 // +name:"Parser"
 // +url:"https://docs.fluentd.org/filter/parser"
 // +version:"more info"
-// +description:"Parses" string field in event records and mutates its"
+// +description:"Parses a string field in event records and mutates its event record with the parsed result."
 // +status:"GA"
 type _metaParser interface{}
 
