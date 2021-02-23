@@ -147,11 +147,11 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			Enabled   bool
 			SharedKey string
 		}{
-			Enabled:   n.nodeAgent.FluentbitSpec.TLS.Enabled,
+			Enabled:   *n.nodeAgent.FluentbitSpec.TLS.Enabled,
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc", n.QualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
+		TargetHost:              fmt.Sprintf("%s.%s.svc", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
 		TargetPort:              n.logging.Spec.FluentdSpec.Port,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
@@ -201,7 +201,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		}
 	}
 
-	if n.nodeAgent.FluentbitSpec.EnableUpstream {
+	if n.nodeAgent.FluentbitSpec.EnableUpstream != nil && *n.nodeAgent.FluentbitSpec.EnableUpstream {
 		input.Upstream.Enabled = true
 		input.Upstream.Config.Name = "fluentd-upstream"
 
@@ -262,12 +262,12 @@ func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 }
 
 func (n *nodeAgentInstance) generateUpstreamNode(index int) upstreamNode {
-	podName := n.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
+	podName := n.FluentdQualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
 		Host: fmt.Sprintf("%s.%s.%s.svc.cluster.local",
 			podName,
-			n.QualifiedName(fluentd.ServiceName+"-headless"),
+			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
 			n.logging.Spec.ControlNamespace),
 		Port: 24240,
 	}

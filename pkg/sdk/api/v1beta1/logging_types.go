@@ -428,6 +428,12 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.ForwardOptions.RetryLimit == "" {
 			l.Spec.FluentbitSpec.ForwardOptions.RetryLimit = "False"
 		}
+		if l.Spec.FluentbitSpec.TLS == nil {
+			l.Spec.FluentbitSpec.TLS = &FluentbitTLS{}
+		}
+		if l.Spec.FluentbitSpec.TLS.Enabled == nil {
+			l.Spec.FluentbitSpec.TLS.Enabled = util.BoolPointer(false)
+		}
 	}
 	return nil
 }

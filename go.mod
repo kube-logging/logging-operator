@@ -7,9 +7,8 @@ require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
-	github.com/banzaicloud/operator-tools v0.18.0
+	github.com/banzaicloud/operator-tools v0.20.1
 	github.com/go-logr/logr v0.2.1
-	github.com/imdario/mergo v0.3.9
 	github.com/onsi/gomega v1.10.1
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.43.0

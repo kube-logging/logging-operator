@@ -24,6 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,7 +56,7 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 		for key, config := range n.configs {
 			h := sha256.New()
 			_, _ = h.Write(config)
-			templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
+			podMeta = templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
 		}
 	}
 
@@ -131,7 +132,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 	for vCount, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.VolumeMount{
 			Name:      "extravolumemount" + strconv.Itoa(vCount),
-			ReadOnly:  vMnt.ReadOnly,
+			ReadOnly:  util.PointerToBool(vMnt.ReadOnly),
 			MountPath: vMnt.Destination,
 		})
 	}
@@ -142,7 +143,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: "/fluent-bit/etc/fluent-bit.conf",
 			SubPath:   BaseConfigName,
 		})
-		if n.nodeAgent.FluentbitSpec.EnableUpstream {
+		if util.PointerToBool(n.nodeAgent.FluentbitSpec.EnableUpstream) {
 			v = append(v, corev1.VolumeMount{
 				Name:      "config",
 				MountPath: "/fluent-bit/etc/upstream.conf",
@@ -156,7 +157,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if n.nodeAgent.FluentbitSpec.TLS.Enabled {
+	if util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-bit-tls",
@@ -213,7 +214,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		}
-		if n.nodeAgent.FluentbitSpec.EnableUpstream {
+		if util.PointerToBool(n.nodeAgent.FluentbitSpec.EnableUpstream) {
 			volume.VolumeSource.Secret.Items = append(volume.VolumeSource.Secret.Items, corev1.KeyToPath{
 				Key:  UpstreamConfigName,
 				Path: UpstreamConfigName,
@@ -230,7 +231,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 			},
 		})
 	}
-	if n.nodeAgent.FluentbitSpec.TLS.Enabled {
+	if n.nodeAgent.FluentbitSpec.TLS != nil && util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluent-bit-tls",
 			VolumeSource: corev1.VolumeSource{

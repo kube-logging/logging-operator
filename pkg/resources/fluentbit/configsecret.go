@@ -147,7 +147,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			Enabled   bool
 			SharedKey string
 		}{
-			Enabled:   r.Logging.Spec.FluentbitSpec.TLS.Enabled,
+			Enabled:   *r.Logging.Spec.FluentbitSpec.TLS.Enabled,
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,

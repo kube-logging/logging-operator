@@ -20,11 +20,11 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -43,17 +43,21 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
-	n = &v1beta1.NodeAgent{
+func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAgent, error) {
+	programDefault := &v1beta1.NodeAgent{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+			//TLS: userDefined.FluentbitSpec.TLS,
 			DaemonSetOverrides: &typeoverride.DaemonSet{
 				Spec: typeoverride.DaemonSetSpec{
 					Template: typeoverride.PodTemplateSpec{
+						ObjectMeta: typeoverride.ObjectMeta{
+							Annotations: map[string]string{},
+						},
 						Spec: typeoverride.PodSpec{
 							Containers: []v1.Container{
 								{
 									Name:            containerName,
-									Image:           "fluent/fluent-bit:1.6.8",
+									Image:           "fluent/fluent-bit:1.6.10",
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{
 										Limits: v1.ResourceList{
@@ -65,20 +69,7 @@ func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
 											v1.ResourceCPU:    resource.MustParse("100m"),
 										},
 									},
-									LivenessProbe: &v1.Probe{
-										Handler: v1.Handler{
-											HTTPGet: &v1.HTTPGetAction{
-												Path: "/api/v1/metrics/prometheus",
-												Port: intstr.IntOrString{
-													IntVal: 2020,
-												},
-											}},
-										InitialDelaySeconds: 10,
-										TimeoutSeconds:      0,
-										PeriodSeconds:       10,
-										SuccessThreshold:    0,
-										FailureThreshold:    3,
-									},
+									LivenessProbe: &v1.Probe{},
 								},
 							},
 						},
@@ -106,25 +97,101 @@ func NodeAgentFluentbitDefaults() (n *v1beta1.NodeAgent) {
 			BufferStorage: v1beta1.BufferStorage{
 				StoragePath: "/buffers",
 			},
-			FilterAws: &v1beta1.FilterAws{
-				ImdsVersion:     "v2",
-				AZ:              util.BoolPointer(true),
-				Ec2InstanceID:   util.BoolPointer(true),
-				Ec2InstanceType: util.BoolPointer(false),
-				PrivateIP:       util.BoolPointer(false),
-				AmiID:           util.BoolPointer(false),
-				AccountID:       util.BoolPointer(false),
-				Hostname:        util.BoolPointer(false),
-				VpcID:           util.BoolPointer(false),
-				Match:           "*",
-			},
+
 			ForwardOptions: &v1beta1.ForwardOptions{
 				RetryLimit: "False",
 			},
 		},
 	}
+	//if userDefined.FluentbitSpec.DaemonSetOverrides == nil {
+	//	userDefined.FluentbitSpec.DaemonSetOverrides = &typeoverride.DaemonSet{}
+	//}
+	//
+	//err := merge.Merge(programDefault, userDefined.FluentbitSpec.DaemonSetOverrides)
+	//if err != nil {
+	//	return nil, err
+	//}
+	if userDefined.FluentbitSpec == nil {
+		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
+	}
 
-	return n
+	if userDefined.FluentbitSpec.FilterAws != nil {
+
+		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
+			ImdsVersion:     "v2",
+			AZ:              util.BoolPointer(true),
+			Ec2InstanceID:   util.BoolPointer(true),
+			Ec2InstanceType: util.BoolPointer(false),
+			PrivateIP:       util.BoolPointer(false),
+			AmiID:           util.BoolPointer(false),
+			AccountID:       util.BoolPointer(false),
+			Hostname:        util.BoolPointer(false),
+			VpcID:           util.BoolPointer(false),
+			Match:           "*",
+		}
+
+		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, userDefined.FluentbitSpec.FilterAws)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
+		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
+			Port: 2020,
+			Path: "/",
+		}
+	}
+
+	if userDefined.FluentbitSpec.Metrics != nil {
+
+		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
+			Interval: "15s",
+			Timeout:  "5s",
+			Port:     2020,
+			Path:     "/api/v1/metrics/prometheus",
+		}
+		err := merge.Merge(programDefault.FluentbitSpec.Metrics, userDefined.FluentbitSpec.Metrics)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if programDefault.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics.PrometheusAnnotations {
+		defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
+			Annotations: map[string]string{
+				"prometheus.io/scrape": "true",
+				"prometheus.io/path":   programDefault.FluentbitSpec.Metrics.Path,
+				"prometheus.io/port":   fmt.Sprintf("%d", programDefault.FluentbitSpec.Metrics.Port),
+			},
+		}
+		err := merge.Merge(&(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if programDefault.FluentbitSpec.Metrics != nil {
+		defaultLivenessProbe := &v1.Probe{
+			Handler: v1.Handler{
+				HTTPGet: &v1.HTTPGetAction{
+					Path: programDefault.FluentbitSpec.Metrics.Path,
+					Port: intstr.IntOrString{
+						IntVal: programDefault.FluentbitSpec.Metrics.Port,
+					},
+				}},
+			InitialDelaySeconds: 10,
+			TimeoutSeconds:      0,
+			PeriodSeconds:       10,
+			SuccessThreshold:    0,
+			FailureThreshold:    3,
+		}
+
+		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return programDefault, nil
 }
 
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
@@ -146,12 +213,10 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 						},
 					}},
 			}},
-
-		Flush: 2},
+	},
 }
 var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgent{
-	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-		Flush: 3},
+	FluentbitSpec: &v1beta1.NodeAgentFluentbit{},
 }
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {
@@ -202,31 +267,35 @@ type nodeAgentInstance struct {
 
 // Reconcile reconciles the NodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	for _, a := range r.Logging.Spec.NodeAgents {
+	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
-		err := mergo.Merge(a, NodeAgentFluentbitDefaults())
+		NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(userDefinedAgent)
+		if err != nil {
+			return nil, err
+		}
+		err = merge.Merge(NodeAgentFluentbitDefaults, userDefinedAgent)
 		if err != nil {
 			return nil, err
 		}
 
-		switch a.Type {
+		switch userDefinedAgent.Type {
 		case "windows":
-			err := mergo.Merge(a, NodeAgentFluentbitWindowsDefaults)
+			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
 			if err != nil {
 				return nil, err
 			}
 			instance = nodeAgentInstance{
-				nodeAgent:  a,
+				nodeAgent:  userDefinedAgent,
 				reconciler: r.GenericResourceReconciler,
 				logging:    r.Logging,
 			}
 		default:
-			err := mergo.Merge(a, NodeAgentFluentbitLinuxDefaults)
+			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
 			if err != nil {
 				return nil, err
 			}
 			instance = nodeAgentInstance{
-				nodeAgent:  a,
+				nodeAgent:  NodeAgentFluentbitDefaults,
 				reconciler: r.GenericResourceReconciler,
 				logging:    r.Logging,
 			}
@@ -236,7 +305,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		result, err := instance.Reconcile()
 		if err != nil {
 			return nil, errors.WrapWithDetails(err,
-				"failed to reconcile instances", "NodeName", a.Name)
+				"failed to reconcile instances", "NodeName", userDefinedAgent.Name)
 		}
 		if result != nil {
 			return result, nil
@@ -282,6 +351,11 @@ func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
 // nodeAgent QualifiedName
 func (n *nodeAgentInstance) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.nodeAgent.Name, name)
+}
+
+// nodeAgent FluentdQualifiedName
+func (n *nodeAgentInstance) FluentdQualifiedName(name string) string {
+	return fmt.Sprintf("%s-%s", n.logging.Name, name)
 }
 
 //

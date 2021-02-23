@@ -3641,7 +3641,7 @@ spec:
                         type: integer
                       customConfigSecret:
                         type: string
-                      daemonSetOverrides:
+                      daemonSet:
                         properties:
                           metadata:
                             properties:
@@ -6670,6 +6670,91 @@ spec:
                           timeout:
                             type: string
                         type: object
+                      metricsService:
+                        properties:
+                          metadata:
+                            properties:
+                              annotations:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              labels:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                            type: object
+                          spec:
+                            properties:
+                              clusterIP:
+                                type: string
+                              externalIPs:
+                                items:
+                                  type: string
+                                type: array
+                              externalName:
+                                type: string
+                              externalTrafficPolicy:
+                                type: string
+                              healthCheckNodePort:
+                                format: int32
+                                type: integer
+                              ipFamily:
+                                type: string
+                              loadBalancerIP:
+                                type: string
+                              loadBalancerSourceRanges:
+                                items:
+                                  type: string
+                                type: array
+                              ports:
+                                items:
+                                  properties:
+                                    appProtocol:
+                                      type: string
+                                    name:
+                                      type: string
+                                    nodePort:
+                                      format: int32
+                                      type: integer
+                                    port:
+                                      format: int32
+                                      type: integer
+                                    protocol:
+                                      type: string
+                                    targetPort:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                  required:
+                                  - port
+                                  type: object
+                                type: array
+                              publishNotReadyAddresses:
+                                type: boolean
+                              selector:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              sessionAffinity:
+                                type: string
+                              sessionAffinityConfig:
+                                properties:
+                                  clientIP:
+                                    properties:
+                                      timeoutSeconds:
+                                        format: int32
+                                        type: integer
+                                    type: object
+                                type: object
+                              topologyKeys:
+                                items:
+                                  type: string
+                                type: array
+                              type:
+                                type: string
+                            type: object
+                        type: object
                       mountPath:
                         type: string
                       network:
@@ -6916,6 +7001,48 @@ spec:
                             type: object
                           serviceAccount:
                             type: string
+                        type: object
+                      serviceAccount:
+                        properties:
+                          automountServiceAccountToken:
+                            type: boolean
+                          imagePullSecrets:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                              type: object
+                            type: array
+                          metadata:
+                            properties:
+                              annotations:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              labels:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                            type: object
+                          secrets:
+                            items:
+                              properties:
+                                apiVersion:
+                                  type: string
+                                fieldPath:
+                                  type: string
+                                kind:
+                                  type: string
+                                name:
+                                  type: string
+                                namespace:
+                                  type: string
+                                resourceVersion:
+                                  type: string
+                                uid:
+                                  type: string
+                              type: object
+                            type: array
                         type: object
                       targetHost:
                         type: string

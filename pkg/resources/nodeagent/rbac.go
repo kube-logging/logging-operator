@@ -15,6 +15,8 @@
 package nodeagent
 
 import (
+	"emperror.dev/errors"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -64,11 +66,24 @@ func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.Des
 
 func (n *nodeAgentInstance) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {
-		return &corev1.ServiceAccount{
+		desired := &corev1.ServiceAccount{
 			ObjectMeta: n.nodeAgent.Metadata.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
-		}, reconciler.StatePresent, nil
+		}
+		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
+		if err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		}
+
+		return desired, reconciler.StatePresent, nil
+	} else {
+		desired := &corev1.ServiceAccount{
+			ObjectMeta: n.NodeAgentObjectMeta(defaultServiceAccountName),
+		}
+
+		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
+		if err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		}
+		return desired, reconciler.StateAbsent, nil
 	}
-	return &corev1.ServiceAccount{
-		ObjectMeta: n.NodeAgentObjectMeta(defaultServiceAccountName),
-	}, reconciler.StateAbsent, nil
 }

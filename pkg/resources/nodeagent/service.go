@@ -15,6 +15,8 @@
 package nodeagent
 
 import (
+	"emperror.dev/errors"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -26,7 +28,7 @@ import (
 
 func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.Metrics != nil {
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -41,7 +43,12 @@ func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.Desired
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}, reconciler.StatePresent, nil
+		}
+		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.MetricsService)
+		if err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		}
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
@@ -68,6 +75,8 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					HonorLabels:          n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+					Interval:             n.nodeAgent.FluentbitSpec.Metrics.Interval,
+					ScrapeTimeout:        n.nodeAgent.FluentbitSpec.Metrics.Timeout,
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),

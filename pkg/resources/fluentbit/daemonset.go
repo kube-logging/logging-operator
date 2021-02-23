@@ -56,7 +56,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		for key, config := range r.configs {
 			h := sha256.New()
 			_, _ = h.Write(config)
-			templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
+			podMeta = templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
 		}
 	}
 
@@ -137,7 +137,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.VolumeMount{
 			Name:      "extravolumemount" + strconv.Itoa(vCount),
-			ReadOnly:  vMnt.ReadOnly,
+			ReadOnly:  *vMnt.ReadOnly,
 			MountPath: vMnt.Destination,
 		})
 	}
@@ -162,7 +162,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
+	if *r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-bit-tls",
@@ -236,7 +236,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		})
 	}
-	if r.Logging.Spec.FluentbitSpec.TLS.Enabled {
+	if *r.Logging.Spec.FluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluent-bit-tls",
 			VolumeSource: corev1.VolumeSource{

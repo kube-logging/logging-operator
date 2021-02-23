@@ -39,7 +39,7 @@ func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconcil
 		for _, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: vMnt.Source,
-				ReadOnly:   vMnt.ReadOnly,
+				ReadOnly:   *vMnt.ReadOnly,
 			})
 		}
 

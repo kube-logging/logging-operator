@@ -39,7 +39,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 		for _, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: vMnt.Source,
-				ReadOnly:   vMnt.ReadOnly,
+				ReadOnly:   *vMnt.ReadOnly,
 			})
 		}
 
