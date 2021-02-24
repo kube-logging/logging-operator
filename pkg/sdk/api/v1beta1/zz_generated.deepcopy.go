@@ -1128,13 +1128,9 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 	}
 	if in.NodeAgents != nil {
 		in, out := &in.NodeAgents, &out.NodeAgents
-		*out = make([]*NodeAgent, len(*in))
+		*out = make([]NodeAgent, len(*in))
 		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(NodeAgent)
-				(*in).DeepCopyInto(*out)
-			}
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.FluentdSpec != nil {

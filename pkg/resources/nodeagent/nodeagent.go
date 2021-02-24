@@ -269,11 +269,11 @@ type nodeAgentInstance struct {
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
-		NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(userDefinedAgent)
+		NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(&userDefinedAgent)
 		if err != nil {
 			return nil, err
 		}
-		err = merge.Merge(NodeAgentFluentbitDefaults, userDefinedAgent)
+		err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
 		if err != nil {
 			return nil, err
 		}
@@ -285,7 +285,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 				return nil, err
 			}
 			instance = nodeAgentInstance{
-				nodeAgent:  userDefinedAgent,
+				nodeAgent:  &userDefinedAgent,
 				reconciler: r.GenericResourceReconciler,
 				logging:    r.Logging,
 			}
