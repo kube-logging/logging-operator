@@ -211,12 +211,20 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*v1.Secret, error) {
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
+	// If nodeSelector settings are not provided, default to only selecting Linux nodes for the ConfigCheck only.
+	nodeSelector := r.Logging.Spec.FluentdSpec.NodeSelector
+	if nodeSelector == nil {
+		nodeSelector = map[string]string{
+			"kubernetes.io/os": "linux",
+		}
+	}
+
 	pod := &v1.Pod{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: v1.PodSpec{
 			RestartPolicy:      v1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccount(),
-			NodeSelector:       r.Logging.Spec.FluentdSpec.NodeSelector,
+			NodeSelector:       nodeSelector,
 			Tolerations:        r.Logging.Spec.FluentdSpec.Tolerations,
 			Affinity:           r.Logging.Spec.FluentdSpec.Affinity,
 			PriorityClassName:  r.Logging.Spec.FluentdSpec.PodPriorityClassName,
