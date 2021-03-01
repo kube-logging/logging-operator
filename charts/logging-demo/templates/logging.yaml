@@ -13,16 +13,36 @@ spec:
     {{- if .Values.loggingOperator.fluentd }}
 {{ toYaml .Values.loggingOperator.fluentd | indent 4}}
     {{- end}}
+  nodeAgents:
+    - name: win95
+      type: windows
+      nodeAgentFluentbit:
+        metrics:
+          serviceMonitor: false
+          prometheusAnnotations: true
+        {{- if .Values.loggingOperator.tls.enabled }}
+        tls:
+          enabled: true
+          secretName: {{ .Values.loggingOperator.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentbit-tls" ) }}
+          sharedKey: "{{ .Values.loggingOperator.tls.sharedKey }}"
+        {{- end }}
+        {{- if .Values.loggingOperator.fluentbit }}
+    {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
+        {{- end}}
+    - name: linux
+      nodeAgentFluentbit:
+        metrics:
+          serviceMonitor: false
+          prometheusAnnotations: true
+        {{- if .Values.loggingOperator.tls.enabled }}
+        tls:
+          enabled: true
+          secretName: {{ .Values.loggingOperator.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentbit-tls" ) }}
+          sharedKey: "{{ .Values.loggingOperator.tls.sharedKey }}"
+        {{- end }}
+        {{- if .Values.loggingOperator.fluentbit }}
+    {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
+        {{- end}}
 
-  fluentbit:
-    {{- if .Values.loggingOperator.tls.enabled }}
-    tls:
-      enabled: true
-      secretName: {{ .Values.loggingOperator.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-demo.name" . ) "fluentbit-tls" ) }}
-      sharedKey: "{{ .Values.loggingOperator.tls.sharedKey }}"
-    {{- end }}
-    {{- if .Values.loggingOperator.fluentbit }}
-{{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
-    {{- end}}
 
   controlNamespace: {{ .Values.loggingOperator.controlNamespace | default .Release.Namespace }}

@@ -23,17 +23,12 @@ var fluentBitConfigTemplate = `
     Grace        {{ .Grace }}
     Daemon       Off
     Log_Level    {{ .LogLevel }}
-    Parsers_File parsers.conf
+    Parsers_File /fluent-bit/conf/parsers.conf
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
     HTTP_Port    {{ .Monitor.Port }}
-    {{- end }}
-    {{- range $key, $value := .BufferStorage }}
-    {{- if $value }}
-    {{ $key }}  {{$value}}
-    {{- end }}
     {{- end }}
 
 [INPUT]
@@ -74,7 +69,7 @@ var fluentBitConfigTemplate = `
     Name          forward
     Match         *
     {{- if .Upstream.Enabled }}
-    Upstream upstream.conf
+    Upstream /fluent-bit/conf_upstream/upstream.conf
     {{- else }}
     Host          {{ .TargetHost }}
     Port          {{ .TargetPort }}

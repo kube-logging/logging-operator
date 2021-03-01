@@ -140,14 +140,12 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 	if n.nodeAgent.FluentbitSpec.CustomConfigSecret == "" {
 		v = append(v, corev1.VolumeMount{
 			Name:      "config",
-			MountPath: "/fluent-bit/etc/fluent-bit.conf",
-			SubPath:   BaseConfigName,
+			MountPath: "/fluent-bit/conf_operator",
 		})
 		if util.PointerToBool(n.nodeAgent.FluentbitSpec.EnableUpstream) {
 			v = append(v, corev1.VolumeMount{
 				Name:      "config",
-				MountPath: "/fluent-bit/etc/upstream.conf",
-				SubPath:   UpstreamConfigName,
+				MountPath: "/fluent-bit/conf_upstream",
 			})
 		}
 	} else {

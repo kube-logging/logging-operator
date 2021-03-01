@@ -58,15 +58,16 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 								{
 									Name:            containerName,
 									Image:           "fluent/fluent-bit:1.6.10",
+									Command:         []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{
 										Limits: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("100M"),
-											v1.ResourceCPU:    resource.MustParse("200m"),
+											v1.ResourceMemory: resource.MustParse("3G"),
+											v1.ResourceCPU:    resource.MustParse("2000m"),
 										},
 										Requests: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("50M"),
-											v1.ResourceCPU:    resource.MustParse("100m"),
+											v1.ResourceMemory: resource.MustParse("2G"),
+											v1.ResourceCPU:    resource.MustParse("1000m"),
 										},
 									},
 									LivenessProbe: &v1.Probe{},
@@ -78,7 +79,7 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			},
 			Flush:         1,
 			Grace:         5,
-			LogLevel:      "info",
+			LogLevel:      "debug",
 			CoroStackSize: 24576,
 			InputTail: v1beta1.InputTail{
 				Path:            "/var/log/containers/*.log",
@@ -178,11 +179,11 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 						IntVal: programDefault.FluentbitSpec.Metrics.Port,
 					},
 				}},
-			InitialDelaySeconds: 10,
-			TimeoutSeconds:      0,
-			PeriodSeconds:       10,
+			InitialDelaySeconds: 1000,
+			TimeoutSeconds:      1000,
+			PeriodSeconds:       1000,
 			SuccessThreshold:    0,
-			FailureThreshold:    3,
+			FailureThreshold:    3000,
 		}
 
 		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
@@ -196,16 +197,27 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
+		FilterKubernetes: v1beta1.FilterKubernetes{
+			KubeURL: "https://kubernetes.default.svc.cluster.local:443",
+		},
 		MountPath: "C:\\ProgramData\\docker",
 		DaemonSetOverrides: &typeoverride.DaemonSet{
 			Spec: typeoverride.DaemonSetSpec{
 				Template: typeoverride.PodTemplateSpec{
 					Spec: typeoverride.PodSpec{
+						Containers: []v1.Container{
+							{
+								Name:  containerName,
+								Image: "banzaicloud/fluentbit:1.6.5",
+								//Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"}}},
+								//Command: []string{"\\fluent-bit\\bin\\fluent-bit", "-i", "dummy", "-o", "stdout"},
+								//Command: []string{"powershell", "Start-Sleep", "-s", "380"}}},
+							}},
 						NodeSelector: map[string]string{
 							"kubernetes.io/os": "windows",
 						},
 						Tolerations: []v1.Toleration{{
-							Key:      "os",
+							Key:      "node.kubernetes.io/os",
 							Operator: "Equal",
 							Value:    "windows",
 							Effect:   "NoSchedule",
@@ -285,7 +297,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 				return nil, err
 			}
 			instance = nodeAgentInstance{
-				nodeAgent:  &userDefinedAgent,
+				nodeAgent:  NodeAgentFluentbitDefaults,
 				reconciler: r.GenericResourceReconciler,
 				logging:    r.Logging,
 			}
