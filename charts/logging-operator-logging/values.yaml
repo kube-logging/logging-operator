@@ -47,6 +47,9 @@ controlNamespace: ""
 # defaultFlow
 defaultFlow: {}
 
+# defaultFlow
+globalFilters: []
+
 # ClusterFlows to deploy
 clusterFlows: []
 

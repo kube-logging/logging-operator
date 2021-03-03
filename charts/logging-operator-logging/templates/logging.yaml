@@ -22,6 +22,10 @@ spec:
   defaultFlow:
 {{ toYaml .Values.defaultFlow | indent 4 }}
   {{- end }}
+  {{- if .Values.globalFilters }}
+  globalFilters:
+{{ toYaml .Values.globalFilters | indent 4 }}
+  {{- end }}
   {{- if or .Values.tls.enabled .Values.fluentd }}
   fluentd:
     {{- if .Values.tls.enabled }}
