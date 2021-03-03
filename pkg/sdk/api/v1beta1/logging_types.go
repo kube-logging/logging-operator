@@ -61,7 +61,7 @@ type LoggingSpec struct {
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
-	// Allow configuration of cluster resources from any namespace. Mutually exclusive
+	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
 
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
