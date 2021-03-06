@@ -118,14 +118,12 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 	v = []corev1.VolumeMount{
 		{
-			Name:      "varlibcontainers",
-			ReadOnly:  true,
-			MountPath: "/var/lib/docker/containers",
+			Name:      "containerspath",
+			MountPath: n.nodeAgent.FluentbitSpec.ContainersPath,
 		},
 		{
-			Name:      "varlogs",
-			ReadOnly:  true,
-			MountPath: "/var/log/",
+			Name:      "varlogspath",
+			MountPath: n.nodeAgent.FluentbitSpec.VarLogsPath,
 		},
 	}
 
@@ -170,18 +168,18 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
-			Name: "varlibcontainers",
+			Name: "containerspath",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
-					Path: n.nodeAgent.FluentbitSpec.MountPath,
+					Path: n.nodeAgent.FluentbitSpec.ContainersPath,
 				},
 			},
 		},
 		{
-			Name: "varlogs",
+			Name: "varlogspath",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
-					Path: "/var/log",
+					Path: n.nodeAgent.FluentbitSpec.VarLogsPath,
 				},
 			},
 		},

@@ -151,7 +151,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
+		TargetHost:              fmt.Sprintf("%s.%s.svc.cluster.local", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
 		TargetPort:              n.logging.Spec.FluentdSpec.Port,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,

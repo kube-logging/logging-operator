@@ -3636,6 +3636,8 @@ spec:
                                 type: object
                             type: object
                         type: object
+                      containersPath:
+                        type: string
                       coroStackSize:
                         format: int32
                         type: integer
@@ -6755,8 +6757,6 @@ spec:
                                 type: string
                             type: object
                         type: object
-                      mountPath:
-                        type: string
                       network:
                         properties:
                           connectTimeout:
@@ -7060,6 +7060,8 @@ spec:
                         required:
                         - enabled
                         type: object
+                      varLogsPath:
+                        type: string
                     type: object
                   type:
                     type: string

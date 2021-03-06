@@ -29,10 +29,10 @@ import (
 func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		allowedHostPaths := []policyv1beta1.AllowedHostPath{{
-			PathPrefix: n.nodeAgent.FluentbitSpec.MountPath,
+			PathPrefix: n.nodeAgent.FluentbitSpec.ContainersPath,
 			ReadOnly:   true,
 		}, {
-			PathPrefix: "/var/log",
+			PathPrefix: n.nodeAgent.FluentbitSpec.VarLogsPath,
 			ReadOnly:   true,
 		}}
 

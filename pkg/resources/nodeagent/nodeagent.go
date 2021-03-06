@@ -58,7 +58,7 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 								{
 									Name:            containerName,
 									Image:           "fluent/fluent-bit:1.6.10",
-									Command:         []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
+									Command:         []string{"/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/conf_operator/fluent-bit.conf"},
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{
 										Limits: v1.ResourceList{
@@ -94,7 +94,8 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 				SecurityContext:              &v1.SecurityContext{},
 				PodSecurityContext:           &v1.PodSecurityContext{},
 			},
-			MountPath: "/var/lib/docker/containers",
+			ContainersPath: "/var/lib/docker/containers",
+			VarLogsPath:    "/var/log",
 			BufferStorage: v1beta1.BufferStorage{
 				StoragePath: "/buffers",
 			},
@@ -198,20 +199,29 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		FilterKubernetes: v1beta1.FilterKubernetes{
-			KubeURL: "https://kubernetes.default.svc.cluster.local:443",
+			KubeURL:       "https://kubernetes.default.svc.cluster.local:443",
+			KubeCAFile:    "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\ca.crt",
+			KubeTokenFile: "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\token",
 		},
-		MountPath: "C:\\ProgramData\\docker",
+		InputTail: v1beta1.InputTail{
+			Path:            "C:\\var\\log\\containers\\*.log",
+			RefreshInterval: "5",
+			SkipLongLines:   "Off",
+			DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
+			MemBufLimit:     "5MB",
+			Tag:             "kube.*",
+		},
+		ContainersPath: "C:\\ProgramData\\docker",
+		VarLogsPath:    "C:\\var\\log",
 		DaemonSetOverrides: &typeoverride.DaemonSet{
 			Spec: typeoverride.DaemonSetSpec{
 				Template: typeoverride.PodTemplateSpec{
 					Spec: typeoverride.PodSpec{
 						Containers: []v1.Container{
 							{
-								Name:  containerName,
-								Image: "banzaicloud/fluentbit:1.6.5",
-								//Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"}}},
-								//Command: []string{"\\fluent-bit\\bin\\fluent-bit", "-i", "dummy", "-o", "stdout"},
-								//Command: []string{"powershell", "Start-Sleep", "-s", "380"}}},
+								Name:    containerName,
+								Image:   "banzaicloud/fluentbit:1.6.10",
+								Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
 							}},
 						NodeSelector: map[string]string{
 							"kubernetes.io/os": "windows",
