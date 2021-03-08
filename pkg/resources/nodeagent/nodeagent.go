@@ -62,12 +62,12 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{
 										Limits: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("3G"),
-											v1.ResourceCPU:    resource.MustParse("2000m"),
+											v1.ResourceMemory: resource.MustParse("100M"),
+											v1.ResourceCPU:    resource.MustParse("200m"),
 										},
 										Requests: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("2G"),
-											v1.ResourceCPU:    resource.MustParse("1000m"),
+											v1.ResourceMemory: resource.MustParse("50M"),
+											v1.ResourceCPU:    resource.MustParse("100m"),
 										},
 									},
 									LivenessProbe: &v1.Probe{},
@@ -79,7 +79,7 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			},
 			Flush:         1,
 			Grace:         5,
-			LogLevel:      "debug",
+			LogLevel:      "info",
 			CoroStackSize: 24576,
 			InputTail: v1beta1.InputTail{
 				Path:            "/var/log/containers/*.log",
@@ -180,11 +180,11 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 						IntVal: programDefault.FluentbitSpec.Metrics.Port,
 					},
 				}},
-			InitialDelaySeconds: 1000,
-			TimeoutSeconds:      1000,
-			PeriodSeconds:       1000,
+			InitialDelaySeconds: 10,
+			TimeoutSeconds:      0,
+			PeriodSeconds:       10,
 			SuccessThreshold:    0,
-			FailureThreshold:    3000,
+			FailureThreshold:    3,
 		}
 
 		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
@@ -205,12 +205,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 			KubeTagPrefix: "kubernetes.C.var.log.containers.",
 		},
 		InputTail: v1beta1.InputTail{
-			Path:            "C:\\var\\log\\containers\\*.log",
-			RefreshInterval: "5",
-			SkipLongLines:   "Off",
-			DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
-			MemBufLimit:     "5MB",
-			Tag:             "kubernetes.*",
+			Path: "C:\\var\\log\\containers\\*.log",
 		},
 		ContainersPath: "C:\\ProgramData\\docker",
 		VarLogsPath:    "C:\\var\\log",
@@ -223,6 +218,16 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 								Name:    containerName,
 								Image:   "banzaicloud/fluentbit:1.6.10",
 								Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
+								Resources: v1.ResourceRequirements{
+									Limits: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("200M"),
+										v1.ResourceCPU:    resource.MustParse("200m"),
+									},
+									Requests: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("100M"),
+										v1.ResourceCPU:    resource.MustParse("100m"),
+									},
+								},
 							}},
 						NodeSelector: map[string]string{
 							"kubernetes.io/os": "windows",
