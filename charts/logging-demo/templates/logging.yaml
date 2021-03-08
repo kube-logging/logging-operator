@@ -4,6 +4,7 @@ metadata:
   name: {{ include "logging-demo.fullname" . }}
 spec:
   fluentd:
+    logLevel: debug
     {{- if .Values.loggingOperator.tls.enabled }}
     tls:
       enabled: true
@@ -14,7 +15,7 @@ spec:
 {{ toYaml .Values.loggingOperator.fluentd | indent 4}}
     {{- end}}
   nodeAgents:
-    - name: win95
+    - name: winagent
       type: windows
       nodeAgentFluentbit:
         metrics:

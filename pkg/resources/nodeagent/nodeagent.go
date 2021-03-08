@@ -202,6 +202,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 			KubeURL:       "https://kubernetes.default.svc.cluster.local:443",
 			KubeCAFile:    "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\ca.crt",
 			KubeTokenFile: "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\token",
+			KubeTagPrefix: "kubernetes.C.var.log.containers.",
 		},
 		InputTail: v1beta1.InputTail{
 			Path:            "C:\\var\\log\\containers\\*.log",
@@ -209,7 +210,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 			SkipLongLines:   "Off",
 			DB:              util.StringPointer("/tail-db/tail-containers-state.db"),
 			MemBufLimit:     "5MB",
-			Tag:             "kube.*",
+			Tag:             "kubernetes.*",
 		},
 		ContainersPath: "C:\\ProgramData\\docker",
 		VarLogsPath:    "C:\\var\\log",
