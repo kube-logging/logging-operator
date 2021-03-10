@@ -23,7 +23,9 @@ import (
 // +kubebuilder:object:generate=true
 
 type NodeAgent struct {
-	Name          string              `json:"name,omitempty"`
+	//NodeAgent unique name.
+	Name string `json:"name,omitempty"`
+	// Specify the Logging-Operator nodeAgents type. It can be fluentbit_linux or fluentbit_windows. (default:fluentbit_linux)
 	Type          string              `json:"type,omitempty"`
 	Metadata      types.MetaBase      `json:"metadata,omitempty"`
 	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`

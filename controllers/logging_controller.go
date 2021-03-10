@@ -229,6 +229,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
+	nodeagent.RegisterWatches(builder)
 
 	return builder
 }

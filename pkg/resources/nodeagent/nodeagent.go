@@ -25,9 +25,13 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -46,7 +50,6 @@ const (
 func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAgent, error) {
 	programDefault := &v1beta1.NodeAgent{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
-			//TLS: userDefined.FluentbitSpec.TLS,
 			DaemonSetOverrides: &typeoverride.DaemonSet{
 				Spec: typeoverride.DaemonSetSpec{
 					Template: typeoverride.PodTemplateSpec{
@@ -70,7 +73,6 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 											v1.ResourceCPU:    resource.MustParse("100m"),
 										},
 									},
-									LivenessProbe: &v1.Probe{},
 								},
 							},
 						},
@@ -105,14 +107,6 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			},
 		},
 	}
-	//if userDefined.FluentbitSpec.DaemonSetOverrides == nil {
-	//	userDefined.FluentbitSpec.DaemonSetOverrides = &typeoverride.DaemonSet{}
-	//}
-	//
-	//err := merge.Merge(programDefault, userDefined.FluentbitSpec.DaemonSetOverrides)
-	//if err != nil {
-	//	return nil, err
-	//}
 	if userDefined.FluentbitSpec == nil {
 		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
 	}
@@ -139,9 +133,11 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 
 	}
 	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
-		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
-			Port: 2020,
-			Path: "/",
+		if userDefined.Type != "fluentbit_windows" {
+			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
+				Port: 2020,
+				Path: "/",
+			}
 		}
 	}
 
@@ -185,6 +181,9 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			PeriodSeconds:       10,
 			SuccessThreshold:    0,
 			FailureThreshold:    3,
+		}
+		if programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
+			programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
 		}
 
 		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
@@ -307,7 +306,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 
 		switch userDefinedAgent.Type {
-		case "windows":
+		case "fluentbit_windows":
 			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
 			if err != nil {
 				return nil, err
@@ -376,6 +375,15 @@ func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
 	return nil, nil
 }
 
+func RegisterWatches(builder *builder.Builder) *builder.Builder {
+	return builder.
+		Owns(&corev1.ConfigMap{}).
+		Owns(&appsv1.DaemonSet{}).
+		Owns(&rbacv1.ClusterRole{}).
+		Owns(&rbacv1.ClusterRoleBinding{}).
+		Owns(&corev1.ServiceAccount{})
+}
+
 // nodeAgent QualifiedName
 func (n *nodeAgentInstance) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.nodeAgent.Name, name)
@@ -385,13 +393,3 @@ func (n *nodeAgentInstance) QualifiedName(name string) string {
 func (n *nodeAgentInstance) FluentdQualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", n.logging.Name, name)
 }
-
-//
-//func RegisterWatches(builder *builder.Builder) *builder.Builder {
-//	return builder.
-//		Owns(&corev1.ConfigMap{}).
-//		Owns(&appsv1.DaemonSet{}).
-//		Owns(&rbacv1.ClusterRole{}).
-//		Owns(&rbacv1.ClusterRoleBinding{}).
-//		Owns(&corev1.ServiceAccount{})
-//}
