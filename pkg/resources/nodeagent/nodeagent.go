@@ -47,7 +47,7 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAgent, error) {
+func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeAgent, error) {
 	programDefault := &v1beta1.NodeAgent{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 			DaemonSetOverrides: &typeoverride.DaemonSet{
@@ -107,11 +107,11 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			},
 		},
 	}
-	if userDefined.FluentbitSpec == nil {
-		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
+	if (*userDefined).FluentbitSpec == nil {
+		(*userDefined).FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
 	}
 
-	if userDefined.FluentbitSpec.FilterAws != nil {
+	if (*userDefined).FluentbitSpec.FilterAws != nil {
 
 		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
 			ImdsVersion:     "v2",
@@ -126,14 +126,14 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			Match:           "*",
 		}
 
-		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, userDefined.FluentbitSpec.FilterAws)
+		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, (*userDefined).FluentbitSpec.FilterAws)
 		if err != nil {
 			return nil, err
 		}
 
 	}
-	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
-		if userDefined.Type != "fluentbit_windows" {
+	if (*userDefined).FluentbitSpec.LivenessDefaultCheck == nil || *(*userDefined).FluentbitSpec.LivenessDefaultCheck {
+		if (*userDefined).Type != "fluentbit_windows" {
 			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 				Port: 2020,
 				Path: "/",
@@ -141,7 +141,7 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 		}
 	}
 
-	if userDefined.FluentbitSpec.Metrics != nil {
+	if (*userDefined).FluentbitSpec.Metrics != nil {
 
 		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 			Interval: "15s",
@@ -149,12 +149,12 @@ func NodeAgentFluentbitDefaults(userDefined *v1beta1.NodeAgent) (*v1beta1.NodeAg
 			Port:     2020,
 			Path:     "/api/v1/metrics/prometheus",
 		}
-		err := merge.Merge(programDefault.FluentbitSpec.Metrics, userDefined.FluentbitSpec.Metrics)
+		err := merge.Merge(programDefault.FluentbitSpec.Metrics, (*userDefined).FluentbitSpec.Metrics)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if programDefault.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics.PrometheusAnnotations {
+	if programDefault.FluentbitSpec.Metrics != nil && (*userDefined).FluentbitSpec.Metrics != nil && (*userDefined).FluentbitSpec.Metrics.PrometheusAnnotations {
 		defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
 			Annotations: map[string]string{
 				"prometheus.io/scrape": "true",

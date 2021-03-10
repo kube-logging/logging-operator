@@ -1126,13 +1126,6 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 		*out = new(FluentbitSpec)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.NodeAgents != nil {
-		in, out := &in.NodeAgents, &out.NodeAgents
-		*out = make([]NodeAgent, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	if in.FluentdSpec != nil {
 		in, out := &in.FluentdSpec, &out.FluentdSpec
 		*out = new(FluentdSpec)
@@ -1154,6 +1147,17 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 		in, out := &in.WatchNamespaces, &out.WatchNamespaces
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.NodeAgents != nil {
+		in, out := &in.NodeAgents, &out.NodeAgents
+		*out = make([]*NodeAgent, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(NodeAgent)
+				(*in).DeepCopyInto(*out)
+			}
+		}
 	}
 }
 
