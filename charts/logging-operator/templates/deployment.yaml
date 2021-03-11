@@ -16,6 +16,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "logging-operator.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- with .Values.podLabels }}
+          {{ toYaml . | nindent 8 }}
+      {{- end }}
     {{- with .Values.annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
