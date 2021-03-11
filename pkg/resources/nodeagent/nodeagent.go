@@ -133,7 +133,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeA
 
 	}
 	if (*userDefined).FluentbitSpec.LivenessDefaultCheck == nil || *(*userDefined).FluentbitSpec.LivenessDefaultCheck {
-		if (*userDefined).Type != "fluentbit_windows" {
+		if (*userDefined).Profile != "windows" {
 			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 				Port: 2020,
 				Path: "/",
@@ -305,8 +305,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return nil, err
 		}
 
-		switch userDefinedAgent.Type {
-		case "fluentbit_windows":
+		switch userDefinedAgent.Profile {
+		case "windows":
 			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
 			if err != nil {
 				return nil, err

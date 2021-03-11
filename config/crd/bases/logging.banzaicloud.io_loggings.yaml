@@ -7063,7 +7063,7 @@ spec:
                       varLogsPath:
                         type: string
                     type: object
-                  type:
+                  profile:
                     type: string
                 type: object
               type: array

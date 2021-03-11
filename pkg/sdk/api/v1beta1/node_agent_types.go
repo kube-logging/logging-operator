@@ -25,8 +25,8 @@ import (
 type NodeAgent struct {
 	//NodeAgent unique name.
 	Name string `json:"name,omitempty"`
-	// Specify the Logging-Operator nodeAgents type. It can be fluentbit_linux or fluentbit_windows. (default:fluentbit_linux)
-	Type          string              `json:"type,omitempty"`
+	// Specify the Logging-Operator nodeAgents profile. It can be linux or windows . (default:linux)
+	Profile       string              `json:"profile,omitempty"`
 	Metadata      types.MetaBase      `json:"metadata,omitempty"`
 	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
 }
