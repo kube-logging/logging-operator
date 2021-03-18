@@ -300,10 +300,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
-		if err != nil {
-			return nil, err
-		}
 
 		switch userDefinedAgent.Profile {
 		case "windows":
@@ -311,22 +307,22 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			if err != nil {
 				return nil, err
 			}
-			instance = nodeAgentInstance{
-				nodeAgent:  NodeAgentFluentbitDefaults,
-				reconciler: r.GenericResourceReconciler,
-				logging:    r.Logging,
-			}
 		default:
 			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
 			if err != nil {
 				return nil, err
 			}
-			instance = nodeAgentInstance{
-				nodeAgent:  NodeAgentFluentbitDefaults,
-				reconciler: r.GenericResourceReconciler,
-				logging:    r.Logging,
-			}
 
+		}
+		err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
+		if err != nil {
+			return nil, err
+		}
+
+		instance = nodeAgentInstance{
+			nodeAgent:  NodeAgentFluentbitDefaults,
+			reconciler: r.GenericResourceReconciler,
+			logging:    r.Logging,
 		}
 
 		result, err := instance.Reconcile()
