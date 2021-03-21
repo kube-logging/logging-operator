@@ -17,6 +17,8 @@ package main
 import (
 	"context"
 	"flag"
+	"net/http"
+	"net/http/pprof"
 	"os"
 	"strings"
 
@@ -54,11 +56,13 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var verboseLogging bool
+	var enableprofile bool
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
+	flag.BoolVar(&enableprofile, "pprof", false, "enable pprof")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -79,6 +83,15 @@ func main() {
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
+	}
+
+	if enableprofile {
+		setupLog.Info("enabling pprof")
+		err = mgr.AddMetricsExtraHandler("/debug/pprof/", http.HandlerFunc(pprof.Index))
+		if err != nil {
+			setupLog.Error(err, "unable to attach pprof to webserver")
+			os.Exit(1)
+		}
 	}
 
 	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {
