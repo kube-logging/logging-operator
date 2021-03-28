@@ -28,6 +28,7 @@ RUN apk update \
  && gem install fluentd -v 1.7.4 \
  && gem install prometheus-client -v 0.10.0 \
  && gem install bigdecimal -v 1.3.5 \
+ && gem install gelf -v 3.0.0 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -59,6 +60,7 @@ RUN apk update \
          fluent-plugin-datadog \
          fluent-plugin-aws-elasticsearch-service \
          fluent-plugin-redis \
+         fluent-plugin-gelf-hs \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-cloudwatch-logs/releases/download/v0.7.6/fluent-plugin-cloudwatch-logs-0.7.6.gem \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
