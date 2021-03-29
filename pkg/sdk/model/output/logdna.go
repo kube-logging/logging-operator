@@ -45,8 +45,16 @@ type LogDNAOutput struct {
 	HostName string `json:"hostname"`
 	// Application name
 	App string `json:"app,omitempty"`
-	// Do not increase past 8m (8MB) or your logs will be rejected by LogDNA server.
-	BufferQueueLimit string `json:"buffer_chunk_limit,omitempty" default:"1m"`
+	// Comma-Separated List of Tags, Optional
+	Tags string `json:"tags,omitempty"`
+	// HTTPS POST Request Timeout, Optional. Supports s and ms Suffices (default: 30 s)
+	RequestTimeout string `json:"request_timeout,omitempty"`
+	// Custom Ingester URL, Optional (default: https://logs.logdna.com)
+	IngesterDomain string `json:"ingester_domain,omitempty"`
+	// Custom Ingester Endpoint, Optional (default: /logs/ingest)
+	IngesterEndpoint string `json:"ingester_endpoint,omitempty"`
+	// +docLink:"Buffer,../buffer/"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 // #### Example `LogDNA` filter configurations
@@ -60,6 +68,9 @@ type LogDNAOutput struct {
 //     api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
 //     hostname: logging-operator
 //     app: my-app
+//     tags: web,dev
+//     ingester_domain https://logs.logdna.com
+//     ingester_endpoint /logs/ingest
 // ```
 //
 // #### Fluentd Config Result
@@ -89,6 +100,13 @@ func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) 
 		return nil, err
 	} else {
 		logdna.Params = params
+	}
+	if l.Buffer != nil {
+		if buffer, err := l.Buffer.ToDirective(secretLoader, id); err != nil {
+			return nil, err
+		} else {
+			logdna.SubDirectives = append(logdna.SubDirectives, buffer)
+		}
 	}
 	return logdna, nil
 }
