@@ -1347,7 +1347,7 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.LogDNAOutput != nil {
 		in, out := &in.LogDNAOutput, &out.LogDNAOutput
 		*out = new(output.LogDNAOutput)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.NewRelicOutputConfig != nil {
 		in, out := &in.NewRelicOutputConfig, &out.NewRelicOutputConfig
