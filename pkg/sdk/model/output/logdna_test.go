@@ -27,10 +27,10 @@ func TestLogDNAOutput(t *testing.T) {
 api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxy
 hostname: logging-operator
 app: myapp
-tags web,dev
-request_timeout 30000 ms
-ingester_domain https://logs.logdna.com
-ingester_endpoint /logs/ingest
+tags: web,dev
+request_timeout: 30000 ms
+ingester_domain: https://logs.logdna.com
+ingester_endpoint: /logs/ingest
 buffer:
   timekey: 1m
   timekey_wait: 30s
@@ -38,27 +38,30 @@ buffer:
 `)
 	expected := `
   <match **>
-    @type logdna
-    @id test_logdna
-    api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
-    hostname logging-operator
-    app myapp
-    tags web,dev
-    request_timeout 30000 ms
-    ingester_domain https://logs.logdna.com
-    ingester_endpoint /logs/ingest
-    <buffer tag,time>
-      @type file
-      path /buffers/test.*.buffer
-      retry_forever true
-      timekey 1m
-      timekey_use_utc true
-      timekey_wait 30s
-    </buffer>
+	@type logdna
+	@id test_logdna
+	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
+	app myapp
+	hostname logging-operator
+	ingester_domain https://logs.logdna.com
+	ingester_endpoint /logs/ingest
+	request_timeout 30000 ms
+	tags web,dev
+	<buffer tag,time>
+	  @type file
+	  path /buffers/test_logdna.*.buffer
+	  retry_forever true
+	  timekey 1m
+	  timekey_use_utc true
+	  timekey_wait 30s
+	</buffer>
   </match>
 `
 	logdna := &output.LogDNAOutput{}
-	yaml.Unmarshal(CONFIG, logdna)
+	err := yaml.Unmarshal(CONFIG, logdna)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 	test := render.NewOutputPluginTest(t, logdna)
 	test.DiffResult(expected)
 }
