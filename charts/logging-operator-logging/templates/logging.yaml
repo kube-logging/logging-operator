@@ -54,4 +54,9 @@ spec:
   {{- else }}
   fluentbit: {}
   {{- end }}
-
+{{- if .Values.nodeAgents }}
+{{ toYaml .Values.nodeAgents | indent 4 }}
+    {{- end }}
+{{- else }}
+    nodeAgents: {}
+{{- end }}

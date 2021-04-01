@@ -18,6 +18,31 @@ enableRecreateWorkloadOnImmutableFieldChange: false
 
 # Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/#fluent-bit-spec
 fluentbit: {}
+
+#Node agent Deffinition
+nodeAgents: {}
+#  - name: win-agent
+#    profile: windows
+#    nodeAgentFluentbit:
+#      daemonSet:
+#        spec:
+#          template:
+#            spec:
+#              containers:
+#              - image: banzaicloud/fluentbit:1.6.10
+#                name: fluent-bit
+#      tls:
+#        enabled: false
+#  - name: linux-agent
+#    profile: linux
+#    nodeAgentFluentbit:
+#      metrics:
+#        prometheusAnnotations: true
+#        serviceMonitor: false
+#      tls:
+#        enabled: false
+
+
 # Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/#fluentd-spec
 fluentd: {}
 # 20Gi persistent storage is configured for fluentd by default.
