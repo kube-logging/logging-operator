@@ -215,7 +215,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 						Containers: []v1.Container{
 							{
 								Name:    containerName,
-								Image:   "banzaicloud/fluentbit:1.6.10",
+								Image:   "rancher/fluent-bit:1.6.10-rc7",
 								Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
 								Resources: v1.ResourceRequirements{
 									Limits: v1.ResourceList{
