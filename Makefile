@@ -100,7 +100,7 @@ manager: generate fmt vet
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet
-	go run ./main.go --verbose
+	go run ./main.go --verbose --pprof
 
 # remote debug
 debug: manager

@@ -9,10 +9,15 @@ image:
   tag: 3.9.1
   pullPolicy: IfNotPresent
 
+extraArgs: []
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 namespaceOverride: ""
+
+## Pod custom labels
+##
+podLabels: {}
 
 annotations: {}
 
