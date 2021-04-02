@@ -78,8 +78,10 @@ github.com/aws/aws-sdk-go v1.27.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN
 github.com/aws/aws-sdk-go-v2 v0.18.0/go.mod h1:JWVYvqSMppoMJC0x5wdwiImzgXTI9FuZwxzkQq9wy+g=
 github.com/banzaicloud/k8s-objectmatcher v1.5.0 h1:mYrLzvRgxCHBlJZEcyIglDuoKpMhwHocgsAXl1nmm10=
 github.com/banzaicloud/k8s-objectmatcher v1.5.0/go.mod h1:9MWY5HsM/OaTmoTirczhlO8UALbH722WgdpaaR7Y8OE=
-github.com/banzaicloud/operator-tools v0.15.0 h1:BxtRBJlHntpAq4dtgCkhTImAUiT9sdKxwlcYKoKR+uM=
-github.com/banzaicloud/operator-tools v0.15.0/go.mod h1:544x65QDUmKMTrnMs0lbJ/0jvBSGKkaP2Z4fcmUZeLg=
+github.com/banzaicloud/operator-tools v0.18.0 h1:0MNkuSCH5BfTCziAufP5WxgxNY7/4thX8hPoppVu+ec=
+github.com/banzaicloud/operator-tools v0.18.0/go.mod h1:FqvrE0Ww9DIgkAwGn/x4wZPfMZRDu5W7+7aG9S15CnI=
+github.com/banzaicloud/operator-tools v0.20.1 h1:gn9xRNZGvGywi5AmtplEw469qmUyUUPoLlnKi6z3M3A=
+github.com/banzaicloud/operator-tools v0.20.1/go.mod h1:A/Y7Sxu9oSswN+gQABqx0imR6AbaMnxq2Mxag/gN/eM=
 github.com/banzaicloud/vfsgen v0.0.0-20200203103248-c48ce8603af1 h1:mU1NWbBhWFQmpc4Vop9XWWHQQ3wINvZT666c3OX52Cw=
 github.com/banzaicloud/vfsgen v0.0.0-20200203103248-c48ce8603af1/go.mod h1:kkOp3NatLFRDKepb9dRDhgu5JWLahgVGIHiCW7wufv0=
 github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -264,6 +266,7 @@ github.com/go-openapi/validate v0.19.5/go.mod h1:8DJv2CVJQ6kGNpFW6eV9N3JviE1C85n
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/go-sql-driver/mysql v1.4.1/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
+github.com/go-test/deep v1.0.7/go.mod h1:QV8Hv/iy04NyLBxAdO9njL0iVPN1S4d/A3NVv1V36o8=
 github.com/gobuffalo/envy v1.7.0/go.mod h1:n7DRkBerg/aorDM8kbduw5dN3oXGswK5liaSCx4T5NI=
 github.com/gobuffalo/envy v1.7.1/go.mod h1:FurDp9+EDPE4aIUS3ZLyD+7/9fpx7YRt/ukY6jIHf0w=
 github.com/gobuffalo/logger v1.0.1/go.mod h1:2zbswyIUa45I+c+FLXuWl9zSWEiVuthsk8ze5s8JvPs=

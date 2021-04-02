@@ -1,4 +1,4 @@
-// Copyright © 2019 Banzai Cloud
+// Copyright © 2021 Banzai Cloud
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fluentbit
+package nodeagent
 
 import (
 	"fmt"
@@ -26,35 +26,35 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
+	if n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		allowedHostPaths := []policyv1beta1.AllowedHostPath{{
-			PathPrefix: r.Logging.Spec.FluentbitSpec.MountPath,
+			PathPrefix: n.nodeAgent.FluentbitSpec.ContainersPath,
 			ReadOnly:   true,
 		}, {
-			PathPrefix: "/var/log",
+			PathPrefix: n.nodeAgent.FluentbitSpec.VarLogsPath,
 			ReadOnly:   true,
 		}}
 
-		for _, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+		for _, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: vMnt.Source,
 				ReadOnly:   *vMnt.ReadOnly,
 			})
 		}
 
-		if r.Logging.Spec.FluentbitSpec.PositionDB.HostPath != nil {
-			r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
-				fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+		if n.nodeAgent.FluentbitSpec.PositionDB.HostPath != nil {
+			n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
+				fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
 
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-				PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
+				PathPrefix: n.nodeAgent.FluentbitSpec.PositionDB.HostPath.Path,
 				ReadOnly:   false,
 			})
 		}
 
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
 				Volumes: []policyv1beta1.FSType{
 					"configMap",
@@ -80,49 +80,49 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 		}, reconciler.StatePresent, nil
 	}
 	return &policyv1beta1.PodSecurityPolicy{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitPodSecurityPolicyName),
+		ObjectMeta: n.NodeAgentObjectMeta(fluentbitPodSecurityPolicyName),
 		Spec:       policyv1beta1.PodSecurityPolicySpec{},
 	}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+func (n *nodeAgentInstance) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
+	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRole{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups:     []string{"policy"},
 					Resources:     []string{"podsecuritypolicies"},
-					ResourceNames: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
+					ResourceNames: []string{n.QualifiedName(fluentbitPodSecurityPolicyName)},
 					Verbs:         []string{"use"},
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
-		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+func (n *nodeAgentInstance) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
+	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRoleBinding{
-			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(clusterRoleName + "-psp"),
+				Name:     n.QualifiedName(clusterRoleName + "-psp"),
 			},
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
-					Name:      r.getServiceAccount(),
-					Namespace: r.Logging.Spec.ControlNamespace,
+					Name:      n.getServiceAccount(),
+					Namespace: n.logging.Spec.ControlNamespace,
 				},
 			},
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
+		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }

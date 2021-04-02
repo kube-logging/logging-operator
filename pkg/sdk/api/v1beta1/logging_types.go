@@ -63,7 +63,8 @@ type LoggingSpec struct {
 	ControlNamespace string `json:"controlNamespace"`
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
-
+	// NodeAgent Configuration
+	NodeAgents []*NodeAgent `json:"nodeAgents,omitempty"`
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
 	// in case there is a change in an immutable field
@@ -426,6 +427,12 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentbitSpec.ForwardOptions.RetryLimit == "" {
 			l.Spec.FluentbitSpec.ForwardOptions.RetryLimit = "False"
+		}
+		if l.Spec.FluentbitSpec.TLS == nil {
+			l.Spec.FluentbitSpec.TLS = &FluentbitTLS{}
+		}
+		if l.Spec.FluentbitSpec.TLS.Enabled == nil {
+			l.Spec.FluentbitSpec.TLS.Enabled = util.BoolPointer(false)
 		}
 	}
 	return nil

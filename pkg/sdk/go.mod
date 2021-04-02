@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.0
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/banzaicloud/operator-tools v0.15.0
+	github.com/banzaicloud/operator-tools v0.20.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/zapr v0.2.0
 	github.com/onsi/ginkgo v1.12.1
