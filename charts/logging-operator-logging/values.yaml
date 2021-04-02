@@ -19,7 +19,7 @@ enableRecreateWorkloadOnImmutableFieldChange: false
 # Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/#fluent-bit-spec
 fluentbit: {}
 
-#Node agent Deffinition
+#Node agent Definition
 nodeAgents: {}
 #  - name: win-agent
 #    profile: windows
