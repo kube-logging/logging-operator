@@ -30,6 +30,7 @@ RUN apk update \
  && gem install prometheus-client -v 0.9.0 \
  && gem install bigdecimal -v 1.4.4 \
  && gem install webrick \
+ && gem install gelf -v 3.0.0 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -62,6 +63,7 @@ RUN apk update \
          fluent-plugin-datadog \
          fluent-plugin-aws-elasticsearch-service \
          fluent-plugin-redis \
+         fluent-plugin-gelf-hs \
  && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
  && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \

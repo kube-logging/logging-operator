@@ -31,6 +31,7 @@ RUN apk update \
  && gem install bigdecimal -v 1.4.4 \
  # Until this lock fluentd '< 1.10' https://github.com/fabric8io/fluent-plugin-kubernetes_metadata_filter/blob/master/fluent-plugin-kubernetes_metadata_filter.gemspec#L22
  && gem install fluent-plugin-kubernetes_metadata_filter -v 2.4.5 \
+ && gem install gelf -v 3.0.0 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -64,6 +65,7 @@ RUN apk update \
          fluent-plugin-datadog \
          fluent-plugin-aws-elasticsearch-service \
          fluent-plugin-redis \
+         fluent-plugin-gelf-hs \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem

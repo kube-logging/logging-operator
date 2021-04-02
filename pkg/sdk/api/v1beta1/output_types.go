@@ -53,6 +53,7 @@ type OutputSpec struct {
 	AwsElasticsearchOutputConfig *output.AwsElasticsearchOutputConfig `json:"awsElasticsearch,omitempty"`
 	RedisOutputConfig            *output.RedisOutputConfig            `json:"redis,omitempty"`
 	SyslogOutputConfig           *output.SyslogOutputConfig           `json:"syslog,omitempty"`
+	GELFOutputConfig             *output.GELFOutputConfig             `json:"gelf,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output
