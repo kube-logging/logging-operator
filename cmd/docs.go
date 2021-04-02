@@ -66,7 +66,7 @@ func plugins() {
 		For more information please click on the plugin name
 		<center>
 
-		| Name | Type | Description | Status |Version |
+		| Name | Profile | Description | Status |Version |
 		|:---|---|:---|:---:|---:|`,
 	)
 

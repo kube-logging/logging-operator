@@ -37,7 +37,7 @@ type FluentbitSpec struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
 	Image       ImageSpec         `json:"image,omitempty"`
-	TLS         FluentbitTLS      `json:"tls,omitempty"`
+	TLS         *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost  string            `json:"targetHost,omitempty"`
 	TargetPort  int32             `json:"targetPort,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
@@ -60,7 +60,7 @@ type FluentbitSpec struct {
 	// Deprecated, use positiondb
 	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
 	MountPath         string                   `json:"mountPath,omitempty"`
-	ExtraVolumeMounts []VolumeMount            `json:"extraVolumeMounts,omitempty"`
+	ExtraVolumeMounts []*VolumeMount           `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	// Deprecated, use inputTail.parser
@@ -86,7 +86,7 @@ type FluentbitSpec struct {
 
 // FluentbitTLS defines the TLS configs
 type FluentbitTLS struct {
-	Enabled    bool   `json:"enabled"`
+	Enabled    *bool  `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
 }
@@ -259,7 +259,7 @@ type VolumeMount struct {
 	// +kubebuilder:validation:Pattern=^/.+$
 	Destination string `json:"destination"`
 	// Mount Mode
-	ReadOnly bool `json:"readOnly,omitempty"`
+	ReadOnly *bool `json:"readOnly,omitempty"`
 }
 
 // ForwardOptions defines custom forward output plugin options, see https://docs.fluentbit.io/manual/pipeline/outputs/forward

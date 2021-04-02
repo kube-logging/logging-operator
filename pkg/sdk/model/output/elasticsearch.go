@@ -175,7 +175,7 @@ type ElasticsearchOutput struct {
 	ReconnectOnError bool `json:"reconnect_on_error,omitempty"`
 	// This is debugging purpose option to enable to obtain transporter layer log. (default: false)
 	WithTransporterLog bool `json:"with_transporter_log,omitempty"`
-	// With content_type application/x-ndjson, elasticsearch plugin adds application/x-ndjson as Content-Type in payload. (default: application/json)
+	// With content_type application/x-ndjson, elasticsearch plugin adds application/x-ndjson as Content-Profile in payload. (default: application/json)
 	ContentType string `json:"content_type,omitempty"`
 	//With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
 	IncludeIndexInUrl bool `json:"include_index_in_url,omitempty"`

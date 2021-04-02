@@ -22,12 +22,19 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func TestLogDNA(t *testing.T) {
+func TestLogDNAOutput(t *testing.T) {
 	CONFIG := []byte(`
 api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxy
 hostname: logging-operator
-
 app: myapp
+tags: web,dev
+request_timeout: 30000 ms
+ingester_domain: https://logs.logdna.com
+ingester_endpoint: /logs/ingest
+buffer:
+  timekey: 1m
+  timekey_wait: 30s
+  timekey_use_utc: true
 `)
 	expected := `
   <match **>
@@ -35,11 +42,26 @@ app: myapp
 	@id test_logdna
 	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
 	app myapp
-    hostname logging-operator
+	hostname logging-operator
+	ingester_domain https://logs.logdna.com
+	ingester_endpoint /logs/ingest
+	request_timeout 30000 ms
+	tags web,dev
+	<buffer tag,time>
+	  @type file
+	  path /buffers/test_logdna.*.buffer
+	  retry_forever true
+	  timekey 1m
+	  timekey_use_utc true
+	  timekey_wait 30s
+	</buffer>
   </match>
 `
-	s := &output.LogDNAOutput{}
-	yaml.Unmarshal(CONFIG, s)
-	test := render.NewOutputPluginTest(t, s)
+	logdna := &output.LogDNAOutput{}
+	err := yaml.Unmarshal(CONFIG, logdna)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	test := render.NewOutputPluginTest(t, logdna)
 	test.DiffResult(expected)
 }
