@@ -2470,6 +2470,8 @@ spec:
                     type:
                       type: string
                   type: object
+                client_id:
+                  type: string
                 compression_codec:
                   type: string
                 default_message_key:
@@ -2478,6 +2480,8 @@ spec:
                   type: string
                 default_topic:
                   type: string
+                discard_kafka_delivery_failed:
+                  type: boolean
                 exclude_partion_key:
                   type: boolean
                 exclude_topic_key:
@@ -2511,6 +2515,10 @@ spec:
                   type: object
                 idempotent:
                   type: boolean
+                kafka_agg_max_bytes:
+                  type: integer
+                kafka_agg_max_messages:
+                  type: string
                 max_send_retries:
                   type: integer
                 message_key_key:

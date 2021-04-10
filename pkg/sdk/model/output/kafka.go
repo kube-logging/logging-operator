@@ -66,6 +66,8 @@ type KafkaOutputConfig struct {
 	PartitionKeyKey string `json:"partition_key_key,omitempty"`
 	// Message Key (default: "message_key")
 	MessageKeyKey string `json:"message_key_key,omitempty"`
+	// Client ID (default: "kafka")
+	ClientId string `json:"client_id,omitempty"`
 	// The name of default topic (default: nil).
 	DefaultTopic string `json:"default_topic,omitempty"`
 	// The name of default partition key (default: nil).
@@ -103,6 +105,12 @@ type KafkaOutputConfig struct {
 	AckTimeout int `json:"ack_timeout,omitempty"`
 	// The codec the producer uses to compress messages (default: nil). The available options are gzip and snappy.
 	CompressionCodec string `json:"compression_codec,omitempty"`
+	// Maximum value of total message size to be included in one batch transmission. (default: 4096).
+	KafkaAggMaxBytes int `json:"kafka_agg_max_bytes,omitempty"`
+	// Maximum number of messages to include in one batch transmission. (default: nil).
+	KafkaAggMaxMessages string `json:"kafka_agg_max_messages,omitempty"`
+	// Discard the record where Kafka DeliveryFailed occurred (default: false)
+	DiscardKafkaDeliveryFailed bool `json:"discard_kafka_delivery_failed,omitempty"`
 	// System's CA cert store (default: false)
 	SSLCACertsFromSystem *bool `json:"ssl_ca_certs_from_system,omitempty"`
 	// CA certificate
