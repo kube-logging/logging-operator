@@ -370,6 +370,8 @@ spec:
                   type: boolean
                 logstash_format:
                   type: boolean
+                logstash_prefix:
+                  type: string
                 tag_key:
                   type: string
               type: object
