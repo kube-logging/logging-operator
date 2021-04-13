@@ -51,6 +51,9 @@ type AwsElasticsearchOutputConfig struct {
 	// logstash_format
 	LogstashFormat bool `json:"logstash_format,omitempty"`
 
+	// logstash_prefix
+	LogstashPrefix string `json:"logstash_prefix,omitempty"`
+
 	// include_tag_key
 	IncludeTagKey bool `json:"include_tag_key,omitempty"`
 
