@@ -182,7 +182,7 @@ type InputTail struct {
 type FilterKubernetes struct {
 	// Match filtered records (default:kube.*)
 	Match string `json:"Match,omitempty" plugin:"default:kubernetes.*"`
-	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. (default:32k)
+	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs.(default:32k)
 	BufferSize string `json:"Buffer_Size,omitempty"`
 	// API Server end-point (default:https://kubernetes.default.svc:443)
 	KubeURL string `json:"Kube_URL,omitempty" plugin:"default:https://kubernetes.default.svc:443"`
@@ -224,6 +224,14 @@ type FilterKubernetes struct {
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
 	DummyMeta string `json:"Dummy_Meta,omitempty"`
+	// DNS lookup retries N times until the network start working (default:6)
+	DNSRetries string `json:"DNS_Retries,omitempty"`
+	// DNS lookup interval between network status checks (default:30)
+	DNSWaitTime string `json:"DNS_Wait_Time,omitempty"`
+	// This is an optional feature flag to get metadata information from kubelet instead of calling Kube Server API to enhance the log. (default:Off)
+	UseKubelet string `json:"Use_Kubelet,omitempty"`
+	// kubelet port using for HTTP request, this only works when Use_Kubelet  set to On (default:10250)
+	KubeletPort string `json:"Kubelet_Port,omitempty"`
 }
 
 // FilterAws The AWS Filter Enriches logs with AWS Metadata.

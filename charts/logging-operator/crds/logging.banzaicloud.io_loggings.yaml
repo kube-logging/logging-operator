@@ -1126,6 +1126,10 @@ spec:
                       type: string
                     Buffer_Size:
                       type: string
+                    DNS_Retries:
+                      type: string
+                    DNS_Wait_Time:
+                      type: string
                     Dummy_Meta:
                       type: string
                     K8S-Logging.Exclude:
@@ -1146,6 +1150,8 @@ spec:
                       type: string
                     Kube_meta_preload_cache_dir:
                       type: string
+                    Kubelet_Port:
+                      type: string
                     Labels:
                       type: string
                     Match:
@@ -1161,6 +1167,8 @@ spec:
                     Regex_Parser:
                       type: string
                     Use_Journal:
+                      type: string
+                    Use_Kubelet:
                       type: string
                     tls.debug:
                       type: string
@@ -6488,6 +6496,10 @@ spec:
                             type: string
                           Buffer_Size:
                             type: string
+                          DNS_Retries:
+                            type: string
+                          DNS_Wait_Time:
+                            type: string
                           Dummy_Meta:
                             type: string
                           K8S-Logging.Exclude:
@@ -6508,6 +6520,8 @@ spec:
                             type: string
                           Kube_meta_preload_cache_dir:
                             type: string
+                          Kubelet_Port:
+                            type: string
                           Labels:
                             type: string
                           Match:
@@ -6523,6 +6537,8 @@ spec:
                           Regex_Parser:
                             type: string
                           Use_Journal:
+                            type: string
+                          Use_Kubelet:
                             type: string
                           tls.debug:
                             type: string
