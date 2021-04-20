@@ -25,6 +25,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type fluentbitInputConfig struct {
@@ -127,6 +128,15 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 	fluentbitInput.Values = fluentbitInputValues
 
 	disableKubernetesFilter := n.nodeAgent.FluentbitSpec.DisableKubernetesFilter != nil && *n.nodeAgent.FluentbitSpec.DisableKubernetesFilter == true
+
+	if !disableKubernetesFilter {
+		if n.nodeAgent.FluentbitSpec.FilterKubernetes.BufferSize == "" {
+			n.nodeAgent.FluentbitSpec.FilterKubernetes.BufferSize = "0"
+		} else if n.nodeAgent.FluentbitSpec.FilterKubernetes.BufferSize != "0" {
+			log.Log.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+		}
+	}
+
 	fluentbitKubernetesFilter, err := mapper.StringsMap(n.nodeAgent.FluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
