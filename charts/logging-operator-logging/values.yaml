@@ -29,7 +29,7 @@ nodeAgents: {}
 #          template:
 #            spec:
 #              containers:
-#              - image: banzaicloud/fluentbit:1.6.10
+#              - image: banzaicloud/fluentbit:1.7.3
 #                name: fluent-bit
 #      tls:
 #        enabled: false
