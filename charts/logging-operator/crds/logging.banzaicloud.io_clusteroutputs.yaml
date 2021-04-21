@@ -557,9 +557,7 @@ spec:
                   type: string
               required:
               - azure_container
-              - azure_storage_access_key
               - azure_storage_account
-              - azure_storage_sas_token
               type: object
             cloudwatch:
               properties:
