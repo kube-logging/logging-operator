@@ -45,10 +45,10 @@ type AzureStorage struct {
 	AzureStorageAccount *secret.Secret `json:"azure_storage_account"`
 	// Your azure storage access key
 	// +docLink:"Secret,../secret/"
-	AzureStorageAccessKey *secret.Secret `json:"azure_storage_access_key"`
+	AzureStorageAccessKey *secret.Secret `json:"azure_storage_access_key,omitempty"`
 	// Your azure storage sas token
 	// +docLink:"Secret,../secret/"
-	AzureStorageSasToken *secret.Secret `json:"azure_storage_sas_token"`
+	AzureStorageSasToken *secret.Secret `json:"azure_storage_sas_token,omitempty"`
 	// Your azure storage container
 	AzureContainer string `json:"azure_container"`
 	// Azure Instance Metadata Service API Version
