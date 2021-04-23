@@ -58,7 +58,16 @@ http:
 rbac:
   enabled: true
   psp:
-    enabled: false
+    enabled: true
+    annotations:
+      seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
+      seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    ## Specify pod annotations
+    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#apparmor
+    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#sysctl
+
+
 
 ## SecurityContext holds pod-level security attributes and common container settings.
 ## This defaults to non root user with uid 1000 and gid 2000.	*v1.PodSecurityContext	false
