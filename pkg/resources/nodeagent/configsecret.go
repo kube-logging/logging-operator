@@ -212,6 +212,16 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		}
 	}
 
+	if n.logging.Spec.FluentdSpec.Scaling.Replicas > 1 && n.nodeAgent.FluentbitSpec.Network == nil {
+		input.Network.KeepaliveSet = true
+		input.Network.Keepalive = true
+		input.Network.KeepaliveIdleTimeoutSet = true
+		input.Network.KeepaliveIdleTimeout = 30
+		input.Network.KeepaliveMaxRecycleSet = true
+		input.Network.KeepaliveMaxRecycle = 100
+		log.Log.Info("Notice: Because the Fluentd statefulset has been scaled, we've made some changes in the fluentbit network config too. We advice to revise these default configurations.")
+	}
+
 	if n.nodeAgent.FluentbitSpec.EnableUpstream != nil && *n.nodeAgent.FluentbitSpec.EnableUpstream {
 		input.Upstream.Enabled = true
 		input.Upstream.Config.Name = "fluentd-upstream"
