@@ -234,10 +234,17 @@ type ElasticsearchOutput struct {
 	IlmPolicy string `json:"ilm_policy,omitempty"`
 	// Specify whether overwriting ilm policy or not.
 	IlmPolicyOverwrite bool `json:"ilm_policy_overwrite,omitempty"`
+	// Use @type elasticsearch_data_stream
+	DataStreamEnable *bool `json:"data_stream_enable,omitempty"`
+	// You can specify Elasticsearch data stream name by this parameter. This parameter is mandatory for elasticsearch_data_stream. There are some limitations about naming rule. For more details https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-create-data-stream.html#indices-create-data-stream-api-path-params
+	DataStreamName string `json:"data_stream_name,omitempty"`
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	const pluginType = "elasticsearch"
+	pluginType := "elasticsearch"
+	if e.DataStreamEnable != nil && *e.DataStreamEnable {
+		pluginType = "elasticsearch_data_stream"
+	}
 	elasticsearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

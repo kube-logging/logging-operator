@@ -1134,6 +1134,10 @@ spec:
                   type: string
                 customize_template:
                   type: string
+                data_stream_enable:
+                  type: boolean
+                data_stream_name:
+                  type: string
                 default_elasticsearch_version:
                   type: string
                 deflector_alias:
