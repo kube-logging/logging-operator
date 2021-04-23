@@ -62,6 +62,7 @@ type ServiceMonitorConfig struct {
 // Security defines Fluentd, Fluentbit deployment security properties
 type Security struct {
 	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
+	ServiceAccountAnnotations    map[string]string          `json:"serviceAccountAnnotations,omitempty"`
 	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`
 	PodSecurityPolicyCreate      bool                       `json:"podSecurityPolicyCreate,omitempty"`
 	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`

@@ -24,7 +24,7 @@ import (
 func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
-			ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd, nil),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{""},
@@ -35,14 +35,14 @@ func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.Role{
-		ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd, nil),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
-			ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd, nil),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "Role",
 				APIGroup: "rbac.authorization.k8s.io",
@@ -58,7 +58,7 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.RoleBinding{
-		ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd, nil),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
@@ -74,7 +74,7 @@ func (r *Reconciler) isEnhanceK8sFilter() bool {
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
 		return &rbacv1.ClusterRole{
-			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd, nil),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{""},
@@ -115,14 +115,14 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRole{
-		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd, nil),
 		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
 		return &rbacv1.ClusterRoleBinding{
-			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd, nil),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
@@ -138,17 +138,17 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 		}, reconciler.StatePresent, nil
 	}
 	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd, nil),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
 		return &corev1.ServiceAccount{
-			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd, r.Logging.Spec.FluentdSpec.Security.ServiceAccountAnnotations),
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.ServiceAccount{
-		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd, r.Logging.Spec.FluentdSpec.Security.ServiceAccountAnnotations),
 	}, reconciler.StateAbsent, nil
 }

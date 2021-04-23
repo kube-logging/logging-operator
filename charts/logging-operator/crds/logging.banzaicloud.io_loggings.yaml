@@ -1830,6 +1830,10 @@ spec:
                       type: object
                     serviceAccount:
                       type: string
+                    serviceAccountAnnotations:
+                      additionalProperties:
+                        type: string
+                      type: object
                   type: object
                 targetHost:
                   type: string
@@ -2822,6 +2826,10 @@ spec:
                       type: object
                     serviceAccount:
                       type: string
+                    serviceAccountAnnotations:
+                      additionalProperties:
+                        type: string
+                      type: object
                   type: object
                 tls:
                   properties:
@@ -7017,6 +7025,10 @@ spec:
                             type: object
                           serviceAccount:
                             type: string
+                          serviceAccountAnnotations:
+                            additionalProperties:
+                              type: string
+                            type: object
                         type: object
                       serviceAccount:
                         properties:

@@ -35,7 +35,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	)
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
-			return r.FluentdObjectMeta(name, ComponentFluentd)
+			return r.FluentdObjectMeta(name, ComponentFluentd, nil)
 		})
 		if err != nil {
 			return nil, reconciler.StatePresent, err
@@ -48,7 +48,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	}
 
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd, nil),
 		Spec:       *spec,
 	}
 

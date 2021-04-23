@@ -26,7 +26,7 @@ import (
 
 func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) {
 	desired := &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName, ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName, ComponentFluentd, nil),
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
@@ -62,7 +62,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
+			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd, nil),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -79,13 +79,13 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-monitor", ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-monitor", ComponentFluentd, nil),
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
-		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
+		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd, nil)
 		if r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -114,14 +114,14 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd, nil),
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState, error) {
 	desired := &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-headless", ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-headless", ComponentFluentd, nil),
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
