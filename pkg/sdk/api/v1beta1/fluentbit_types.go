@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"strconv"
 
+	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -71,15 +72,16 @@ type FluentbitSpec struct {
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
-	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
-	PodPriorityClassName string                  `json:"podPriorityClassName,omitempty"`
-	LivenessProbe        *corev1.Probe           `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck bool                    `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe       *corev1.Probe           `json:"readinessProbe,omitempty"`
-	Network              *FluentbitNetwork       `json:"network,omitempty"`
-	ForwardOptions       *ForwardOptions         `json:"forwardOptions,omitempty"`
-	EnableUpstream       bool                    `json:"enableUpstream,omitempty"`
+	BufferStorageVolume     volume.KubernetesVolume      `json:"bufferStorageVolume,omitempty"`
+	CustomConfigSecret      string                       `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName    string                       `json:"podPriorityClassName,omitempty"`
+	LivenessProbe           *corev1.Probe                `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck    bool                         `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe          *corev1.Probe                `json:"readinessProbe,omitempty"`
+	Network                 *FluentbitNetwork            `json:"network,omitempty"`
+	ForwardOptions          *ForwardOptions              `json:"forwardOptions,omitempty"`
+	EnableUpstream          bool                         `json:"enableUpstream,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
