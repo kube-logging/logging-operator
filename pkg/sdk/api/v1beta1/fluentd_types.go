@@ -57,6 +57,9 @@ type FluentdSpec struct {
 	NodeSelector         map[string]string           `json:"nodeSelector,omitempty"`
 	Affinity             *corev1.Affinity            `json:"affinity,omitempty"`
 	Metrics              *Metrics                    `json:"metrics,omitempty"`
+	BufferVolumeMetrics  *Metrics                    `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeImage    ImageSpec                   `json:"bufferVolumeImage,omitempty"`
+	BufferVolumeArgs     []string                    `json:"bufferVolumeArgs,omitempty"`
 	Security             *Security                   `json:"security,omitempty"`
 	Scaling              *FluentdScaling             `json:"scaling,omitempty"`
 	Workers              int32                       `json:"workers,omitempty"`

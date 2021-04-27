@@ -46,14 +46,15 @@ const (
 	OutputSecretName      = "fluentd-output"
 	OutputSecretPath      = "/fluentd/secret"
 
-	bufferPath                = "/buffers"
-	bufferVolumeName          = "fluentd-buffer"
-	defaultServiceAccountName = "fluentd"
-	roleBindingName           = "fluentd"
-	roleName                  = "fluentd"
-	clusterRoleBindingName    = "fluentd"
-	clusterRoleName           = "fluentd"
-	containerName             = "fluentd"
+	bufferPath                     = "/buffers"
+	bufferVolumeName               = "fluentd-buffer"
+	defaultServiceAccountName      = "fluentd"
+	roleBindingName                = "fluentd"
+	roleName                       = "fluentd"
+	clusterRoleBindingName         = "fluentd"
+	clusterRoleName                = "fluentd"
+	containerName                  = "fluentd"
+	defaultBufferVolumeMetricsPort = 9200
 )
 
 // Reconciler holds info what resource to reconcile
@@ -216,6 +217,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.headlessService,
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
+		r.serviceBufferMetrics,
+		r.monitorBufferServiceMetrics,
 	} {
 		o, state, err := res()
 		if err != nil {

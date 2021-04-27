@@ -215,6 +215,15 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
 		}
+		if l.Spec.FluentdSpec.BufferVolumeImage.Repository == "" {
+			l.Spec.FluentdSpec.BufferVolumeImage.Repository = "quay.io/prometheus/node-exporter"
+		}
+		if l.Spec.FluentdSpec.BufferVolumeImage.Tag == "" {
+			l.Spec.FluentdSpec.BufferVolumeImage.Tag = "v1.1.2"
+		}
+		if l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy == "" {
+			l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
+		}
 		if l.Spec.FluentdSpec.Resources.Limits == nil {
 			l.Spec.FluentdSpec.Resources.Limits = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("400M"),

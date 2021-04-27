@@ -957,6 +957,17 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = new(Metrics)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.BufferVolumeMetrics != nil {
+		in, out := &in.BufferVolumeMetrics, &out.BufferVolumeMetrics
+		*out = new(Metrics)
+		(*in).DeepCopyInto(*out)
+	}
+	in.BufferVolumeImage.DeepCopyInto(&out.BufferVolumeImage)
+	if in.BufferVolumeArgs != nil {
+		in, out := &in.BufferVolumeArgs, &out.BufferVolumeArgs
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(Security)
