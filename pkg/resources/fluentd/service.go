@@ -119,6 +119,70 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 	}, reconciler.StateAbsent, nil
 }
 
+func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
+		port := int32(defaultBufferVolumeMetricsPort)
+		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port
+		}
+
+		return &corev1.Service{
+			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
+					{
+						Protocol:   corev1.ProtocolTCP,
+						Name:       "buffer-metrics",
+						Port:       port,
+						TargetPort: intstr.IntOrString{IntVal: port},
+					},
+				},
+				Selector:  r.getFluentdLabels(ComponentFluentd),
+				Type:      corev1.ServiceTypeClusterIP,
+				ClusterIP: "None",
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &corev1.Service{
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-monitor", ComponentFluentd),
+		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitor {
+		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
+		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
+				objectMetadata.Labels[k] = v
+			}
+		}
+		return &v1.ServiceMonitor{
+			ObjectMeta: objectMetadata,
+			Spec: v1.ServiceMonitorSpec{
+				JobLabel:        "",
+				TargetLabels:    nil,
+				PodTargetLabels: nil,
+				Endpoints: []v1.Endpoint{{
+					Port:                 "buffer-metrics",
+					Path:                 r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Path,
+					Interval:             r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Interval,
+					ScrapeTimeout:        r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Timeout,
+					HonorLabels:          r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+				}},
+				Selector:          v12.LabelSelector{MatchLabels: r.getFluentdLabels(ComponentFluentd)},
+				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				SampleLimit:       0,
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &v1.ServiceMonitor{
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
+		Spec:       v1.ServiceMonitorSpec{},
+	}, reconciler.StateAbsent, nil
+}
+
 func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState, error) {
 	desired := &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-headless", ComponentFluentd),

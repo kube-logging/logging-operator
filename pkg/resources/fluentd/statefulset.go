@@ -72,6 +72,37 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			},
 		})
 	}
+	containers := make([]corev1.Container, 0)
+	containers = append(containers,
+		*r.fluentContainer(),
+		*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
+	)
+	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
+		port := int32(defaultBufferVolumeMetricsPort)
+		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port
+		}
+		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
+		args := []string{portParam}
+		if len(r.Logging.Spec.FluentdSpec.BufferVolumeArgs) != 0 {
+			args = append(args, r.Logging.Spec.FluentdSpec.BufferVolumeArgs...)
+		} else {
+			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
+		}
+		containers = append(containers, corev1.Container{
+			Name:            "buffer-metrics-sidecar",
+			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.Repository + ":" + r.Logging.Spec.FluentdSpec.BufferVolumeImage.Tag,
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
+			Args:            args,
+			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      r.Logging.QualifiedName(bufferVolumeName),
+					MountPath: bufferPath,
+				},
+			},
+		})
+	}
 
 	return &appsv1.StatefulSetSpec{
 		Replicas:            util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
@@ -86,14 +117,11 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				ServiceAccountName: r.getServiceAccount(),
 				InitContainers:     initContainers,
 				ImagePullSecrets:   r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
-				Containers: []corev1.Container{
-					*r.fluentContainer(),
-					*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
-				},
-				NodeSelector:      r.Logging.Spec.FluentdSpec.NodeSelector,
-				Tolerations:       r.Logging.Spec.FluentdSpec.Tolerations,
-				Affinity:          r.Logging.Spec.FluentdSpec.Affinity,
-				PriorityClassName: r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+				Containers:         containers,
+				NodeSelector:       r.Logging.Spec.FluentdSpec.NodeSelector,
+				Tolerations:        r.Logging.Spec.FluentdSpec.Tolerations,
+				Affinity:           r.Logging.Spec.FluentdSpec.Affinity,
+				PriorityClassName:  r.Logging.Spec.FluentdSpec.PodPriorityClassName,
 				SecurityContext: &corev1.PodSecurityContext{
 					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
 					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
@@ -177,6 +205,20 @@ func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
 				Name:      "app-config",
 				MountPath: "/fluentd/app-config/",
 			},
+		},
+	}
+}
+
+func generatePortsBufferVolumeMetrics(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
+	port := int32(defaultBufferVolumeMetricsPort)
+	if spec.Metrics != nil && spec.BufferVolumeMetrics.Port != 0 {
+		port = spec.BufferVolumeMetrics.Port
+	}
+	return []corev1.ContainerPort{
+		{
+			Name:          "buffer-metrics",
+			ContainerPort: port,
+			Protocol:      "TCP",
 		},
 	}
 }
