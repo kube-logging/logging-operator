@@ -15,6 +15,8 @@
 package fluentd
 
 import (
+	"emperror.dev/errors"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -144,11 +146,19 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.ServiceAccount == "" {
-		return &corev1.ServiceAccount{
+		desired := &corev1.ServiceAccount{
 			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
-		}, reconciler.StatePresent, nil
+		}
+		err := merge.Merge(desired, r.Logging.Spec.FluentdSpec.ServiceAccountOverrides)
+		if err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		}
+
+		return desired, reconciler.StatePresent, nil
+	} else {
+		desired := &corev1.ServiceAccount{
+			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
+		}
+		return desired, reconciler.StateAbsent, nil
 	}
-	return &corev1.ServiceAccount{
-		ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
-	}, reconciler.StateAbsent, nil
 }
