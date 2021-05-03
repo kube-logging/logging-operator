@@ -39,7 +39,7 @@ type _hugoRedis interface{}
 // ```
 type _docRedis interface{}
 
-// +name:"Http"
+// +name:"Redis"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-redis"
 // +version:"0.3.5"
 // +description:"Sends logs to Redis endpoints."
