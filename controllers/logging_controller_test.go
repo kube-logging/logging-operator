@@ -1191,7 +1191,6 @@ func beforeEach(t *testing.T) func() {
 }
 
 func ensureCreated(t *testing.T, obj runtime.Object) func() {
-
 	var err error
 	object, ok := obj.(client.Object)
 	if !ok {
