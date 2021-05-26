@@ -85,7 +85,6 @@ type ClusterFlowList struct {
 }
 
 func init() {
-	// SchemeBuilder.Register(&ClusterFlow{}, &ClusterFlowList{})
 	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
 		scheme.AddKnownTypes(GroupVersion, &ClusterFlow{}, &ClusterFlowList{})
 		return nil
