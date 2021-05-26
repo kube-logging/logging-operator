@@ -470,6 +470,7 @@ func init() {
 	// SchemeBuilder.Register(&Logging{}, &LoggingList{})
 	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
 		scheme.AddKnownTypes(GroupVersion, &Logging{}, &LoggingList{})
+		metav1.AddToGroupVersion(scheme, GroupVersion)
 		return nil
 	})
 }
