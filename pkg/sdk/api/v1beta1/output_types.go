@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // +name:"OutputSpec"
@@ -88,5 +89,9 @@ type OutputList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&Output{}, &OutputList{})
+	// SchemeBuilder.Register(&Output{}, &OutputList{})
+	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
+		scheme.AddKnownTypes(GroupVersion, &Output{}, &OutputList{})
+		return nil
+	})
 }
