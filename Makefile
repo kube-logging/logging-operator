@@ -164,3 +164,6 @@ check-diff: check
 	go mod tidy
 	$(MAKE) generate manifests
 	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
+
+tidy:
+	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
