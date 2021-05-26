@@ -17,6 +17,7 @@ package v1beta1
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // +name:"FlowSpec"
@@ -108,5 +109,9 @@ type FlowList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&Flow{}, &FlowList{})
+	// SchemeBuilder.Register(&Flow{}, &FlowList{})
+	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
+		scheme.AddKnownTypes(GroupVersion, &Flow{}, &FlowList{})
+		return nil
+	})
 }
