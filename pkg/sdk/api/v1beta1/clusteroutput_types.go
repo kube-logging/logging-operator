@@ -61,7 +61,6 @@ type ClusterOutputList struct {
 }
 
 func init() {
-	// SchemeBuilder.Register(&ClusterOutput{}, &ClusterOutputList{})
 	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
 		scheme.AddKnownTypes(GroupVersion, &ClusterOutput{}, &ClusterOutputList{})
 		return nil

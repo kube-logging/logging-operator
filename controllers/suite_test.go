@@ -115,7 +115,7 @@ func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool) (
 	results := make(chan reconcile.Result)
 	errors := make(chan error)
 	fn := reconcile.Func(func(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
-		result, err := inner.Reconcile(context.Background(), req)
+		result, err := inner.Reconcile(ctx, req)
 		if err != nil {
 			if !*stopped {
 				t.Logf("reconcile failure err: %+v req: %+v, result: %+v", err, req, result)
@@ -131,7 +131,6 @@ func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool) (
 
 // startTestManager adds recFn
 func startTestManager(t *testing.T, mgr manager.Manager) (context.CancelFunc, *sync.WaitGroup) {
-	// stop := make(chan struct{})
 	stop, cf := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
