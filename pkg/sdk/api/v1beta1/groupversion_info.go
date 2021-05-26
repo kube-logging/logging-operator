@@ -20,7 +20,6 @@ package v1beta1
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
 var (
@@ -28,7 +27,6 @@ var (
 	GroupVersion = schema.GroupVersion{Group: "logging.banzaicloud.io", Version: "v1beta1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
-	// SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
 	SchemeBuilder = runtime.NewSchemeBuilder()
 
 	// AddToScheme adds the types in this group-version to the given scheme.

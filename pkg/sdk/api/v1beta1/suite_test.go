@@ -15,12 +15,16 @@
 package v1beta1_test
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/go-logr/zapr"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
