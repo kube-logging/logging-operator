@@ -31,6 +31,7 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -175,7 +176,7 @@ func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) s
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
 	requestMapper := handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		object, err := meta.Accessor(obj.DeepCopyObject())
+		object, err := meta.Accessor(runtime.Object(obj))
 		if err != nil {
 			return nil
 		}

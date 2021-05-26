@@ -1183,7 +1183,6 @@ func beforeEach(t *testing.T) func() {
 	stopMgr, mgrStopped := startTestManager(t, mgr)
 
 	return func() {
-		// close(stopMgr)
 		stopMgr()
 		stopped = true
 		mgrStopped.Wait()
@@ -1191,15 +1190,12 @@ func beforeEach(t *testing.T) func() {
 }
 
 func ensureCreated(t *testing.T, obj runtime.Object) func() {
-	var err error
 	object, ok := obj.(client.Object)
 	if !ok {
-		err = errors.New("unable to cast runtime.Object to client.Object")
-		t.Fatalf("%+v", err)
+		t.Fatalf("unable to cast runtime.Object to client.Object")
 	}
 
-	err = mgr.GetClient().Create(context.TODO(), object)
-	if err != nil {
+	if err := mgr.GetClient().Create(context.TODO(), object); err != nil {
 		t.Fatalf("%+v", err)
 	}
 	return func() {
@@ -1211,14 +1207,12 @@ func ensureCreated(t *testing.T, obj runtime.Object) func() {
 }
 
 func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) func() {
-	var err error
 	object, ok := obj.(client.Object)
 	if !ok {
-		err = errors.New("unable to cast runtime.Object to client.Object")
-		t.Fatalf("%+v", err)
+		t.Fatalf("unable to cast runtime.Object to client.Object")
 	}
 
-	err = wait.Poll(time.Second, time.Second*3, func() (bool, error) {
+	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), types.NamespacedName{
 			Name: name, Namespace: ns,
 		}, object)
