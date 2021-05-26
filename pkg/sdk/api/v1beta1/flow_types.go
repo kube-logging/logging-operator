@@ -110,7 +110,6 @@ type FlowList struct {
 }
 
 func init() {
-	// SchemeBuilder.Register(&Flow{}, &FlowList{})
 	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
 		scheme.AddKnownTypes(GroupVersion, &Flow{}, &FlowList{})
 		return nil

@@ -90,7 +90,6 @@ type OutputList struct {
 }
 
 func init() {
-	// SchemeBuilder.Register(&Output{}, &OutputList{})
 	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
 		scheme.AddKnownTypes(GroupVersion, &Output{}, &OutputList{})
 		return nil
