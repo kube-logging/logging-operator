@@ -24,7 +24,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -467,11 +466,7 @@ func (l *Logging) QualifiedName(name string) string {
 }
 
 func init() {
-	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
-		scheme.AddKnownTypes(GroupVersion, &Logging{}, &LoggingList{})
-		metav1.AddToGroupVersion(scheme, GroupVersion)
-		return nil
-	})
+	SchemeBuilder.Register(&Logging{}, &LoggingList{})
 }
 
 func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVolumeMode {
