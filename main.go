@@ -25,6 +25,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -47,6 +48,7 @@ var (
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = loggingv1beta1.AddToScheme(scheme)
+	_ = loggingv1alpha1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 	_ = prometheusOperator.AddToScheme(scheme)
 	_ = apiextensions.AddToScheme(scheme)
@@ -103,6 +105,12 @@ func main() {
 
 	if err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Logging")
+		os.Exit(1)
+	}
+	// +kubebuilder:scaffold:builder
+
+	if err = (&loggingv1beta1.Output{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "logging")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
