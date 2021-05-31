@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1alpha1
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
@@ -24,7 +24,7 @@ import (
 type _hugoOutputSpec interface{}
 
 // +name:"OutputSpec"
-// +version:"v1beta1"
+// +version:"v1alpha1"
 // +description:"OutputSpec defines the desired state of Output"
 type _metaOutputSpec interface{}
 
@@ -68,7 +68,6 @@ type OutputStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the output active?"
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
-// +kubebuilder:storageversion
 
 // Output is the Schema for the outputs API
 type Output struct {
