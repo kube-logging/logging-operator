@@ -28,7 +28,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	crdv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -118,7 +118,7 @@ func Namespace(_ reconciler.ResourceOwner, config ComponentConfig) (runtime.Obje
 }
 
 func CRD(config *ComponentConfig, group string, kind string) (runtime.Object, reconciler.DesiredState, error) {
-	crd := &v1beta1.CustomResourceDefinition{
+	crd := &crdv1.CustomResourceDefinition{
 		ObjectMeta: v1.ObjectMeta{
 			Name: fmt.Sprintf("%s.%s", kind, group),
 		},
@@ -133,7 +133,7 @@ func CRD(config *ComponentConfig, group string, kind string) (runtime.Object, re
 	}
 
 	scheme := runtime.NewScheme()
-	_ = v1beta1.AddToScheme(scheme)
+	_ = crdv1.AddToScheme(scheme)
 
 	_, _, err = serializer.NewSerializerWithOptions(serializer.DefaultMetaFactory, scheme, scheme, serializer.SerializerOptions{
 		Yaml: true,
@@ -149,7 +149,7 @@ func CRD(config *ComponentConfig, group string, kind string) (runtime.Object, re
 	crd.TypeMeta.APIVersion = ""
 
 	return crd, reconciler.DesiredStateHook(func(object runtime.Object) error {
-		current := object.(*v1beta1.CustomResourceDefinition)
+		current := object.(*crdv1.CustomResourceDefinition)
 		// simply copy the existing status over, so that we don't diff because of it
 		crd.Status = current.Status
 		return nil
