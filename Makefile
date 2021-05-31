@@ -17,7 +17,7 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -
 GOFILES_NOPLUGINS =  $(shell find . -type f -name '*.go' -not -path "./pkg/sdk/model/filter/*"  -not -path "./pkg/sdk/model/output/*"  -not -path "./pkg/sdk/model/input/*")
 PKGS=$(shell go list ./... | grep -v /vendor)
 
-CONTROLLER_GEN_VERSION = v0.2.4
+CONTROLLER_GEN_VERSION = v0.5.0
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
 
 GOLANGCI_VERSION = 1.33.0
@@ -90,7 +90,6 @@ bin/kubebuilder: bin/kubebuilder_${KUBEBUILDER_VERSION}
 test: generate fmt vet manifests bin/kubebuilder
 	@which kubebuilder
 	@which etcd
-	kubebuilder version
 	cd pkg/sdk && go test ./...
 	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
 
@@ -164,3 +163,6 @@ check-diff: check
 	go mod tidy
 	$(MAKE) generate manifests
 	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
+
+tidy:
+	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'

@@ -26,13 +26,12 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -57,8 +56,7 @@ var _ = BeforeSuite(func(done Done) {
 	if err != nil {
 		panic(fmt.Sprintf("who watches the watchmen (%v)?", err))
 	}
-	log := zapr.NewLogger(zapLog)
-	logf.SetLogger(log)
+	log.SetLogger(zapr.NewLogger(zapLog))
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{

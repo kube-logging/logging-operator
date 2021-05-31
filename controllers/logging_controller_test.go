@@ -42,6 +42,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -1182,15 +1183,19 @@ func beforeEach(t *testing.T) func() {
 	stopMgr, mgrStopped := startTestManager(t, mgr)
 
 	return func() {
-		close(stopMgr)
+		stopMgr()
 		stopped = true
 		mgrStopped.Wait()
 	}
 }
 
-func ensureCreated(t *testing.T, object runtime.Object) func() {
-	err := mgr.GetClient().Create(context.TODO(), object)
-	if err != nil {
+func ensureCreated(t *testing.T, obj runtime.Object) func() {
+	object, ok := obj.(client.Object)
+	if !ok {
+		t.Fatalf("unable to cast runtime.Object to client.Object")
+	}
+
+	if err := mgr.GetClient().Create(context.TODO(), object); err != nil {
 		t.Fatalf("%+v", err)
 	}
 	return func() {
@@ -1201,7 +1206,12 @@ func ensureCreated(t *testing.T, object runtime.Object) func() {
 	}
 }
 
-func ensureCreatedEventually(t *testing.T, ns, name string, object runtime.Object) func() {
+func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) func() {
+	object, ok := obj.(client.Object)
+	if !ok {
+		t.Fatalf("unable to cast runtime.Object to client.Object")
+	}
+
 	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), types.NamespacedName{
 			Name: name, Namespace: ns,
