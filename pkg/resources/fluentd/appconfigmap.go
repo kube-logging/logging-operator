@@ -140,9 +140,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 	return &ConfigCheckResult{}, nil
 }
 
-func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
-	var multierr error
-	var removedHashes = make([]string, 0)
+func (r *Reconciler) configCheckCleanup(currentHash string) (removedHashes []string, multierr error) {
 	for configHash := range r.Logging.Status.ConfigCheckResults {
 		if configHash == currentHash {
 			continue
@@ -182,7 +180,7 @@ func (r *Reconciler) configCheckCleanup(currentHash string) ([]string, error) {
 		}
 		removedHashes = append(removedHashes, configHash)
 	}
-	return removedHashes, multierr
+	return
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*v1.Secret, error) {
