@@ -15,15 +15,12 @@
 package v1alpha1
 
 import (
-	"fmt"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
 )
 
 func (o *Output) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.Output)
-	fmt.Printf("DEBUG>> ConvertTo() called on v1alpha1, src:\n%#v\ndst:\n%#v\n", o, dst)
 
 	dst.ObjectMeta = o.ObjectMeta
 	dst.Spec = v1beta1.OutputSpec(o.Spec)
@@ -34,7 +31,6 @@ func (o *Output) ConvertTo(dstRaw conversion.Hub) error {
 
 func (o *Output) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*v1beta1.Output)
-	fmt.Printf("DEBUG>> ConvertFrom() called on v1alpha1, dst:\n%#v\nsrc:%#v\n", o, src)
 
 	o.ObjectMeta = src.ObjectMeta
 	o.Spec = OutputSpec(src.Spec)

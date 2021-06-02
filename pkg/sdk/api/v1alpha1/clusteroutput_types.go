@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1alpha1
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -23,7 +24,7 @@ import (
 type _hugoClusterOutput interface{}
 
 // +name:"ClusterOutput"
-// +version:"v1beta1"
+// +version:"v1alpha1"
 // +description:"ClusterOutput is the Schema for the clusteroutputs API"
 type _metaClusterOutput interface{}
 
@@ -32,23 +33,14 @@ type _metaClusterOutput interface{}
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the output active?"
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
-// +kubebuilder:storageversion
 
 // ClusterOutput is the Schema for the clusteroutputs API
 type ClusterOutput struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ClusterOutputSpec `json:"spec"`
-	Status OutputStatus      `json:"status,omitempty"`
-}
-
-// +kubebuilder:object:generate=true
-
-// ClusterOutputSpec contains Kubernetes spec for CLusterOutput
-type ClusterOutputSpec struct {
-	OutputSpec        `json:",inline"`
-	EnabledNamespaces []string `json:"enabledNamespaces,omitempty"`
+	Spec   v1beta1.ClusterOutputSpec `json:"spec"`
+	Status v1beta1.OutputStatus      `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
