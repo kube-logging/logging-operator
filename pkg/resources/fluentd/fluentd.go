@@ -243,7 +243,7 @@ func RegisterWatches(builder *builder.Builder) *builder.Builder {
 	return builder.
 		Owns(&corev1.ConfigMap{}).
 		Owns(&corev1.Service{}).
-		Owns(&appsv1.Deployment{}).
+		Owns(&appsv1.StatefulSet{}).
 		Owns(&rbacv1.ClusterRole{}).
 		Owns(&rbacv1.ClusterRoleBinding{}).
 		Owns(&corev1.ServiceAccount{})
