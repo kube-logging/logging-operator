@@ -7466,9 +7466,12 @@ spec:
     storage: false
     subresources:
       status: {}
+<<<<<<< HEAD
 =======
   versions:
 >>>>>>> 300f5cbd (Regenerate sources)
+=======
+>>>>>>> 0bd592e7 (logging v1alpha1 + conversion hooks added)
   - name: v1beta1
     schema:
       openAPIV3Schema:

@@ -41,4 +41,4 @@ func (o *Output) ConvertFrom(srcRaw conversion.Hub) error {
 	o.Status = OutputStatus(src.Status)
 
 	return nil
-}
+)
