@@ -32,6 +32,9 @@ spec:
       name: Problems
       type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0bd592e7 (logging v1alpha1 + conversion hooks added)
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -765,8 +768,11 @@ spec:
       jsonPath: .status.problemsCount
       name: Problems
       type: integer
+<<<<<<< HEAD
 =======
 >>>>>>> 300f5cbd (Regenerate sources)
+=======
+>>>>>>> 0bd592e7 (logging v1alpha1 + conversion hooks added)
     name: v1beta1
     schema:
       openAPIV3Schema:
