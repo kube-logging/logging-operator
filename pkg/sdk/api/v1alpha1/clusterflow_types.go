@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1alpha1
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -23,7 +24,7 @@ import (
 type _hugoClusterFlow interface{}
 
 // +name:"ClusterFlow"
-// +version:"v1beta1"
+// +version:"v1alpha1"
 // +description:"ClusterFlow is the Schema for the clusterflows API"
 type _metaClusterFlow interface{}
 
@@ -32,7 +33,6 @@ type _metaClusterFlow interface{}
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the flow active?"
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
-// +kubebuilder:storageversion
 
 // ClusterFlow is the Schema for the clusterflows API
 type ClusterFlow struct {
@@ -40,39 +40,8 @@ type ClusterFlow struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Name of the logging cluster to be attached
-	Spec   ClusterFlowSpec `json:"spec,omitempty"`
-	Status FlowStatus      `json:"status,omitempty"`
-}
-
-type ClusterMatch struct {
-	*ClusterSelect  `json:"select,omitempty"`
-	*ClusterExclude `json:"exclude,omitempty"`
-}
-
-type ClusterSelect struct {
-	Namespaces     []string          `json:"namespaces,omitempty"`
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
-	ContainerNames []string          `json:"container_names,omitempty"`
-}
-
-type ClusterExclude struct {
-	Namespaces     []string          `json:"namespaces,omitempty"`
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
-	ContainerNames []string          `json:"container_names,omitempty"`
-}
-
-// FlowSpec is the Kubernetes spec for Flows
-type ClusterFlowSpec struct {
-	// Deprecated
-	Selectors  map[string]string `json:"selectors,omitempty"`
-	Match      []ClusterMatch    `json:"match,omitempty"`
-	Filters    []Filter          `json:"filters,omitempty"`
-	LoggingRef string            `json:"loggingRef,omitempty"`
-	// Deprecated
-	OutputRefs       []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
+	Spec   v1beta1.ClusterFlowSpec `json:"spec,omitempty"`
+	Status v1beta1.FlowStatus      `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

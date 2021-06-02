@@ -89,26 +89,28 @@ func ResourceBuilders(parent reconciler.ResourceOwner, object interface{}) []rec
 		config.build(parent, Certificate),
 	}
 	// We don't return with an absent state since we don't want them to be removed
+	// however we return the CRDs without modified with webhook configuration to set the conversion strategy to default (None)
+	webhookModifiers := []CRDModifier{}
 	if config.IsEnabled() {
-		webhookModifiers := ConversionWebhookModifiers(parent, config)
-		resources = append(resources,
-			func() (runtime.Object, reconciler.DesiredState, error) {
-				return CRD(config, loggingv1beta1.GroupVersion.Group, "loggings", webhookModifiers...)
-			},
-			func() (runtime.Object, reconciler.DesiredState, error) {
-				return CRD(config, loggingv1beta1.GroupVersion.Group, "flows", webhookModifiers...)
-			},
-			func() (runtime.Object, reconciler.DesiredState, error) {
-				return CRD(config, loggingv1beta1.GroupVersion.Group, "clusterflows", webhookModifiers...)
-			},
-			func() (runtime.Object, reconciler.DesiredState, error) {
-				return CRD(config, loggingv1beta1.GroupVersion.Group, "outputs", webhookModifiers...)
-			},
-			func() (runtime.Object, reconciler.DesiredState, error) {
-				return CRD(config, loggingv1beta1.GroupVersion.Group, "clusteroutputs", webhookModifiers...)
-			},
-		)
+		webhookModifiers = ConversionWebhookModifiers(parent, config)
 	}
+	resources = append(resources,
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(config, loggingv1beta1.GroupVersion.Group, "loggings", webhookModifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(config, loggingv1beta1.GroupVersion.Group, "flows", webhookModifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(config, loggingv1beta1.GroupVersion.Group, "clusterflows", webhookModifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(config, loggingv1beta1.GroupVersion.Group, "outputs", webhookModifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(config, loggingv1beta1.GroupVersion.Group, "clusteroutputs", webhookModifiers...)
+		},
+	)
 	return resources
 }
 
