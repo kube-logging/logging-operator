@@ -56,8 +56,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
-	initContainers := make([]corev1.Container, 0)
-
+	var initContainers []corev1.Container
 	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
 		initContainers = append(initContainers, corev1.Container{
 			Name:            "volume-mount-hack",
@@ -72,7 +71,8 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 			},
 		})
 	}
-	containers := make([]corev1.Container, 0)
+
+	var containers []corev1.Container
 	containers = append(containers,
 		*r.fluentContainer(),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
