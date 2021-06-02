@@ -23,8 +23,8 @@ func (o *Logging) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.Logging)
 
 	dst.ObjectMeta = o.ObjectMeta
-	dst.Spec = v1beta1.LoggingSpec(o.Spec)
-	dst.Status = v1beta1.LoggingStatus(o.Status)
+	dst.Spec = o.Spec
+	dst.Status = o.Status
 
 	return nil
 }
@@ -33,7 +33,6 @@ func (o *Logging) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*v1beta1.Logging)
 
 	o.ObjectMeta = src.ObjectMeta
-	// its a dummy logging struct for v1alpha1
 	o.Spec = src.Spec
 	o.Status = src.Status
 

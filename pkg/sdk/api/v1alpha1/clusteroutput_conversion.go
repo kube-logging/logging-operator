@@ -23,8 +23,8 @@ func (o *ClusterOutput) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.ClusterOutput)
 
 	dst.ObjectMeta = o.ObjectMeta
-	dst.Spec = v1beta1.ClusterOutputSpec(o.Spec)
-	dst.Status = v1beta1.OutputStatus(o.Status)
+	dst.Spec = o.Spec
+	dst.Status = o.Status
 
 	return nil
 }

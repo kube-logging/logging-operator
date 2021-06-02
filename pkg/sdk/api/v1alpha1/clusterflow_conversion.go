@@ -23,8 +23,8 @@ func (o *ClusterFlow) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.ClusterFlow)
 
 	dst.ObjectMeta = o.ObjectMeta
-	dst.Spec = v1beta1.ClusterFlowSpec(o.Spec)
-	dst.Status = v1beta1.FlowStatus(o.Status)
+	dst.Spec = o.Spec
+	dst.Status = o.Status
 
 	return nil
 }
