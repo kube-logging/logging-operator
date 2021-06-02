@@ -15,18 +15,25 @@
 package v1beta1
 
 import (
-	"fmt"
-
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *Output) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
-		Complete()
-}
+// Hub marks these types as conversion hub.
+func (r *Logging) Hub()       {}
+func (r *Output) Hub()        {}
+func (r *ClusterOutput) Hub() {}
+func (r *Flow) Hub()          {}
+func (r *ClusterFlow) Hub()   {}
 
-// Hub marks this type as a conversion hub.
-func (r *Output) Hub() {
-	fmt.Printf("DEBUG>> Hub() called on v1\n")
+func SetupWebhookWithManager(mgr ctrl.Manager) error {
+	for _, apiType := range []runtime.Object{&Logging{}, &Output{}, &ClusterOutput{}, &Flow{}, &ClusterFlow{}} {
+		// register webhook using controller-runtime because of interface checks
+		if err := ctrl.NewWebhookManagedBy(mgr).
+			For(apiType).
+			Complete(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

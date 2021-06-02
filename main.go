@@ -109,10 +109,11 @@ func main() {
 	}
 	// +kubebuilder:scaffold:builder
 
-	if err = (&loggingv1beta1.Output{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = loggingv1beta1.SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "logging")
 		os.Exit(1)
 	}
+
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")
