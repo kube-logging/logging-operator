@@ -30,7 +30,6 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -176,10 +175,6 @@ func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) s
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
 	requestMapper := handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		object, err := meta.Accessor(obj)
-		if err != nil {
-			return nil
-		}
 		// get all the logging resources from the cache
 		var loggingList loggingv1beta1.LoggingList
 		if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
@@ -187,7 +182,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return nil
 		}
 
-		switch o := object.(type) {
+		switch o := obj.(type) {
 		case *loggingv1beta1.ClusterOutput:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.Output:
@@ -200,8 +195,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
 			var requestList []reconcile.Request
 			for key := range o.Annotations {
-				result := r.FindStringSubmatch(key)
-				if len(result) > 1 {
+				if result := r.FindStringSubmatch(key); len(result) > 1 {
 					loggingRef := result[1]
 					// When loggingRef is "default" we also trigger for the empty ("") loggingRef as well, because the empty string cannot be used in the annotation, thus "default" refers to the empty case.
 					if loggingRef == "default" {
