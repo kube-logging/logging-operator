@@ -181,6 +181,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 	if !config.IsEnabled() {
 		return deployment, reconciler.StateAbsent, nil
 	}
+	webhookEnv := append([]corev1.EnvVar{}, corev1.EnvVar{Name: "ENABLE_WEBHOOKS", Value: "true"})
 	deployment.Spec = appsv1.DeploymentSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: config.WorkloadMetaOverrides.Merge(v1.ObjectMeta{
@@ -194,6 +195,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 						Image:   Image,
 						Command: []string{"/manager"},
 						Args:    []string{"--enable-leader-election"},
+						Env:     webhookEnv,
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
 								corev1.ResourceCPU:    resource.MustParse("300m"),

@@ -107,15 +107,16 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Logging")
 		os.Exit(1)
 	}
-	// +kubebuilder:scaffold:builder
 
-	if err = loggingv1beta1.SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "logging")
-		os.Exit(1)
+	// +kubebuilder:scaffold:builder
+	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
+		if err = loggingv1beta1.SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "logging")
+			os.Exit(1)
+		}
 	}
 
 	// +kubebuilder:scaffold:builder
-
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
