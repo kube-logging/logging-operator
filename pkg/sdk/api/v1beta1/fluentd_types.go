@@ -94,8 +94,9 @@ type FluentOutLogrotate struct {
 
 // FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
 type FluentdScaling struct {
-	Replicas            int    `json:"replicas,omitempty"`
-	PodManagementPolicy string `json:"podManagementPolicy,omitempty"`
+	Replicas            int                      `json:"replicas,omitempty"`
+	PodManagementPolicy string                   `json:"podManagementPolicy,omitempty"`
+	DrainWatch          *FluentdDrainWatchConfig `json:"drainWatch,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -105,4 +106,11 @@ type FluentdTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+// FluentdDrainWatchConfig enables configuring the drain behavior when scaling down the fluentd statefulset
+type FluentdDrainWatchConfig struct {
+	Image ImageSpec `json:"image,omitempty"`
 }
