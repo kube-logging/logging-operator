@@ -68,7 +68,7 @@ install: manifests ## Install CRDs into the cluster in ~/.kube/config
 	kubectl apply -f config/crd/bases
 
 .PHONY: license-check
-license-check: bin/licensei ## Run license check
+license-check: bin/licensei .licensei.cache ## Run license check
 	bin/licensei check
 	./scripts/check-header.sh
 
@@ -120,6 +120,13 @@ tidy: ## Tidy Go modules
 vet: ## Run go vet against code
 	go vet ./...
 	cd pkg/sdk && go vet ./...
+
+.licensei.cache: bin/licensei
+ifndef GITHUB_TOKEN
+	@>&2 echo "WARNING: building licensei cache without Github token, rate limiting might occur."
+	@>&2 echo "(Hint: If too many licenses are missing, try specifying a Github token via the environment variable GITHUB_TOKEN.)"
+endif
+	bin/licensei cache
 
 bin/controller-gen: | bin/controller-gen_${CONTROLLER_GEN_VERSION} bin
 	ln -sf controller-gen_${CONTROLLER_GEN_VERSION} $@
