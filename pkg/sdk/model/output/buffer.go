@@ -41,8 +41,8 @@ type Buffer struct {
 	Tags string `json:"tags,omitempty"`
 	// The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default. (default: operator generated)
 	Path string `json:"path,omitempty"`
-	// The max size of each chunks: events will be written into chunks until the size of chunks become this size
-	ChunkLimitSize string `json:"chunk_limit_size,omitempty"`
+	// The max size of each chunks: events will be written into chunks until the size of chunks become this size (default: 8MB)
+	ChunkLimitSize string `json:"chunk_limit_size,omitempty" plugin:"default:8MB"`
 	// The max number of events that each chunks can store in it
 	ChunkLimitRecords int `json:"chunk_limit_records,omitempty"`
 	// The size limitation of this buffer plugin instance. Once the total size of stored buffer reached this threshold, all append operations will fail with error (and data will be lost)

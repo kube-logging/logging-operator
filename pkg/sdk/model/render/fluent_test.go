@@ -558,6 +558,7 @@ func TestRenderS3(t *testing.T) {
 						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
 						<buffer tag,time>
 						@type file
+						chunk_limit_size 8MB
 						path asd
 						retry_forever true
 						timekey 10m
@@ -580,6 +581,14 @@ func TestRenderS3(t *testing.T) {
 						path /var/buffer
 						s3_bucket test_bucket
 						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
+        				<buffer tag,time>
+							@type file
+							chunk_limit_size 8MB
+							path /buffers/test.*.buffer
+							retry_forever true
+							timekey 10m
+							timekey_wait 10m
+        				</buffer>
 						<instance_profile_credentials>
 						</instance_profile_credentials>`,
 		},
@@ -598,6 +607,14 @@ func TestRenderS3(t *testing.T) {
 						path /var/buffer
 						s3_bucket test_bucket
 						s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
+        				<buffer tag,time>
+							@type file
+							chunk_limit_size 8MB
+							path /buffers/test.*.buffer
+							retry_forever true
+							timekey 10m
+							timekey_wait 10m
+        				</buffer>
 						<shared_credentials>
 							path e
 							profile_name f
@@ -618,6 +635,7 @@ func TestRenderS3(t *testing.T) {
 						s3_object_key_format %{path}%H:%M_%{index}.%{file_extension}
 						<buffer tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name>
 						@type file
+						chunk_limit_size 8MB
 						path /buffers/test.*.buffer
 						retry_forever true
 						timekey 10m
