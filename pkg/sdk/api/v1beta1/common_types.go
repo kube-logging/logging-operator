@@ -40,6 +40,14 @@ type ImageSpec struct {
 	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 }
 
+func (s ImageSpec) RepositoryWithTag() string {
+	res := s.Repository
+	if s.Tag != "" {
+		res += ":" + s.Tag
+	}
+	return res
+}
+
 // Metrics defines the service monitor endpoints
 type Metrics struct {
 	Interval              string               `json:"interval,omitempty"`

@@ -60,7 +60,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
 		initContainers = append(initContainers, corev1.Container{
 			Name:            "volume-mount-hack",
-			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.Repository + ":" + r.Logging.Spec.FluentdSpec.VolumeModImage.Tag,
+			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
 			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
 			VolumeMounts: []corev1.VolumeMount{
@@ -91,7 +91,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		}
 		containers = append(containers, corev1.Container{
 			Name:            "buffer-metrics-sidecar",
-			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.Repository + ":" + r.Logging.Spec.FluentdSpec.BufferVolumeImage.Tag,
+			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
 			Args:            args,
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
@@ -136,7 +136,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 func (r *Reconciler) fluentContainer() *corev1.Container {
 	container := &corev1.Container{
 		Name:            "fluentd",
-		Image:           r.Logging.Spec.FluentdSpec.Image.Repository + ":" + r.Logging.Spec.FluentdSpec.Image.Tag,
+		Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
 		Ports:           generatePorts(r.Logging.Spec.FluentdSpec),
 		VolumeMounts:    r.generateVolumeMounts(),
@@ -190,7 +190,7 @@ func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
 	return &corev1.Container{
 		Name:            "config-reloader",
 		ImagePullPolicy: corev1.PullPolicy(spec.PullPolicy),
-		Image:           spec.Repository + ":" + spec.Tag,
+		Image:           spec.RepositoryWithTag(),
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
 			"-volume-dir=/fluentd/app-config/",
