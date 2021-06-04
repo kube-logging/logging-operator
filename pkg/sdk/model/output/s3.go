@@ -148,11 +148,11 @@ type S3OutputConfig struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
-	// +docLink:"Assume Role Credentials,#assume_role_credentials"
+	// +docLink:"Assume Role Credentials,#assume-role-credentials"
 	AssumeRoleCredentials *S3AssumeRoleCredentials `json:"assume_role_credentials,omitempty"`
-	// +docLink:"Instance Profile Credentials,#instance_profile_credentials"
+	// +docLink:"Instance Profile Credentials,#instance-profile-credentials"
 	InstanceProfileCredentials *S3InstanceProfileCredentials `json:"instance_profile_credentials,omitempty"`
-	// +docLink:"Shared Credentials,#shared_credentials"
+	// +docLink:"Shared Credentials,#shared-credentials"
 	SharedCredentials *S3SharedCredentials `json:"shared_credentials,omitempty"`
 	// One-eye format trigger (default:false)
 	OneEyeFormat bool `json:"oneeye_format,omitempty"`
