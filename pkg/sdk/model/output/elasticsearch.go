@@ -258,12 +258,13 @@ func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id s
 	} else {
 		elasticsearch.Params = params
 	}
-	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			elasticsearch.SubDirectives = append(elasticsearch.SubDirectives, buffer)
-		}
+	if e.Buffer == nil {
+		e.Buffer = &Buffer{}
+	}
+	if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		elasticsearch.SubDirectives = append(elasticsearch.SubDirectives, buffer)
 	}
 	return elasticsearch, nil
 }

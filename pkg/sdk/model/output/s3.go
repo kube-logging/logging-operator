@@ -235,12 +235,13 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 
 	s3.Params = params
 
-	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			s3.SubDirectives = append(s3.SubDirectives, buffer)
-		}
+	if c.Buffer == nil {
+		c.Buffer = &Buffer{}
+	}
+	if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		s3.SubDirectives = append(s3.SubDirectives, buffer)
 	}
 	if c.Format != nil {
 		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {

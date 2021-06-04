@@ -91,12 +91,13 @@ func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 	} else {
 		gcs.Params = params
 	}
-	if g.Buffer != nil {
-		if buffer, err := g.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			gcs.SubDirectives = append(gcs.SubDirectives, buffer)
-		}
+	if g.Buffer == nil {
+		g.Buffer = &Buffer{}
+	}
+	if buffer, err := g.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		gcs.SubDirectives = append(gcs.SubDirectives, buffer)
 	}
 	if g.Format != nil {
 		if format, err := g.Format.ToDirective(secretLoader, ""); err != nil {

@@ -98,12 +98,13 @@ func (a *DatadogOutput) ToDirective(secretLoader secret.SecretLoader, id string)
 	} else {
 		datadog.Params = params
 	}
-	if a.Buffer != nil {
-		if buffer, err := a.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			datadog.SubDirectives = append(datadog.SubDirectives, buffer)
-		}
+	if a.Buffer == nil {
+		a.Buffer = &Buffer{}
+	}
+	if buffer, err := a.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		datadog.SubDirectives = append(datadog.SubDirectives, buffer)
 	}
 	return datadog, nil
 }

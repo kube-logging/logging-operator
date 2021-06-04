@@ -157,12 +157,14 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			loki.SubDirectives = append(loki.SubDirectives, meta)
 		}
 	}
-	if l.Buffer != nil {
-		if buffer, err := l.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			loki.SubDirectives = append(loki.SubDirectives, buffer)
-		}
+	if l.Buffer == nil {
+		l.Buffer = &Buffer{}
 	}
+	if buffer, err := l.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		loki.SubDirectives = append(loki.SubDirectives, buffer)
+	}
+
 	return loki, nil
 }

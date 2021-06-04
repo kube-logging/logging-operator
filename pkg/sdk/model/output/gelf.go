@@ -108,12 +108,14 @@ func (s *GELFOutputConfig) ToDirective(secretLoader secret.SecretLoader, id stri
 	} else {
 		gelf.Params = params
 	}
-	if s.Buffer != nil {
-		if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			gelf.SubDirectives = append(gelf.SubDirectives, buffer)
-		}
+	if s.Buffer == nil {
+		s.Buffer = &Buffer{}
 	}
+	if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		gelf.SubDirectives = append(gelf.SubDirectives, buffer)
+	}
+
 	return gelf, nil
 }

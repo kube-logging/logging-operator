@@ -150,13 +150,13 @@ func (c *SplunkHecOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 	if err := c.validateConflictingFields(); err != nil {
 		return nil, err
 	}
-
-	if c.Buffer != nil {
-		if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			splunkHec.SubDirectives = append(splunkHec.SubDirectives, buffer)
-		}
+	if c.Buffer == nil {
+		c.Buffer = &Buffer{}
+	}
+	if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		splunkHec.SubDirectives = append(splunkHec.SubDirectives, buffer)
 	}
 
 	if c.Format != nil {

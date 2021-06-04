@@ -101,12 +101,14 @@ func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) 
 	} else {
 		logdna.Params = params
 	}
-	if l.Buffer != nil {
-		if buffer, err := l.Buffer.ToDirective(secretLoader, pluginID); err != nil {
-			return nil, err
-		} else {
-			logdna.SubDirectives = append(logdna.SubDirectives, buffer)
-		}
+	if l.Buffer == nil {
+		l.Buffer = &Buffer{}
 	}
+	if buffer, err := l.Buffer.ToDirective(secretLoader, pluginID); err != nil {
+		return nil, err
+	} else {
+		logdna.SubDirectives = append(logdna.SubDirectives, buffer)
+	}
+
 	return logdna, nil
 }
