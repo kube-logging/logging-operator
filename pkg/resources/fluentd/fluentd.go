@@ -26,9 +26,12 @@ import (
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/selection"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -47,7 +50,6 @@ const (
 	OutputSecretPath      = "/fluentd/secret"
 
 	bufferPath                     = "/buffers"
-	bufferVolumeName               = "fluentd-buffer"
 	defaultServiceAccountName      = "fluentd"
 	roleBindingName                = "fluentd"
 	roleName                       = "fluentd"
@@ -238,6 +240,85 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 
+	if !r.Logging.Spec.FluentdSpec.DisablePvc {
+		nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
+		labelSet := r.getFluentdLabels(ComponentFluentd)
+
+		var pvcList corev1.PersistentVolumeClaimList
+		if err := r.Client.List(ctx, &pvcList, nsOpt,
+			client.MatchingLabelsSelector{
+				Selector: labels.SelectorFromSet(labelSet).Add(drainableRequirement),
+			}); err != nil {
+			return nil, errors.WrapIf(err, "listing PVC resources")
+		}
+
+		var stsPods corev1.PodList
+		if err := r.Client.List(ctx, &stsPods, nsOpt, client.MatchingLabels(labelSet)); err != nil {
+			return nil, errors.WrapIf(err, "listing StatefulSet pods")
+		}
+
+		bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+
+		livePVCs := make(map[string]bool)
+		for _, pod := range stsPods.Items {
+			if pod.Status.Phase == corev1.PodRunning {
+				if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
+					livePVCs[bufVol.PersistentVolumeClaim.ClaimName] = true
+				}
+			}
+		}
+
+		var jobList batchv1.JobList
+		if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(labelSet)); err != nil {
+			return nil, errors.WrapIf(err, "listing buffer drain jobs")
+		}
+
+		jobOfPVC := make(map[string]batchv1.Job)
+		for _, job := range jobList.Items {
+			if bufVol := findVolumeByName(job.Spec.Template.Spec.Volumes, bufVolName); bufVol != nil {
+				jobOfPVC[bufVol.PersistentVolumeClaim.ClaimName] = job
+			}
+		}
+
+		var errs error
+		for _, pvc := range pvcList.Items {
+			drained := markedAsDrained(pvc)
+			live := livePVCs[pvc.Name]
+			if drained && live {
+				patch := client.MergeFrom(pvc.DeepCopy())
+				delete(pvc.Labels, drainStatusLabelKey)
+				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
+					errs = errors.Append(errs, errors.WrapIf(err, "removing drained label from pvc"))
+				}
+				continue
+			}
+			job, hasJob := jobOfPVC[pvc.Name]
+			if hasJob && jobSuccessfullyCompleted(job) {
+				patch := client.MergeFrom(pvc.DeepCopy())
+				pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
+				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
+					errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
+				}
+
+				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job)); err != nil {
+					errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drain job"))
+				}
+				continue
+			}
+			if !drained && !live && !hasJob {
+				if job, err := r.drainJobFor(pvc); err != nil {
+					errs = errors.Append(errs, errors.WrapIf(err, "assembling drain job"))
+				} else if err := r.Client.Create(ctx, job); err != nil {
+					errs = errors.Append(errs, errors.WrapIf(err, "creating drain job"))
+				}
+				continue
+			}
+		}
+		if errs != nil {
+			return nil, errs
+		}
+	}
+
 	return nil, nil
 }
 
@@ -248,5 +329,39 @@ func RegisterWatches(builder *builder.Builder) *builder.Builder {
 		Owns(&appsv1.StatefulSet{}).
 		Owns(&rbacv1.ClusterRole{}).
 		Owns(&rbacv1.ClusterRoleBinding{}).
-		Owns(&corev1.ServiceAccount{})
+		Owns(&corev1.ServiceAccount{}).
+		Owns(&batchv1.Job{})
+}
+
+var drainableRequirement = requirementMust(labels.NewRequirement("logging.banzaicloud.io/drain", selection.NotEquals, []string{"no"}))
+
+func requirementMust(req *labels.Requirement, err error) labels.Requirement {
+	if err != nil {
+		panic(err)
+	}
+	if req == nil {
+		panic("requirement is nil")
+	}
+	return *req
+}
+
+const drainStatusLabelKey = "logging.banzaicloud.io/drain-status"
+const drainStatusLabelValue = "drained"
+
+func markedAsDrained(pvc corev1.PersistentVolumeClaim) bool {
+	return pvc.Labels[drainStatusLabelKey] == drainStatusLabelValue
+}
+
+func findVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
+	for i := range vols {
+		vol := &vols[i]
+		if vol.Name == name {
+			return vol
+		}
+	}
+	return nil
+}
+
+func jobSuccessfullyCompleted(job batchv1.Job) bool {
+	return job.Status.CompletionTime != nil && job.Status.Succeeded > 0
 }

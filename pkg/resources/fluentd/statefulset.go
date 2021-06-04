@@ -31,7 +31,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	spec := r.statefulsetSpec()
 
 	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(bufferVolumeName)),
+		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName)),
 	)
 	if !r.Logging.Spec.FluentdSpec.DisablePvc {
 		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
@@ -41,7 +41,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			return nil, reconciler.StatePresent, err
 		}
 	} else {
-		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(bufferVolumeName, containerName, bufferPath, &spec.Template.Spec)
+		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(v1beta1.DefaultFluentdBufferStorageVolumeName, containerName, bufferPath, &spec.Template.Spec)
 		if err != nil {
 			return nil, reconciler.StatePresent, err
 		}
@@ -57,51 +57,16 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
-	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
-		initContainers = append(initContainers, corev1.Container{
-			Name:            "volume-mount-hack",
-			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
-			VolumeMounts: []corev1.VolumeMount{
-				{
-					Name:      r.Logging.QualifiedName(bufferVolumeName),
-					MountPath: bufferPath,
-				},
-			},
-		})
+	if c := r.volumeMountHackContainer(); c != nil {
+		initContainers = append(initContainers, *c)
 	}
 
-	var containers []corev1.Container
-	containers = append(containers,
+	containers := []corev1.Container{
 		*r.fluentContainer(),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
-	)
-	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
-		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
-			port = r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port
-		}
-		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
-		args := []string{portParam}
-		if len(r.Logging.Spec.FluentdSpec.BufferVolumeArgs) != 0 {
-			args = append(args, r.Logging.Spec.FluentdSpec.BufferVolumeArgs...)
-		} else {
-			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
-		}
-		containers = append(containers, corev1.Container{
-			Name:            "buffer-metrics-sidecar",
-			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
-			Args:            args,
-			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
-			VolumeMounts: []corev1.VolumeMount{
-				{
-					Name:      r.Logging.QualifiedName(bufferVolumeName),
-					MountPath: bufferPath,
-				},
-			},
-		})
+	}
+	if c := r.bufferMetricsSidecarContainer(); c != nil {
+		containers = append(containers, *c)
 	}
 
 	return &appsv1.StatefulSetSpec{
@@ -307,4 +272,52 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		v = append(v, tlsRelatedVolume)
 	}
 	return
+}
+
+func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
+	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
+		return &corev1.Container{
+			Name:            "volume-mount-hack",
+			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
+			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName),
+					MountPath: bufferPath,
+				},
+			},
+		}
+	}
+	return nil
+}
+
+func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
+	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
+		port := int32(defaultBufferVolumeMetricsPort)
+		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port
+		}
+		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
+		args := []string{portParam}
+		if len(r.Logging.Spec.FluentdSpec.BufferVolumeArgs) != 0 {
+			args = append(args, r.Logging.Spec.FluentdSpec.BufferVolumeArgs...)
+		} else {
+			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
+		}
+		return &corev1.Container{
+			Name:            "buffer-metrics-sidecar",
+			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
+			Args:            args,
+			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName),
+					MountPath: bufferPath,
+				},
+			},
+		}
+	}
+	return nil
 }
