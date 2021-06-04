@@ -83,7 +83,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					Containers: []corev1.Container{
 						{
 							Name:            containerName,
-							Image:           r.Logging.Spec.FluentbitSpec.Image.Repository + ":" + r.Logging.Spec.FluentbitSpec.Image.Tag,
+							Image:           r.Logging.Spec.FluentbitSpec.Image.RepositoryWithTag(),
 							ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
 							Ports:           containerPorts,
 							Resources:       r.Logging.Spec.FluentbitSpec.Resources,
