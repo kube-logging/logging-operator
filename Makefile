@@ -9,7 +9,7 @@ IMG ?= controller:latest
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
 KUBEBUILDER_VERSION = 2.3.1
-LICENSEI_VERSION = 0.3.1
+LICENSEI_VERSION = v0.3.1
 VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
@@ -37,13 +37,6 @@ docs:
 lint: bin/golangci-lint ## Run linter
 	bin/golangci-lint run
 	cd pkg/sdk && ../../bin/golangci-lint run  -c ../../.golangci.yml
-
-bin/licensei: bin/licensei-${LICENSEI_VERSION}
-	@ln -sf licensei-${LICENSEI_VERSION} bin/licensei
-bin/licensei-${LICENSEI_VERSION}:
-	@mkdir -p bin
-	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s v${LICENSEI_VERSION}
-	@mv bin/licensei $@
 
 .PHONY: license-check
 license-check: bin/licensei ## Run license check
@@ -159,6 +152,14 @@ bin/kubebuilder_${KUBEBUILDER_VERSION}: | bin
 	find $(PWD)/bin -name 'kubebuilder_*' -exec rm -r {} +
 	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin
 	ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin $@
+
+bin/licensei: | bin/licensei_${LICENSEI_VERSION}
+	ln -sf licensei_${LICENSEI_VERSION} $@
+
+bin/licensei_${LICENSEI_VERSION}: | bin
+	find $(PWD)/bin -name 'licensei*' -exec rm {} +
+	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s ${LICENSEI_VERSION}
+	mv bin/licensei $@
 
 check-diff: check
 	go mod tidy
