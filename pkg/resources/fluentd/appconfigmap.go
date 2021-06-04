@@ -245,9 +245,8 @@ func (r *Reconciler) newCheckPod(hashKey string) *v1.Pod {
 			ImagePullSecrets: r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
 			Containers: []v1.Container{
 				{
-					Name: "fluentd",
-					Image: fmt.Sprintf("%s:%s",
-						r.Logging.Spec.FluentdSpec.Image.Repository, r.Logging.Spec.FluentdSpec.Image.Tag),
+					Name:            "fluentd",
+					Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
 					ImagePullPolicy: v1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
 					Args: []string{
 						"fluentd", "-c",
