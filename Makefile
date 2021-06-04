@@ -20,7 +20,7 @@ PKGS=$(shell go list ./... | grep -v /vendor)
 CONTROLLER_GEN_VERSION = v0.5.0
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
 
-GOLANGCI_VERSION = 1.33.0
+GOLANGCI_VERSION = v1.33.0
 GOBIN_VERSION = 0.0.13
 
 export KUBEBUILDER_ASSETS := $(PWD)/bin
@@ -33,16 +33,9 @@ all: manager
 docs:
 	go run cmd/docs.go
 
-bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
-	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
-bin/golangci-lint-${GOLANGCI_VERSION}:
-	@mkdir -p bin
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
-	@mv bin/golangci-lint $@
-
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run 
+	bin/golangci-lint run
 	cd pkg/sdk && ../../bin/golangci-lint run  -c ../../.golangci.yml
 
 bin/licensei: bin/licensei-${LICENSEI_VERSION}
@@ -141,6 +134,14 @@ bin/controller-gen_${CONTROLLER_GEN_VERSION}: | bin
 	find $(PWD)/bin -name 'controller-gen*' -exec rm {} +
 	GOBIN=$(PWD)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION}
 	mv $(PWD)/bin/controller-gen $@
+
+bin/golangci-lint: | bin/golangci-lint_${GOLANGCI_VERSION} bin
+	ln -sf golangci-lint_${GOLANGCI_VERSION} bin/golangci-lint
+
+bin/golangci-lint_${GOLANGCI_VERSION}: | bin
+	find $(PWD)/bin -name 'golangci-lint*' -exec rm {} +
+	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_VERSION}
+	mv bin/golangci-lint $@
 
 bin/kubebuilder: | bin/kube-apiserver bin/etcd bin/kubectl bin/kubebuilder_${KUBEBUILDER_VERSION} bin
 	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder $@
