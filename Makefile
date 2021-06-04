@@ -148,16 +148,13 @@ docker-build:
 docker-push:
 	docker push ${IMG}
 
-.PHONY: bin/controller-gen
-bin/controller-gen:
-	@ if ! test -x bin/controller-gen; then \
-		set -ex ;\
-		CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
-		cd $$CONTROLLER_GEN_TMP_DIR ;\
-		go mod init tmp ;\
-		GOBIN=$(PWD)/bin go get sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION} ;\
-		rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
-	fi
+bin/controller-gen: | bin/controller-gen_${CONTROLLER_GEN_VERSION} bin
+	ln -sf controller-gen_${CONTROLLER_GEN_VERSION} $@
+
+bin/controller-gen_${CONTROLLER_GEN_VERSION}: | bin
+	find $(PWD)/bin -name 'controller-gen*' -exec rm {} +
+	GOBIN=$(PWD)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION}
+	mv $(PWD)/bin/controller-gen $@
 
 check-diff: check
 	go mod tidy
@@ -166,3 +163,6 @@ check-diff: check
 
 tidy:
 	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
+
+bin:
+	mkdir -p bin
