@@ -106,9 +106,9 @@ run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kub
 	go run ./main.go --verbose --pprof
 
 .PHONY: test
-test: generate fmt vet manifests bin/kubebuilder ## Run tests
-	@echo Using kubebuilder: $$(which kubebuilder)
+test: generate fmt vet manifests bin/etcd bin/kube-apiserver ## Run tests
 	@echo Using etcd: $$(which etcd)
+	@echo Using kube-apiserver: $$(which kube-apiserver)
 	cd pkg/sdk && go test ./...
 	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
 
@@ -144,7 +144,7 @@ bin/golangci-lint_${GOLANGCI_VERSION}: | bin
 	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_VERSION}
 	mv bin/golangci-lint $@
 
-bin/kubebuilder: | bin/kube-apiserver bin/etcd bin/kubectl bin/kubebuilder_${KUBEBUILDER_VERSION} bin
+bin/kubebuilder: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
 	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder $@
 
 bin/kube-apiserver: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
