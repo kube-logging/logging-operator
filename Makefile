@@ -25,7 +25,7 @@ all: manager
 check: license-check lint test
 
 .PHONY: check-diff
-check-diff: check
+check-diff: generate fmt manifests
 	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
 
 .PHONY: debug
