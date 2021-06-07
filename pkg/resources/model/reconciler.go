@@ -41,7 +41,7 @@ func NewValidationReconciler(
 		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{
 				Obj:   obj,
-				Patch: client.MergeFrom(obj),
+				Patch: client.MergeFrom(obj.DeepCopyObject().(client.Object)),
 			})
 		}
 
