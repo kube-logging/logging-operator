@@ -55,6 +55,10 @@ const (
 	timeout = 5 * time.Second
 )
 
+const (
+	timeout = 5 * time.Second
+)
+
 func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
