@@ -45,7 +45,7 @@ func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	RunSpecsWithDefaultAndCustomReporters(t,
-		"v1alpha2 Suite",
+		"v1beta1 Suite",
 		[]Reporter{
 			printer.NewlineReporter{},
 		})
@@ -60,7 +60,8 @@ var _ = BeforeSuite(func(done Done) {
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths: []string{filepath.Join("..", "..", "..", "..", "config", "crd", "bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "..", "config", "crd", "bases")},
+		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "..", "testbin", "bin"),
 	}
 
 	err = v1beta1.SchemeBuilder.AddToScheme(scheme.Scheme)

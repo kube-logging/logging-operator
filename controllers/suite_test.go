@@ -65,7 +65,8 @@ func beforeSuite() error {
 	logf.SetLogger(zap.New(zap.UseDevMode(true), zap.WriteTo(os.Stdout)))
 
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("..", "config", "crd", "bases")},
+		BinaryAssetsDirectory: filepath.Join("../testbin/bin"),
 	}
 
 	var err error
