@@ -144,13 +144,15 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 	} else {
 		kafka.Params = params
 	}
-	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			kafka.SubDirectives = append(kafka.SubDirectives, buffer)
-		}
+	if e.Buffer == nil {
+		e.Buffer = &Buffer{}
 	}
+	if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		kafka.SubDirectives = append(kafka.SubDirectives, buffer)
+	}
+
 	if e.Format != nil {
 		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err

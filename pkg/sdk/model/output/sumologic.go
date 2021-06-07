@@ -126,12 +126,13 @@ func (s *SumologicOutput) ToDirective(secretLoader secret.SecretLoader, id strin
 	} else {
 		sumologic.Params = params
 	}
-	if s.Buffer != nil {
-		if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			sumologic.SubDirectives = append(sumologic.SubDirectives, buffer)
-		}
+	if s.Buffer == nil {
+		s.Buffer = &Buffer{}
+	}
+	if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		sumologic.SubDirectives = append(sumologic.SubDirectives, buffer)
 	}
 	return sumologic, nil
 }

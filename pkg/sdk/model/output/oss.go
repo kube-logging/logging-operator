@@ -109,13 +109,15 @@ func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 	} else {
 		oss.Params = params
 	}
-	if o.Buffer != nil {
-		if buffer, err := o.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			oss.SubDirectives = append(oss.SubDirectives, buffer)
-		}
+	if o.Buffer == nil {
+		o.Buffer = &Buffer{}
 	}
+	if buffer, err := o.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		oss.SubDirectives = append(oss.SubDirectives, buffer)
+	}
+
 	if o.Format != nil {
 		if format, err := o.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err

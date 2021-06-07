@@ -158,12 +158,13 @@ func (e *KinesisStreamOutputConfig) ToDirective(secretLoader secret.SecretLoader
 			kinesis.SubDirectives = append(kinesis.SubDirectives, processCredentials)
 		}
 	}
-	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			kinesis.SubDirectives = append(kinesis.SubDirectives, buffer)
-		}
+	if e.Buffer == nil {
+		e.Buffer = &Buffer{}
+	}
+	if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		kinesis.SubDirectives = append(kinesis.SubDirectives, buffer)
 	}
 	if e.Format != nil {
 		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {

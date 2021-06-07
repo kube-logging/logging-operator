@@ -115,13 +115,15 @@ func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string)
 	} else {
 		forward.Params = params
 	}
-	if f.Buffer != nil {
-		if buffer, err := f.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			forward.SubDirectives = append(forward.SubDirectives, buffer)
-		}
+	if f.Buffer == nil {
+		f.Buffer = &Buffer{}
 	}
+	if buffer, err := f.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		forward.SubDirectives = append(forward.SubDirectives, buffer)
+	}
+
 	if f.Security != nil {
 		if format, err := f.Security.ToDirective(secretLoader, ""); err != nil {
 			return nil, err

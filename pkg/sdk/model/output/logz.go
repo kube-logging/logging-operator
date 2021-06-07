@@ -148,12 +148,14 @@ func (e *LogZOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 	logz.Params = mapstrstr.MergeInto(logz.Params, types.Params{"endpoint_url": connectionString})
 
 	// logz.Params = params
-	if e.Buffer != nil {
-		if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			logz.SubDirectives = append(logz.SubDirectives, buffer)
-		}
+	if e.Buffer == nil {
+		e.Buffer = &Buffer{}
 	}
+	if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		logz.SubDirectives = append(logz.SubDirectives, buffer)
+	}
+
 	return logz, nil
 }

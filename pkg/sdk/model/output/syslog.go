@@ -111,12 +111,13 @@ func (s *SyslogOutputConfig) ToDirective(secretLoader secret.SecretLoader, id st
 	} else {
 		syslog.Params = params
 	}
-	if s.Buffer != nil {
-		if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			syslog.SubDirectives = append(syslog.SubDirectives, buffer)
-		}
+	if s.Buffer == nil {
+		s.Buffer = &Buffer{}
+	}
+	if buffer, err := s.Buffer.ToDirective(secretLoader, id); err != nil {
+		return nil, err
+	} else {
+		syslog.SubDirectives = append(syslog.SubDirectives, buffer)
 	}
 	if s.Format != nil {
 		if format, err := s.Format.ToDirective(secretLoader, ""); err != nil {
