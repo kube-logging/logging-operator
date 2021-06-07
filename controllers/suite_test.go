@@ -111,16 +111,31 @@ func afterSuite() error {
 
 // duplicateRequest returns a reconcile.Reconcile implementation that delegates to inner and
 // writes the request to requests after Reconcile is finished.
-func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool, errors chan<- error) reconcile.Reconciler {
+func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool) (reconcile.Reconciler, chan reconcile.Request, chan reconcile.Result, chan error) {
+	requests := make(chan reconcile.Request, 100)
+	results := make(chan reconcile.Result, 100)
+	errors := make(chan error, 100)
 	fn := reconcile.Func(func(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 		result, err := inner.Reconcile(ctx, req)
 		if err != nil {
 			if !*stopped {
 				t.Logf("reconcile failure err: %+v req: %+v, result: %+v", err, req, result)
 			}
-			if errors != nil {
-				errors <- err
+			select {
+			case errors <- err:
+			default:
+				t.Log("wrapped error channel is full")
 			}
+		}
+		select {
+		case requests <- req:
+		default:
+			t.Log("wrapped request channel is full")
+		}
+		select {
+		case results <- result:
+		default:
+			t.Log("wrapped result channel is full")
 		}
 		return result, err
 	})
