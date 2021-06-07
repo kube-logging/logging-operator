@@ -7,15 +7,14 @@ CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=
 
 CONTROLLER_GEN_VERSION = v0.5.0
 GOLANGCI_VERSION = v1.33.0
-KUBEBUILDER_VERSION = 2.3.1
 LICENSEI_VERSION = v0.3.1
+ENVTEST_CTRL_VERSION = v0.8.3
 
 VERSION := $(shell git describe --abbrev=0 --tags)
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
 
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
-export KUBEBUILDER_ASSETS := $(PWD)/bin
 export PATH := $(PWD)/bin:$(PATH)
 
 .PHONY: all
@@ -105,13 +104,6 @@ manifests: bin/controller-gen ## Generate manifests e.g. CRD, RBAC etc.
 run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
-.PHONY: test
-test: generate fmt vet manifests bin/etcd bin/kube-apiserver ## Run tests
-	@echo Using etcd: $$(which etcd)
-	@echo Using kube-apiserver: $$(which kube-apiserver)
-	cd pkg/sdk && go test ./...
-	go test ./controllers/... ./pkg/... -coverprofile cover.out -v
-
 .PHONY: tidy
 tidy: ## Tidy Go modules
 	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
@@ -144,22 +136,13 @@ bin/golangci-lint_${GOLANGCI_VERSION}: | bin
 	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_VERSION}
 	mv bin/golangci-lint $@
 
-bin/kubebuilder: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
-	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubebuilder $@
-
-bin/kube-apiserver: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
-	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kube-apiserver $@
-
-bin/etcd: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
-	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/etcd $@
-
-bin/kubectl: | bin/kubebuilder_${KUBEBUILDER_VERSION} bin
-	ln -sf kubebuilder_${KUBEBUILDER_VERSION}/kubectl $@
-
-bin/kubebuilder_${KUBEBUILDER_VERSION}: | bin
-	find $(PWD)/bin -name 'kubebuilder_*' -exec rm -r {} +
-	curl -L https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64.tar.gz | tar xvz -C bin
-	ln -sf kubebuilder_${KUBEBUILDER_VERSION}_${OS}_amd64/bin $@
+# Run tests
+ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+test: generate fmt vet manifests
+	cd pkg/sdk && go test ./...
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/$(ENVTEST_CTRL_VERSION)/hack/setup-envtest.sh
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./controllers/... ./pkg/... -coverprofile cover.out
 
 bin/licensei: | bin/licensei_${LICENSEI_VERSION}
 	ln -sf licensei_${LICENSEI_VERSION} $@
