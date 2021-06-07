@@ -1163,9 +1163,12 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 func beforeEach(t *testing.T) func() {
 	g := gomega.NewWithT(t)
 
+	timeout := 1 * time.Second
+
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		MetricsBindAddress: "0",
+		Scheme:                  scheme.Scheme,
+		MetricsBindAddress:      "0",
+		GracefulShutdownTimeout: &timeout,
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
