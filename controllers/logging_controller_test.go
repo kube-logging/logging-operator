@@ -53,6 +53,10 @@ var (
 	reconcilerErrors chan error
 )
 
+const (
+	timeout = 5 * time.Second
+)
+
 func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
@@ -656,12 +660,12 @@ func TestClusterOutputWithoutPlugin(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("no output target configured"))
+	}, timeout).Should(gomega.ConsistOf("no output target configured"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestOutputWithoutPlugin(t *testing.T) {
@@ -694,12 +698,12 @@ func TestOutputWithoutPlugin(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("no output target configured"))
+	}, timeout).Should(gomega.ConsistOf("no output target configured"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestClusterOutputWithMultiplePlugins(t *testing.T) {
@@ -739,12 +743,12 @@ func TestClusterOutputWithMultiplePlugins(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
+	}, timeout).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestOutputWithMultiplePlugins(t *testing.T) {
@@ -782,12 +786,12 @@ func TestOutputWithMultiplePlugins(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
+	}, timeout).Should(gomega.ConsistOf("multiple output targets configured: [file nullout]"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestClusterOutputWithMissingSecret(t *testing.T) {
@@ -836,12 +840,12 @@ func TestClusterOutputWithMissingSecret(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
+	}, timeout).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestOutputWithMissingSecret(t *testing.T) {
@@ -888,12 +892,12 @@ func TestOutputWithMissingSecret(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
+	}, timeout).Should(gomega.ConsistOf(gomega.ContainSubstring("Secret \"no-such-secret\" not found")))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(output), output)
 		return output.Status.ProblemsCount == len(output.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
@@ -946,12 +950,12 @@ func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead"))
+	}, timeout).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestFlowWithLegacyOutputRef(t *testing.T) {
@@ -1015,12 +1019,12 @@ func TestFlowWithLegacyOutputRef(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead"))
+	}, timeout).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
@@ -1073,12 +1077,12 @@ func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf("dangling global output reference: no-such-output-1", "dangling global output reference: no-such-output-2"))
+	}, timeout).Should(gomega.ConsistOf("dangling global output reference: no-such-output-1", "dangling global output reference: no-such-output-2"))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
@@ -1143,7 +1147,7 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, 1*time.Minute).Should(gomega.ConsistOf(
+	}, timeout).Should(gomega.ConsistOf(
 		"dangling global output reference: no-such-output-1",
 		"dangling global output reference: no-such-output-2",
 		"dangling local output reference: no-such-output-1",
@@ -1153,7 +1157,7 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
-	}, 1*time.Minute).Should(gomega.BeTrue())
+	}, timeout).Should(gomega.BeTrue())
 }
 
 // TODO add following tests:
