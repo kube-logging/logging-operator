@@ -1,4 +1,5 @@
 OS = $(shell uname | tr A-Z a-z)
+SHELL := /bin/bash
 
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
@@ -139,10 +140,11 @@ bin/golangci-lint_${GOLANGCI_VERSION}: | bin
 # Run tests
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: generate fmt vet manifests
-	cd pkg/sdk && go test ./...
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/$(ENVTEST_CTRL_VERSION)/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./controllers/... ./pkg/... -coverprofile cover.out
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR)
+	cd pkg/sdk && go test ./...
+	go test ./controllers/... ./pkg/... -coverprofile cover.out
 
 bin/licensei: | bin/licensei_${LICENSEI_VERSION}
 	ln -sf licensei_${LICENSEI_VERSION} $@
