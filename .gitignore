@@ -91,3 +91,5 @@ vendor
 example/tls-cluster-forward/*.pem
 example/tls-cluster-forward/*.csr
 example/tls-cluster-forward/*.key
+
+.licensei.cache
