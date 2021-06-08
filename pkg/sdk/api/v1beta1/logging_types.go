@@ -251,17 +251,14 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = "OrderedReady"
 		}
-		if l.Spec.FluentdSpec.Scaling.DrainWatch == nil {
-			l.Spec.FluentdSpec.Scaling.DrainWatch = new(FluentdDrainWatchConfig)
+		if l.Spec.FluentdSpec.Scaling.Drain.Image.Repository == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.Image.Repository = DefaultFluentdDrainWatchImageRepository
 		}
-		if l.Spec.FluentdSpec.Scaling.DrainWatch.Image.Repository == "" {
-			l.Spec.FluentdSpec.Scaling.DrainWatch.Image.Repository = DefaultFluentdDrainWatchImageRepository
+		if l.Spec.FluentdSpec.Scaling.Drain.Image.Tag == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.Image.Tag = DefaultFluentdDrainWatchImageTag
 		}
-		if l.Spec.FluentdSpec.Scaling.DrainWatch.Image.Tag == "" {
-			l.Spec.FluentdSpec.Scaling.DrainWatch.Image.Tag = DefaultFluentdDrainWatchImageTag
-		}
-		if l.Spec.FluentdSpec.Scaling.DrainWatch.Image.PullPolicy == "" {
-			l.Spec.FluentdSpec.Scaling.DrainWatch.Image.PullPolicy = "IfNotPresent"
+		if l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentdSpec.FluentLogDestination == "" {
 			l.Spec.FluentdSpec.FluentLogDestination = "null"

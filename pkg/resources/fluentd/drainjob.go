@@ -17,26 +17,23 @@ package fluentd
 import (
 	"strings"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (r *Reconciler) drainJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
+func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
 	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
-	var initContainers []corev1.Container
-	if c := r.volumeMountHackContainer(); c != nil {
-		initContainers = append(initContainers, *c)
-	}
-
-	fluentdContainer := r.fluentContainer() // TODO: don't redirect container logs
+	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(r.Logging.Spec.FluentdSpec))
 	fluentdContainer.VolumeMounts = append(fluentdContainer.VolumeMounts, corev1.VolumeMount{
 		Name:      bufVolName,
 		MountPath: bufferPath,
 	})
 	containers := []corev1.Container{
-		*fluentdContainer,
-		r.drainWatchContainer(bufVolName),
+		fluentdContainer,
+		drainWatchContainer(&r.Logging.Spec.FluentdSpec.Scaling.Drain, bufVolName),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -44,11 +41,12 @@ func (r *Reconciler) drainJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job
 
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
-			ObjectMeta: r.generatePodMeta(),
+			ObjectMeta: metav1.ObjectMeta{
+				Labels: r.getFluentdLabels(ComponentDrainer),
+			},
 			Spec: corev1.PodSpec{
 				Volumes:            r.generateVolume(),
 				ServiceAccountName: r.getServiceAccount(),
-				InitContainers:     initContainers,
 				ImagePullSecrets:   r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
 				Containers:         containers,
 				NodeSelector:       r.Logging.Spec.FluentdSpec.NodeSelector,
@@ -75,12 +73,12 @@ func (r *Reconciler) drainJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job
 		},
 	})
 	return &batchv1.Job{
-		ObjectMeta: r.FluentdObjectMeta(StatefulSetName+pvc.Name[strings.LastIndex(pvc.Name, "-"):]+"-drain", ComponentFluentd),
+		ObjectMeta: r.FluentdObjectMeta(StatefulSetName+pvc.Name[strings.LastIndex(pvc.Name, "-"):]+"-drainer", ComponentDrainer),
 		Spec:       spec,
 	}, nil
 }
 
-func (r *Reconciler) drainWatchContainer(bufferVolumeName string) corev1.Container {
+func drainWatchContainer(cfg *v1beta1.FluentdDrainConfig, bufferVolumeName string) corev1.Container {
 	return corev1.Container{
 		Env: []corev1.EnvVar{
 			{
@@ -88,8 +86,8 @@ func (r *Reconciler) drainWatchContainer(bufferVolumeName string) corev1.Contain
 				Value: bufferPath,
 			},
 		},
-		Image:           r.Logging.Spec.FluentdSpec.Scaling.DrainWatch.Image.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Scaling.DrainWatch.Image.PullPolicy),
+		Image:           cfg.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(cfg.Image.PullPolicy),
 		Name:            "drain-watch",
 		VolumeMounts: []corev1.VolumeMount{
 			{
@@ -99,4 +97,10 @@ func (r *Reconciler) drainWatchContainer(bufferVolumeName string) corev1.Contain
 			},
 		},
 	}
+}
+
+func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
+	res := spec.DeepCopy()
+	res.FluentOutLogrotate = nil
+	return res
 }

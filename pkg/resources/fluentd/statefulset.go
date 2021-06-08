@@ -62,7 +62,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	containers := []corev1.Container{
-		*r.fluentContainer(),
+		fluentContainer(r.Logging.Spec.FluentdSpec),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
@@ -98,14 +98,14 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 }
 
-func (r *Reconciler) fluentContainer() *corev1.Container {
-	container := &corev1.Container{
+func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
+	container := corev1.Container{
 		Name:            "fluentd",
-		Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
-		Ports:           generatePorts(r.Logging.Spec.FluentdSpec),
-		VolumeMounts:    r.generateVolumeMounts(),
-		Resources:       r.Logging.Spec.FluentdSpec.Resources,
+		Image:           spec.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
+		Ports:           generatePorts(spec),
+		VolumeMounts:    generateVolumeMounts(spec),
+		Resources:       spec.Resources,
 		Env: []corev1.EnvVar{
 			{
 				Name:  "BUFFER_PATH",
@@ -113,24 +113,24 @@ func (r *Reconciler) fluentContainer() *corev1.Container {
 			},
 		},
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
+			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
+			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
+			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               spec.Security.SecurityContext.Privileged,
+			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
+			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
 		},
-		LivenessProbe:  r.Logging.Spec.FluentdSpec.LivenessProbe,
-		ReadinessProbe: r.Logging.Spec.FluentdSpec.ReadinessProbe,
+		LivenessProbe:  spec.LivenessProbe,
+		ReadinessProbe: spec.ReadinessProbe,
 	}
 
-	if r.Logging.Spec.FluentdSpec.FluentOutLogrotate != nil && r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Enabled {
+	if spec.FluentOutLogrotate != nil && spec.FluentOutLogrotate.Enabled {
 		container.Args = []string{
 			"fluentd",
-			"-o", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Path,
-			"--log-rotate-age", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Age,
-			"--log-rotate-size", r.Logging.Spec.FluentdSpec.FluentOutLogrotate.Size,
+			"-o", spec.FluentOutLogrotate.Path,
+			"--log-rotate-age", spec.FluentOutLogrotate.Age,
+			"--log-rotate-size", spec.FluentOutLogrotate.Size,
 		}
 	}
 
@@ -206,8 +206,8 @@ func generatePorts(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
 	return ports
 }
 
-func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
-	v = []corev1.VolumeMount{
+func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
+	res := []corev1.VolumeMount{
 		{
 			Name:      "config",
 			MountPath: "/fluentd/etc/",
@@ -221,16 +221,13 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			MountPath: OutputSecretPath,
 		},
 	}
-	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
-		tlsRelatedVolume := []corev1.VolumeMount{
-			{
-				Name:      "fluentd-tls",
-				MountPath: "/fluentd/tls/",
-			},
-		}
-		v = append(v, tlsRelatedVolume...)
+	if spec != nil && spec.TLS.Enabled {
+		res = append(res, corev1.VolumeMount{
+			Name:      "fluentd-tls",
+			MountPath: "/fluentd/tls/",
+		})
 	}
-	return
+	return res
 }
 
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
