@@ -262,10 +262,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 
 		livePVCs := make(map[string]bool)
 		for _, pod := range stsPods.Items {
-			if pod.Status.Phase == corev1.PodRunning {
-				if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
-					livePVCs[bufVol.PersistentVolumeClaim.ClaimName] = true
-				}
+			if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
+				livePVCs[bufVol.PersistentVolumeClaim.ClaimName] = true
 			}
 		}
 
