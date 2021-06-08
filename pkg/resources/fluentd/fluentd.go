@@ -284,6 +284,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			drained := markedAsDrained(pvc)
 			live := livePVCs[pvc.Name]
 			if drained && live {
+				r.Log.Info("removing drained label from PVC as it has a matching statefulset pod", "pvc", pvc.Name)
 				patch := client.MergeFrom(pvc.DeepCopy())
 				delete(pvc.Labels, drainStatusLabelKey)
 				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
@@ -293,6 +294,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			}
 			job, hasJob := jobOfPVC[pvc.Name]
 			if hasJob && jobSuccessfullyCompleted(job) {
+				r.Log.Info("drainer job for PVC has completed, adding drained label and deleting job", "pvc", pvc.Name)
 				patch := client.MergeFrom(pvc.DeepCopy())
 				pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
 				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
@@ -305,6 +307,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 				continue
 			}
 			if !drained && !live && !hasJob {
+				r.Log.Info("creating drain job for PVC", "pvc", pvc.Name)
 				if job, err := r.drainJobFor(pvc); err != nil {
 					errs = errors.Append(errs, errors.WrapIf(err, "assembling drain job"))
 				} else if err := r.Client.Create(ctx, job); err != nil {
