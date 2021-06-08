@@ -21,7 +21,7 @@ do
 
   if [ "$(find $BUFFER_PATH -iname '*.buffer' -or -iname '*.buffer.meta' | wc -l)" = 0 ]
   then
-    echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl http://$RPC_ADDRESS/api/processes.killWorkers 2>/dev/null)"
+    echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl --silent --show-error http://$RPC_ADDRESS/api/processes.killWorkers)"
     exit 0
   fi
 

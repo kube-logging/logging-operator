@@ -241,93 +241,109 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 
-	if !r.Logging.Spec.FluentdSpec.DisablePvc {
-		nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-		labelSet := r.getFluentdLabels(ComponentFluentd)
-
-		var pvcList corev1.PersistentVolumeClaimList
-		if err := r.Client.List(ctx, &pvcList, nsOpt,
-			client.MatchingLabelsSelector{
-				Selector: labels.SelectorFromSet(labelSet).Add(drainableRequirement),
-			}); err != nil {
-			return nil, errors.WrapIf(err, "listing PVC resources")
-		}
-
-		var stsPods corev1.PodList
-		if err := r.Client.List(ctx, &stsPods, nsOpt, client.MatchingLabels(labelSet)); err != nil {
-			return nil, errors.WrapIf(err, "listing StatefulSet pods")
-		}
-
-		bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
-
-		livePVCs := make(map[string]bool)
-		for _, pod := range stsPods.Items {
-			if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
-				livePVCs[bufVol.PersistentVolumeClaim.ClaimName] = true
-			}
-		}
-
-		var jobList batchv1.JobList
-		if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(labelSet)); err != nil {
-			return nil, errors.WrapIf(err, "listing buffer drain jobs")
-		}
-
-		jobOfPVC := make(map[string]batchv1.Job)
-		for _, job := range jobList.Items {
-			if bufVol := findVolumeByName(job.Spec.Template.Spec.Volumes, bufVolName); bufVol != nil {
-				jobOfPVC[bufVol.PersistentVolumeClaim.ClaimName] = job
-			}
-		}
-
-		var errs error
-		for _, pvc := range pvcList.Items {
-			pvcLog := r.Log.WithValues("pvc", pvc.Name)
-			drained := markedAsDrained(pvc)
-			live := livePVCs[pvc.Name]
-			if drained && live {
-				pvcLog.Info("removing drained label from PVC as it has a matching statefulset pod")
-				patch := client.MergeFrom(pvc.DeepCopy())
-				delete(pvc.Labels, drainStatusLabelKey)
-				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
-					errs = errors.Append(errs, errors.WrapIf(err, "removing drained label from pvc"))
-				}
-				continue
-			}
-			job, hasJob := jobOfPVC[pvc.Name]
-			if hasJob && jobSuccessfullyCompleted(job) {
-				pvcLog.Info("drainer job for PVC has completed, adding drained label and deleting job")
-				patch := client.MergeFrom(pvc.DeepCopy())
-				pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
-				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
-					errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
-				}
-				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
-					errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drain job"))
-				}
-				continue
-			} else if hasJob && !jobSuccessfullyCompleted(job) {
-				if job.Status.Failed > 0 {
-					errs = errors.Append(errs, errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
-				} else {
-					pvcLog.Info("drainer job for PVC has not yet been completed")
-				}
-			}
-			if !drained && !live && !hasJob {
-				pvcLog.Info("creating drainer job for PVC", "pvc", pvc.Name)
-				if job, err := r.drainJobFor(pvc); err != nil {
-					errs = errors.Append(errs, errors.WrapIf(err, "assembling drain job"))
-				} else if err := r.Client.Create(ctx, job); err != nil {
-					errs = errors.Append(errs, errors.WrapIf(err, "creating drain job"))
-				}
-				continue
-			}
-		}
-		if errs != nil {
-			return nil, errs
-		}
+	if err := r.reconcileDrain(ctx); err != nil {
+		return nil, err
 	}
 
 	return nil, nil
+}
+
+func (r *Reconciler) reconcileDrain(ctx context.Context) error {
+	if r.Logging.Spec.FluentdSpec.DisablePvc || !r.Logging.Spec.FluentdSpec.Scaling.Drain.Enabled {
+		return nil
+	}
+
+	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
+	labelSet := r.getFluentdLabels(ComponentFluentd)
+
+	var pvcList corev1.PersistentVolumeClaimList
+	if err := r.Client.List(ctx, &pvcList, nsOpt,
+		client.MatchingLabelsSelector{
+			Selector: labels.SelectorFromSet(labelSet).Add(drainableRequirement),
+		}); err != nil {
+		return errors.WrapIf(err, "listing PVC resources")
+	}
+
+	var stsPods corev1.PodList
+	if err := r.Client.List(ctx, &stsPods, nsOpt, client.MatchingLabels(labelSet)); err != nil {
+		return errors.WrapIf(err, "listing StatefulSet pods")
+	}
+
+	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+
+	pvcsInUse := make(map[string]bool)
+	for _, pod := range stsPods.Items {
+		if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
+			pvcsInUse[bufVol.PersistentVolumeClaim.ClaimName] = true
+		}
+	}
+
+	var jobList batchv1.JobList
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(labelSet)); err != nil {
+		return errors.WrapIf(err, "listing buffer drainer jobs")
+	}
+
+	jobOfPVC := make(map[string]batchv1.Job)
+	for _, job := range jobList.Items {
+		if bufVol := findVolumeByName(job.Spec.Template.Spec.Volumes, bufVolName); bufVol != nil {
+			jobOfPVC[bufVol.PersistentVolumeClaim.ClaimName] = job
+		}
+	}
+
+	var errs error
+	for _, pvc := range pvcList.Items {
+		pvcLog := r.Log.WithValues("pvc", pvc.Name)
+
+		drained := markedAsDrained(pvc)
+		inUse := pvcsInUse[pvc.Name]
+		if drained && inUse {
+			pvcLog.Info("removing drained label from PVC as it has a matching statefulset pod")
+
+			patch := client.MergeFrom(pvc.DeepCopy())
+			delete(pvc.Labels, drainStatusLabelKey)
+			if err := client.IgnoreNotFound(r.Client.Patch(ctx, pvc.DeepCopy(), patch)); err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "removing drained label from pvc"))
+			}
+			continue
+		}
+
+		job, hasJob := jobOfPVC[pvc.Name]
+		if hasJob && jobSuccessfullyCompleted(job) {
+			pvcLog.Info("drainer job for PVC has completed, adding drained label and deleting job")
+
+			patch := client.MergeFrom(pvc.DeepCopy())
+			pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
+			if err := client.IgnoreNotFound(r.Client.Patch(ctx, pvc.DeepCopy(), patch)); err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
+			}
+
+			if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drainer job"))
+			}
+			continue
+		}
+
+		if hasJob && !jobSuccessfullyCompleted(job) {
+			if job.Status.Failed > 0 {
+				errs = errors.Append(errs, errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
+			} else {
+				pvcLog.Info("drainer job for PVC has not yet been completed")
+			}
+			continue
+		}
+
+		if !drained && !inUse && !hasJob {
+			pvcLog.Info("creating drainer job for PVC")
+
+			if job, err := r.drainerJobFor(pvc); err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "assembling drainer job"))
+			} else if err := r.Client.Create(ctx, job); err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "creating drainer job"))
+			}
+			continue
+		}
+	}
+	return errs
 }
 
 func RegisterWatches(builder *builder.Builder) *builder.Builder {
