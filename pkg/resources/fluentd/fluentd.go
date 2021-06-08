@@ -29,6 +29,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/selection"
@@ -300,7 +301,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 					errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
 				}
 
-				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job)); err != nil {
+				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
 					errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drain job"))
 				}
 				continue
