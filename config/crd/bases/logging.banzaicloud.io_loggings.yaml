@@ -3090,8 +3090,10 @@ spec:
                     type: string
                   scaling:
                     properties:
-                      drainWatch:
+                      drain:
                         properties:
+                          enabled:
+                            type: boolean
                           image:
                             properties:
                               imagePullSecrets:
@@ -10877,8 +10879,10 @@ spec:
                     type: string
                   scaling:
                     properties:
-                      drainWatch:
+                      drain:
                         properties:
+                          enabled:
+                            type: boolean
                           image:
                             properties:
                               imagePullSecrets:
