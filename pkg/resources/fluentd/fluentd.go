@@ -281,10 +281,11 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 
 		var errs error
 		for _, pvc := range pvcList.Items {
+			pvcLog := r.Log.WithValues("pvc", pvc.Name)
 			drained := markedAsDrained(pvc)
 			live := livePVCs[pvc.Name]
 			if drained && live {
-				r.Log.Info("removing drained label from PVC as it has a matching statefulset pod", "pvc", pvc.Name)
+				pvcLog.Info("removing drained label from PVC as it has a matching statefulset pod")
 				patch := client.MergeFrom(pvc.DeepCopy())
 				delete(pvc.Labels, drainStatusLabelKey)
 				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
@@ -294,20 +295,25 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			}
 			job, hasJob := jobOfPVC[pvc.Name]
 			if hasJob && jobSuccessfullyCompleted(job) {
-				r.Log.Info("drainer job for PVC has completed, adding drained label and deleting job", "pvc", pvc.Name)
+				pvcLog.Info("drainer job for PVC has completed, adding drained label and deleting job")
 				patch := client.MergeFrom(pvc.DeepCopy())
 				pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
 				if err := client.IgnoreNotFound(r.Client.Patch(ctx, &pvc, patch)); err != nil {
 					errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
 				}
-
 				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
 					errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drain job"))
 				}
 				continue
+			} else if hasJob && !jobSuccessfullyCompleted(job) {
+				if job.Status.Failed > 0 {
+					errs = errors.Append(errs, errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
+				} else {
+					pvcLog.Info("drainer job for PVC has not yet been completed")
+				}
 			}
 			if !drained && !live && !hasJob {
-				r.Log.Info("creating drain job for PVC", "pvc", pvc.Name)
+				pvcLog.Info("creating drainer job for PVC", "pvc", pvc.Name)
 				if job, err := r.drainJobFor(pvc); err != nil {
 					errs = errors.Append(errs, errors.WrapIf(err, "assembling drain job"))
 				} else if err := r.Client.Create(ctx, job); err != nil {
