@@ -41,7 +41,7 @@ import (
 )
 
 const (
-	Image            = "ghcr.io/banzaicloud/logging-operator:3.9.5-dev"
+	Image            = "ghcr.io/banzaicloud/logging-operator:3.11.0"
 	defaultNamespace = "logging-system"
 )
 
@@ -143,11 +143,11 @@ func CRD(config *ComponentConfig, group string, kind string, modifiers ...CRDMod
 
 	// apply modifiers
 	for _, modifier := range modifiers {
-		CRDmodified, err := modifier(crd)
+		crdModified, err := modifier(crd)
 		if err != nil {
 			return nil, nil, err
 		}
-		crd = CRDmodified
+		crd = crdModified
 	}
 
 	scheme := runtime.NewScheme()
@@ -348,7 +348,7 @@ func Service(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.O
 		return svc, reconciler.StateAbsent, nil
 	}
 
-	spec := corev1.ServiceSpec{
+	svc.Spec = corev1.ServiceSpec{
 		Ports: []corev1.ServicePort{
 			{
 				Name:       "conversion-webhook",
@@ -360,7 +360,6 @@ func Service(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.O
 		Selector: config.labelSelector(parent),
 		Type:     corev1.ServiceTypeClusterIP,
 	}
-	svc.Spec = spec
 
 	return svc, reconciler.StateCreated, nil
 }

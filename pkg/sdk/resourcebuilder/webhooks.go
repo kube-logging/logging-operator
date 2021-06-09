@@ -15,8 +15,6 @@
 package resourcebuilder
 
 import (
-	"fmt"
-
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -60,12 +58,13 @@ func ModifierConversionWebhook(svc types.NamespacedName) CRDModifier {
 	}
 }
 
+//nolint:interfacer // irrelevant linting error
 func ModifierCAInjectAnnotation(certName types.NamespacedName) CRDModifier {
 	return func(crd *v1.CustomResourceDefinition) (*v1.CustomResourceDefinition, error) {
 		if crd.Annotations == nil {
 			crd.Annotations = make(map[string]string)
 		}
-		crd.Annotations[CertManagerInjectCAFromAnnotationKey] = fmt.Sprintf("%s/%s", certName.Namespace, certName.Name)
+		crd.Annotations[CertManagerInjectCAFromAnnotationKey] = certName.String()
 		return crd, nil
 	}
 }
