@@ -12,31 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
-
-// Hub marks these types as conversion hub.
-func (r *Logging) Hub()       {}
-func (r *Output) Hub()        {}
-func (r *ClusterOutput) Hub() {}
-func (r *Flow) Hub()          {}
-func (r *ClusterFlow) Hub()   {}
-
-func SetupWebhookWithManager(mgr ctrl.Manager, apiTypes ...runtime.Object) error {
-	for _, apiType := range apiTypes {
-		// register webhook using controller-runtime because of interface checks
-		if err := ctrl.NewWebhookManagedBy(mgr).
-			For(apiType).
-			Complete(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 func APITypes() []runtime.Object {
 	return []runtime.Object{&Logging{}, &Output{}, &ClusterOutput{}, &Flow{}, &ClusterFlow{}}

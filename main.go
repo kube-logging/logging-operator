@@ -25,7 +25,9 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
 	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -109,8 +111,12 @@ func main() {
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
-		if err = loggingv1beta1.SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "logging")
+		if err = loggingv1beta1.SetupWebhookWithManager(mgr, v1beta1.APITypes()...); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "v1beta1.logging")
+			os.Exit(1)
+		}
+		if err = loggingv1beta1.SetupWebhookWithManager(mgr, v1alpha1.APITypes()...); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "v1alpha1.logging")
 			os.Exit(1)
 		}
 	}
