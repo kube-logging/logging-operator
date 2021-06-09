@@ -22,6 +22,8 @@ import (
 func (o *ClusterFlow) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.ClusterFlow)
 
+	Log.Info("ConvertTo", "source", o.TypeMeta, "destination", dst.TypeMeta)
+
 	dst.ObjectMeta = o.ObjectMeta
 	dst.Spec = o.Spec
 	dst.Status = o.Status
@@ -31,6 +33,8 @@ func (o *ClusterFlow) ConvertTo(dstRaw conversion.Hub) error {
 
 func (o *ClusterFlow) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*v1beta1.ClusterFlow)
+
+	Log.Info("ConvertFrom", "source", src.TypeMeta, "destination", o.TypeMeta)
 
 	o.ObjectMeta = src.ObjectMeta
 	o.Spec = src.Spec

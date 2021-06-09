@@ -15,9 +15,12 @@
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
+	amruntime "k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func APITypes() []runtime.Object {
-	return []runtime.Object{&Logging{}, &Output{}, &ClusterOutput{}, &Flow{}, &ClusterFlow{}}
+var Log = ctrl.Log.WithName("conversion:v1alpha1")
+
+func APITypes() []amruntime.Object {
+	return []amruntime.Object{&Logging{}, &Output{}, &ClusterOutput{}, &Flow{}, &ClusterFlow{}}
 }

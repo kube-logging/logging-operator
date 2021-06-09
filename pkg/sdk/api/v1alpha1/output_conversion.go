@@ -22,6 +22,8 @@ import (
 func (o *Output) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*v1beta1.Output)
 
+	Log.Info("ConvertTo", "source", o.TypeMeta, "destination", dst.TypeMeta)
+
 	dst.ObjectMeta = o.ObjectMeta
 	dst.Spec = v1beta1.OutputSpec(o.Spec)
 	dst.Status = v1beta1.OutputStatus(o.Status)
@@ -31,6 +33,8 @@ func (o *Output) ConvertTo(dstRaw conversion.Hub) error {
 
 func (o *Output) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*v1beta1.Output)
+
+	Log.Info("ConvertFrom", "source", src.TypeMeta, "destination", o.TypeMeta)
 
 	o.ObjectMeta = src.ObjectMeta
 	o.Spec = OutputSpec(src.Spec)
