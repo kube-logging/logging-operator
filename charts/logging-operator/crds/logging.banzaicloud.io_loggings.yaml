@@ -17,8 +17,6 @@ spec:
     plural: loggings
     singular: logging
   scope: Cluster
-<<<<<<< HEAD
-<<<<<<< HEAD
   versions:
   - name: v1alpha1
     schema:
@@ -7788,12 +7786,6 @@ spec:
     storage: false
     subresources:
       status: {}
-<<<<<<< HEAD
-=======
-  versions:
->>>>>>> 300f5cbd (Regenerate sources)
-=======
->>>>>>> 0bd592e7 (logging v1alpha1 + conversion hooks added)
   - name: v1beta1
     schema:
       openAPIV3Schema:
@@ -7818,105 +7810,6 @@ spec:
                         concat:
                           properties:
                             continuous_line_regexp:
-<<<<<<< HEAD
-                              type: string
-                            flush_interval:
-                              type: integer
-                            keep_partial_key:
-                              type: boolean
-                            keep_partial_metadata:
-                              type: string
-                            key:
-                              type: string
-                            multiline_end_regexp:
-                              type: string
-                            multiline_start_regexp:
-                              type: string
-                            n_lines:
-                              type: integer
-                            partial_key:
-                              type: string
-                            partial_value:
-                              type: string
-                            separator:
-                              type: string
-                            stream_identity_key:
-                              type: string
-                            timeout_label:
-                              type: string
-                            use_first_timestamp:
-                              type: boolean
-                            use_partial_metadata:
-=======
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          type: string
-        kind:
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            allowClusterResourcesFromAllNamespaces:
-              type: boolean
-            controlNamespace:
-              type: string
-            defaultFlow:
-              properties:
-                filters:
-                  items:
-                    properties:
-                      concat:
-                        properties:
-                          continuous_line_regexp:
-                            type: string
-                          flush_interval:
-                            type: integer
-                          keep_partial_key:
-                            type: boolean
-                          keep_partial_metadata:
-                            type: string
-                          key:
-                            type: string
-                          multiline_end_regexp:
-                            type: string
-                          multiline_start_regexp:
-                            type: string
-                          n_lines:
-                            type: integer
-                          partial_key:
-                            type: string
-                          partial_value:
-                            type: string
-                          separator:
-                            type: string
-                          stream_identity_key:
-                            type: string
-                          timeout_label:
-                            type: string
-                          use_first_timestamp:
-                            type: boolean
-                          use_partial_metadata:
-                            type: string
-                        type: object
-                      dedot:
-                        properties:
-                          de_dot_nested:
-                            type: boolean
-                          de_dot_separator:
-                            type: string
-                        type: object
-                      detectExceptions:
-                        properties:
-                          languages:
-                            items:
->>>>>>> 550fc1e8 (falling back to controller-runtime/schemebuilder from apimachinery/schemebuilder)
-=======
->>>>>>> 300f5cbd (Regenerate sources)
                               type: string
                             flush_interval:
                               type: integer
