@@ -88,6 +88,7 @@ type FlowStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the flow active?"
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
+// +kubebuilder:storageversion
 
 // Flow Kubernetes object
 type Flow struct {
