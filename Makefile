@@ -138,7 +138,7 @@ bin/golangci-lint_${GOLANGCI_VERSION}: | bin
 	mv bin/golangci-lint $@
 
 # Run tests
-ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+ENVTEST_ASSETS_DIR=${PWD}/testbin
 test: generate fmt vet manifests
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/$(ENVTEST_CTRL_VERSION)/hack/setup-envtest.sh
