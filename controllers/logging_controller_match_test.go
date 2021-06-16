@@ -155,7 +155,8 @@ func TestClusterFlowMatchWithNamespaces(t *testing.T) {
 }
 
 func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := testLogging()
 	output := testOutput()
@@ -190,11 +191,12 @@ func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
-	expectError(t, expected)
+	expectError(t, expected, errors)
 }
 
 func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := testLogging()
 	output := testOutput()
@@ -231,11 +233,12 @@ func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
-	expectError(t, expected)
+	expectError(t, expected, errors)
 }
 
 func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := testLogging()
 	output := testClusterOutput()
@@ -272,11 +275,12 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
-	expectError(t, expected)
+	expectError(t, expected, errors)
 }
 
 func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := testLogging()
 	output := testClusterOutput()
@@ -311,5 +315,5 @@ func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
 		utils.ObjectKeyFromObjectMeta(flow).String(),
 	)
 
-	expectError(t, expected)
+	expectError(t, expected, errors)
 }

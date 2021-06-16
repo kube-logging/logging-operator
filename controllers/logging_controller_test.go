@@ -47,10 +47,8 @@ import (
 )
 
 var (
-	err              error
-	mgr              ctrl.Manager
-	requests         chan reconcile.Request
-	reconcilerErrors chan error
+	err error
+	mgr ctrl.Manager
 )
 
 const (
@@ -320,7 +318,8 @@ func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 }
 
 func TestClusterFlowWithNamespacedOutput(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
@@ -361,7 +360,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	expectError(t, "referenced clusteroutput not found: test-output")
+	expectError(t, "referenced clusteroutput not found: test-output", errors)
 }
 
 func TestSingleFlowWithOutputRef(t *testing.T) {
@@ -417,7 +416,8 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 }
 
 func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
@@ -448,7 +448,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	defer ensureCreated(t, flow)()
 
 	expected := "referenced output not found: test-output-nonexistent"
-	expectError(t, expected)
+	expectError(t, expected, errors)
 }
 
 func TestSingleFlowWithSecretInOutput(t *testing.T) {
@@ -1160,11 +1160,11 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	}, timeout).Should(gomega.BeTrue())
 }
 
-// TODO add following tests:
-// - resources from non watched namespaces are not incorporated
-// - namespaced flow cannot use an output not enabled for the given namespace
-
 func beforeEach(t *testing.T) func() {
+	return beforeEachWithError(t, nil)
+}
+
+func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	g := gomega.NewWithT(t)
 
 	timeout := 1 * time.Second
@@ -1180,7 +1180,7 @@ func beforeEach(t *testing.T) func() {
 
 	var stopped bool
 	var wrappedReconciler reconcile.Reconciler
-	wrappedReconciler, requests, _, reconcilerErrors = duplicateRequest(t, flowReconciler, &stopped)
+	wrappedReconciler = duplicateRequest(t, flowReconciler, &stopped, errors)
 
 	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).
 		Named(uuid.New()[:8]).Complete(wrappedReconciler)
@@ -1239,11 +1239,10 @@ func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) 
 	}
 }
 
-func expectError(t *testing.T, expected string) {
+func expectError(t *testing.T, expected string, reconcilerErrors <-chan error) {
 	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
 		select {
 		case err := <-reconcilerErrors:
-
 			if !strings.Contains(err.Error(), expected) {
 				return false, errors.Errorf("expected `%s` but received `%s`", expected, err.Error())
 			} else {
