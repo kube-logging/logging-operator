@@ -5,6 +5,8 @@ SHELL := /bin/bash
 IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
+DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
+DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 CONTROLLER_GEN_VERSION = v0.5.0
 GOLANGCI_VERSION = v1.33.0
@@ -42,6 +44,10 @@ docker-build: ## Build the docker image
 	docker build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+
+.PHONY: docker-build-drain-watch
+docker-build-drain-watch: ## Build the drain-watch docker image
+	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
