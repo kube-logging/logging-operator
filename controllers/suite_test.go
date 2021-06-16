@@ -65,7 +65,8 @@ func beforeSuite() error {
 	logf.SetLogger(zap.New(zap.UseDevMode(true), zap.WriteTo(os.Stdout)))
 
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("..", "config", "crd", "bases")},
+		BinaryAssetsDirectory: filepath.Join("../testbin/bin"),
 	}
 
 	var err error
@@ -110,23 +111,20 @@ func afterSuite() error {
 
 // duplicateRequest returns a reconcile.Reconcile implementation that delegates to inner and
 // writes the request to requests after Reconcile is finished.
-func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool) (reconcile.Reconciler, chan reconcile.Request, chan reconcile.Result, chan error) {
-	requests := make(chan reconcile.Request)
-	results := make(chan reconcile.Result)
-	errors := make(chan error)
+func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool, errors chan<- error) reconcile.Reconciler {
 	fn := reconcile.Func(func(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 		result, err := inner.Reconcile(ctx, req)
 		if err != nil {
 			if !*stopped {
 				t.Logf("reconcile failure err: %+v req: %+v, result: %+v", err, req, result)
 			}
-			errors <- err
+			if errors != nil {
+				errors <- err
+			}
 		}
-		requests <- req
-		results <- result
 		return result, err
 	})
-	return fn, requests, results, errors
+	return fn
 }
 
 // startTestManager adds recFn

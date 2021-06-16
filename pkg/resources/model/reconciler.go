@@ -24,7 +24,6 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -39,10 +38,10 @@ func NewValidationReconciler(
 ) func() (*reconcile.Result, error) {
 	return func() (*reconcile.Result, error) {
 		var patchRequests []patchRequest
-		registerForPatching := func(obj runtime.Object) {
+		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{
 				Obj:   obj,
-				Patch: client.MergeFrom(obj.DeepCopyObject()),
+				Patch: client.MergeFrom(obj.DeepCopyObject().(client.Object)),
 			})
 		}
 
@@ -174,7 +173,7 @@ func validateOutputSpec(spec v1beta1.OutputSpec, secrets secret.SecretLoader) (p
 }
 
 type patchRequest struct {
-	Obj   runtime.Object
+	Obj   client.Object
 	Patch client.Patch
 }
 
