@@ -241,32 +241,33 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 
-	if err := r.reconcileDrain(ctx); err != nil {
-		return nil, err
+	if res, err := r.reconcileDrain(ctx); res != nil || err != nil {
+		return res, err
 	}
 
 	return nil, nil
 }
 
-func (r *Reconciler) reconcileDrain(ctx context.Context) error {
+func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, error) {
 	if r.Logging.Spec.FluentdSpec.DisablePvc || !r.Logging.Spec.FluentdSpec.Scaling.Drain.Enabled {
-		return nil
+		r.Log.Info("fluentd buffer draining is disabled")
+		return nil, nil
 	}
 
 	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-	labelSet := r.getFluentdLabels(ComponentFluentd)
+	fluentdLabelSet := r.getFluentdLabels(ComponentFluentd)
 
 	var pvcList corev1.PersistentVolumeClaimList
 	if err := r.Client.List(ctx, &pvcList, nsOpt,
 		client.MatchingLabelsSelector{
-			Selector: labels.SelectorFromSet(labelSet).Add(drainableRequirement),
+			Selector: labels.SelectorFromSet(fluentdLabelSet).Add(drainableRequirement),
 		}); err != nil {
-		return errors.WrapIf(err, "listing PVC resources")
+		return nil, errors.WrapIf(err, "listing PVC resources")
 	}
 
 	var stsPods corev1.PodList
-	if err := r.Client.List(ctx, &stsPods, nsOpt, client.MatchingLabels(labelSet)); err != nil {
-		return errors.WrapIf(err, "listing StatefulSet pods")
+	if err := r.Client.List(ctx, &stsPods, nsOpt, client.MatchingLabels(fluentdLabelSet)); err != nil {
+		return nil, errors.WrapIf(err, "listing StatefulSet pods")
 	}
 
 	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
@@ -279,8 +280,8 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) error {
 	}
 
 	var jobList batchv1.JobList
-	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(labelSet)); err != nil {
-		return errors.WrapIf(err, "listing buffer drainer jobs")
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.getFluentdLabels(ComponentDrainer))); err != nil {
+		return nil, errors.WrapIf(err, "listing buffer drainer jobs")
 	}
 
 	jobOfPVC := make(map[string]batchv1.Job)
@@ -290,7 +291,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) error {
 		}
 	}
 
-	var errs error
+	var cr reconciler.CombinedResult
 	for _, pvc := range pvcList.Items {
 		pvcLog := r.Log.WithValues("pvc", pvc.Name)
 
@@ -302,7 +303,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) error {
 			patch := client.MergeFrom(pvc.DeepCopy())
 			delete(pvc.Labels, drainStatusLabelKey)
 			if err := client.IgnoreNotFound(r.Client.Patch(ctx, pvc.DeepCopy(), patch)); err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "removing drained label from pvc"))
+				cr.CombineErr(errors.WrapIf(err, "removing drained label from pvc"))
 			}
 			continue
 		}
@@ -314,18 +315,20 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) error {
 			patch := client.MergeFrom(pvc.DeepCopy())
 			pvc.Labels[drainStatusLabelKey] = drainStatusLabelValue
 			if err := client.IgnoreNotFound(r.Client.Patch(ctx, pvc.DeepCopy(), patch)); err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "marking pvc as drained"))
+				cr.CombineErr(errors.WrapIf(err, "marking pvc as drained"))
+				continue
 			}
 
 			if err := client.IgnoreNotFound(r.Client.Delete(ctx, &job, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "deleting completed drainer job"))
+				cr.CombineErr(errors.WrapIf(err, "deleting completed drainer job"))
+				continue
 			}
 			continue
 		}
 
 		if hasJob && !jobSuccessfullyCompleted(job) {
 			if job.Status.Failed > 0 {
-				errs = errors.Append(errs, errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
+				cr.CombineErr(errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
 			} else {
 				pvcLog.Info("drainer job for PVC has not yet been completed")
 			}
@@ -336,14 +339,18 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) error {
 			pvcLog.Info("creating drainer job for PVC")
 
 			if job, err := r.drainerJobFor(pvc); err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "assembling drainer job"))
-			} else if err := r.Client.Create(ctx, job); err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "creating drainer job"))
+				cr.CombineErr(errors.WrapIf(err, "assembling drainer job"))
+			} else {
+				cr.Combine(r.ReconcileResource(job, reconciler.StatePresent))
 			}
 			continue
 		}
 	}
-	return errs
+	var res *reconcile.Result
+	if !cr.Result.IsZero() {
+		res = &cr.Result
+	}
+	return res, cr.Err
 }
 
 func RegisterWatches(builder *builder.Builder) *builder.Builder {
