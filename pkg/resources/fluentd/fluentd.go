@@ -323,6 +323,11 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 				cr.CombineErr(errors.WrapIf(err, "deleting completed drainer job"))
 				continue
 			}
+
+			if res, err := r.ReconcileResource(r.placeholderPodFor(pvc), reconciler.StateAbsent); err != nil {
+				cr.Combine(res, errors.WrapIfWithDetails(err, "removing placeholder pod for pvc", "pvc", pvc.Name))
+				continue
+			}
 			continue
 		}
 
@@ -337,6 +342,11 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 
 		if !drained && !inUse && !hasJob {
 			pvcLog.Info("creating drainer job for PVC")
+
+			if res, err := r.ReconcileResource(r.placeholderPodFor(pvc), reconciler.StatePresent); err != nil {
+				cr.Combine(res, errors.WrapIfWithDetails(err, "ensuring placeholder pod is present for pvc", "pvc", pvc.Name))
+				continue
+			}
 
 			if job, err := r.drainerJobFor(pvc); err != nil {
 				cr.CombineErr(errors.WrapIf(err, "assembling drainer job"))
