@@ -185,3 +185,14 @@ After the placeholder pod is gone, the statefulset should be able to start all r
 (The retry backoff might delay the creation of the pods a bit.)
 
 After the statefulset's pods are all ready, the previously drained PVC should lose its `drained` label.
+
+### Clean it up
+
+```
+one-eye log-generator delete --update
+k delete logging-all --all
+k delete po log-target
+k delete svc log-target
+
+kind delete cluster --name drainer
+```
