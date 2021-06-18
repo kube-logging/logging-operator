@@ -73,7 +73,7 @@ func main() {
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
 	flag.BoolVar(&enableprofile, "pprof", false, "enable pprof")
-	flag.StringVar(&namespace, "logging-namespace", "", "logging-operator namespace")
+	flag.StringVar(&namespace, "watch-namespace", "", "namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
 	flag.Parse()
 
