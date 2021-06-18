@@ -74,7 +74,7 @@ func main() {
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
 	flag.BoolVar(&enableprofile, "pprof", false, "enable pprof")
 	flag.StringVar(&namespace, "logging-namespace", "", "logging-operator namespace")
-	flag.StringVar(&loggingRef, "logging-name", "", "logging-operator name reference")
+	flag.StringVar(&loggingRef, "watch-logging-name", "", "logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
 	flag.Parse()
 
 	ctx := context.Background()
