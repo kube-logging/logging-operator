@@ -2519,7 +2519,7 @@ spec:
                   kafka_agg_max_bytes:
                     type: integer
                   kafka_agg_max_messages:
-                    type: string
+                    type: integer
                   max_send_retries:
                     type: integer
                   message_key_key:
@@ -7218,7 +7218,7 @@ spec:
                   kafka_agg_max_bytes:
                     type: integer
                   kafka_agg_max_messages:
-                    type: string
+                    type: integer
                   max_send_retries:
                     type: integer
                   message_key_key:
