@@ -51,9 +51,9 @@ jobs:
       - name: Build Fluentd Image
         uses: docker/build-push-action@v2
         with:
-          context: fluentd-image/v1.11/
+          context: fluentd-image/v1.12/
           tags: ghcr.io/banzaicloud/fluentd:${{ steps.imagetag.outputs.value }}
-          file: fluentd-image/v1.11/Dockerfile
+          file: fluentd-image/v1.12/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
