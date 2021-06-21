@@ -8,7 +8,7 @@ spec:
     disablePvc: true
   fluentbit:
     image:
-      tag: 1.7.4-debug
+      tag: 1.7.9-debug
       repository: fluent/fluent-bit
       pullPolicy: IfNotPresent
   controlNamespace: default
