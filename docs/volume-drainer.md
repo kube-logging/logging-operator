@@ -169,22 +169,8 @@ Upscale fluentd
 kubectl patch logging drainer --type merge -p '{"spec":{"fluentd":{"scaling":{"replicas":3}}}}'
 ```
 
-The placeholder pod should block the statefulset from creating a pod for the currently draining PVC (`drainer-fluentd-1` pod for PVC `drainer-fluentd-buffer-drainer-fluentd-1`).
-This will be visible when checking the statefulset's events (`kubectl describe sts drainer-fluentd`).
-The third replica (`drainer-fluentd-2`) should also be blocked from starting.
-
-Start receiving logs again
-```sh
-kubectl exec log-target -- curl -sS http://localhost:8081/on
-```
-
-Buffers should start disappearing after a while.
-When all buffers are gone, the drainer job should be deleted along with its pod(s) and the placeholder pod, and the PVC `drainer-fluentd-buffer-drainer-fluentd-1` should be marked as drained.
-
-After the placeholder pod is gone, the statefulset should be able to start all replicas.
-(The retry backoff might delay the creation of the pods a bit.)
-
-After the statefulset's pods are all ready, the previously drained PVC should lose its `drained` label.
+The drainer job and the placeholder pod should be terminated to allow the statefulset to create its required pods and giving back control over the buffers to the statefulset pods.
+The previously drained PVC should **not** be marked as *drained*.
 
 ### Clean it up
 
