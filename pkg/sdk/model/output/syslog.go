@@ -47,7 +47,7 @@ type SyslogOutputConfig struct {
 	Insecure *bool `json:"insecure,omitempty"`
 	// file path to ca to trust
 	TrustedCaPath *secret.Secret `json:"trusted_ca_path,omitempty"`
-	// +docLink:"Format,../format/"
+	// +docLink:"Format,../format_rfc5424/"
 	Format *FormatRfc5424 `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
@@ -119,12 +119,13 @@ func (s *SyslogOutputConfig) ToDirective(secretLoader secret.SecretLoader, id st
 	} else {
 		syslog.SubDirectives = append(syslog.SubDirectives, buffer)
 	}
-	if s.Format != nil {
-		if format, err := s.Format.ToDirective(secretLoader, ""); err != nil {
-			return nil, err
-		} else {
-			syslog.SubDirectives = append(syslog.SubDirectives, format)
-		}
+	if s.Format == nil {
+		s.Format = &FormatRfc5424{}
+	}
+	if format, err := s.Format.ToDirective(secretLoader, ""); err != nil {
+		return nil, err
+	} else {
+		syslog.SubDirectives = append(syslog.SubDirectives, format)
 	}
 	return syslog, nil
 }
