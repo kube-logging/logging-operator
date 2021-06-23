@@ -37,6 +37,7 @@ type FluentdSpec struct {
 	Annotations            map[string]string `json:"annotations,omitempty"`
 	ConfigCheckAnnotations map[string]string `json:"configCheckAnnotations,omitempty"`
 	Labels                 map[string]string `json:"labels,omitempty"`
+	EnvVars                []corev1.EnvVar   `json:"envVars,omitempty"`
 	TLS                    FluentdTLS        `json:"tls,omitempty"`
 	Image                  ImageSpec         `json:"image,omitempty"`
 	DisablePvc             bool              `json:"disablePvc,omitempty"`

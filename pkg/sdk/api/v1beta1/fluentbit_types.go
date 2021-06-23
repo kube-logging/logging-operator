@@ -37,6 +37,7 @@ type _metaFluentbitSpec interface{}
 type FluentbitSpec struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
+	EnvVars     []corev1.EnvVar   `json:"envVars,omitempty"`
 	Image       ImageSpec         `json:"image,omitempty"`
 	TLS         *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost  string            `json:"targetHost,omitempty"`
