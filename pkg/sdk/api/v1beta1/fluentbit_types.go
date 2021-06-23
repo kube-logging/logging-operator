@@ -61,6 +61,7 @@ type FluentbitSpec struct {
 	// Deprecated, use positiondb
 	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
 	MountPath         string                   `json:"mountPath,omitempty"`
+	ExtraVolumes      []corev1.Volume          `json:"extraVolumes,omitempty"`
 	ExtraVolumeMounts []*VolumeMount           `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`

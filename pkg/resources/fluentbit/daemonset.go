@@ -194,6 +194,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
+	v = append(v, r.Logging.Spec.FluentbitSpec.ExtraVolumes...)
+
 	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.Volume{
 			Name: "extravolumemount" + strconv.Itoa(vCount),

@@ -18,6 +18,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // +kubebuilder:object:generate=true
@@ -56,6 +57,7 @@ type NodeAgentFluentbit struct {
 	PositionDB              volume.KubernetesVolume `json:"positiondb,omitempty"`
 	ContainersPath          string                  `json:"containersPath,omitempty"`
 	VarLogsPath             string                  `json:"varLogsPath,omitempty"`
+	ExtraVolumes            []corev1.Volume         `json:"extraVolumes,omitempty"`
 	ExtraVolumeMounts       []*VolumeMount          `json:"extraVolumeMounts,omitempty"`
 	InputTail               InputTail               `json:"inputTail,omitempty"`
 	FilterAws               *FilterAws              `json:"filterAws,omitempty"`

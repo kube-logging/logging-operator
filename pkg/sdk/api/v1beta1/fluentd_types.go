@@ -45,6 +45,7 @@ type FluentdSpec struct {
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	// Deprecated, use bufferStorageVolume
 	FluentdPvcSpec       *volume.KubernetesVolume    `json:"fluentdPvcSpec,omitempty"`
+	ExtraVolumes         []corev1.Volume             `json:"extraVolumes,omitempty"`
 	VolumeMountChmod     bool                        `json:"volumeMountChmod,omitempty"`
 	VolumeModImage       ImageSpec                   `json:"volumeModImage,omitempty"`
 	ConfigReloaderImage  ImageSpec                   `json:"configReloaderImage,omitempty"`

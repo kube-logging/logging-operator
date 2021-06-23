@@ -185,6 +185,8 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
+	v = append(v, n.nodeAgent.FluentbitSpec.ExtraVolumes...)
+
 	for vCount, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.Volume{
 			Name: "extravolumemount" + strconv.Itoa(vCount),

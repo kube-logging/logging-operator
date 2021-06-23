@@ -268,6 +268,9 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
+
+	v = append(v, r.Logging.Spec.FluentdSpec.ExtraVolumes...)
+
 	return
 }
 

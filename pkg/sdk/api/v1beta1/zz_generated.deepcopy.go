@@ -791,6 +791,13 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = new(volume.KubernetesVolume)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ExtraVolumes != nil {
+		in, out := &in.ExtraVolumes, &out.ExtraVolumes
+		*out = make([]v1.Volume, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.ExtraVolumeMounts != nil {
 		in, out := &in.ExtraVolumeMounts, &out.ExtraVolumeMounts
 		*out = make([]*VolumeMount, len(*in))
@@ -936,6 +943,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		in, out := &in.FluentdPvcSpec, &out.FluentdPvcSpec
 		*out = new(volume.KubernetesVolume)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.ExtraVolumes != nil {
+		in, out := &in.ExtraVolumes, &out.ExtraVolumes
+		*out = make([]v1.Volume, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
 	}
 	in.VolumeModImage.DeepCopyInto(&out.VolumeModImage)
 	in.ConfigReloaderImage.DeepCopyInto(&out.ConfigReloaderImage)
@@ -1332,6 +1346,13 @@ func (in *NodeAgentFluentbit) DeepCopyInto(out *NodeAgentFluentbit) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.PositionDB.DeepCopyInto(&out.PositionDB)
+	if in.ExtraVolumes != nil {
+		in, out := &in.ExtraVolumes, &out.ExtraVolumes
+		*out = make([]v1.Volume, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.ExtraVolumeMounts != nil {
 		in, out := &in.ExtraVolumeMounts, &out.ExtraVolumeMounts
 		*out = make([]*VolumeMount, len(*in))
