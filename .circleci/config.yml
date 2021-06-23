@@ -28,11 +28,6 @@ jobs:
             make check-diff
 
       - run:
-          name: Check licenses
-          command: |
-            make license-check
-
-      - run:
           name: Run lint
           command: make lint
 
