@@ -1301,6 +1301,13 @@ func (in *NodeAgentFluentbit) DeepCopyInto(out *NodeAgentFluentbit) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.EnvVars != nil {
+		in, out := &in.EnvVars, &out.EnvVars
+		*out = make([]v1.EnvVar, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.DaemonSetOverrides != nil {
 		in, out := &in.DaemonSetOverrides, &out.DaemonSetOverrides
 		*out = new(typeoverride.DaemonSet)

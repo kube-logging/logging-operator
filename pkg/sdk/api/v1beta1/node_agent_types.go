@@ -18,6 +18,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // +kubebuilder:object:generate=true
@@ -35,6 +36,7 @@ type NodeAgent struct {
 
 type NodeAgentFluentbit struct {
 	Enabled                 *bool                        `json:"enabled,omitempty"`
+	EnvVars                 []corev1.EnvVar              `json:"envVars,omitempty"`
 	DaemonSetOverrides      *typeoverride.DaemonSet      `json:"daemonSet,omitempty"`
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 	TLS                     *FluentbitTLS                `json:"tls,omitempty"`

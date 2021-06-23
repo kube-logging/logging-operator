@@ -88,6 +88,7 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 								Privileged:               n.nodeAgent.FluentbitSpec.Security.SecurityContext.Privileged,
 								SELinuxOptions:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
 							},
+							Env: n.nodeAgent.FluentbitSpec.EnvVars,
 						},
 					},
 				},
