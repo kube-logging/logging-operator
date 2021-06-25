@@ -96,6 +96,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
 								SELinuxOptions:           r.Logging.Spec.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
 							},
+							Env:            r.Logging.Spec.FluentbitSpec.EnvVars,
 							LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
 							ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
 						},

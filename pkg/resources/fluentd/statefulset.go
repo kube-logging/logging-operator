@@ -99,6 +99,10 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 }
 
 func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
+	envVars := append(spec.EnvVars,
+		corev1.EnvVar{Name: "BUFFER_PATH", Value: bufferPath},
+	)
+
 	container := corev1.Container{
 		Name:            "fluentd",
 		Image:           spec.Image.RepositoryWithTag(),
@@ -106,12 +110,6 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		Ports:           generatePorts(spec),
 		VolumeMounts:    generateVolumeMounts(spec),
 		Resources:       spec.Resources,
-		Env: []corev1.EnvVar{
-			{
-				Name:  "BUFFER_PATH",
-				Value: bufferPath,
-			},
-		},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
 			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
@@ -121,6 +119,7 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
 			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
 		},
+		Env:            envVars,
 		LivenessProbe:  spec.LivenessProbe,
 		ReadinessProbe: spec.ReadinessProbe,
 	}
