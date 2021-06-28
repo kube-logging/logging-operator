@@ -194,6 +194,10 @@ func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef str
 			Field: namespaceSelector,
 			Label: labelSelector,
 		},
+		&corev1.PersistentVolumeClaim{}: {
+			Field: namespaceSelector,
+			Label: labelSelector,
+		},
 	}
 
 	mgrOptions.NewCache = cache.BuilderWithOptions(cache.Options{SelectorsByObject: selectorsByObject})
