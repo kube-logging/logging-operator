@@ -954,6 +954,7 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	in.VolumeModImage.DeepCopyInto(&out.VolumeModImage)
 	in.ConfigReloaderImage.DeepCopyInto(&out.ConfigReloaderImage)
 	in.Resources.DeepCopyInto(&out.Resources)
+	in.ConfigCheckResources.DeepCopyInto(&out.ConfigCheckResources)
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)
