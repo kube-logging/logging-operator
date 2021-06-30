@@ -63,7 +63,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 
 	containers := []corev1.Container{
 		fluentContainer(r.Logging.Spec.FluentdSpec),
-		*newConfigMapReloader(r.Logging.Spec.FluentdSpec.ConfigReloaderImage),
+		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -150,11 +150,12 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
-func newConfigMapReloader(spec v1beta1.ImageSpec) *corev1.Container {
+func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 	return &corev1.Container{
 		Name:            "config-reloader",
-		ImagePullPolicy: corev1.PullPolicy(spec.PullPolicy),
-		Image:           spec.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(spec.ConfigReloaderImage.PullPolicy),
+		Image:           spec.ConfigReloaderImage.RepositoryWithTag(),
+		Resources:       spec.ConfigReloaderResources,
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
 			"-volume-dir=/fluentd/app-config/",

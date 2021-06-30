@@ -271,6 +271,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 						RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
 						SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
 					},
+					Resources: r.Logging.Spec.FluentdSpec.ConfigCheckResources,
 				},
 			},
 		},
