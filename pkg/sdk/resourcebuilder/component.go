@@ -54,6 +54,8 @@ type ComponentConfig struct {
 	WorkloadMetaOverrides *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
 	WorkloadOverrides     *types.PodSpecBase   `json:"workloadOverrides,omitempty"`
 	ContainerOverrides    *types.ContainerBase `json:"containerOverrides,omitempty"`
+	WatchNamespace        string               `json:"watchNamespace,omitempty"`
+	WatchLoggingName      string               `json:"watchLoggingName,omitempty"`
 }
 
 func (c *ComponentConfig) IsEnabled() bool {
@@ -194,7 +196,7 @@ func Operator(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.
 						Name:    "logging-operator",
 						Image:   Image,
 						Command: []string{"/manager"},
-						Args:    []string{"--enable-leader-election"},
+						Args:    OperatorArgs(config),
 						Env:     webhookEnv,
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
@@ -408,4 +410,15 @@ func ConversionWebhookModifiers(parent reconciler.ResourceOwner, config *Compone
 		ModifierConversionWebhook(k8stypes.NamespacedName{Name: parent.GetName() + WebhookNameAffix, Namespace: config.Namespace}),
 		ModifierCAInjectAnnotation(k8stypes.NamespacedName{Name: parent.GetName() + WebhookNameAffix, Namespace: config.Namespace}),
 	}
+}
+
+func OperatorArgs(config ComponentConfig) (args []string) {
+	args = append(args, "--enable-leader-election")
+	if config.WatchNamespace != "" {
+		args = append(args, "--watch-namespace", config.WatchNamespace)
+	}
+	if config.WatchLoggingName != "" {
+		args = append(args, "--watch-logging-name", config.WatchLoggingName)
+	}
+	return
 }
