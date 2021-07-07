@@ -89,6 +89,7 @@ COPY healthy.sh /bin/
 
 
 ENV FLUENTD_CONF="fluent.conf"
+ENV RUBYLIB="/usr/lib/ruby/gems/2.7.0/gems/resolv-0.2.1/lib"
 
 ENV LD_PRELOAD=""
 EXPOSE 24224 5140
