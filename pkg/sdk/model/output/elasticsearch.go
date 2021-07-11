@@ -207,6 +207,8 @@ type ElasticsearchOutput struct {
 	DefaultElasticsearchVersion string `json:"default_elasticsearch_version,omitempty"`
 	// This parameter adds additional headers to request. Example: {"token":"secret"} (default: {})
 	CustomHeaders string `json:"custom_headers,omitempty"`
+	// api_key parameter adds authentication header.
+	ApiKey *secret.Secret `json:"api_key,omitempty"`
 	// By default, the error logger won't record the reason for a 400 error from the Elasticsearch API unless you set log_level to debug. However, this results in a lot of log spam, which isn't desirable if all you want is the 400 error reasons. You can set this true to capture the 400 error reasons without all the other debug logs. (default: false)
 	LogEs400Reason bool `json:"log_es_400_reason,omitempty"`
 	// By default, record body is wrapped by 'doc'. This behavior can not handle update script requests. You can set this to suppress doc wrapping and allow record body to be untouched. (default: false)
