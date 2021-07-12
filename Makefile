@@ -10,6 +10,7 @@ DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 CONTROLLER_GEN_VERSION = v0.5.0
 GOLANGCI_VERSION = v1.33.0
+KIND_VERSION = v0.11.1
 LICENSEI_VERSION = v0.3.1
 ENVTEST_CTRL_VERSION = v0.8.3
 
@@ -18,7 +19,10 @@ DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
 
 CONTROLLER_GEN = $(PWD)/bin/controller-gen
+ENVTEST_ASSETS_DIR=${PWD}/testbin
 export PATH := $(PWD)/bin:$(PATH)
+
+E2E_TEST_TIMEOUT ?= 5m
 
 .PHONY: all
 all: manager
@@ -111,6 +115,15 @@ manifests: bin/controller-gen ## Generate manifests e.g. CRD, RBAC etc.
 run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
+test: generate fmt vet manifests | ${ENVTEST_ASSETS_DIR}/setup-envtest.sh ## Run tests
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools ${ENVTEST_ASSETS_DIR}; setup_envtest_env ${ENVTEST_ASSETS_DIR}
+	cd pkg/sdk && go test ./...
+	go test ./controllers/... ./pkg/... -coverprofile cover.out
+
+.PHONY: test-e2e
+test-e2e: bin/kind docker-build generate fmt vet manifests ## Run E2E tests
+	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" go test -timeout ${E2E_TEST_TIMEOUT} ./...
+
 .PHONY: tidy
 tidy: ## Tidy Go modules
 	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
@@ -143,12 +156,13 @@ bin/golangci-lint_${GOLANGCI_VERSION}: | bin
 	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_VERSION}
 	mv bin/golangci-lint $@
 
-# Run tests
-ENVTEST_ASSETS_DIR=${PWD}/testbin
-test: generate fmt vet manifests | ${ENVTEST_ASSETS_DIR}/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR)
-	cd pkg/sdk && go test ./...
-	go test ./controllers/... ./pkg/... -coverprofile cover.out
+bin/kind: | bin/kind_${KIND_VERSION} bin
+	ln -sf kind_${KIND_VERSION} $@
+
+bin/kind_${KIND_VERSION}: | bin
+	find $(PWD)/bin -name 'kind*' -exec rm {} +
+	GOBIN=$(PWD)/bin go install sigs.k8s.io/kind@${KIND_VERSION}
+	mv bin/kind $@
 
 bin/licensei: | bin/licensei_${LICENSEI_VERSION}
 	ln -sf licensei_${LICENSEI_VERSION} $@
