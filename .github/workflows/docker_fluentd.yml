@@ -50,7 +50,7 @@ jobs:
           TAG_OR_BRANCH: ${{ steps.refortag.outputs.value }}
       - name: Path from tag
         id: pathfromtag
-        run: echo "::set-output name=value::$(echo ${TAG:0:5})"
+        run: echo "::set-output name=value::$(echo $TAG | sed -E 's/^(v[0-9]+\.[0-9]+).*/\1/')"
         env:
           TAG: ${{ steps.imagetag.outputs.value }}
       - name: Build Fluentd Image
@@ -63,5 +63,4 @@ jobs:
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
 
