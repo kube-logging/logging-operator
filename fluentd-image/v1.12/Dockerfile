@@ -23,6 +23,7 @@ RUN apk update \
  && gem install oj -v 3.11.6 \
  && gem install http_parser.rb -v 0.5.3 \
  && gem install tzinfo -v 1.2.7 \
+ && gem install resolv -v 0.2.1 \
  && gem install json -v 2.5.1 \
  && gem install async-http -v 0.56.3 \
  && gem install ext_monitor -v 0.1.2 \
@@ -88,6 +89,7 @@ COPY healthy.sh /bin/
 
 
 ENV FLUENTD_CONF="fluent.conf"
+ENV RUBYLIB="/usr/lib/ruby/gems/2.7.0/gems/resolv-0.2.1/lib"
 
 ENV LD_PRELOAD=""
 EXPOSE 24224 5140
