@@ -48,15 +48,19 @@ jobs:
         run: echo "::set-output name=value::$(echo ${TAG_OR_BRANCH##*/}| sed 's/fluentd-//g')"
         env:
           TAG_OR_BRANCH: ${{ steps.refortag.outputs.value }}
+      - name: Path from tag
+        id: pathfromtag
+        run: echo "::set-output name=value::$(echo $TAG | sed -E 's/^(v[0-9]+\.[0-9]+).*/\1/')"
+        env:
+          TAG: ${{ steps.imagetag.outputs.value }}
       - name: Build Fluentd Image
         uses: docker/build-push-action@v2
         with:
-          context: fluentd-image/v1.12/
+          context: fluentd-image/${{ steps.pathfromtag.outputs.value }}/
           tags: ghcr.io/banzaicloud/fluentd:${{ steps.imagetag.outputs.value }}
-          file: fluentd-image/v1.12/Dockerfile
+          file: fluentd-image/${{ steps.pathfromtag.outputs.value }}/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
 
