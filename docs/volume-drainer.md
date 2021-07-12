@@ -100,7 +100,9 @@ metadata:
   name: drainer-http
 spec:
   match:
-  - select: {}
+  - select:
+      labels:
+        app.kubernetes.io/name: log-generator
   localOutputRefs:
   - http
 EOT

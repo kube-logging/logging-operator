@@ -20,7 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 )
 
-// +name:"Http"
+// +name:"Redis"
 // +weight:"200"
 type _hugoRedis interface{}
 
