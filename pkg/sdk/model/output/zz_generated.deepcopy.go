@@ -241,6 +241,11 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.ApiKey != nil {
+		in, out := &in.ApiKey, &out.ApiKey
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ExceptionBackup != nil {
 		in, out := &in.ExceptionBackup, &out.ExceptionBackup
 		*out = new(bool)
