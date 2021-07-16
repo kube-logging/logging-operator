@@ -231,13 +231,6 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 						NodeSelector: map[string]string{
 							"kubernetes.io/os": "windows",
 						},
-						Tolerations: []v1.Toleration{{
-							Key:      "node.kubernetes.io/os",
-							Operator: "Equal",
-							Value:    "windows",
-							Effect:   "NoSchedule",
-						},
-						},
 					}},
 			}},
 	},
