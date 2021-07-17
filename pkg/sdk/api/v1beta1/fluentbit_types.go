@@ -177,6 +177,8 @@ type InputTail struct {
 	ParserN []string `json:"Parser_N,omitempty"`
 	// If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline. (default:Off)
 	DockerMode string `json:"Docker_Mode,omitempty"`
+	// Specify an optional parser for the first line of the docker multiline mode.
+	DockerModeParser string `json:"Docker_Mode_Parser,omitempty"`
 	//Wait period time in seconds to flush queued unfinished split lines. (default:4)
 	DockerModeFlush string `json:"Docker_Mode_Flush,omitempty"`
 }

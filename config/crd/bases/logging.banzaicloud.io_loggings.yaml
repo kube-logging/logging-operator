@@ -1387,6 +1387,8 @@ spec:
                         type: string
                       Docker_Mode_Flush:
                         type: string
+                      Docker_Mode_Parser:
+                        type: string
                       Exclude_Path:
                         type: string
                       Ignore_Older:
@@ -7407,6 +7409,8 @@ spec:
                             Docker_Mode:
                               type: string
                             Docker_Mode_Flush:
+                              type: string
+                            Docker_Mode_Parser:
                               type: string
                             Exclude_Path:
                               type: string
@@ -9334,6 +9338,8 @@ spec:
                         type: string
                       Docker_Mode_Flush:
                         type: string
+                      Docker_Mode_Parser:
+                        type: string
                       Exclude_Path:
                         type: string
                       Ignore_Older:
@@ -15354,6 +15360,8 @@ spec:
                             Docker_Mode:
                               type: string
                             Docker_Mode_Flush:
+                              type: string
+                            Docker_Mode_Parser:
                               type: string
                             Exclude_Path:
                               type: string
