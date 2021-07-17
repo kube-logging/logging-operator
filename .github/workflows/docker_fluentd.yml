@@ -2,8 +2,6 @@ name: FluentD
 
 on:
   push:
-    branches:
-      - master
     tags:
       - fluentd-v[0-9].[0-9]+.[0-9]+-[a-z]+-[0-9]+
 env:
