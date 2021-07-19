@@ -1353,6 +1353,8 @@ spec:
                         type: string
                       Time_as_Integer:
                         type: boolean
+                      storage.total_limit_size:
+                        type: string
                     type: object
                   grace:
                     format: int32
@@ -7392,6 +7394,8 @@ spec:
                               type: string
                             Time_as_Integer:
                               type: boolean
+                            storage.total_limit_size:
+                              type: string
                           type: object
                         grace:
                           format: int32
@@ -9304,6 +9308,8 @@ spec:
                         type: string
                       Time_as_Integer:
                         type: boolean
+                      storage.total_limit_size:
+                        type: string
                     type: object
                   grace:
                     format: int32
@@ -15343,6 +15349,8 @@ spec:
                               type: string
                             Time_as_Integer:
                               type: boolean
+                            storage.total_limit_size:
+                              type: string
                           type: object
                         grace:
                           format: int32

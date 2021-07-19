@@ -282,4 +282,6 @@ type ForwardOptions struct {
 	RequireAckResponse bool   `json:"Require_ack_response,omitempty"`
 	Tag                string `json:"Tag,omitempty"`
 	RetryLimit         string `json:"Retry_Limit,omitempty"`
+	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
+	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
 }
