@@ -30,7 +30,7 @@ type _docSyslog interface{}
 
 // +name:"Syslog"
 // +url:"https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424"
-// +version:"0.9.0.rc.5"
+// +version:"0.9.0.rc.8"
 // +description:"Output plugin writes events to syslog"
 // +status:"GA"
 type _metaSyslog interface{}

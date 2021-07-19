@@ -42,7 +42,7 @@ type _docNewRelic interface{}
 
 // +name:"NewRelic Logs"
 // +url:"https://github.com/newrelic/newrelic-fluentd-output"
-// +version:"1.1.10"
+// +version:"1.2.0"
 // +description:"Send logs to New Relic Logs"
 // +status:"GA"
 type _metaNewRelic interface{}
