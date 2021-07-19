@@ -38,8 +38,8 @@ type _hugoKinesisStream interface{}
 type _docKinesisStream interface{}
 
 // +name:"Amazon Kinesis Stream"
-// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.3.0"
-// +version:"3.3.0"
+// +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.4.0"
+// +version:"3.4.0"
 // +description:"Fluent plugin for Amazon Kinesis"
 // +status:"GA"
 type _metaKinesis interface{}

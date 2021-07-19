@@ -39,7 +39,7 @@ type _docAwsElasticsearch interface{}
 
 // +name:"Amazon Elasticsearch"
 // +url:"https://github.com/atomita/fluent-plugin-aws-elasticsearch-service"
-// +version:"2.4.0"
+// +version:"2.4.1"
 // +description:"Fluent plugin for Amazon Elasticsearch"
 // +status:"Testing"
 type _metaAwsElasticsearch interface{}

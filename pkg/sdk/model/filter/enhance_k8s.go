@@ -30,7 +30,7 @@ type _docEnhanceK8s interface{}
 
 // +name:"Enhance K8s Metadata"
 // +url:"https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata"
-// +version:"0.0.0"
+// +version:"2.0.0"
 // +description:"Fluentd output plugin to add extra Kubernetes metadata to the events."
 // +status:"GA"
 type _metaEnhanceK8s interface{}
