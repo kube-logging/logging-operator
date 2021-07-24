@@ -4447,6 +4447,10 @@ spec:
                 type: object
               sqs:
                 properties:
+                  aws_key_id:
+                    type: string
+                  aws_sec_key:
+                    type: string
                   buffer:
                     properties:
                       chunk_full_threshold:
@@ -4516,12 +4520,20 @@ spec:
                     type: object
                   create_queue:
                     type: boolean
+                  delay_seconds:
+                    type: integer
+                  include_tag:
+                    type: boolean
+                  message_group_id:
+                    type: string
                   queue_name:
                     type: string
                   region:
                     type: string
-                required:
-                - queue_name
+                  sqs_url:
+                    type: string
+                  tag_property_name:
+                    type: string
                 type: object
               sumologic:
                 properties:
@@ -9257,6 +9269,10 @@ spec:
                 type: object
               sqs:
                 properties:
+                  aws_key_id:
+                    type: string
+                  aws_sec_key:
+                    type: string
                   buffer:
                     properties:
                       chunk_full_threshold:
@@ -9326,12 +9342,20 @@ spec:
                     type: object
                   create_queue:
                     type: boolean
+                  delay_seconds:
+                    type: integer
+                  include_tag:
+                    type: boolean
+                  message_group_id:
+                    type: string
                   queue_name:
                     type: string
                   region:
                     type: string
-                required:
-                - queue_name
+                  sqs_url:
+                    type: string
+                  tag_property_name:
+                    type: string
                 type: object
               sumologic:
                 properties:

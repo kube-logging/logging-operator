@@ -38,12 +38,26 @@ type _metaSQS interface{}
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type SQSOutputConfig struct {
-	// SQS queue name
-	QueueName string `json:"queue_name"`
-	// Create SQS queue (default: false)
+	// SQS queue url e.g. https://sqs.us-west-2.amazonaws.com/123456789012/myqueue
+	SQSUrl string `json:"sqs_url,omitempty"`
+	// SQS queue name - required if sqs_url is not set
+	QueueName string `json:"queue_name,omitempty"`
+	// AWS access key id
+	AWSKeyId string `json:"aws_key_id,omitempty"`
+	// AWS secret key
+	AWSSecKey string `json:"aws_sec_key,omitempty"`
+	// Create SQS queue (default: true)
 	CreateQueue *bool `json:"create_queue,omitempty"`
-	// AWS region (default: us-east-1)
+	// AWS region (default: ap-northeast-1)
 	Region string `json:"region,omitempty"`
+	// Message group id for FIFO queue
+	MessageGroupId string `json:"message_group_id,omitempty"`
+	// Delivery delay seconds (default: 0)
+	DelaySeconds int `json:"delay_seconds,omitempty"`
+	// Include tag (default: true)
+	IncludeTag *bool `json:"include_tag,omitempty"`
+	// Tags property name in json (default: '__tag')
+	TagPropertyName string `json:"tag_property_name,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
@@ -59,14 +73,7 @@ type SQSOutputConfig struct {
 //  sqs:
 //    queue_name: some-aws-sqs-queue
 //    create_queue: false
-//    region: us-east-2
-//    buffer:
-//      flush_thread_count: 8
-//      flush_interval: 5s
-//      chunk_limit_size: 8M
-//      queue_limit_length: 512
-//      retry_max_interval: 30
-//      retry_forever: true
+//    region: us-east-1
 // ```
 //
 // #### Fluentd Config Result
@@ -76,17 +83,7 @@ type SQSOutputConfig struct {
 //      @id test_sqs
 //      queue_name some-aws-sqs-queue
 //      create_queue false
-//      region us-east-2
-//      <buffer tag,time>
-//        @type file
-//        path /buffers/test_file.*.buffer
-//    flush_thread_count 8
-//    flush_interval 5s
-//    chunk_limit_size 8M
-//    queue_limit_length 512
-//    retry_max_interval 30
-//    retry_forever true
-//      </buffer>
+//      region us-east-1
 //  </match>
 // ```
 type _expSQS interface{}
