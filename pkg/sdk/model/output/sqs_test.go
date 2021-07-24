@@ -39,8 +39,8 @@ buffer:
   <match **>
     @type sqs
     @id test
-    queue_name some-aws-sqs-queue
     create_queue false
+    queue_name some-aws-sqs-queue
     region us-east-2
     <buffer tag,time>
       @type file
