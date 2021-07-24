@@ -54,19 +54,22 @@ type FluentdSpec struct {
 	ConfigReloaderResources corev1.ResourceRequirements `json:"configReloaderResources,omitempty"`
 	LivenessProbe           *corev1.Probe               `json:"livenessProbe,omitempty"`
 	LivenessDefaultCheck    bool                        `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe          *corev1.Probe               `json:"readinessProbe,omitempty"`
-	Port                    int32                       `json:"port,omitempty"`
-	Tolerations             []corev1.Toleration         `json:"tolerations,omitempty"`
-	NodeSelector            map[string]string           `json:"nodeSelector,omitempty"`
-	Affinity                *corev1.Affinity            `json:"affinity,omitempty"`
-	Metrics                 *Metrics                    `json:"metrics,omitempty"`
-	BufferVolumeMetrics     *Metrics                    `json:"bufferVolumeMetrics,omitempty"`
-	BufferVolumeImage       ImageSpec                   `json:"bufferVolumeImage,omitempty"`
-	BufferVolumeArgs        []string                    `json:"bufferVolumeArgs,omitempty"`
-	Security                *Security                   `json:"security,omitempty"`
-	Scaling                 *FluentdScaling             `json:"scaling,omitempty"`
-	Workers                 int32                       `json:"workers,omitempty"`
-	RootDir                 string                      `json:"rootDir,omitempty"`
+	// Enable default Readiness check it'll fail if the buffer volume free space exceeds the `readinessDefaultThreshold` percentage (90%).
+	ReadinessDefaultCheck     bool                `json:"readinessDefaultCheck,omitempty"`
+	ReadinessDefaultThreshold int32               `json:"readinessDefaultThreshold,omitempty"`
+	ReadinessProbe            *corev1.Probe       `json:"readinessProbe,omitempty"`
+	Port                      int32               `json:"port,omitempty"`
+	Tolerations               []corev1.Toleration `json:"tolerations,omitempty"`
+	NodeSelector              map[string]string   `json:"nodeSelector,omitempty"`
+	Affinity                  *corev1.Affinity    `json:"affinity,omitempty"`
+	Metrics                   *Metrics            `json:"metrics,omitempty"`
+	BufferVolumeMetrics       *Metrics            `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeImage         ImageSpec           `json:"bufferVolumeImage,omitempty"`
+	BufferVolumeArgs          []string            `json:"bufferVolumeArgs,omitempty"`
+	Security                  *Security           `json:"security,omitempty"`
+	Scaling                   *FluentdScaling     `json:"scaling,omitempty"`
+	Workers                   int32               `json:"workers,omitempty"`
+	RootDir                   string              `json:"rootDir,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel string `json:"logLevel,omitempty"`
 	// Ignore same log lines

@@ -123,7 +123,7 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		},
 		Env:            envVars,
 		LivenessProbe:  spec.LivenessProbe,
-		ReadinessProbe: spec.ReadinessProbe,
+		ReadinessProbe: generateReadinessCheck(spec),
 	}
 
 	if spec.FluentOutLogrotate != nil && spec.FluentOutLogrotate.Enabled {
@@ -319,4 +319,27 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		}
 	}
 	return nil
+}
+
+func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
+	res := &corev1.Probe{}
+	if spec.ReadinessProbe != nil {
+		return spec.ReadinessProbe
+	}
+
+	if spec.ReadinessDefaultCheck {
+		res = &corev1.Probe{Handler: corev1.Handler{
+			Exec: &corev1.ExecAction{
+				Command: []string{
+					"/bin/sh",
+					"-c",
+					fmt.Sprintf("THRESHOLD=%d", spec.ReadinessDefaultThreshold),
+					"CURRENT=$(df -h $BUFFER_PATH  | grep / | awk '{ print $5}' | sed 's/%//g')",
+					"if [ \"$CURRENT\" -gt \"$THRESHOLD\" ] ; then exit 1; fi",
+				},
+			},
+		}}
+	}
+
+	return res
 }

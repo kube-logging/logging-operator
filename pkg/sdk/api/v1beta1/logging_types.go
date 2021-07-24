@@ -293,6 +293,9 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 	}
+	if l.Spec.FluentdSpec.ReadinessDefaultThreshold == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultThreshold = 90
+	}
 	if l.Spec.FluentbitSpec != nil { // nolint:nestif
 		if l.Spec.FluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
