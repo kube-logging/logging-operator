@@ -80,6 +80,9 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 					},
 					ImagePullSecrets: r.Logging.Spec.FluentbitSpec.Image.ImagePullSecrets,
+					DNSPolicy:        r.Logging.Spec.FluentbitSpec.DNSPolicy,
+					DNSConfig:        r.Logging.Spec.FluentbitSpec.DNSConfig,
+
 					Containers: []corev1.Container{
 						{
 							Name:            containerName,
