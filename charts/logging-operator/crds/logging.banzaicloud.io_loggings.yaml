@@ -3206,10 +3206,33 @@ spec:
                     format: int32
                     type: integer
                   readinessDefaultCheck:
-                    type: boolean
-                  readinessDefaultThreshold:
-                    format: int32
-                    type: integer
+                    properties:
+                      bufferFileNumber:
+                        type: boolean
+                      bufferFileNumberMax:
+                        format: int32
+                        type: integer
+                      bufferFreeSpace:
+                        type: boolean
+                      bufferFreeSpaceThreshold:
+                        format: int32
+                        type: integer
+                      failureThreshold:
+                        format: int32
+                        type: integer
+                      initialDelaySeconds:
+                        format: int32
+                        type: integer
+                      periodSeconds:
+                        format: int32
+                        type: integer
+                      successThreshold:
+                        format: int32
+                        type: integer
+                      timeoutSeconds:
+                        format: int32
+                        type: integer
+                    type: object
                   readinessProbe:
                     properties:
                       exec:
@@ -11210,10 +11233,33 @@ spec:
                     format: int32
                     type: integer
                   readinessDefaultCheck:
-                    type: boolean
-                  readinessDefaultThreshold:
-                    format: int32
-                    type: integer
+                    properties:
+                      bufferFileNumber:
+                        type: boolean
+                      bufferFileNumberMax:
+                        format: int32
+                        type: integer
+                      bufferFreeSpace:
+                        type: boolean
+                      bufferFreeSpaceThreshold:
+                        format: int32
+                        type: integer
+                      failureThreshold:
+                        format: int32
+                        type: integer
+                      initialDelaySeconds:
+                        format: int32
+                        type: integer
+                      periodSeconds:
+                        format: int32
+                        type: integer
+                      successThreshold:
+                        format: int32
+                        type: integer
+                      timeoutSeconds:
+                        format: int32
+                        type: integer
+                    type: object
                   readinessProbe:
                     properties:
                       exec:

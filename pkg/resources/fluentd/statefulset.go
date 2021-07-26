@@ -322,24 +322,38 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 }
 
 func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
-	res := &corev1.Probe{}
 	if spec.ReadinessProbe != nil {
 		return spec.ReadinessProbe
 	}
 
-	if spec.ReadinessDefaultCheck {
-		res = &corev1.Probe{Handler: corev1.Handler{
-			Exec: &corev1.ExecAction{
-				Command: []string{
-					"/bin/sh",
-					"-c",
-					fmt.Sprintf("THRESHOLD=%d", spec.ReadinessDefaultThreshold),
-					"CURRENT=$(df -h $BUFFER_PATH  | grep / | awk '{ print $5}' | sed 's/%//g')",
-					"if [ \"$CURRENT\" -gt \"$THRESHOLD\" ] ; then exit 1; fi",
+	if spec.ReadinessDefaultCheck.BufferFreeSpace || spec.ReadinessDefaultCheck.BufferFileNumber {
+		check := []string{"/bin/sh", "-c"}
+		if spec.ReadinessDefaultCheck.BufferFreeSpace {
+			check = append(check,
+				fmt.Sprintf("FREESPACE_THRESHOLD=%d", spec.ReadinessDefaultCheck.BufferFreeSpaceThreshold),
+				"FREESPACE_CURRENT=$(df -h $BUFFER_PATH  | grep / | awk '{ print $5}' | sed 's/%//g')",
+				"if [ \"$FREESPACE_CURRENT\" -gt \"$FREESPACE_THRESHOLD\" ] ; then exit 1; fi",
+			)
+		}
+		if spec.ReadinessDefaultCheck.BufferFileNumber {
+			check = append(check,
+				fmt.Sprintf("MAX_FILE_NUMBER=%d", spec.ReadinessDefaultCheck.BufferFileNumberMax),
+				"FILE_NUMBER_CURRENT=$(find $BUFFER_PATH -type f -name *.buffer | wc -l)",
+				"if [ \"$FILE_NUMBER_CURRENT\" -gt \"$MAX_FILE_NUMBER\" ] ; then exit 1; fi",
+			)
+		}
+		return &corev1.Probe{
+			Handler: corev1.Handler{
+				Exec: &corev1.ExecAction{
+					Command: check,
 				},
 			},
-		}}
+			InitialDelaySeconds: spec.ReadinessDefaultCheck.InitialDelaySeconds,
+			TimeoutSeconds:      spec.ReadinessDefaultCheck.TimeoutSeconds,
+			PeriodSeconds:       spec.ReadinessDefaultCheck.PeriodSeconds,
+			SuccessThreshold:    spec.ReadinessDefaultCheck.SuccessThreshold,
+			FailureThreshold:    spec.ReadinessDefaultCheck.FailureThreshold,
+		}
 	}
-
-	return res
+	return nil
 }
