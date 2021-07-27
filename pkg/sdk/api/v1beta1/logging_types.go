@@ -457,6 +457,7 @@ func (l *Logging) SetDefaults() error {
 			l.Spec.FluentbitSpec.TLS.Enabled = util.BoolPointer(false)
 		}
 	}
+
 	return nil
 }
 

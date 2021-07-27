@@ -1182,6 +1182,28 @@ spec:
                     type: string
                   disableKubernetesFilter:
                     type: boolean
+                  dnsConfig:
+                    properties:
+                      nameservers:
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  dnsPolicy:
+                    type: string
                   enableUpstream:
                     type: boolean
                   envVars:
@@ -2731,6 +2753,28 @@ spec:
                     type: object
                   disablePvc:
                     type: boolean
+                  dnsConfig:
+                    properties:
+                      nameservers:
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  dnsPolicy:
+                    type: string
                   envVars:
                     items:
                       properties:
@@ -9137,6 +9181,28 @@ spec:
                     type: string
                   disableKubernetesFilter:
                     type: boolean
+                  dnsConfig:
+                    properties:
+                      nameservers:
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  dnsPolicy:
+                    type: string
                   enableUpstream:
                     type: boolean
                   envVars:
@@ -10686,6 +10752,28 @@ spec:
                     type: object
                   disablePvc:
                     type: boolean
+                  dnsConfig:
+                    properties:
+                      nameservers:
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  dnsPolicy:
+                    type: string
                   envVars:
                     items:
                       properties:
