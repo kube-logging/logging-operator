@@ -87,6 +87,8 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				Tolerations:        r.Logging.Spec.FluentdSpec.Tolerations,
 				Affinity:           r.Logging.Spec.FluentdSpec.Affinity,
 				PriorityClassName:  r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+				DNSPolicy:          r.Logging.Spec.FluentdSpec.DNSPolicy,
+				DNSConfig:          r.Logging.Spec.FluentdSpec.DNSConfig,
 				SecurityContext: &corev1.PodSecurityContext{
 					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
 					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,

@@ -83,6 +83,8 @@ type FluentbitSpec struct {
 	ForwardOptions          *ForwardOptions              `json:"forwardOptions,omitempty"`
 	EnableUpstream          bool                         `json:"enableUpstream,omitempty"`
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
