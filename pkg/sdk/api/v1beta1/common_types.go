@@ -75,3 +75,17 @@ type Security struct {
 	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`
 	PodSecurityContext           *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
 }
+
+// ReadinessDefaultCheck Enable default readiness checks
+type ReadinessDefaultCheck struct {
+	// Enable default Readiness check it'll fail if the buffer volume free space exceeds the `readinessDefaultThreshold` percentage (90%).
+	BufferFreeSpace          bool  `json:"bufferFreeSpace,omitempty"`
+	BufferFreeSpaceThreshold int32 `json:"bufferFreeSpaceThreshold,omitempty"`
+	BufferFileNumber         bool  `json:"bufferFileNumber,omitempty"`
+	BufferFileNumberMax      int32 `json:"bufferFileNumberMax,omitempty"`
+	InitialDelaySeconds      int32 `json:"initialDelaySeconds,omitempty"`
+	TimeoutSeconds           int32 `json:"timeoutSeconds,omitempty"`
+	PeriodSeconds            int32 `json:"periodSeconds,omitempty"`
+	SuccessThreshold         int32 `json:"successThreshold,omitempty"`
+	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
+}

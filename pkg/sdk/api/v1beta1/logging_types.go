@@ -293,6 +293,33 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFreeSpace {
+		if l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFreeSpaceThreshold == 0 {
+			l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFreeSpaceThreshold = 90
+		}
+	}
+
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFileNumber {
+		if l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFileNumberMax == 0 {
+			l.Spec.FluentdSpec.ReadinessDefaultCheck.BufferFileNumberMax = 5000
+		}
+	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.InitialDelaySeconds == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultCheck.InitialDelaySeconds = 5
+	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.TimeoutSeconds == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultCheck.TimeoutSeconds = 3
+	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.PeriodSeconds == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultCheck.PeriodSeconds = 30
+	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.SuccessThreshold == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultCheck.SuccessThreshold = 3
+	}
+	if l.Spec.FluentdSpec.ReadinessDefaultCheck.FailureThreshold == 0 {
+		l.Spec.FluentdSpec.ReadinessDefaultCheck.FailureThreshold = 1
+	}
+
 	if l.Spec.FluentbitSpec != nil { // nolint:nestif
 		if l.Spec.FluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
