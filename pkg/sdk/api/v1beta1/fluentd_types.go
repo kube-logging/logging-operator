@@ -55,6 +55,7 @@ type FluentdSpec struct {
 	LivenessProbe           *corev1.Probe               `json:"livenessProbe,omitempty"`
 	LivenessDefaultCheck    bool                        `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe          *corev1.Probe               `json:"readinessProbe,omitempty"`
+	ReadinessDefaultCheck   ReadinessDefaultCheck       `json:"readinessDefaultCheck,omitempty"`
 	Port                    int32                       `json:"port,omitempty"`
 	Tolerations             []corev1.Toleration         `json:"tolerations,omitempty"`
 	NodeSelector            map[string]string           `json:"nodeSelector,omitempty"`
