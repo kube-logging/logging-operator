@@ -43,9 +43,9 @@ type SQSOutputConfig struct {
 	// SQS queue name - required if sqs_url is not set
 	QueueName string `json:"queue_name,omitempty"`
 	// AWS access key id
-	AWSKeyId string `json:"aws_key_id,omitempty"`
+	AWSKeyId *secret.Secret `json:"aws_key_id,omitempty"`
 	// AWS secret key
-	AWSSecKey string `json:"aws_sec_key,omitempty"`
+	AWSSecKey *secret.Secret `json:"aws_sec_key,omitempty"`
 	// Create SQS queue (default: true)
 	CreateQueue *bool `json:"create_queue,omitempty"`
 	// AWS region (default: ap-northeast-1)
