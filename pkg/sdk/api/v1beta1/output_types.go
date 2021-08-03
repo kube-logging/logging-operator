@@ -54,6 +54,7 @@ type OutputSpec struct {
 	RedisOutputConfig            *output.RedisOutputConfig            `json:"redis,omitempty"`
 	SyslogOutputConfig           *output.SyslogOutputConfig           `json:"syslog,omitempty"`
 	GELFOutputConfig             *output.GELFOutputConfig             `json:"gelf,omitempty"`
+	SQSOutputConfig              *output.SQSOutputConfig              `json:"sqs,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output
