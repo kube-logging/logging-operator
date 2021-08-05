@@ -16,7 +16,6 @@ package v1beta1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -51,25 +50,14 @@ func (l *Logging) Default() {
 	if l.Spec.FluentdSpec != nil {
 		if l.Spec.FluentdSpec.Scaling == nil {
 			l.Spec.FluentdSpec.Scaling = &FluentdScaling{
-				Replicas:            1,
 				PodManagementPolicy: string(appsv1.ParallelPodManagement),
-				Drain: FluentdDrainConfig{
-					Image: ImageSpec{
-						Repository: DefaultFluentdDrainWatchImageRepository,
-						Tag:        DefaultFluentdDrainWatchImageTag,
-						PullPolicy: string(corev1.PullIfNotPresent),
-					},
-				},
 			}
 			return
 		}
 		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = string(appsv1.ParallelPodManagement)
-		} else {
-			Log.Info("Default: l.Spec.FluentdSpec.Scaling.PodManagementPolicy is not empty ")
 		}
 	} else {
-		Log.Info("Default: l.Spec.FluentdSpec is missing")
+		Log.Info("l.Spec.FluentdSpec is missing, skipping Defaulter")
 	}
-	Log.Info("Default outgoing", "logging", l)
 }
