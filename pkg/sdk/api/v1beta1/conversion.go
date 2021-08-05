@@ -23,11 +23,11 @@ import (
 var Log = ctrl.Log.WithName("Defaulter:v1beta1")
 
 // Hub marks these types as conversion hub.
-func (r *Logging) Hub()       {}
-func (r *Output) Hub()        {}
-func (r *ClusterOutput) Hub() {}
-func (r *Flow) Hub()          {}
-func (r *ClusterFlow) Hub()   {}
+func (l *Logging) Hub()       {}
+func (o *Output) Hub()        {}
+func (c *ClusterOutput) Hub() {}
+func (f *Flow) Hub()          {}
+func (c *ClusterFlow) Hub()   {}
 
 func SetupWebhookWithManager(mgr ctrl.Manager, apiTypes ...runtime.Object) error {
 	for _, apiType := range apiTypes {
