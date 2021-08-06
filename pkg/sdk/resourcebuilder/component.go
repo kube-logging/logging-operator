@@ -450,9 +450,7 @@ func MutatingWebhookConfiguration(parent reconciler.ResourceOwner, config Compon
 	for _, apiType := range loggingv1beta1.APITypes() {
 		gvk, err := apiutil.GVKForObject(apiType, scheme)
 		if err != nil {
-			// TODO implement proper info logging
-			// log.Info("gvk error", "gvk", gvk)
-			continue
+			return nil, nil, err
 		}
 
 		_, isDefaulter := apiType.(admission.Defaulter)
