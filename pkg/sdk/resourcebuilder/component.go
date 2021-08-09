@@ -45,7 +45,7 @@ import (
 )
 
 const (
-	Image            = "ghcr.io/banzaicloud/logging-operator:3.13.0"
+	Image            = "ghcr.io/banzaicloud/logging-operator:3.13.0-dev"
 	defaultNamespace = "logging-system"
 )
 
@@ -359,8 +359,11 @@ func (c *ComponentConfig) clusterObjectMeta(parent reconciler.ResourceOwner) v1.
 
 func (c *ComponentConfig) clusterObjectMetaExt(parent reconciler.ResourceOwner, annotations map[string]string) v1.ObjectMeta {
 	meta := c.clusterObjectMeta(parent)
-	if len(annotations) > 0 {
-		meta.Annotations = annotations
+	if meta.Annotations == nil {
+		meta.Annotations = make(map[string]string, len(annotations))
+	}
+	for k, v := range annotations {
+		meta.Annotations[k] = v
 	}
 	return meta
 }
@@ -453,8 +456,7 @@ func MutatingWebhookConfiguration(parent reconciler.ResourceOwner, config Compon
 			return nil, nil, err
 		}
 
-		_, isDefaulter := apiType.(admission.Defaulter)
-		if !isDefaulter {
+		if _, isDefaulter := apiType.(admission.Defaulter); !isDefaulter {
 			// TODO implement proper info logging
 			// log.Info(fmt.Sprintf("missing Defaulter implementation in %v, skipping mutationwebhook generation\n", gvk.Kind))
 			continue

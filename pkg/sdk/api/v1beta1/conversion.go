@@ -49,10 +49,7 @@ func (l *Logging) Default() {
 	Log.Info("Defaulter called for", "logging", l)
 	if l.Spec.FluentdSpec != nil {
 		if l.Spec.FluentdSpec.Scaling == nil {
-			l.Spec.FluentdSpec.Scaling = &FluentdScaling{
-				PodManagementPolicy: string(appsv1.ParallelPodManagement),
-			}
-			return
+			l.Spec.FluentdSpec.Scaling = new(FluentdScaling)
 		}
 		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = string(appsv1.ParallelPodManagement)
