@@ -25,10 +25,12 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
+	admissionregistration "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	crdv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -38,10 +40,12 @@ import (
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 const (
-	Image            = "ghcr.io/banzaicloud/logging-operator:3.13.0"
+	Image            = "ghcr.io/banzaicloud/logging-operator:3.13.1"
 	defaultNamespace = "logging-system"
 )
 
@@ -127,6 +131,7 @@ func AppendCRDResourceBuilders(rbs []reconciler.ResourceBuilder, modifiers ...CR
 
 func AppendWebhookResourceBuilders(rbs []reconciler.ResourceBuilder, parent reconciler.ResourceOwner, config *ComponentConfig) []reconciler.ResourceBuilder {
 	return append(rbs,
+		config.build(parent, MutatingWebhookConfiguration),
 		config.build(parent, WebhookService),
 		config.build(parent, Issuer),
 		config.build(parent, Certificate),
@@ -352,6 +357,17 @@ func (c *ComponentConfig) clusterObjectMeta(parent reconciler.ResourceOwner) v1.
 	return meta
 }
 
+func (c *ComponentConfig) clusterObjectMetaExt(parent reconciler.ResourceOwner, annotations map[string]string) v1.ObjectMeta {
+	meta := c.clusterObjectMeta(parent)
+	if meta.Annotations == nil {
+		meta.Annotations = make(map[string]string, len(annotations))
+	}
+	for k, v := range annotations {
+		meta.Annotations[k] = v
+	}
+	return meta
+}
+
 func (c *ComponentConfig) labelSelector(parent reconciler.ResourceOwner) map[string]string {
 	return map[string]string{
 		"banzaicloud.io/operator": parent.GetName() + "-logging-operator",
@@ -423,6 +439,72 @@ func Certificate(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 	}
 
 	return &cert, reconciler.StatePresent, nil
+}
+
+func MutatingWebhookConfiguration(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.Object, reconciler.DesiredState, error) {
+	scope := admissionregistration.AllScopes
+	failurePolicy := admissionregistration.Ignore
+	sideEffects := admissionregistration.SideEffectClassNone
+
+	scheme := runtime.NewScheme()
+	_ = loggingv1beta1.AddToScheme(scheme)
+
+	webhooks := []admissionregistration.MutatingWebhook{}
+	for _, apiType := range loggingv1beta1.APITypes() {
+		gvk, err := apiutil.GVKForObject(apiType, scheme)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if _, isDefaulter := apiType.(admission.Defaulter); !isDefaulter {
+			// TODO implement proper info logging
+			// log.Info(fmt.Sprintf("missing Defaulter implementation in %v, skipping mutationwebhook generation\n", gvk.Kind))
+			continue
+		}
+
+		plural, _ := meta.UnsafeGuessKindToResource(gvk)
+
+		webhook := admissionregistration.MutatingWebhook{
+			Name: GVKDomainName(gvk),
+			ClientConfig: admissionregistration.WebhookClientConfig{
+				Service: &admissionregistration.ServiceReference{
+					Name:      parent.GetName() + WebhookNameAffix,
+					Namespace: config.Namespace,
+					Path:      utils.StringPointer(generateMutatePath(gvk)),
+				},
+			},
+			Rules: []admissionregistration.RuleWithOperations{
+				{
+					Operations: []admissionregistration.OperationType{
+						admissionregistration.Create,
+					},
+					Rule: admissionregistration.Rule{
+						APIGroups:   []string{"logging.banzaicloud.io"},
+						APIVersions: []string{"v1beta1"},
+						Resources:   []string{plural.Resource},
+						Scope:       &scope,
+					},
+				},
+			},
+			FailurePolicy:           &failurePolicy,
+			SideEffects:             &sideEffects,
+			AdmissionReviewVersions: []string{"v1"},
+		}
+
+		webhooks = append(webhooks, webhook)
+	}
+
+	mutatingWebhookConfiguration := &admissionregistration.MutatingWebhookConfiguration{
+		ObjectMeta: config.MetaOverrides.Merge(config.clusterObjectMetaExt(parent,
+			map[string]string{"cert-manager.io/inject-ca-from": config.Namespace + "/" + parent.GetName() + WebhookNameAffix})),
+		Webhooks: webhooks,
+	}
+
+	if !config.IsEnabled() || config.DisableWebhook {
+		return mutatingWebhookConfiguration, reconciler.StateAbsent, nil
+	}
+
+	return mutatingWebhookConfiguration, reconciler.StatePresent, nil
 }
 
 func ConversionWebhookModifiers(parent reconciler.ResourceOwner, config *ComponentConfig) []CRDModifier {

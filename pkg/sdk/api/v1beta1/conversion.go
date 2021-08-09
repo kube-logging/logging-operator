@@ -15,16 +15,19 @@
 package v1beta1
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+var Log = ctrl.Log.WithName("Defaulter:v1beta1")
+
 // Hub marks these types as conversion hub.
-func (r *Logging) Hub()       {}
-func (r *Output) Hub()        {}
-func (r *ClusterOutput) Hub() {}
-func (r *Flow) Hub()          {}
-func (r *ClusterFlow) Hub()   {}
+func (l *Logging) Hub()       {}
+func (o *Output) Hub()        {}
+func (c *ClusterOutput) Hub() {}
+func (f *Flow) Hub()          {}
+func (c *ClusterFlow) Hub()   {}
 
 func SetupWebhookWithManager(mgr ctrl.Manager, apiTypes ...runtime.Object) error {
 	for _, apiType := range apiTypes {
@@ -40,4 +43,18 @@ func SetupWebhookWithManager(mgr ctrl.Manager, apiTypes ...runtime.Object) error
 
 func APITypes() []runtime.Object {
 	return []runtime.Object{&Logging{}, &Output{}, &ClusterOutput{}, &Flow{}, &ClusterFlow{}}
+}
+
+func (l *Logging) Default() {
+	Log.Info("Defaulter called for", "logging", l)
+	if l.Spec.FluentdSpec != nil {
+		if l.Spec.FluentdSpec.Scaling == nil {
+			l.Spec.FluentdSpec.Scaling = new(FluentdScaling)
+		}
+		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
+			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = string(appsv1.ParallelPodManagement)
+		}
+	} else {
+		Log.Info("l.Spec.FluentdSpec is missing, skipping Defaulter")
+	}
 }

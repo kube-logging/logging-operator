@@ -15,8 +15,11 @@
 package resourcebuilder
 
 import (
+	"strings"
+
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -67,4 +70,18 @@ func ModifierCAInjectAnnotation(certName types.NamespacedName) CRDModifier {
 		crd.Annotations[CertManagerInjectCAFromAnnotationKey] = certName.String()
 		return crd, nil
 	}
+}
+
+func generateMutatePath(gvk schema.GroupVersionKind) string {
+	return "/mutate-" + strings.Replace(gvk.Group, ".", "-", -1) + "-" +
+		gvk.Version + "-" + strings.ToLower(gvk.Kind)
+}
+
+func GVKDomainName(gvk schema.GroupVersionKind) string {
+	return strings.Join(
+		[]string{
+			strings.Replace(gvk.Group, ".", "-", -1),
+			gvk.Version,
+			strings.ToLower(gvk.Kind)},
+		".")
 }
