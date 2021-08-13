@@ -83,8 +83,6 @@ tags
 !/.idea/modules.xml
 !/.idea/*.iml
 
-
-# End of https://www.gitignore.io/api/go,vim,emacs,visualstudiocode
 bin
 vendor
 testbin
@@ -94,3 +92,5 @@ example/tls-cluster-forward/*.csr
 example/tls-cluster-forward/*.key
 
 .licensei.cache
+
+.DS_Store
