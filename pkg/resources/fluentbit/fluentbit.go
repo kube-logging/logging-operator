@@ -91,6 +91,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.daemonSet,
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
+		r.prometheusRules,
 	} {
 		o, state, err := factory()
 		if err != nil {

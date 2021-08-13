@@ -1537,6 +1537,8 @@ spec:
                         type: integer
                       prometheusAnnotations:
                         type: boolean
+                      prometheusRules:
+                        type: boolean
                       serviceMonitor:
                         type: boolean
                       serviceMonitorConfig:
@@ -2635,6 +2637,8 @@ spec:
                         type: integer
                       prometheusAnnotations:
                         type: boolean
+                      prometheusRules:
+                        type: boolean
                       serviceMonitor:
                         type: boolean
                       serviceMonitorConfig:
@@ -3137,6 +3141,8 @@ spec:
                         format: int32
                         type: integer
                       prometheusAnnotations:
+                        type: boolean
+                      prometheusRules:
                         type: boolean
                       serviceMonitor:
                         type: boolean
@@ -7539,6 +7545,8 @@ spec:
                               format: int32
                               type: integer
                             prometheusAnnotations:
+                              type: boolean
+                            prometheusRules:
                               type: boolean
                             serviceMonitor:
                               type: boolean
@@ -9564,6 +9572,8 @@ spec:
                         type: integer
                       prometheusAnnotations:
                         type: boolean
+                      prometheusRules:
+                        type: boolean
                       serviceMonitor:
                         type: boolean
                       serviceMonitorConfig:
@@ -10662,6 +10672,8 @@ spec:
                         type: integer
                       prometheusAnnotations:
                         type: boolean
+                      prometheusRules:
+                        type: boolean
                       serviceMonitor:
                         type: boolean
                       serviceMonitorConfig:
@@ -11164,6 +11176,8 @@ spec:
                         format: int32
                         type: integer
                       prometheusAnnotations:
+                        type: boolean
+                      prometheusRules:
                         type: boolean
                       serviceMonitor:
                         type: boolean
@@ -15566,6 +15580,8 @@ spec:
                               format: int32
                               type: integer
                             prometheusAnnotations:
+                              type: boolean
+                            prometheusRules:
                               type: boolean
                             serviceMonitor:
                               type: boolean

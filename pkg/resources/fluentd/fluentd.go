@@ -225,6 +225,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
 		r.monitorBufferServiceMetrics,
+		r.prometheusRules,
 	} {
 		o, state, err := res()
 		if err != nil {
