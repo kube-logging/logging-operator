@@ -15,6 +15,8 @@
 package fluentbit
 
 import (
+	"fmt"
+
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -24,6 +26,7 @@ import (
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.PrometheusRules {
 		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName)
+		nsJobLabel := fmt.Sprintf("job=\"%s\", namespace=\"%s\"", objectMetadata.Name, objectMetadata.Namespace)
 
 		return &v1.PrometheusRule{
 			ObjectMeta: objectMetadata,
@@ -35,7 +38,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 							Alert: "FluentbitTooManyErrors",
 							Expr: intstr.IntOrString{
 								Type:   intstr.String,
-								StrVal: `rate(fluentbit_output_retries_failed_total[10m]) > 0`,
+								StrVal: fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel),
 							},
 							For: "10m",
 							Labels: map[string]string{
@@ -45,22 +48,6 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 							Annotations: map[string]string{
 								"summary":     `Fluentbit too many errors.`,
 								"description": `Fluentbit ({{ $labels.instance }}) is erroring.`,
-							},
-						},
-						{
-							Alert: "VolumeUsedSpace",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: `kubelet_volume_stats_used_bytes{} / kubelet_volume_stats_capacity_bytes{} > 0.9`,
-							},
-							For: "10m",
-							Labels: map[string]string{
-								"service":  "fluentbit",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `Fluentbit disk usage`,
-								"description": `Volume {{ $labels.persistentvolumeclaim }} has more than 90% space used.`,
 							},
 						},
 					},
