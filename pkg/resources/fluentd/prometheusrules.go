@@ -24,152 +24,124 @@ import (
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.PrometheusRules {
-		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
-		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, objectMetadata.Name, objectMetadata.Namespace)
+	obj := &v1.PrometheusRule{
+		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
+	}
+	state := reconciler.StateAbsent
 
-		return &v1.PrometheusRule{
-			ObjectMeta: objectMetadata,
-			Spec: v1.PrometheusRuleSpec{
-				Groups: []v1.RuleGroup{{
-					Name: "fluentd",
-					Rules: []v1.Rule{
-						{
-							Alert: "FluentdNodeDown",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("up{%s} == 0", nsJobLabel),
-							},
-							For: "10m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "critical",
-							},
-							Annotations: map[string]string{
-								"summary":     `fluentd cannot be scraped`,
-								"description": `Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 30 minutes`,
-							},
-						},
-						{
-							Alert: "FluentdQueueLength",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.3", nsJobLabel),
-							},
-							For: "1m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `fluentd node are failing`,
-								"description": `In the last 5 minutes, fluentd queues increased 30%. Current value is {{ "{{ $value }}" }}`,
-							},
-						},
-						{
-							Alert: "FluentdQueueLength",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.5", nsJobLabel),
-							},
-							For: "1m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "critical",
-							},
-							Annotations: map[string]string{
-								"summary":     `fluentd nodes buffer queue length are critical`,
-								"description": `In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}`,
-							},
-						},
-						{
-							Alert: "FluentdRecordsCountsHigh",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("sum(rate(fluentd_output_status_emit_records{%s}[5m])) BY (pod) >  (3 * sum(rate(fluentd_output_status_emit_records{%s}[15m])) BY (pod))", nsJobLabel, nsJobLabel),
-							},
-							For: "1m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "critical",
-							},
-							Annotations: map[string]string{
-								"summary":     `fluentd records count are critical`,
-								"description": `In the last 5m, records counts increased 3 times, comparing to the latest 15 min.`,
-							},
-						},
-						{
-							Alert: "FluentdRetry",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("increase(fluentd_status_retry_count{%s}[10m]) > 0", nsJobLabel),
-							},
-							For: "20m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes`,
-								"description": `Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes`,
-							},
-						},
-						{
-							Alert: "FluentdOutputError",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("increase(fluentd_output_status_num_errors{%s}[10m]) > 0", nsJobLabel),
-							},
-							For: "1s",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `There have been Fluentd output error(s) for the last 10 minutes`,
-								"description": `Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes`,
-							},
-						},
-						{
-							Alert: "FluentdBufferSize",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\", %s} * 100 < 10", nsJobLabel, nsJobLabel),
-							},
-							For: "10m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `Fluentd buffer free capacity less than 10%.`,
-								"description": `Fluentd buffer size capacity is {{ "{{ $value }}" }}% `,
-							},
-						},
-						{
-							Alert: "FluentdBufferSize",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\" ,%s} * 100 < 5", nsJobLabel, nsJobLabel),
-							},
-							For: "10m",
-							Labels: map[string]string{
-								"service":  "fluentd",
-								"severity": "critical",
-							},
-							Annotations: map[string]string{
-								"summary":     `Fluentd buffer free capacity less than 5%`,
-								"description": `Fluentd buffer size capacity is {{ "{{ $value }}" }}% `,
-							},
-						},
+	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.PrometheusRules {
+		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
+		state = reconciler.StatePresent
+		obj.Spec.Groups = []v1.RuleGroup{{
+			Name: "fluentd",
+			Rules: []v1.Rule{
+				{
+					Alert: "FluentdNodeDown",
+					Expr:  intstr.FromString(fmt.Sprintf("up{%s} == 0", nsJobLabel)),
+					For:   "10m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "critical",
+					},
+					Annotations: map[string]string{
+						"summary":     `fluentd cannot be scraped`,
+						"description": `Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 30 minutes`,
 					},
 				},
+				{
+					Alert: "FluentdQueueLength",
+					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.3", nsJobLabel)),
+					For:   "1m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `fluentd node are failing`,
+						"description": `In the last 5 minutes, fluentd queues increased 30%. Current value is {{ "{{ $value }}" }}`,
+					},
+				},
+				{
+					Alert: "FluentdQueueLength",
+					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.5", nsJobLabel)),
+					For:   "1m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "critical",
+					},
+					Annotations: map[string]string{
+						"summary":     `fluentd nodes buffer queue length are critical`,
+						"description": `In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}`,
+					},
+				},
+				{
+					Alert: "FluentdRecordsCountsHigh",
+					Expr:  intstr.FromString(fmt.Sprintf("sum(rate(fluentd_output_status_emit_records{%s}[5m])) BY (pod) >  (3 * sum(rate(fluentd_output_status_emit_records{%s}[15m])) BY (pod))", nsJobLabel, nsJobLabel)),
+					For:   "1m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "critical",
+					},
+					Annotations: map[string]string{
+						"summary":     `fluentd records count are critical`,
+						"description": `In the last 5m, records counts increased 3 times, comparing to the latest 15 min.`,
+					},
+				},
+				{
+					Alert: "FluentdRetry",
+					Expr:  intstr.FromString(fmt.Sprintf("increase(fluentd_status_retry_count{%s}[10m]) > 0", nsJobLabel)),
+					For:   "20m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes`,
+						"description": `Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes`,
+					},
+				},
+				{
+					Alert: "FluentdOutputError",
+					Expr:  intstr.FromString(fmt.Sprintf("increase(fluentd_output_status_num_errors{%s}[10m]) > 0", nsJobLabel)),
+					For:   "1s",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `There have been Fluentd output error(s) for the last 10 minutes`,
+						"description": `Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes`,
+					},
+				},
+				{
+					Alert: "FluentdBufferSize",
+					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\", %s} * 100 < 10", nsJobLabel, nsJobLabel)),
+					For:   "10m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `Fluentd buffer free capacity less than 10%.`,
+						"description": `Fluentd buffer size capacity is {{ "{{ $value }}" }}% `,
+					},
+				},
+				{
+					Alert: "FluentdBufferSize",
+					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\" ,%s} * 100 < 5", nsJobLabel, nsJobLabel)),
+					For:   "10m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "critical",
+					},
+					Annotations: map[string]string{
+						"summary":     `Fluentd buffer free capacity less than 5%`,
+						"description": `Fluentd buffer size capacity is {{ "{{ $value }}" }}% `,
+					},
 				},
 			},
-		}, reconciler.StatePresent, nil
+		},
+		}
 	}
-	return &v1.PrometheusRule{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName, ComponentFluentd),
-		Spec:       v1.PrometheusRuleSpec{},
-	}, reconciler.StateAbsent, nil
+	return obj, state, nil
 }

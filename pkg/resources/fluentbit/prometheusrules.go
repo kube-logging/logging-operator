@@ -24,37 +24,33 @@ import (
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.PrometheusRules {
-		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName)
-		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, objectMetadata.Name, objectMetadata.Namespace)
+	obj := &v1.PrometheusRule{
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName),
+	}
+	state := reconciler.StateAbsent
 
-		return &v1.PrometheusRule{
-			ObjectMeta: objectMetadata,
-			Spec: v1.PrometheusRuleSpec{
-				Groups: []v1.RuleGroup{{
-					Name: "fluentbit",
-					Rules: []v1.Rule{
-						{
-							Alert: "FluentbitTooManyErrors",
-							Expr: intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
-							For: "10m",
-							Labels: map[string]string{
-								"service":  "fluentbit",
-								"severity": "warning",
-							},
-							Annotations: map[string]string{
-								"summary":     `Fluentbit too many errors.`,
-								"description": `Fluentbit ({{ $labels.instance }}) is erroring.`,
-							},
-						},
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.PrometheusRules {
+		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
+		state = reconciler.StatePresent
+		obj.Spec.Groups = []v1.RuleGroup{{
+			Name: "fluentbit",
+			Rules: []v1.Rule{
+				{
+					Alert: "FluentbitTooManyErrors",
+					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
+					For:   "10m",
+					Labels: map[string]string{
+						"service":  "fluentbit",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `Fluentbit too many errors.`,
+						"description": `Fluentbit ({{ $labels.instance }}) is erroring.`,
 					},
 				},
-				},
 			},
-		}, reconciler.StatePresent, nil
+		},
+		}
 	}
-	return &v1.PrometheusRule{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName),
-		Spec:       v1.PrometheusRuleSpec{},
-	}, reconciler.StateAbsent, nil
+	return obj, state, nil
 }
