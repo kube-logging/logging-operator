@@ -26,7 +26,7 @@ import (
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.PrometheusRules {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
-		nsJobLabel := fmt.Sprintf("job=\"%s\", namespace=\"%s\"", objectMetadata.Name, objectMetadata.Namespace)
+		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, objectMetadata.Name, objectMetadata.Namespace)
 
 		return &v1.PrometheusRule{
 			ObjectMeta: objectMetadata,
