@@ -36,10 +36,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Rules: []v1.Rule{
 						{
 							Alert: "FluentbitTooManyErrors",
-							Expr: intstr.IntOrString{
-								Type:   intstr.String,
-								StrVal: fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel),
-							},
+							Expr: intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
 							For: "10m",
 							Labels: map[string]string{
 								"service":  "fluentbit",
