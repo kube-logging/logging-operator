@@ -57,6 +57,7 @@ type Metrics struct {
 	ServiceMonitor        bool                 `json:"serviceMonitor,omitempty"`
 	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
+	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
 }
 
 // ServiceMonitorConfig defines the ServiceMonitor properties
