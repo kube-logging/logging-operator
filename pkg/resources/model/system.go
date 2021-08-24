@@ -124,7 +124,6 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		if err != nil {
 			return nil, err
 		}
-
 	}
 
 	system, err := builder.Build()
