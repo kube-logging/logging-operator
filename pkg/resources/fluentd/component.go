@@ -18,4 +18,5 @@ const (
 	ComponentFluentd     = "fluentd"
 	ComponentConfigCheck = "fluentd-configcheck"
 	ComponentDrainer     = "fluentd-drainer"
+	ComponentPlaceholder = "fluentd-placeholder"
 )
