@@ -52,6 +52,10 @@ func NewValidationReconciler(
 			output.Status.Active = utils.BoolPointer(false)
 			output.Status.Problems = nil
 
+			if output.Name == resources.Logging.Spec.ErrorOutputRef {
+				output.Status.Active = utils.BoolPointer(true)
+			}
+
 			output.Status.Problems = append(output.Status.Problems,
 				validateOutputSpec(output.Spec.OutputSpec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
 			output.Status.ProblemsCount = len(output.Status.Problems)
