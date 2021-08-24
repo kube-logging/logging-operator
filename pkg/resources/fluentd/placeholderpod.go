@@ -17,13 +17,13 @@ package fluentd
 import (
 	"strings"
 
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 )
 
 func (r *Reconciler) placeholderPodFor(pvc corev1.PersistentVolumeClaim) *corev1.Pod {
-	tgps := int64(0)
 	return &corev1.Pod{
-		ObjectMeta: r.FluentdObjectMeta(StatefulSetName+pvc.Name[strings.LastIndex(pvc.Name, "-"):], ComponentDrainer),
+		ObjectMeta: r.FluentdObjectMeta(StatefulSetName+pvc.Name[strings.LastIndex(pvc.Name, "-"):], ComponentPlaceholder),
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
 				{
@@ -36,7 +36,7 @@ func (r *Reconciler) placeholderPodFor(pvc corev1.PersistentVolumeClaim) *corev1
 			Affinity:                      r.Logging.Spec.FluentdSpec.Affinity,
 			PriorityClassName:             r.Logging.Spec.FluentdSpec.PodPriorityClassName,
 			RestartPolicy:                 corev1.RestartPolicyNever,
-			TerminationGracePeriodSeconds: &tgps,
+			TerminationGracePeriodSeconds: utils.IntPointer64(0), // terminate immediately
 		},
 	}
 }
