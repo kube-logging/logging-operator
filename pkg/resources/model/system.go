@@ -110,6 +110,23 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 	}
 
+	if resources.Logging.Spec.ErrorOutputRef != "" {
+		//Create a Flow with ERROR label
+		// This should be a type Flow that can be added to the system builder without modification
+		// It has only 1 output the errorOutputRef
+		//FlowForError()
+		errorFlow, err := FlowForError(resources.Logging.Spec.ErrorOutputRef, resources.ClusterOutputs, secrets)
+		if err != nil {
+			// TODO set flow status to error?
+			return nil, err
+		}
+		err = builder.RegisterErrorFlow(errorFlow)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
 	system, err := builder.Build()
 
 	if system != nil && len(system.Flows) == 0 {
@@ -157,6 +174,29 @@ func filtersForFilters(flowID string, flowName string, secretLoader secret.Secre
 		result = append(result, filter)
 	}
 	return result, errs
+}
+
+func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
+	errorFlow := &types.Flow{
+		PluginMeta: types.PluginMeta{
+			Id:        "error",
+			Directive: "label",
+			Tag:       "@ERROR",
+		},
+		FlowLabel: "@ERROR",
+	}
+
+	if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
+		outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", "error", clusterOutput.Namespace, clusterOutput.Name)
+		plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+		if err != nil {
+			err = errors.WrapIff(err, "failed to create configured output %q", outputRef)
+			return nil, err
+		}
+		return errorFlow.WithOutputs(plugin), nil
+	}
+
+	return nil, errors.Errorf("there is no ClusterOutput named %s", outputRef)
 }
 
 func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outputs, secrets SecretLoaderFactory) (*types.Flow, error) {
@@ -357,4 +397,8 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 	result.WithFilters(filters...)
 
 	return result, errs
+}
+
+func ErrorOutput() {
+
 }
