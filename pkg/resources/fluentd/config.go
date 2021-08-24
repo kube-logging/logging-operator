@@ -62,13 +62,6 @@ var fluentdInputTemplate = `
 {{ end }}
 `
 var fluentdOutputTemplate = `
-<label @ERROR>
-<match **>
-    @type null
-    @id main-fluentd-error
-</match>
-</label>
-
 <match **>
     @type null
     @id main-no-output
