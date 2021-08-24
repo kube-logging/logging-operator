@@ -397,7 +397,3 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 
 	return result, errs
 }
-
-func ErrorOutput() {
-
-}
