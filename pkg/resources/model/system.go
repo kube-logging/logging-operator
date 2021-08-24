@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
+
 	"emperror.dev/errors"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
@@ -110,20 +112,31 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 	}
 
+	// Set ErrorOutput
+	var errorFlow *types.Flow
 	if resources.Logging.Spec.ErrorOutputRef != "" {
-		//Create a Flow with ERROR label
-		// This should be a type Flow that can be added to the system builder without modification
-		// It has only 1 output the errorOutputRef
-		//FlowForError()
-		errorFlow, err := FlowForError(resources.Logging.Spec.ErrorOutputRef, resources.ClusterOutputs, secrets)
-		if err != nil {
-			// TODO set flow status to error?
-			return nil, err
-		}
-		err = builder.RegisterErrorFlow(errorFlow)
+		errorFlow, err = FlowForError(resources.Logging.Spec.ErrorOutputRef, resources.ClusterOutputs, secrets)
 		if err != nil {
 			return nil, err
 		}
+
+	} else {
+		errorFlow = &types.Flow{
+			PluginMeta: types.PluginMeta{
+				Directive: "label",
+				Tag:       "@ERROR",
+			},
+			FlowLabel: "@ERROR",
+		}
+		plugin, err := output.NewNullOutputConfig().ToDirective(nil, "main-fluentd-error")
+		if err != nil {
+			return nil, err
+		}
+		errorFlow.WithOutputs(plugin)
+	}
+	err = builder.RegisterErrorFlow(errorFlow)
+	if err != nil {
+		return nil, err
 	}
 
 	system, err := builder.Build()
@@ -178,7 +191,6 @@ func filtersForFilters(flowID string, flowName string, secretLoader secret.Secre
 func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
 	errorFlow := &types.Flow{
 		PluginMeta: types.PluginMeta{
-			Id:        "error",
 			Directive: "label",
 			Tag:       "@ERROR",
 		},
