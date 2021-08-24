@@ -119,7 +119,6 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		if err != nil {
 			return nil, err
 		}
-
 	} else {
 		errorFlow = &types.Flow{
 			PluginMeta: types.PluginMeta{
