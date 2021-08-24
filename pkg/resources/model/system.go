@@ -198,8 +198,7 @@ func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets Secre
 	}
 
 	if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
-		outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", "error", clusterOutput.Namespace, clusterOutput.Name)
-		plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+		plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, "main-fluentd-error", secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 		if err != nil {
 			err = errors.WrapIff(err, "failed to create configured output %q", outputRef)
 			return nil, err
