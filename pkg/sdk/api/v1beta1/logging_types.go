@@ -53,6 +53,8 @@ type LoggingSpec struct {
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
 	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
 	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
+	// GlobalOutput name to flush ERROR events to
+	ErrorOutputRef string `json:"errorOutputRef,omitempty"`
 	// Global filters to apply on logs before any match or filter mechanism.
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
 	// Limit namespaces to watch Flow and Output custom reasources.

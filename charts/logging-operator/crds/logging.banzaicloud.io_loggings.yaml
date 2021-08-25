@@ -689,6 +689,8 @@ spec:
                 type: object
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
+              errorOutputRef:
+                type: string
               flowConfigCheckDisabled:
                 type: boolean
               flowConfigOverride:
@@ -8724,6 +8726,8 @@ spec:
                 type: object
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
+              errorOutputRef:
+                type: string
               flowConfigCheckDisabled:
                 type: boolean
               flowConfigOverride:

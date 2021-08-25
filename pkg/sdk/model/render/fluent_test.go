@@ -454,6 +454,61 @@ func TestRenderFullFluentConfig(t *testing.T) {
 	}
 }
 
+func TestRenderErrorOutput(t *testing.T) {
+	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
+
+	errorFlow := &types.Flow{
+		PluginMeta: types.PluginMeta{
+			Id:        "error",
+			Directive: "label",
+			Tag:       "@ERROR",
+		},
+		FlowLabel: "@ERROR",
+	}
+	errorFlow.WithOutputs(toDirective(t, output.NewNullOutputConfig()))
+	err := system.RegisterErrorFlow(errorFlow)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fluentConfig, err := system.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b := &bytes.Buffer{}
+	renderer := render.FluentRender{
+		Out:    b,
+		Indent: 2,
+	}
+	err = renderer.Render(fluentConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `
+		<source>
+          @type tail
+          @id test
+          path input.log
+        </source>
+        <match **>
+          @type label_router
+          @id test
+        </match>
+        <label @ERROR>
+          @id error
+          <match **>
+            @type null
+            @id test
+          </match>
+        </label>`
+
+	if a, e := diff.TrimLinesInString(b.String()), diff.TrimLinesInString(expected); a != e {
+		t.Errorf("Result does not match (-actual vs +expected):\n%v\nActual: %s", diff.LineDiff(a, e), b.String())
+	}
+}
+
 func TestRenderFullFluentConfigWithGlobalFilter(t *testing.T) {
 	globalFilters := []types.Filter{toDirective(t, filter.NewStdOutFilterConfig())}
 	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), globalFilters, types.NewRouter("test", nil))

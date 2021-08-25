@@ -26,6 +26,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
 )
@@ -110,6 +111,32 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 	}
 
+	// Set ErrorOutput
+	var errorFlow *types.Flow
+	if resources.Logging.Spec.ErrorOutputRef != "" {
+		errorFlow, err = FlowForError(resources.Logging.Spec.ErrorOutputRef, resources.ClusterOutputs, secrets)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		errorFlow = &types.Flow{
+			PluginMeta: types.PluginMeta{
+				Directive: "label",
+				Tag:       "@ERROR",
+			},
+			FlowLabel: "@ERROR",
+		}
+		plugin, err := output.NewNullOutputConfig().ToDirective(nil, "main-fluentd-error")
+		if err != nil {
+			return nil, err
+		}
+		errorFlow.WithOutputs(plugin)
+	}
+	err = builder.RegisterErrorFlow(errorFlow)
+	if err != nil {
+		return nil, err
+	}
+
 	system, err := builder.Build()
 
 	if system != nil && len(system.Flows) == 0 {
@@ -157,6 +184,26 @@ func filtersForFilters(flowID string, flowName string, secretLoader secret.Secre
 		result = append(result, filter)
 	}
 	return result, errs
+}
+
+func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
+	errorFlow := &types.Flow{
+		PluginMeta: types.PluginMeta{
+			Directive: "label",
+			Tag:       "@ERROR",
+		},
+		FlowLabel: "@ERROR",
+	}
+
+	if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
+		plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, "main-fluentd-error", secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
+		if err != nil {
+			return nil, errors.WrapIff(err, "failed to create configured output %q", outputRef)
+		}
+		return errorFlow.WithOutputs(plugin), nil
+	}
+
+	return nil, errors.Errorf("there is no ClusterOutput named %s", outputRef)
 }
 
 func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outputs, secrets SecretLoaderFactory) (*types.Flow, error) {
