@@ -19,7 +19,6 @@ import (
 	"strconv"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
-
 	"emperror.dev/errors"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
