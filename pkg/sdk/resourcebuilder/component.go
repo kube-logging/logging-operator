@@ -60,7 +60,7 @@ type ComponentConfig struct {
 	ContainerOverrides    *types.ContainerBase `json:"containerOverrides,omitempty"`
 	WatchNamespace        string               `json:"watchNamespace,omitempty"`
 	WatchLoggingName      string               `json:"watchLoggingName,omitempty"`
-	DisableWebhook        bool                 `json:"-"`
+	DisableWebhook        bool                 `json:"disableWebhook,omitempty"`
 }
 
 func (c *ComponentConfig) IsEnabled() bool {
