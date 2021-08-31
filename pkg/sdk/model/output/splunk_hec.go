@@ -31,9 +31,9 @@ type _hugoSplunk interface{}
 // #### Example output configurations
 // ```
 // spec:
-//   SplunkHec:
-//     host: splunk.default.svc.cluster.local
-//     port: 8088
+//   splunkHec:
+//     hec_host: splunk.default.svc.cluster.local
+//     hec_port: 8088
 //     protocol: http
 // ```
 type _docSplunkHec interface{}
