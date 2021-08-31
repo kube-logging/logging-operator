@@ -25,6 +25,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
+	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	admissionregistration "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -52,15 +53,16 @@ const (
 // +kubebuilder:object:generate=true
 
 type ComponentConfig struct {
-	Namespace             string               `json:"namespace,omitempty"`
-	Enabled               *bool                `json:"enabled,omitempty"`
-	MetaOverrides         *types.MetaBase      `json:"metaOverrides,omitempty"`
-	WorkloadMetaOverrides *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
-	WorkloadOverrides     *types.PodSpecBase   `json:"workloadOverrides,omitempty"`
-	ContainerOverrides    *types.ContainerBase `json:"containerOverrides,omitempty"`
-	WatchNamespace        string               `json:"watchNamespace,omitempty"`
-	WatchLoggingName      string               `json:"watchLoggingName,omitempty"`
-	DisableWebhook        bool                 `json:"disableWebhook,omitempty"`
+	Namespace              string               `json:"namespace,omitempty"`
+	Enabled                *bool                `json:"enabled,omitempty"`
+	MetaOverrides          *types.MetaBase      `json:"metaOverrides,omitempty"`
+	WorkloadMetaOverrides  *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
+	WorkloadOverrides      *types.PodSpecBase   `json:"workloadOverrides,omitempty"`
+	ContainerOverrides     *types.ContainerBase `json:"containerOverrides,omitempty"`
+	WatchNamespace         string               `json:"watchNamespace,omitempty"`
+	WatchLoggingName       string               `json:"watchLoggingName,omitempty"`
+	DisableWebhook         bool                 `json:"disableWebhook,omitempty"`
+	InstallPrometheusRules bool                 `json:"-"`
 }
 
 func (c *ComponentConfig) IsEnabled() bool {
@@ -95,6 +97,9 @@ func ResourceBuilders(parent reconciler.ResourceOwner, object interface{}) (reso
 	resources = AppendOperatorResourceBuilders(resources, parent, config)
 	if !config.DisableWebhook {
 		resources = AppendWebhookResourceBuilders(resources, parent, config)
+	}
+	if config.InstallPrometheusRules {
+		resources = AppendPrometheusRulesResourceBuilders(resources, parent, config)
 	}
 	return resources
 }
@@ -135,6 +140,53 @@ func AppendWebhookResourceBuilders(rbs []reconciler.ResourceBuilder, parent reco
 		config.build(parent, WebhookService),
 		config.build(parent, Issuer),
 		config.build(parent, Certificate),
+	)
+}
+
+func AppendPrometheusRulesResourceBuilders(rbs []reconciler.ResourceBuilder, parent reconciler.ResourceOwner, config *ComponentConfig) []reconciler.ResourceBuilder {
+	return append(rbs,
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return &monitoringv1.PrometheusRule{
+				ObjectMeta: config.objectMeta(parent),
+				Spec: monitoringv1.PrometheusRuleSpec{
+					Groups: []monitoringv1.RuleGroup{
+						{
+							Name: "fluentd",
+							Rules: []monitoringv1.Rule{
+								{
+									Record: "fluentd_buffer_size_bytes",
+									Expr:   intstr.FromString(`avg (node_filesystem_size_bytes{container="buffer-metrics-sidecar",mountpoint="/buffers"}) without(container,mountpoint)`),
+									Labels: map[string]string{
+										"service": "fluentd",
+									},
+								},
+								{
+									Record: "fluentd_buffer_avail_bytes",
+									Expr:   intstr.FromString(`avg (node_filesystem_avail_bytes{container="buffer-metrics-sidecar",mountpoint="/buffers"}) without(container,mountpoint)`),
+									Labels: map[string]string{
+										"service": "fluentd",
+									},
+								},
+								{
+									Record: "fluentd_buffer_used_bytes",
+									Expr:   intstr.FromString(`fluentd_buffer_size_bytes - fluentd_buffer_avail_bytes`),
+									Labels: map[string]string{
+										"service": "fluentd",
+									},
+								},
+								{
+									Record: "fluentd_buffer_usage",
+									Expr:   intstr.FromString(`fluentd_buffer_used_bytes / fluentd_buffer_size_bytes`),
+									Labels: map[string]string{
+										"service": "fluentd",
+									},
+								},
+							},
+						},
+					},
+				},
+			}, reconciler.StatePresent, nil
+		},
 	)
 }
 
