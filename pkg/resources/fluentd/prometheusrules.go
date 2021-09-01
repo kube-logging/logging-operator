@@ -139,6 +139,19 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 						"description": `Fluentd buffer size capacity is {{ "{{ $value }}" }}% `,
 					},
 				},
+				{
+					Alert: "FluentdPredictedBufferGrowth",
+					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%s}", nsJobLabel, nsJobLabel)),
+					For:   "10m",
+					Labels: map[string]string{
+						"service":  "fluentd",
+						"severity": "warning",
+					},
+					Annotations: map[string]string{
+						"summary":     `Fluentd buffer size prediction warning`,
+						"description": `Fluentd buffer trending watcher`,
+					},
+				},
 			},
 		},
 		}
