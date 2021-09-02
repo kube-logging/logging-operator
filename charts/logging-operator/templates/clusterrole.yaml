@@ -159,6 +159,7 @@ rules:
   - monitoring.coreos.com
   resources:
   - servicemonitors
+  - prometheusrules
   verbs:
   - create
   - delete
