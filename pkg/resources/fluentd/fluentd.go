@@ -108,6 +108,7 @@ func New(client client.Client, log logr.Logger,
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	ctx := context.Background()
+	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
 	for _, res := range []resources.Resource{
 		r.serviceAccount,
@@ -155,8 +156,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 					for _, removedHash := range removedHashes {
 						delete(r.Logging.Status.ConfigCheckResults, removedHash)
 					}
-					if err := r.Client.Status().Update(ctx, r.Logging); err != nil {
-						return nil, errors.WrapWithDetails(err, "failed to update status", "logging", r.Logging)
+					if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+						return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
 					} else {
 						// explicitly ask for a requeue to short circuit the controller loop after the status update
 						return &reconcile.Result{Requeue: true}, nil
@@ -173,8 +174,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			}
 			if result.Ready {
 				r.Logging.Status.ConfigCheckResults[hash] = result.Valid
-				if err := r.Client.Status().Update(ctx, r.Logging); err != nil {
-					return nil, errors.WrapWithDetails(err, "failed to update status", "logging", r.Logging)
+				if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
 				} else {
 					// explicitly ask for a requeue to short circuit the controller loop after the status update
 					return &reconcile.Result{Requeue: true}, nil
