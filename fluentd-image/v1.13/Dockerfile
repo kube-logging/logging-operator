@@ -32,7 +32,10 @@ RUN apk update \
  && gem install bigdecimal -v 1.4.4 \
  && gem install webrick \
  && gem install gelf -v 3.0.0 \
- && gem install fluent-plugin-elasticsearch -v 5.0.5 \
+ # Pin the elasticsearch-ruby library < 7.14.
+ # See https://github.com/uken/fluent-plugin-elasticsearch/issues/912
+ && gem install elasticsearch -v 7.13.3 \
+ && gem install elasticsearch-xpack -v 7.13.3 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -57,7 +60,7 @@ RUN apk update \
          fluent-plugin-record-modifier \
          fluent-plugin-splunk-hec \
          fluent-plugin-newrelic \
-         elasticsearch-xpack \
+         fluent-plugin-elasticsearch \
          fluent-plugin-cloudwatch-logs \
          fluent-plugin-throttle \
          fluent-plugin-logdna \
