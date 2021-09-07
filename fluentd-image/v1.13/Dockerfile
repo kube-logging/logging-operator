@@ -32,11 +32,11 @@ RUN apk update \
  && gem install bigdecimal -v 1.4.4 \
  && gem install webrick \
  && gem install gelf -v 3.0.0 \
+ && gem install fluent-plugin-elasticsearch -v 5.0.5 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
          fluent-plugin-webhdfs \
-         fluent-plugin-elasticsearch \
          fluent-plugin-prometheus \
          fluent-plugin-s3 \
          fluent-plugin-rewrite-tag-filter \
