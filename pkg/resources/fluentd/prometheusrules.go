@@ -80,7 +80,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				{
 					Alert: "FluentdRecordsCountsHigh",
-					Expr:  intstr.FromString(fmt.Sprintf("sum(rate(fluentd_output_status_emit_records{%s}[5m])) BY (pod) >  (3 * sum(rate(fluentd_output_status_emit_records{%s}[15m])) BY (pod))", nsJobLabel, nsJobLabel)),
+					Expr:  intstr.FromString(fmt.Sprintf("sum(rate(fluentd_output_status_emit_records{%[1]s}[5m])) by (job,pod,namespace) > (3 * sum(rate(fluentd_output_status_emit_records{%[1]s}[15m])) by (job,pod,namespace))", nsJobLabel)),
 					For:   "1m",
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
