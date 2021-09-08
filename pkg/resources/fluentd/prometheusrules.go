@@ -32,16 +32,18 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
+		const ruleGroupName = "fluentd"
 		obj.Spec.Groups = []v1.RuleGroup{{
-			Name: "fluentd",
+			Name: ruleGroupName,
 			Rules: []v1.Rule{
 				{
 					Alert: "FluentdNodeDown",
 					Expr:  intstr.FromString(fmt.Sprintf("up{%s} == 0", nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "critical",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "critical",
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd cannot be scraped`,
@@ -53,8 +55,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.3", nsJobLabel)),
 					For:   "1m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "warning",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "warning",
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd node are failing`,
@@ -66,8 +69,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentd_status_buffer_queue_length{%s}[5m]) > 0.5", nsJobLabel)),
 					For:   "1m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "critical",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "critical",
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd nodes buffer queue length are critical`,
@@ -79,8 +83,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("sum(rate(fluentd_output_status_emit_records{%s}[5m])) BY (pod) >  (3 * sum(rate(fluentd_output_status_emit_records{%s}[15m])) BY (pod))", nsJobLabel, nsJobLabel)),
 					For:   "1m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "critical",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "critical",
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd records count are critical`,
@@ -92,8 +97,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("increase(fluentd_status_retry_count{%s}[10m]) > 0", nsJobLabel)),
 					For:   "20m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "warning",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "warning",
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes`,
@@ -105,8 +111,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("increase(fluentd_output_status_num_errors{%s}[10m]) > 0", nsJobLabel)),
 					For:   "1s",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "warning",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "warning",
 					},
 					Annotations: map[string]string{
 						"summary":     `There have been Fluentd output error(s) for the last 10 minutes`,
@@ -118,8 +125,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\", %s} * 100 < 10", nsJobLabel, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "warning",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "warning",
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer free capacity less than 10%.`,
@@ -131,8 +139,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\" ,%s} * 100 < 5", nsJobLabel, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "critical",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "critical",
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer free capacity less than 5%`,
@@ -144,8 +153,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%s}", nsJobLabel, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
-						"service":  "fluentd",
-						"severity": "warning",
+						"rulegroup": ruleGroupName,
+						"service":   "fluentd",
+						"severity":  "warning",
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer size prediction warning`,
