@@ -122,7 +122,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				{
 					Alert: "FluentdBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\", %s} * 100 < 10", nsJobLabel, nsJobLabel)),
+					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
@@ -136,7 +136,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				{
 					Alert: "FluentdBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf("node_filesystem_avail_bytes{mountpoint=\"/buffers\", %s} / node_filesystem_size_bytes{mountpoint=\"/buffers\" ,%s} * 100 < 5", nsJobLabel, nsJobLabel)),
+					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 5`, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
@@ -150,7 +150,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				{
 					Alert: "FluentdPredictedBufferGrowth",
-					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%s}", nsJobLabel, nsJobLabel)),
+					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%[1]s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%[1]s}", nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
