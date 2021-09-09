@@ -69,8 +69,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		containers = append(containers, *c)
 	}
 
-	return &appsv1.StatefulSetSpec{
-		Replicas:            util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
+	sts := &appsv1.StatefulSetSpec{
 		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.FluentdSpec.Scaling.PodManagementPolicy),
 		Selector: &metav1.LabelSelector{
 			MatchLabels: r.getFluentdLabels(ComponentFluentd),
@@ -98,6 +97,12 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		},
 		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 	}
+
+	if r.Logging.Spec.FluentdSpec.Scaling.Replicas > 0 {
+		sts.Replicas = util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas))
+	}
+
+	return sts
 }
 
 func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
