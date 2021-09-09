@@ -248,9 +248,6 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.Scaling == nil {
 			l.Spec.FluentdSpec.Scaling = new(FluentdScaling)
 		}
-		if l.Spec.FluentdSpec.Scaling.Replicas == 0 {
-			l.Spec.FluentdSpec.Scaling.Replicas = 1
-		}
 		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = "OrderedReady"
 		}
