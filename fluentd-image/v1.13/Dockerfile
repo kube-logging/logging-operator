@@ -1,5 +1,5 @@
 FROM alpine:3.14
-LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.13.1"
+LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.13.3"
 
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
@@ -27,16 +27,19 @@ RUN apk update \
  && gem install json -v 2.5.1 \
  && gem install async-http -v 0.56.3 \
  && gem install ext_monitor -v 0.1.2 \
- && gem install fluentd -v 1.13.1 \
+ && gem install fluentd -v 1.13.3 \
  && gem install prometheus-client -v 2.1.0 \
  && gem install bigdecimal -v 1.4.4 \
  && gem install webrick \
  && gem install gelf -v 3.0.0 \
+ # Pin the elasticsearch-ruby library < 7.14.
+ # See https://github.com/uken/fluent-plugin-elasticsearch/issues/912
+ && gem install elasticsearch -v 7.13.3 \
+ && gem install elasticsearch-xpack -v 7.13.3 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
          fluent-plugin-webhdfs \
-         fluent-plugin-elasticsearch \
          fluent-plugin-prometheus \
          fluent-plugin-s3 \
          fluent-plugin-rewrite-tag-filter \
@@ -57,7 +60,7 @@ RUN apk update \
          fluent-plugin-record-modifier \
          fluent-plugin-splunk-hec \
          fluent-plugin-newrelic \
-         elasticsearch-xpack \
+         fluent-plugin-elasticsearch \
          fluent-plugin-cloudwatch-logs \
          fluent-plugin-throttle \
          fluent-plugin-logdna \
