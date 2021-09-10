@@ -24,7 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -270,8 +270,14 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 			pvcsInUse[bufVol.PersistentVolumeClaim.ClaimName] = true
 		}
 	}
+
+	replicaCount, err := NewDataProvider(r.Client).GetReplicaCount(ctx, r.Logging)
+	if err != nil {
+		return nil, errors.WrapIf(err, "get replica count for fluentd")
+	}
+
 	// mark PVCs required for upscaling as in-use
-	for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+	for i := int32(0); i < utils.PointerToInt32(replicaCount); i++ {
 		pvcsInUse[fmt.Sprintf("%s-%s-%d", bufVolName, r.Logging.QualifiedName(StatefulSetName), i)] = true
 	}
 
