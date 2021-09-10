@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"text/template"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -212,7 +214,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if r.Logging.Spec.FluentdSpec.Scaling.Replicas > 1 && r.Logging.Spec.FluentbitSpec.Network == nil {
+	fluentdReplicas, err := r.fluentdDataProvider.GetReplicaCount(context.TODO(), r.Logging)
+	if err != nil {
+		return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
+	}
+
+	if r.Logging.Spec.FluentbitSpec.Network == nil && utils.PointerToInt32(fluentdReplicas) > 1 {
 		input.Network.KeepaliveSet = true
 		input.Network.Keepalive = true
 		input.Network.KeepaliveIdleTimeoutSet = true
@@ -225,8 +232,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if r.Logging.Spec.FluentbitSpec.EnableUpstream {
 		input.Upstream.Enabled = true
 		input.Upstream.Config.Name = "fluentd-upstream"
-
-		for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+		for i := int32(0); i < utils.PointerToInt32(fluentdReplicas); i++ {
 			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 		}
 	}
@@ -282,7 +288,7 @@ func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (r *Reconciler) generateUpstreamNode(index int) upstreamNode {
+func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 	podName := r.Logging.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,

@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
+	"github.com/banzaicloud/logging-operator/pkg/resources/fluentddataprovider"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -67,14 +68,16 @@ type DesiredObject struct {
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
-	configs map[string][]byte
+	configs             map[string][]byte
+	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
 // NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
+		fluentdDataProvider:       fluentdDataProvider,
 	}
 }
 
