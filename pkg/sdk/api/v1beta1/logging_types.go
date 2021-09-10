@@ -512,3 +512,37 @@ func init() {
 func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVolumeMode {
 	return &mode
 }
+
+// FluentdObjectMeta creates an objectMeta for resource fluentd
+func (l *Logging) FluentdObjectMeta(name, component string) metav1.ObjectMeta {
+	o := metav1.ObjectMeta{
+		Name:      l.QualifiedName(name),
+		Namespace: l.Spec.ControlNamespace,
+		Labels:    l.GetFluentdLabels(component),
+		OwnerReferences: []metav1.OwnerReference{
+			{
+				APIVersion: l.APIVersion,
+				Kind:       l.Kind,
+				Name:       l.Name,
+				UID:        l.UID,
+				Controller: util.BoolPointer(true),
+			},
+		},
+	}
+	return o
+}
+
+func (l *Logging) GetFluentdLabels(component string) map[string]string {
+	return util.MergeLabels(
+		l.Spec.FluentdSpec.Labels,
+		map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": component,
+		},
+		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+	)
+}
+
+func GenerateLoggingRefLabels(loggingRef string) map[string]string {
+	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
