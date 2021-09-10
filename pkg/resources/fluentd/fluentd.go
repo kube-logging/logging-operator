@@ -77,17 +77,6 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
-func (r *Reconciler) getFluentdLabels(component string) map[string]string {
-	return util.MergeLabels(
-		r.Logging.Spec.FluentdSpec.Labels,
-		map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": component,
-		},
-		generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()),
-	)
-}
-
 func (r *Reconciler) getServiceAccount() string {
 	if r.Logging.Spec.FluentdSpec.Security.ServiceAccount != "" {
 		return r.Logging.Spec.FluentdSpec.Security.ServiceAccount
@@ -258,7 +247,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-	fluentdLabelSet := r.getFluentdLabels(ComponentFluentd)
+	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd)
 
 	var pvcList corev1.PersistentVolumeClaimList
 	if err := r.Client.List(ctx, &pvcList, nsOpt,
@@ -287,7 +276,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	var jobList batchv1.JobList
-	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.getFluentdLabels(ComponentDrainer))); err != nil {
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer))); err != nil {
 		return nil, errors.WrapIf(err, "listing buffer drainer jobs")
 	}
 
