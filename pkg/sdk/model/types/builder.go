@@ -15,6 +15,8 @@
 package types
 
 import (
+	"encoding/json"
+
 	"emperror.dev/errors"
 )
 
@@ -66,6 +68,11 @@ func (s *SystemBuilder) RegisterDefaultFlow(f *Flow) error {
 	}
 	s.flows = append(s.flows, f)
 	s.router.Params["default_route"] = f.FlowLabel
+	metricsLabels, err := json.Marshal(map[string]string{"id": f.FlowID})
+	if err != nil {
+		return errors.Wrapf(err, "marshaling default_metrics_labels")
+	}
+	s.router.Params["default_metrics_labels"] = string(metricsLabels)
 	return nil
 }
 
