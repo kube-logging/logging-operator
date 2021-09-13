@@ -96,7 +96,7 @@ type CloudWatchOutput struct {
 	// Specified field of records as AWS tags for the log group
 	LogGroupAwsTagsKey string `json:"log_group_aws_tags_key,omitempty"`
 	// Name of log group to store logs
-	LogGroupName string `json:"log_group_name,omitempty"`
+	LogGroupName string `json:"log_group_name"`
 	// Specified field of records as log group name
 	LogGroupNameKey string `json:"log_group_name_key,omitempty"`
 	// Output rejected_log_events_info request log. (default: false)
