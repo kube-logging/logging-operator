@@ -102,7 +102,7 @@ type CloudWatchOutput struct {
 	// Output rejected_log_events_info request log. (default: false)
 	LogRejectedRequest string `json:"log_rejected_request,omitempty"`
 	// Name of log stream to store logs
-	LogStreamName string `json:"log_stream_name,omitempty"`
+	LogStreamName string `json:"log_stream_name"`
 	// Specified field of records as log stream name
 	LogStreamNameKey string `json:"log_stream_name_key,omitempty"`
 	// Maximum number of events to send at once (default: 10000)
