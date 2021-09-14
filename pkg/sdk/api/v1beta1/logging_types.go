@@ -116,7 +116,7 @@ const (
 	DefaultFluentbitImageRepository         = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                = "1.8.5"
 	DefaultFluentdImageRepository           = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag                  = "v1.13.3-alpine-4"
+	DefaultFluentdImageTag                  = "v1.13.3-alpine-5"
 	DefaultFluentdBufferStorageVolumeName   = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository = "ghcr.io/banzaicloud/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag        = "v0.0.1"
