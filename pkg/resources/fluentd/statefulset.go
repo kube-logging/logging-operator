@@ -69,11 +69,10 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		containers = append(containers, *c)
 	}
 
-	return &appsv1.StatefulSetSpec{
-		Replicas:            util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas)),
+	sts := &appsv1.StatefulSetSpec{
 		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.FluentdSpec.Scaling.PodManagementPolicy),
 		Selector: &metav1.LabelSelector{
-			MatchLabels: r.getFluentdLabels(ComponentFluentd),
+			MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd),
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: r.generatePodMeta(),
@@ -98,6 +97,12 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		},
 		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 	}
+
+	if r.Logging.Spec.FluentdSpec.Scaling.Replicas > 0 {
+		sts.Replicas = util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas))
+	}
+
+	return sts
 }
 
 func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
@@ -140,16 +145,12 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
-		Labels: r.getFluentdLabels(ComponentFluentd),
+		Labels: r.Logging.GetFluentdLabels(ComponentFluentd),
 	}
 	if r.Logging.Spec.FluentdSpec.Annotations != nil {
 		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations
 	}
 	return meta
-}
-
-func generateLoggingRefLabels(loggingRef string) map[string]string {
-	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
 func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {

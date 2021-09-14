@@ -116,7 +116,7 @@ const (
 	DefaultFluentbitImageRepository         = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                = "1.8.5"
 	DefaultFluentdImageRepository           = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag                  = "v1.13.3-alpine-4"
+	DefaultFluentdImageTag                  = "v1.13.3-alpine-5"
 	DefaultFluentdBufferStorageVolumeName   = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository = "ghcr.io/banzaicloud/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag        = "v0.0.1"
@@ -247,9 +247,6 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentdSpec.Scaling == nil {
 			l.Spec.FluentdSpec.Scaling = new(FluentdScaling)
-		}
-		if l.Spec.FluentdSpec.Scaling.Replicas == 0 {
-			l.Spec.FluentdSpec.Scaling.Replicas = 1
 		}
 		if l.Spec.FluentdSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.PodManagementPolicy = "OrderedReady"
@@ -514,4 +511,38 @@ func init() {
 
 func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVolumeMode {
 	return &mode
+}
+
+// FluentdObjectMeta creates an objectMeta for resource fluentd
+func (l *Logging) FluentdObjectMeta(name, component string) metav1.ObjectMeta {
+	o := metav1.ObjectMeta{
+		Name:      l.QualifiedName(name),
+		Namespace: l.Spec.ControlNamespace,
+		Labels:    l.GetFluentdLabels(component),
+		OwnerReferences: []metav1.OwnerReference{
+			{
+				APIVersion: l.APIVersion,
+				Kind:       l.Kind,
+				Name:       l.Name,
+				UID:        l.UID,
+				Controller: util.BoolPointer(true),
+			},
+		},
+	}
+	return o
+}
+
+func (l *Logging) GetFluentdLabels(component string) map[string]string {
+	return util.MergeLabels(
+		l.Spec.FluentdSpec.Labels,
+		map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": component,
+		},
+		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+	)
+}
+
+func GenerateLoggingRefLabels(loggingRef string) map[string]string {
+	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }

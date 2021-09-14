@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -31,6 +32,7 @@ import (
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -39,6 +41,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -67,21 +70,32 @@ func main() {
 	var enableprofile bool
 	var namespace string
 	var loggingRef string
+	var klogLevel int
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
-	flag.BoolVar(&enableprofile, "pprof", false, "enable pprof")
-	flag.StringVar(&namespace, "watch-namespace", "", "namespace to filter the list of watched objects")
-	flag.StringVar(&loggingRef, "watch-logging-name", "", "logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
+	flag.IntVar(&klogLevel, "klogLevel", 0, "Global log level for klog (0-9)")
+	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
+	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
+	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
 	flag.Parse()
 
 	ctx := context.Background()
 
-	ctrl.SetLogger(zap.New(func(o *zap.Options) {
+	zapLogger := zap.New(func(o *zap.Options) {
 		o.Development = verboseLogging
-	}))
+	})
+	ctrl.SetLogger(zapLogger)
+
+	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
+	klog.InitFlags(klogFlags)
+	err := klogFlags.Set("v", cast.ToString(klogLevel))
+	if err != nil {
+		fmt.Printf("%s - failed to set log level for klog, moving on.\n", err)
+	}
+	klog.SetLogger(zapLogger)
 
 	mgrOptions := ctrl.Options{
 		Scheme:             scheme,

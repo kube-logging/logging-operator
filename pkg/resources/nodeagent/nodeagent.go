@@ -19,6 +19,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
+	"github.com/banzaicloud/logging-operator/pkg/resources/fluentddataprovider"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
@@ -267,22 +268,25 @@ func (n *nodeAgentInstance) getServiceAccount() string {
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
-	configs map[string][]byte
+	configs             map[string][]byte
+	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
 // NewReconciler creates a new NodeAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
+		fluentdDataProvider:       fluentdDataProvider,
 	}
 }
 
 type nodeAgentInstance struct {
-	nodeAgent  *v1beta1.NodeAgent
-	reconciler *reconciler.GenericResourceReconciler
-	logging    *v1beta1.Logging
-	configs    map[string][]byte
+	nodeAgent           *v1beta1.NodeAgent
+	reconciler          *reconciler.GenericResourceReconciler
+	logging             *v1beta1.Logging
+	configs             map[string][]byte
+	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
 // Reconcile reconciles the NodeAgent resource

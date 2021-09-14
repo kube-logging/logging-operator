@@ -24,7 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -75,17 +75,6 @@ type Desire struct {
 	// BeforeUpdateHook has the ability to change the desired object
 	// or even to change the desired state in case the object should be recreated
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
-}
-
-func (r *Reconciler) getFluentdLabels(component string) map[string]string {
-	return util.MergeLabels(
-		r.Logging.Spec.FluentdSpec.Labels,
-		map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": component,
-		},
-		generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()),
-	)
 }
 
 func (r *Reconciler) getServiceAccount() string {
@@ -258,7 +247,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-	fluentdLabelSet := r.getFluentdLabels(ComponentFluentd)
+	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd)
 
 	var pvcList corev1.PersistentVolumeClaimList
 	if err := r.Client.List(ctx, &pvcList, nsOpt,
@@ -281,13 +270,19 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 			pvcsInUse[bufVol.PersistentVolumeClaim.ClaimName] = true
 		}
 	}
+
+	replicaCount, err := NewDataProvider(r.Client).GetReplicaCount(ctx, r.Logging)
+	if err != nil {
+		return nil, errors.WrapIf(err, "get replica count for fluentd")
+	}
+
 	// mark PVCs required for upscaling as in-use
-	for i := 0; i < r.Logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+	for i := int32(0); i < utils.PointerToInt32(replicaCount); i++ {
 		pvcsInUse[fmt.Sprintf("%s-%s-%d", bufVolName, r.Logging.QualifiedName(StatefulSetName), i)] = true
 	}
 
 	var jobList batchv1.JobList
-	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.getFluentdLabels(ComponentDrainer))); err != nil {
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer))); err != nil {
 		return nil, errors.WrapIf(err, "listing buffer drainer jobs")
 	}
 

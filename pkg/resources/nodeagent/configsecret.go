@@ -16,6 +16,7 @@ package nodeagent
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"text/template"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -212,7 +214,12 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		}
 	}
 
-	if n.logging.Spec.FluentdSpec.Scaling.Replicas > 1 && n.nodeAgent.FluentbitSpec.Network == nil {
+	fluentdReplicas, err := n.fluentdDataProvider.GetReplicaCount(context.TODO(), n.logging)
+	if err != nil {
+		return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
+	}
+
+	if n.nodeAgent.FluentbitSpec.Network == nil && utils.PointerToInt32(fluentdReplicas) > 1 {
 		input.Network.KeepaliveSet = true
 		input.Network.Keepalive = true
 		input.Network.KeepaliveIdleTimeoutSet = true
@@ -222,11 +229,11 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		log.Log.Info("Notice: Because the Fluentd statefulset has been scaled, we've made some changes in the fluentbit network config too. We advice to revise these default configurations.")
 	}
 
-	if n.nodeAgent.FluentbitSpec.EnableUpstream != nil && *n.nodeAgent.FluentbitSpec.EnableUpstream {
+	if utils.PointerToBool(n.nodeAgent.FluentbitSpec.EnableUpstream) {
 		input.Upstream.Enabled = true
 		input.Upstream.Config.Name = "fluentd-upstream"
 
-		for i := 0; i < n.logging.Spec.FluentdSpec.Scaling.Replicas; i++ {
+		for i := int32(0); i < utils.PointerToInt32(fluentdReplicas); i++ {
 			input.Upstream.Config.Nodes = append(input.Upstream.Config.Nodes, n.generateUpstreamNode(i))
 		}
 	}
@@ -282,7 +289,7 @@ func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (n *nodeAgentInstance) generateUpstreamNode(index int) upstreamNode {
+func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 	podName := n.FluentdQualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
