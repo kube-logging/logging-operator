@@ -5,5 +5,9 @@ metadata:
 spec:
   fluentd:
     disablePvc: true
+    resources:
+      requests:
+        cpu: 0
+        memory: 0
   fluentbit: {}
   controlNamespace: default

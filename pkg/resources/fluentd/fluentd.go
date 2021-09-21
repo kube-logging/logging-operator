@@ -34,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/selection"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -124,6 +125,22 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return result, nil
 		}
 	}
+
+	// Update Status with number of ready fluentd replicas
+	statefulset := &appsv1.StatefulSet{}
+	err := r.Client.Get(context.TODO(), types.NamespacedName{
+		Name:      r.FluentdObjectMeta(StatefulSetName, ComponentFluentd).Name,
+		Namespace: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd).Namespace}, statefulset)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Logging.Status.FluentdReadyReplicas = int(statefulset.Status.ReadyReplicas)
+
+	if err := r.Client.Status().Update(ctx, r.Logging); err != nil {
+		return nil, errors.WrapWithDetails(err, "failed to update status", "logging", r.Logging)
+	}
+
 	// Config check and cleanup if enabled
 	if !r.Logging.Spec.FlowConfigCheckDisabled { //nolint:nestif
 		hash, err := r.configHash()

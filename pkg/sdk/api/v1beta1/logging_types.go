@@ -76,11 +76,13 @@ type LoggingSpec struct {
 
 // LoggingStatus defines the observed state of Logging
 type LoggingStatus struct {
-	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
+	ConfigCheckResults   map[string]bool `json:"configCheckResults,omitempty"`
+	FluentdReadyReplicas int             `json:"fluentdReadyReplicas,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:subresource:scale:specpath=.spec.fluentd.scaling.replicas,statuspath=.status.fluentdReadyReplicas
 // +kubebuilder:resource:path=loggings,scope=Cluster,categories=logging-all
 // +kubebuilder:storageversion
 

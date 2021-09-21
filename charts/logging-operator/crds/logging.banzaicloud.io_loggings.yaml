@@ -8049,6 +8049,8 @@ spec:
                 additionalProperties:
                   type: boolean
                 type: object
+              fluentdReadyReplicas:
+                type: integer
             type: object
         type: object
     served: true
@@ -16086,11 +16088,16 @@ spec:
                 additionalProperties:
                   type: boolean
                 type: object
+              fluentdReadyReplicas:
+                type: integer
             type: object
         type: object
     served: true
     storage: true
     subresources:
+      scale:
+        specReplicasPath: .spec.fluentd.scaling.replicas
+        statusReplicasPath: .status.fluentdReadyReplicas
       status: {}
 status:
   acceptedNames:
