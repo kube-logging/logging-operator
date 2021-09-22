@@ -31,8 +31,8 @@ type Logging struct {
 	Status LoggingStatus `json:"status,omitempty"`
 }
 
-type LoggingSpec struct {}
-type LoggingStatus struct {}
+type LoggingSpec struct{}
+type LoggingStatus struct{}
 
 // +kubebuilder:object:root=true
 
