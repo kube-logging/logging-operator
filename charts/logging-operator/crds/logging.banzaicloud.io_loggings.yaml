@@ -359,6 +359,15 @@ spec:
                                 type: object
                               type: array
                           type: object
+                        kube_events_timestamp:
+                          properties:
+                            mapped_time_key:
+                              type: string
+                            timestamp_fields:
+                              items:
+                                type: string
+                              type: array
+                          type: object
                         parser:
                           properties:
                             emit_invalid_record_to_error:
@@ -3900,6 +3909,15 @@ spec:
                             - key
                             - pattern
                             type: object
+                          type: array
+                      type: object
+                    kube_events_timestamp:
+                      properties:
+                        mapped_time_key:
+                          type: string
+                        timestamp_fields:
+                          items:
+                            type: string
                           type: array
                       type: object
                     parser:
