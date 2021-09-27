@@ -61,7 +61,7 @@ buffer:
 	  queue_limit_length 4096
 	  retry_forever true
       timekey 10m
-      timekey_wait 10m
+      timekey_wait 1m
     </buffer>
   </match>
 `
