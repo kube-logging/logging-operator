@@ -617,7 +617,7 @@ func TestRenderS3(t *testing.T) {
 						path asd
 						retry_forever true
 						timekey 10m
-						timekey_wait 10m
+						timekey_wait 1m
 						</buffer>
 						<assume_role_credentials>
 							role_arn asd
@@ -642,7 +642,7 @@ func TestRenderS3(t *testing.T) {
 							path /buffers/test.*.buffer
 							retry_forever true
 							timekey 10m
-							timekey_wait 10m
+							timekey_wait 1m
         				</buffer>
 						<instance_profile_credentials>
 						</instance_profile_credentials>`,
@@ -668,7 +668,7 @@ func TestRenderS3(t *testing.T) {
 							path /buffers/test.*.buffer
 							retry_forever true
 							timekey 10m
-							timekey_wait 10m
+							timekey_wait 1m
         				</buffer>
 						<shared_credentials>
 							path e
@@ -694,7 +694,7 @@ func TestRenderS3(t *testing.T) {
 						path /buffers/test.*.buffer
 						retry_forever true
 						timekey 10m
-						timekey_wait 10m
+						timekey_wait 1m
 						</buffer>`,
 		},
 	}

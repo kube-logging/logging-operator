@@ -50,7 +50,7 @@ buffer:
       retry_forever true
       retry_max_interval 30
       timekey 10m
-      timekey_wait 10m
+      timekey_wait 1m
     </buffer>
   </match>
 `
