@@ -75,6 +75,8 @@ RUN apk update \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-sumologic \
+ # https://github.com/SumoLogic/sumologic-kubernetes-fluentd/blob/main/Dockerfile#L27
+ && gem specific_install https://github.com/abonas/kubeclient --ref 3267dc3fd02c49e3b19f1210ff7cb84c3b2a4478 \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
 
