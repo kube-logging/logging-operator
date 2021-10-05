@@ -79,15 +79,12 @@ type EnhanceK8s struct {
 // #### Example `EnhanceK8s` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
+//kind: Logging
 //metadata:
 //  name: demo-flow
 //spec:
-//  filters:
-//    - enhanceK8s: {]
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+//  globalFilters:
+//    - enhanceK8s: {}
 // ```
 //
 // #### Fluentd Config Result
