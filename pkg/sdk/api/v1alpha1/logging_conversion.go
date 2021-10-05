@@ -25,8 +25,6 @@ func (o *Logging) ConvertTo(dstRaw conversion.Hub) error {
 	Log.Info("ConvertTo", "source", o.TypeMeta, "destination", dst.TypeMeta)
 
 	dst.ObjectMeta = o.ObjectMeta
-	dst.Spec = o.Spec
-	dst.Status = o.Status
 
 	return nil
 }
@@ -37,8 +35,6 @@ func (o *Logging) ConvertFrom(srcRaw conversion.Hub) error {
 	Log.Info("ConvertFrom", "source", src.TypeMeta, "destination", o.TypeMeta)
 
 	o.ObjectMeta = src.ObjectMeta
-	o.Spec = src.Spec
-	o.Status = src.Status
 
 	return nil
 }

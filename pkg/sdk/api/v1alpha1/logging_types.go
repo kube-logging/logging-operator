@@ -15,7 +15,6 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,9 +27,12 @@ type Logging struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   v1beta1.LoggingSpec   `json:"spec,omitempty"`
-	Status v1beta1.LoggingStatus `json:"status,omitempty"`
+	Spec   LoggingSpec   `json:"spec,omitempty"`
+	Status LoggingStatus `json:"status,omitempty"`
 }
+
+type LoggingSpec struct{}
+type LoggingStatus struct{}
 
 // +kubebuilder:object:root=true
 

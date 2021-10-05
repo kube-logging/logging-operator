@@ -88,7 +88,7 @@ license-cache: bin/licensei ## Generate license cache
 
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run
+	bin/golangci-lint run --timeout 2m
 	cd pkg/sdk && ../../bin/golangci-lint run  -c ../../.golangci.yml
 
 .PHONY: lint-fix
