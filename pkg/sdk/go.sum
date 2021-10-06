@@ -87,8 +87,8 @@ github.com/aws/aws-sdk-go v1.27.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN
 github.com/aws/aws-sdk-go-v2 v0.18.0/go.mod h1:JWVYvqSMppoMJC0x5wdwiImzgXTI9FuZwxzkQq9wy+g=
 github.com/banzaicloud/k8s-objectmatcher v1.5.1 h1:u3Ic1JzIUQe0pGGjVQJvCWTNa+t9CiW49IPPovYqAss=
 github.com/banzaicloud/k8s-objectmatcher v1.5.1/go.mod h1:9MWY5HsM/OaTmoTirczhlO8UALbH722WgdpaaR7Y8OE=
-github.com/banzaicloud/operator-tools v0.25.2 h1:7uIdZgfp+NSh/XOsSTDuC1nKoUifSFN/d3LCTaAr/IY=
-github.com/banzaicloud/operator-tools v0.25.2/go.mod h1:7ZdB3pqJMbrhqQa1LSBR65Vyta2L9UDUGWKjCs+zSnk=
+github.com/banzaicloud/operator-tools v0.25.4 h1:w0TMKFx0tSYpQXYIDNEHHI5l+b9GbK7j843e4yu0zxo=
+github.com/banzaicloud/operator-tools v0.25.4/go.mod h1:7ZdB3pqJMbrhqQa1LSBR65Vyta2L9UDUGWKjCs+zSnk=
 github.com/banzaicloud/vfsgen v0.0.0-20200203103248-c48ce8603af1 h1:mU1NWbBhWFQmpc4Vop9XWWHQQ3wINvZT666c3OX52Cw=
 github.com/banzaicloud/vfsgen v0.0.0-20200203103248-c48ce8603af1/go.mod h1:kkOp3NatLFRDKepb9dRDhgu5JWLahgVGIHiCW7wufv0=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
