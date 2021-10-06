@@ -21,19 +21,19 @@ import (
 
 // +name:"Grep"
 // +weight:"200"
-type _hugoGrep interface{}
+type _hugoGrep interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Grep Filter](https://docs.fluentd.org/filter/grep)"
 // The grep filter plugin "greps" events by the values of specified fields.
-type _docGrep interface{}
+type _docGrep interface{} //nolint:deadcode,unused
 
 // +name:"Grep"
 // +url:"https://docs.fluentd.org/filter/grep"
 // +version:"more info"
 // +description:"Grep events by the values"
 // +status:"GA"
-type _metaGrep interface{}
+type _metaGrep interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GrepConfig struct {
@@ -85,7 +85,7 @@ type RegexpSection struct {
 //    </regexp>
 //  </filter>
 // ```
-type _expRegexp interface{}
+type _expRegexp interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Exclude Directive](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive) {#Exclude-Directive}"
@@ -125,7 +125,7 @@ type ExcludeSection struct {
 //    </exclude>
 //  </filter>
 // ```
-type _expExclude interface{}
+type _expExclude interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Or Directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive) {#Or-Directive}"
@@ -171,7 +171,7 @@ type OrSection struct {
 //      </exclude>
 //    </or>
 // ```
-type _expOR interface{}
+type _expOR interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[And Directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive) {#And-Directive}"
@@ -217,7 +217,7 @@ type AndSection struct {
 //      </regexp>
 //    </and>
 // ```
-type _expAND interface{}
+type _expAND interface{} //nolint:deadcode,unused
 
 func (r *RegexpSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	meta := types.PluginMeta{

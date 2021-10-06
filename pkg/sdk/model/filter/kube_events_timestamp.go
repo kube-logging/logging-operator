@@ -21,19 +21,19 @@ import (
 
 // +name:"Kubernetes Events Timestamp"
 // +weight:"200"
-type _hugoKubeEventsTimestamp interface{}
+type _hugoKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Kubernetes Events Timestamp Filter](https://github.com/banzaicloud/fluentd-filter-kube-events-timestamp)"
 // Fluentd Filter plugin to select particular timestamp into an additional field
-type _docKubeEventsTimestamp interface{}
+type _docKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 // +name:"Kubernetes Events Timestamp"
 // +url:"https://github.com/banzaicloud/fluentd-filter-kube-events-timestamp"
 // +version:"0.1.4"
 // +description:"Fluentd Filter plugin to select particular timestamp into an additional field"
 // +status:"GA"
-type _metaKubeEventsTimestamp interface{}
+type _metaKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type KubeEventsTimestampConfig struct {
@@ -71,7 +71,7 @@ type KubeEventsTimestampConfig struct {
 // mapped_time_key mytimefield
 // </filter>
 // ```
-type _expKubeEventsTimestamp interface{}
+type _expKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 func NewKubeEventsTimestampConfig() *KubeEventsTimestampConfig {
 	return &KubeEventsTimestampConfig{}

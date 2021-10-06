@@ -23,7 +23,7 @@ import (
 
 // +name:"NewRelic"
 // +weight:"200"
-type _hugoNewRelic interface{}
+type _hugoNewRelic interface{} //nolint:deadcode,unused
 
 // +docName:"New Relic Logs plugin for Fluentd"
 //**newrelic** output plugin send log data to New Relic Logs
@@ -38,14 +38,14 @@ type _hugoNewRelic interface{}
 //           name: logging-newrelic
 //           key: licenseKey
 // ```
-type _docNewRelic interface{}
+type _docNewRelic interface{} //nolint:deadcode,unused
 
 // +name:"NewRelic Logs"
 // +url:"https://github.com/newrelic/newrelic-fluentd-output"
 // +version:"1.2.1"
 // +description:"Send logs to New Relic Logs"
 // +status:"GA"
-type _metaNewRelic interface{}
+type _metaNewRelic interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

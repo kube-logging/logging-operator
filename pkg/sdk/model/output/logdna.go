@@ -21,19 +21,19 @@ import (
 
 // +name:"LogDNA"
 // +weight:"200"
-type _hugoLogDNA interface{}
+type _hugoLogDNA interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[LogDNA Output](https://github.com/logdna/fluent-plugin-logdna)"
 // This plugin has been designed to output logs to LogDNA. Example Deployment: [Transport Nginx Access Logs into LogDNA with Logging Operator](https://raw.githubusercontent.com/banzaicloud/logging-operator/master/docs/examples/logging_output_logdna.yaml)
-type _docLogDNA interface{}
+type _docLogDNA interface{} //nolint:deadcode,unused
 
 // +name:"LogDNA"
 // +url:"https://github.com/logdna/fluent-plugin-logdna/releases/tag/v0.4.0"
 // +version:"0.4.0"
 // +description:"Send your logs to LogDNA"
 // +status:"GA"
-type _metaLogDNA interface{}
+type _metaLogDNA interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"LogDNA"
@@ -83,7 +83,7 @@ type LogDNAOutput struct {
 //	hostname logging-operator
 //</match>
 // ```
-type _expLogDNA interface{}
+type _expLogDNA interface{} //nolint:deadcode,unused
 
 func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "logdna"

@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConcat(t *testing.T) {
@@ -39,7 +40,7 @@ n_lines: 10
 </filter>
 `
 	parser := &filter.Concat{}
-	yaml.Unmarshal(CONFIG, parser)
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }

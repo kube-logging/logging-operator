@@ -21,18 +21,18 @@ import (
 
 // +name:"SumoLogic"
 // +weight:"200"
-type _hugoSumoLogic interface{}
+type _hugoSumoLogic interface{} //nolint:deadcode,unused
 
 // +docName:"Sumo Logic collection solution for Kubernetes"
 //More info at https://github.com/SumoLogic/sumologic-kubernetes-collection
-type _docSumologic interface{}
+type _docSumologic interface{} //nolint:deadcode,unused
 
 // +name:"SumoLogic"
 // +url:"https://github.com/SumoLogic/sumologic-kubernetes-collection"
 // +version:"2.3.1"
 // +description:"Sumo Logic collection solution for Kubernetes"
 // +status:"GA"
-type _metaSumologic interface{}
+type _metaSumologic interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SumoLogic struct {
@@ -113,7 +113,7 @@ type SumoLogic struct {
 //  source_name elso
 //</filter>
 // ```
-type _expSumologic interface{}
+type _expSumologic interface{} //nolint:deadcode,unused
 
 func (s *SumoLogic) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "kubernetes_sumologic"

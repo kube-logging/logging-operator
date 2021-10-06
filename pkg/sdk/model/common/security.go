@@ -20,10 +20,10 @@ import (
 
 // +name:"Security"
 // +weight:"200"
-type _hugoSecurity interface{}
+type _hugoSecurity interface{} //nolint:deadcode,unused
 
 // +name:"Security"
-type _metaSecurity interface{}
+type _metaSecurity interface{} //nolint:deadcode,unused
 
 type Security struct {
 	// Hostname

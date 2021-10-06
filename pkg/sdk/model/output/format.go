@@ -21,14 +21,14 @@ import (
 
 // +name:"Format"
 // +weight:"200"
-type _hugoFormat interface{}
+type _hugoFormat interface{} //nolint:deadcode,unused
 
 // +name:"Format"
 // +url:"https://docs.fluentd.org/configuration/format-section"
 // +version:"more info"
 // +description:"Specify how to format output record."
 // +status:"GA"
-type _metaFormat interface{}
+type _metaFormat interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type Format struct {

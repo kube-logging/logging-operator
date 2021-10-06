@@ -21,19 +21,19 @@ import (
 
 // +name:"Record Modifier"
 // +weight:"200"
-type _hugoRecordModifier interface{}
+type _hugoRecordModifier interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Record Modifier](https://github.com/repeatedly/fluent-plugin-record-modifier)"
 // Modify each event record.
-type _docRecordModifier interface{}
+type _docRecordModifier interface{} //nolint:deadcode,unused
 
 // +name:"Record Modifier"
 // +url:"https://github.com/repeatedly/fluent-plugin-record-modifier"
 // +version:"2.1.0"
 // +description:"Modify each event record."
 // +status:"GA"
-type _metaRecordModifier interface{}
+type _metaRecordModifier interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RecordModifier struct {
@@ -78,7 +78,7 @@ type RecordModifier struct {
 //  </record>
 //</filter>
 // ```
-type _expRecordModifier interface{}
+type _expRecordModifier interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Replace Directive](https://github.com/repeatedly/fluent-plugin-record-modifier#replace_keys_value)"

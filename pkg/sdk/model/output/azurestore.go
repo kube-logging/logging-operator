@@ -21,19 +21,19 @@ import (
 
 // +name:"Azure Storage"
 // +weight:"200"
-type _hugoAzure interface{}
+type _hugoAzure interface{} //nolint:deadcode,unused
 
 // +docName:"Azure Storage output plugin for Fluentd"
 //Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
 //More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
-type _docAzure interface{}
+type _docAzure interface{} //nolint:deadcode,unused
 
 // +name:"Azure Storage"
 // +url:"https://github.com/microsoft/fluent-plugin-azure-storage-append-blob"
 // +version:"0.2.1"
 // +description:"Store logs in Azure Storage"
 // +status:"GA"
-type _metaAzure interface{}
+type _metaAzure interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

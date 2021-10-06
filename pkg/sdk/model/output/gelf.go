@@ -21,19 +21,19 @@ import (
 
 // +name:"GELF"
 // +weight:"200"
-type _hugoGELF interface{}
+type _hugoGELF interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[GELF Output](https://github.com/hotschedules/fluent-plugin-gelf-hs)"
 // Fluentd output plugin for GELF.
-type _docGELF interface{}
+type _docGELF interface{} //nolint:deadcode,unused
 
 // +name:"Gelf"
 // +url:"https://github.com/hotschedules/fluent-plugin-gelf-hs"
 // +version:"1.0.8"
 // +description:"Output plugin writes events to GELF"
 // +status:"Testing"
-type _metaGelf interface{}
+type _metaGelf interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
@@ -91,7 +91,7 @@ type GELFOutputConfig struct {
 //	</buffer>
 //  </match>
 // ```
-type _expGELF interface{}
+type _expGELF interface{} //nolint:deadcode,unused
 
 func (s *GELFOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "gelf"

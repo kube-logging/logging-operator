@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestElasticSearch(t *testing.T) {
@@ -60,7 +61,7 @@ buffer:
   </match>
 `
 	es := &output.ElasticsearchOutput{}
-	yaml.Unmarshal(CONFIG, es)
+	require.NoError(t, yaml.Unmarshal(CONFIG, es))
 	test := render.NewOutputPluginTest(t, es)
 	test.DiffResult(expected)
 }

@@ -21,19 +21,19 @@ import (
 
 // +name:"Enhance K8s Metadata"
 // +weight:"200"
-type _hugoEnhanceK8s interface{}
+type _hugoEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Enhance K8s Metadata](https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata)"
 // Fluentd Filter plugin to fetch several metadata for a Pod
-type _docEnhanceK8s interface{}
+type _docEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +name:"Enhance K8s Metadata"
 // +url:"https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata"
 // +version:"2.0.0"
 // +description:"Fluentd output plugin to add extra Kubernetes metadata to the events."
 // +status:"GA"
-type _metaEnhanceK8s interface{}
+type _metaEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type EnhanceK8s struct {
@@ -94,7 +94,7 @@ type EnhanceK8s struct {
 //  @id test_enhanceK8s
 //</filter>
 // ```
-type _expEnhanceK8s interface{}
+type _expEnhanceK8s interface{} //nolint:deadcode,unused
 
 func (c *EnhanceK8s) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "enhance_k8s_metadata"

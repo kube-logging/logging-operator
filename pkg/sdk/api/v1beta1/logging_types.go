@@ -29,7 +29,7 @@ import (
 
 // +name:"LoggingSpec"
 // +weight:"200"
-type _hugoLoggingSpec interface{}
+type _hugoLoggingSpec interface{} //nolint:deadcode,unused
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
@@ -37,7 +37,7 @@ type _hugoLoggingSpec interface{}
 // +name:"Logging"
 // +version:"v1beta1"
 // +description:"Logging system configuration"
-type _metaLoggingSpec interface{}
+type _metaLoggingSpec interface{} //nolint:deadcode,unused
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {

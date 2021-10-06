@@ -21,14 +21,14 @@ import (
 
 // +name:"Null"
 // +weight:"200"
-type _hugoNull interface{}
+type _hugoNull interface{} //nolint:deadcode,unused
 
 // +name:"Null"
 // +url:"https://docs.fluentd.org/output/null"
 // +version:"more info"
 // +description:"Null output plugin just throws away events."
 // +status:"GA"
-type _metaNull interface{}
+type _metaNull interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 

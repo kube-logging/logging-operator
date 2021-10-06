@@ -21,7 +21,7 @@ import (
 
 // +name:"Exception Detector"
 // +weight:"200"
-type _hugoExceptionDetector interface{}
+type _hugoExceptionDetector interface{} //nolint:deadcode,unused
 
 // +docName:"Exception Detector"
 //This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
@@ -36,14 +36,14 @@ type _hugoExceptionDetector interface{}
 //      languages: java, python
 //      multiline_flush_interval: 0.1
 // ```
-type _docExceptionDetector interface{}
+type _docExceptionDetector interface{} //nolint:deadcode,unused
 
 // +name:"Exception Detector"
 // +url:"https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions"
 // +version:"0.0.13"
 // +description:"Exception Detector"
 // +status:"GA"
-type _metaDDetectExceptions interface{}
+type _metaDDetectExceptions interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type DetectExceptions struct {
@@ -91,7 +91,7 @@ type DetectExceptions struct {
 //  remove_tag_prefix kubernetes
 //</match>
 // ```
-type _expDetectExceptions interface{}
+type _expDetectExceptions interface{} //nolint:deadcode,unused
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "detect_exceptions"

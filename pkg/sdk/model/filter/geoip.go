@@ -21,19 +21,19 @@ import (
 
 // +name:"Geo IP"
 // +weight:"200"
-type _hugoGeoIP interface{}
+type _hugoGeoIP interface{} //nolint:deadcode,unused
 
 // +docName:"Fluentd GeoIP filter"
 // Fluentd Filter plugin to add information about geographical location of IP addresses with Maxmind GeoIP databases.
 // More information at https://github.com/y-ken/fluent-plugin-geoip
-type _docGeoIP interface{}
+type _docGeoIP interface{} //nolint:deadcode,unused
 
 // +name:"Geo IP"
 // +url:"https://github.com/y-ken/fluent-plugin-geoip"
 // +version:"1.3.2"
 // +description:"Fluentd GeoIP filter"
 // +status:"GA"
-type _metaGeoIP interface{}
+type _metaGeoIP interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GeoIP struct {
@@ -88,7 +88,7 @@ type GeoIP struct {
 //  </record>
 //</filter>
 // ```
-type _expGeoIP interface{}
+type _expGeoIP interface{} //nolint:deadcode,unused
 
 func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "geoip"

@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestKubeEventsTimestamp(t *testing.T) {
@@ -40,7 +41,7 @@ timestamp_fields ["event.eventTime","event.lastTimestamp","event.firstTimestamp"
 </filter>
 `
 	parser := &filter.KubeEventsTimestampConfig{}
-	yaml.Unmarshal(CONFIG, parser)
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }

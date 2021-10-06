@@ -129,7 +129,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	fluentbitInput.Values = fluentbitInputValues
 
-	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter == true
+	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter
 
 	if !disableKubernetesFilter {
 		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize == "" {

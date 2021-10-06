@@ -21,7 +21,7 @@ import (
 
 // +name:"Amazon Kinesis"
 // +weight:"200"
-type _hugoKinesisStream interface{}
+type _hugoKinesisStream interface{} //nolint:deadcode,unused
 
 // +docName:"Kinesis Stream output plugin for Fluentd"
 //  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
@@ -35,14 +35,14 @@ type _hugoKinesisStream interface{}
 //     format:
 //       type: json
 // ```
-type _docKinesisStream interface{}
+type _docKinesisStream interface{} //nolint:deadcode,unused
 
 // +name:"Amazon Kinesis Stream"
 // +url:"https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.4.0"
 // +version:"3.4.0"
 // +description:"Fluent plugin for Amazon Kinesis"
 // +status:"GA"
-type _metaKinesis interface{}
+type _metaKinesis interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"KinesisStream"

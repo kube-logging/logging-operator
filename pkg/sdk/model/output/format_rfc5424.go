@@ -21,14 +21,14 @@ import (
 
 // +name:"Format rfc5424"
 // +weight:"200"
-type _hugoFormatRfc5424 interface{}
+type _hugoFormatRfc5424 interface{} //nolint:deadcode,unused
 
 // +name:"Format rfc5424"
 // +url:"https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424#format-section"
 // +version:"more info"
 // +description:"Specify how to format output record."
 // +status:"GA"
-type _metaFormatRfc5424 interface{}
+type _metaFormatRfc5424 interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type FormatRfc5424 struct {

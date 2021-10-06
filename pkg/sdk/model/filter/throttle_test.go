@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestThrottle(t *testing.T) {
@@ -40,7 +41,7 @@ group_reset_rate_s: 100
 </filter>
 `
 	parser := &filter.Throttle{}
-	yaml.Unmarshal(CONFIG, parser)
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }

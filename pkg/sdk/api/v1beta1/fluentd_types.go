@@ -23,12 +23,12 @@ import (
 
 // +name:"FluentdSpec"
 // +weight:"200"
-type _hugoFluentdSpec interface{}
+type _hugoFluentdSpec interface{} //nolint:deadcode,unused
 
 // +name:"FluentdSpec"
 // +version:"v1beta1"
 // +description:"FluentdSpec defines the desired state of Fluentd"
-type _metaFluentdSpec interface{}
+type _metaFluentdSpec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 

@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFileOutputConfig(t *testing.T) {
@@ -50,7 +51,7 @@ buffer:
   </match>
 `
 	f := &output.FileOutputConfig{}
-	yaml.Unmarshal(CONFIG, f)
+	require.NoError(t, yaml.Unmarshal(CONFIG, f))
 	test := render.NewOutputPluginTest(t, f)
 	test.DiffResult(expected)
 }
