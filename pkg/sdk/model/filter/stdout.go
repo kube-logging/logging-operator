@@ -21,19 +21,19 @@ import (
 
 // +name:"StdOut"
 // +weight:"200"
-type _hugoStdOut interface{}
+type _hugoStdOut interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Stdout Filter](https://docs.fluentd.org/filter/stdout)"
 // Fluentd Filter plugin to print events to stdout
-type _docStdOut interface{}
+type _docStdOut interface{} //nolint:deadcode,unused
 
 // +name:"Stdout"
 // +url:"https://docs.fluentd.org/filter/stdout"
 // +version:"more info"
 // +description:"Prints events to stdout"
 // +status:"GA"
-type _metaStdOut interface{}
+type _metaStdOut interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type StdOutFilterConfig struct {
@@ -64,7 +64,7 @@ type StdOutFilterConfig struct {
 //  output_type json
 //</filter>
 // ```
-type _expStdOut interface{}
+type _expStdOut interface{} //nolint:deadcode,unused
 
 func NewStdOutFilterConfig() *StdOutFilterConfig {
 	return &StdOutFilterConfig{}

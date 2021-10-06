@@ -21,14 +21,14 @@ import (
 
 // +name:"Google Cloud Storage"
 // +weight:"200"
-type _hugoGCS interface{}
+type _hugoGCS interface{} //nolint:deadcode,unused
 
 // +name:"Google Cloud Storage"
 // +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
 // +version:"0.4.0"
 // +description:"Store logs in Google Cloud Storage"
 // +status:"GA"
-type _metaGCS interface{}
+type _metaGCS interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GCSOutput struct {

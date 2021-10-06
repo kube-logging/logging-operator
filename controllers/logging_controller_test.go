@@ -43,7 +43,6 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var (
@@ -1179,8 +1178,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Flow"))
 
 	var stopped bool
-	var wrappedReconciler reconcile.Reconciler
-	wrappedReconciler = duplicateRequest(t, flowReconciler, &stopped, errors)
+	wrappedReconciler := duplicateRequest(t, flowReconciler, &stopped, errors)
 
 	err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager").WithName("Setup")).
 		Named(uuid.New()[:8]).Complete(wrappedReconciler)

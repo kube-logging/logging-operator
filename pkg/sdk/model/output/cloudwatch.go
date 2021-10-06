@@ -21,7 +21,7 @@ import (
 
 // +name:"Amazon CloudWatch"
 // +weight:"200"
-type _hugoCloudWatch interface{}
+type _hugoCloudWatch interface{} //nolint:deadcode,unused
 
 // +docName:"CloudWatch output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to Amazon CloudWatch.
@@ -50,14 +50,14 @@ type _hugoCloudWatch interface{}
 //      timekey_wait: 30s
 //      timekey_use_utc: true
 // ```
-type _docCloudWatch interface{}
+type _docCloudWatch interface{} //nolint:deadcode,unused
 
 // +name:"Amazon CloudWatch"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.14.0"
 // +version:"0.14.0"
 // +description:"Send your logs to AWS CloudWatch"
 // +status:"GA"
-type _metaCloudWatch interface{}
+type _metaCloudWatch interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

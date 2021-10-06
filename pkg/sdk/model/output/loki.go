@@ -22,7 +22,7 @@ import (
 
 // +name:"Grafana Loki"
 // +weight:"200"
-type _hugoLoki interface{}
+type _hugoLoki interface{} //nolint:deadcode,unused
 
 // +docName:"Loki output plugin "
 //Fluentd output plugin to ship logs to a Loki server.
@@ -39,14 +39,14 @@ type _hugoLoki interface{}
 //       timekey_wait: 30s
 //       timekey_use_utc: true
 // ```
-type _docLoki interface{}
+type _docLoki interface{} //nolint:deadcode,unused
 
 // +name:"Grafana Loki"
 // +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
 // +version:"1.2.16"
 // +description:"Transfer logs to Loki"
 // +status:"GA"
-type _metaLoki interface{}
+type _metaLoki interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

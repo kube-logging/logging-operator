@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAzureStore(t *testing.T) {
@@ -50,7 +51,7 @@ buffer:
   </match>
 `
 	azure := &output.AzureStorage{}
-	yaml.Unmarshal(CONFIG, azure)
+	require.NoError(t, yaml.Unmarshal(CONFIG, azure))
 	test := render.NewOutputPluginTest(t, azure)
 	test.DiffResult(expected)
 }

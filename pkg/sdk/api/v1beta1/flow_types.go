@@ -21,12 +21,12 @@ import (
 
 // +name:"FlowSpec"
 // +weight:"200"
-type _hugoFlowSpec interface{}
+type _hugoFlowSpec interface{} //nolint:deadcode,unused
 
 // +name:"FlowSpec"
 // +version:"v1beta1"
 // +description:"FlowSpec is the Kubernetes spec for Flows"
-type _metaFlowSpec interface{}
+type _metaFlowSpec interface{} //nolint:deadcode,unused
 
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {

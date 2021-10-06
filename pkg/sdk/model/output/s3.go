@@ -24,7 +24,7 @@ import (
 
 // +name:"Amazon S3"
 // +weight:"200"
-type _hugoS3 interface{}
+type _hugoS3 interface{} //nolint:deadcode,unused
 
 // +docName:"Amazon S3 plugin for Fluentd"
 //**s3** output plugin buffers event logs in local file and upload it to S3 periodically. This plugin splits files exactly by using the time of event logs (not the time when the logs are received). For example, a log '2011-01-02 message B' is reached, and then another log '2011-01-03 message B' is reached in this order, the former one is stored in "20110102.gz" file, and latter one in "20110103.gz" file.
@@ -52,14 +52,14 @@ type _hugoS3 interface{}
 //      timekey_wait: 30s
 //      timekey_use_utc: true*/
 // ```
-type _docS3 interface{}
+type _docS3 interface{} //nolint:deadcode,unused
 
 // +name:"Amazon S3"
 // +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.6.1"
 // +version:"1.6.1"
 // +description:"Store logs in Amazon S3"
 // +status:"GA"
-type _metaS3 interface{}
+type _metaS3 interface{} //nolint:deadcode,unused
 
 const (
 	OneEyeTags            string = "tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name"

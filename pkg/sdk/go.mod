@@ -14,6 +14,7 @@ require (
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.43.0
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd
 	github.com/spf13/cast v1.3.1
+	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.18.1
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
 	k8s.io/api v0.21.3

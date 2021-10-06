@@ -20,10 +20,10 @@ import (
 
 // +name:"Transport"
 // +weight:"200"
-type _hugoTransport interface{}
+type _hugoTransport interface{} //nolint:deadcode,unused
 
 // +name:"Transport"
-type _metaTransport interface{}
+type _metaTransport interface{} //nolint:deadcode,unused
 
 type Transport struct {
 	// Protocol Default: :tcp

@@ -24,12 +24,12 @@ import (
 
 // +name:"FluentbitSpec"
 // +weight:"200"
-type _hugoFluentbitSpec interface{}
+type _hugoFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +name:"FluentbitSpec"
 // +version:"v1beta1"
 // +description:"FluentbitSpec defines the desired state of Fluentbit"
-type _metaFluentbitSpec interface{}
+type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 

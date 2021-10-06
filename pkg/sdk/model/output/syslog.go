@@ -21,19 +21,19 @@ import (
 
 // +name:"Syslog"
 // +weight:"200"
-type _hugoSyslog interface{}
+type _hugoSyslog interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Syslog Output](https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424)"
 // Fluentd output plugin for remote syslog with RFC5424 headers logs.
-type _docSyslog interface{}
+type _docSyslog interface{} //nolint:deadcode,unused
 
 // +name:"Syslog"
 // +url:"https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424"
 // +version:"0.9.0.rc.8"
 // +description:"Output plugin writes events to syslog"
 // +status:"GA"
-type _metaSyslog interface{}
+type _metaSyslog interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SyslogOutputConfig struct {
@@ -94,7 +94,7 @@ type SyslogOutputConfig struct {
 //	</buffer>
 //  </match>
 // ```
-type _expSyslog interface{}
+type _expSyslog interface{} //nolint:deadcode,unused
 
 func (s *SyslogOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "syslog_rfc5424"

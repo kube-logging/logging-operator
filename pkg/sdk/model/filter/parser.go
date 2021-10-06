@@ -24,19 +24,19 @@ import (
 
 // +name:"Parser"
 // +weight:"200"
-type _hugoParser interface{}
+type _hugoParser interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Parser Filter](https://docs.fluentd.org/filter/parser)"
 // Parses a string field in event records and mutates its event record with the parsed result.
-type _docParser interface{}
+type _docParser interface{} //nolint:deadcode,unused
 
 // +name:"Parser"
 // +url:"https://docs.fluentd.org/filter/parser"
 // +version:"more info"
 // +description:"Parses a string field in event records and mutates its event record with the parsed result."
 // +status:"GA"
-type _metaParser interface{}
+type _metaParser interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ParserConfig struct {
@@ -187,7 +187,7 @@ type SingleParseSection struct {
 //  </parse>
 //</filter>
 // ```
-type _expParser interface{}
+type _expParser interface{} //nolint:deadcode,unused
 
 func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseMeta := types.PluginMeta{
@@ -215,8 +215,7 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 	if len(p.Multiline) > 0 && p.Type == "multiline" {
 		parseSection.Params["format_firstline"] = p.FormatFirstline
 		for i, v := range p.Multiline {
-			var key string
-			key = fmt.Sprintf("format%d", i+1)
+			key := fmt.Sprintf("format%d", i+1)
 			parseSection.Params[key] = v
 		}
 	}

@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEnahnceK8s(t *testing.T) {
@@ -34,7 +35,7 @@ verify_ssl: false
 </filter>
 `
 	parser := &filter.EnhanceK8s{}
-	yaml.Unmarshal(CONFIG, parser)
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }

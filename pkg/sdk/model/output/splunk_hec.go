@@ -23,7 +23,7 @@ import (
 
 // +name:"Splunk"
 // +weight:"200"
-type _hugoSplunk interface{}
+type _hugoSplunk interface{} //nolint:deadcode,unused
 
 // +docName:"Splunk via Hec output plugin for Fluentd"
 //More info at https://github.com/splunk/fluent-plugin-splunk-hec
@@ -36,14 +36,14 @@ type _hugoSplunk interface{}
 //     hec_port: 8088
 //     protocol: http
 // ```
-type _docSplunkHec interface{}
+type _docSplunkHec interface{} //nolint:deadcode,unused
 
 // +name:"Splunk Hec"
 // +url:"https://github.com/splunk/fluent-plugin-splunk-hec/releases/tag/1.2.7
 // +version:"1.2.7"
 // +description:"Fluent Plugin Splunk Hec Release 1.2.3"
 // +status:"GA"
-type _metaSplunkHec interface{}
+type _metaSplunkHec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"SplunkHecOutput"

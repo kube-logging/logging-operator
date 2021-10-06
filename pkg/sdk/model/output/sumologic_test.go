@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSumologic(t *testing.T) {
@@ -56,7 +57,7 @@ buffer:
   </match>
 `
 	s := &output.SumologicOutput{}
-	yaml.Unmarshal(CONFIG, s)
+	require.NoError(t, yaml.Unmarshal(CONFIG, s))
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)
 }

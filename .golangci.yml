@@ -4,7 +4,7 @@ run:
         - client
 
 linters-settings:
-    golint:
+    revive:
         min-confidence: 0.9
     gocyclo:
         min-complexity: 15
@@ -12,40 +12,6 @@ linters-settings:
         # local-prefixes: github.com/banzaicloud/logging-operator
 
 linters:
-    enable-all: true
-    disable:
-        - funlen
-        - dupl
-        - maligned
-        - wsl
-
-        # TODO: fix these
-        - gci
-        - godot
-        - nlreturn
-        - gomnd
-        - goerr113
-        - gofumpt
-        - exhaustivestruct
-        - wrapcheck
-        - deadcode
-        - unused
-        - goconst
-        - unparam
-        - nakedret
-        - prealloc
-        - errcheck
-        - gochecknoinits
-        - gochecknoglobals
-        - lll
-        - gosec
-        - stylecheck
-        - staticcheck
-        - gosimple
-        - gocritic
-        - godox
-        - gocyclo
-        - gocognit
 
 issues:
     exclude:

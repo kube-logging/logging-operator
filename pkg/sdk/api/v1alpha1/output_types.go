@@ -21,12 +21,12 @@ import (
 
 // +name:"OutputSpec"
 // +weight:"200"
-type _hugoOutputSpec interface{}
+type _hugoOutputSpec interface{} //nolint:deadcode,unused
 
 // +name:"OutputSpec"
 // +version:"v1alpha1"
 // +description:"OutputSpec defines the desired state of Output"
-type _metaOutputSpec interface{}
+type _metaOutputSpec interface{} //nolint:deadcode,unused
 
 // OutputSpec defines the desired state of Output
 type OutputSpec struct {
