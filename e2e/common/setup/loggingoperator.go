@@ -36,7 +36,9 @@ import (
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
 	options := LoggingOperatorOptions{
 		Config: resourcebuilder.ComponentConfig{
-			Enabled:   utils.BoolPointer(true),
+			EnabledComponent: types.EnabledComponent{
+				Enabled: utils.BoolPointer(true),
+			},
 			Namespace: "default",
 		},
 		Logger: logrtesting.TestLogger{

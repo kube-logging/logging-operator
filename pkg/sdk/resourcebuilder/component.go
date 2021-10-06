@@ -53,8 +53,8 @@ const (
 // +kubebuilder:object:generate=true
 
 type ComponentConfig struct {
+	types.EnabledComponent
 	Namespace              string               `json:"namespace,omitempty"`
-	Enabled                *bool                `json:"enabled,omitempty"`
 	MetaOverrides          *types.MetaBase      `json:"metaOverrides,omitempty"`
 	WorkloadMetaOverrides  *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
 	WorkloadOverrides      *types.PodSpecBase   `json:"workloadOverrides,omitempty"`
@@ -63,14 +63,6 @@ type ComponentConfig struct {
 	WatchLoggingName       string               `json:"watchLoggingName,omitempty"`
 	DisableWebhook         bool                 `json:"disableWebhook,omitempty"`
 	InstallPrometheusRules bool                 `json:"-"`
-}
-
-func (c *ComponentConfig) IsEnabled() bool {
-	return utils.PointerToBool(c.Enabled)
-}
-
-func (c *ComponentConfig) IsSkipped() bool {
-	return c.Enabled == nil
 }
 
 func (c *ComponentConfig) build(parent reconciler.ResourceOwner, fn func(reconciler.ResourceOwner, ComponentConfig) (runtime.Object, reconciler.DesiredState, error)) reconciler.ResourceBuilder {
