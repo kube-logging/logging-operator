@@ -22,7 +22,7 @@ import (
 
 // +name:"Http"
 // +weight:"200"
-type _hugoHTTP interface{}
+type _hugoHTTP interface{} //nolint:deadcode,unused
 
 // +docName:"Http plugin for Fluentd"
 // Sends logs to HTTP/HTTPS endpoints.
@@ -37,14 +37,14 @@ type _hugoHTTP interface{}
 //       tags: "[]"
 //       flush_interval: 10s
 // ```
-type _docHTTP interface{}
+type _docHTTP interface{} //nolint:deadcode,unused
 
 // +name:"Http"
 // +url:"https://docs.fluentd.org/output/http"
 // +version:"more info"
 // +description:"Sends logs to HTTP/HTTPS endpoints."
 // +status:"GA"
-type _metaHTTP interface{}
+type _metaHTTP interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

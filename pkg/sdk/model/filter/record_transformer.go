@@ -21,19 +21,19 @@ import (
 
 // +name:"Record Transformer"
 // +weight:"200"
-type _hugoRecordTransformer interface{}
+type _hugoRecordTransformer interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Record Transformer](https://docs.fluentd.org/filter/record_transformer)"
 // Mutates/transforms incoming event streams.
-type _docRecordTransformer interface{}
+type _docRecordTransformer interface{} //nolint:deadcode,unused
 
 // +name:"Record Transformer"
 // +url:"https://docs.fluentd.org/filter/record_transformer"
 // +version:"more info"
 // +description:"Mutates/transforms incoming event streams."
 // +status:"GA"
-type _metaRecordTransformer interface{}
+type _metaRecordTransformer interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RecordTransformer struct {
@@ -80,7 +80,7 @@ type RecordTransformer struct {
 //  </record>
 //</filter>
 // ```
-type _expRecordTransformer interface{}
+type _expRecordTransformer interface{} //nolint:deadcode,unused
 
 // Parameters inside record directives are considered to be new key-value pairs
 type Record map[string]string

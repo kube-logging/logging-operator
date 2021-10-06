@@ -21,19 +21,19 @@ import (
 
 // +name:"Datadog"
 // +weight:"200"
-type _hugoDatadog interface{}
+type _hugoDatadog interface{} //nolint:deadcode,unused
 
 // +docName:"Datadog output plugin for Fluentd"
 //It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
 //More info at https://github.com/DataDog/fluent-plugin-datadog
-type _docDatadog interface{}
+type _docDatadog interface{} //nolint:deadcode,unused
 
 // +name:"Datadog"
 // +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.13.0"
 // +version:"0.13.0"
 // +description:"Send your logs to Datadog"
 // +status:"Testing"
-type _metaDatadog interface{}
+type _metaDatadog interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

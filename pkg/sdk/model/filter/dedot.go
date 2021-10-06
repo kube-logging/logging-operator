@@ -21,19 +21,19 @@ import (
 
 // +name:"Dedot"
 // +weight:"200"
-type _hugoDedot interface{}
+type _hugoDedot interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Dedot Filter](https://github.com/lunardial/fluent-plugin-dedot_filter)"
 // Fluentd Filter plugin to de-dot field name for elasticsearch.
-type _docDedot interface{}
+type _docDedot interface{} //nolint:deadcode,unused
 
 // +name:"Dedot"
 // +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
 // +version:"1.0.0"
 // +description:"Concatenate multiline log separated in multiple events"
 // +status:"GA"
-type _metaDedot interface{}
+type _metaDedot interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type DedotFilterConfig struct {
@@ -68,7 +68,7 @@ type DedotFilterConfig struct {
 //  de_dot_separator -
 //</filter>
 // ```
-type _expDedot interface{}
+type _expDedot interface{} //nolint:deadcode,unused
 
 func NewDedotFilterConfig() *DedotFilterConfig {
 	return &DedotFilterConfig{}

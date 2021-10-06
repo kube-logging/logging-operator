@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewRelic(t *testing.T) {
@@ -36,7 +37,7 @@ license_key:
 	</match>
 `
 	newrelic := &output.NewRelicOutputConfig{}
-	yaml.Unmarshal(CONFIG, newrelic)
+	require.NoError(t, yaml.Unmarshal(CONFIG, newrelic))
 	test := render.NewOutputPluginTest(t, newrelic)
 	test.DiffResult(expected)
 }

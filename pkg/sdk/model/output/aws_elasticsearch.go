@@ -21,7 +21,7 @@ import (
 
 // +name:"Amazon Elasticsearch"
 // +weight:"200"
-type _hugoAwsElasticsearch interface{}
+type _hugoAwsElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Amazon Elasticsearch output plugin for Fluentd"
 //  More info at https://github.com/atomita/fluent-plugin-aws-elasticsearch-service
@@ -35,14 +35,14 @@ type _hugoAwsElasticsearch interface{}
 //     format:
 //       type: json
 // ```
-type _docAwsElasticsearch interface{}
+type _docAwsElasticsearch interface{} //nolint:deadcode,unused
 
 // +name:"Amazon Elasticsearch"
 // +url:"https://github.com/atomita/fluent-plugin-aws-elasticsearch-service"
 // +version:"2.4.1"
 // +description:"Fluent plugin for Amazon Elasticsearch"
 // +status:"Testing"
-type _metaAwsElasticsearch interface{}
+type _metaAwsElasticsearch interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Amazon Elasticsearch"

@@ -86,8 +86,8 @@ github.com/aws/aws-sdk-go v1.27.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN
 github.com/aws/aws-sdk-go-v2 v0.18.0/go.mod h1:JWVYvqSMppoMJC0x5wdwiImzgXTI9FuZwxzkQq9wy+g=
 github.com/banzaicloud/k8s-objectmatcher v1.5.1 h1:u3Ic1JzIUQe0pGGjVQJvCWTNa+t9CiW49IPPovYqAss=
 github.com/banzaicloud/k8s-objectmatcher v1.5.1/go.mod h1:9MWY5HsM/OaTmoTirczhlO8UALbH722WgdpaaR7Y8OE=
-github.com/banzaicloud/operator-tools v0.25.2 h1:7uIdZgfp+NSh/XOsSTDuC1nKoUifSFN/d3LCTaAr/IY=
-github.com/banzaicloud/operator-tools v0.25.2/go.mod h1:7ZdB3pqJMbrhqQa1LSBR65Vyta2L9UDUGWKjCs+zSnk=
+github.com/banzaicloud/operator-tools v0.25.4 h1:w0TMKFx0tSYpQXYIDNEHHI5l+b9GbK7j843e4yu0zxo=
+github.com/banzaicloud/operator-tools v0.25.4/go.mod h1:7ZdB3pqJMbrhqQa1LSBR65Vyta2L9UDUGWKjCs+zSnk=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=

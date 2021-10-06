@@ -132,13 +132,7 @@ func NewValidationReconciler(
 				continue
 			}
 
-			co, ok := req.Obj.(client.Object)
-			if !ok {
-				errors.Append(errs, errors.New("unable to cast runtime.Object to client.Object"))
-				continue
-			}
-
-			if err := repo.Status().Patch(ctx, co, req.Patch); err != nil {
+			if err := repo.Status().Patch(ctx, req.Obj, req.Patch); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}

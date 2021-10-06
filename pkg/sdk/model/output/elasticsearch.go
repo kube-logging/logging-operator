@@ -21,7 +21,7 @@ import (
 
 // +name:"Elasticsearch"
 // +weight:"200"
-type _hugoElasticsearch interface{}
+type _hugoElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Elasticsearch output plugin for Fluentd"
 //More info at https://github.com/uken/fluent-plugin-elasticsearch
@@ -41,14 +41,14 @@ type _hugoElasticsearch interface{}
 //       timekey_wait: 30s
 //       timekey_use_utc: true
 // ```
-type _docElasticsearch interface{}
+type _docElasticsearch interface{} //nolint:deadcode,unused
 
 // +name:"Elasticsearch"
 // +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v5.0.5"
 // +version:"5.0.5"
 // +description:"Send your logs to Elasticsearch"
 // +status:"GA"
-type _metaElasticsearch interface{}
+type _metaElasticsearch interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Elasticsearch"

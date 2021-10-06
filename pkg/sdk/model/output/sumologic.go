@@ -21,7 +21,7 @@ import (
 
 // +name:"SumoLogic"
 // +weight:"200"
-type _hugoSumoLogic interface{}
+type _hugoSumoLogic interface{} //nolint:deadcode,unused
 
 // +docName:"SumoLogic output plugin for Fluentd"
 //This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
@@ -53,14 +53,14 @@ type _hugoSumoLogic interface{}
 //          name: sumo-output
 //    source_name: test1
 //```
-type _docSumoLogic interface{}
+type _docSumoLogic interface{} //nolint:deadcode,unused
 
 // +name:"SumoLogic"
 // +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/2.0.0"
 // +version:"2.0.0"
 // +description:"Send your logs to Sumologic"
 // +status:"GA"
-type _metaSumologic interface{}
+type _metaSumologic interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

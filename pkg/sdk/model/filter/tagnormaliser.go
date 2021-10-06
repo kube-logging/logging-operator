@@ -21,7 +21,7 @@ import (
 
 // +name:"Tag Normaliser"
 // +weight:"200"
-type _hugoTagNormaliser interface{}
+type _hugoTagNormaliser interface{} //nolint:deadcode,unused
 
 // +docName:"Fluentd Plugin to re-tag based on log metadata"
 //More info at https://github.com/banzaicloud/fluent-plugin-tag-normaliser
@@ -37,14 +37,14 @@ type _hugoTagNormaliser interface{}
 //| ${labels} | Kubernetes Pod labels. This is a nested map. You can access nested attributes via `.`  | {"app":"logging-demo", "pod-template-hash":"7dcdcfdcd7" }  |
 //| ${host} | Node hostname the Pod runs on | docker-desktop |
 //| ${docker_id} | Docker UUID of the container | 3a38148aa37aa3... |
-type _docTagNormaliser interface{}
+type _docTagNormaliser interface{} //nolint:deadcode,unused
 
 // +name:"Tag Normaliser"
 // +url:"https://github.com/banzaicloud/fluent-plugin-tag-normaliser"
 // +version:"0.1.1"
 // +description:"Re-tag based on log metadata"
 // +status:"GA"
-type _metaTagNormaliser interface{}
+type _metaTagNormaliser interface{} //nolint:deadcode,unused
 
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {
@@ -75,7 +75,7 @@ type TagNormaliser struct {
 //  format cluster1.${namespace_name}.${pod_name}.${labels.app}
 //</match>
 // ```
-type _expTagNormaliser interface{}
+type _expTagNormaliser interface{} //nolint:deadcode,unused
 
 func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "tag_normaliser"

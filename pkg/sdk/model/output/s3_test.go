@@ -20,11 +20,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestS3(t *testing.T) {
 	CONFIG := []byte(`
-assume_role_credentials: arn:aws:iam::123456789012:role/logs
+assume_role_credentials:
+  role_arn: arn:aws:iam::123456789012:role/logs
 s3_bucket: logging-amazon-s3
 s3_region: eu-central-1
 path: logs/${tag}/%Y/%m/%d/
@@ -51,13 +53,13 @@ buffer:
       timekey_wait 30s
     </buffer>
     <assume_role_credentials>
-      role_arn
+      role_arn arn:aws:iam::123456789012:role/logs
       role_session_name
     </assume_role_credentials>
   </match>
 `
 	s3 := &output.S3OutputConfig{}
-	yaml.Unmarshal(CONFIG, s3)
+	require.NoError(t, yaml.Unmarshal(CONFIG, s3))
 	test := render.NewOutputPluginTest(t, s3)
 	test.DiffResult(expected)
 }

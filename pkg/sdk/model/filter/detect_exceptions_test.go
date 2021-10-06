@@ -20,12 +20,13 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDetectExceptions(t *testing.T) {
 	CONFIG := []byte(`
 multiline_flush_interval: 0.1
-languages: 
+languages:
   - java
   - python
 `)
@@ -39,7 +40,7 @@ languages:
 </match>
 `
 	ed := &filter.DetectExceptions{}
-	yaml.Unmarshal(CONFIG, ed)
+	require.NoError(t, yaml.Unmarshal(CONFIG, ed))
 	test := render.NewOutputPluginTest(t, ed)
 	test.DiffResult(expected)
 }

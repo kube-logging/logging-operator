@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGrepRegexp(t *testing.T) {
@@ -39,7 +40,7 @@ regexp:
 </filter>
 `
 	grep := &filter.GrepConfig{}
-	yaml.Unmarshal(CONFIG, grep)
+	require.NoError(t, yaml.Unmarshal(CONFIG, grep))
 	test := render.NewOutputPluginTest(t, grep)
 	test.DiffResult(expected)
 }
@@ -61,7 +62,7 @@ exclude:
 </filter>
 `
 	grep := &filter.GrepConfig{}
-	yaml.Unmarshal(CONFIG, grep)
+	require.NoError(t, yaml.Unmarshal(CONFIG, grep))
 	test := render.NewOutputPluginTest(t, grep)
 	test.DiffResult(expected)
 }
@@ -92,7 +93,7 @@ or:
 </filter>
 `
 	grep := &filter.GrepConfig{}
-	yaml.Unmarshal(CONFIG, grep)
+	require.NoError(t, yaml.Unmarshal(CONFIG, grep))
 	test := render.NewOutputPluginTest(t, grep)
 	test.DiffResult(expected)
 }
@@ -123,7 +124,7 @@ and:
 </filter>
 `
 	grep := &filter.GrepConfig{}
-	yaml.Unmarshal(CONFIG, grep)
+	require.NoError(t, yaml.Unmarshal(CONFIG, grep))
 	test := render.NewOutputPluginTest(t, grep)
 	test.DiffResult(expected)
 }
@@ -167,7 +168,7 @@ and:
 </filter>
 `
 	grep := &filter.GrepConfig{}
-	yaml.Unmarshal(CONFIG, grep)
+	require.NoError(t, yaml.Unmarshal(CONFIG, grep))
 	test := render.NewOutputPluginTest(t, grep)
 	test.DiffResult(expected)
 }

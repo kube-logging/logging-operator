@@ -22,14 +22,14 @@ import (
 // +kubebuilder:object:generate=true
 // +docName:"[Throttle Filter](https://github.com/rubrikinc/fluent-plugin-throttle)"
 // A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group.
-type _docThrottle interface{}
+type _docThrottle interface{} //nolint:deadcode,unused
 
 // +name:"Throttle"
 // +url:"https://github.com/rubrikinc/fluent-plugin-throttle"
 // +version:"0.0.5"
 // +description:"A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group."
 // +status:"GA"
-type _metaThrottle interface{}
+type _metaThrottle interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type Throttle struct {
@@ -70,7 +70,7 @@ type Throttle struct {
 //  group_key $.kubernetes.container_name
 //</filter>
 // ```
-type _expThrottle interface{}
+type _expThrottle interface{} //nolint:deadcode,unused
 
 func (t *Throttle) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "throttle"
