@@ -1170,7 +1170,11 @@ spec:
                     type: string
                   data_stream_enable:
                     type: boolean
+                  data_stream_ilm_name:
+                    type: string
                   data_stream_name:
+                    type: string
+                  data_stream_template_name:
                     type: string
                   default_elasticsearch_version:
                     type: string
@@ -6056,7 +6060,11 @@ spec:
                     type: string
                   data_stream_enable:
                     type: boolean
+                  data_stream_ilm_name:
+                    type: string
                   data_stream_name:
+                    type: string
+                  data_stream_template_name:
                     type: string
                   default_elasticsearch_version:
                     type: string

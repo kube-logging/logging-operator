@@ -116,7 +116,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.image.repository`                        | Fluentbit container image repository                   | `fluent/fluent-bit`            |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                        | `IfNotPresent`                 |
 | `fluentd.enabled`                                   | Install fluentd                                        | true                           |
-| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.13.3-alpine-9`             |
+| `fluentd.image.tag`                                 | Fluentd container image tag                            | `v1.13.3-alpine-9`            |
 | `fluentd.image.repository`                          | Fluentd container image repository                     | `ghcr.io/banzaicloud/fluentd`  |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                          | `IfNotPresent`                 |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag             | `latest`                       |

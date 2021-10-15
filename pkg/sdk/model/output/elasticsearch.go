@@ -240,6 +240,10 @@ type ElasticsearchOutput struct {
 	DataStreamEnable *bool `json:"data_stream_enable,omitempty"`
 	// You can specify Elasticsearch data stream name by this parameter. This parameter is mandatory for elasticsearch_data_stream. There are some limitations about naming rule. For more details https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-create-data-stream.html#indices-create-data-stream-api-path-params
 	DataStreamName string `json:"data_stream_name,omitempty"`
+	// Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream. (default: data_stream_name) Further details here https://github.com/uken/fluent-plugin-elasticsearch#configuration---elasticsearch-output-data-stream
+	DataStreamTemplateName string `json:"data_stream_template_name,omitempty"`
+	// Specify an existing ILM policy to be applied to the data stream. If not present, either the specified template's or a new ILM default policy is applied. (default: data_stream_name) Further details here https://github.com/uken/fluent-plugin-elasticsearch#configuration---elasticsearch-output-data-stream
+	DataStreamILMName string `json:"data_stream_ilm_name,omitempty"`
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
