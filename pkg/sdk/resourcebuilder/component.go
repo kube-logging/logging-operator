@@ -53,7 +53,7 @@ const (
 // +kubebuilder:object:generate=true
 
 type ComponentConfig struct {
-	types.EnabledComponent
+	types.EnabledComponent `json:",inline"`
 	Namespace              string               `json:"namespace,omitempty"`
 	MetaOverrides          *types.MetaBase      `json:"metaOverrides,omitempty"`
 	WorkloadMetaOverrides  *types.MetaBase      `json:"workloadMetaOverrides,omitempty"`
