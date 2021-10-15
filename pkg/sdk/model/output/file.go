@@ -48,6 +48,10 @@ type FileOutputConfig struct {
 	PathSuffix string `json:"path_suffix,omitempty"`
 	// Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.(default: false)
 	SymlinkPath bool `json:"symlink_path,omitempty"`
+	// Compresses flushed files using gzip. No compression is performed by default.
+	Compress string `json:"compress,omitempty"`
+	// Performs compression again even if the buffer chunk is already compressed. (default: false)
+	Recompress bool `json:"recompress,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
