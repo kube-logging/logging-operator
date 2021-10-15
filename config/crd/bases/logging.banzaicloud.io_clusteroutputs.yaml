@@ -1458,6 +1458,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   format:
                     properties:
                       add_newline:
@@ -1479,6 +1481,8 @@ spec:
                     type: string
                   path_suffix:
                     type: string
+                  recompress:
+                    type: boolean
                   symlink_path:
                     type: boolean
                 required:
@@ -6354,6 +6358,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   format:
                     properties:
                       add_newline:
@@ -6375,6 +6381,8 @@ spec:
                     type: string
                   path_suffix:
                     type: string
+                  recompress:
+                    type: boolean
                   symlink_path:
                     type: boolean
                 required:
