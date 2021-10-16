@@ -394,6 +394,8 @@ spec:
                                   type: string
                                 keep_time_key:
                                   type: boolean
+                                keys:
+                                  type: string
                                 label_delimiter:
                                   type: string
                                 local_time:
@@ -471,6 +473,8 @@ spec:
                                     type: string
                                   keep_time_key:
                                     type: boolean
+                                  keys:
+                                    type: string
                                   label_delimiter:
                                     type: string
                                   local_time:
@@ -3946,6 +3950,8 @@ spec:
                               type: string
                             keep_time_key:
                               type: boolean
+                            keys:
+                              type: string
                             label_delimiter:
                               type: string
                             local_time:
@@ -4023,6 +4029,8 @@ spec:
                                 type: string
                               keep_time_key:
                                 type: boolean
+                              keys:
+                                type: string
                               label_delimiter:
                                 type: string
                               local_time:
