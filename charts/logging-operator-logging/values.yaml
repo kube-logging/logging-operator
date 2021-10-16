@@ -16,7 +16,7 @@ fullnameOverride: ""
 # and recreate it with the new configuration.
 enableRecreateWorkloadOnImmutableFieldChange: false
 
-# Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/#fluent-bit-spec
+# Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/fluentbit_types/
 fluentbit: {}
 
 #Node agent Definition
