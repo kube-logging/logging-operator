@@ -42,8 +42,9 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector: r.Logging.GetFluentdLabels(ComponentFluentd),
-			Type:     corev1.ServiceTypeClusterIP,
+			Selector:     r.Logging.GetFluentdLabels(ComponentFluentd),
+			Type:         corev1.ServiceTypeClusterIP,
+			TopologyKeys: r.Logging.Spec.FluentdSpec.ServiceTopologyKeys,
 		},
 	}
 
@@ -201,9 +202,10 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 					TargetPort: intstr.IntOrString{IntVal: 24240},
 				},
 			},
-			Selector:  r.Logging.GetFluentdLabels(ComponentFluentd),
-			Type:      corev1.ServiceTypeClusterIP,
-			ClusterIP: corev1.ClusterIPNone,
+			Selector:     r.Logging.GetFluentdLabels(ComponentFluentd),
+			Type:         corev1.ServiceTypeClusterIP,
+			ClusterIP:    corev1.ClusterIPNone,
+			TopologyKeys: r.Logging.Spec.FluentdSpec.HeadlessServiceTopologyKeys,
 		},
 	}
 	return desired, reconciler.StatePresent, nil
