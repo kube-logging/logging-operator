@@ -367,6 +367,10 @@ spec:
                     type: object
                   include_tag_key:
                     type: boolean
+                  include_timestamp:
+                    type: string
+                  index_name:
+                    type: string
                   logstash_format:
                     type: boolean
                   logstash_prefix:
@@ -5215,6 +5219,10 @@ spec:
                     type: object
                   include_tag_key:
                     type: boolean
+                  include_timestamp:
+                    type: string
+                  index_name:
+                    type: string
                   logstash_format:
                     type: boolean
                   logstash_prefix:
