@@ -27,13 +27,6 @@ func TestGELFOutputConfig(t *testing.T) {
 	CONFIG := []byte(`
 host: gelf-host
 port: 12201
-buffer:
-  flush_thread_count: 8
-  flush_interval: 5s
-  chunk_limit_size: 8M
-  queue_limit_length: 512
-  retry_max_interval: 30
-  retry_forever: true
 `)
 	expected := `
   <match **>
@@ -41,18 +34,6 @@ buffer:
     @id test
     host gelf-host
     port 12201
-    <buffer tag,time>
-      @type file
-      chunk_limit_size 8M
-      flush_interval 5s
-      flush_thread_count 8
-      path /buffers/test.*.buffer
-      queue_limit_length 512
-      retry_forever true
-      retry_max_interval 30
-      timekey 10m
-      timekey_wait 1m
-    </buffer>
   </match>
 `
 	s := &output.GELFOutputConfig{}
