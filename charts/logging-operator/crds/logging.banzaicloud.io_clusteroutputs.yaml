@@ -3989,6 +3989,21 @@ spec:
                     type: string
                   clustername:
                     type: string
+                  compress:
+                    properties:
+                      parquet_compression_codec:
+                        type: string
+                      parquet_page_size:
+                        type: string
+                      parquet_row_group_size:
+                        type: string
+                      record_type:
+                        type: string
+                      schema_file:
+                        type: string
+                      schema_type:
+                        type: string
+                    type: object
                   compute_checksums:
                     type: string
                   enable_transfer_acceleration:
@@ -8822,6 +8837,21 @@ spec:
                     type: string
                   clustername:
                     type: string
+                  compress:
+                    properties:
+                      parquet_compression_codec:
+                        type: string
+                      parquet_page_size:
+                        type: string
+                      parquet_row_group_size:
+                        type: string
+                      record_type:
+                        type: string
+                      schema_file:
+                        type: string
+                      schema_type:
+                        type: string
+                    type: object
                   compute_checksums:
                     type: string
                   enable_transfer_acceleration:

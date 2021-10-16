@@ -154,6 +154,8 @@ type S3OutputConfig struct {
 	InstanceProfileCredentials *S3InstanceProfileCredentials `json:"instance_profile_credentials,omitempty"`
 	// +docLink:"Shared Credentials,#shared-credentials"
 	SharedCredentials *S3SharedCredentials `json:"shared_credentials,omitempty"`
+	// Parquet compressor
+	Compress *Compress `json:"compress,omitempty"`
 	// One-eye format trigger (default:false)
 	OneEyeFormat bool `json:"oneeye_format,omitempty"`
 	// Custom cluster name (default:one-eye)
@@ -202,6 +204,24 @@ type S3SharedCredentials struct {
 	Path string `json:"path,omitempty"`
 }
 
+// +kubebuilder:object:generate=true
+// +docName:"Parquet compressor"
+// parquet compressor
+type Compress struct {
+	// Parquet compression codec. (uncompressed, snappy, gzip, lzo, brotli, lz4, zstd)(default: snappy)
+	ParquetCompressionCodec string `json:"parquet_compression_codec,omitempty"`
+	// Parquet file page size. (default: 8192 bytes)
+	ParquetPageSize string `json:"parquet_page_size,omitempty"`
+	// Parquet file row group size. (default: 128 MB)
+	ParquetRowGroupSize string `json:"parquet_row_group_size,omitempty"`
+	// Record data format type. (avro csv jsonl msgpack tsv msgpack json) (default: msgpack)
+	RecordType string `json:"record_type,omitempty"`
+	// Schema type. (avro, bigquery) (default: avro)
+	SchemaType string `json:"schema_type,omitempty"`
+	// Path to schema file.
+	SchemaFile string `json:"schema_file,omitempty"`
+}
+
 func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "s3"
 	s3 := &types.OutputPlugin{
@@ -248,6 +268,14 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 			return nil, err
 		} else {
 			s3.SubDirectives = append(s3.SubDirectives, format)
+		}
+	}
+	if c.Compress != nil {
+		if compress, err := types.NewFlatDirective(types.PluginMeta{Directive: "compress"},
+			c.Compress, secretLoader); err != nil {
+			return nil, err
+		} else {
+			s3.SubDirectives = append(s3.SubDirectives, compress)
 		}
 	}
 	if err := c.validateAndSetCredentials(s3, secretLoader); err != nil {

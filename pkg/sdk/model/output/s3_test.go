@@ -30,6 +30,8 @@ assume_role_credentials:
 s3_bucket: logging-amazon-s3
 s3_region: eu-central-1
 path: logs/${tag}/%Y/%m/%d/
+compress:
+  parquet_compression_codec: snappy
 buffer:
   timekey: 1m
   timekey_wait: 30s
@@ -52,6 +54,9 @@ buffer:
       timekey_use_utc true
       timekey_wait 30s
     </buffer>
+	<compress>
+	  parquet_compression_codec snappy
+	</compress>
     <assume_role_credentials>
       role_arn arn:aws:iam::123456789012:role/logs
       role_session_name
