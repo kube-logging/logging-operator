@@ -3589,6 +3589,45 @@ spec:
                           type: string
                       type: object
                     type: array
+                  topologySpreadConstraints:
+                    items:
+                      properties:
+                        labelSelector:
+                          properties:
+                            matchExpressions:
+                              items:
+                                properties:
+                                  key:
+                                    type: string
+                                  operator:
+                                    type: string
+                                  values:
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              type: object
+                          type: object
+                        maxSkew:
+                          format: int32
+                          type: integer
+                        topologyKey:
+                          type: string
+                        whenUnsatisfiable:
+                          type: string
+                      required:
+                      - maxSkew
+                      - topologyKey
+                      - whenUnsatisfiable
+                      type: object
+                    type: array
                   volumeModImage:
                     properties:
                       imagePullSecrets:

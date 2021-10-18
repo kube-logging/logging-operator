@@ -997,6 +997,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = new(v1.Affinity)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.TopologySpreadConstraints != nil {
+		in, out := &in.TopologySpreadConstraints, &out.TopologySpreadConstraints
+		*out = make([]v1.TopologySpreadConstraint, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.Metrics != nil {
 		in, out := &in.Metrics, &out.Metrics
 		*out = new(Metrics)
