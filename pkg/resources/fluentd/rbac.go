@@ -86,6 +86,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 						"nodes",
 						"endpoints",
 						"services",
+						"pods",
 					},
 					Verbs: []string{"get", "list", "watch"},
 				}, {
