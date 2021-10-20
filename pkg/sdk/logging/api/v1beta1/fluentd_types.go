@@ -82,13 +82,11 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
-	FluentOutLogrotate          *FluentOutLogrotate          `json:"fluentOutLogrotate,omitempty"`
-	ForwardInputConfig          *input.ForwardInputConfig    `json:"forwardInputConfig,omitempty"`
-	ServiceAccountOverrides     *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	DNSPolicy                   corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
-	DNSConfig                   *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
-	ServiceTopologyKeys         []string                     `json:"serviceTopologyKeys,omitempty"`
-	HeadlessServiceTopologyKeys []string                     `json:"headlessServiceTopologyKeys,omitempty"`
+	FluentOutLogrotate      *FluentOutLogrotate          `json:"fluentOutLogrotate,omitempty"`
+	ForwardInputConfig      *input.ForwardInputConfig    `json:"forwardInputConfig,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
