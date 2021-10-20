@@ -31,13 +31,14 @@ buffer:
   timekey: 1m
   timekey_wait: 30s
   timekey_use_utc: true
+format:
+  type: json
 `)
 	expected := `
   <match **>
     @type azure-storage-append-blob
     @id test
     azure_container example-azure-container
-    format json
     path logs/${tag}/%Y/%m/%d/
     <buffer tag,time>
       @type file
@@ -48,6 +49,9 @@ buffer:
       timekey_use_utc true
       timekey_wait 30s
     </buffer>
+    <format>
+      @type json
+    </format>
   </match>
 `
 	azure := &output.AzureStorage{}

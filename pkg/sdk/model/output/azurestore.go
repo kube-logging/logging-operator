@@ -57,8 +57,8 @@ type AzureStorage struct {
 	AzureObjectKeyFormat string `json:"azure_object_key_format,omitempty"`
 	// Automatically create container if not exists(default: true)
 	AutoCreateContainer bool `json:"auto_create_container,omitempty"`
-	// Compat format type: out_file, json, ltsv (default: out_file)
-	Format string `json:"format,omitempty" plugin:"default:json"`
+	// +docLink:"Format,../format/"
+	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
@@ -85,6 +85,13 @@ func (a *AzureStorage) ToDirective(secretLoader secret.SecretLoader, id string) 
 		return nil, err
 	} else {
 		azure.SubDirectives = append(azure.SubDirectives, buffer)
+	}
+	if a.Format != nil {
+		if format, err := a.Format.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			azure.SubDirectives = append(azure.SubDirectives, format)
+		}
 	}
 	return azure, nil
 }

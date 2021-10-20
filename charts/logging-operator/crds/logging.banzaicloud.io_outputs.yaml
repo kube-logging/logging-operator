@@ -555,7 +555,22 @@ spec:
                         type: string
                     type: object
                   format:
-                    type: string
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
                   path:
                     type: string
                 required:
@@ -5401,7 +5416,22 @@ spec:
                         type: string
                     type: object
                   format:
-                    type: string
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
                   path:
                     type: string
                 required:
