@@ -68,6 +68,8 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					HonorLabels:          r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+					Scheme:               r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            r.Logging.Spec.FluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
