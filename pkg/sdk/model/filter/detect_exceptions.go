@@ -40,7 +40,7 @@ type _docExceptionDetector interface{} //nolint:deadcode,unused
 
 // +name:"Exception Detector"
 // +url:"https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions"
-// +version:"0.0.13"
+// +version:"0.0.14"
 // +description:"Exception Detector"
 // +status:"GA"
 type _metaDDetectExceptions interface{} //nolint:deadcode,unused
