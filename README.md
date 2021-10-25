@@ -83,11 +83,6 @@ If you encounter problems that the documentation does not address, [open an issu
 
 If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/contact/), the company backing the development of the Logging operator. If you are looking for the ultimate observability tool for multi-cluster Kubernetes infrastructures to automate the collection, correlation, and storage of logs and metrics, check out [One Eye](https://banzaicloud.com/products/one-eye/).
 
-### Engineering blog
-
-To be up-to-date with the Logging operator and the other open source and commercial products of [Banzai Cloud, subscribe to our blog](https://pages.banzaicloud.com/sign-up-for-the-banzai-cloud-newsletter/).
-
-
 ## Documentation
 
  You can find the complete documentation of the Logging operator on the [Banzai Cloud Documentation Page](https://banzaicloud.com/docs/one-eye/logging-operator) :blue_book: <br>
