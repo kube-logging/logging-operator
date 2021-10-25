@@ -36,6 +36,7 @@ RUN apk update \
  # See https://github.com/uken/fluent-plugin-elasticsearch/issues/912
  && gem install elasticsearch -v 7.13.3 \
  && gem install elasticsearch-xpack -v 7.13.3 \
+ && gem install fluent-plugin-detect-exceptions -v 0.0.13 \
  && gem install \
          specific_install \
          fluent-plugin-remote-syslog \
@@ -55,7 +56,6 @@ RUN apk update \
          fluent-plugin-concat \
          fluent-plugin-kinesis \
          fluent-plugin-parser-logfmt \
-         fluent-plugin-detect-exceptions \
          fluent-plugin-multi-format-parser \
          fluent-plugin-record-modifier \
          fluent-plugin-splunk-hec \
