@@ -45,8 +45,8 @@ type _hugoKafka interface{} //nolint:deadcode,unused
 type _docKafka interface{} //nolint:deadcode,unused
 
 // +name:"Kafka"
-// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.17.0"
-// +version:"0.17.0"
+// +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.17.2"
+// +version:"0.17.2"
 // +description:"Send your logs to Kafka"
 // +status:"GA"
 type _metaKafka interface{} //nolint:deadcode,unused

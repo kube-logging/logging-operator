@@ -22,12 +22,12 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.enabled`                                 | Install fluent-bit                                                       | true                                                       |
 | `fluentbit.namespace`                               | Specified fluentbit installation namespace                               | same as operator namespace                                 |
 | `fluentbit.tolerations`                             | Tolerations for fluentbit daemonset                                      | none                                                       |
-| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.8.5`                                                    |
+| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.8.8`                                                    |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                                     | `fluent/fluent-bit`                                        |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                                          | `IfNotPresent`                                             |
 | `fluentbit.podPriorityClassName`                    | Priority class name for fluentbit pods                                   | none                                                       |
 | `fluentd.enabled`                                   | Install fluentd                                                          | true                                                       |
-| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.13.3-alpine-9`                                        |
+| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.13.3-alpine-11`                                        |
 | `fluentd.image.repository`                          | Fluentd container image repository                                       | `ghcr.io/banzaicloud/fluentd`                                      |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                                            | `IfNotPresent`                                             |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag                               | `latest`                                                   |

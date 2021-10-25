@@ -29,8 +29,8 @@ type _hugoDatadog interface{} //nolint:deadcode,unused
 type _docDatadog interface{} //nolint:deadcode,unused
 
 // +name:"Datadog"
-// +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.13.0"
-// +version:"0.13.0"
+// +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.14.0"
+// +version:"0.14.0"
 // +description:"Send your logs to Datadog"
 // +status:"Testing"
 type _metaDatadog interface{} //nolint:deadcode,unused

@@ -53,8 +53,8 @@ type _hugoCloudWatch interface{} //nolint:deadcode,unused
 type _docCloudWatch interface{} //nolint:deadcode,unused
 
 // +name:"Amazon CloudWatch"
-// +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.14.0"
-// +version:"0.14.0"
+// +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs/releases/tag/v0.14.2"
+// +version:"0.14.2"
 // +description:"Send your logs to AWS CloudWatch"
 // +status:"GA"
 type _metaCloudWatch interface{} //nolint:deadcode,unused

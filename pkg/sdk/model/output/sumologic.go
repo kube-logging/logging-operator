@@ -56,8 +56,8 @@ type _hugoSumoLogic interface{} //nolint:deadcode,unused
 type _docSumoLogic interface{} //nolint:deadcode,unused
 
 // +name:"SumoLogic"
-// +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/2.0.0"
-// +version:"2.0.0"
+// +url:"https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.7.3"
+// +version:"1.7.3"
 // +description:"Send your logs to Sumologic"
 // +status:"GA"
 type _metaSumologic interface{} //nolint:deadcode,unused
