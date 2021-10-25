@@ -77,7 +77,7 @@ Deploy Logging Operator with [Kubernetes manifests](https://banzaicloud.com/docs
 
 ### Community support
 
-If you encounter problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://pages.banzaicloud.com/invite-slack).
+If you encounter problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://banzaicloud.com/invite-slack/).
 
 ### Commercial support
 
