@@ -42,7 +42,8 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels: r.Logging.GetFluentdLabels(ComponentDrainer),
+				Labels:      r.Logging.GetFluentdLabels(ComponentDrainer),
+				Annotations: r.Logging.Spec.FluentdSpec.Scaling.Drain.Annotations,
 			},
 			Spec: corev1.PodSpec{
 				Volumes:                   r.generateVolume(),
