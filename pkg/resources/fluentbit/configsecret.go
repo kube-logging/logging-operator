@@ -114,6 +114,20 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
+	var fluentbitTargetHost string
+	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetHost == "" {
+		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
+	} else {
+		fluentbitTargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
+	}
+
+	var fluentbitTargetPort int32
+	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetPort == 0 {
+		fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
+	} else {
+		fluentbitTargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
+	}
+
 	mapper := types.NewStructToStringMapper(nil)
 
 	// FluentBit input Values
@@ -164,8 +178,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
-		TargetPort:              r.Logging.Spec.FluentdSpec.Port,
+		TargetHost:              fluentbitTargetHost,
+		TargetPort:              fluentbitTargetPort,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		KubernetesFilter:        fluentbitKubernetesFilter,
