@@ -68,6 +68,8 @@ tls:
 watchNamespaces: []
 # Control namespace that contains ClusterOutput and ClusterFlow resources
 controlNamespace: ""
+# Allow configuration of cluster resources from any namespace
+allowClusterResourcesFromAllNamespaces: false
 
 # defaultFlow
 defaultFlow: {}
