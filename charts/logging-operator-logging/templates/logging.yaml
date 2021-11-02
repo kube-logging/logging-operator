@@ -18,6 +18,9 @@ spec:
   flowConfigOverride: {{ . }}
   {{- end }}
   controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
+  {{- if .Values.allowClusterResourcesFromAllNamespaces }}
+  allowClusterResourcesFromAllNamespaces:
+  {{- end }}
   {{- if .Values.defaultFlow }}
   defaultFlow:
 {{ toYaml .Values.defaultFlow | indent 4 }}
