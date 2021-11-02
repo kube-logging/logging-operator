@@ -120,6 +120,8 @@ const (
 	DefaultFluentdBufferStorageVolumeName   = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository = "ghcr.io/banzaicloud/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag        = "v0.0.1"
+	DefaultFluentdDrainPauseImageRepository = "k8s.gcr.io/pause"
+	DefaultFluentdDrainPauseImageTag        = "latest"
 )
 
 // SetDefaults fills empty attributes
@@ -259,6 +261,15 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy = "IfNotPresent"
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Repository == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Repository = DefaultFluentdDrainPauseImageRepository
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Tag == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Tag = DefaultFluentdDrainPauseImageTag
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentdSpec.FluentLogDestination == "" {
 			l.Spec.FluentdSpec.FluentLogDestination = "null"
