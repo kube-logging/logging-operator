@@ -124,5 +124,6 @@ type FluentdDrainConfig struct {
 	// Should buffers on persistent volumes left after scaling down the statefulset be drained
 	Enabled bool `json:"enabled,omitempty"`
 	// Container image to use for the drain watch sidecar
-	Image ImageSpec `json:"image,omitempty"`
+	Image       ImageSpec         `json:"image,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
