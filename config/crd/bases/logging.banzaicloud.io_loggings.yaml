@@ -3370,6 +3370,10 @@ spec:
                     properties:
                       drain:
                         properties:
+                          annotations:
+                            additionalProperties:
+                              type: string
+                            type: object
                           enabled:
                             type: boolean
                           image:
