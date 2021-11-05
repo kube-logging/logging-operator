@@ -100,14 +100,6 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 					Verbs: []string{"get", "list", "watch"},
 				},
 				{
-					APIGroups: []string{"extensions"},
-					Resources: []string{
-						"deployments",
-					},
-					Verbs: []string{"get", "list", "watch"},
-				},
-
-				{
 					APIGroups: []string{"events.k8s.io"},
 					Resources: []string{
 						"events",
