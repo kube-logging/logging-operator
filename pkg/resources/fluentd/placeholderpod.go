@@ -27,8 +27,9 @@ func (r *Reconciler) placeholderPodFor(pvc corev1.PersistentVolumeClaim) *corev1
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
 				{
-					Name:  "pause",
-					Image: "k8s.gcr.io/pause",
+					Name:            "pause",
+					Image:           r.Logging.Spec.FluentdSpec.Scaling.Drain.PauseImage.RepositoryWithTag(),
+					ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy),
 				},
 			},
 			NodeSelector:                  r.Logging.Spec.FluentdSpec.NodeSelector,

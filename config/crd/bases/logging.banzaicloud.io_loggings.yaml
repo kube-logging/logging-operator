@@ -3392,6 +3392,22 @@ spec:
                               tag:
                                 type: string
                             type: object
+                          pauseImage:
+                            properties:
+                              imagePullSecrets:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                  type: object
+                                type: array
+                              pullPolicy:
+                                type: string
+                              repository:
+                                type: string
+                              tag:
+                                type: string
+                            type: object
                         type: object
                       podManagementPolicy:
                         type: string
