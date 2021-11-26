@@ -1483,6 +1483,10 @@ spec:
                         type: string
                       Tag_Regex:
                         type: string
+                      multiline.parser:
+                        items:
+                          type: string
+                        type: array
                       storage.type:
                         type: string
                     type: object
@@ -7874,6 +7878,10 @@ spec:
                               type: string
                             Tag_Regex:
                               type: string
+                            multiline.parser:
+                              items:
+                                type: string
+                              type: array
                             storage.type:
                               type: string
                           type: object
