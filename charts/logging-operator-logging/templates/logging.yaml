@@ -17,6 +17,9 @@ spec:
   {{- with .Values.flowConfigOverride }}
   flowConfigOverride: {{ . }}
   {{- end }}
+  {{- with .Values.allowClusterResourcesFromAllNamespaces }}
+  allowClusterResourcesFromAllNamespaces: {{ . }}
+  {{- end }}
   controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
   {{- if .Values.defaultFlow }}
   defaultFlow:

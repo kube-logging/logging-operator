@@ -61,6 +61,8 @@ type DetectExceptions struct {
 	MaxBytes int `json:"max_bytes,omitempty"`
 	// Separate log streams by this field in the input JSON data. (default: "")
 	Stream string `json:"stream,omitempty"`
+	// Force line breaks between each lines when comibining exception stacks. (default: false)
+	ForceLineBreaks bool `json:"force_line_breaks,omitempty"`
 }
 
 // #### Example `Exception Detector` filter configurations

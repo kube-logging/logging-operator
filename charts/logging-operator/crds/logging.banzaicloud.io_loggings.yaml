@@ -100,6 +100,8 @@ spec:
                           type: object
                         detectExceptions:
                           properties:
+                            force_line_breaks:
+                              type: boolean
                             languages:
                               items:
                                 type: string
@@ -1481,6 +1483,10 @@ spec:
                         type: string
                       Tag_Regex:
                         type: string
+                      multiline.parser:
+                        items:
+                          type: string
+                        type: array
                       storage.type:
                         type: string
                     type: object
@@ -1627,6 +1633,82 @@ spec:
                                   type: string
                               type: object
                             type: array
+                          scheme:
+                            type: string
+                          tlsConfig:
+                            properties:
+                              ca:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              caFile:
+                                type: string
+                              cert:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              certFile:
+                                type: string
+                              insecureSkipVerify:
+                                type: boolean
+                              keyFile:
+                                type: string
+                              keySecret:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                              serverName:
+                                type: string
+                            type: object
                         type: object
                       timeout:
                         type: string
@@ -2727,6 +2809,82 @@ spec:
                                   type: string
                               type: object
                             type: array
+                          scheme:
+                            type: string
+                          tlsConfig:
+                            properties:
+                              ca:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              caFile:
+                                type: string
+                              cert:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              certFile:
+                                type: string
+                              insecureSkipVerify:
+                                type: boolean
+                              keyFile:
+                                type: string
+                              keySecret:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                              serverName:
+                                type: string
+                            type: object
                         type: object
                       timeout:
                         type: string
@@ -3236,6 +3394,82 @@ spec:
                                   type: string
                               type: object
                             type: array
+                          scheme:
+                            type: string
+                          tlsConfig:
+                            properties:
+                              ca:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              caFile:
+                                type: string
+                              cert:
+                                properties:
+                                  configMap:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                  secret:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                type: object
+                              certFile:
+                                type: string
+                              insecureSkipVerify:
+                                type: boolean
+                              keyFile:
+                                type: string
+                              keySecret:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                              serverName:
+                                type: string
+                            type: object
                         type: object
                       timeout:
                         type: string
@@ -3370,9 +3604,29 @@ spec:
                     properties:
                       drain:
                         properties:
+                          annotations:
+                            additionalProperties:
+                              type: string
+                            type: object
                           enabled:
                             type: boolean
                           image:
+                            properties:
+                              imagePullSecrets:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                  type: object
+                                type: array
+                              pullPolicy:
+                                type: string
+                              repository:
+                                type: string
+                              tag:
+                                type: string
+                            type: object
+                          pauseImage:
                             properties:
                               imagePullSecrets:
                                 items:
@@ -3703,6 +3957,8 @@ spec:
                       type: object
                     detectExceptions:
                       properties:
+                        force_line_breaks:
+                          type: boolean
                         languages:
                           items:
                             type: string
@@ -7622,6 +7878,10 @@ spec:
                               type: string
                             Tag_Regex:
                               type: string
+                            multiline.parser:
+                              items:
+                                type: string
+                              type: array
                             storage.type:
                               type: string
                           type: object
@@ -7696,6 +7956,82 @@ spec:
                                         type: string
                                     type: object
                                   type: array
+                                scheme:
+                                  type: string
+                                tlsConfig:
+                                  properties:
+                                    ca:
+                                      properties:
+                                        configMap:
+                                          properties:
+                                            key:
+                                              type: string
+                                            name:
+                                              type: string
+                                            optional:
+                                              type: boolean
+                                          required:
+                                          - key
+                                          type: object
+                                        secret:
+                                          properties:
+                                            key:
+                                              type: string
+                                            name:
+                                              type: string
+                                            optional:
+                                              type: boolean
+                                          required:
+                                          - key
+                                          type: object
+                                      type: object
+                                    caFile:
+                                      type: string
+                                    cert:
+                                      properties:
+                                        configMap:
+                                          properties:
+                                            key:
+                                              type: string
+                                            name:
+                                              type: string
+                                            optional:
+                                              type: boolean
+                                          required:
+                                          - key
+                                          type: object
+                                        secret:
+                                          properties:
+                                            key:
+                                              type: string
+                                            name:
+                                              type: string
+                                            optional:
+                                              type: boolean
+                                          required:
+                                          - key
+                                          type: object
+                                      type: object
+                                    certFile:
+                                      type: string
+                                    insecureSkipVerify:
+                                      type: boolean
+                                    keyFile:
+                                      type: string
+                                    keySecret:
+                                      properties:
+                                        key:
+                                          type: string
+                                        name:
+                                          type: string
+                                        optional:
+                                          type: boolean
+                                      required:
+                                      - key
+                                      type: object
+                                    serverName:
+                                      type: string
+                                  type: object
                               type: object
                             timeout:
                               type: string

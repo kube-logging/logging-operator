@@ -66,6 +66,8 @@ type ServiceMonitorConfig struct {
 	HonorLabels        bool                `json:"honorLabels,omitempty"`
 	Relabelings        []*v1.RelabelConfig `json:"relabelings,omitempty"`
 	MetricsRelabelings []*v1.RelabelConfig `json:"metricRelabelings,omitempty"`
+	Scheme             string              `json:"scheme,omitempty"`
+	TLSConfig          *v1.TLSConfig       `json:"tlsConfig,omitempty"`
 }
 
 // Security defines Fluentd, Fluentbit deployment security properties

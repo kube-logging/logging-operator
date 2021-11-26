@@ -77,16 +77,11 @@ Deploy Logging Operator with [Kubernetes manifests](https://banzaicloud.com/docs
 
 ### Community support
 
-If you encounter problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://pages.banzaicloud.com/invite-slack).
+If you encounter problems that the documentation does not address, [open an issue](https://github.com/banzaicloud/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://banzaicloud.com/invite-slack/).
 
 ### Commercial support
 
 If you are using the Logging operator in a production environment and [require commercial support, contact Banzai Cloud](https://banzaicloud.com/contact/), the company backing the development of the Logging operator. If you are looking for the ultimate observability tool for multi-cluster Kubernetes infrastructures to automate the collection, correlation, and storage of logs and metrics, check out [One Eye](https://banzaicloud.com/products/one-eye/).
-
-### Engineering blog
-
-To be up-to-date with the Logging operator and the other open source and commercial products of [Banzai Cloud, subscribe to our blog](https://pages.banzaicloud.com/sign-up-for-the-banzai-cloud-newsletter/).
-
 
 ## Documentation
 

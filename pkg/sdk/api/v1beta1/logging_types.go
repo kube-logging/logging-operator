@@ -114,12 +114,14 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository         = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                = "1.8.8"
+	DefaultFluentbitImageTag                = "1.8.9"
 	DefaultFluentdImageRepository           = "ghcr.io/banzaicloud/fluentd"
 	DefaultFluentdImageTag                  = "v1.13.3-alpine-11"
 	DefaultFluentdBufferStorageVolumeName   = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository = "ghcr.io/banzaicloud/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag        = "v0.0.1"
+	DefaultFluentdDrainPauseImageRepository = "k8s.gcr.io/pause"
+	DefaultFluentdDrainPauseImageTag        = "latest"
 )
 
 // SetDefaults fills empty attributes
@@ -259,6 +261,15 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.Drain.Image.PullPolicy = "IfNotPresent"
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Repository == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Repository = DefaultFluentdDrainPauseImageRepository
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Tag == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.Tag = DefaultFluentdDrainPauseImageTag
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy == "" {
+			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentdSpec.FluentLogDestination == "" {
 			l.Spec.FluentdSpec.FluentLogDestination = "null"

@@ -31,8 +31,9 @@ import (
 )
 
 type fluentbitInputConfig struct {
-	Values  map[string]string
-	ParserN []string
+	Values          map[string]string
+	ParserN         []string
+	MultilineParser []string
 }
 
 type upstreamNode struct {
@@ -136,6 +137,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if len(inputTail.ParserN) > 0 {
 		fluentbitInput.ParserN = r.Logging.Spec.FluentbitSpec.InputTail.ParserN
 		inputTail.ParserN = nil
+	}
+	if len(inputTail.MultilineParser) > 0 {
+		fluentbitInput.MultilineParser = r.Logging.Spec.FluentbitSpec.InputTail.MultilineParser
+		inputTail.MultilineParser = nil
 	}
 	fluentbitInputValues, err := mapper.StringsMap(inputTail)
 	if err != nil {
