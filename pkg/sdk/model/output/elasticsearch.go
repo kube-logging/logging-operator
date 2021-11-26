@@ -44,7 +44,7 @@ type _hugoElasticsearch interface{} //nolint:deadcode,unused
 type _docElasticsearch interface{} //nolint:deadcode,unused
 
 // +name:"Elasticsearch"
-// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v5.1.1"
+// +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v5.1.4"
 // +version:"5.1.1"
 // +description:"Send your logs to Elasticsearch"
 // +status:"GA"
