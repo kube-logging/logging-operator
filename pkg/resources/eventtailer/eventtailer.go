@@ -1,0 +1,64 @@
+// Copyright (c) 2020 Banzai Cloud Zrt. All Rights Reserved.
+
+package eventtailer
+
+import (
+	"k8s.io/apimachinery/pkg/runtime"
+
+	"emperror.dev/errors"
+	loggingextensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
+	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/go-logr/logr"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+// EventTailer .
+type EventTailer struct {
+	log logr.Logger
+	*reconciler.GenericResourceReconciler
+	customResource       loggingextensionsv1alpha1.EventTailer
+	CommonSelectorLabels map[string]string `json:"selectorLabels,omitempty"`
+}
+
+// New .
+func New(client client.Client, log logr.Logger, opts reconciler.ReconcilerOpts, customResource loggingextensionsv1alpha1.EventTailer) *EventTailer {
+	return &EventTailer{
+		log:                       log,
+		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
+		customResource:            customResource,
+	}
+}
+
+func (e *EventTailer) Reconcile(object runtime.Object) (*reconcile.Result, error) {
+	for _, res := range []Resource{
+		e.ServiceAccount,
+		e.ClusterRole,
+		e.ClusterRoleBinding,
+		e.ConfigMap,
+		e.StatefulSet,
+	} {
+		o, state, err := res()
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to create desired object")
+		}
+		if o == nil {
+			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", res)
+		}
+		result, err := e.ReconcileResource(o, state)
+		if err != nil {
+			return nil, errors.WrapIf(err, "failed to reconcile resource")
+		}
+		if result != nil {
+			return result, nil
+		}
+	}
+
+	return nil, nil
+}
+
+// RegisterWatches completes the implementation of ComponentReconciler
+func (e *EventTailer) RegisterWatches(*builder.Builder) {
+	// placeholder
+}
