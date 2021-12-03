@@ -134,14 +134,31 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	// FluentBit input Values
 	fluentbitInput := fluentbitInputConfig{}
 	inputTail := r.Logging.Spec.FluentbitSpec.InputTail
-	if len(inputTail.ParserN) > 0 {
-		fluentbitInput.ParserN = r.Logging.Spec.FluentbitSpec.InputTail.ParserN
+
+	if len(inputTail.MultilineParser) > 0 {
+		fluentbitInput.MultilineParser = inputTail.MultilineParser
+		inputTail.MultilineParser = nil
+
+		// If MultilineParser is set, remove other parser fields
+		// See https://docs.fluentbit.io/manual/pipeline/inputs/tail#multiline-core-v1.8
+
+		log.Log.Info("Notice: MultilineParser is enabled. Disabling other parser options",
+			"logging", r.Logging.Name)
+
+		inputTail.Parser = ""
+		inputTail.ParserFirstline = ""
+		inputTail.ParserN = nil
+		inputTail.Multiline = ""
+		inputTail.MultilineFlush = ""
+		inputTail.DockerMode = ""
+		inputTail.DockerModeFlush = ""
+		inputTail.DockerModeParser = ""
+
+	} else if len(inputTail.ParserN) > 0 {
+		fluentbitInput.ParserN = inputTail.ParserN
 		inputTail.ParserN = nil
 	}
-	if len(inputTail.MultilineParser) > 0 {
-		fluentbitInput.MultilineParser = r.Logging.Spec.FluentbitSpec.InputTail.MultilineParser
-		inputTail.MultilineParser = nil
-	}
+
 	fluentbitInputValues, err := mapper.StringsMap(inputTail)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
