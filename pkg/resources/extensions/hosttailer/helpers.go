@@ -3,8 +3,8 @@
 package hosttailer
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/kubetool"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/volumepath"
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensionsconfig"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/utils"

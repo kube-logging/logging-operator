@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/kubetool"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/volumepath"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/api/tailer"
 	v1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensionsconfig"

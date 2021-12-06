@@ -12,7 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/banzaicloud/logging-operator/pkg/resources/eventtailer"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/eventtailer"
 	loggingextensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 )

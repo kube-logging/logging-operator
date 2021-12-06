@@ -26,8 +26,10 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/controllers"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
+	"github.com/banzaicloud/logging-operator/pkg/resources/extensions/podhandler"
 	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensionsconfig"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
@@ -44,6 +46,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -164,6 +167,19 @@ func main() {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1alpha1.logging")
 			os.Exit(1)
 		}
+
+		setupLog.Info("Setting up webhook server...")
+		webhookServer := mgr.GetWebhookServer()
+		if config.TailerWebhook.ServerPort != 0 {
+			webhookServer.Port = config.TailerWebhook.ServerPort
+		}
+		if config.TailerWebhook.CertDir != "" {
+			webhookServer.CertDir = config.TailerWebhook.CertDir
+		}
+
+		setupLog.Info("Registering webhooks...")
+		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
+
 	}
 
 	// +kubebuilder:scaffold:builder
