@@ -1,4 +1,16 @@
-// Copyright (c) 2020 Banzai Cloud Zrt. All Rights Reserved.
+// Copyright © 2021 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package v1alpha1
 
@@ -15,12 +27,12 @@ import (
 
 // +name:"Promtail"
 // +weight:"200"
-type _hugoPromtail = interface{}
+type _hugoPromtail = interface{} //nolint:deadcode,unused
 
 // +name:"Promtail"
 // +version:"v1alpha1"
 // +description:"Promtail's main goal is to tail custom files and transmit their changes to stdout. This way the logging-operator is able to process them."
-type _metaPromtail = interface{}
+type _metaPromtail = interface{} //nolint:deadcode,unused
 
 // PromtailSpec defines the desired state of Promtail
 type PromtailSpec struct {
