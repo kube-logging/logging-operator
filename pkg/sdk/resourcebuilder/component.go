@@ -19,7 +19,7 @@ import (
 	"io/ioutil"
 
 	"emperror.dev/errors"
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/crds"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/rbac"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
