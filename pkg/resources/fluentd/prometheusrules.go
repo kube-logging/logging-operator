@@ -158,7 +158,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 						"severity":  "warning",
 					},
 					Annotations: map[string]string{
-						"summary":     `Fluentd buffer size prediction warning 10 minutes.`,
+						"summary":     `Fluentd buffer size prediction warning.`,
 						"description": `Fluentd buffer trending watcher.`,
 					},
 				},
