@@ -117,7 +117,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 	var fluentbitTargetHost string
 	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetHost == "" {
-		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
+		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
 	} else {
 		fluentbitTargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
 	}
