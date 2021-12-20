@@ -49,7 +49,7 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
     {{- if .Input.MultilineParser }}
-    multiline.parser: {{- range $i, $v := .Input.MultilineParser }}{{ if $i }},{{ end}} {{ $v }}{{ end }}
+    multiline.parser {{- range $i, $v := .Input.MultilineParser }}{{ if $i }},{{ end}} {{ $v }}{{ end }}
     {{- end }}
 
 {{- if not .DisableKubernetesFilter }}
