@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 
 	"emperror.dev/errors"
+	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/crds"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/rbac"
@@ -122,6 +123,12 @@ func AppendCRDResourceBuilders(rbs []reconciler.ResourceBuilder, modifiers ...CR
 		},
 		func() (runtime.Object, reconciler.DesiredState, error) {
 			return CRD(loggingv1beta1.GroupVersion.Group, "clusteroutputs", modifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(extensionsv1alpha1.GroupVersion.Group, "hosttailers", modifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(extensionsv1alpha1.GroupVersion.Group, "eventtailers", modifiers...)
 		},
 	)
 }

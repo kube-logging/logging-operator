@@ -144,7 +144,7 @@ func LogConsumer(t *testing.T, c client.Client, opts ...LogConsumerOption) LogCo
 	ctx := context.Background()
 	require.NoError(t, c.Create(ctx, &logConsumerPod))
 	require.NoError(t, c.Create(ctx, &logConsumerSvc))
-	require.Eventually(t, cond.PodShouldBeRunning(t, c, client.ObjectKeyFromObject(&logConsumerPod)), 2*time.Minute, 5*time.Second)
+	require.Eventually(t, cond.PodShouldBeRunning(t, c, client.ObjectKeyFromObject(&logConsumerPod)), 5*time.Minute, 5*time.Second)
 	return LogConsumerResult{
 		PodKey:     client.ObjectKeyFromObject(&logConsumerPod),
 		ServiceKey: client.ObjectKeyFromObject(&logConsumerSvc),
