@@ -17,7 +17,7 @@ package fluentddataprovider
 import (
 	"context"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type FluentdDataProvider interface {
