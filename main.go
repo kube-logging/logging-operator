@@ -139,7 +139,7 @@ func main() {
 
 	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Logging"))
 
-	if err = (&extensionsControllers.EventTailerReconciler{
+	if err := (&extensionsControllers.EventTailerReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("EventTailer"),
 		Scheme: mgr.GetScheme(),
@@ -147,7 +147,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "EventTailer")
 		os.Exit(1)
 	}
-	if err = (&extensionsControllers.HostTailerReconciler{
+	if err := (&extensionsControllers.HostTailerReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("HostTailer"),
 		Scheme: mgr.GetScheme(),
@@ -162,11 +162,11 @@ func main() {
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
-		if err = loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1beta1.APITypes()...); err != nil {
+		if err := loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1beta1.APITypes()...); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1beta1.logging")
 			os.Exit(1)
 		}
-		if err = loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1alpha1.APITypes()...); err != nil {
+		if err := loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1alpha1.APITypes()...); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1alpha1.logging")
 			os.Exit(1)
 		}

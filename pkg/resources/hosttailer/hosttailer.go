@@ -37,9 +37,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-// Resource .
-type Resource func() (runtime.Object, reconciler.DesiredState, error)
-
 // HostTailer .
 type HostTailer struct {
 	log logr.Logger

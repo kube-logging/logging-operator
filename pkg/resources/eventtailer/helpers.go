@@ -18,15 +18,10 @@ import (
 	"fmt"
 
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
-
-// Resource redeclaration of function with return type kubernetes Object
-type Resource func() (runtime.Object, reconciler.DesiredState, error)
 
 // Name .
 func (e *EventTailer) Name() string {

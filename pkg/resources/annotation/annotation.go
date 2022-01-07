@@ -62,7 +62,7 @@ func NewHandler(containerNames []string) *Handler {
 		h.defaultContainerName = containerNames[0]
 	}
 	for _, containerName := range containerNames {
-		h.containerPaths[containerName] = []string{}
+		h.containerPaths[containerName] = FilePaths{}
 	}
 	return h
 }
@@ -127,13 +127,11 @@ func (h *Handler) FilePathsForContainer(containerName string) FilePaths {
 }
 
 // AllFilePaths returns FilePaths for all containers
-func (h *Handler) AllFilePaths() FilePaths {
-	if h == nil {
-		return nil
-	}
-	result := FilePaths{}
-	for _, v := range h.containerPaths {
-		result = append(result, v...)
+func (h *Handler) AllFilePaths() (result FilePaths) {
+	if h != nil {
+		for _, v := range h.containerPaths {
+			result = append(result, v...)
+		}
 	}
 	return result
 }

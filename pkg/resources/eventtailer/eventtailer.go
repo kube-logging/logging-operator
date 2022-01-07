@@ -44,7 +44,7 @@ func New(client client.Client, log logr.Logger, opts reconciler.ReconcilerOpts, 
 }
 
 func (e *EventTailer) Reconcile(object runtime.Object) (*reconcile.Result, error) {
-	for _, res := range []Resource{
+	for _, res := range []reconciler.ResourceBuilder{
 		e.ServiceAccount,
 		e.ClusterRole,
 		e.ClusterRoleBinding,
