@@ -23,12 +23,12 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/common"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/input"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/plugins"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/common"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
 )
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {

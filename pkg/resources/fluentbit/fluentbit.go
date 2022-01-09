@@ -20,7 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"

@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/output"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

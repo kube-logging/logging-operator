@@ -34,9 +34,9 @@ func main() {
 func plugins() {
 	lister := docgen.NewSourceLister(
 		map[string]docgen.SourceDir{
-			"filters": {Path: "pkg/sdk/model/filter", DestPath: "docs/configuration/plugins/filters"},
-			"outputs": {Path: "pkg/sdk/model/output", DestPath: "docs/configuration/plugins/outputs"},
-			"common":  {Path: "pkg/sdk/model/common", DestPath: "docs/configuration/plugins/common"},
+			"filters": {Path: "pkg/sdk/logging/model/filter", DestPath: "docs/configuration/plugins/filters"},
+			"outputs": {Path: "pkg/sdk/logging/model/output", DestPath: "docs/configuration/plugins/outputs"},
+			"common":  {Path: "pkg/sdk/logging/model/common", DestPath: "docs/configuration/plugins/common"},
 		},
 		logger.WithName("pluginlister"))
 
@@ -99,7 +99,7 @@ func plugins() {
 func crds() {
 	lister := docgen.NewSourceLister(
 		map[string]docgen.SourceDir{
-			"v1beta1": {Path: "pkg/sdk/api/v1beta1", DestPath: "docs/configuration/crds/v1beta1"},
+			"v1beta1": {Path: "pkg/sdk/logging/api/v1beta1", DestPath: "docs/configuration/crds/v1beta1"},
 		},
 		logger.WithName("crdlister"))
 

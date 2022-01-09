@@ -17,7 +17,7 @@ package fluentd
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
