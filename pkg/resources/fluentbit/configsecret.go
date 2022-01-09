@@ -22,7 +22,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"

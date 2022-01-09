@@ -11,6 +11,18 @@ rules:
   - ""
   resources:
   - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
   - secrets
   verbs:
   - create
@@ -33,10 +45,31 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - persistentvolumeclaims
   - pods
   - serviceaccounts
   - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
   verbs:
   - create
   - delete
@@ -73,7 +106,33 @@ rules:
   - apps
   - extensions
   resources:
+  - daemonsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  - extensions
+  resources:
   - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - statefulsets
   verbs:
   - create
   - delete
@@ -101,6 +160,14 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - extensions
   - networking.k8s.io
   resources:
@@ -127,6 +194,46 @@ rules:
   - update
   - use
   - watch
+- apiGroups:
+  - logging-extensions.banzaicloud.io
+  resources:
+  - eventtailers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - logging-extensions.banzaicloud.io
+  resources:
+  - eventtailers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - logging-extensions.banzaicloud.io
+  resources:
+  - hosttailers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - logging-extensions.banzaicloud.io
+  resources:
+  - hosttailers/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - logging.banzaicloud.io
   resources:
@@ -172,9 +279,33 @@ rules:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
   - clusterroles
   - rolebindings
   - roles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
   verbs:
   - create
   - delete

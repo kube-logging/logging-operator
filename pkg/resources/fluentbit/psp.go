@@ -17,7 +17,7 @@ package fluentbit
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"

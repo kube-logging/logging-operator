@@ -24,13 +24,15 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/controllers"
+	extensionsControllers "github.com/banzaicloud/logging-operator/controllers/extensions"
+	loggingControllers "github.com/banzaicloud/logging-operator/controllers/logging"
 	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
-	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1alpha1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/model/types"
+	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1alpha1"
+	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/banzaicloud/logging-operator/pkg/webhook/podhandler"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
@@ -46,6 +48,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -58,6 +61,7 @@ func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = loggingv1beta1.AddToScheme(scheme)
 	_ = loggingv1alpha1.AddToScheme(scheme)
+	_ = extensionsv1alpha1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 	_ = prometheusOperator.AddToScheme(scheme)
 	_ = apiextensions.AddToScheme(scheme)
@@ -133,22 +137,53 @@ func main() {
 		os.Exit(1)
 	}
 
-	loggingReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Logging"))
+	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Logging"))
 
-	if err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
+	if err := (&extensionsControllers.EventTailerReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("EventTailer"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "EventTailer")
+		os.Exit(1)
+	}
+	if err := (&extensionsControllers.HostTailerReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("HostTailer"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "HostTailer")
+		os.Exit(1)
+	}
+
+	if err := loggingControllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Logging")
 		os.Exit(1)
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
-		if err = loggingv1beta1.SetupWebhookWithManager(mgr, v1beta1.APITypes()...); err != nil {
+		if err := loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1beta1.APITypes()...); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1beta1.logging")
 			os.Exit(1)
 		}
-		if err = loggingv1beta1.SetupWebhookWithManager(mgr, v1alpha1.APITypes()...); err != nil {
+		if err := loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1alpha1.APITypes()...); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1alpha1.logging")
 			os.Exit(1)
 		}
+
+		// Webhook server registration
+		setupLog.Info("Setting up webhook server...")
+		webhookServer := mgr.GetWebhookServer()
+		if config.TailerWebhook.ServerPort != 0 {
+			webhookServer.Port = config.TailerWebhook.ServerPort
+		}
+		if config.TailerWebhook.CertDir != "" {
+			webhookServer.CertDir = config.TailerWebhook.CertDir
+		}
+
+		setupLog.Info("Registering webhooks...")
+		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
+
 	}
 
 	// +kubebuilder:scaffold:builder
