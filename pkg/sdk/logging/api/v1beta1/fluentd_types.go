@@ -44,6 +44,7 @@ type FluentdSpec struct {
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
+	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
 	// Deprecated, use bufferStorageVolume
 	FluentdPvcSpec            *volume.KubernetesVolume          `json:"fluentdPvcSpec,omitempty"`
 	VolumeMountChmod          bool                              `json:"volumeMountChmod,omitempty"`
@@ -97,6 +98,24 @@ type FluentOutLogrotate struct {
 	Path    string `json:"path,omitempty"`
 	Age     string `json:"age,omitempty"`
 	Size    string `json:"size,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+// ExtraVolume defines the fluentd extra volumes
+type ExtraVolume struct {
+	VolumeName    string                   `json:"volumeName,omitempty"`
+	Path          string                   `json:"path,omitempty"`
+	ContainerName string                   `json:"containerName,omitempty"`
+	Volume        *volume.KubernetesVolume `json:"volume,omitempty"`
+}
+
+func (e *ExtraVolume) GetVolume() (corev1.Volume, error) {
+	return e.Volume.GetVolume(e.VolumeName)
+}
+
+func (e *ExtraVolume) ApplyVolumeForPodSpec(spec *corev1.PodSpec) error {
+	return e.Volume.ApplyVolumeForPodSpec(e.VolumeName, e.ContainerName, e.Path, spec)
 }
 
 // +kubebuilder:object:generate=true

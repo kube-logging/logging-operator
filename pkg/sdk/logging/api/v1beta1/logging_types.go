@@ -328,6 +328,21 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.ReadinessDefaultCheck.FailureThreshold == 0 {
 			l.Spec.FluentdSpec.ReadinessDefaultCheck.FailureThreshold = 1
 		}
+		for i := range l.Spec.FluentdSpec.ExtraVolumes {
+			e := &l.Spec.FluentdSpec.ExtraVolumes[i]
+			if e.ContainerName == "" {
+				e.ContainerName = "fluentd"
+			}
+			if e.VolumeName == "" {
+				e.VolumeName = fmt.Sprintf("extravolume-%d", i)
+			}
+			if e.Path == "" {
+				e.Path = "/tmp"
+			}
+			if e.Volume == nil {
+				e.Volume = &volume.KubernetesVolume{}
+			}
+		}
 	}
 
 	if l.Spec.FluentbitSpec != nil { // nolint:nestif
