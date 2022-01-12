@@ -47,8 +47,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		}
 	}
 	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
-		err := n.ApplyVolumeForPodSpec(&spec.Template.Spec)
-		if err != nil {
+		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 			return nil, reconciler.StatePresent, err
 		}
 	}
