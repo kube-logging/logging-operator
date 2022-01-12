@@ -295,5 +295,11 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 		}
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
+	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
+			r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
+		}
+	}
+
 	return pod
 }

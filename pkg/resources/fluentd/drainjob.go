@@ -74,6 +74,11 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 			},
 		},
 	})
+	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
+			return nil, err
+		}
+	}
 	return &batchv1.Job{
 		ObjectMeta: r.FluentdObjectMeta(StatefulSetName+pvc.Name[strings.LastIndex(pvc.Name, "-"):]+"-drainer", ComponentDrainer),
 		Spec:       spec,
