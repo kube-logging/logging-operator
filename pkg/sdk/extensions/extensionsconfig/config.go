@@ -87,7 +87,7 @@ var EventTailer = EventTailerConfig{
 var TailerWebhook = TailerWebhookConfig{
 	FluentBitImage:    "fluent/fluent-bit:1.6.1",
 	AnnotationKey:     "sidecar.logging-extensions.banzaicloud.io/tail",
-	ServerPath:        "/mutate-v1-pod",
+	ServerPath:        "/tailer-webhook",
 	ServerPort:        9443,
 	CertDir:           "/tmp/k8s-webhook-server/serving-certs",
 	DisableEnvVarName: "ENABLE_TAILER_WEBHOOK",
