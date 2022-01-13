@@ -46,6 +46,11 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			return nil, reconciler.StatePresent, err
 		}
 	}
+	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
+			return nil, reconciler.StatePresent, err
+		}
+	}
 
 	desired := &appsv1.StatefulSet{
 		ObjectMeta: r.FluentdObjectMeta(StatefulSetName, ComponentFluentd),
