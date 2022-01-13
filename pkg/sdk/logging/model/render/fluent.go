@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 )
@@ -37,6 +36,9 @@ func (f *FluentRender) Render(config types.FluentConfig) error {
 
 func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int) error {
 	for _, d := range directives {
+		if d == nil {
+			continue
+		}
 		meta := d.GetPluginMeta()
 		if meta.Directive == "" {
 			return fmt.Errorf("Directive must have a name %s", meta)

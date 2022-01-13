@@ -35,6 +35,8 @@ type _metaBuffer interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 
 type Buffer struct {
+	// Disable buffer section (default: false)
+	Disabled bool `json:"disabled,omitempty" plugin:"default:false,hidden"`
 	// Fluentd core bundles memory and file plugins. 3rd party plugins are also available when installed.
 	Type string `json:"type,omitempty"`
 	// When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags. (default: tag,time)
@@ -110,6 +112,10 @@ type Buffer struct {
 }
 
 func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	if b.Disabled {
+		return nil, nil
+	}
+
 	metadata := types.PluginMeta{
 		Type:      "file",
 		Directive: "buffer",
@@ -125,7 +131,7 @@ func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types
 	} else {
 		metadata.Tag = "tag,time"
 	}
-	if buffer.Path == "" {
+	if buffer.Path == "" && buffer.Type != "memory" {
 		buffer.Path = fmt.Sprintf("/buffers/%s.*.buffer", id)
 	}
 	// Cleanup non parameter configurations

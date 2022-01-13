@@ -77,6 +77,9 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 
 	pluginTagOpts := parseTag(field.Tag.Get(s.PluginTagName))
 	required := pluginTagOpts.Has("required")
+	if pluginTagOpts.Has("hidden") {
+		return nil
+	}
 
 	if tagOpts.Has("omitempty") {
 		if required {
