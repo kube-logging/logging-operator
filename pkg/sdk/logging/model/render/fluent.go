@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
+
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 )
