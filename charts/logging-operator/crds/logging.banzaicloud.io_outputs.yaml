@@ -55,6 +55,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -501,6 +503,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -653,6 +657,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -834,6 +840,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -978,6 +986,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -1405,6 +1415,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -1505,6 +1517,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -1892,6 +1906,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -2140,6 +2156,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -2397,6 +2415,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -2861,6 +2881,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -2971,6 +2993,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -3055,6 +3079,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -3179,6 +3205,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -3584,6 +3612,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -3707,6 +3737,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -3928,6 +3960,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -4117,6 +4151,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -4489,6 +4525,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -4576,6 +4614,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -4722,6 +4762,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -4901,6 +4943,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -5347,6 +5391,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -5499,6 +5545,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -5680,6 +5728,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -5824,6 +5874,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -6251,6 +6303,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -6351,6 +6405,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -6738,6 +6794,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -6986,6 +7044,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -7243,6 +7303,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -7707,6 +7769,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -7817,6 +7881,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -7901,6 +7967,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -8025,6 +8093,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -8430,6 +8500,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -8553,6 +8625,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -8774,6 +8848,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -8963,6 +9039,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -9335,6 +9413,8 @@ spec:
                         type: string
                       disable_chunk_backup:
                         type: boolean
+                      disabled:
+                        type: boolean
                       flush_at_shutdown:
                         type: boolean
                       flush_interval:
@@ -9422,6 +9502,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
@@ -9568,6 +9650,8 @@ spec:
                       delayed_commit_timeout:
                         type: string
                       disable_chunk_backup:
+                        type: boolean
+                      disabled:
                         type: boolean
                       flush_at_shutdown:
                         type: boolean
