@@ -164,5 +164,12 @@ func (c *CloudWatchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 	} else {
 		cloudwatch.SubDirectives = append(cloudwatch.SubDirectives, buffer)
 	}
+	if c.Format != nil {
+		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			cloudwatch.SubDirectives = append(cloudwatch.SubDirectives, format)
+		}
+	}
 	return cloudwatch, nil
 }
