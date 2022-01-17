@@ -597,8 +597,8 @@ func ExtensionsMutatingWebhook(parent reconciler.ResourceOwner, config Component
 					admissionregistration.Create,
 				},
 				Rule: admissionregistration.Rule{
-					APIGroups:   []string{""},
-					APIVersions: []string{"v1"},
+					APIGroups:   []string{corev1.SchemeGroupVersion.Group},
+					APIVersions: []string{corev1.SchemeGroupVersion.Version},
 					Resources:   []string{"pods"},
 					Scope:       &scope,
 				},
