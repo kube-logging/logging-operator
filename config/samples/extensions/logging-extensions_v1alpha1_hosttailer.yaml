@@ -1,0 +1,28 @@
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: HostTailer
+metadata:
+  name: sample
+spec:
+  # Add fields here
+  controlNamespace: default
+  enableRecreateWorkloadOnImmutableFieldChange: false
+  workloadOverrides:
+    priorityClassName: system-node-critical
+  fileTailers:
+    - name: firstfiletailer
+      path: /dev/urandom
+      disabled: true
+    - name: secondfiletailer
+      path: /tmp/foobar
+      disabled: true
+    - name: thirdfiletailer
+      path: /tmp/temp/foobar
+      disabled: false
+    - name: fourthfiletailer
+      path: /tmp/temp/shifter
+      disabled: false
+  systemdTailers:
+    - name: firstsystemdtailer
+      disabled: false
+      maxEntries: 20
+      systemdFilter: kubelet.service

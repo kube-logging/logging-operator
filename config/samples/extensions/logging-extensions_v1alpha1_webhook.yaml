@@ -1,0 +1,25 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: sample-webhook-cfg
+  labels:
+    app: sample-webhook
+  annotations:
+    certmanager.k8s.io/inject-ca-from: "namespace/certificate-name"
+webhooks:
+  - name: sample-webhook.banzaicloud.com
+    clientConfig:
+      service:
+        name: sample-tailer-webhook
+        namespace: default
+        path: "/tailer-webhook"
+      caBundle: "-- your CARoot comes here --"
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "*"
+    # namespaceSelector:
+    #   matchLabels:
+    #     sidecar-injector: enabled

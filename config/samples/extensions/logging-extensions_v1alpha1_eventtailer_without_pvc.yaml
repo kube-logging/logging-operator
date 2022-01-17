@@ -1,0 +1,9 @@
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: EventTailer
+metadata:
+  name: sample-wo-pvc
+spec:
+  # Add fields here
+  controlNamespace: default
+  workloadOverrides:
+    priorityClassName: system-cluster-critical
