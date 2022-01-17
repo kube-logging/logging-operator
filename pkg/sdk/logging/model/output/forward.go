@@ -36,6 +36,8 @@ type ForwardOutput struct {
 	// Server definitions at least one is required
 	// +docLink:"Server,#fluentd-server"
 	FluentdServers []FluentdServer `json:"servers"`
+	// The transport protocol to use [ tcp, tls ]
+	Transport string `json:"transport,omitempty"`
 	// Change the protocol to at-least-once. The plugin waits the ack from destination's in_forward plugin.
 	RequireAckResponse bool `json:"require_ack_response,omitempty"`
 	// This option is used when require_ack_response is true. This default value is based on popular tcp_syn_retries. (default: 190)
@@ -57,7 +59,7 @@ type ForwardOutput struct {
 	PhiThreshold int `json:"phi_threshold,omitempty"`
 	// The hard timeout used to detect server failure. The default value is equal to the send_timeout parameter. (default: 60)
 	HardTimeout int `json:"hard_timeout,omitempty"`
-	// Set TTL to expire DNS cache in seconds. Set 0 not to use DNS Cache. (defult: 0)
+	// Set TTL to expire DNS cache in seconds. Set 0 not to use DNS Cache. (default: 0)
 	ExpireDnsCache int `json:"expire_dns_cache,omitempty"`
 	// Enable client-side DNS round robin. Uniform randomly pick an IP address to send data when a hostname has several IP addresses.
 	// `heartbeat_type udp` is not available with `dns_round_robin true`. Use `heartbeat_type tcp` or `heartbeat_type none`.
