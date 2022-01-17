@@ -1,0 +1,18 @@
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: EventTailer
+metadata:
+  name: sample-w-pvc
+spec:
+  # Add fields here
+  controlNamespace: default
+  workloadOverrides:
+    priorityClassName: system-node-critical
+  positionVolume:
+    pvc:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        volumeMode: Filesystem

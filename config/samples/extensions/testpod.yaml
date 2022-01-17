@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+    volumeMounts:
+    - mountPath: /test
+      name: test-volume
+    - mountPath: /var/log/nginx
+      name: nginx
+  volumes:
+  - name: test-volume
+    hostPath:
+      # directory location on host
+      path: /tmp
+  - name: nginx
+    hostPath:
+      path: /var/log/nginx

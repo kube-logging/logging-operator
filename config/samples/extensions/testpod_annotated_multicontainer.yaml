@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-multipod
+  annotations: {"sidecar.logging-extensions.banzaicloud.io/tail": "test-container:/var/log/nginx/access.log,test-container:/var/log/nginx/error.log,second-container:/var/log/date,/var/log/foo/shifter"}
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+  - image: debian
+    name: second-container
+    command: ["/bin/sh", "-c"]
+    args:
+      - while true; do
+          date >> /var/log/date;
+          sleep 1;
+        done
+  volumes:
+  - name: test-volume
+    hostPath:
+      path: /tmp
