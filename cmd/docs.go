@@ -99,7 +99,8 @@ func plugins() {
 func crds() {
 	lister := docgen.NewSourceLister(
 		map[string]docgen.SourceDir{
-			"v1beta1": {Path: "pkg/sdk/logging/api/v1beta1", DestPath: "docs/configuration/crds/v1beta1"},
+			"v1beta1":    {Path: "pkg/sdk/logging/api/v1beta1", DestPath: "docs/configuration/crds/v1beta1"},
+			"extensions": {Path: "pkg/sdk/extensions/api/v1alpha1", DestPath: "docs/configuration/crds/extensions/v1alpha1"},
 		},
 		logger.WithName("crdlister"))
 
