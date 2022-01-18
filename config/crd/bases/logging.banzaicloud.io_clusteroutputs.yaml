@@ -1883,6 +1883,8 @@ spec:
                     type: boolean
                   tls_version:
                     type: string
+                  transport:
+                    type: string
                   verify_connection_at_startup:
                     type: boolean
                 required:
@@ -6776,6 +6778,8 @@ spec:
                   tls_verify_hostname:
                     type: boolean
                   tls_version:
+                    type: string
+                  transport:
                     type: string
                   verify_connection_at_startup:
                     type: boolean
