@@ -48,7 +48,7 @@ import (
 )
 
 const (
-	Image            = "ghcr.io/banzaicloud/logging-operator:3.16.0"
+	Image            = "ghcr.io/banzaicloud/logging-operator:3.17.0"
 	defaultNamespace = "logging-system"
 )
 
