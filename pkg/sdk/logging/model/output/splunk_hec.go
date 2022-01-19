@@ -39,8 +39,8 @@ type _hugoSplunk interface{} //nolint:deadcode,unused
 type _docSplunkHec interface{} //nolint:deadcode,unused
 
 // +name:"Splunk Hec"
-// +url:"https://github.com/splunk/fluent-plugin-splunk-hec/releases/tag/1.2.8
-// +version:"1.2.8"
+// +url:"https://github.com/splunk/fluent-plugin-splunk-hec/releases/tag/1.2.9
+// +version:"1.2.9"
 // +description:"Fluent Plugin Splunk Hec Release"
 // +status:"GA"
 type _metaSplunkHec interface{} //nolint:deadcode,unused

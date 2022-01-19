@@ -46,28 +46,28 @@ The command removes all Kubernetes components associated with the chart and dele
 
 The following tables lists the configurable parameters of the logging-operator chart and their default values.
 
-|                      Parameter                      |                        Description                     |             Default            |
-| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
-| `image.repository`                                  | Container image repository                             | `ghcr.io/banzaicloud/logging-operator` |
-| `image.tag`                                         | Container image tag                                    | `3.16.0`                        |
-| `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                 |
-| `nameOverride`                                      | Override name of app                                   | ``                             |
-| `fullnameOverride`                                  | Override full name of app                              | ``                             |
-| `namespaceOverride`                                 | Override namespace of app                              | ``                             |
-| `watchNamespace`                                    | Namespace to watch for LoggingOperator CRD             | ``                             |
-| `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                         |
-| `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.    | `false`                        |
-| `priorityClassName`                                 | Operator priorityClassName                             | `{}`                           |
-| `affinity`                                          | Node Affinity                                          | `{}`                           |
-| `resources`                                         | CPU/Memory resource requests/limits                    | `{}`                           |
-| `tolerations`                                       | Node Tolerations                                       | `[]`                           |
-| `nodeSelector`                                      | Define which Nodes the Pods are scheduled on.          | `{}`                           |
-| `podLabels`                                         | Define custom labels for logging-operator pods         | `{}`                           |
-| `annotations`                                       | Define annotations for logging-operator pods           | `{}`                           |
-| `podSecurityContext`                                | Pod SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"runAsNonRoot": true, "runAsUser": 1000, "fsGroup": 2000}` |
+|                      Parameter                      |                        Description                     | Default                                                               |
+| --------------------------------------------------- | ------------------------------------------------------ |-----------------------------------------------------------------------|
+| `image.repository`                                  | Container image repository                             | `ghcr.io/banzaicloud/logging-operator`                                |
+| `image.tag`                                         | Container image tag                                    | `3.17.0`                                                              |
+| `image.pullPolicy`                                  | Container pull policy                                  | `IfNotPresent`                                                        |
+| `nameOverride`                                      | Override name of app                                   | ``                                                                    |
+| `fullnameOverride`                                  | Override full name of app                              | ``                                                                    |
+| `namespaceOverride`                                 | Override namespace of app                              | ``                                                                    |
+| `watchNamespace`                                    | Namespace to watch for LoggingOperator CRD             | ``                                                                    |
+| `rbac.enabled`                                      | Create rbac service account and roles                  | `true`                                                                |
+| `rbac.psp.enabled`                                  | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.    | `false`                                                               |
+| `priorityClassName`                                 | Operator priorityClassName                             | `{}`                                                                  |
+| `affinity`                                          | Node Affinity                                          | `{}`                                                                  |
+| `resources`                                         | CPU/Memory resource requests/limits                    | `{}`                                                                  |
+| `tolerations`                                       | Node Tolerations                                       | `[]`                                                                  |
+| `nodeSelector`                                      | Define which Nodes the Pods are scheduled on.          | `{}`                                                                  |
+| `podLabels`                                         | Define custom labels for logging-operator pods         | `{}`                                                                  |
+| `annotations`                                       | Define annotations for logging-operator pods           | `{}`                                                                  |
+| `podSecurityContext`                                | Pod SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/)                                                                                             | `{"runAsNonRoot": true, "runAsUser": 1000, "fsGroup": 2000}`          |
 | `securityContext`                                   | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/) | `{"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true}` |
-| `createCustomResource`                              | Create CRDs. | `true` |
-| `monitoring.serviceMonitor.enabled`                 | Create Prometheus Operator servicemonitor. | `false` |
+| `createCustomResource`                              | Create CRDs. | `true`                                                                |
+| `monitoring.serviceMonitor.enabled`                 | Create Prometheus Operator servicemonitor. | `false`                                                               |
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 

@@ -43,7 +43,7 @@ type _docLoki interface{} //nolint:deadcode,unused
 
 // +name:"Grafana Loki"
 // +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
-// +version:"1.2.16"
+// +version:"1.2.17"
 // +description:"Transfer logs to Loki"
 // +status:"GA"
 type _metaLoki interface{} //nolint:deadcode,unused
