@@ -25,7 +25,7 @@ import (
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
 	obj := &v1.PrometheusRule{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName),
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
 	}
 	state := reconciler.StateAbsent
 
