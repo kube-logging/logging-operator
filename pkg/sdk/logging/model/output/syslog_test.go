@@ -97,3 +97,51 @@ buffer:
 	test := render.NewOutputPluginTest(t, f)
 	test.DiffResult(expected)
 }
+
+func TestSyslogOutputConfigForMutualTLS(t *testing.T) {
+	CONFIG := []byte(`
+allow_self_signed_cert: true
+fqdn: Test-Fqdn
+host: SYSLOG-HOST
+port: 123
+private_key_passphrase: Test-Passphrase
+version: TLSv1_2
+format:
+  app_name_field: example.custom_field_1
+  proc_id_field: example.custom_field_2
+buffer:
+  timekey: 1m
+  timekey_wait: 30s
+  timekey_use_utc: true
+`)
+	expected := `
+  <match **>
+	@type syslog_rfc5424
+	@id test
+	allow_self_signed_cert true
+	fqdn Test-Fqdn
+	host SYSLOG-HOST
+	port 123
+	private_key_passphrase Test-Passphrase
+	version TLSv1_2
+	<buffer tag,time>
+	  @type file
+	  chunk_limit_size 8MB
+	  path /buffers/test.*.buffer
+	  retry_forever true
+	  timekey 1m
+	  timekey_use_utc true
+	  timekey_wait 30s
+	</buffer>
+	<format>
+	  @type syslog_rfc5424
+	  app_name_field example.custom_field_1
+	  proc_id_field example.custom_field_2
+	</format>
+  </match>
+`
+	f := &output.SyslogOutputConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, f))
+	test := render.NewOutputPluginTest(t, f)
+	test.DiffResult(expected)
+}

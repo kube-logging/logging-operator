@@ -47,6 +47,16 @@ type SyslogOutputConfig struct {
 	Insecure *bool `json:"insecure,omitempty"`
 	// file path to ca to trust
 	TrustedCaPath *secret.Secret `json:"trusted_ca_path,omitempty"`
+	// file path for private_key_path
+	PrivateKeyPath *secret.Secret `json:"private_key_path,omitempty"`
+	// PrivateKeyPassphrase for private key  (default: "nil")
+	PrivateKeyPassphrase string `json:"private_key_passphrase,omitempty"`
+	// allow_self_signed_cert for mutual tls (default: false)
+	AllowSelfSignedCert *bool `json:"allow_self_signed_cert,omitempty"`
+	// Fqdn (default: "nil")
+	Fqdn string `json:"fqdn,omitempty"`
+	// TLS Version  (default: "TLSv1_2")
+	Version string `json:"version,omitempty"`
 	// +docLink:"Format,../format_rfc5424/"
 	Format *FormatRfc5424 `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
