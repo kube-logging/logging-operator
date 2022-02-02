@@ -7,7 +7,7 @@ require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.0.0
-	github.com/banzaicloud/operator-tools v0.25.4
+	github.com/banzaicloud/operator-tools v0.26.0
 	github.com/go-logr/logr v0.4.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.14.0
