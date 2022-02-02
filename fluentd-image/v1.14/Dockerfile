@@ -1,5 +1,5 @@
 FROM alpine:3.14
-LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.14.4"
+LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.14.5"
 
 # Do not split this into multiple RUN!
 # Docker creates a layer for every RUN-Statement
