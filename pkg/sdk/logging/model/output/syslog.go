@@ -46,6 +46,10 @@ type SyslogOutputConfig struct {
 	// skip ssl validation (default: false)
 	Insecure *bool `json:"insecure,omitempty"`
 	// file path to ca to trust
+	VerifyFqdn *bool `json:"verify_fqdn,omitempty"`
+	// verify_fqdn (default: nil)
+	VerifyPeer *bool `json:"verify_peer,omitempty"`
+	// verify_peer (default: nil)
 	TrustedCaPath *secret.Secret `json:"trusted_ca_path,omitempty"`
 	// file path for private_key_path
 	PrivateKeyPath *secret.Secret `json:"private_key_path,omitempty"`

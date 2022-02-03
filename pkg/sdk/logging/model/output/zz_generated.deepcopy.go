@@ -1398,6 +1398,16 @@ func (in *SyslogOutputConfig) DeepCopyInto(out *SyslogOutputConfig) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.VerifyFqdn != nil {
+		in, out := &in.VerifyFqdn, &out.VerifyFqdn
+		*out = new(bool)
+		**out = **in
+	}
+	if in.VerifyPeer != nil {
+		in, out := &in.VerifyPeer, &out.VerifyPeer
+		*out = new(bool)
+		**out = **in
+	}
 	if in.TrustedCaPath != nil {
 		in, out := &in.TrustedCaPath, &out.TrustedCaPath
 		*out = new(secret.Secret)

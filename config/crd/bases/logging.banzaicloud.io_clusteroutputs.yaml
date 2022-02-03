@@ -4931,6 +4931,10 @@ spec:
                             type: object
                         type: object
                     type: object
+                  verify_fqdn:
+                    type: boolean
+                  verify_peer:
+                    type: boolean
                   version:
                     type: string
                 required:
@@ -9868,6 +9872,10 @@ spec:
                             type: object
                         type: object
                     type: object
+                  verify_fqdn:
+                    type: boolean
+                  verify_peer:
+                    type: boolean
                   version:
                     type: string
                 required:
