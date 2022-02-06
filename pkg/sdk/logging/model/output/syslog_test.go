@@ -106,7 +106,6 @@ host: SYSLOG-HOST
 port: 123
 verify_fqdn: false
 verify_peer: false
-private_key_passphrase: Test-Passphrase
 version: TLSv1_2
 format:
   app_name_field: example.custom_field_1
@@ -124,7 +123,6 @@ buffer:
 	fqdn Test-Fqdn
 	host SYSLOG-HOST
 	port 123
-	private_key_passphrase Test-Passphrase
 	verify_fqdn false
 	verify_fqdn false
 	version TLSv1_2

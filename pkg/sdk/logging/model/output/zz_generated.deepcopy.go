@@ -1418,6 +1418,11 @@ func (in *SyslogOutputConfig) DeepCopyInto(out *SyslogOutputConfig) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.PrivateKeyPassphrase != nil {
+		in, out := &in.PrivateKeyPassphrase, &out.PrivateKeyPassphrase
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AllowSelfSignedCert != nil {
 		in, out := &in.AllowSelfSignedCert, &out.AllowSelfSignedCert
 		*out = new(bool)

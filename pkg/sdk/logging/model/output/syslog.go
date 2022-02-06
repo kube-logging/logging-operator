@@ -54,7 +54,7 @@ type SyslogOutputConfig struct {
 	// file path for private_key_path
 	PrivateKeyPath *secret.Secret `json:"private_key_path,omitempty"`
 	// PrivateKeyPassphrase for private key  (default: "nil")
-	PrivateKeyPassphrase string `json:"private_key_passphrase,omitempty"`
+	PrivateKeyPassphrase *secret.Secret `json:"private_key_passphrase,omitempty"`
 	// allow_self_signed_cert for mutual tls (default: false)
 	AllowSelfSignedCert *bool `json:"allow_self_signed_cert,omitempty"`
 	// Fqdn (default: "nil")
