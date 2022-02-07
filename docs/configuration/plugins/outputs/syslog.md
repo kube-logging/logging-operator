@@ -35,9 +35,27 @@ skip ssl validation
 
 Default:  false
 
+### verify_fqdn (*bool, optional) {#syslogoutputconfig-verify_fqdn}
+
+verify_fqdn  
+
+Default:  nil
+
+### enable_system_cert_store (*bool, optional) {#syslogoutputconfig-enable_system_cert_store}
+
+cert_store to set ca_certificate for ssl context 
+
+Default: -
+
 ### trusted_ca_path (*secret.Secret, optional) {#syslogoutputconfig-trusted_ca_path}
 
 file path to ca to trust 
+
+Default: -
+
+### client_cert_path (*secret.Secret, optional) {#syslogoutputconfig-client_cert_path}
+
+file path for private_key_path 
 
 Default: -
 
@@ -47,7 +65,7 @@ file path for private_key_path
 
 Default: -
 
-### private_key_passphrase (string, optional) {#syslogoutputconfig-private_key_passphrase}
+### private_key_passphrase (*secret.Secret, optional) {#syslogoutputconfig-private_key_passphrase}
 
 PrivateKeyPassphrase for private key   
 
