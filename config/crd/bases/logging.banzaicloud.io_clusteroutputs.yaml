@@ -4826,6 +4826,41 @@ spec:
                       type:
                         type: string
                     type: object
+                  client_cert_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  enable_system_cert_store:
+                    type: boolean
                   format:
                     properties:
                       app_name_field:
@@ -4963,8 +4998,6 @@ spec:
                         type: object
                     type: object
                   verify_fqdn:
-                    type: boolean
-                  verify_peer:
                     type: boolean
                   version:
                     type: string
@@ -9798,6 +9831,41 @@ spec:
                       type:
                         type: string
                     type: object
+                  client_cert_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  enable_system_cert_store:
+                    type: boolean
                   format:
                     properties:
                       app_name_field:
@@ -9935,8 +10003,6 @@ spec:
                         type: object
                     type: object
                   verify_fqdn:
-                    type: boolean
-                  verify_peer:
                     type: boolean
                   version:
                     type: string

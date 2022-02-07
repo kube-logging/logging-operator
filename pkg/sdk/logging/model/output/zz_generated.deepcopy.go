@@ -1403,13 +1403,18 @@ func (in *SyslogOutputConfig) DeepCopyInto(out *SyslogOutputConfig) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.VerifyPeer != nil {
-		in, out := &in.VerifyPeer, &out.VerifyPeer
+	if in.EnableSystemCertStore != nil {
+		in, out := &in.EnableSystemCertStore, &out.EnableSystemCertStore
 		*out = new(bool)
 		**out = **in
 	}
 	if in.TrustedCaPath != nil {
 		in, out := &in.TrustedCaPath, &out.TrustedCaPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.ClientCertPath != nil {
+		in, out := &in.ClientCertPath, &out.ClientCertPath
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}

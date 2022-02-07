@@ -105,7 +105,7 @@ fqdn: Test-Fqdn
 host: SYSLOG-HOST
 port: 123
 verify_fqdn: false
-verify_peer: false
+enable_system_cert_store: true
 version: TLSv1_2
 format:
   app_name_field: example.custom_field_1
@@ -124,7 +124,7 @@ buffer:
 	host SYSLOG-HOST
 	port 123
 	verify_fqdn false
-	verify_fqdn false
+	enable_system_cert_store true
 	version TLSv1_2
 	<buffer tag,time>
 	  @type file

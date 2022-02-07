@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
       # Change the value of image field below to your controller image URL
-      - image: 672327909798.dkr.ecr.us-east-1.amazonaws.com/sagar-logging-operator:v2
+      - image: 672327909798.dkr.ecr.us-east-1.amazonaws.com/sagar-logging-operator:v4
         name: manager
