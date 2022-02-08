@@ -113,15 +113,21 @@ type DefaultFlowSpec struct {
 }
 
 const (
-	DefaultFluentbitImageRepository         = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                = "1.8.9"
-	DefaultFluentdImageRepository           = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag                  = "v1.14.4-alpine-2"
-	DefaultFluentdBufferStorageVolumeName   = "fluentd-buffer"
-	DefaultFluentdDrainWatchImageRepository = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag        = "v0.0.1"
-	DefaultFluentdDrainPauseImageRepository = "k8s.gcr.io/pause"
-	DefaultFluentdDrainPauseImageTag        = "latest"
+	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
+	DefaultFluentbitImageTag                    = "1.8.9"
+	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
+	DefaultFluentdImageTag                      = "v1.14.4-alpine-2"
+	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
+	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
+	DefaultFluentdDrainWatchImageTag            = "v0.0.1"
+	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
+	DefaultFluentdDrainPauseImageTag            = "latest"
+	DefaultFluentdVolumeModeImageRepository     = "busybox"
+	DefaultFluentdVolumeModeImageTag            = "latest"
+	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
+	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
+	DefaultFluentdBufferVolumeImageRepository   = "quay.io/prometheus/node-exporter"
+	DefaultFluentdBufferVolumeImageTag          = "v1.1.2"
 )
 
 // SetDefaults fills empty attributes
@@ -206,28 +212,28 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 		if l.Spec.FluentdSpec.VolumeModImage.Repository == "" {
-			l.Spec.FluentdSpec.VolumeModImage.Repository = "busybox"
+			l.Spec.FluentdSpec.VolumeModImage.Repository = DefaultFluentdVolumeModeImageRepository
 		}
 		if l.Spec.FluentdSpec.VolumeModImage.Tag == "" {
-			l.Spec.FluentdSpec.VolumeModImage.Tag = "latest"
+			l.Spec.FluentdSpec.VolumeModImage.Tag = DefaultFluentdVolumeModeImageTag
 		}
 		if l.Spec.FluentdSpec.VolumeModImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.VolumeModImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.Repository == "" {
-			l.Spec.FluentdSpec.ConfigReloaderImage.Repository = "jimmidyson/configmap-reload"
+			l.Spec.FluentdSpec.ConfigReloaderImage.Repository = DefaultFluentdConfigReloaderImageRepository
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.Tag == "" {
-			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = "v0.4.0"
+			l.Spec.FluentdSpec.ConfigReloaderImage.Tag = DefaultFluentdConfigReloaderImageTag
 		}
 		if l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentdSpec.BufferVolumeImage.Repository == "" {
-			l.Spec.FluentdSpec.BufferVolumeImage.Repository = "quay.io/prometheus/node-exporter"
+			l.Spec.FluentdSpec.BufferVolumeImage.Repository = DefaultFluentdBufferVolumeImageRepository
 		}
 		if l.Spec.FluentdSpec.BufferVolumeImage.Tag == "" {
-			l.Spec.FluentdSpec.BufferVolumeImage.Tag = "v1.1.2"
+			l.Spec.FluentdSpec.BufferVolumeImage.Tag = DefaultFluentdBufferVolumeImageTag
 		}
 		if l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
