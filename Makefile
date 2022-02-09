@@ -22,7 +22,7 @@ CONTROLLER_GEN = $(PWD)/bin/controller-gen
 ENVTEST_ASSETS_DIR=${PWD}/testbin
 export PATH := $(PWD)/bin:$(PATH)
 
-E2E_TEST_TIMEOUT ?= 10m
+E2E_TEST_TIMEOUT ?= 20m
 
 .PHONY: all
 all: manager
