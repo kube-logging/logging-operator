@@ -4755,6 +4755,8 @@ spec:
                 type: object
               syslog:
                 properties:
+                  allow_self_signed_cert:
+                    type: boolean
                   buffer:
                     properties:
                       chunk_full_threshold:
@@ -4824,6 +4826,41 @@ spec:
                       type:
                         type: string
                     type: object
+                  client_cert_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  enable_system_cert_store:
+                    type: boolean
                   format:
                     properties:
                       app_name_field:
@@ -4851,12 +4888,80 @@ spec:
                         - single_value
                         type: string
                     type: object
+                  fqdn:
+                    type: string
                   host:
                     type: string
                   insecure:
                     type: boolean
                   port:
                     type: integer
+                  private_key_passphrase:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  private_key_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
                   transport:
                     type: string
                   trusted_ca_path:
@@ -4892,6 +4997,10 @@ spec:
                             type: object
                         type: object
                     type: object
+                  verify_fqdn:
+                    type: boolean
+                  version:
+                    type: string
                 required:
                 - host
                 type: object
@@ -9651,6 +9760,8 @@ spec:
                 type: object
               syslog:
                 properties:
+                  allow_self_signed_cert:
+                    type: boolean
                   buffer:
                     properties:
                       chunk_full_threshold:
@@ -9720,6 +9831,41 @@ spec:
                       type:
                         type: string
                     type: object
+                  client_cert_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  enable_system_cert_store:
+                    type: boolean
                   format:
                     properties:
                       app_name_field:
@@ -9747,12 +9893,80 @@ spec:
                         - single_value
                         type: string
                     type: object
+                  fqdn:
+                    type: string
                   host:
                     type: string
                   insecure:
                     type: boolean
                   port:
                     type: integer
+                  private_key_passphrase:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  private_key_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
                   transport:
                     type: string
                   trusted_ca_path:
@@ -9788,6 +10002,10 @@ spec:
                             type: object
                         type: object
                     type: object
+                  verify_fqdn:
+                    type: boolean
+                  version:
+                    type: string
                 required:
                 - host
                 type: object

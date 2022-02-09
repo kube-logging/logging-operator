@@ -73,7 +73,7 @@ RUN apk update \
          fluent-plugin-sqs \
          fluent-plugin-kube-events-timestamp \
  && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
- && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
+ && gem specific_install -l https://github.com/acquia/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \

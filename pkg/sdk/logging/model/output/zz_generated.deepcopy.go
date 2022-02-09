@@ -1398,10 +1398,40 @@ func (in *SyslogOutputConfig) DeepCopyInto(out *SyslogOutputConfig) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.VerifyFqdn != nil {
+		in, out := &in.VerifyFqdn, &out.VerifyFqdn
+		*out = new(bool)
+		**out = **in
+	}
+	if in.EnableSystemCertStore != nil {
+		in, out := &in.EnableSystemCertStore, &out.EnableSystemCertStore
+		*out = new(bool)
+		**out = **in
+	}
 	if in.TrustedCaPath != nil {
 		in, out := &in.TrustedCaPath, &out.TrustedCaPath
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.ClientCertPath != nil {
+		in, out := &in.ClientCertPath, &out.ClientCertPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.PrivateKeyPath != nil {
+		in, out := &in.PrivateKeyPath, &out.PrivateKeyPath
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.PrivateKeyPassphrase != nil {
+		in, out := &in.PrivateKeyPassphrase, &out.PrivateKeyPassphrase
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.AllowSelfSignedCert != nil {
+		in, out := &in.AllowSelfSignedCert, &out.AllowSelfSignedCert
+		*out = new(bool)
+		**out = **in
 	}
 	if in.Format != nil {
 		in, out := &in.Format, &out.Format

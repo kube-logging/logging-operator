@@ -27,7 +27,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                                          | `IfNotPresent`                                            |
 | `fluentbit.podPriorityClassName`                    | Priority class name for fluentbit pods                                   | none                                                      |
 | `fluentd.enabled`                                   | Install fluentd                                                          | true                                                      |
-| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.14.4-alpine-1`                                        |
+| `fluentd.image.tag`                                 | Fluentd container image tag                                              | `v1.14.4-alpine-2`                                        |
 | `fluentd.image.repository`                          | Fluentd container image repository                                       | `ghcr.io/banzaicloud/fluentd`                             |
 | `fluentd.image.pullPolicy`                          | Fluentd container pull policy                                            | `IfNotPresent`                                            |
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag                               | `latest`                                                  |
