@@ -100,12 +100,22 @@ type FluentbitTLS struct {
 type FluentbitNetwork struct {
 	// Sets the timeout for connecting to an upstream (default: 10)
 	ConnectTimeout *uint32 `json:"connectTimeout,omitempty"`
+	// On connection timeout, specify if it should log an error. When disabled, the timeout is logged as a debug message (default: true)
+	ConnectTimeoutLogError *bool `json:"connectTimeoutLogError,omitempty"`
+	// Sets the primary transport layer protocol used by the asynchronous DNS resolver for connections established (default: UDP, UDP or TCP)
+	DNSMode string `json:"dnsMode,omitempty"`
+	// Prioritize IPv4 DNS results when trying to establish a connection (default: false)
+	DNSPreferIPV4 *bool `json:"dnsPreferIpv4,omitempty"`
+	// Select the primary DNS resolver type (default: ASYNC, LEGACY or ASYNC)
+	DNSResolver string `json:"dnsResolver,omitempty"`
 	// Whether or not TCP keepalive is used for the upstream connection (default: true)
 	Keepalive *bool `json:"keepalive,omitempty"`
 	// How long in seconds a TCP keepalive connection can be idle before being recycled (default: 30)
 	KeepaliveIdleTimeout *uint32 `json:"keepaliveIdleTimeout,omitempty"`
 	// How many times a TCP keepalive connection can be used before being recycled (default: 0, disabled)
 	KeepaliveMaxRecycle *uint32 `json:"keepaliveMaxRecycle,omitempty"`
+	// Specify network address (interface) to use for connection and data traffic. (default: disabled)
+	SourceAddress string `json:"sourceAddress,omitempty"`
 }
 
 // GetPrometheusPortFromAnnotation gets the port value from annotation
