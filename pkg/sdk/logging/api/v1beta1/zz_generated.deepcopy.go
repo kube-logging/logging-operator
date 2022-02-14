@@ -731,6 +731,16 @@ func (in *FluentbitNetwork) DeepCopyInto(out *FluentbitNetwork) {
 		*out = new(uint32)
 		**out = **in
 	}
+	if in.ConnectTimeoutLogError != nil {
+		in, out := &in.ConnectTimeoutLogError, &out.ConnectTimeoutLogError
+		*out = new(bool)
+		**out = **in
+	}
+	if in.DNSPreferIPV4 != nil {
+		in, out := &in.DNSPreferIPV4, &out.DNSPreferIPV4
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Keepalive != nil {
 		in, out := &in.Keepalive, &out.Keepalive
 		*out = new(bool)

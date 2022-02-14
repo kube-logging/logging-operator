@@ -71,14 +71,21 @@ type fluentBitConfig struct {
 	AwsFilter               map[string]string
 	BufferStorage           map[string]string
 	Network                 struct {
-		ConnectTimeoutSet       bool
-		ConnectTimeout          uint32
-		Keepalive               bool
-		KeepaliveSet            bool
-		KeepaliveIdleTimeout    uint32
-		KeepaliveIdleTimeoutSet bool
-		KeepaliveMaxRecycle     uint32
-		KeepaliveMaxRecycleSet  bool
+		ConnectTimeoutSet         bool
+		ConnectTimeout            uint32
+		ConnectTimeoutLogErrorSet bool
+		ConnectTimeoutLogError    bool
+		DNSMode                   string
+		DNSPreferIPV4Set          bool
+		DNSPreferIPV4             bool
+		DNSResolver               string
+		KeepaliveSet              bool
+		Keepalive                 bool
+		KeepaliveIdleTimeoutSet   bool
+		KeepaliveIdleTimeout      uint32
+		KeepaliveMaxRecycleSet    bool
+		KeepaliveMaxRecycle       uint32
+		SourceAddress             string
 	}
 	ForwardOptions map[string]string
 	Upstream       struct {
@@ -234,6 +241,24 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			input.Network.ConnectTimeout = *r.Logging.Spec.FluentbitSpec.Network.ConnectTimeout
 		}
 
+		if r.Logging.Spec.FluentbitSpec.Network.ConnectTimeoutLogError != nil {
+			input.Network.ConnectTimeoutLogErrorSet = true
+			input.Network.ConnectTimeoutLogError = *r.Logging.Spec.FluentbitSpec.Network.ConnectTimeoutLogError
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.DNSMode != "" {
+			input.Network.DNSMode = r.Logging.Spec.FluentbitSpec.Network.DNSMode
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.DNSPreferIPV4 != nil {
+			input.Network.DNSPreferIPV4Set = true
+			input.Network.DNSPreferIPV4 = *r.Logging.Spec.FluentbitSpec.Network.DNSPreferIPV4
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.DNSResolver != "" {
+			input.Network.DNSResolver = r.Logging.Spec.FluentbitSpec.Network.DNSResolver
+		}
+
 		if r.Logging.Spec.FluentbitSpec.Network.Keepalive != nil {
 			input.Network.KeepaliveSet = true
 			input.Network.Keepalive = *r.Logging.Spec.FluentbitSpec.Network.Keepalive
@@ -247,6 +272,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		if r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle != nil {
 			input.Network.KeepaliveMaxRecycleSet = true
 			input.Network.KeepaliveMaxRecycle = *r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle
+		}
+
+		if r.Logging.Spec.FluentbitSpec.Network.SourceAddress != "" {
+			input.Network.SourceAddress = r.Logging.Spec.FluentbitSpec.Network.SourceAddress
 		}
 	}
 

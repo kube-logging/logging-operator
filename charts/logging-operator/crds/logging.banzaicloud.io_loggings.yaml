@@ -1720,6 +1720,14 @@ spec:
                       connectTimeout:
                         format: int32
                         type: integer
+                      connectTimeoutLogError:
+                        type: boolean
+                      dnsMode:
+                        type: string
+                      dnsPreferIpv4:
+                        type: boolean
+                      dnsResolver:
+                        type: string
                       keepalive:
                         type: boolean
                       keepaliveIdleTimeout:
@@ -1728,6 +1736,8 @@ spec:
                       keepaliveMaxRecycle:
                         format: int32
                         type: integer
+                      sourceAddress:
+                        type: string
                     type: object
                   nodeSelector:
                     additionalProperties:
@@ -8269,6 +8279,14 @@ spec:
                             connectTimeout:
                               format: int32
                               type: integer
+                            connectTimeoutLogError:
+                              type: boolean
+                            dnsMode:
+                              type: string
+                            dnsPreferIpv4:
+                              type: boolean
+                            dnsResolver:
+                              type: string
                             keepalive:
                               type: boolean
                             keepaliveIdleTimeout:
@@ -8277,6 +8295,8 @@ spec:
                             keepaliveMaxRecycle:
                               format: int32
                               type: integer
+                            sourceAddress:
+                              type: string
                           type: object
                         podPriorityClassName:
                           type: string
