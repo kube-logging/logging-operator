@@ -59,8 +59,8 @@ spec:
     pods:
       metric:
         name: buffer_space_usage_ratio
-        target:
-          type: AverageValue
-          averageValue: 800m
+      target:
+        type: AverageValue
+        averageValue: 800m
 ```
 This example tries to keep the average buffer volume usage of Fluentd instances at 80%.
