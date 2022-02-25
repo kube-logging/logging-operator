@@ -1160,6 +1160,18 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                              dataSourceRef:
+                                properties:
+                                  apiGroup:
+                                    type: string
+                                  kind:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
                               resources:
                                 properties:
                                   limits:
@@ -1508,6 +1520,16 @@ spec:
                       failureThreshold:
                         format: int32
                         type: integer
+                      grpc:
+                        properties:
+                          port:
+                            format: int32
+                            type: integer
+                          service:
+                            type: string
+                        required:
+                        - port
+                        type: object
                       httpGet:
                         properties:
                           host:
@@ -1807,6 +1829,18 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                              dataSourceRef:
+                                properties:
+                                  apiGroup:
+                                    type: string
+                                  kind:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
                               resources:
                                 properties:
                                   limits:
@@ -1918,6 +1952,18 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                              dataSourceRef:
+                                properties:
+                                  apiGroup:
+                                    type: string
+                                  kind:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
                               resources:
                                 properties:
                                   limits:
@@ -1981,6 +2027,16 @@ spec:
                       failureThreshold:
                         format: int32
                         type: integer
+                      grpc:
+                        properties:
+                          port:
+                            format: int32
+                            type: integer
+                          service:
+                            type: string
+                        required:
+                        - port
+                        type: object
                       httpGet:
                         properties:
                           host:
@@ -2116,6 +2172,8 @@ spec:
                                 type: string
                               gmsaCredentialSpecName:
                                 type: string
+                              hostProcess:
+                                type: boolean
                               runAsUserName:
                                 type: string
                             type: object
@@ -2179,6 +2237,8 @@ spec:
                                 type: string
                               gmsaCredentialSpecName:
                                 type: string
+                              hostProcess:
+                                type: boolean
                               runAsUserName:
                                 type: string
                             type: object
@@ -2681,6 +2741,18 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                              dataSourceRef:
+                                properties:
+                                  apiGroup:
+                                    type: string
+                                  kind:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
                               resources:
                                 properties:
                                   limits:
@@ -3108,6 +3180,18 @@ spec:
                                       - kind
                                       - name
                                       type: object
+                                    dataSourceRef:
+                                      properties:
+                                        apiGroup:
+                                          type: string
+                                        kind:
+                                          type: string
+                                        name:
+                                          type: string
+                                      required:
+                                      - kind
+                                      - name
+                                      type: object
                                     resources:
                                       properties:
                                         limits:
@@ -3227,6 +3311,18 @@ spec:
                                   type: string
                                 type: array
                               dataSource:
+                                properties:
+                                  apiGroup:
+                                    type: string
+                                  kind:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              dataSourceRef:
                                 properties:
                                   apiGroup:
                                     type: string
@@ -3397,6 +3493,16 @@ spec:
                       failureThreshold:
                         format: int32
                         type: integer
+                      grpc:
+                        properties:
+                          port:
+                            format: int32
+                            type: integer
+                          service:
+                            type: string
+                        required:
+                        - port
+                        type: object
                       httpGet:
                         properties:
                           host:
@@ -3651,6 +3757,16 @@ spec:
                       failureThreshold:
                         format: int32
                         type: integer
+                      grpc:
+                        properties:
+                          port:
+                            format: int32
+                            type: integer
+                          service:
+                            type: string
+                        required:
+                        - port
+                        type: object
                       httpGet:
                         properties:
                           host:
@@ -3836,6 +3952,8 @@ spec:
                                 type: string
                               gmsaCredentialSpecName:
                                 type: string
+                              hostProcess:
+                                type: boolean
                               runAsUserName:
                                 type: string
                             type: object
@@ -3899,6 +4017,8 @@ spec:
                                 type: string
                               gmsaCredentialSpecName:
                                 type: string
+                              hostProcess:
+                                type: boolean
                               runAsUserName:
                                 type: string
                             type: object
@@ -4784,6 +4904,18 @@ spec:
                                       - kind
                                       - name
                                       type: object
+                                    dataSourceRef:
+                                      properties:
+                                        apiGroup:
+                                          type: string
+                                        kind:
+                                          type: string
+                                        name:
+                                          type: string
+                                      required:
+                                      - kind
+                                      - name
+                                      type: object
                                     resources:
                                       properties:
                                         limits:
@@ -5471,6 +5603,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -5565,6 +5707,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -5695,6 +5847,8 @@ spec:
                                                         type: string
                                                       gmsaCredentialSpecName:
                                                         type: string
+                                                      hostProcess:
+                                                        type: boolean
                                                       runAsUserName:
                                                         type: string
                                                     type: object
@@ -5711,6 +5865,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6050,6 +6214,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6128,6 +6302,10 @@ spec:
                                                   - containerPort
                                                   type: object
                                                 type: array
+                                                x-kubernetes-list-map-keys:
+                                                - containerPort
+                                                - protocol
+                                                x-kubernetes-list-type: map
                                               readinessProbe:
                                                 properties:
                                                   exec:
@@ -6140,6 +6318,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6270,6 +6458,8 @@ spec:
                                                         type: string
                                                       gmsaCredentialSpecName:
                                                         type: string
+                                                      hostProcess:
+                                                        type: boolean
                                                       runAsUserName:
                                                         type: string
                                                     type: object
@@ -6286,6 +6476,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6629,6 +6829,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6723,6 +6933,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -6853,6 +7073,8 @@ spec:
                                                         type: string
                                                       gmsaCredentialSpecName:
                                                         type: string
+                                                      hostProcess:
+                                                        type: boolean
                                                       runAsUserName:
                                                         type: string
                                                     type: object
@@ -6869,6 +7091,16 @@ spec:
                                                   failureThreshold:
                                                     format: int32
                                                     type: integer
+                                                  grpc:
+                                                    properties:
+                                                      port:
+                                                        format: int32
+                                                        type: integer
+                                                      service:
+                                                        type: string
+                                                    required:
+                                                    - port
+                                                    type: object
                                                   httpGet:
                                                     properties:
                                                       host:
@@ -7067,6 +7299,8 @@ spec:
                                                   type: string
                                                 gmsaCredentialSpecName:
                                                   type: string
+                                                hostProcess:
+                                                  type: boolean
                                                 runAsUserName:
                                                   type: string
                                               type: object
@@ -7337,6 +7571,18 @@ spec:
                                                               type: string
                                                             type: array
                                                           dataSource:
+                                                            properties:
+                                                              apiGroup:
+                                                                type: string
+                                                              kind:
+                                                                type: string
+                                                              name:
+                                                                type: string
+                                                            required:
+                                                            - kind
+                                                            - name
+                                                            type: object
+                                                          dataSourceRef:
                                                             properties:
                                                               apiGroup:
                                                                 type: string
@@ -8247,6 +8493,7 @@ spec:
                                   additionalProperties:
                                     type: string
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 sessionAffinity:
                                   type: string
                                 sessionAffinityConfig:
@@ -8258,10 +8505,6 @@ spec:
                                           type: integer
                                       type: object
                                   type: object
-                                topologyKeys:
-                                  items:
-                                    type: string
-                                  type: array
                                 type:
                                   type: string
                               type: object
@@ -8341,6 +8584,18 @@ spec:
                                         type: string
                                       type: array
                                     dataSource:
+                                      properties:
+                                        apiGroup:
+                                          type: string
+                                        kind:
+                                          type: string
+                                        name:
+                                          type: string
+                                      required:
+                                      - kind
+                                      - name
+                                      type: object
+                                    dataSourceRef:
                                       properties:
                                         apiGroup:
                                           type: string
@@ -8463,6 +8718,8 @@ spec:
                                       type: string
                                     gmsaCredentialSpecName:
                                       type: string
+                                    hostProcess:
+                                      type: boolean
                                     runAsUserName:
                                       type: string
                                   type: object
@@ -8526,6 +8783,8 @@ spec:
                                       type: string
                                     gmsaCredentialSpecName:
                                       type: string
+                                    hostProcess:
+                                      type: boolean
                                     runAsUserName:
                                       type: string
                                   type: object

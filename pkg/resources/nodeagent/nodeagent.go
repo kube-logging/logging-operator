@@ -170,7 +170,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeA
 	}
 	if programDefault.FluentbitSpec.Metrics != nil {
 		defaultLivenessProbe := &v1.Probe{
-			Handler: v1.Handler{
+			ProbeHandler: v1.ProbeHandler{
 				HTTPGet: &v1.HTTPGetAction{
 					Path: programDefault.FluentbitSpec.Metrics.Path,
 					Port: intstr.IntOrString{

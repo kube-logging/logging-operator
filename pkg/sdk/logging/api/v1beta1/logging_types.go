@@ -297,7 +297,7 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.LivenessProbe == nil {
 			if l.Spec.FluentdSpec.LivenessDefaultCheck {
 				l.Spec.FluentdSpec.LivenessProbe = &v1.Probe{
-					Handler: v1.Handler{
+					ProbeHandler: v1.ProbeHandler{
 						Exec: &v1.ExecAction{Command: []string{"/bin/healthy.sh"}},
 					},
 					InitialDelaySeconds: 600,
@@ -451,7 +451,7 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.LivenessProbe == nil {
 			if l.Spec.FluentbitSpec.LivenessDefaultCheck {
 				l.Spec.FluentbitSpec.LivenessProbe = &v1.Probe{
-					Handler: v1.Handler{
+					ProbeHandler: v1.ProbeHandler{
 						HTTPGet: &v1.HTTPGetAction{
 							Path: l.Spec.FluentbitSpec.Metrics.Path,
 							Port: intstr.IntOrString{
