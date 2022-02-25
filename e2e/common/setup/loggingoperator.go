@@ -41,9 +41,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 			},
 			Namespace: "default",
 		},
-		Logger: logrtesting.TestLogger{
-			T: t,
-		},
+		Logger: logrtesting.NewTestLogger(t),
 		Parent: &parentObject{
 			Name: "test",
 		},
