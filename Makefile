@@ -129,7 +129,7 @@ test-e2e: bin/kind docker-build generate fmt vet manifests ## Run E2E tests
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
-	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
+	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy -compat=1.17'
 
 .PHONY: vet
 vet: ## Run go vet against code
