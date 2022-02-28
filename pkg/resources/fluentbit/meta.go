@@ -22,9 +22,10 @@ import (
 // FluentbitObjectMeta creates an objectMeta for resource fluentbit
 func (r *Reconciler) FluentbitObjectMeta(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:      r.Logging.QualifiedName(name),
-		Namespace: r.Logging.Spec.ControlNamespace,
-		Labels:    r.getFluentBitLabels(),
+		Name:        r.Logging.QualifiedName(name),
+		Namespace:   r.Logging.Spec.ControlNamespace,
+		Labels:      r.getFluentBitLabels(),
+		Annotations: r.Logging.Spec.FluentbitSpec.DaemonSetAnnotations,
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: r.Logging.APIVersion,

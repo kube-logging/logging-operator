@@ -1085,6 +1085,10 @@ spec:
                             type: array
                         type: object
                     type: object
+                  daemonsetAnnotations:
+                    additionalProperties:
+                      type: string
+                    type: object
                   annotations:
                     additionalProperties:
                       type: string
@@ -2676,6 +2680,10 @@ spec:
                               type: object
                             type: array
                         type: object
+                    type: object
+                  statefulsetAnnotations:
+                    additionalProperties:
+                      type: string
                     type: object
                   annotations:
                     additionalProperties:

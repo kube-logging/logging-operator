@@ -34,6 +34,7 @@ type _metaFluentdSpec interface{} //nolint:deadcode,unused
 
 // FluentdSpec defines the desired state of Fluentd
 type FluentdSpec struct {
+	StatefulSetAnnotations map[string]string `json:"statefulsetAnnotations,omitempty"`
 	Annotations            map[string]string `json:"annotations,omitempty"`
 	ConfigCheckAnnotations map[string]string `json:"configCheckAnnotations,omitempty"`
 	Labels                 map[string]string `json:"labels,omitempty"`
