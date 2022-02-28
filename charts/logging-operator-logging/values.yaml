@@ -43,7 +43,7 @@ nodeAgents: {}
 #        enabled: false
 
 
-# Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/#fluentd-spec
+# Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/fluentd_types/
 fluentd: {}
 # 20Gi persistent storage is configured for fluentd by default.
 # Here is an example, on how to override it:

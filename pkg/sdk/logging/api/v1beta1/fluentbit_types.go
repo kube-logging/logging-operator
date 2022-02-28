@@ -35,13 +35,14 @@ type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 
 // FluentbitSpec defines the desired state of Fluentbit
 type FluentbitSpec struct {
-	Annotations map[string]string `json:"annotations,omitempty"`
-	Labels      map[string]string `json:"labels,omitempty"`
-	EnvVars     []corev1.EnvVar   `json:"envVars,omitempty"`
-	Image       ImageSpec         `json:"image,omitempty"`
-	TLS         *FluentbitTLS     `json:"tls,omitempty"`
-	TargetHost  string            `json:"targetHost,omitempty"`
-	TargetPort  int32             `json:"targetPort,omitempty"`
+	DaemonSetAnnotations map[string]string `json:"daemonsetAnnotations,omitempty"`
+	Annotations          map[string]string `json:"annotations,omitempty"`
+	Labels               map[string]string `json:"labels,omitempty"`
+	EnvVars              []corev1.EnvVar   `json:"envVars,omitempty"`
+	Image                ImageSpec         `json:"image,omitempty"`
+	TLS                  *FluentbitTLS     `json:"tls,omitempty"`
+	TargetHost           string            `json:"targetHost,omitempty"`
+	TargetPort           int32             `json:"targetPort,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
