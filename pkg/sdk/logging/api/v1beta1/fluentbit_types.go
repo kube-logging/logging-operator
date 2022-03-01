@@ -15,7 +15,9 @@
 package v1beta1
 
 import (
+	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
@@ -66,6 +68,7 @@ type FluentbitSpec struct {
 	ExtraVolumeMounts []*VolumeMount           `json:"extraVolumeMounts,omitempty"`
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
+	FilterModify      []FilterModify           `json:"filterModify,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser string `json:"parser,omitempty"`
 	// Parameters for Kubernetes metadata filter
@@ -276,6 +279,99 @@ type FilterAws struct {
 	VpcID *bool `json:"vpc_id,omitempty" plugin:"default:false"`
 	// Match filtered records (default:*)
 	Match string `json:"Match,omitempty" plugin:"default:*"`
+}
+
+// FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
+type FilterModify struct {
+	// Fluentbit Filter Modification Rule
+	Rules []FilterModifyRule `json:"rules,omitempty"`
+	// Fluentbit Filter Modification Condition
+	Conditions []FilterModifyCondition `json:"conditions,omitempty"`
+}
+
+// FilterModifyRule The Modify Filter plugin allows you to change records using rules and conditions.
+type FilterModifyRule struct {
+	// Add a key/value pair with key KEY and value VALUE. If KEY already exists, this field is overwritten
+	Set *FilterKeyValue `json:"Set,omitempty"`
+	// Add a key/value pair with key KEY and value VALUE if KEY does not exist
+	Add *FilterKeyValue `json:"Add,omitempty" `
+	// Remove a key/value pair with key KEY if it exists
+	Remove *FilterKey `json:"Remove,omitempty" `
+	// Remove all key/value pairs with key matching wildcard KEY
+	RemoveWildcard *FilterKey `json:"Remove_wildcard,omitempty" `
+	// Remove all key/value pairs with key matching regexp KEY
+	RemoveRegex *FilterKey `json:"Remove_regex,omitempty" `
+	// Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists AND RENAMED_KEY does not exist
+	Rename *FilterKeyValue `json:"Rename,omitempty" `
+	// Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists. If RENAMED_KEY already exists, this field is overwritten
+	HardRename *FilterKeyValue `json:"Hard_rename,omitempty" `
+	// Copy a key/value pair with key KEY to COPIED_KEY if KEY exists AND COPIED_KEY does not exist
+	Copy *FilterKeyValue `json:"Copy,omitempty" `
+	// Copy a key/value pair with key KEY to COPIED_KEY if KEY exists. If COPIED_KEY already exists, this field is overwritten
+	HardCopy *FilterKeyValue `json:"Hard_copy,omitempty" `
+}
+
+// FilterModifyCondition The Modify Filter plugin allows you to change records using rules and conditions.
+type FilterModifyCondition struct {
+	// Is true if KEY exists
+	KeyExists *FilterKey `json:"Key_exists,omitempty"`
+	// Is true if KEY does not exist
+	KeyDoesNotExist *FilterKeyValue `json:"Key_does_not_exist,omitempty"`
+	// Is true if a key matches regex KEY
+	AKeyMatches *FilterKey `json:"A_key_matches,omitempty"`
+	// Is true if no key matches regex KEY
+	NoKeyMatches *FilterKey `json:"No_key_matches,omitempty"`
+	// Is true if KEY exists and its value is VALUE
+	KeyValueEquals *FilterKeyValue `json:"Key_value_equals,omitempty"`
+	// Is true if KEY exists and its value is not VALUE
+	KeyValueDoesNotEqual *FilterKeyValue `json:"Key_value_does_not_equal,omitempty"`
+	// Is true if key KEY exists and its value matches VALUE
+	KeyValueMatches *FilterKeyValue `json:"Key_value_matches,omitempty"`
+	// Is true if key KEY exists and its value does not match VALUE
+	KeyValueDoesNotMatch *FilterKeyValue `json:"Key_value_does_not_match,omitempty"`
+	// Is true if all keys matching KEY have values that match VALUE
+	MatchingKeysHaveMatchingValues *FilterKeyValue `json:"Matching_keys_have_matching_values,omitempty"`
+	// Is true if all keys matching KEY have values that do not match VALUE
+	MatchingKeysDoNotHaveMatchingValues *FilterKeyValue `json:"Matching_keys_do_not_have_matching_values,omitempty"`
+}
+
+type Operation struct {
+	Op    string
+	Key   string
+	Value string
+}
+
+func getOperation(c interface{}) (result Operation) {
+	vc := reflect.ValueOf(c)
+	for i := 0; i < vc.NumField(); i++ {
+		field := vc.Field(i)
+		if !field.IsNil() {
+			result.Op = strings.SplitN(vc.Type().Field(i).Tag.Get("json"), ",", 2)[0]
+			switch f := field.Interface().(type) {
+			case *FilterKey:
+				result.Key = f.Key
+			case *FilterKeyValue:
+				result.Key, result.Value = f.Key, f.Value
+			}
+			return
+		}
+	}
+	return
+}
+
+func (c FilterModifyCondition) Operation() (result Operation) {
+	return getOperation(c)
+}
+func (r FilterModifyRule) Operation() (result Operation) {
+	return getOperation(r)
+}
+
+type FilterKey struct {
+	Key string `json:"key,omitempty"`
+}
+type FilterKeyValue struct {
+	Key   string `json:"key,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // VolumeMount defines source and destination folders of a hostPath type pod mount

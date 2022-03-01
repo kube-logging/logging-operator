@@ -22,6 +22,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
@@ -70,6 +71,7 @@ type fluentBitConfig struct {
 	KubernetesFilter        map[string]string
 	AwsFilter               map[string]string
 	BufferStorage           map[string]string
+	FilterModify            []v1beta1.FilterModify
 	Network                 struct {
 		ConnectTimeoutSet         bool
 		ConnectTimeout            uint32
@@ -212,6 +214,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		KubernetesFilter:        fluentbitKubernetesFilter,
+		FilterModify:            r.Logging.Spec.FluentbitSpec.FilterModify,
 		BufferStorage:           fluentbitBufferStorage,
 	}
 	if r.Logging.Spec.FluentbitSpec.FilterAws != nil {
