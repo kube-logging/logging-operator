@@ -73,6 +73,23 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
+{{- range $modify := .FilterModify }}
+
+[FILTER]
+    Name        modify
+    Match       *
+	{{- range $rule := $modify.Rules }}
+	{{- $operation :=  $rule.Operation }}
+    {{ $operation.Op }} {{ $operation.Key }} {{ if $operation.Value }}{{ $operation.Value }}{{ end }}
+    {{- end }}
+
+	{{- range $condition := $modify.Conditions }}
+	{{- $operation :=  $condition.Operation }}
+    Condition {{ $operation.Op }} {{ $operation.Key }} {{ if $operation.Value }}{{ $operation.Value }}{{ end }}
+	{{- end }}
+
+{{- end}}
+
 [OUTPUT]
     Name          forward
     Match         *

@@ -1412,6 +1412,142 @@ spec:
                       tls.verify:
                         type: string
                     type: object
+                  filterModify:
+                    items:
+                      properties:
+                        conditions:
+                          items:
+                            properties:
+                              A_key_matches:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                              Key_does_not_exist:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Key_exists:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                              Key_value_does_not_equal:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Key_value_does_not_match:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Key_value_equals:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Key_value_matches:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Matching_keys_do_not_have_matching_values:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Matching_keys_have_matching_values:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              No_key_matches:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                        rules:
+                          items:
+                            properties:
+                              Add:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Copy:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Hard_copy:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Hard_rename:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Remove:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                              Remove_regex:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                              Remove_wildcard:
+                                properties:
+                                  key:
+                                    type: string
+                                type: object
+                              Rename:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              Set:
+                                properties:
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                      type: object
+                    type: array
                   flush:
                     format: int32
                     type: integer
