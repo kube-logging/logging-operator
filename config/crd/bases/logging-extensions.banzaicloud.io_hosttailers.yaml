@@ -33,6 +33,8 @@ spec:
               fileTailers:
                 items:
                   properties:
+                    buffer_max_size:
+                      type: string
                     containerOverrides:
                       properties:
                         command:
