@@ -27,6 +27,10 @@ func (f FileTailer) defaults() FileTailer {
 	if result.BufferMaxSize == "" {
 		result.BufferMaxSize = "32k"
 	}
+	if result.SkipLongLines == "" {
+		result.SkipLongLines = "On"
+	}
+
 	return result
 }
 
@@ -38,6 +42,7 @@ func (f FileTailer) Command(Name string) []string {
 		"-p", fmt.Sprintf("path=%s", f.Path),
 		"-p", fmt.Sprintf("db=/var/pos/%s.db", Name),
 		"-p", fmt.Sprintf("buffer_max_size=%s", f.BufferMaxSize),
+		"-p", fmt.Sprintf("skip_long_lines=%s", f.SkipLongLines),
 		"-o", "file",
 		"-p", "format=template",
 		"-p", "template={log}",

@@ -310,6 +310,8 @@ spec:
                       type: string
                     path:
                       type: string
+                    skip_long_lines:
+                      type: string
                   required:
                   - name
                   type: object
