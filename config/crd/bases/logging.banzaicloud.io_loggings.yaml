@@ -1085,10 +1085,6 @@ spec:
                             type: array
                         type: object
                     type: object
-                  daemonsetAnnotations:
-                    additionalProperties:
-                      type: string
-                    type: object
                   annotations:
                     additionalProperties:
                       type: string
@@ -1232,6 +1228,10 @@ spec:
                     type: integer
                   customConfigSecret:
                     type: string
+                  daemonsetAnnotations:
+                    additionalProperties:
+                      type: string
+                    type: object
                   disableKubernetesFilter:
                     type: boolean
                   dnsConfig:
@@ -2681,10 +2681,6 @@ spec:
                             type: array
                         type: object
                     type: object
-                  statefulsetAnnotations:
-                    additionalProperties:
-                      type: string
-                    type: object
                   annotations:
                     additionalProperties:
                       type: string
@@ -4075,6 +4071,10 @@ spec:
                               type: string
                           type: object
                         type: array
+                    type: object
+                  statefulsetAnnotations:
+                    additionalProperties:
+                      type: string
                     type: object
                   tls:
                     properties:
