@@ -21,12 +21,23 @@ import (
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
+func (f FileTailer) defaults() FileTailer {
+	result := f
+	// setting defaults
+	if result.BufferMaxSize == "" {
+		result.BufferMaxSize = "32k"
+	}
+	return result
+}
+
 // Command returns the desired command for the current filetailer
 func (f FileTailer) Command(Name string) []string {
+	f = f.defaults()
 	command := []string{
 		"/fluent-bit/bin/fluent-bit", "-i", "tail",
 		"-p", fmt.Sprintf("path=%s", f.Path),
 		"-p", fmt.Sprintf("db=/var/pos/%s.db", Name),
+		"-p", fmt.Sprintf("buffer_max_size=%s", f.BufferMaxSize),
 		"-o", "file",
 		"-p", "format=template",
 		"-p", "template={log}",
