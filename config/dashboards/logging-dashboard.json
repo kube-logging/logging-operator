@@ -639,7 +639,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"cpu\", unit=\"core\", cluster=\"$cluster\"})",
           "instant": false,
           "refId": "A"
         }
@@ -730,7 +730,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_limits_cpu_cores{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"cpu\", unit=\"core\", cluster=\"$cluster\"})",
           "instant": false,
           "refId": "A"
         }
@@ -1271,7 +1271,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"memory\", unit=\"byte\", cluster=\"$cluster\"})",
           "instant": false,
           "refId": "A"
         }
@@ -1362,7 +1362,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", unit=\"byte\", cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"memory\", unit=\"byte\", cluster=\"$cluster\"})",
           "instant": false,
           "refId": "A"
         }
@@ -1453,7 +1453,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_limits_memory_bytes{cluster=\"$cluster\"}) / sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"memory\", unit=\"byte\", cluster=\"$cluster\"})",
           "instant": false,
           "refId": "A"
         }
