@@ -16,6 +16,7 @@ package fluentd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
@@ -335,15 +336,16 @@ func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
 
 	if spec.ReadinessDefaultCheck.BufferFreeSpace || spec.ReadinessDefaultCheck.BufferFileNumber {
 		check := []string{"/bin/sh", "-c"}
+		bash := []string{}
 		if spec.ReadinessDefaultCheck.BufferFreeSpace {
-			check = append(check,
+			bash = append(bash,
 				fmt.Sprintf("FREESPACE_THRESHOLD=%d", spec.ReadinessDefaultCheck.BufferFreeSpaceThreshold),
 				"FREESPACE_CURRENT=$(df -h $BUFFER_PATH  | grep / | awk '{ print $5}' | sed 's/%//g')",
 				"if [ \"$FREESPACE_CURRENT\" -gt \"$FREESPACE_THRESHOLD\" ] ; then exit 1; fi",
 			)
 		}
 		if spec.ReadinessDefaultCheck.BufferFileNumber {
-			check = append(check,
+			bash = append(bash,
 				fmt.Sprintf("MAX_FILE_NUMBER=%d", spec.ReadinessDefaultCheck.BufferFileNumberMax),
 				"FILE_NUMBER_CURRENT=$(find $BUFFER_PATH -type f -name *.buffer | wc -l)",
 				"if [ \"$FILE_NUMBER_CURRENT\" -gt \"$MAX_FILE_NUMBER\" ] ; then exit 1; fi",
@@ -352,7 +354,7 @@ func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
 		return &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
-					Command: check,
+					Command: append(check, strings.Join(bash, "\n")),
 				},
 			},
 			InitialDelaySeconds: spec.ReadinessDefaultCheck.InitialDelaySeconds,
