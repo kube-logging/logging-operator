@@ -64,7 +64,7 @@ tls:
   fluentbitSecretName: ""
   fluentdSecretName: ""
 
-# Limit namespaces from where to read Flow and Output specs
+# Control and limit namespaces from where to read Flow and Output specs
 watchNamespaces: []
 # Control namespace that contains ClusterOutput and ClusterFlow resources
 controlNamespace: ""
