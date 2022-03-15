@@ -20,6 +20,10 @@ spec:
   {{- with .Values.allowClusterResourcesFromAllNamespaces }}
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}
+  {{- if .Values.watchNamespaces }}
+  watchNamespaces:
+{{ toYaml .Values.watchNamespaces | indent 4 }}
+  {{- end }}
   controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
   {{- if .Values.defaultFlow }}
   defaultFlow:
