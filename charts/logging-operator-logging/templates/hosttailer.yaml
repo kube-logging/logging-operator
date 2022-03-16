@@ -1,0 +1,14 @@
+{{- with $.Values.hostTailer }}
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: HostTailer
+metadata:
+  name: {{ $.name | default "hosttailer" }}
+spec:
+  enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.enableRecreateWorkloadOnImmutableFieldChange }}
+  workloadOverrides:
+    priorityClassName: system-node-critical
+  fileTailers:
+{{ toYaml .fileTailers | indent 4 }}
+  systemdTailers:
+{{ toYaml .systemdTailers | indent 4 }}
+{{- end }}

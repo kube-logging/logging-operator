@@ -4,7 +4,6 @@ metadata:
   name: sample
 spec:
   # Add fields here
-  controlNamespace: default
   enableRecreateWorkloadOnImmutableFieldChange: false
   workloadOverrides:
     priorityClassName: system-node-critical
