@@ -1,0 +1,20 @@
+{{- with $.Values.eventTailer }}
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: EventTailer
+metadata:
+  name: {{ .name | default "event-tailer" }}
+spec:
+  controlNamespace: {{ $.Values.controlNamespace | default $.Release.Namespace }}
+  workloadOverrides:
+    priorityClassName: system-node-critical
+{{- with .pvc }}
+  positionVolume:
+    pvc:
+      spec:
+        accessModes: {{ .accessModes | default (list "ReadWriteOnce") }}
+        resources:
+          requests:
+            storage: {{ .storage | default "1G" }}
+        volumeMode: {{ .volumeMode | default "Filesystem" }}
+{{- end }}
+{{- end }}

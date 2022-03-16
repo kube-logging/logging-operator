@@ -97,3 +97,26 @@ clusterOutputs: []
 #         format:
 #           type: json
 #         default_topic: topic
+
+
+# EventTailer config
+eventTailer:
+  name: sample
+  # pvc:
+  #   accessModes:
+  #     - ReadWriteOnce
+  #   volumeMode: Filesystem
+  #   storage: 1G
+
+# HostTailer config
+hostTailer:
+  name: sample
+  fileTailers:
+    - name: sample-file
+      path: /var/log/sample-file
+      disabled: false
+  # systemdTailers:
+  #   - name: system-sample
+  #     disabled: false
+  #     maxEntries: 20
+  #     systemdFilter: kubelet.service
