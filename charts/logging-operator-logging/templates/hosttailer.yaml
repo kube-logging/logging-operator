@@ -2,7 +2,7 @@
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: HostTailer
 metadata:
-  name: {{ $.name | default "hosttailer" }}
+  name: {{ .name | default "hosttailer" }}
 spec:
   enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.enableRecreateWorkloadOnImmutableFieldChange }}
   workloadOverrides:
