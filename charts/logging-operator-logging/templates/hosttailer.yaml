@@ -7,8 +7,12 @@ spec:
   enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.enableRecreateWorkloadOnImmutableFieldChange }}
   workloadOverrides:
     priorityClassName: system-node-critical
+{{- with .fileTailers }}
   fileTailers:
-{{ toYaml .fileTailers | indent 4 }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .systemdTailers }}
   systemdTailers:
-{{ toYaml .systemdTailers | indent 4 }}
+{{ toYaml . | indent 4 }}
+{{- end }}
 {{- end }}
