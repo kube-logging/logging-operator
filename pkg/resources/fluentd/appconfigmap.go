@@ -52,16 +52,34 @@ func (r *Reconciler) configHash() (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
 }
 
-func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
+func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
 	hashKey, err := r.configHash()
 	if err != nil {
 		return nil, err
 	}
 
+	checkSecret, err := r.newCheckSecret(hashKey)
+	if err != nil {
+		return nil, err
+	}
+	err = r.Client.Create(ctx, checkSecret)
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return nil, errors.WrapIf(err, "failed to create secret for fluentd configcheck")
+	}
+
+	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
+	if err != nil {
+		return nil, err
+	}
+	err = r.Client.Create(ctx, checkOutputSecret)
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return nil, errors.WrapIf(err, "failed to create output secret for fluentd configcheck")
+	}
+
 	pod := r.newCheckPod(hashKey)
 
 	existingPods := &corev1.PodList{}
-	err = r.Client.List(context.TODO(), existingPods, client.MatchingLabels(pod.Labels))
+	err = r.Client.List(ctx, existingPods, client.MatchingLabels(pod.Labels))
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to list existing configcheck pods")
 	}
@@ -84,7 +102,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 		}, nil
 	}
 
-	err = r.Client.Get(context.TODO(), types.NamespacedName{Namespace: pod.Namespace, Name: pod.Name}, pod)
+	err = r.Client.Get(ctx, types.NamespacedName{Namespace: pod.Namespace, Name: pod.Name}, pod)
 	if err == nil {
 		// check pod status and write into the configmap
 		switch pod.Status.Phase {
@@ -113,25 +131,7 @@ func (r *Reconciler) configCheck() (*ConfigCheckResult, error) {
 		return nil, errors.WrapIff(err, "failed to get configcheck pod %s:%s", pod.Namespace, pod.Name)
 	}
 
-	checkSecret, err := r.newCheckSecret(hashKey)
-	if err != nil {
-		return nil, err
-	}
-	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.Client.Create(context.TODO(), checkSecret)
-	if err != nil && !apierrors.IsAlreadyExists(err) {
-		return nil, errors.WrapIf(err, "failed to create secret for fluentd configcheck")
-	}
-	err = r.Client.Create(context.TODO(), checkOutputSecret)
-	if err != nil && !apierrors.IsAlreadyExists(err) {
-		return nil, errors.WrapIf(err, "failed to create output secret for fluentd configcheck")
-	}
-
-	err = r.Client.Create(context.TODO(), pod)
+	err = r.Client.Create(ctx, pod)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create pod for fluentd configcheck")
 	}
