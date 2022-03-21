@@ -157,7 +157,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			// We don't have an existing result
 			// - let's create what's necessary to have one
 			// - if the result is ready write it into the status
-			result, err := r.configCheck()
+			result, err := r.configCheck(ctx)
 			if err != nil {
 				return nil, errors.WrapIf(err, "failed to validate config")
 			}
