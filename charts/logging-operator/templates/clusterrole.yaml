@@ -38,6 +38,7 @@ rules:
   - endpoints
   - namespaces
   - nodes
+  - nodes/proxy
   verbs:
   - get
   - list

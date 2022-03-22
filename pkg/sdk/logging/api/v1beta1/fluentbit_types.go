@@ -89,6 +89,7 @@ type FluentbitSpec struct {
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
+	HostNetwork             bool                         `json:"HostNetwork,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
