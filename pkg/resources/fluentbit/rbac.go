@@ -25,12 +25,16 @@ import (
 
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+		clusterRoleResources := []string{"pods", "namespaces"}
+		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.UseKubelet == "On" {
+			clusterRoleResources = append(clusterRoleResources, "nodes", "nodes/proxy")
+		}
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName),
 			Rules: []rbacv1.PolicyRule{
 				{
 					APIGroups: []string{""},
-					Resources: []string{"pods", "namespaces"},
+					Resources: clusterRoleResources,
 					Verbs:     []string{"get", "list", "watch"},
 				},
 			},

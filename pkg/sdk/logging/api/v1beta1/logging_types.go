@@ -502,6 +502,13 @@ func (l *Logging) SetDefaults() error {
 				l.Spec.FluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
 			}
 		}
+		if len(l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet) == 0 {
+			l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet = "Off"
+		}
+		if l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet == "On" {
+			l.Spec.FluentbitSpec.DNSPolicy = "ClusterFirstWithHostNet"
+			l.Spec.FluentbitSpec.HostNetwork = true
+		}
 		if l.Spec.FluentbitSpec.ForwardOptions == nil {
 			l.Spec.FluentbitSpec.ForwardOptions = &ForwardOptions{}
 		}
