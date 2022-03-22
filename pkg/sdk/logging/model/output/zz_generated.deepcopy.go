@@ -492,7 +492,7 @@ func (in *ForwardOutput) DeepCopyInto(out *ForwardOutput) {
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(common.Security)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer

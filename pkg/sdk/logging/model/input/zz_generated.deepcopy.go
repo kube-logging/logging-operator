@@ -54,7 +54,7 @@ func (in *ForwardInputConfig) DeepCopyInto(out *ForwardInputConfig) {
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(common.Security)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 }
 

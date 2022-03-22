@@ -25,11 +25,15 @@ type _hugoSecurity interface{} //nolint:deadcode,unused
 // +name:"Security"
 type _metaSecurity interface{} //nolint:deadcode,unused
 
+// +kubebuilder:object:generate=true
+
 type Security struct {
 	// Hostname
 	SelfHostname string `json:"self_hostname"`
 	// Shared key for authentication.
 	SharedKey string `json:"shared_key"`
+	// Secret ref containing the shared key for authentication
+	ShareKeySecretRef *secret.Secret `json:"shared_key_secret_ref,omitempty"`
 	// If true, use user based authentication.
 	UserAuth bool `json:"user_auth,omitempty"`
 	// Allow anonymous source. <client> sections are required if disabled.
@@ -37,7 +41,18 @@ type Security struct {
 }
 
 func (s *Security) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	return types.NewFlatDirective(types.PluginMeta{
+	metadata := types.PluginMeta{
 		Directive: "security",
-	}, s, secretLoader)
+	}
+	var err error
+	security := s.DeepCopy()
+	if len(security.SharedKey) == 0 && security.ShareKeySecretRef != nil && *security.ShareKeySecretRef != (secret.Secret{}) {
+		security.SharedKey, err = secretLoader.Load(security.ShareKeySecretRef)
+		if err != nil {
+			return nil, err
+		}
+		security.ShareKeySecretRef = nil
+	}
+
+	return types.NewFlatDirective(metadata, security, secretLoader)
 }
