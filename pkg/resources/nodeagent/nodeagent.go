@@ -317,9 +317,10 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 
 		instance = nodeAgentInstance{
-			nodeAgent:  NodeAgentFluentbitDefaults,
-			reconciler: r.GenericResourceReconciler,
-			logging:    r.Logging,
+			nodeAgent:           NodeAgentFluentbitDefaults,
+			reconciler:          r.GenericResourceReconciler,
+			logging:             r.Logging,
+			fluentdDataProvider: r.fluentdDataProvider,
 		}
 
 		result, err := instance.Reconcile()
