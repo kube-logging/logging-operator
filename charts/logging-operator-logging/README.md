@@ -22,7 +22,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentbit.enabled`                                 | Install fluent-bit                                                       | true                                                       |
 | `fluentbit.namespace`                               | Specified fluentbit installation namespace                               | same as operator namespace                                 |
 | `fluentbit.tolerations`                             | Tolerations for fluentbit daemonset                                      | none                                                       |
-| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.8.13`                                                   |
+| `fluentbit.image.tag`                               | Fluentbit container image tag                                            | `1.8.15`                                                   |
 | `fluentbit.image.repository`                        | Fluentbit container image repository                                     | `fluent/fluent-bit`                                        |
 | `fluentbit.image.pullPolicy`                        | Fluentbit container pull policy                                          | `IfNotPresent`                                             |
 | `fluentbit.podPriorityClassName`                    | Priority class name for fluentbit pods                                   | none                                                       |
