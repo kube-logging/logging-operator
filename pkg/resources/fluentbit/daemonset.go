@@ -59,7 +59,6 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 			podMeta = templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
 		}
 	}
-
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
@@ -82,6 +81,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					ImagePullSecrets: r.Logging.Spec.FluentbitSpec.Image.ImagePullSecrets,
 					DNSPolicy:        r.Logging.Spec.FluentbitSpec.DNSPolicy,
 					DNSConfig:        r.Logging.Spec.FluentbitSpec.DNSConfig,
+					HostNetwork:      r.Logging.Spec.FluentbitSpec.HostNetwork,
 
 					Containers: []corev1.Container{
 						{
