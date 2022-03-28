@@ -731,6 +731,8 @@ spec:
                 type: string
               fluentbit:
                 properties:
+                  HostNetwork:
+                    type: boolean
                   affinity:
                     properties:
                       nodeAffinity:
