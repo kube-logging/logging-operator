@@ -100,8 +100,8 @@ clusterOutputs: []
 
 
 # EventTailer config
-eventTailer:
-  name: sample
+eventTailer: {}
+  # name: sample
   # pvc:
   #   accessModes:
   #     - ReadWriteOnce
@@ -109,12 +109,12 @@ eventTailer:
   #   storage: 1G
 
 # HostTailer config
-hostTailer:
-  name: sample
-  fileTailers:
-    - name: sample-file
-      path: /var/log/sample-file
-      disabled: false
+hostTailer: {}
+  # name: sample
+  # fileTailers:
+  #   - name: sample-file
+  #     path: /var/log/sample-file
+  #     disabled: false
   # systemdTailers:
   #   - name: system-sample
   #     disabled: false
