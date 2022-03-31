@@ -394,6 +394,9 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.InputTail.Path == "" {
 			l.Spec.FluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
 		}
+		if l.Spec.FluentbitSpec.InputTail.ReadFromHead == "" {
+			l.Spec.FluentbitSpec.InputTail.ReadFromHead = "false"
+		}
 		if l.Spec.FluentbitSpec.InputTail.RefreshInterval == "" {
 			l.Spec.FluentbitSpec.InputTail.RefreshInterval = "5"
 		}
