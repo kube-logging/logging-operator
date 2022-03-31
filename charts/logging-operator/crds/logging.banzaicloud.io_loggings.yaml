@@ -1646,6 +1646,8 @@ spec:
                         type: string
                       Path_Key:
                         type: string
+                      Read_From_Head:
+                        type: string
                       Refresh_Interval:
                         type: string
                       Rotate_Wait:
@@ -8421,6 +8423,8 @@ spec:
                             Path:
                               type: string
                             Path_Key:
+                              type: string
+                            Read_From_Head:
                               type: string
                             Refresh_Interval:
                               type: string

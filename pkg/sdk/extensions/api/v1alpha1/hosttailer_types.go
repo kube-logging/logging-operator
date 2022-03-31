@@ -84,6 +84,8 @@ type FileTailer struct {
 	BufferMaxSize string `json:"buffer_max_size,omitempty"`
 	// Set the buffer chunk size per active filetailer
 	BufferChunkSize string `json:"buffer_chunk_size,omitempty"`
+	// Read_From_Head
+	ReadFromHead string `json:"read_from_head,omitempty"`
 	// Skip long line when exceeding Buffer_Max_Size
 	SkipLongLines string `json:"skip_long_lines,omitempty"`
 	// Override container fields for the given tailer
