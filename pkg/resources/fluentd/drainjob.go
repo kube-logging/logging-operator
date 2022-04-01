@@ -35,9 +35,6 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 		fluentdContainer,
 		drainWatchContainer(&r.Logging.Spec.FluentdSpec.Scaling.Drain, bufVolName),
 	}
-	if c := r.bufferMetricsSidecarContainer(); c != nil {
-		containers = append(containers, *c)
-	}
 
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
