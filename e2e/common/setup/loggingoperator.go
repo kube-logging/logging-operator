@@ -63,7 +63,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		opt.ApplyToLoggingOperatorOptions(&options)
 	}
 
-	resourceBuilders := resourcebuilder.ResourceBuilders(options.Parent, &options.Config)
+	resourceBuilders := resourcebuilder.ResourceBuildersWithReader(c.GetClient())(options.Parent, &options.Config)
 	reconciler := reconciler.NewGenericReconciler(c.GetClient(), options.Logger, reconciler.ReconcilerOpts{
 		Scheme: c.GetScheme(),
 	})
