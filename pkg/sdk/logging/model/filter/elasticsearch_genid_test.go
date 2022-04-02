@@ -27,8 +27,9 @@ func TestElasticsearchGenId(t *testing.T) {
 	CONFIG := []byte(`
 use_entire_record: true
 hash_type: sha1
+record_keys: key1,key2
 hash_id_key: gen_id
-separator: |
+separator: "|"
 `)
 	expected := `
 <filter **>
@@ -36,6 +37,7 @@ separator: |
   @id test
   hash_id_key gen_id
   hash_type sha1
+  record_keys key1,key2
   separator |
   use_entire_record true
 </filter>

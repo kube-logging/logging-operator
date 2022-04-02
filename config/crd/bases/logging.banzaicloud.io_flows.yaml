@@ -86,6 +86,20 @@ spec:
                       properties:
                         hash_id_key:
                           type: string
+                        include_tag_in_seed:
+                          type: boolean
+                        include_time_in_seed:
+                          type: boolean
+                        use_record_as_seed:
+                          type: boolean
+                        record_keys:
+                          type: string
+                        use_entire_record:
+                          type: bool
+                        separator:
+                          type: string
+                        hash_type:
+                          type: string
                       type: object
                     detectExceptions:
                       properties:
@@ -838,6 +852,20 @@ spec:
                     elasticsearch_genid:
                       properties:
                         hash_id_key:
+                          type: string
+                        include_tag_in_seed:
+                          type: boolean
+                        include_time_in_seed:
+                          type: boolean
+                        use_record_as_seed:
+                          type: boolean
+                        record_keys:
+                          type: string
+                        use_entire_record:
+                          type: bool
+                        separator:
+                          type: string
+                        hash_type:
                           type: string
                       type: object
                     detectExceptions:
