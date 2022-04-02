@@ -29,6 +29,7 @@ var fluentBitConfigTemplate = `
     HTTP_Server  On
     HTTP_Listen  0.0.0.0
     HTTP_Port    {{ .Monitor.Port }}
+    storage.metrics On
     {{- end }}
     {{- range $key, $value := .BufferStorage }}
     {{- if $value }}

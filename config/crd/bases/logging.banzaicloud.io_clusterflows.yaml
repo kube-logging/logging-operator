@@ -82,6 +82,11 @@ spec:
                         de_dot_separator:
                           type: string
                       type: object
+                    elasticsearch_genid:
+                      properties:
+                        hash_id_key:
+                          type: string
+                      type: object
                     detectExceptions:
                       properties:
                         force_line_breaks:
@@ -832,6 +837,11 @@ spec:
                         de_dot_nested:
                           type: boolean
                         de_dot_separator:
+                          type: string
+                      type: object
+                    elasticsearch_genid:
+                      properties:
+                        hash_id_key:
                           type: string
                       type: object
                     detectExceptions:
