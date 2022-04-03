@@ -436,6 +436,11 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 		*out = new(filter.DedotFilterConfig)
 		**out = **in
 	}
+	if in.ElasticGenId != nil {
+		in, out := &in.ElasticGenId, &out.ElasticGenId
+		*out = new(filter.ElasticsearchGenId)
+		**out = **in
+	}
 	if in.RecordTransformer != nil {
 		in, out := &in.RecordTransformer, &out.RecordTransformer
 		*out = new(filter.RecordTransformer)
