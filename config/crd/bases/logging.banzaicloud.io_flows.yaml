@@ -103,6 +103,25 @@ spec:
                         stream:
                           type: string
                       type: object
+                    elasticsearch_genid:
+                      properties:
+                        hash_id_key:
+                          type: string
+                        hash_type:
+                          type: string
+                        include_tag_in_seed:
+                          type: boolean
+                        include_time_in_seed:
+                          type: boolean
+                        record_keys:
+                          type: string
+                        separator:
+                          type: string
+                        use_entire_record:
+                          type: boolean
+                        use_record_as_seed:
+                          type: boolean
+                      type: object
                     enhanceK8s:
                       properties:
                         api_groups:
@@ -850,6 +869,25 @@ spec:
                           type: string
                         stream:
                           type: string
+                      type: object
+                    elasticsearch_genid:
+                      properties:
+                        hash_id_key:
+                          type: string
+                        hash_type:
+                          type: string
+                        include_tag_in_seed:
+                          type: boolean
+                        include_time_in_seed:
+                          type: boolean
+                        record_keys:
+                          type: string
+                        separator:
+                          type: string
+                        use_entire_record:
+                          type: boolean
+                        use_record_as_seed:
+                          type: boolean
                       type: object
                     enhanceK8s:
                       properties:
