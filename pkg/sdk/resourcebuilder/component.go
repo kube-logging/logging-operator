@@ -15,6 +15,7 @@
 package resourcebuilder
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 
@@ -43,6 +44,7 @@ import (
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
@@ -73,29 +75,33 @@ func (c *ComponentConfig) build(parent reconciler.ResourceOwner, fn func(reconci
 	})
 }
 
-func ResourceBuilders(parent reconciler.ResourceOwner, object interface{}) (resources []reconciler.ResourceBuilder) {
-	config := &ComponentConfig{}
-	if object != nil {
-		config = object.(*ComponentConfig)
+func ResourceBuildersWithReader(reader client.Reader) reconciler.ResourceBuilders {
+	return func(parent reconciler.ResourceOwner, object interface{}) (resources []reconciler.ResourceBuilder) {
+		config := &ComponentConfig{}
+		if object != nil {
+			config = object.(*ComponentConfig)
+		}
+		if config.Namespace == "" {
+			config.Namespace = defaultNamespace
+		}
+		var modifiers []CRDModifier
+		// We don't return with an absent state since we don't want them to be removed
+		// however we return the CRDs without modified with webhook configuration to set the conversion strategy to default (None)
+		if config.IsEnabled() && !config.DisableWebhook {
+			modifiers = ConversionWebhookModifiers(parent, config)
+		}
+		resources = AppendCRDResourceBuilders(resources, modifiers...)
+		resources = AppendOperatorResourceBuilders(resources, parent, config)
+
+		if ok, _ := CRDExists(context.Background(), reader, "issuers.cert-manager.io"); ok {
+			resources = AppendWebhookResourceBuilders(resources, parent, config)
+		}
+
+		if config.InstallPrometheusRules {
+			resources = AppendPrometheusRulesResourceBuilders(resources, parent, config)
+		}
+		return resources
 	}
-	if config.Namespace == "" {
-		config.Namespace = defaultNamespace
-	}
-	var modifiers []CRDModifier
-	// We don't return with an absent state since we don't want them to be removed
-	// however we return the CRDs without modified with webhook configuration to set the conversion strategy to default (None)
-	if config.IsEnabled() && !config.DisableWebhook {
-		modifiers = ConversionWebhookModifiers(parent, config)
-	}
-	resources = AppendCRDResourceBuilders(resources, modifiers...)
-	resources = AppendOperatorResourceBuilders(resources, parent, config)
-	if !config.DisableWebhook {
-		resources = AppendWebhookResourceBuilders(resources, parent, config)
-	}
-	if config.InstallPrometheusRules {
-		resources = AppendPrometheusRulesResourceBuilders(resources, parent, config)
-	}
-	return resources
 }
 
 func AppendOperatorResourceBuilders(rbs []reconciler.ResourceBuilder, parent reconciler.ResourceOwner, config *ComponentConfig) []reconciler.ResourceBuilder {
@@ -465,6 +471,9 @@ func Issuer(parent reconciler.ResourceOwner, config ComponentConfig) (runtime.Ob
 	issuer.SetLabels(config.labelSelector(parent))
 	issuer.Object["spec"] = strIfMap{"selfSigned": strIfMap{}}
 
+	if config.DisableWebhook {
+		return &issuer, reconciler.StateAbsent, nil
+	}
 	return &issuer, reconciler.StatePresent, nil
 }
 
@@ -489,7 +498,9 @@ func Certificate(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 			parent.GetName() + WebhookNameAffix + "." + config.Namespace + ".svc",
 		},
 	}
-
+	if config.DisableWebhook {
+		return &cert, reconciler.StateAbsent, nil
+	}
 	return &cert, reconciler.StatePresent, nil
 }
 
@@ -608,4 +619,11 @@ func ExtensionsMutatingWebhook(parent reconciler.ResourceOwner, config Component
 		SideEffects:             &sideEffects,
 		AdmissionReviewVersions: []string{"v1"},
 	}
+}
+
+func CRDExists(ctx context.Context, reader client.Reader, crdName string) (bool, error) {
+	if err := reader.Get(ctx, client.ObjectKey{Name: crdName}, new(crdv1.CustomResourceDefinition)); err != nil {
+		return false, errors.WrapIff(client.IgnoreNotFound(err), "retrieving custom resource definition %q", crdName)
+	}
+	return true, nil
 }
