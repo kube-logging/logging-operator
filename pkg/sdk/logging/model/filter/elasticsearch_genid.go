@@ -22,21 +22,21 @@ import (
 // +kubebuilder:object:generate=true
 type ElasticsearchGenId struct {
 	// You can specify generated hash storing key.
-	Hash_id_key string `json:"hash_id_key,omitempty"`
+	HashIdKey string `json:"hash_id_key,omitempty"`
 	// You can specify to use tag for hash generation seed.
-	Include_tag_in_seed bool `json:"include_tag_in_seed,omitempty"`
+	IncludeTagInSeed bool `json:"include_tag_in_seed,omitempty"`
 	// You can specify to use time for hash generation seed.
-	Include_time_in_seed bool `json:"include_time_in_seed,omitempty"`
+	IncludeTimeInSeed bool `json:"include_time_in_seed,omitempty"`
 	// You can specify to use record in events for hash generation seed. This parameter should be used with record_keys parameter in practice.
-	Use_record_as_seed bool `json:"use_record_as_seed,omitempty"`
+	UseRecordAsSeed bool `json:"use_record_as_seed,omitempty"`
 	// You can specify keys which are record in events for hash generation seed. This parameter should be used with use_record_as_seed parameter in practice.
-	Record_keys string `json:"record_keys,omitempty"`
+	RecordKeys string `json:"record_keys,omitempty"`
 	// You can specify to use entire record in events for hash generation seed.
-	Use_entire_record bool `json:"use_entire_record,omitempty"`
+	UseEntireRecord bool `json:"use_entire_record,omitempty"`
 	// You can specify separator charactor to creating seed for hash generation.
 	Separator string `json:"separator,omitempty"`
 	// You can specify hash algorithm. Support algorithms md5, sha1, sha256, sha512. Default: sha1
-	Hash_type string `json:"hash_type,omitempty"`
+	HashType string `json:"hash_type,omitempty"`
 }
 
 // #### Example `Elasticsearch Genid` filter configurations
