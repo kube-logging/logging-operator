@@ -36,7 +36,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 			},
 		},
 	}
-	return o
+	return *o.DeepCopy()
 }
 
 // FluentdObjectMetaClusterScope creates an objectMeta for resource fluentd

@@ -36,7 +36,7 @@ func (r *Reconciler) FluentbitObjectMeta(name string) metav1.ObjectMeta {
 			},
 		},
 	}
-	return o
+	return *o.DeepCopy()
 }
 
 // FluentbitObjectMetaClusterScope creates an cluster scoped objectMeta for resource fluentbit
