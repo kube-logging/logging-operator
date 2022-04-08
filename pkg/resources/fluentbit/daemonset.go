@@ -47,6 +47,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 
 	labels := util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())
 	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
+	meta.Annotations = util.MergeLabels(meta.Annotations, r.Logging.Spec.FluentbitSpec.DaemonSetAnnotations)
 	podMeta := metav1.ObjectMeta{
 		Labels:      labels,
 		Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
