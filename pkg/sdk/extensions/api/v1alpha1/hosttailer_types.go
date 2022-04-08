@@ -80,8 +80,10 @@ type FileTailer struct {
 	Path string `json:"path,omitempty"`
 	// Disable tailing the file
 	Disabled bool `json:"disabled,omitempty"`
-	// Set the limit of the buffer size per monitored file
+	// Set the limit of the buffer size per active filetailer
 	BufferMaxSize string `json:"buffer_max_size,omitempty"`
+	// Set the buffer chunk size per active filetailer
+	BufferChunkSize string `json:"buffer_chunk_size,omitempty"`
 	// Skip long line when exceeding Buffer_Max_Size
 	SkipLongLines string `json:"skip_long_lines,omitempty"`
 	// Override container fields for the given tailer
