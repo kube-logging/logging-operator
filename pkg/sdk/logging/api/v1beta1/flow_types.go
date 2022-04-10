@@ -64,6 +64,7 @@ type Filter struct {
 	Parser              *filter.ParserConfig              `json:"parser,omitempty"`
 	TagNormaliser       *filter.TagNormaliser             `json:"tag_normaliser,omitempty"`
 	Dedot               *filter.DedotFilterConfig         `json:"dedot,omitempty"`
+	ElasticGenId        *filter.ElasticsearchGenId        `json:"elasticsearch_genid,omitempty"`
 	RecordTransformer   *filter.RecordTransformer         `json:"record_transformer,omitempty"`
 	RecordModifier      *filter.RecordModifier            `json:"record_modifier,omitempty"`
 	GeoIP               *filter.GeoIP                     `json:"geoip,omitempty"`
