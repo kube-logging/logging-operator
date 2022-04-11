@@ -22,10 +22,9 @@ import (
 // FluentdObjectMeta creates an objectMeta for resource fluentd
 func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
-		Name:        r.Logging.QualifiedName(name),
-		Namespace:   r.Logging.Spec.ControlNamespace,
-		Labels:      r.Logging.GetFluentdLabels(component),
-		Annotations: r.Logging.Spec.FluentdSpec.StatefulSetAnnotations,
+		Name:      r.Logging.QualifiedName(name),
+		Namespace: r.Logging.Spec.ControlNamespace,
+		Labels:    r.Logging.GetFluentdLabels(component),
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: r.Logging.APIVersion,
@@ -36,7 +35,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 			},
 		},
 	}
-	return o
+	return *o.DeepCopy()
 }
 
 // FluentdObjectMetaClusterScope creates an objectMeta for resource fluentd

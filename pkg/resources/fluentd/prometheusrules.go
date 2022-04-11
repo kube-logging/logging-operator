@@ -121,34 +121,6 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					},
 				},
 				{
-					Alert: "FluentdBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
-					For:   "10m",
-					Labels: map[string]string{
-						"rulegroup": ruleGroupName,
-						"service":   "fluentd",
-						"severity":  "warning",
-					},
-					Annotations: map[string]string{
-						"summary":     `Fluentd buffer free capacity less than 10%.`,
-						"description": `Fluentd buffer size capacity is {{ $value }}%.`,
-					},
-				},
-				{
-					Alert: "FluentdBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 5`, nsJobLabel)),
-					For:   "10m",
-					Labels: map[string]string{
-						"rulegroup": ruleGroupName,
-						"service":   "fluentd",
-						"severity":  "critical",
-					},
-					Annotations: map[string]string{
-						"summary":     `Fluentd buffer free capacity less than 5%.`,
-						"description": `Fluentd buffer size capacity is {{ $value }}%.`,
-					},
-				},
-				{
 					Alert: "FluentdPredictedBufferGrowth",
 					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%[1]s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%[1]s}", nsJobLabel)),
 					For:   "10m",

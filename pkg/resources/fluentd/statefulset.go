@@ -58,6 +58,8 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		Spec:       *spec,
 	}
 
+	desired.Annotations = util.MergeLabels(desired.Annotations, r.Logging.Spec.FluentdSpec.StatefulSetAnnotations)
+
 	return desired, reconciler.StatePresent, nil
 }
 

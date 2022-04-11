@@ -27,6 +27,10 @@ func (f FileTailer) defaults() FileTailer {
 	if result.BufferMaxSize == "" {
 		result.BufferMaxSize = "32k"
 	}
+	if result.BufferChunkSize == "" {
+		result.BufferChunkSize = result.BufferMaxSize
+	}
+
 	if result.SkipLongLines == "" {
 		result.SkipLongLines = "On"
 	}
