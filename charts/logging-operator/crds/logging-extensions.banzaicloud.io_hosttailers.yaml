@@ -311,7 +311,7 @@ spec:
                     path:
                       type: string
                     read_from_head:
-                      type: string
+                      type: boolean
                     skip_long_lines:
                       type: string
                   required:

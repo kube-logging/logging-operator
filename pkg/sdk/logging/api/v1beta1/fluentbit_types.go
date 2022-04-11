@@ -163,7 +163,7 @@ type InputTail struct {
 	// Set one or multiple shell patterns separated by commas to exclude files matching a certain criteria, e.g: exclude_path=*.gz,*.zip
 	ExcludePath string `json:"Exclude_Path,omitempty"`
 	// For new discovered files on start (without a database offset/position), read the content from the head of the file, not tail.
-	ReadFromHead string `json:"Read_From_Head,omitempty"`
+	ReadFromHead bool `json:"Read_From_Head,omitempty"`
 	// The interval of refreshing the list of watched files in seconds. (default:60)
 	RefreshInterval string `json:"Refresh_Interval,omitempty"`
 	// Specify the number of extra time in seconds to monitor a file once is rotated in case some pending data is flushed. (default:5)
