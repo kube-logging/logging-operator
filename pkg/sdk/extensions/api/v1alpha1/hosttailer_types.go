@@ -82,6 +82,8 @@ type FileTailer struct {
 	Disabled bool `json:"disabled,omitempty"`
 	// Set the limit of the buffer size per active filetailer
 	BufferMaxSize string `json:"buffer_max_size,omitempty"`
+	// Read_From_Head
+	ReadFromHead bool `json:"read_from_head,omitempty"`
 	// Set the buffer chunk size per active filetailer
 	BufferChunkSize string `json:"buffer_chunk_size,omitempty"`
 	// Read_From_Head
