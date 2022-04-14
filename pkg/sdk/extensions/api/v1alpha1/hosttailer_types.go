@@ -86,6 +86,8 @@ type FileTailer struct {
 	BufferChunkSize string `json:"buffer_chunk_size,omitempty"`
 	// Skip long line when exceeding Buffer_Max_Size
 	SkipLongLines string `json:"skip_long_lines,omitempty"`
+	// Start reading from the head of new log files
+	ReadFromHead bool `json:"read_from_head,omitempty"`
 	// Override container fields for the given tailer
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
 }
