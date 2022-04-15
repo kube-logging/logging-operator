@@ -68,6 +68,7 @@ The following tables lists the configurable parameters of the logging-operator c
 | `securityContext`                                   | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/) | `{"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true}` |
 | `createCustomResource`                              | Create CRDs. | `true`                                                                |
 | `monitoring.serviceMonitor.enabled`                 | Create Prometheus Operator servicemonitor. | `false`                                                               |
+| `serviceAccount.annotations`                        | Define annotations for logging-operator ServiceAccount | `{}`                                                                  |
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 

@@ -95,3 +95,6 @@ monitoring:
     additionalLabels: {}
     metricRelabelings: []
     relabelings: []
+
+serviceAccount:
+  annotations: {}
