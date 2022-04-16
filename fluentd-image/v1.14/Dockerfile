@@ -63,7 +63,7 @@ RUN apk update \
          fluent-plugin-splunk-hec \
          fluent-plugin-newrelic \
          fluent-plugin-elasticsearch \
-         fluent-plugin-cloudwatch-logs \
+         fluent-plugin-opensearch \
          fluent-plugin-throttle \
          fluent-plugin-logdna \
          fluent-plugin-datadog \
