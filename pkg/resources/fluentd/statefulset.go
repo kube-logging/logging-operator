@@ -42,7 +42,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			return nil, reconciler.StatePresent, err
 		}
 	} else {
-		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(v1beta1.DefaultFluentdBufferStorageVolumeName, containerName, bufferPath, &spec.Template.Spec)
+		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName), containerName, bufferPath, &spec.Template.Spec)
 		if err != nil {
 			return nil, reconciler.StatePresent, err
 		}
