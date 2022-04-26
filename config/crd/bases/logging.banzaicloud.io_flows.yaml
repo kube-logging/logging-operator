@@ -385,6 +385,8 @@ spec:
                           type: string
                         parse:
                           properties:
+                            custom_pattern_path:
+                              type: string
                             delimiter:
                               type: string
                             delimiter_pattern:
@@ -397,6 +399,31 @@ spec:
                               type: string
                             format_firstline:
                               type: string
+                            grok_failure_key:
+                              type: string
+                            grok_name_key:
+                              type: string
+                            grok_pattern:
+                              type: string
+                            grok_patterns:
+                              items:
+                                properties:
+                                  keep_time_key:
+                                    type: boolean
+                                  name:
+                                    type: string
+                                  pattern:
+                                    type: string
+                                  time_format:
+                                    type: string
+                                  time_key:
+                                    type: string
+                                  timezone:
+                                    type: string
+                                required:
+                                - pattern
+                                type: object
+                              type: array
                             keep_time_key:
                               type: boolean
                             keys:
@@ -405,6 +432,8 @@ spec:
                               type: string
                             local_time:
                               type: boolean
+                            multi_line_start_regexp:
+                              type: string
                             multiline:
                               items:
                                 type: string
@@ -464,6 +493,8 @@ spec:
                         parsers:
                           items:
                             properties:
+                              custom_pattern_path:
+                                type: string
                               delimiter:
                                 type: string
                               delimiter_pattern:
@@ -476,6 +507,31 @@ spec:
                                 type: string
                               format_firstline:
                                 type: string
+                              grok_failure_key:
+                                type: string
+                              grok_name_key:
+                                type: string
+                              grok_pattern:
+                                type: string
+                              grok_patterns:
+                                items:
+                                  properties:
+                                    keep_time_key:
+                                      type: boolean
+                                    name:
+                                      type: string
+                                    pattern:
+                                      type: string
+                                    time_format:
+                                      type: string
+                                    time_key:
+                                      type: string
+                                    timezone:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  type: object
+                                type: array
                               keep_time_key:
                                 type: boolean
                               keys:
@@ -484,6 +540,8 @@ spec:
                                 type: string
                               local_time:
                                 type: boolean
+                              multi_line_start_regexp:
+                                type: string
                               multiline:
                                 items:
                                   type: string
@@ -1152,6 +1210,8 @@ spec:
                           type: string
                         parse:
                           properties:
+                            custom_pattern_path:
+                              type: string
                             delimiter:
                               type: string
                             delimiter_pattern:
@@ -1164,6 +1224,31 @@ spec:
                               type: string
                             format_firstline:
                               type: string
+                            grok_failure_key:
+                              type: string
+                            grok_name_key:
+                              type: string
+                            grok_pattern:
+                              type: string
+                            grok_patterns:
+                              items:
+                                properties:
+                                  keep_time_key:
+                                    type: boolean
+                                  name:
+                                    type: string
+                                  pattern:
+                                    type: string
+                                  time_format:
+                                    type: string
+                                  time_key:
+                                    type: string
+                                  timezone:
+                                    type: string
+                                required:
+                                - pattern
+                                type: object
+                              type: array
                             keep_time_key:
                               type: boolean
                             keys:
@@ -1172,6 +1257,8 @@ spec:
                               type: string
                             local_time:
                               type: boolean
+                            multi_line_start_regexp:
+                              type: string
                             multiline:
                               items:
                                 type: string
@@ -1231,6 +1318,8 @@ spec:
                         parsers:
                           items:
                             properties:
+                              custom_pattern_path:
+                                type: string
                               delimiter:
                                 type: string
                               delimiter_pattern:
@@ -1243,6 +1332,31 @@ spec:
                                 type: string
                               format_firstline:
                                 type: string
+                              grok_failure_key:
+                                type: string
+                              grok_name_key:
+                                type: string
+                              grok_pattern:
+                                type: string
+                              grok_patterns:
+                                items:
+                                  properties:
+                                    keep_time_key:
+                                      type: boolean
+                                    name:
+                                      type: string
+                                    pattern:
+                                      type: string
+                                    time_format:
+                                      type: string
+                                    time_key:
+                                      type: string
+                                    timezone:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  type: object
+                                type: array
                               keep_time_key:
                                 type: boolean
                               keys:
@@ -1251,6 +1365,8 @@ spec:
                                 type: string
                               local_time:
                                 type: boolean
+                              multi_line_start_regexp:
+                                type: string
                               multiline:
                                 items:
                                   type: string
