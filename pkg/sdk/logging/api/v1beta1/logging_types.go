@@ -119,7 +119,7 @@ const (
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-2"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.0.1"
+	DefaultFluentdDrainWatchImageTag            = "v0.0.2"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag            = "latest"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
