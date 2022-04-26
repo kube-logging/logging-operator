@@ -81,6 +81,9 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 							corev1.ResourceMemory: resource.MustParse("50M"),
 						},
 					},
+					BufferVolumeMetrics: &v1beta1.Metrics{
+						// ServiceMonitor: true,
+					},
 					Scaling: &v1beta1.FluentdScaling{
 						Replicas: 2,
 						Drain: v1beta1.FluentdDrainConfig{
