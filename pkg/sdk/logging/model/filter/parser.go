@@ -65,7 +65,7 @@ type ParserConfig struct {
 // +kubebuilder:object:generate=true
 // +docName:"Parse Section"
 type ParseSection struct {
-	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt
+	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
 	Type string `json:"type,omitempty"`
 	// Regexp expression to evaluate
 	Expression string `json:"expression,omitempty"`
@@ -108,6 +108,25 @@ type ParseSection struct {
 	// Only available when using type: multi_format
 	// +docLink:"Parse Section,#parse-section"
 	Patterns []SingleParseSection `json:"patterns,omitempty"`
+    // Only available when using type: grok
+    // The pattern of grok. You cannot specify multiple grok pattern with this.
+	GrokPattern string `json:"grok_pattern,omitempty"`
+    // Only available when using type: grok
+    // Path to the file that includes custom grok patterns.
+	CustomPatternPath string `json:"custom_pattern_path,omitempty"`
+    // Only available when using type: grok
+    // The key has grok failure reason.
+	GrokFailureKey string `json:"grok_failure_key,omitempty"`
+    // Only available when using type: grok
+    // The key name to store grok section's name.
+	GrokNameKey string `json:"grok_name_key,omitempty"`
+    // Only available when using type: multiline_grok
+    // The regexp to match beginning of multiline.
+    MultiLineStartRegexp string `json:"multi_line_start_regexp,omitempty"`
+    // Only available when using type: grok
+    // +docLink:"Parse Section,#grok-section"
+    // Specify grok pattern series set.
+    GrokPatterns []SingleGrokSection `json:"grok_patterns,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -141,6 +160,23 @@ type SingleParseSection struct {
 	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+// +docName:"GROK Section (single)"
+type SingleGrokSection struct {
+    // The name of grok section.
+    Name string `json:"name,omitempty"`
+    // The pattern of grok.
+    Pattern string `json:"pattern" plugin:"required"`
+    // If true, keep time field in the record.
+    KeepTimeKey bool `json:"keep_time_key,omitempty"`
+    // Specify time field for event time. If the event doesn't have this field, current time is used.
+    TimeKey string `json:"time_key,omitempty" plugin:"default:time"`
+    // Process value using specified format. This is available only when time_type is string.
+    TimeFormat string `json:"time_format,omitempty"`
+    // Use specified timezone. one can parse/format the time value in the specified timezone.
+    Timezone string `json:"timezone,omitempty"`
 }
 
 // #### Example `Parser` filter configurations
@@ -199,6 +235,14 @@ func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader
 	return types.NewFlatDirective(parseMeta, section, secretLoader)
 }
 
+func (p *SingleGrokSection) ToGrokDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	parseMeta := types.PluginMeta{
+		Directive: "grok",
+	}
+	section := p.DeepCopy()
+	return types.NewFlatDirective(parseMeta, section, secretLoader)
+}
+
 func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseSection := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
@@ -229,6 +273,13 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 			return nil, errors.Errorf("none format type parameter only works with multi_format type")
 		}
 		if meta, err := parseRule.ToPatternDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			parseSection.SubDirectives = append(parseSection.SubDirectives, meta)
+		}
+	}
+	for _, grokRule := range section.GrokPatterns {
+		if meta, err := grokRule.ToGrokDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
 			parseSection.SubDirectives = append(parseSection.SubDirectives, meta)
