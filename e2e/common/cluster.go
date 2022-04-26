@@ -37,15 +37,15 @@ func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Opt
 	cluster, err := GetTestCluster(defaultClusterName, opts...)
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, _ := context.WithCancel(context.Background())
 	go func() {
 		require.NoError(t, cluster.Start(ctx))
 	}()
 
-	defer func() {
-		cancel()
-		require.NoError(t, DeleteTestCluster(defaultClusterName))
-	}()
+	// defer func() {
+	// 	cancel()
+	// 	require.NoError(t, DeleteTestCluster(defaultClusterName))
+	// }()
 
 	fn(t, cluster)
 }
