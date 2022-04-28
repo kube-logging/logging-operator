@@ -50,7 +50,7 @@ import (
 )
 
 const (
-	Image            = "ghcr.io/banzaicloud/logging-operator:3.17.4"
+	Image            = "ghcr.io/banzaicloud/logging-operator:3.17.6"
 	defaultNamespace = "logging-system"
 )
 
