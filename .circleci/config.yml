@@ -52,6 +52,10 @@ jobs:
       CHANGE_MINIKUBE_NONE_USER: 'true'
       GOPATH: '/home/circleci/go'
     steps:
+      # https://gitlab.alpinelinux.org/alpine/aports/-/issues/12821
+      - setup_remote_docker:
+          version: 20.10.6
+
       - run:
           name: Setup minikube
           command: |
