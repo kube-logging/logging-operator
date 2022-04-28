@@ -17,6 +17,7 @@ package output
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 // +name:"Amazon Elasticsearch"
@@ -48,23 +49,6 @@ type _metaAwsElasticsearch interface{} //nolint:deadcode,unused
 // +docName:"Amazon Elasticsearch"
 // Send your logs to a Amazon Elasticsearch Service
 type AwsElasticsearchOutputConfig struct {
-	// logstash_format
-	LogstashFormat bool `json:"logstash_format,omitempty"`
-
-	// logstash_prefix
-	LogstashPrefix string `json:"logstash_prefix,omitempty"`
-
-	// index_name
-	IndexName string `json:"index_name,omitempty"`
-
-	// include_timestamp
-	IncludeTimestamp string `json:"include_timestamp,omitempty"`
-
-	// include_tag_key
-	IncludeTagKey bool `json:"include_tag_key,omitempty"`
-
-	// tag_key
-	TagKey string `json:"tag_key,omitempty"`
 
 	// flush_interval
 	FlushInterval string `json:"flush_interval,omitempty"`
@@ -76,6 +60,8 @@ type AwsElasticsearchOutputConfig struct {
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	//  ElasticSearch
+	*ElasticsearchOutput `json:",omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -118,7 +104,7 @@ func (o *EndpointCredentials) ToDirective(secretLoader secret.SecretLoader, id s
 
 func (e *AwsElasticsearchOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "aws-elasticsearch-service"
-	kinesis := &types.OutputPlugin{
+	awsElastic := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
@@ -129,13 +115,21 @@ func (e *AwsElasticsearchOutputConfig) ToDirective(secretLoader secret.SecretLoa
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
 		return nil, err
 	} else {
-		kinesis.Params = params
+		awsElastic.Params = params
 	}
+	if e.ElasticsearchOutput != nil {
+		if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e.ElasticsearchOutput); err != nil {
+			return nil, err
+		} else {
+			awsElastic.Params = utils.MergeLabels(awsElastic.Params, params)
+		}
+	}
+
 	if e.Endpoint != nil {
 		if assumeRoleCredentials, err := e.Endpoint.ToDirective(secretLoader, id); err != nil {
 			return nil, err
 		} else {
-			kinesis.SubDirectives = append(kinesis.SubDirectives, assumeRoleCredentials)
+			awsElastic.SubDirectives = append(awsElastic.SubDirectives, assumeRoleCredentials)
 		}
 	}
 	if e.Buffer == nil {
@@ -145,14 +139,14 @@ func (e *AwsElasticsearchOutputConfig) ToDirective(secretLoader secret.SecretLoa
 	if buffer, err := e.Buffer.ToDirective(secretLoader, id); err != nil {
 		return nil, err
 	} else {
-		kinesis.SubDirectives = append(kinesis.SubDirectives, buffer)
+		awsElastic.SubDirectives = append(awsElastic.SubDirectives, buffer)
 	}
 	if e.Format != nil {
 		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
-			kinesis.SubDirectives = append(kinesis.SubDirectives, format)
+			awsElastic.SubDirectives = append(awsElastic.SubDirectives, format)
 		}
 	}
-	return kinesis, nil
+	return awsElastic, nil
 }

@@ -45,10 +45,16 @@ buffer:
   <match **>
 	@type aws-elasticsearch-service
 	@id test
+	exception_backup true
+	fail_on_putting_template_retry_exceed true
 	flush_interval 1s
 	include_tag_key true
 	logstash_format true
+	reload_connections true
+	ssl_verify true
 	tag_key @log_name
+	utc_index true
+	verify_es_version_at_startup true
 	<endpoint>
 	  access_key_id aws-key
 	  region eu-west-1
