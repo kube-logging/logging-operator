@@ -48,6 +48,8 @@ function configure_logging()
         --wait \
         --create-namespace \
         --namespace logging \
+        --set fluentd.image.tag='local' \
+        --set fluentd.image.repository='fluentd' \
         'logging-operator-logging-tls' \
         "${SCRIPT_PATH}/../charts/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"

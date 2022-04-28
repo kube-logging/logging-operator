@@ -72,6 +72,7 @@ RUN apk update \
          fluent-plugin-gelf-hs \
          fluent-plugin-sqs \
          fluent-plugin-kube-events-timestamp \
+         fluent-plugin-grok-parser \
  && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
  && gem specific_install -l https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
