@@ -81,6 +81,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 							corev1.ResourceMemory: resource.MustParse("50M"),
 						},
 					},
+					BufferVolumeMetrics: &v1beta1.Metrics{},
 					Scaling: &v1beta1.FluentdScaling{
 						Replicas: 2,
 						Drain: v1beta1.FluentdDrainConfig{
@@ -169,13 +170,13 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			return present && job.Status.Active > 0
 		}, 2*time.Minute, 1*time.Second)
 
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 5*time.Second, time.Second/2)
+		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
 		require.NoError(t, exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on").Run())
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 5*time.Second, time.Second/2)
+		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
 		require.NoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))

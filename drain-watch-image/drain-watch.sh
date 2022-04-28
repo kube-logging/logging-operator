@@ -2,6 +2,7 @@
 
 CHECK_INTERVAL="${CHECK_INTERVAL:-60}"
 RPC_ADDRESS="${RPC_ADDRESS:-127.0.0.1:24444}"
+CUSTOM_RUNNER_ADDRESS="${CUSTOM_RUNNER_ADDRESS:-127.0.0.1:7357}"
 
 [ -z "$BUFFER_PATH" ] && exit 2
 
@@ -21,6 +22,7 @@ do
 
   if [ "$(find $BUFFER_PATH -iname '*.buffer' -or -iname '*.buffer.meta' | wc -l)" = 0 ]
   then
+    echo '['$(date)']' 'exiting node exporter custom runner:' "$(curl --silent --show-error http://$CUSTOM_RUNNER_ADDRESS/exit)"
     echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl --silent --show-error http://$RPC_ADDRESS/api/processes.killWorkers)"
     exit 0
   fi

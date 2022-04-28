@@ -119,15 +119,15 @@ const (
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-3"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.0.1"
+	DefaultFluentdDrainWatchImageTag            = "v0.0.2"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag            = "latest"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
 	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
-	DefaultFluentdBufferVolumeImageRepository   = "quay.io/prometheus/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v1.1.2"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
 
 // SetDefaults fills empty attributes
