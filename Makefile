@@ -49,6 +49,10 @@ docker-build: ## Build the docker image
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
+.PHONY: docker-build-fluentd
+docker-build-fluentd: ## Build fluentd docker image
+	docker build ./fluentd-image/v1.14 -t ${IMG}
+
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
 	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}

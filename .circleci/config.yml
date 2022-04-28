@@ -99,6 +99,11 @@ jobs:
             make docker-build IMG='controller:local'
 
       - run:
+          name: Build fluentd docker image
+          command: |
+            make docker-build-fluentd IMG='fluentd:local'            
+
+      - run:
           name: Wait for minikube
           command: |
             timeout 180s bash \<<EOT
