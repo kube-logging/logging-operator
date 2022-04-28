@@ -128,3 +128,72 @@ parse:
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }
+
+func TestParserGrokSingleParser(t *testing.T) {
+	CONFIG := []byte(`
+remove_key_name_field: true
+reserve_data: true
+parse:
+  type: grok
+  grok_failure_key: grokFailure
+  grok_pattern: "%{GREEDYDATA:grokMessage}"
+`)
+
+	expected := `
+<filter **>
+  @type parser
+  @id test
+  key_name message
+  remove_key_name_field true
+  reserve_data true
+  <parse>
+    @type grok
+    grok_failure_key grokFailure
+    grok_pattern %{GREEDYDATA:grokMessage}
+  </parse>
+</filter>
+`
+	parser := &filter.ParserConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
+}
+
+func TestParserGrokMultiParser(t *testing.T) {
+	CONFIG := []byte(`
+remove_key_name_field: true
+reserve_data: true
+parse:
+  type: grok
+  grok_failure_key: grokFailure
+  grok_patterns:
+    - pattern: "%{GREEDYDATA:firstMessage}"
+    - pattern: "%{GREEDYDATA:secondMessage}"
+`)
+
+	expected := `
+<filter **>
+  @type parser
+  @id test
+  key_name message
+  remove_key_name_field true
+  reserve_data true
+  <parse>
+    @type grok
+    grok_failure_key grokFailure
+    <grok>
+      pattern %{GREEDYDATA:firstMessage}
+      time_key time
+    </grok>
+    <grok>
+      pattern %{GREEDYDATA:secondMessage}
+      time_key time
+    </grok>    
+  </parse>
+</filter>
+`
+	parser := &filter.ParserConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
+}
