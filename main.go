@@ -71,6 +71,7 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var verboseLogging bool
+	var loggingOutputFormat string
 	var enableprofile bool
 	var namespace string
 	var loggingRef string
@@ -80,6 +81,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
+	flag.StringVar(&loggingOutputFormat, "output-format", "", "Logging output format json, console")
 	flag.IntVar(&klogLevel, "klogLevel", 0, "Global log level for klog (0-9)")
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
@@ -90,7 +92,22 @@ func main() {
 
 	zapLogger := zap.New(func(o *zap.Options) {
 		o.Development = verboseLogging
+
+		switch loggingOutputFormat {
+		case "json":
+			encoder := zap.JSONEncoder()
+			encoder(o)
+		case "console":
+			encoder := zap.ConsoleEncoder()
+			encoder(o)
+		case "":
+			break
+		default:
+			fmt.Printf("invalid encoder value \"%s\"", loggingOutputFormat)
+			os.Exit(1)
+		}
 	})
+
 	ctrl.SetLogger(zapLogger)
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
