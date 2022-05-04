@@ -85,7 +85,7 @@ type HTTPOutputConfig struct {
 	TlsVerifyMode string `json:"tls_verify_mode,omitempty"`
 	// Raise UnrecoverableError when the response code is non success, 1xx/3xx/4xx/5xx. If false, the plugin logs error message instead of raising UnrecoverableError. (default: true)
 	ErrorResponseAsUnrecoverable *bool `json:"error_response_as_unrecoverable,omitempty"`
-	// List of retryable response codes. If the response code is included in this list, the plugin retries the buffer flush. (default: [503])
+	// List of retryable response codes. If the response code is included in this list, the plugin retries the buffer flush. Since Fluentd v2 the Status code 503 is going to be removed from default. (default: [503])
 	RetryableResponseCodes []int `json:"retryable_response_codes,omitempty"`
 	// +docLink:"HTTP auth,#http-auth-config"
 	Auth *HTTPAuth `json:"auth,omitempty"`
