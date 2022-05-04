@@ -140,7 +140,8 @@ type S3OutputConfig struct {
 	S3Bucket string `json:"s3_bucket"`
 	// Archive format on S3
 	StoreAs string `json:"store_as,omitempty"`
-	// The type of storage to use for the object(STANDARD,REDUCED_REDUNDANCY,STANDARD_IA)
+	// The type of storage to use for the object, for example STANDARD, REDUCED_REDUNDANCY, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER, DEEP_ARCHIVE, OUTPOSTS, GLACIER_IR
+	// For a complete list of possible values, see the [Amazon S3 API reference](https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#AmazonS3-PutObject-request-header-StorageClass).
 	StorageClass string `json:"storage_class,omitempty"`
 	// The number of attempts to load instance profile credentials from the EC2 metadata service using IAM role
 	AwsIamRetries string `json:"aws_iam_retries,omitempty"`
