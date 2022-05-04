@@ -45,6 +45,7 @@ func (f FileTailer) Command(Name string) []string {
 		"/fluent-bit/bin/fluent-bit", "-i", "tail",
 		"-p", fmt.Sprintf("path=%s", f.Path),
 		"-p", fmt.Sprintf("db=/var/pos/%s.db", Name),
+		"-p", fmt.Sprintf("buffer_chunk_size=%s", f.BufferChunkSize),
 		"-p", fmt.Sprintf("buffer_max_size=%s", f.BufferMaxSize),
 		"-p", fmt.Sprintf("skip_long_lines=%s", f.SkipLongLines),
 		"-p", fmt.Sprintf("read_from_head=%t", f.ReadFromHead),
