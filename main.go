@@ -81,7 +81,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
-	flag.StringVar(&loggingOutputFormat, "output-format", "", "Logging output format json, console")
+	flag.StringVar(&loggingOutputFormat, "output-format", "", "Logging output format (json, console)")
 	flag.IntVar(&klogLevel, "klogLevel", 0, "Global log level for klog (0-9)")
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
