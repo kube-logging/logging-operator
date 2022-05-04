@@ -29,7 +29,7 @@ type _hugoSplunk interface{} //nolint:deadcode,unused
 //More info at https://github.com/splunk/fluent-plugin-splunk-hec
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   splunkHec:
 //     hec_host: splunk.default.svc.cluster.local

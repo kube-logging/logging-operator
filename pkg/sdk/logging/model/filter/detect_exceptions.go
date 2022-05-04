@@ -30,7 +30,7 @@ type _hugoExceptionDetector interface{} //nolint:deadcode,unused
 // > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
 //
 // #### Example output configurations
-// ```
+// ```yaml
 //filters:
 //  - detectExceptions:
 //      languages: java, python

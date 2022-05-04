@@ -28,7 +28,7 @@ type _hugoElasticsearch interface{} //nolint:deadcode,unused
 //>Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   elasticsearch:
 //     host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local

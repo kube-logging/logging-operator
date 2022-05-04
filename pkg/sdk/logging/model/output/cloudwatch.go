@@ -28,7 +28,7 @@ type _hugoCloudWatch interface{} //nolint:deadcode,unused
 //More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //  cloudwatch:
 //    aws_key_id:

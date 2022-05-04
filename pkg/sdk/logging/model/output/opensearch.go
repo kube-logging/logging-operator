@@ -28,7 +28,7 @@ type _hugoOpenSearch interface{} //nolint:deadcode,unused
 //>Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   opensearch:
 //     host: opensearch-cluster.default.svc.cluster.local
