@@ -50,7 +50,7 @@ type _hugoS3 interface{} //nolint:deadcode,unused
 //    buffer:
 //      timekey: 10m
 //      timekey_wait: 30s
-//      timekey_use_utc: true*/
+//      timekey_use_utc: true
 // ```
 type _docS3 interface{} //nolint:deadcode,unused
 
