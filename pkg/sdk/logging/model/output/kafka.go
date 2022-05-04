@@ -28,7 +28,7 @@ type _hugoKafka interface{} //nolint:deadcode,unused
 //>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   kafka:
 //     brokers: kafka-headless.kafka.svc.cluster.local:29092

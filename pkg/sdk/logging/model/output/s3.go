@@ -31,7 +31,7 @@ type _hugoS3 interface{} //nolint:deadcode,unused
 //>Example: [S3 Output Deployment](../../../../quickstarts/example-s3/)
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //  s3:
 //    aws_key_id:

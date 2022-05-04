@@ -31,7 +31,7 @@ type _hugoLogZ interface{} //nolint:deadcode,unused
 //More info at https://github.com/tarokkk/fluent-plugin-logzio
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   logz:
 //     endpoint:

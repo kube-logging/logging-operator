@@ -29,7 +29,7 @@ type _hugoNewRelic interface{} //nolint:deadcode,unused
 //**newrelic** output plugin send log data to New Relic Logs
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   newrelic:
 //     license_key:

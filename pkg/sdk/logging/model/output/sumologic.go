@@ -35,7 +35,7 @@ type _hugoSumoLogic interface{} //nolint:deadcode,unused
 //
 // Example ClusterOutput
 //
-//```
+//```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: ClusterOutput
 //metadata:

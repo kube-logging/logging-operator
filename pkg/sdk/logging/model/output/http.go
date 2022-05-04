@@ -29,7 +29,7 @@ type _hugoHTTP interface{} //nolint:deadcode,unused
 // More info at https://docs.fluentd.org/output/http.
 //
 // #### Example output configurations
-// ```
+// ```yaml
 // spec:
 //   http:
 //     endpoint: http://logserver.com:9000/api
