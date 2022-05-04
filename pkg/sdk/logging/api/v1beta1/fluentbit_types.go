@@ -338,10 +338,11 @@ type FilterModifyCondition struct {
 	MatchingKeysDoNotHaveMatchingValues *FilterKeyValue `json:"Matching_keys_do_not_have_matching_values,omitempty"`
 }
 
+// Operation Doc stub
 type Operation struct {
-	Op    string
-	Key   string
-	Value string
+	Op    string `json:"Op,omitempty"`
+	Key   string `json:"Key,omitempty"`
+	Value string `json:"Value,omitempty"`
 }
 
 func getOperation(c interface{}) (result Operation) {
