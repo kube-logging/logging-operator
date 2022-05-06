@@ -1162,8 +1162,6 @@ spec:
                   use_tag_as_stream:
                     type: boolean
                 required:
-                - log_group_name
-                - log_stream_name
                 - region
                 type: object
               datadog:
@@ -6536,8 +6534,6 @@ spec:
                   use_tag_as_stream:
                     type: boolean
                 required:
-                - log_group_name
-                - log_stream_name
                 - region
                 type: object
               datadog:
