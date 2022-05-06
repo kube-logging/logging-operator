@@ -236,6 +236,8 @@ type FilterKubernetes struct {
 	TLSVerify string `json:"tls.verify,omitempty"`
 	// When enabled, the filter reads logs coming in Journald format. (default:Off)
 	UseJournal string `json:"Use_Journal,omitempty"`
+	// When enabled, metadata will be fetched from K8s when docker_id is changed. (default:Off)
+	CacheUseDockerId string `json:"Cache_Use_Docker_Id,omitempty"`
 	// Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).
 	RegexParser string `json:"Regex_Parser,omitempty"`
 	// Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) (default:Off)

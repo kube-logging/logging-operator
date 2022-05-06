@@ -1442,6 +1442,8 @@ spec:
                         type: string
                       Buffer_Size:
                         type: string
+                      Cache_Use_Docker_Id:
+                        type: string
                       DNS_Retries:
                         type: string
                       DNS_Wait_Time:
@@ -8429,6 +8431,8 @@ spec:
                             Annotations:
                               type: string
                             Buffer_Size:
+                              type: string
+                            Cache_Use_Docker_Id:
                               type: string
                             DNS_Retries:
                               type: string
