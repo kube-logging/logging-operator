@@ -60,6 +60,7 @@ RUN apk update \
          fluent-plugin-parser-logfmt \
          fluent-plugin-multi-format-parser \
          fluent-plugin-record-modifier \
+         fluent-plugin-splunk-hec \
          fluent-plugin-newrelic \
          fluent-plugin-elasticsearch \
          fluent-plugin-cloudwatch-logs \
@@ -80,8 +81,6 @@ RUN apk update \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-sumologic \
  # https://github.com/SumoLogic/sumologic-kubernetes-fluentd/blob/main/Dockerfile#L27
- && gem specific_install -l https://github.com/ahma/fluent-plugin-splunk-hec.git -b net-http-persistent_4 \
- # https://github.com/splunk/fluent-plugin-splunk-hec/pull/236#issuecomment-1110917743
  && gem specific_install https://github.com/abonas/kubeclient --ref 3267dc3fd02c49e3b19f1210ff7cb84c3b2a4478 \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
