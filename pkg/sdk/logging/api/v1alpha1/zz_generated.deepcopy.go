@@ -377,6 +377,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.ElasticsearchOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.OpenSearchOutput != nil {
+		in, out := &in.OpenSearchOutput, &out.OpenSearchOutput
+		*out = new(output.OpenSearchOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LogZOutput != nil {
 		in, out := &in.LogZOutput, &out.LogZOutput
 		*out = new(output.LogZOutput)
