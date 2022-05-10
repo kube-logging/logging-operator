@@ -114,7 +114,7 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                    = "1.9.2"
+	DefaultFluentbitImageTag                    = "1.9.3"
 	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-4"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
