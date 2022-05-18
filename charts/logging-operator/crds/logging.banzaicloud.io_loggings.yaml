@@ -9165,6 +9165,8 @@ spec:
                       type: string
                   type: object
                 type: array
+              skipInvalidResources:
+                type: boolean
               watchNamespaces:
                 items:
                   type: string

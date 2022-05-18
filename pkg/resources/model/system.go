@@ -19,16 +19,15 @@ import (
 	"strconv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/go-logr/logr"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/common"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/go-logr/logr"
 )
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
@@ -80,8 +79,11 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	for _, flowCr := range resources.Flows {
 		flow, err := FlowForFlow(flowCr, resources.ClusterOutputs, resources.Outputs, secrets)
 		if err != nil {
-			// TODO set flow status to error?
-			return nil, err
+			if logging.Spec.SkipInvalidResources {
+				logger.Error(err, "Flow contains errors.")
+			} else {
+				return nil, err
+			}
 		}
 		err = builder.RegisterFlow(flow)
 		if err != nil {
@@ -91,8 +93,11 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	for _, flowCr := range resources.ClusterFlows {
 		flow, err := FlowForClusterFlow(flowCr, resources.ClusterOutputs, secrets)
 		if err != nil {
-			// TODO set flow status to error?
-			return nil, err
+			if logging.Spec.SkipInvalidResources {
+				logger.Error(err, "ClusterFlow contains errors.")
+			} else {
+				return nil, err
+			}
 		}
 		err = builder.RegisterFlow(flow)
 		if err != nil {

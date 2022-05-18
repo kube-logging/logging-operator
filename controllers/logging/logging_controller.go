@@ -28,12 +28,15 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
@@ -98,6 +101,23 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
+	// metrics
+	defer func() {
+		gv := getResourceStateMetrics(log)
+		gv.Reset()
+		for _, ob := range loggingResources.Flows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range loggingResources.ClusterFlows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range loggingResources.Outputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range loggingResources.ClusterOutputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+	}()
 
 	reconcilers := []resources.ComponentReconciler{
 		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client}),
@@ -135,8 +155,34 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return *result, err
 		}
 	}
-
 	return ctrl.Result{}, nil
+}
+
+func updateResourceStateMetrics(obj client.Object, active bool, gv *prometheus.GaugeVec) {
+	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "active", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(active))
+	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "inactive", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(!active))
+}
+
+func getResourceStateMetrics(logger logr.Logger) *prometheus.GaugeVec {
+	gv := prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
+	err := metrics.Registry.Register(gv)
+	if err != nil {
+		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			if gv, ok = err.ExistingCollector.(*prometheus.GaugeVec); !ok {
+				logger.Error(err, "already registered metric name with different type ", "metric", gv)
+			}
+		} else {
+			logger.Error(err, "couldn't register metrics vector for resource", "metric", gv)
+		}
+	}
+	return gv
+}
+
+func boolToFloat64(b bool) float64 {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResources) (string, *secret.MountSecrets, error) {

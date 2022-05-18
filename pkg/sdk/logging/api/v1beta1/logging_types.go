@@ -45,6 +45,8 @@ type LoggingSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 	// Disable configuration check before applying new fluentd configuration.
 	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
+	// Skip Invalid Resources
+	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
 	// Fluentbit daemonset configuration.
@@ -57,7 +59,7 @@ type LoggingSpec struct {
 	ErrorOutputRef string `json:"errorOutputRef,omitempty"`
 	// Global filters to apply on logs before any match or filter mechanism.
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
-	// Limit namespaces to watch Flow and Output custom reasources.
+	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
 	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
