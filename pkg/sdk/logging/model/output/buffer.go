@@ -40,7 +40,7 @@ type Buffer struct {
 	// Fluentd core bundles memory and file plugins. 3rd party plugins are also available when installed.
 	Type string `json:"type,omitempty"`
 	// When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags. (default: tag,time)
-	Tags string `json:"tags,omitempty"`
+	Tags *string `json:"tags,omitempty"`
 	// The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default. (default: operator generated)
 	Path string `json:"path,omitempty"`
 	// The max size of each chunks: events will be written into chunks until the size of chunks become this size (default: 8MB)
@@ -126,8 +126,8 @@ func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types
 		metadata.Type = buffer.Type
 	}
 	// Set default values for tags
-	if buffer.Tags != "" {
-		metadata.Tag = buffer.Tags
+	if buffer.Tags != nil {
+		metadata.Tag = *buffer.Tags
 	} else {
 		metadata.Tag = "tag,time"
 	}
@@ -136,6 +136,6 @@ func (b *Buffer) ToDirective(secretLoader secret.SecretLoader, id string) (types
 	}
 	// Cleanup non parameter configurations
 	buffer.Type = ""
-	buffer.Tags = ""
+	buffer.Tags = nil
 	return types.NewFlatDirective(metadata, buffer, secretLoader)
 }
