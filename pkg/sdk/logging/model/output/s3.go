@@ -20,6 +20,7 @@ import (
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/banzaicloud/operator-tools/pkg/utils"
 )
 
 // +name:"Amazon S3"
@@ -62,9 +63,9 @@ type _docS3 interface{} //nolint:deadcode,unused
 type _metaS3 interface{} //nolint:deadcode,unused
 
 const (
-	OneEyeTags            string = "tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name"
 	OneEyePathTemplate    string = "%v/%%Y/%%m/%%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/"
 	OneEyeObjectKeyFormat string = "%{path}%H:%M_%{index}.%{file_extension}"
+	OneEyeTags            string = "tag,time,$.kubernetes.namespace_name,$.kubernetes.pod_name,$.kubernetes.container_name"
 )
 
 // +kubebuilder:object:generate=true
@@ -234,6 +235,7 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		},
 	}
 	// Overwrite values when One Eye format is used
+
 	if c.OneEyeFormat {
 		clusterName := "one-eye"
 		if c.ClusterName != "" {
@@ -242,7 +244,7 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		if c.Buffer == nil {
 			c.Buffer = new(Buffer)
 		}
-		*c.Buffer.Tags = OneEyeTags
+		c.Buffer.Tags = utils.StringPointer(OneEyeTags)
 		c.Path = fmt.Sprintf(OneEyePathTemplate, clusterName)
 		c.S3ObjectKeyFormat = OneEyeObjectKeyFormat
 	}

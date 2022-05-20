@@ -92,6 +92,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			},
 		}
 		require.NoError(t, c.GetClient().Create(ctx, &logging))
+		tags := "time"
 		output := v1beta1.Output{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-output",
@@ -102,7 +103,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 					Endpoint: consumer.InputURL(),
 					Buffer: &output.Buffer{
 						Type:        "file",
-						Tags:        "time",
+						Tags:        &tags,
 						Timekey:     "10s",
 						TimekeyWait: "0s",
 					},
