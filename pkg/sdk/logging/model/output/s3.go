@@ -242,7 +242,7 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		if c.Buffer == nil {
 			c.Buffer = new(Buffer)
 		}
-		c.Buffer.Tags = OneEyeTags
+		*c.Buffer.Tags = OneEyeTags
 		c.Path = fmt.Sprintf(OneEyePathTemplate, clusterName)
 		c.S3ObjectKeyFormat = OneEyeObjectKeyFormat
 	}
