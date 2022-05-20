@@ -163,6 +163,8 @@ type ElasticsearchOutput struct {
 	IdKey string `json:"id_key,omitempty"`
 	// Similar to parent_key config, will add _routing into elasticsearch command if routing_key is set and the field does exist in input event.
 	RoutingKey string `json:"routing_key,omitempty"`
+	// https://github.com/uken/fluent-plugin-elasticsearch#remove_keys
+	RemoveKeys string `json:"remove_keys,omitempty"`
 	// Remove keys on update will not update the configured keys in elasticsearch when a record is being updated. This setting only has any effect if the write operation is update or upsert.
 	RemoveKeysOnUpdate string `json:"remove_keys_on_update,omitempty"`
 	// This setting allows remove_keys_on_update to be configured with a key in each record, in much the same way as target_index_key works.
