@@ -77,6 +77,10 @@ type LogZOutput struct {
 	RetryCount int `json:"retry_count,omitempty"`
 	// How long to sleep initially between retries, exponential step-off.
 	RetrySleep int `json:"retry_sleep,omitempty"`
+	// Limit to the size of the Logz.io upload bulk. Defaults to 1000000 bytes leaving about 24kB for overhead.
+	BulkLimit int `json:"bulk_limit,omitempty"`
+	// Limit to the size of the Logz.io warning message when a record exceeds bulk_limit to prevent a recursion when Fluent warnings are sent to the Logz.io output.
+	BulkLimitWarningLimit int `json:"bulk_limit_warning_limit,omitempty"`
 	// Should the plugin ship the logs in gzip compression. Default is false.
 	Gzip bool `json:"gzip,omitempty"`
 	// +docLink:"Buffer,../buffer/"
