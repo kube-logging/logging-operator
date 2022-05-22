@@ -3518,6 +3518,10 @@ spec:
                       type:
                         type: string
                     type: object
+                  bulk_limit:
+                    type: integer
+                  bulk_limit_warning_limit:
+                    type: integer
                   endpoint:
                     properties:
                       port:
@@ -9320,6 +9324,10 @@ spec:
                       type:
                         type: string
                     type: object
+                  bulk_limit:
+                    type: integer
+                  bulk_limit_warning_limit:
+                    type: integer
                   endpoint:
                     properties:
                       port:
