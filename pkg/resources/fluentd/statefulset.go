@@ -314,7 +314,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		} else {
 			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
 		}
-		customRunner := fmt.Sprintf("'./bin/node_exporter %v'", strings.Join(args, " "))
+		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
