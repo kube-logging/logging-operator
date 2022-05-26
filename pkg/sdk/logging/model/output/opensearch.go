@@ -44,8 +44,8 @@ type _hugoOpenSearch interface{} //nolint:deadcode,unused
 type _docOpenSearch interface{} //nolint:deadcode,unused
 
 // +name:"OpenSearch"
-// +url:"https://github.com/fluent/fluent-plugin-opensearch/releases/tag/v1.0.4"
-// +version:"1.0.4"
+// +url:"https://github.com/fluent/fluent-plugin-opensearch/releases/tag/v1.0.5"
+// +version:"1.0.5"
 // +description:"Send your logs to OpenSearch"
 // +status:"GA"
 type _metaOpenSearch interface{} //nolint:deadcode,unused
