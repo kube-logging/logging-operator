@@ -1,0 +1,6 @@
+{{- if .Values.createCustomResource -}}
+{{- range $path, $bytes := .Files.Glob "crds/*.yaml" }}
+{{ tpl ( $.Files.Get $path ) $ }}
+---
+{{- end }}
+{{- end }}
