@@ -184,7 +184,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
 		},
 		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc.cluster.local", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace),
+		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
 		TargetPort:              n.logging.Spec.FluentdSpec.Port,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
@@ -317,10 +317,11 @@ func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 	podName := n.FluentdQualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
-		Host: fmt.Sprintf("%s.%s.%s.svc.cluster.local",
+		Host: fmt.Sprintf("%s.%s.%s.svc%s",
 			podName,
 			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
-			n.logging.Spec.ControlNamespace),
+			n.logging.Spec.ControlNamespace,
+			n.logging.ClusterDomainAsSuffix()),
 		Port: 24240,
 	}
 }

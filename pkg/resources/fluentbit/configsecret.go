@@ -126,7 +126,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 	var fluentbitTargetHost string
 	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetHost == "" {
-		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
+		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc%s", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace, r.Logging.ClusterDomainAsSuffix())
 	} else {
 		fluentbitTargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
 	}
@@ -360,10 +360,11 @@ func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 	podName := r.Logging.QualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
-		Host: fmt.Sprintf("%s.%s.%s.svc.cluster.local",
+		Host: fmt.Sprintf("%s.%s.%s.svc%s",
 			podName,
 			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
-			r.Logging.Spec.ControlNamespace),
+			r.Logging.Spec.ControlNamespace,
+			r.Logging.ClusterDomainAsSuffix()),
 		Port: 24240,
 	}
 }

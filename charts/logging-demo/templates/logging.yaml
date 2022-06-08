@@ -25,4 +25,5 @@ spec:
 {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
     {{- end}}
 
+  clusterDomain: {{ .Values.loggingOperator.clusterDomain }}
   controlNamespace: {{ .Values.loggingOperator.controlNamespace | default .Release.Namespace }}

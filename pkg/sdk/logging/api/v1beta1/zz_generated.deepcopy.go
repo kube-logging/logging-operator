@@ -1508,6 +1508,11 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.ClusterDomain != nil {
+		in, out := &in.ClusterDomain, &out.ClusterDomain
+		*out = new(string)
+		**out = **in
+	}
 	if in.NodeAgents != nil {
 		in, out := &in.NodeAgents, &out.NodeAgents
 		*out = make([]*NodeAgent, len(*in))

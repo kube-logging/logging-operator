@@ -68,6 +68,10 @@ skipInvalidResources: false
 
 # Limit namespaces from where to read Flow and Output specs
 watchNamespaces: []
+
+# Cluster domain name to be used when templating URLs to services
+clusterDomain: "cluster.local"
+
 # Control namespace that contains ClusterOutput and ClusterFlow resources
 controlNamespace: ""
 # Allow configuration of cluster resources from any namespace
