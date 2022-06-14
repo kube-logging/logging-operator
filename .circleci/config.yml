@@ -15,7 +15,7 @@ executors:
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.17.1
+      - image: cimg/go:1.17
         environment:
           GOFLAGS: -mod=readonly
 
@@ -38,7 +38,7 @@ jobs:
 
   e2e-test:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202201-02
       docker_layer_caching: true
     environment:
       GO_VERSION: '1.13'
@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Build e2e fluentd docker image
           command: |
-            make docker-build-e2e-fluentd IMG='fluentd:local'            
+            make docker-build-e2e-fluentd IMG='fluentd:local'
 
       - run:
           name: Wait for minikube
