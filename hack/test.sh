@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -eufo pipefail
+set -x
 
 SCRIPT_PATH="hack"
 BUCKET='minio/test'
@@ -35,6 +36,7 @@ function create_test_bucket()
 function helm_deploy_logging_operator()
 {
     helm install \
+        --debug \
         --wait \
         logging-operator \
         --set image.tag='local' \
@@ -45,6 +47,7 @@ function helm_deploy_logging_operator()
 function configure_logging()
 {
     helm install \
+        --debug \
         --wait \
         --create-namespace \
         --namespace logging \
