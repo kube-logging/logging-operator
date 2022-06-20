@@ -1,12 +1,14 @@
 #!/bin/bash
 
 set -eufo pipefail
+set -x
 
 SCRIPT_PATH="hack"
 BUCKET='minio/test'
 
 function main()
 {
+    load_images
     local mc_pod="$(get_mc_pod_name)"
     remove_test_bucket "${mc_pod}"
     create_test_bucket "${mc_pod}"
@@ -16,6 +18,14 @@ function main()
 
     wait_for_log_files "${mc_pod}" 300
     print_logs "${mc_pod}"
+}
+
+function load_images()
+{
+    local images=( "fluentd:local" "controller:local")
+    for image in ${images[@]}; do
+        minikube image load "${image}"
+    done
 }
 
 function remove_test_bucket()
@@ -35,6 +45,7 @@ function create_test_bucket()
 function helm_deploy_logging_operator()
 {
     helm install \
+        --debug \
         --wait \
         logging-operator \
         --set image.tag='local' \
@@ -45,6 +56,7 @@ function helm_deploy_logging_operator()
 function configure_logging()
 {
     helm install \
+        --debug \
         --wait \
         --create-namespace \
         --namespace logging \
