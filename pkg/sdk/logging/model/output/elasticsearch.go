@@ -246,6 +246,10 @@ type ElasticsearchOutput struct {
 	DataStreamTemplateName string `json:"data_stream_template_name,omitempty"`
 	// Specify an existing ILM policy to be applied to the data stream. If not present, either the specified template's or a new ILM default policy is applied. (default: data_stream_name) Further details here https://github.com/uken/fluent-plugin-elasticsearch#configuration---elasticsearch-output-data-stream
 	DataStreamILMName string `json:"data_stream_ilm_name,omitempty"`
+	// Specify data stream ILM policy contents as Hash.
+	DataStreamIlmPolicy string `json:"data_stream_ilm_policy,omitempty"`
+	// Specify whether overwriting data stream ilm policy or not.
+	DataStreamIlmPolicyOverwrite bool `json:"data_stream_ilm_policy_overwrite,omitempty"`
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

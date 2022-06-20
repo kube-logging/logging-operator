@@ -289,6 +289,10 @@ spec:
                     type: boolean
                   data_stream_ilm_name:
                     type: string
+                  data_stream_ilm_policy:
+                    type: string
+                  data_stream_ilm_policy_overwrite:
+                    type: boolean
                   data_stream_name:
                     type: string
                   data_stream_template_name:
@@ -1561,6 +1565,10 @@ spec:
                     type: boolean
                   data_stream_ilm_name:
                     type: string
+                  data_stream_ilm_policy:
+                    type: string
+                  data_stream_ilm_policy_overwrite:
+                    type: boolean
                   data_stream_name:
                     type: string
                   data_stream_template_name:
@@ -6095,6 +6103,10 @@ spec:
                     type: boolean
                   data_stream_ilm_name:
                     type: string
+                  data_stream_ilm_policy:
+                    type: string
+                  data_stream_ilm_policy_overwrite:
+                    type: boolean
                   data_stream_name:
                     type: string
                   data_stream_template_name:
@@ -7367,6 +7379,10 @@ spec:
                     type: boolean
                   data_stream_ilm_name:
                     type: string
+                  data_stream_ilm_policy:
+                    type: string
+                  data_stream_ilm_policy_overwrite:
+                    type: boolean
                   data_stream_name:
                     type: string
                   data_stream_template_name:
