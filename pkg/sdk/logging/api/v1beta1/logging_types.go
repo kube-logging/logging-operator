@@ -408,6 +408,9 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
 			l.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
 		}
+		if l.Spec.FluentbitSpec.InputTail.BufferMaxSize == "" {
+			l.Spec.FluentbitSpec.InputTail.BufferMaxSize = "32KB"
+		}
 		if l.Spec.FluentbitSpec.InputTail.Tag == "" {
 			l.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
 		}
