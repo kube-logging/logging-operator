@@ -112,8 +112,8 @@ type ParseSection struct {
 	// The pattern of grok. You cannot specify multiple grok pattern with this.
 	GrokPattern string `json:"grok_pattern,omitempty"`
 	// Only available when using type: grok.
-	// Path to the file that includes custom grok patterns.
-	CustomPatternPath string `json:"custom_pattern_path,omitempty"`
+	// File that includes custom grok patterns.
+	CustomPatternPath *secret.Secret `json:"custom_pattern_path,omitempty"`
 	// Only available when using type: grok.
 	// The key has grok failure reason.
 	GrokFailureKey string `json:"grok_failure_key,omitempty"`
