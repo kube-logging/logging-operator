@@ -79,7 +79,10 @@ type FluentdSpec struct {
 	// Ignore repeated log lines
 	// +docLink:"more info, https://docs.fluentd.org/deployment/logging#ignore_repeated_log_interval"
 	IgnoreRepeatedLogInterval string `json:"ignoreRepeatedLogInterval,omitempty"`
-	PodPriorityClassName      string `json:"podPriorityClassName,omitempty"`
+	// Allows Time object in buffer's MessagePack serde
+	// +docLink:"more info, https://docs.fluentd.org/deployment/system-config#enable_msgpack_time_support"
+	EnableMsgpackTimeSupport bool   `json:"enableMsgpackTimeSupport,omitempty"`
+	PodPriorityClassName     string `json:"podPriorityClassName,omitempty"`
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
