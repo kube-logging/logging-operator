@@ -108,22 +108,22 @@ type ParseSection struct {
 	// Only available when using type: multi_format
 	// +docLink:"Parse Section,#parse-section"
 	Patterns []SingleParseSection `json:"patterns,omitempty"`
-	// Only available when using type: grok.
+	// Only available when using type: grok, multiline_grok.
 	// The pattern of grok. You cannot specify multiple grok pattern with this.
 	GrokPattern string `json:"grok_pattern,omitempty"`
-	// Only available when using type: grok.
+	// Only available when using type: grok, multiline_grok.
 	// File that includes custom grok patterns.
 	CustomPatternPath *secret.Secret `json:"custom_pattern_path,omitempty"`
-	// Only available when using type: grok.
+	// Only available when using type: grok, multiline_grok.
 	// The key has grok failure reason.
 	GrokFailureKey string `json:"grok_failure_key,omitempty"`
-	// Only available when using type: grok.
+	// Only available when using type: grok, multiline_grok.
 	// The key name to store grok section's name.
 	GrokNameKey string `json:"grok_name_key,omitempty"`
 	// Only available when using type: multiline_grok
 	// The regexp to match beginning of multiline.
-	MultiLineStartRegexp string `json:"multi_line_start_regexp,omitempty"`
-	// Only available when using type: grok.
+	MultilineStartRegexp string `json:"multiline_start_regexp,omitempty"`
+	// Only available when using type: grok, multiline_grok.
 	// +docLink:"Grok Section,#grok-section"
 	// Specify grok pattern series set.
 	GrokPatterns []GrokSection `json:"grok_patterns,omitempty"`
@@ -132,7 +132,7 @@ type ParseSection struct {
 // +kubebuilder:object:generate=true
 // +docName:"Parse Section (single)"
 type SingleParseSection struct {
-	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt
+	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
 	Type string `json:"type,omitempty"`
 	// Regexp expression to evaluate
 	Expression string `json:"expression,omitempty"`
@@ -160,6 +160,25 @@ type SingleParseSection struct {
 	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
+	// Only available when using format: grok, multiline_grok.
+	// The pattern of grok. You cannot specify multiple grok pattern with this.
+	GrokPattern string `json:"grok_pattern,omitempty"`
+	// Only available when using format: grok, multiline_grok.
+	// File that includes custom grok patterns.
+	CustomPatternPath *secret.Secret `json:"custom_pattern_path,omitempty"`
+	// Only available when using format: grok, multiline_grok.
+	// The key has grok failure reason.
+	GrokFailureKey string `json:"grok_failure_key,omitempty"`
+	// Only available when using format: grok, multiline_grok.
+	// The key name to store grok section's name.
+	GrokNameKey string `json:"grok_name_key,omitempty"`
+	// Only available when using format: multiline_grok
+	// The regexp to match beginning of multiline.
+	MultilineStartRegexp string `json:"multiline_start_regexp,omitempty"`
+	// Only available when using format: grok, multiline_grok.
+	// +docLink:"Grok Section,#grok-section"
+	// Specify grok pattern series set.
+	GrokPatterns []GrokSection `json:"grok_patterns,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -228,11 +247,27 @@ type GrokSection struct {
 type _expParser interface{} //nolint:deadcode,unused
 
 func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	parseMeta := types.PluginMeta{
-		Directive: "pattern",
+	parseSection := &types.GenericDirective{
+		PluginMeta: types.PluginMeta{
+			Type:      p.Type,
+			Directive: "pattern",
+		},
 	}
 	section := p.DeepCopy()
-	return types.NewFlatDirective(parseMeta, section, secretLoader)
+	section.Type = ""
+	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(section); err != nil {
+		return nil, err
+	} else {
+		parseSection.Params = params
+	}
+	for _, grokRule := range section.GrokPatterns {
+		if meta, err := grokRule.ToGrokDirective(secretLoader, ""); err != nil {
+			return nil, err
+		} else {
+			parseSection.SubDirectives = append(parseSection.SubDirectives, meta)
+		}
+	}
+	return parseSection, nil
 }
 
 func (p *GrokSection) ToGrokDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
