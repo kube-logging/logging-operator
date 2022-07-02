@@ -179,6 +179,10 @@ type InputTail struct {
 	DB *string `json:"DB,omitempty"`
 	// Set a default synchronization (I/O) method. Values: Extra, Full, Normal, Off. This flag affects how the internal SQLite engine do synchronization to disk, for more details about each option please refer to this section. (default:Full)
 	DBSync string `json:"DB_Sync,omitempty"`
+	// Specify that the database will be accessed only by Fluent Bit. Enabling this feature helps to increase performance when accessing the database but it restrict any external tool to query the content. (default: true)
+	DBLocking *bool `json:"DB.locking,omitempty"`
+	// sets the journal mode for databases (WAL). Enabling WAL provides higher performance. Note that WAL is not compatible with shared network file systems. (default: WAL)
+	DBJournalMode string `json:"DB.journal_mode,omitempty"`
 	// Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes.
 	MemBufLimit string `json:"Mem_Buf_Limit,omitempty"`
 	// Specify the name of a parser to interpret the entry as a structured message.

@@ -2023,6 +2023,10 @@ spec:
                         type: string
                       DB:
                         type: string
+                      DB.journal_mode:
+                        type: string
+                      DB.locking:
+                        type: boolean
                       DB_Sync:
                         type: string
                       Docker_Mode:
@@ -9049,6 +9053,10 @@ spec:
                               type: string
                             DB:
                               type: string
+                            DB.journal_mode:
+                              type: string
+                            DB.locking:
+                              type: boolean
                             DB_Sync:
                               type: string
                             Docker_Mode:

@@ -408,6 +408,9 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.InputTail.DB == nil {
 			l.Spec.FluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
 		}
+		if l.Spec.FluentbitSpec.InputTail.DBLocking == nil {
+			l.Spec.FluentbitSpec.InputTail.DBLocking = util.BoolPointer(true)
+		}
 		if l.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
 			l.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
 		}

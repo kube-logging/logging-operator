@@ -1391,6 +1391,11 @@ func (in *InputTail) DeepCopyInto(out *InputTail) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.DBLocking != nil {
+		in, out := &in.DBLocking, &out.DBLocking
+		*out = new(bool)
+		**out = **in
+	}
 	if in.ParserN != nil {
 		in, out := &in.ParserN, &out.ParserN
 		*out = make([]string, len(*in))
