@@ -5,8 +5,10 @@ metadata:
   name: {{ .name | default "event-tailer" }}
 spec:
   controlNamespace: {{ $.Values.controlNamespace | default $.Release.Namespace }}
+{{- with .workloadOverrides }}
   workloadOverrides:
-    priorityClassName: system-node-critical
+{{ toYaml . | indent 4 }}
+{{- end }}
 {{- with .containerOverrides }}
   containerOverrides:
 {{- toYaml . | nindent 4 }}
