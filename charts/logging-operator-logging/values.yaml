@@ -7,7 +7,7 @@ loggingRef: ""
 # Disable configuration check before deploy
 flowConfigCheckDisabled: false
 # Use static configuration instead of generated config.
-flowConfigOverride:	""
+flowConfigOverride: ""
 
 nameOverride: ""
 fullnameOverride: ""
@@ -29,7 +29,7 @@ nodeAgents: {}
 #          template:
 #            spec:
 #              containers:
-#              - image: banzaicloud/fluentbit:1.9.3
+#              - image: banzaicloud/fluentbit:1.9.5
 #                name: fluent-bit
 #      tls:
 #        enabled: false
@@ -41,7 +41,6 @@ nodeAgents: {}
 #        serviceMonitor: false
 #      tls:
 #        enabled: false
-
 
 # Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/fluentd_types/
 fluentd: {}
@@ -97,7 +96,6 @@ clusterOutputs: []
 #         format:
 #           type: json
 #         default_topic: topic
-
 
 # EventTailer config
 eventTailer: {}
