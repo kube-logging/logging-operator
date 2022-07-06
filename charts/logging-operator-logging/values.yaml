@@ -104,7 +104,8 @@ eventTailer: {}
   #   accessModes:
   #     - ReadWriteOnce
   #   volumeMode: Filesystem
-  #   storage: 1G
+  #   storage: 1Gi
+  #   storageClass: standard
 
 # HostTailer config
 hostTailer: {}
