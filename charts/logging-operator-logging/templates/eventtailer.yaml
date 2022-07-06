@@ -20,7 +20,10 @@ spec:
         accessModes: {{ .accessModes | default (list "ReadWriteOnce") }}
         resources:
           requests:
-            storage: {{ .storage | default "1G" }}
+            storage: {{ .storage | default "1Gi" }}
         volumeMode: {{ .volumeMode | default "Filesystem" }}
+{{- with .storageClass }}
+        storageClass: {{ .storageClass }}
+{{- end }}
 {{- end }}
 {{- end }}
