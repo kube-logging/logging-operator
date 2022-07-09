@@ -25,6 +25,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/model"
 	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
+	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
@@ -134,6 +135,20 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+		}
+	}
+
+	if logging.Spec.SyslogNGSpec != nil {
+		syslogNGConfig, secretList, err := r.clusterConfiguration(loggingResources)
+		if err != nil {
+			// TODO: move config generation into Syslog-NG reconciler
+			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+				return &reconcile.Result{}, err
+			})
+		} else {
+			log.V(1).Info("flow configuration", "config", syslogNGConfig)
+
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, &syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
 	}
 
