@@ -63,6 +63,9 @@ tls:
   fluentbitSecretName: ""
   fluentdSecretName: ""
 
+# Whether to skip invalid Flow and ClusterFlow resources
+skipInvalidResources: false
+
 # Limit namespaces from where to read Flow and Output specs
 watchNamespaces: []
 # Control namespace that contains ClusterOutput and ClusterFlow resources
