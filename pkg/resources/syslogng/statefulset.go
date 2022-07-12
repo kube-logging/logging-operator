@@ -152,6 +152,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	if spec.SyslogNGOutLogrotate != nil && spec.SyslogNGOutLogrotate.Enabled {
 		container.Args = []string{
 			"--control=" + SYSLOGNG_CONTROL_SOCKET_PATH,
+			"--no-caps",
 		}
 	}
 
