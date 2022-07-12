@@ -145,6 +145,8 @@ const (
 	DefaultSyslogNPrometheusExporterImageTag        = "latest"
 	DefaultSyslogNGBufferVolumeImageRepository      = "ghcr.io/banzaicloud/custom-runner"
 	DefaultSyslogNGBufferVolumeImageTag             = "0.1.0"
+	DefaultSyslogNGConfigReloaderImageRepository    = "ghcr.io/banzaicloud/syslogng-reload"
+	DefaultSyslogNGConfigReloaderImageTag           = "v1.0.0"
 )
 
 // SetDefaults fills empty attributes
@@ -453,6 +455,17 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.SyslogNGSpec.BufferVolumeImage.PullPolicy == "" {
 			l.Spec.SyslogNGSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
+
+		if l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository == "" {
+			l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository = DefaultSyslogNGConfigReloaderImageRepository
+		}
+		if l.Spec.SyslogNGSpec.ConfigReloaderImage.Tag == "" {
+			l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository = DefaultSyslogNGConfigReloaderImageTag
+		}
+		if l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy == "" {
+			l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
+		}
+
 		if l.Spec.SyslogNGSpec.PrometheusExporterImage.Repository == "" {
 			l.Spec.SyslogNGSpec.PrometheusExporterImage.Repository = DefaultSyslogNPrometheusExporterImageRepository
 		}
