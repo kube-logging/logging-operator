@@ -486,9 +486,6 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.SyslogNGSpec.Scaling.PodManagementPolicy == "" {
 			l.Spec.SyslogNGSpec.Scaling.PodManagementPolicy = "OrderedReady"
 		}
-		if l.Spec.SyslogNGSpec.SyslogNGLogDestination == "" {
-			l.Spec.SyslogNGSpec.SyslogNGLogDestination = "null"
-		}
 		if l.Spec.SyslogNGSpec.SyslogNGOutLogrotate == nil {
 			l.Spec.SyslogNGSpec.SyslogNGOutLogrotate = &SyslogNGOutLogrotate{
 				Enabled: true,

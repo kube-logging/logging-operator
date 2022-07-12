@@ -15,54 +15,64 @@
 package syslogng
 
 var SyslogNGConfigCheckTemplate = `
+#SyslogNGConfigCheckTemplate
 @version: 3.37
-@include "scl.conf"
-options {
-  # enable or
-    disable directory creation for destination files
-  create_dirs(yes);
 
-  # keep
-    hostnames from source host
-  keep_hostname(yes);
+options { stats-level(3); };
 
-  # use ISO8601 timestamps
 
-    \ ts_format(iso);
+source main-input { network(transport(tcp) flags(no-parse) port(2000)); };
+destination file { file("/tmp/valami" template("$(format-json json.* )\n")); };
+
+log {
+
+
+        source(main-input);
+        parser { json-parser(prefix("json.")); };
+        destination(file);
 };
 `
 
 var SyslogNGDefaultTemplate = `
-@version: 3.27
-@include "scl.conf"
-options {
-  # enable or
-    disable directory creation for destination files
-  create_dirs(yes);
+#SyslogNGDefaultTemplate
+@version: 3.37
 
-  # keep
-    hostnames from source host
-  keep_hostname(yes);
+options { stats-level(3); };
 
-  # use ISO8601 timestamps
 
-    \ ts_format(iso);
-};
-`
-var SyslogNGInputTemplate = `
+source main-input { network(transport(tcp) flags(no-parse) port(2000)); };
+destination file { file("/tmp/valami" template("$(format-json json.* )\n")); };
+
 log {
-	source {
-		network(transport(tcp) flags(no-parse));
-	};
-	destination { 
-		file("/var/log/--syslog"); 
-	};
+
+
+        source(main-input);
+        parser { json-parser(prefix("json.")); };
+        destination(file);
 };
-`
-var SyslogNGOutputTemplate = `
-#Output Config
 `
 
 var SyslogNGLog = `
-#log config
+##SyslogNGLog
+@version: 3.37
+
+options { stats-level(3); };
+
+
+source main-input { network(transport(tcp) flags(no-parse) port(2000)); };
+destination file { file("/tmp/valami" template("$(format-json json.* )\n")); };
+
+log {
+
+
+        source(main-input);
+        parser { json-parser(prefix("json.")); };
+        destination(file);
+};
+`
+var SyslogNGInputTemplate = `
+#SyslogNGInputTemplate
+`
+var SyslogNGOutputTemplate = `
+#SyslogNGOutputTemplate
 `

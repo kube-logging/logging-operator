@@ -248,9 +248,8 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 					Image:           r.Logging.Spec.SyslogNGSpec.Image.RepositoryWithTag(),
 					ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.SyslogNGSpec.Image.PullPolicy),
 					Args: []string{
-						"syslog-ng", "-c",
-						fmt.Sprintf("/syslog-ng/etc/%s", ConfigKey),
-						"--dry-run",
+						"-s",
+						//fmt.Sprintf("/syslog-ng/etc/%s", ConfigKey),
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
