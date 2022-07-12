@@ -50,6 +50,7 @@ type SyslogNGSpec struct {
 	SyslogNGPvcSpec             *volume.KubernetesVolume          `json:"SyslogNGPvcSpec,omitempty"`
 	VolumeMountChmod            bool                              `json:"volumeMountChmod,omitempty"`
 	VolumeModImage              ImageSpec                         `json:"volumeModImage,omitempty"`
+	ConfigReloaderImage         ImageSpec                         `json:"configReloaderImage,omitempty"`
 	PrometheusExporterImage     ImageSpec                         `json:"prometheusExporterImage,omitempty"`
 	PrometheusExporterResources corev1.ResourceRequirements       `json:"prometheusExporterResources,omitempty"`
 	Resources                   corev1.ResourceRequirements       `json:"resources,omitempty"`

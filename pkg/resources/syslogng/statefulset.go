@@ -28,6 +28,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+const (
+	SYSLOGNG_CONTROL_SOCKET_PATH = "/tmp/syslog-ng/syslog-ng.ctl"
+	SYSLOGNG_CONFIG_PATH         = "/etc/syslog-ng/"
+)
+
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	spec := r.statefulsetSpec()
 
@@ -71,6 +76,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 
 	containers := []corev1.Container{
 		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
+		configReloadContainer(r.Logging.Spec.SyslogNGSpec),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -145,7 +151,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 
 	if spec.SyslogNGOutLogrotate != nil && spec.SyslogNGOutLogrotate.Enabled {
 		container.Args = []string{
-			"--control=/tmp/syslog-ng/syslog-ng.ctl",
+			"--control=" + SYSLOGNG_CONTROL_SOCKET_PATH,
 		}
 	}
 
@@ -199,7 +205,7 @@ func generateVolumeMounts(spec *v1beta1.SyslogNGSpec) []corev1.VolumeMount {
 	res := []corev1.VolumeMount{
 		{
 			Name:      "config",
-			MountPath: "/etc/syslog-ng/",
+			MountPath: SYSLOGNG_CONFIG_PATH,
 		},
 	}
 	if spec != nil && spec.TLS.Enabled {
@@ -208,7 +214,7 @@ func generateVolumeMounts(spec *v1beta1.SyslogNGSpec) []corev1.VolumeMount {
 			MountPath: "/syslog-ng/tls/",
 		})
 	}
-	if spec != nil && spec.Metrics != nil {
+	if spec != nil {
 		res = append(res, corev1.VolumeMount{
 			Name:      "syslog-ng-socket",
 			MountPath: "/tmp/syslog-ng",
@@ -386,4 +392,44 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 		}
 	}
 	return nil
+}
+
+func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
+	container := corev1.Container{
+		Name:            "config-reloader",
+		Image:           spec.ConfigReloaderImage.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(spec.ConfigReloaderImage.PullPolicy),
+		Args: []string{
+			"-cfgjson",
+			generateConfigReloaderConfig(SYSLOGNG_CONFIG_PATH),
+		},
+		VolumeMounts: generateVolumeMounts(spec),
+	}
+
+	return container
+}
+
+func generateConfigReloaderConfig(configDir string) string {
+	return fmt.Sprintf(`
+	{
+		"events": {
+		  "onFileCreate": {
+			"%s/..data" : [
+			  {
+				"exec": {
+				  "key": "info",
+				  "command": "echo config secret changed!"
+				}  
+			  },
+			  {
+				"exec": {
+					"key": "reload",
+					"command": "echo RELOAD | socat - UNIX-CONNECT:%s"
+				}
+			  }  
+			]
+		  }
+		}
+	  }	  
+	`, configDir, SYSLOGNG_CONTROL_SOCKET_PATH)
 }
