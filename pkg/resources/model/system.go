@@ -34,7 +34,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	logging := resources.Logging
 
 	var forwardInput *input.ForwardInputConfig
-	if logging.Spec.FluentdSpec.ForwardInputConfig != nil {
+	if logging.Spec.FluentdSpec != nil && logging.Spec.FluentdSpec.ForwardInputConfig != nil {
 		forwardInput = logging.Spec.FluentdSpec.ForwardInputConfig
 	} else {
 		forwardInput = input.NewForwardInputConfig()

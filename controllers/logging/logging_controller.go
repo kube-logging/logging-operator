@@ -125,7 +125,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.FluentdSpec != nil {
-		fluentdConfig, secretList, err := r.clusterConfiguration(loggingResources)
+		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
 			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
@@ -139,7 +139,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
-		syslogNGConfig, secretList, err := r.clusterConfiguration(loggingResources)
+		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
 			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
@@ -200,7 +200,7 @@ func boolToFloat64(b bool) float64 {
 	return 0
 }
 
-func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
 	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
 		return cfg, nil, nil
 	}
@@ -224,6 +224,32 @@ func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResource
 	}
 
 	return output.String(), &slf.Secrets, nil
+}
+
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+	//if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
+	//	return cfg, nil, nil
+	//}
+	//
+	slf := secretLoaderFactory{
+		Client: r.Client,
+	}
+	//
+	//fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
+	//if err != nil {
+	//	return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", resources.Logging)
+	//}
+	//
+	//output := &bytes.Buffer{}
+	//renderer := render.FluentRender{
+	//	Out:    output,
+	//	Indent: 2,
+	//}
+	//if err := renderer.Render(fluentConfig); err != nil {
+	//	return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
+	//}
+
+	return "", &slf.Secrets, nil
 }
 
 type secretLoaderFactory struct {

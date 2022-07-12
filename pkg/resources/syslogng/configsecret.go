@@ -16,7 +16,6 @@ package syslogng
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 
 	"emperror.dev/errors"
@@ -92,7 +91,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	if err != nil {
 		return nil, nil, err
 	}
-	configMap["syslog-ng.conf"] = []byte(fmt.Sprintf(SyslogNGLog, r.Logging.Spec.SyslogNGSpec.SyslogNGLogDestination))
+	//configMap["syslog-ng.conf"] = []byte(fmt.Sprintf(SyslogNGLog, r.Logging.Spec.SyslogNGSpec.SyslogNGLogDestination))
 	configs := &corev1.Secret{
 		ObjectMeta: r.SyslogNGObjectMeta(SecretConfigName, ComponentSyslogNG),
 		Data:       configMap,
