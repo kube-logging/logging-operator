@@ -2310,6 +2310,7 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.VolumeModImage.DeepCopyInto(&out.VolumeModImage)
+	in.ConfigReloaderImage.DeepCopyInto(&out.ConfigReloaderImage)
 	in.PrometheusExporterImage.DeepCopyInto(&out.PrometheusExporterImage)
 	in.PrometheusExporterResources.DeepCopyInto(&out.PrometheusExporterResources)
 	in.Resources.DeepCopyInto(&out.Resources)

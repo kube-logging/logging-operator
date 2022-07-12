@@ -146,7 +146,7 @@ const (
 	DefaultSyslogNGBufferVolumeImageRepository      = "ghcr.io/banzaicloud/custom-runner"
 	DefaultSyslogNGBufferVolumeImageTag             = "0.1.0"
 	DefaultSyslogNGConfigReloaderImageRepository    = "ghcr.io/banzaicloud/syslogng-reload"
-	DefaultSyslogNGConfigReloaderImageTag           = "v1.0.0"
+	DefaultSyslogNGConfigReloaderImageTag           = "v1.0.1"
 )
 
 // SetDefaults fills empty attributes
@@ -460,7 +460,7 @@ func (l *Logging) SetDefaults() error {
 			l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository = DefaultSyslogNGConfigReloaderImageRepository
 		}
 		if l.Spec.SyslogNGSpec.ConfigReloaderImage.Tag == "" {
-			l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository = DefaultSyslogNGConfigReloaderImageTag
+			l.Spec.SyslogNGSpec.ConfigReloaderImage.Tag = DefaultSyslogNGConfigReloaderImageTag
 		}
 		if l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy == "" {
 			l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"

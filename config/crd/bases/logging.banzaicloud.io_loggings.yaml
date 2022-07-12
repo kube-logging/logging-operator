@@ -14538,6 +14538,22 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: object
                     type: object
+                  configReloaderImage:
+                    properties:
+                      imagePullSecrets:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          type: object
+                        type: array
+                      pullPolicy:
+                        type: string
+                      repository:
+                        type: string
+                      tag:
+                        type: string
+                    type: object
                   disablePvc:
                     type: boolean
                   dnsConfig:
