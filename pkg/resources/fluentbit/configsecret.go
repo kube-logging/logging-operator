@@ -67,6 +67,7 @@ type fluentBitConfig struct {
 	BufferStorage           map[string]string
 	FilterModify            []v1beta1.FilterModify
 	FluentForwardOutput     *fluentForwardOutputConfig
+	SyslogNGOutput          *syslogNGOutputConfig
 }
 
 type fluentForwardOutputConfig struct {
@@ -102,6 +103,14 @@ type fluentForwardOutputTLSConfig struct {
 type fluentForwardOutputUpstreamConfig struct {
 	Enabled bool
 	Config  upstream
+}
+
+type syslogNGOutputConfig struct {
+	Host           string
+	Port           string
+	JSONDateKey    string
+	JSONDateFormat string
+	Workers        *int
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {

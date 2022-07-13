@@ -94,7 +94,7 @@ var fluentBitConfigTemplate = `
     Name          forward
     Match         *
     {{- if .Upstream.Enabled }}
-    Upstream upstream.conf
+    Upstream      upstream.conf
     {{- else }}
     Host          {{ .TargetHost }}
     Port          {{ .TargetPort }}
@@ -144,6 +144,24 @@ var fluentBitConfigTemplate = `
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}
+    {{- end }}
+{{- end }}
+
+{{- with .SyslogNGOutput }}
+[OUTPUT]
+    Name tcp
+    Match *
+    Host {{ .Host }}
+    Port {{ .Port }}
+    Format json_lines
+    {{- with .JSONDateKey }}
+    json_date_key {{ . }}
+    {{- end }}
+    {{- with .JSONDateFormat }}
+    json_date_format {{ . }}
+    {{- end }}
+    {{- with .Workers }}
+    Workers {{ . }}
     {{- end }}
 {{- end }}
 `
