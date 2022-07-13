@@ -415,7 +415,7 @@ func generateConfigReloaderConfig(configDir string) string {
 	{
 		"events": {
 		  "onFileCreate": {
-			"%s/..data" : [
+			"%s..data" : [
 			  {
 				"exec": {
 				  "key": "info",
