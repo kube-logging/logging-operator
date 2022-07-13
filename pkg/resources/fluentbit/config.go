@@ -89,6 +89,7 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
+{{- with .FluentForwardOutput }}
 [OUTPUT]
     Name          forward
     Match         *
@@ -137,13 +138,14 @@ var fluentBitConfigTemplate = `
     {{- if .Network.SourceAddress }}
     net.source_address {{.Network.SourceAddress}}
     {{- end }}
-    {{- if .ForwardOptions }}
-    {{- range $key, $value := .ForwardOptions }}
+    {{- with .Options }}
+    {{- range $key, $value := . }}
     {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}
     {{- end }}
+{{- end }}
 `
 
 var upstreamConfigTemplate = `
