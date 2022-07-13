@@ -1,0 +1,72 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.0
+  creationTimestamp: null
+  name: syslogngclusteroutputs.logging.banzaicloud.io
+spec:
+  group: logging.banzaicloud.io
+  names:
+    categories:
+    - logging-all
+    kind: SyslogNGClusterOutput
+    listKind: SyslogNGClusterOutputList
+    plural: syslogngclusteroutputs
+    singular: syslogngclusteroutput
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Is the output active?
+      jsonPath: .status.active
+      name: Active
+      type: boolean
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              enabledNamespaces:
+                items:
+                  type: string
+                type: array
+              loggingRef:
+                type: string
+            type: object
+          status:
+            properties:
+              active:
+                type: boolean
+              problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
