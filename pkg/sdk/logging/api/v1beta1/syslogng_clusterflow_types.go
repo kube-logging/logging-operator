@@ -39,18 +39,19 @@ type SyslogNGClusterFlow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Name of the logging cluster to be attached
 	Spec   SyslogNGClusterFlowSpec `json:"spec,omitempty"`
-	Status FlowStatus              `json:"status,omitempty"`
+	Status SyslogNGFlowStatus      `json:"status,omitempty"`
 }
 
 // SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 type SyslogNGClusterFlowSpec struct {
-	Match            []ClusterMatch   `json:"match,omitempty"`
-	Filters          []SyslogNGFilter `json:"filters,omitempty"`
-	LoggingRef       string           `json:"loggingRef,omitempty"`
-	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
+	Match            []SyslogNGClusterMatch `json:"match,omitempty"`
+	Filters          []SyslogNGFilter       `json:"filters,omitempty"`
+	LoggingRef       string                 `json:"loggingRef,omitempty"`
+	GlobalOutputRefs []string               `json:"globalOutputRefs,omitempty"`
 }
+
+type SyslogNGClusterMatch SyslogNGMatch
 
 // +kubebuilder:object:root=true
 
