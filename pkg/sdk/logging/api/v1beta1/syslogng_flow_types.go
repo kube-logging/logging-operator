@@ -16,6 +16,8 @@ package v1beta1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
 )
 
 // +name:"SyslogNGFlowSpec"
@@ -29,16 +31,19 @@ type _metaSyslogNGFlowSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 type SyslogNGFlowSpec struct {
-	Match            []Match          `json:"match,omitempty"`
+	Match            *SyslogNGMatch   `json:"match,omitempty"`
 	Filters          []SyslogNGFilter `json:"filters,omitempty"`
 	LoggingRef       string           `json:"loggingRef,omitempty"`
 	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
 	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
 }
 
+type SyslogNGMatch filter.MatchConfig
+
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {
-	// TODO
+	Match   *filter.MatchConfig   `json:"match,omitempty"`
+	Rewrite *filter.RewriteConfig `json:"rewrite,omitempty"`
 }
 
 type SyslogNGFlowStatus FlowStatus
@@ -55,8 +60,8 @@ type SyslogNGFlow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SyslogNGFlowSpec `json:"spec,omitempty"`
-	Status FlowStatus       `json:"status,omitempty"`
+	Spec   SyslogNGFlowSpec   `json:"spec,omitempty"`
+	Status SyslogNGFlowStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
