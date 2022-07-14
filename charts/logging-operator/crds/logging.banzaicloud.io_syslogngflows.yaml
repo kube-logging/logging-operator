@@ -41,6 +41,181 @@ spec:
             properties:
               filters:
                 items:
+                  properties:
+                    match:
+                      properties:
+                        and:
+                          items: {}
+                          type: array
+                        not:
+                          items: {}
+                          type: array
+                        or:
+                          items: {}
+                          type: array
+                        regexp:
+                          properties:
+                            pattern:
+                              type: string
+                            template:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - pattern
+                          - template
+                          - value
+                          type: object
+                      type: object
+                    rewrite:
+                      properties:
+                        rename:
+                          properties:
+                            condition:
+                              properties:
+                                and:
+                                  items: {}
+                                  type: array
+                                not:
+                                  items: {}
+                                  type: array
+                                or:
+                                  items: {}
+                                  type: array
+                                regexp:
+                                  properties:
+                                    pattern:
+                                      type: string
+                                    template:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  - template
+                                  - value
+                                  type: object
+                              type: object
+                            newName:
+                              type: string
+                            oldName:
+                              type: string
+                          required:
+                          - newName
+                          - oldName
+                          type: object
+                        set:
+                          properties:
+                            condition:
+                              properties:
+                                and:
+                                  items: {}
+                                  type: array
+                                not:
+                                  items: {}
+                                  type: array
+                                or:
+                                  items: {}
+                                  type: array
+                                regexp:
+                                  properties:
+                                    pattern:
+                                      type: string
+                                    template:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  - template
+                                  - value
+                                  type: object
+                              type: object
+                            field:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - field
+                          - value
+                          type: object
+                        subst:
+                          properties:
+                            condition:
+                              properties:
+                                and:
+                                  items: {}
+                                  type: array
+                                not:
+                                  items: {}
+                                  type: array
+                                or:
+                                  items: {}
+                                  type: array
+                                regexp:
+                                  properties:
+                                    pattern:
+                                      type: string
+                                    template:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  - template
+                                  - value
+                                  type: object
+                              type: object
+                            field:
+                              type: string
+                            flags:
+                              items:
+                                type: string
+                              type: array
+                            pattern:
+                              type: string
+                            replace:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                          - field
+                          - pattern
+                          - replace
+                          type: object
+                        unset:
+                          properties:
+                            condition:
+                              properties:
+                                and:
+                                  items: {}
+                                  type: array
+                                not:
+                                  items: {}
+                                  type: array
+                                or:
+                                  items: {}
+                                  type: array
+                                regexp:
+                                  properties:
+                                    pattern:
+                                      type: string
+                                    template:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - pattern
+                                  - template
+                                  - value
+                                  type: object
+                              type: object
+                            field:
+                              type: string
+                          required:
+                          - field
+                          type: object
+                      type: object
                   type: object
                 type: array
               globalOutputRefs:
@@ -54,40 +229,30 @@ spec:
               loggingRef:
                 type: string
               match:
-                items:
-                  properties:
-                    exclude:
-                      properties:
-                        container_names:
-                          items:
-                            type: string
-                          type: array
-                        hosts:
-                          items:
-                            type: string
-                          type: array
-                        labels:
-                          additionalProperties:
-                            type: string
-                          type: object
-                      type: object
-                    select:
-                      properties:
-                        container_names:
-                          items:
-                            type: string
-                          type: array
-                        hosts:
-                          items:
-                            type: string
-                          type: array
-                        labels:
-                          additionalProperties:
-                            type: string
-                          type: object
-                      type: object
-                  type: object
-                type: array
+                properties:
+                  and:
+                    items: {}
+                    type: array
+                  not:
+                    items: {}
+                    type: array
+                  or:
+                    items: {}
+                    type: array
+                  regexp:
+                    properties:
+                      pattern:
+                        type: string
+                      template:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                    - pattern
+                    - template
+                    - value
+                    type: object
+                type: object
             type: object
           status:
             properties:
