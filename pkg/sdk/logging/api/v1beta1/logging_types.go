@@ -517,13 +517,13 @@ func (l *Logging) SetDefaults() error {
 			if l.Spec.SyslogNGSpec.LivenessDefaultCheck {
 				l.Spec.SyslogNGSpec.LivenessProbe = &v1.Probe{
 					ProbeHandler: v1.ProbeHandler{
-						Exec: &v1.ExecAction{Command: []string{"/bin/healthy.sh"}},
+						Exec: &v1.ExecAction{Command: []string{"syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get \"destination.file.processed\""}},
 					},
-					InitialDelaySeconds: 600,
+					InitialDelaySeconds: 30,
 					TimeoutSeconds:      0,
-					PeriodSeconds:       60,
+					PeriodSeconds:       10,
 					SuccessThreshold:    0,
-					FailureThreshold:    0,
+					FailureThreshold:    3,
 				}
 			}
 		}
