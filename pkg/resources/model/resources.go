@@ -49,3 +49,11 @@ func (c Outputs) FindByNamespacedName(namespace string, name string) *v1beta1.Ou
 	}
 	return nil
 }
+
+type SyslogNGLoggingResources struct {
+	Logging        v1beta1.Logging
+	Flows          []v1beta1.SyslogNGFlow
+	Outputs        []v1beta1.SyslogNGOutput
+	ClusterFlows   []v1beta1.SyslogNGClusterFlow
+	ClusterOutputs []v1beta1.SyslogNGClusterOutput
+}

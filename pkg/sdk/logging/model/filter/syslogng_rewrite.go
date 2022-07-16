@@ -14,6 +14,10 @@
 
 package filter
 
+import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
+)
+
 // +name:"Syslog-NG rewrite"
 // +weight:"200"
 type _hugoRewrite interface{} //nolint:deadcode,unused
@@ -38,36 +42,106 @@ type RewriteConfig struct {
 	Unset      *UnsetConfig      `json:"unset,omitempty"`
 }
 
+func (c RewriteConfig) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.String("rewrite { "),
+		syslogng.AllOf(
+			syslogng.RenderIf(c.Rename != nil, c.Rename),
+			syslogng.RenderIf(c.Set != nil, c.Set),
+			syslogng.RenderIf(c.Substitute != nil, c.Substitute),
+			syslogng.RenderIf(c.Unset != nil, c.Unset),
+		),
+		syslogng.String(" };"),
+	).RenderAsSyslogNGConfig(ctx)
+}
+
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829213
 type RenameConfig struct {
 	OldFieldName string     `json:"oldName"`
 	NewFieldName string     `json:"newName"`
-	Condition    *MatchExpr `json:"condition,omitempty"`
+	Condition    *Condition `json:"condition,omitempty"`
+}
+
+func (c RenameConfig) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.Printf("rename(%q %q", c.OldFieldName, c.NewFieldName),
+		syslogng.RenderIf(c.Condition != nil, syslogng.AllOf(
+			syslogng.String(" "),
+			c.Condition,
+		)),
+		syslogng.String(")"),
+	).RenderAsSyslogNGConfig(ctx)
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829207
 type SetConfig struct {
-	FieldName string     `json:"field"`
+	FieldName string     `json:"field"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
 	Value     string     `json:"value"`
-	Condition *MatchExpr `json:"condition,omitempty"`
+	Condition *Condition `json:"condition,omitempty"`
+}
+
+func (c SetConfig) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.Printf("set(%q value(%q)", c.Value, c.FieldName),
+		syslogng.RenderIf(c.Condition != nil, syslogng.AllOf(
+			syslogng.String(" "),
+			c.Condition,
+		)),
+		syslogng.String(")"),
+	).RenderAsSyslogNGConfig(ctx)
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829206
 type SubstituteConfig struct {
-	Pattern     string     `json:"pattern"`
-	Replacement string     `json:"replace"`
-	FieldName   string     `json:"field"`
-	Flags       []string   `json:"flags,omitempty"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
-	Type        string     `json:"type,omitempty"`  // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
-	Condition   *MatchExpr `json:"condition,omitempty"`
+	Pattern     string       `json:"pattern"`
+	Replacement string       `json:"replace"`
+	FieldName   string       `json:"field"`
+	Flags       PatternFlags `json:"flags,omitempty"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
+	Type        string       `json:"type,omitempty"`  // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
+	Condition   *Condition   `json:"condition,omitempty"`
+}
+
+func (c SubstituteConfig) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.Printf("subst(%q %q value(%q)", c.Pattern, c.Replacement, c.FieldName),
+		syslogng.RenderIf(len(c.Flags) > 0, c.Flags),
+		syslogng.RenderIf(c.Type != "", syslogng.Printf("type(%q)", c.Type)),
+		syslogng.RenderIf(c.Condition != nil, syslogng.AllOf(
+			syslogng.String(" "),
+			c.Condition,
+		)),
+		syslogng.String(")"),
+	).RenderAsSyslogNGConfig(ctx)
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 type UnsetConfig struct {
-	FieldName string     `json:"field"`
-	Condition *MatchExpr `json:"condition,omitempty"`
+	FieldName string     `json:"field"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
+	Condition *Condition `json:"condition,omitempty"`
+}
+
+func (c UnsetConfig) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.Printf("unset(value(%q)", c.FieldName),
+		syslogng.RenderIf(c.Condition != nil, syslogng.AllOf(
+			syslogng.String(" "),
+			c.Condition,
+		)),
+		syslogng.String(")"),
+	).RenderAsSyslogNGConfig(ctx)
+}
+
+// +kubebuilder:object:generate=true
+type Condition MatchExpr
+
+func (c Condition) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	return syslogng.AllOf(
+		syslogng.String("condition("),
+		MatchExpr(c),
+		syslogng.String(")"),
+	).RenderAsSyslogNGConfig(ctx)
 }

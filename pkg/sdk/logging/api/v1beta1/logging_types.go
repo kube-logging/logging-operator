@@ -25,6 +25,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // +name:"LoggingSpec"
@@ -63,7 +65,7 @@ type LoggingSpec struct {
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
 	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
-	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
+	// Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
@@ -667,4 +669,10 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
+
+func (l Logging) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	// TODO: render options
+	// TODO: render source
+	return nil
 }

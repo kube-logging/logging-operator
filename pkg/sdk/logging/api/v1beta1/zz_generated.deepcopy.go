@@ -2279,7 +2279,7 @@ func (in *SyslogNGClusterMatch) DeepCopyInto(out *SyslogNGClusterMatch) {
 	*out = *in
 	if in.And != nil {
 		in, out := &in.And, &out.And
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make(filter.AndExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2287,18 +2287,16 @@ func (in *SyslogNGClusterMatch) DeepCopyInto(out *SyslogNGClusterMatch) {
 	if in.Regexp != nil {
 		in, out := &in.Regexp, &out.Regexp
 		*out = new(filter.RegexpMatchExpr)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Not != nil {
 		in, out := &in.Not, &out.Not
-		*out = make([]filter.MatchExpr, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		*out = new(filter.NotExpr)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Or != nil {
 		in, out := &in.Or, &out.Or
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make(filter.OrExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2590,7 +2588,7 @@ func (in *SyslogNGMatch) DeepCopyInto(out *SyslogNGMatch) {
 	*out = *in
 	if in.And != nil {
 		in, out := &in.And, &out.And
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make(filter.AndExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2598,18 +2596,16 @@ func (in *SyslogNGMatch) DeepCopyInto(out *SyslogNGMatch) {
 	if in.Regexp != nil {
 		in, out := &in.Regexp, &out.Regexp
 		*out = new(filter.RegexpMatchExpr)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Not != nil {
 		in, out := &in.Not, &out.Not
-		*out = make([]filter.MatchExpr, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		*out = new(filter.NotExpr)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Or != nil {
 		in, out := &in.Or, &out.Or
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make(filter.OrExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2892,11 +2888,6 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 		in, out := &in.SyslogNGOutLogrotate, &out.SyslogNGOutLogrotate
 		*out = new(SyslogNGOutLogrotate)
 		**out = **in
-	}
-	if in.ForwardInputConfig != nil {
-		in, out := &in.ForwardInputConfig, &out.ForwardInputConfig
-		*out = new(input.ForwardInputConfig)
-		(*in).DeepCopyInto(*out)
 	}
 	if in.ServiceAccountOverrides != nil {
 		in, out := &in.ServiceAccountOverrides, &out.ServiceAccountOverrides

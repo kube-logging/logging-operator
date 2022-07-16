@@ -16,6 +16,8 @@ package v1beta1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // +name:"SyslogNGClusterFlow"
@@ -41,6 +43,11 @@ type SyslogNGClusterFlow struct {
 
 	Spec   SyslogNGClusterFlowSpec `json:"spec,omitempty"`
 	Status SyslogNGFlowStatus      `json:"status,omitempty"`
+}
+
+func (f SyslogNGClusterFlow) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	// TODO
+	return nil
 }
 
 // SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
