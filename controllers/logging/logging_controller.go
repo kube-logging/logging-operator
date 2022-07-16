@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"regexp"
+	"strings"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -42,6 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	rendersyslogng "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
@@ -98,7 +100,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(ctx, logging)
+	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client)
+
+	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
@@ -139,6 +143,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
+		loggingResources, err := loggingResourceRepo.SyslogNGLoggingResourcesFor(ctx, logging)
+		if err != nil {
+			return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+		}
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
@@ -226,30 +234,47 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	return output.String(), &slf.Secrets, nil
 }
 
-func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
-	//if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
-	//	return cfg, nil, nil
-	//}
-	//
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogNGLoggingResources) (string, *secret.MountSecrets, error) {
+	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
+		return cfg, nil, nil
+	}
+
 	slf := secretLoaderFactory{
 		Client: r.Client,
 	}
-	//
-	//fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
-	//if err != nil {
-	//	return "", nil, errors.WrapIfWithDetails(err, "failed to build model", "logging", resources.Logging)
-	//}
-	//
-	//output := &bytes.Buffer{}
-	//renderer := render.FluentRender{
-	//	Out:    output,
-	//	Indent: 2,
-	//}
-	//if err := renderer.Render(fluentConfig); err != nil {
-	//	return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
-	//}
 
-	return "", &slf.Secrets, nil
+	preamble := `@version: 3.37
+	`
+
+	components := []rendersyslogng.ConfigRenderer{
+		rendersyslogng.String(preamble),
+		resources.Logging,
+	}
+	for _, c := range resources.ClusterOutputs {
+		components = append(components, c)
+	}
+	for _, c := range resources.Outputs {
+		components = append(components, c)
+	}
+	for _, c := range resources.ClusterFlows {
+		components = append(components, c)
+	}
+	for _, c := range resources.Flows {
+		components = append(components, c)
+	}
+	config := rendersyslogng.AllOf(components...)
+	var b strings.Builder
+	ctx := rendersyslogng.Context{
+		Out:    &b,
+		Indent: "    ",
+
+		ControlNamespace: resources.Logging.Spec.ControlNamespace,
+	}
+	if err := config.RenderAsSyslogNGConfig(ctx); err != nil {
+		return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
+	}
+
+	return b.String(), &slf.Secrets, nil
 }
 
 type secretLoaderFactory struct {

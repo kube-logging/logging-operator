@@ -148,6 +148,120 @@ func (r LoggingResourceRepository) OutputsInNamespaceFor(ctx context.Context, na
 	return res, nil
 }
 
+func (r LoggingResourceRepository) SyslogNGLoggingResourcesFor(ctx context.Context, logging v1beta1.Logging) (res SyslogNGLoggingResources, errs error) {
+	res.Logging = logging
+
+	var err error
+
+	res.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
+	res.ClusterOutputs, err = r.SyslogNGClusterOutputsFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
+	watchNamespaces := logging.Spec.WatchNamespaces
+	if len(watchNamespaces) == 0 {
+		var nsList corev1.NamespaceList
+		if err := r.Client.List(ctx, &nsList); err != nil {
+			errs = errors.Append(errs, errors.WrapIf(err, "listing namespaces"))
+			return
+		}
+
+		for _, i := range nsList.Items {
+			watchNamespaces = append(watchNamespaces, i.Name)
+		}
+	}
+	sort.Strings(watchNamespaces)
+
+	for _, ns := range watchNamespaces {
+		flows, err := r.SyslogNGFlowsInNamespaceFor(ctx, ns, logging)
+		res.Flows = append(res.Flows, flows...)
+		errs = errors.Append(errs, err)
+
+		outputs, err := r.SyslogNGOutputsInNamespaceFor(ctx, ns, logging)
+		res.Outputs = append(res.Outputs, outputs...)
+		errs = errors.Append(errs, err)
+	}
+
+	return
+}
+
+func (r LoggingResourceRepository) SyslogNGClusterFlowsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.SyslogNGClusterFlow, error) {
+	var list v1beta1.SyslogNGClusterFlowList
+	if err := r.Client.List(ctx, &list, clusterResourceListOpts(logging)...); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.SyslogNGClusterFlow
+	for _, i := range list.Items {
+		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
+func (r LoggingResourceRepository) SyslogNGClusterOutputsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.SyslogNGClusterOutput, error) {
+	var list v1beta1.SyslogNGClusterOutputList
+	if err := r.Client.List(ctx, &list, clusterResourceListOpts(logging)...); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.SyslogNGClusterOutput
+	for _, i := range list.Items {
+		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
+func (r LoggingResourceRepository) SyslogNGFlowsInNamespaceFor(ctx context.Context, namespace string, logging v1beta1.Logging) ([]v1beta1.SyslogNGFlow, error) {
+	var list v1beta1.SyslogNGFlowList
+	if err := r.Client.List(ctx, &list, client.InNamespace(namespace)); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.SyslogNGFlow
+	for _, i := range list.Items {
+		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
+func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Context, namespace string, logging v1beta1.Logging) ([]v1beta1.SyslogNGOutput, error) {
+	var list v1beta1.SyslogNGOutputList
+	if err := r.Client.List(ctx, &list, client.InNamespace(namespace)); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.SyslogNGOutput
+	for _, i := range list.Items {
+		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
 func clusterResourceListOpts(logging v1beta1.Logging) []client.ListOption {
 	var opts []client.ListOption
 	if !logging.Spec.AllowClusterResourcesFromAllNamespaces {
