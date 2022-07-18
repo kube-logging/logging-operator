@@ -78,6 +78,9 @@ type FluentbitSpec struct {
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume     volume.KubernetesVolume      `json:"bufferStorageVolume,omitempty"`
+	BufferVolumeMetrics     *Metrics                     `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeImage       ImageSpec                    `json:"bufferVolumeImage,omitempty"`
+	BufferVolumeArgs        []string                     `json:"bufferVolumeArgs,omitempty"`
 	CustomConfigSecret      string                       `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName    string                       `json:"podPriorityClassName,omitempty"`
 	LivenessProbe           *corev1.Probe                `json:"livenessProbe,omitempty"`

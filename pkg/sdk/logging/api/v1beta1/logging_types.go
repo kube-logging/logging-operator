@@ -117,6 +117,9 @@ type DefaultFlowSpec struct {
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.5"
+	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentbitBufferVolumeImageTag        = "0.1.0"
+	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
@@ -419,6 +422,15 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
 			l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.Repository == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.Tag == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentbitSpec.Security.SecurityContext == nil {
 			l.Spec.FluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
