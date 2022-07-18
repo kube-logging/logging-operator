@@ -15,6 +15,7 @@
 package controllers
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -49,7 +50,7 @@ var _ = BeforeSuite(func(done Done) {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		BinaryAssetsDirectory: filepath.Join("../../testbin/bin"),
+		BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
 	}
 
 	var err error
