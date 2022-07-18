@@ -30,6 +30,8 @@ jobs:
       - run:
           name: Run lint
           command: make lint
+          environment:
+            LINTER_FLAGS: '--timeout 5m'
 
       - run:
           name: Run tests
