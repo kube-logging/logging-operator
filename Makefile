@@ -4,9 +4,8 @@ BIN := ${PWD}/bin
 
 export PATH := $(BIN):$(PATH)
 
-# Do we need these?
-#OS = $(shell uname | tr A-Z a-z)
-#SHELL := /bin/bash
+OS = $(shell go env GOOS)
+ARCH = $(shell go env GOARCH)
 
 GOVERSION = $(shell go env GOVERSION)
 
@@ -154,7 +153,7 @@ run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kub
 	go run ./main.go --verbose --pprof
 
 test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && go test ./...
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./...
 	cd pkg/sdk/extensions && go test ./...
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out

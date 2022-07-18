@@ -16,6 +16,7 @@ package v1beta1_test
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -61,7 +62,7 @@ var _ = BeforeSuite(func(done Done) {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "..", "..", "config", "crd", "bases")},
-		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "..", "..", "testbin", "bin"),
+		BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
 	}
 
 	err = v1beta1.SchemeBuilder.AddToScheme(scheme.Scheme)
