@@ -1062,6 +1062,17 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 	}
 	out.BufferStorage = in.BufferStorage
 	in.BufferStorageVolume.DeepCopyInto(&out.BufferStorageVolume)
+	if in.BufferVolumeMetrics != nil {
+		in, out := &in.BufferVolumeMetrics, &out.BufferVolumeMetrics
+		*out = new(Metrics)
+		(*in).DeepCopyInto(*out)
+	}
+	in.BufferVolumeImage.DeepCopyInto(&out.BufferVolumeImage)
+	if in.BufferVolumeArgs != nil {
+		in, out := &in.BufferVolumeArgs, &out.BufferVolumeArgs
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)
