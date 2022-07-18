@@ -119,11 +119,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
 
-		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
-		}
+		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
