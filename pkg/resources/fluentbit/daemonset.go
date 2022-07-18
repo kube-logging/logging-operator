@@ -128,9 +128,7 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 	}
 }
 
-func (r *Reconciler) generatePortsMetrics() []corev1.ContainerPort {
-
-	var containerPorts []corev1.ContainerPort
+func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPort) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
@@ -138,7 +136,7 @@ func (r *Reconciler) generatePortsMetrics() []corev1.ContainerPort {
 			Protocol:      corev1.ProtocolTCP,
 		})
 	}
-	return nil
+	return
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
