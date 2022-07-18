@@ -88,7 +88,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
 		}
 
