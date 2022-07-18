@@ -18,6 +18,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -36,14 +37,6 @@ const (
 )
 
 func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error) {
-	var containerPorts []corev1.ContainerPort
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
-		containerPorts = append(containerPorts, corev1.ContainerPort{
-			Name:          "monitor",
-			ContainerPort: r.Logging.Spec.FluentbitSpec.Metrics.Port,
-			Protocol:      corev1.ProtocolTCP,
-		})
-	}
 
 	labels := util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())
 	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
@@ -60,6 +53,14 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 			podMeta = templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
 		}
 	}
+
+	containers := []corev1.Container{
+		*r.fluentbitContainer(),
+	}
+	if c := r.bufferMetricsSidecarContainer(); c != nil {
+		containers = append(containers, *c)
+	}
+
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
@@ -84,27 +85,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					DNSConfig:        r.Logging.Spec.FluentbitSpec.DNSConfig,
 					HostNetwork:      r.Logging.Spec.FluentbitSpec.HostNetwork,
 
-					Containers: []corev1.Container{
-						{
-							Name:            containerName,
-							Image:           r.Logging.Spec.FluentbitSpec.Image.RepositoryWithTag(),
-							ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
-							Ports:           containerPorts,
-							Resources:       r.Logging.Spec.FluentbitSpec.Resources,
-							VolumeMounts:    r.generateVolumeMounts(),
-							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
-								RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
-								ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-								AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-								Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
-								SELinuxOptions:           r.Logging.Spec.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
-							},
-							Env:            r.Logging.Spec.FluentbitSpec.EnvVars,
-							LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
-							ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
-						},
-					},
+					Containers: containers,
 				},
 			},
 		},
@@ -123,6 +104,39 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	}
 
 	return desired, reconciler.StatePresent, nil
+}
+
+func (r *Reconciler) fluentbitContainer() *corev1.Container {
+	return &corev1.Container{
+		Name:            containerName,
+		Image:           r.Logging.Spec.FluentbitSpec.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
+		Ports:           r.generatePortsMetrics(),
+		Resources:       r.Logging.Spec.FluentbitSpec.Resources,
+		VolumeMounts:    r.generateVolumeMounts(),
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
+			RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
+			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
+			SELinuxOptions:           r.Logging.Spec.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
+		},
+		Env:            r.Logging.Spec.FluentbitSpec.EnvVars,
+		LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
+		ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
+	}
+}
+
+func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPort) {
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
+		containerPorts = append(containerPorts, corev1.ContainerPort{
+			Name:          "monitor",
+			ContainerPort: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+			Protocol:      corev1.ProtocolTCP,
+		})
+	}
+	return
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
@@ -253,4 +267,49 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		v = append(v, tlsRelatedVolume)
 	}
 	return
+}
+
+func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
+	port := int32(defaultBufferVolumeMetricsPort)
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+		port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
+	}
+	return []corev1.ContainerPort{
+		{
+			Name:          "buffer-metrics",
+			ContainerPort: port,
+			Protocol:      corev1.ProtocolTCP,
+		},
+	}
+}
+
+func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
+	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil {
+		port := int32(defaultBufferVolumeMetricsPort)
+		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
+		}
+		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
+		args := []string{portParam}
+		if len(r.Logging.Spec.FluentbitSpec.BufferVolumeArgs) != 0 {
+			args = append(args, r.Logging.Spec.FluentbitSpec.BufferVolumeArgs...)
+		} else {
+			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
+		}
+		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
+		return &corev1.Container{
+			Name:            "buffer-metrics-sidecar",
+			Image:           r.Logging.Spec.FluentbitSpec.BufferVolumeImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy),
+			Args:            []string{"--startup", customRunner},
+			Ports:           r.generatePortsBufferVolumeMetrics(),
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      BufferStorageVolume,
+					MountPath: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
+				},
+			},
+		}
+	}
+	return nil
 }

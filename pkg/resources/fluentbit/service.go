@@ -84,3 +84,65 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
+
+func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil {
+		port := int32(defaultBufferVolumeMetricsPort)
+		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
+		}
+
+		return &corev1.Service{
+			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
+
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
+					{
+						Protocol:   corev1.ProtocolTCP,
+						Name:       "buffer-metrics",
+						Port:       port,
+						TargetPort: intstr.IntOrString{IntVal: port},
+					},
+				},
+				Selector:  r.getFluentBitLabels(),
+				Type:      corev1.ServiceTypeClusterIP,
+				ClusterIP: "None",
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &corev1.Service{
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-monitor"),
+		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
+		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
+
+		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
+		return &v1.ServiceMonitor{
+			ObjectMeta: objectMetadata,
+			Spec: v1.ServiceMonitorSpec{
+				JobLabel:        "",
+				TargetLabels:    nil,
+				PodTargetLabels: nil,
+				Endpoints: []v1.Endpoint{{
+					Port:                 "buffer-metrics",
+					Path:                 r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Path,
+					Interval:             r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Interval,
+					ScrapeTimeout:        r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Timeout,
+					HonorLabels:          r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+				}},
+				Selector:          v12.LabelSelector{MatchLabels: r.getFluentBitLabels()},
+				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				SampleLimit:       0,
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &v1.ServiceMonitor{
+		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
+		Spec:       v1.ServiceMonitorSpec{},
+	}, reconciler.StateAbsent, nil
+}

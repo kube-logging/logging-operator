@@ -1,28 +1,56 @@
-OS = $(shell uname | tr A-Z a-z)
-SHELL := /bin/bash
+# A Self-Documenting Makefile: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
-# Image URL to use all building/pushing image targets
+BIN := ${PWD}/bin
+
+export PATH := $(BIN):$(PATH)
+
+OS = $(shell go env GOOS)
+ARCH = $(shell go env GOARCH)
+
+GOVERSION = $(shell go env GOVERSION)
+
+# Image name to use for building/pushing image targets
 IMG ?= controller:latest
+
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
+
 DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
-CONTROLLER_GEN_VERSION = v0.5.0
-GOLANGCI_VERSION = v1.42.1
-KIND_VERSION = v0.11.1
-LICENSEI_VERSION = v0.3.1
-ENVTEST_CTRL_VERSION = v0.8.3
-
 VERSION := $(shell git describe --abbrev=0 --tags)
+
+# Where do we use these???
 DOCKER_IMAGE = banzaicloud/logging-operator
 DOCKER_TAG ?= ${VERSION}
 
-CONTROLLER_GEN = $(PWD)/bin/controller-gen
-ENVTEST_ASSETS_DIR=${PWD}/testbin
-export PATH := $(PWD)/bin:$(PATH)
-
 E2E_TEST_TIMEOUT ?= 20m
+
+
+CONTROLLER_GEN = ${BIN}/controller-gen
+CONTROLLER_GEN_VERSION = v0.6.0
+
+ENVTEST_BIN_DIR := ${BIN}/envtest
+ENVTEST_K8S_VERSION := 1.21.4
+ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
+
+GOLANGCI_LINT := ${BIN}/golangci-lint
+GOLANGCI_LINT_VERSION := v1.46.2
+
+KIND := ${BIN}/kind
+KIND_VERSION := v0.11.1
+
+KUBEBUILDER := ${BIN}/kubebuilder
+KUBEBUILDER_VERSION = v3.1.0
+
+LICENSEI := ${BIN}/licensei
+LICENSEI_VERSION = v0.5.0
+
+SETUP_ENVTEST := ${BIN}/setup-envtest
+
+## =============
+## ==  Rules  ==
+## =============
 
 .PHONY: all
 all: manager
@@ -71,35 +99,39 @@ fmt: ## Run go fmt against code
 	cd pkg/sdk && go fmt ./...
 
 .PHONY: generate
-generate: bin/controller-gen tidy ## Generate code
+generate: ${CONTROLLER_GEN} tidy ## Generate code
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/model/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./extensions/api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./resourcebuilder/...
 	cd pkg/sdk && go generate ./static
 
+.PHONY: help
+help: ## Show this help message
+	@grep -h -E '^[a-zA-Z0-9%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' | sort
+
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
 	kubectl create -f config/crd/bases || kubectl replace -f config/crd/bases
 
 .PHONY: license-check
-license-check: bin/licensei .licensei.cache ## Run license check
-	bin/licensei check
-	./scripts/check-header.sh
+license-check: ${LICENSEI} .licensei.cache ## Run license check
+	${LICENSEI} check
+	${LICENSEI} header
 
 .PHONY: license-cache
-license-cache: bin/licensei ## Generate license cache
-	bin/licensei cache
+license-cache: ${LICENSEI} ## Generate license cache
+	${LICENSEI} cache
 
 .PHONY: lint
-lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run --timeout 2m
-	cd pkg/sdk && ../../bin/golangci-lint run  -c ../../.golangci.yml
+lint: ${GOLANGCI_LINT} ## Run linter
+	${GOLANGCI_LINT} run ${LINTER_FLAGS}
+	cd pkg/sdk && ${GOLANGCI_LINT} run ${LINTER_FLAGS}
 
 .PHONY: lint-fix
-lint-fix: bin/golangci-lint ## Run linter
-	bin/golangci-lint run --fix
-	cd pkg/sdk && golangci-lint run -c ../../.golangci.yml --fix
+lint-fix: ${GOLANGCI_LINT} ## Run linter
+	${GOLANGCI_LINT} run --fix
+	cd pkg/sdk && ${GOLANGCI_LINT} run --fix
 
 .PHONY: list
 list: ## List all make targets
@@ -110,7 +142,7 @@ manager: generate fmt vet ## Build manager binary
 	go build -o bin/manager main.go
 
 .PHONY: manifests
-manifests: bin/controller-gen ## Generate manifests e.g. CRD, RBAC etc.
+manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
 	cp config/crd/bases/* charts/logging-operator/crds/
@@ -120,15 +152,14 @@ manifests: bin/controller-gen ## Generate manifests e.g. CRD, RBAC etc.
 run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
-test: generate fmt vet manifests | ${ENVTEST_ASSETS_DIR}/setup-envtest.sh ## Run tests
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools ${ENVTEST_ASSETS_DIR}; setup_envtest_env ${ENVTEST_ASSETS_DIR}
-	cd pkg/sdk/logging && go test ./...
+test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./...
 	cd pkg/sdk/extensions && go test ./...
-	go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
-	go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
 
 .PHONY: test-e2e
-test-e2e: bin/kind docker-build generate fmt vet manifests ## Run E2E tests
+test-e2e: ${KIND} docker-build generate fmt vet manifests ## Run E2E tests
 	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" go test -timeout ${E2E_TEST_TIMEOUT} ./...
 
 .PHONY: tidy
@@ -140,50 +171,75 @@ vet: ## Run go vet against code
 	go vet ./...
 	cd pkg/sdk && go vet ./...
 
-.licensei.cache: bin/licensei
+## =========================
+## ==  Tool dependencies  ==
+## =========================
+
+${CONTROLLER_GEN}: ${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION} | ${BIN}
+	ln -sf $(notdir $<) $@
+
+${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: IMPORT_PATH := sigs.k8s.io/controller-tools/cmd/controller-gen
+${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: VERSION := ${CONTROLLER_GEN_VERSION}
+${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: | ${BIN}
+	${go_install_binary}
+
+${ENVTEST_BINARY_ASSETS}: ${ENVTEST_BINARY_ASSETS}_${ENVTEST_K8S_VERSION}
+	ln -sf $(notdir $<) $@
+
+${ENVTEST_BINARY_ASSETS}_${ENVTEST_K8S_VERSION}: | ${SETUP_ENVTEST} ${ENVTEST_BIN_DIR}
+	ln -sf $$(${SETUP_ENVTEST} --bin-dir ${ENVTEST_BIN_DIR} use ${ENVTEST_K8S_VERSION} -p path) $@
+
+${GOLANGCI_LINT}: ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION} | ${BIN}
+	ln -sf $(notdir $<) $@
+
+${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/golangci/golangci-lint/cmd/golangci-lint
+${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: VERSION := ${GOLANGCI_LINT_VERSION}
+${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: | ${BIN}
+	${go_install_binary}
+
+${KIND}: ${KIND}_${KIND_VERSION}_${GOVERSION} | ${BIN}
+	ln -sf $(notdir $<) $@
+
+${KIND}_${KIND_VERSION}_${GOVERSION}: IMPORT_PATH := sigs.k8s.io/kind
+${KIND}_${KIND_VERSION}_${GOVERSION}: VERSION := ${KIND_VERSION}
+${KIND}_${KIND_VERSION}_${GOVERSION}: | ${BIN}
+	${go_install_binary}
+
+${KUBEBUILDER}: ${KUBEBUILDER}_$(KUBEBUILDER_VERSION) | ${BIN}
+	ln -sf $(notdir $<) $@
+
+${KUBEBUILDER}_$(KUBEBUILDER_VERSION): | ${BIN}
+	curl -sL https://github.com/kubernetes-sigs/kubebuilder/releases/download/${KUBEBUILDER_VERSION}/kubebuilder_${OS}_${ARCH} -o $@
+	chmod +x $@
+
+${LICENSEI}: ${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION} | ${BIN}
+	ln -sf $(notdir $<) $@
+
+${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/goph/licensei/cmd/licensei
+${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: VERSION := ${LICENSEI_VERSION}
+${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: | ${BIN}
+	${go_install_binary}
+
+.licensei.cache: ${LICENSEI}
 ifndef GITHUB_TOKEN
 	@>&2 echo "WARNING: building licensei cache without Github token, rate limiting might occur."
 	@>&2 echo "(Hint: If too many licenses are missing, try specifying a Github token via the environment variable GITHUB_TOKEN.)"
 endif
-	bin/licensei cache
+	${LICENSEI} cache
 
-bin/controller-gen: | bin/controller-gen_${CONTROLLER_GEN_VERSION} bin
-	ln -sf controller-gen_${CONTROLLER_GEN_VERSION} $@
+${SETUP_ENVTEST}: IMPORT_PATH := sigs.k8s.io/controller-runtime/tools/setup-envtest
+${SETUP_ENVTEST}: VERSION := latest
+${SETUP_ENVTEST}: | ${BIN}
+	GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 
-bin/controller-gen_${CONTROLLER_GEN_VERSION}: | bin
-	find $(PWD)/bin -name 'controller-gen*' -exec rm {} +
-	GOBIN=$(PWD)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION}
-	mv $(PWD)/bin/controller-gen $@
+${ENVTEST_BIN_DIR}: | ${BIN}
+	mkdir -p $@
 
-bin/golangci-lint: | bin/golangci-lint_${GOLANGCI_VERSION} bin
-	ln -sf golangci-lint_${GOLANGCI_VERSION} bin/golangci-lint
-
-bin/golangci-lint_${GOLANGCI_VERSION}: | bin
-	find $(PWD)/bin -name 'golangci-lint*' -exec rm {} +
-	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_VERSION}
-	mv bin/golangci-lint $@
-
-bin/kind: | bin/kind_${KIND_VERSION} bin
-	ln -sf kind_${KIND_VERSION} $@
-
-bin/kind_${KIND_VERSION}: | bin
-	find $(PWD)/bin -name 'kind*' -exec rm {} +
-	GOBIN=$(PWD)/bin go install sigs.k8s.io/kind@${KIND_VERSION}
-	mv bin/kind $@
-
-bin/licensei: | bin/licensei_${LICENSEI_VERSION}
-	ln -sf licensei_${LICENSEI_VERSION} $@
-
-bin/licensei_${LICENSEI_VERSION}: | bin
-	find $(PWD)/bin -name 'licensei*' -exec rm {} +
-	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s ${LICENSEI_VERSION}
-	mv bin/licensei $@
-
-bin:
+${BIN}:
 	mkdir -p bin
 
-${ENVTEST_ASSETS_DIR}:
-	mkdir -p ${ENVTEST_ASSETS_DIR}
-
-${ENVTEST_ASSETS_DIR}/setup-envtest.sh: | ${ENVTEST_ASSETS_DIR}
-	curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/$(ENVTEST_CTRL_VERSION)/hack/setup-envtest.sh
+define go_install_binary
+find ${BIN} -name '$(notdir ${IMPORT_PATH})_*' -exec rm {} +
+GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
+mv ${BIN}/$(notdir ${IMPORT_PATH}) $@
+endef
