@@ -76,7 +76,7 @@ allowClusterResourcesFromAllNamespaces: false
 # defaultFlow
 defaultFlow: {}
 
-# defaultFlow
+# Global filters
 globalFilters: []
 
 # ClusterFlows to deploy

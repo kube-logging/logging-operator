@@ -13,7 +13,7 @@ $ helm install banzaicloud-stable/logging-operator-logging
 The following tables lists the configurable parameters of the logging-operator-logging chart and their default values.
 
 | Parameter                                           | Description                                                              | Default                                                    |
-| --------------------------------------------------- | ------------------------------------------------------                   |------------------------------------------------------------|
+|-----------------------------------------------------|--------------------------------------------------------------------------|------------------------------------------------------------|
 | `enableRecreateWorkloadOnImmutableFieldChange`      | Permit deletion and recreation of resources on update of immutable field | false                                                      |
 | `tls.enabled`                                       | Enabled TLS communication between components                             | true                                                       |
 | `tls.fluentdSecretName`                             | Specified secret name, which contain tls certs                           | This will overwrite automatic Helm certificate generation. |
@@ -42,7 +42,24 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.tolerations`                               | Tolerations for fluentd statefulset                                      | none                                                       |
 | `fluentd.nodeSelector`                              | Node selector for fluentd pods                                           | none                                                       |
 | `fluentd.podPriorityClassName`                      | Priority class name for fluentd pods                                     | none                                                       |
-| `nodeAgents`             | Node agents definitions                                     | {}}                                                        |
+| `nodeAgents`                                        | Node agents definitions                                                  | {}                                                         |
 | `defaultFlow`                                       | Default Flow                                                             | {}                                                         |
+| `globalFilters`                                     | Global filters                                                           | []                                                         |
 | `clusterFlows`                                      | Array of ClusterFlows to be created                                      | []                                                         |
 | `clusterOutputs`                                    | Array of ClusterOutputs to be created                                    | []                                                         |
+| `skipInvalidResources`                              | Whether to skip invalid Flow and ClusterFlow resources                   | false                                                      |
+| `watchNamespaces`                                   | Limit namespaces from where to read Flow and Output specs                | []                                                         |
+| `controlNamespace`                                  | Control namespace that contains ClusterOutput and ClusterFlow resources  | same as operator namespace                                 |
+| `allowClusterResourcesFromAllNamespaces`            | Allow configuration of cluster resources from any namespace              | false                                                      |
+| `eventTailer.name`                                  | EventTailer name                                                         | `event-tailer`                                             |
+| `eventTailer.workloadOverrides`                     | EventTailer workload overrides                                           | none                                                       |
+| `eventTailer.containerOverrides`                    | EventTailer container overrides                                          | none                                                       |
+| `eventTailer.pvc.accessModes`                       | EventTailer PVC access modes                                             | `[ReadWriteOnce]`                                          |
+| `eventTailer.pvc.storage`                           | EventTailer PVC storage size                                             | `1Gi`                                                      |
+| `eventTailer.pvc.volumeMode`                        | EventTailer PVC volume mode                                              | `Filesystem`                                               |
+| `eventTailer.storageClass`                          | EventTailer PVC storage class                                            | none                                                       |
+| `hostTailer.name`                                   | HostTailer name                                                          | `hosttailer`                                               |
+| `hostTailer.workloadOverrides`                      | HostTailer workload overrides                                            | none                                                       |
+| `hostTailer.containerOverrides`                     | HostTailer container overrides                                           | none                                                       |
+| `hostTailer.fileTailers`                            | HostTailer file tailers                                                  | none                                                       |
+| `hostTailer.systemdTailers`                         | HostTailer systemd tailers                                               | none                                                       |
