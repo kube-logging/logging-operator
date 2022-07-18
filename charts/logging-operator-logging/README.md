@@ -57,7 +57,7 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `eventTailer.pvc.accessModes`                       | EventTailer PVC access modes                                             | `[ReadWriteOnce]`                                          |
 | `eventTailer.pvc.storage`                           | EventTailer PVC storage size                                             | `1Gi`                                                      |
 | `eventTailer.pvc.volumeMode`                        | EventTailer PVC volume mode                                              | `Filesystem`                                               |
-| `eventTailer.storageClass`                          | EventTailer PVC storage class                                            | none                                                       |
+| `eventTailer.pvc.storageClass`                      | EventTailer PVC storage class                                            | none                                                       |
 | `hostTailer.name`                                   | HostTailer name                                                          | `hosttailer`                                               |
 | `hostTailer.workloadOverrides`                      | HostTailer workload overrides                                            | none                                                       |
 | `hostTailer.containerOverrides`                     | HostTailer container overrides                                           | none                                                       |
