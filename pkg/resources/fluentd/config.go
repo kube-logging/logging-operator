@@ -44,6 +44,9 @@ var fluentdInputTemplate = `
 {{- if .IgnoreSameLogInterval }}
   ignore_same_log_interval {{ .IgnoreSameLogInterval }}
 {{- end }}
+{{- if .EnableMsgpackTimeSupport }}
+  enable_msgpack_time_support true
+{{- end }}
 </system>
 
 # Prometheus monitoring
