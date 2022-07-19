@@ -23,7 +23,7 @@ spec:
             storage: {{ .storage | default "1Gi" }}
         volumeMode: {{ .volumeMode | default "Filesystem" }}
 {{- with .storageClass }}
-        storageClass: {{ .storageClass }}
+        storageClassName: {{ .storageClass }}
 {{- end }}
 {{- end }}
 {{- end }}
