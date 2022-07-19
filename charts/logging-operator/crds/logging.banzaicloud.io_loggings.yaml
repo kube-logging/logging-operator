@@ -3687,6 +3687,10 @@ spec:
                       - name
                       type: object
                     type: array
+                  extraArgs:
+                    items:
+                      type: string
+                    type: array
                   extraVolumes:
                     items:
                       properties:
