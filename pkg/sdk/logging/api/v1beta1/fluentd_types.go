@@ -91,6 +91,7 @@ type FluentdSpec struct {
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
+	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

@@ -208,6 +208,16 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
+	containerArgs := []string{
+		"fluentd", "-c",
+		fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
+		"--dry-run",
+	}
+
+	if len(r.Logging.Spec.FluentdSpec.ExtraArgs) != 0 {
+		containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
+	}
+
 	pod := &corev1.Pod{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
@@ -247,11 +257,8 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 					Name:            "fluentd",
 					Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
 					ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
-					Args: []string{
-						"fluentd", "-c",
-						fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
-						"--dry-run",
-					},
+					Args:            containerArgs,
+					Env:             r.Logging.Spec.FluentdSpec.EnvVars,
 					VolumeMounts: []corev1.VolumeMount{
 						{
 							Name:      "config",

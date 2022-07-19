@@ -149,6 +149,10 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		}
 	}
 
+	if len(spec.ExtraArgs) != 0 {
+		container.Args = append(container.Args, spec.ExtraArgs...)
+	}
+
 	return container
 }
 
