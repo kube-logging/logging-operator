@@ -214,9 +214,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 		"--dry-run",
 	}
 
-	if len(r.Logging.Spec.FluentdSpec.ExtraArgs) != 0 {
-		containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
-	}
+	containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
 
 	pod := &corev1.Pod{
 		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
