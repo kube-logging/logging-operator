@@ -41,9 +41,13 @@ type ImageSpec struct {
 }
 
 func (s ImageSpec) RepositoryWithTag() string {
-	res := s.Repository
-	if s.Tag != "" {
-		res += ":" + s.Tag
+	return RepositoryWithTag(s.Repository, s.Tag)
+}
+
+func RepositoryWithTag(repository, tag string) string {
+	res := repository
+	if tag != "" {
+		res += ":" + tag
 	}
 	return res
 }

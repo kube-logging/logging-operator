@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/utils/pointer"
 )
 
 // +name:"LoggingSpec"
@@ -118,35 +117,24 @@ type DefaultFlowSpec struct {
 }
 
 const (
-	DefaultFluentbitImageRepository                 = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                        = "1.9.5"
-	DefaultFluentbitBufferVolumeImageRepository     = "ghcr.io/banzaicloud/custom-runner"
-	DefaultFluentbitBufferVolumeImageTag            = "0.1.0"
-	DefaultFluentbitBufferStorageVolumeName         = "fluentbit-buffer"
-	DefaultFluentdImageRepository                   = "ghcr.io/banzaicloud/fluentd"
-	DefaultFluentdImageTag                          = "v1.14.6-alpine-5"
-	DefaultFluentdBufferStorageVolumeName           = "fluentd-buffer"
-	DefaultFluentdDrainWatchImageRepository         = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag                = "v0.0.2"
-	DefaultFluentdDrainPauseImageRepository         = "k8s.gcr.io/pause"
-	DefaultFluentdDrainPauseImageTag                = "latest"
-	DefaultFluentdVolumeModeImageRepository         = "busybox"
-	DefaultFluentdVolumeModeImageTag                = "latest"
-	DefaultFluentdConfigReloaderImageRepository     = "jimmidyson/configmap-reload"
-	DefaultFluentdConfigReloaderImageTag            = "v0.4.0"
-	DefaultFluentdBufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
-	DefaultFluentdBufferVolumeImageTag              = "0.1.0"
-	DefaultSyslogNGImageRepository                  = "balabit/syslog-ng"
-	DefaultSyslogNGImageTag                         = "3.37.1"
-	DefaultSyslogNGBufferStorageVolumeName          = "syslog-ng-buffer"
-	DefaultSyslogNGVolumeModeImageRepository        = "busybox"
-	DefaultSyslogNGVolumeModeImageTag               = "latest"
-	DefaultSyslogNPrometheusExporterImageRepository = "jabes1993/syslog-ng_exporter"
-	DefaultSyslogNPrometheusExporterImageTag        = "latest"
-	DefaultSyslogNGBufferVolumeImageRepository      = "ghcr.io/banzaicloud/custom-runner"
-	DefaultSyslogNGBufferVolumeImageTag             = "0.1.0"
-	DefaultSyslogNGConfigReloaderImageRepository    = "ghcr.io/banzaicloud/syslogng-reload"
-	DefaultSyslogNGConfigReloaderImageTag           = "v1.0.1"
+	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
+	DefaultFluentbitImageTag                    = "1.9.5"
+	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentbitBufferVolumeImageTag        = "0.1.0"
+	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
+	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
+	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
+	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
+	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
+	DefaultFluentdDrainWatchImageTag            = "v0.0.2"
+	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
+	DefaultFluentdDrainPauseImageTag            = "latest"
+	DefaultFluentdVolumeModeImageRepository     = "busybox"
+	DefaultFluentdVolumeModeImageTag            = "latest"
+	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
+	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
 
 // SetDefaults fills empty attributes
@@ -370,34 +358,6 @@ func (l *Logging) SetDefaults() error {
 		}
 	}
 
-	if l.Spec.SyslogNGSpec != nil { // nolint:nestif
-		if l.Spec.SyslogNGSpec.Image.Repository == "" {
-			l.Spec.SyslogNGSpec.Image.Repository = DefaultSyslogNGImageRepository
-		}
-		if l.Spec.SyslogNGSpec.Image.Tag == "" {
-			l.Spec.SyslogNGSpec.Image.Tag = DefaultSyslogNGImageTag
-		}
-		if l.Spec.SyslogNGSpec.Image.PullPolicy == "" {
-			l.Spec.SyslogNGSpec.Image.PullPolicy = "IfNotPresent"
-		}
-		if l.Spec.SyslogNGSpec.Annotations == nil {
-			l.Spec.SyslogNGSpec.Annotations = make(map[string]string)
-		}
-		if l.Spec.SyslogNGSpec.Security == nil {
-			l.Spec.SyslogNGSpec.Security = &Security{}
-		}
-		if l.Spec.SyslogNGSpec.Security.RoleBasedAccessControlCreate == nil {
-			l.Spec.SyslogNGSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
-		}
-		if l.Spec.SyslogNGSpec.Security.SecurityContext == nil {
-			l.Spec.SyslogNGSpec.Security.SecurityContext = &v1.SecurityContext{}
-		}
-		if l.Spec.SyslogNGSpec.Security.PodSecurityContext == nil {
-			l.Spec.SyslogNGSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
-		}
-		if l.Spec.SyslogNGSpec.Security.PodSecurityContext.FSGroup == nil {
-			l.Spec.SyslogNGSpec.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
-		}
 		if l.Spec.SyslogNGSpec.Metrics != nil {
 			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
 				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
@@ -420,7 +380,7 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 
-		if !l.Spec.SyslogNGSpec.DisablePvc {
+		if !l.Spec.SyslogNGSpec.DisablePVC {
 			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
 					PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
@@ -435,137 +395,6 @@ func (l *Logging) SetDefaults() error {
 				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("20Gi"),
 				}
-			}
-			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
-				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
-			}
-			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
-				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = DefaultFluentdBufferStorageVolumeName
-			}
-		}
-		if l.Spec.SyslogNGSpec.VolumeModImage.Repository == "" {
-			l.Spec.SyslogNGSpec.VolumeModImage.Repository = DefaultSyslogNGVolumeModeImageRepository
-		}
-		if l.Spec.SyslogNGSpec.VolumeModImage.Tag == "" {
-			l.Spec.SyslogNGSpec.VolumeModImage.Tag = DefaultSyslogNGVolumeModeImageTag
-		}
-		if l.Spec.SyslogNGSpec.VolumeModImage.PullPolicy == "" {
-			l.Spec.SyslogNGSpec.VolumeModImage.PullPolicy = "IfNotPresent"
-		}
-		if l.Spec.SyslogNGSpec.BufferVolumeImage.PullPolicy == "" {
-			l.Spec.SyslogNGSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
-		}
-
-		if l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository == "" {
-			l.Spec.SyslogNGSpec.ConfigReloaderImage.Repository = DefaultSyslogNGConfigReloaderImageRepository
-		}
-		if l.Spec.SyslogNGSpec.ConfigReloaderImage.Tag == "" {
-			l.Spec.SyslogNGSpec.ConfigReloaderImage.Tag = DefaultSyslogNGConfigReloaderImageTag
-		}
-		if l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy == "" {
-			l.Spec.SyslogNGSpec.ConfigReloaderImage.PullPolicy = "IfNotPresent"
-		}
-
-		if l.Spec.SyslogNGSpec.PrometheusExporterImage.Repository == "" {
-			l.Spec.SyslogNGSpec.PrometheusExporterImage.Repository = DefaultSyslogNPrometheusExporterImageRepository
-		}
-		if l.Spec.SyslogNGSpec.PrometheusExporterImage.Tag == "" {
-			l.Spec.SyslogNGSpec.PrometheusExporterImage.Tag = DefaultSyslogNPrometheusExporterImageTag
-		}
-		if l.Spec.SyslogNGSpec.PrometheusExporterImage.PullPolicy == "" {
-			l.Spec.SyslogNGSpec.PrometheusExporterImage.PullPolicy = "IfNotPresent"
-		}
-		if l.Spec.SyslogNGSpec.Resources.Limits == nil {
-			l.Spec.SyslogNGSpec.Resources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("400M"),
-				v1.ResourceCPU:    resource.MustParse("1000m"),
-			}
-		}
-		if l.Spec.SyslogNGSpec.Resources.Requests == nil {
-			l.Spec.SyslogNGSpec.Resources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("100M"),
-				v1.ResourceCPU:    resource.MustParse("500m"),
-			}
-		}
-		if l.Spec.SyslogNGSpec.PortTCP == nil {
-			l.Spec.SyslogNGSpec.PortTCP = pointer.Int32(601)
-		}
-		if l.Spec.SyslogNGSpec.PortUDP == nil {
-			l.Spec.SyslogNGSpec.PortUDP = pointer.Int32(514)
-		}
-		if l.Spec.SyslogNGSpec.Scaling == nil {
-			l.Spec.SyslogNGSpec.Scaling = new(SyslogNGScaling)
-		}
-		if l.Spec.SyslogNGSpec.Scaling.PodManagementPolicy == "" {
-			l.Spec.SyslogNGSpec.Scaling.PodManagementPolicy = "OrderedReady"
-		}
-		if l.Spec.SyslogNGSpec.SyslogNGOutLogrotate == nil {
-			l.Spec.SyslogNGSpec.SyslogNGOutLogrotate = &SyslogNGOutLogrotate{
-				Enabled: true,
-			}
-		}
-		if l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Path == "" {
-			l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Path = "/syslog-ng/log/out"
-		}
-		if l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Age == "" {
-			l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Age = "10"
-		}
-		if l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Size == "" {
-			l.Spec.SyslogNGSpec.SyslogNGOutLogrotate.Size = cast.ToString(1024 * 1024 * 10)
-		}
-		if l.Spec.SyslogNGSpec.LivenessProbe == nil {
-			if l.Spec.SyslogNGSpec.LivenessDefaultCheck {
-				l.Spec.SyslogNGSpec.LivenessProbe = &v1.Probe{
-					ProbeHandler: v1.ProbeHandler{
-						Exec: &v1.ExecAction{Command: []string{"syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get \"destination.file.processed\""}},
-					},
-					InitialDelaySeconds: 30,
-					TimeoutSeconds:      0,
-					PeriodSeconds:       10,
-					SuccessThreshold:    0,
-					FailureThreshold:    3,
-				}
-			}
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFreeSpace {
-			if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFreeSpaceThreshold == 0 {
-				l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFreeSpaceThreshold = 90
-			}
-		}
-
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFileNumber {
-			if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFileNumberMax == 0 {
-				l.Spec.SyslogNGSpec.ReadinessDefaultCheck.BufferFileNumberMax = 5000
-			}
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.InitialDelaySeconds == 0 {
-			l.Spec.SyslogNGSpec.ReadinessDefaultCheck.InitialDelaySeconds = 5
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.TimeoutSeconds == 0 {
-			l.Spec.SyslogNGSpec.ReadinessDefaultCheck.TimeoutSeconds = 3
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.PeriodSeconds == 0 {
-			l.Spec.SyslogNGSpec.ReadinessDefaultCheck.PeriodSeconds = 30
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.SuccessThreshold == 0 {
-			l.Spec.SyslogNGSpec.ReadinessDefaultCheck.SuccessThreshold = 3
-		}
-		if l.Spec.SyslogNGSpec.ReadinessDefaultCheck.FailureThreshold == 0 {
-			l.Spec.SyslogNGSpec.ReadinessDefaultCheck.FailureThreshold = 1
-		}
-		for i := range l.Spec.SyslogNGSpec.ExtraVolumes {
-			e := &l.Spec.SyslogNGSpec.ExtraVolumes[i]
-			if e.ContainerName == "" {
-				e.ContainerName = "syslog-ng"
-			}
-			if e.VolumeName == "" {
-				e.VolumeName = fmt.Sprintf("extravolume-%d", i)
-			}
-			if e.Path == "" {
-				e.Path = "/tmp"
-			}
-			if e.Volume == nil {
-				e.Volume = &volume.KubernetesVolume{}
 			}
 		}
 	}
@@ -834,7 +663,6 @@ func (l *Logging) SyslogNGObjectMeta(name, component string) metav1.ObjectMeta {
 
 func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 	return util.MergeLabels(
-		l.Spec.SyslogNGSpec.Labels,
 		map[string]string{
 			"app.kubernetes.io/name":      "syslog-ng",
 			"app.kubernetes.io/component": component,

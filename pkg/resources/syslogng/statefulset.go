@@ -18,61 +18,22 @@ import (
 	"fmt"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	util "github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-const (
-	SYSLOGNG_CONTROL_SOCKET_PATH = "/tmp/syslog-ng/syslog-ng.ctl"
-	SYSLOGNG_CONFIG_PATH         = "/etc/syslog-ng/"
-)
-
+//func statefulSetDefaults(userDefined **v1beta1.SyslogNGSpec) (*v1beta1.SyslogNGSpec, error) {
+//
+//}
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
-	spec := r.statefulsetSpec()
-
-	r.Logging.Spec.SyslogNGSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(v1beta1.DefaultSyslogNGBufferStorageVolumeName)),
-	)
-	if !r.Logging.Spec.SyslogNGSpec.DisablePvc {
-		err := r.Logging.Spec.SyslogNGSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
-			return r.SyslogNGObjectMeta(name, ComponentSyslogNG)
-		})
-		if err != nil {
-			return nil, reconciler.StatePresent, err
-		}
-	} else {
-		err := r.Logging.Spec.SyslogNGSpec.BufferStorageVolume.ApplyVolumeForPodSpec(r.Logging.QualifiedName(v1beta1.DefaultSyslogNGBufferStorageVolumeName), containerName, bufferPath, &spec.Template.Spec)
-		if err != nil {
-			return nil, reconciler.StatePresent, err
-		}
-	}
-	for _, n := range r.Logging.Spec.SyslogNGSpec.ExtraVolumes {
-		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
-			return nil, reconciler.StatePresent, err
-		}
-	}
-
-	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
-		Spec:       *spec,
-	}
-
-	desired.Annotations = util.MergeLabels(desired.Annotations, r.Logging.Spec.SyslogNGSpec.StatefulSetAnnotations)
-
-	return desired, reconciler.StatePresent, nil
-}
-
-func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
-	var initContainers []corev1.Container
-	if c := r.volumeMountHackContainer(); c != nil {
-		initContainers = append(initContainers, *c)
-	}
 
 	containers := []corev1.Container{
 		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
@@ -86,87 +47,77 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		containers = append(containers, *c)
 	}
 
-	sts := &appsv1.StatefulSetSpec{
-		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.SyslogNGSpec.Scaling.PodManagementPolicy),
-		Selector: &metav1.LabelSelector{
-			MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
-		},
-		Template: corev1.PodTemplateSpec{
-			ObjectMeta: r.generatePodMeta(),
-			Spec: corev1.PodSpec{
-				Volumes:                   r.generateVolume(),
-				ServiceAccountName:        r.getServiceAccount(),
-				InitContainers:            initContainers,
-				ImagePullSecrets:          r.Logging.Spec.SyslogNGSpec.Image.ImagePullSecrets,
-				Containers:                containers,
-				NodeSelector:              r.Logging.Spec.SyslogNGSpec.NodeSelector,
-				Tolerations:               r.Logging.Spec.SyslogNGSpec.Tolerations,
-				Affinity:                  r.Logging.Spec.SyslogNGSpec.Affinity,
-				TopologySpreadConstraints: r.Logging.Spec.SyslogNGSpec.TopologySpreadConstraints,
-				PriorityClassName:         r.Logging.Spec.SyslogNGSpec.PodPriorityClassName,
-				DNSPolicy:                 r.Logging.Spec.SyslogNGSpec.DNSPolicy,
-				DNSConfig:                 r.Logging.Spec.SyslogNGSpec.DNSConfig,
-				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot: r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:      r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:    r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:   r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsGroup},
+	desired := &appsv1.StatefulSet{
+		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
+		Spec: appsv1.StatefulSetSpec{
+			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
 			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+				},
+				Spec: corev1.PodSpec{
+					Containers: containers,
+					Volumes:    r.generateVolume(),
+					SecurityContext: &corev1.PodSecurityContext{
+						FSGroup: util.IntPointer64(101),
+					},
+				},
+			},
+			ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 		},
-		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
+	}
+	if !r.Logging.Spec.SyslogNGSpec.SkipRoleBasedAccessControlCreate {
+		desired.Spec.Template.Spec.ServiceAccountName = r.Logging.QualifiedName(defaultServiceAccountName)
+	}
+	err := merge.Merge(desired, r.Logging.Spec.SyslogNGSpec.StatefulSetOverrides)
+	if err != nil {
+		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 	}
 
-	if r.Logging.Spec.SyslogNGSpec.Scaling.Replicas > 0 {
-		sts.Replicas = util.IntPointer(cast.ToInt32(r.Logging.Spec.SyslogNGSpec.Scaling.Replicas))
-	}
-
-	return sts
+	return desired, reconciler.StatePresent, nil
 }
 
 func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
-	envVars := append(spec.EnvVars,
-		corev1.EnvVar{Name: "BUFFER_PATH", Value: bufferPath},
-	)
 
 	container := corev1.Container{
-		Name:            "syslog-ng",
-		Image:           spec.Image.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
-		Ports:           generatePorts(spec),
-		VolumeMounts:    generateVolumeMounts(spec),
-		Resources:       spec.Resources,
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+		Name:            containerName,
+		Image:           v1beta1.RepositoryWithTag(imageRepository, imageTag),
+		ImagePullPolicy: corev1.PullIfNotPresent,
+		Ports: []corev1.ContainerPort{{
+			Name:          "syslog-ng-tcp",
+			ContainerPort: 601,
+			Protocol:      corev1.ProtocolTCP,
+		}},
+		VolumeMounts: generateVolumeMounts(spec),
+		Resources: corev1.ResourceRequirements{
+			Limits: corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("400M"),
+				corev1.ResourceCPU:    resource.MustParse("1000m"),
+			},
+			Requests: corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+			},
 		},
-		Env:            envVars,
-		LivenessProbe:  spec.LivenessProbe,
+		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: bufferPath}},
+		LivenessProbe: &corev1.Probe{
+			ProbeHandler: corev1.ProbeHandler{
+				Exec: &corev1.ExecAction{
+					Command: []string{`syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get "destination.file.processed"`}},
+			},
+			InitialDelaySeconds: 30,
+			TimeoutSeconds:      0,
+			PeriodSeconds:       10,
+			SuccessThreshold:    0,
+			FailureThreshold:    3,
+		},
 		ReadinessProbe: generateReadinessCheck(spec),
 	}
 
-	if spec.SyslogNGOutLogrotate != nil && spec.SyslogNGOutLogrotate.Enabled {
-		container.Args = []string{
-			"--control=" + SYSLOGNG_CONTROL_SOCKET_PATH,
-			"--no-caps",
-		}
-	}
-
 	return container
-}
-
-func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
-	meta := metav1.ObjectMeta{
-		Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
-	}
-	if r.Logging.Spec.SyslogNGSpec.Annotations != nil {
-		meta.Annotations = r.Logging.Spec.SyslogNGSpec.Annotations
-	}
-	return meta
 }
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.SyslogNGSpec) []corev1.ContainerPort {
@@ -178,46 +129,27 @@ func generatePortsBufferVolumeMetrics(spec *v1beta1.SyslogNGSpec) []corev1.Conta
 		{
 			Name:          "buffer-metrics",
 			ContainerPort: port,
-			Protocol:      "TCP",
+			Protocol:      corev1.ProtocolTCP,
 		},
 	}
-}
-
-func generatePorts(spec *v1beta1.SyslogNGSpec) []corev1.ContainerPort {
-	ports := []corev1.ContainerPort{}
-	if spec.PortTCP != nil {
-		ports = append(ports, corev1.ContainerPort{
-			Name:          "syslog-ng-tcp",
-			ContainerPort: *spec.PortTCP,
-			Protocol:      "TCP",
-		})
-	}
-	if spec.PortUDP != nil {
-		ports = append(ports, corev1.ContainerPort{
-			Name:          "syslog-ng-udp",
-			ContainerPort: *spec.PortUDP,
-			Protocol:      "UDP",
-		})
-	}
-	return ports
 }
 
 func generateVolumeMounts(spec *v1beta1.SyslogNGSpec) []corev1.VolumeMount {
 	res := []corev1.VolumeMount{
 		{
-			Name:      "config",
-			MountPath: SYSLOGNG_CONFIG_PATH,
+			Name:      configVolumeName,
+			MountPath: configDir,
 		},
 	}
 	if spec != nil && spec.TLS.Enabled {
 		res = append(res, corev1.VolumeMount{
-			Name:      "syslog-ng-tls",
+			Name:      tlsVolumeName,
 			MountPath: "/syslog-ng/tls/",
 		})
 	}
 	if spec != nil {
 		res = append(res, corev1.VolumeMount{
-			Name:      "syslog-ng-socket",
+			Name:      socketVolumeName,
 			MountPath: "/tmp/syslog-ng",
 		})
 	}
@@ -228,33 +160,17 @@ func generateVolumeMounts(spec *v1beta1.SyslogNGSpec) []corev1.VolumeMount {
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
-			Name: "config",
+			Name: configVolumeName,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.Logging.QualifiedName(SecretConfigName),
 				},
 			},
 		},
-		{
-			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
-				},
-			},
-		},
-		{
-			Name: "output-secret",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(OutputSecretName),
-				},
-			},
-		},
 	}
 	if r.Logging.Spec.SyslogNGSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
-			Name: "syslog-ng-tls",
+			Name: tlsVolumeName,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.Logging.Spec.SyslogNGSpec.TLS.SecretName,
@@ -263,52 +179,31 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
-	if r.Logging.Spec.SyslogNGSpec.Metrics != nil {
-		socketVolume := corev1.Volume{
-			Name: "syslog-ng-socket",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{
-					Medium:    corev1.StorageMediumDefault,
-					SizeLimit: nil,
-				},
+	socketVolume := corev1.Volume{
+		Name: socketVolumeName,
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{
+				Medium:    corev1.StorageMediumDefault,
+				SizeLimit: nil,
 			},
-		}
-		v = append(v, socketVolume)
+		},
 	}
+	v = append(v, socketVolume)
 
 	return
-}
-
-func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
-	if r.Logging.Spec.SyslogNGSpec.VolumeMountChmod {
-		return &corev1.Container{
-			Name:            "volume-mount-hack",
-			Image:           r.Logging.Spec.SyslogNGSpec.VolumeModImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.SyslogNGSpec.VolumeModImage.PullPolicy),
-			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
-			VolumeMounts: []corev1.VolumeMount{
-				{
-					Name:      r.Logging.QualifiedName(v1beta1.DefaultSyslogNGBufferStorageVolumeName),
-					MountPath: bufferPath,
-				},
-			},
-		}
-	}
-	return nil
 }
 
 func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 	if r.Logging.Spec.SyslogNGSpec.Metrics != nil {
 		return &corev1.Container{
 			Name:            "exporter",
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.SyslogNGSpec.PrometheusExporterImage.PullPolicy),
-			Image:           r.Logging.Spec.SyslogNGSpec.PrometheusExporterImage.RepositoryWithTag(),
-			Resources:       r.Logging.Spec.SyslogNGSpec.PrometheusExporterResources,
+			ImagePullPolicy: corev1.PullIfNotPresent,
+			Image:           v1beta1.RepositoryWithTag(prometheusExporterImageRepository, prometheusExporterImageTag),
 			Ports: []corev1.ContainerPort{
 				{
-					Name:          "exporter",
-					ContainerPort: r.Logging.Spec.SyslogNGSpec.Metrics.Port,
-					Protocol:      "TCP",
+					Name:          metricsPortName,
+					ContainerPort: metricsPortNumber,
+					Protocol:      corev1.ProtocolTCP,
 				},
 			},
 			Args: []string{
@@ -316,7 +211,7 @@ func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      "syslog-ng-socket",
+					Name:      socketVolumeName,
 					MountPath: "/tmp",
 				},
 			},
@@ -333,22 +228,18 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			port = r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
-		args := []string{portParam}
-		if len(r.Logging.Spec.SyslogNGSpec.BufferVolumeArgs) != 0 {
-			args = append(args, r.Logging.Spec.SyslogNGSpec.BufferVolumeArgs...)
-		} else {
-			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
-		}
+		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem"}
+
 		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
-			Image:           r.Logging.Spec.SyslogNGSpec.BufferVolumeImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.SyslogNGSpec.BufferVolumeImage.PullPolicy),
+			Image:           v1beta1.RepositoryWithTag(bufferVolumeImageRepository, bufferVolumeImageTag),
+			ImagePullPolicy: corev1.PullIfNotPresent,
 			Args:            []string{"--startup", customRunner},
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      r.Logging.QualifiedName(v1beta1.DefaultSyslogNGBufferStorageVolumeName),
+					Name:      r.Logging.QualifiedName(bufferStorageVolumeName),
 					MountPath: bufferPath,
 				},
 			},
@@ -358,14 +249,14 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 }
 
 func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
-	if spec.ReadinessProbe != nil {
-		return spec.ReadinessProbe
-	}
 
 	if spec.ReadinessDefaultCheck.BufferFreeSpace || spec.ReadinessDefaultCheck.BufferFileNumber {
 		check := []string{"/bin/sh", "-c"}
 		bash := []string{}
 		if spec.ReadinessDefaultCheck.BufferFreeSpace {
+			if spec.ReadinessDefaultCheck.BufferFreeSpaceThreshold == 0 {
+				spec.ReadinessDefaultCheck.BufferFreeSpaceThreshold = 90
+			}
 			bash = append(bash,
 				fmt.Sprintf("FREESPACE_THRESHOLD=%d", spec.ReadinessDefaultCheck.BufferFreeSpaceThreshold),
 				"FREESPACE_CURRENT=$(df -h $BUFFER_PATH  | grep / | awk '{ print $5}' | sed 's/%//g')",
@@ -373,12 +264,32 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 			)
 		}
 		if spec.ReadinessDefaultCheck.BufferFileNumber {
+			if spec.ReadinessDefaultCheck.BufferFileNumberMax == 0 {
+				spec.ReadinessDefaultCheck.BufferFileNumberMax = 5000
+			}
+
 			bash = append(bash,
 				fmt.Sprintf("MAX_FILE_NUMBER=%d", spec.ReadinessDefaultCheck.BufferFileNumberMax),
 				"FILE_NUMBER_CURRENT=$(find $BUFFER_PATH -type f -name *.buffer | wc -l)",
 				"if [ \"$FILE_NUMBER_CURRENT\" -gt \"$MAX_FILE_NUMBER\" ] ; then exit 1; fi",
 			)
 		}
+		if spec.ReadinessDefaultCheck.InitialDelaySeconds == 0 {
+			spec.ReadinessDefaultCheck.InitialDelaySeconds = 5
+		}
+		if spec.ReadinessDefaultCheck.TimeoutSeconds == 0 {
+			spec.ReadinessDefaultCheck.TimeoutSeconds = 3
+		}
+		if spec.ReadinessDefaultCheck.PeriodSeconds == 0 {
+			spec.ReadinessDefaultCheck.PeriodSeconds = 30
+		}
+		if spec.ReadinessDefaultCheck.SuccessThreshold == 0 {
+			spec.ReadinessDefaultCheck.SuccessThreshold = 3
+		}
+		if spec.ReadinessDefaultCheck.FailureThreshold == 0 {
+			spec.ReadinessDefaultCheck.FailureThreshold = 1
+		}
+
 		return &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
@@ -396,13 +307,14 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 }
 
 func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
+	//TODO: ADD TLS reload watch
 	container := corev1.Container{
 		Name:            "config-reloader",
-		Image:           spec.ConfigReloaderImage.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(spec.ConfigReloaderImage.PullPolicy),
+		Image:           v1beta1.RepositoryWithTag(configReloaderImageRepository, configReloaderImageTag),
+		ImagePullPolicy: corev1.PullIfNotPresent,
 		Args: []string{
 			"-cfgjson",
-			generateConfigReloaderConfig(SYSLOGNG_CONFIG_PATH),
+			generateConfigReloaderConfig(configDir),
 		},
 		VolumeMounts: generateVolumeMounts(spec),
 	}
@@ -432,5 +344,5 @@ func generateConfigReloaderConfig(configDir string) string {
 		  }
 		}
 	  }	  
-	`, configDir, SYSLOGNG_CONTROL_SOCKET_PATH)
+	`, configDir, socketPath)
 }
