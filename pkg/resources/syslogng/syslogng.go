@@ -37,24 +37,38 @@ import (
 
 const (
 	SecretConfigName      = "syslog-ng"
-	AppSecretConfigName   = "syslog-ng-app"
 	ConfigCheckKey        = "generated.conf"
 	ConfigKey             = "syslog-ng.conf"
-	AppConfigKey          = "syslog-ng.conf"
 	StatefulSetName       = "syslog-ng"
 	PodSecurityPolicyName = "syslog-ng"
 	ServiceName           = "syslog-ng"
 	OutputSecretName      = "syslog-ng-output"
 	OutputSecretPath      = "/etc/syslog-ng/secret"
 
-	bufferPath                     = "/buffers"
-	defaultServiceAccountName      = "syslog-ng"
-	roleBindingName                = "syslog-ng"
-	roleName                       = "syslog-ng"
-	clusterRoleBindingName         = "syslog-ng"
-	clusterRoleName                = "syslog-ng"
-	containerName                  = "syslog-ng"
-	defaultBufferVolumeMetricsPort = 9200
+	bufferPath                        = "/buffers"
+	defaultServiceAccountName         = "syslog-ng"
+	roleBindingName                   = "syslog-ng"
+	roleName                          = "syslog-ng"
+	clusterRoleBindingName            = "syslog-ng"
+	clusterRoleName                   = "syslog-ng"
+	containerName                     = "syslog-ng"
+	defaultBufferVolumeMetricsPort    = 9200
+	imageRepository                   = "balabit/syslog-ng"
+	imageTag                          = "3.37.1"
+	bufferStorageVolumeName           = "buffer"
+	prometheusExporterImageRepository = "jabes1993/syslog-ng_exporter"
+	prometheusExporterImageTag        = "latest"
+	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
+	bufferVolumeImageTag              = "0.1.0"
+	configReloaderImageRepository     = "ghcr.io/banzaicloud/syslogng-reload"
+	configReloaderImageTag            = "v1.0.1"
+	socketVolumeName                  = "socket"
+	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
+	configDir                         = "/etc/syslog-ng/"
+	configVolumeName                  = "config"
+	tlsVolumeName                     = "tls"
+	metricsPortNumber                 = 9577
+	metricsPortName                   = "exporter"
 )
 
 // Reconciler holds info what resource to reconcile
@@ -71,13 +85,6 @@ type Desire struct {
 	// BeforeUpdateHook has the ability to change the desired object
 	// or even to change the desired state in case the object should be recreated
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
-}
-
-func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.SyslogNGSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.SyslogNGSpec.Security.ServiceAccount
-	}
-	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
 func New(client client.Client, log logr.Logger,
