@@ -25,8 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // +name:"LoggingSpec"
@@ -669,10 +667,4 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
-}
-
-func (l Logging) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	// TODO: render options
-	// TODO: render source
-	return nil
 }

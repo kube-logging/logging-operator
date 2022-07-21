@@ -1,10 +1,10 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +kubebuilder:object:generate=true
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type SyslogNGSyslogOutput struct {
 	Host           string
@@ -24,41 +24,18 @@ type SyslogNGSyslogOutput struct {
 	DiskBuffer     *SyslogNGDiskBuffer
 }
 
-func (o SyslogNGSyslogOutput) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	var CaFile string
-	var err error
-	if o.CaFile != nil {
-		CaFile, err = ctx.SecretLoader.Load(o.CaFile)
-		if err != nil {
-			return err
-		}
-	}
-
-	return syslogng.AllOf(
-		syslogng.String("syslog("),
-		syslogng.Printf("%q ", o.Host),
-		syslogng.RenderIf(o.Transport != "", syslogng.Printf("transport(%q) ", o.Transport)),
-		syslogng.RenderIf(o.Port != 0, syslogng.Printf("port(%q) ", o.Port)),
-		syslogng.RenderIf(CaFile != "", syslogng.Printf("ca-file(%q) ", CaFile)),
-		syslogng.RenderIf(o.DiskBuffer != nil, o.DiskBuffer),
-		syslogng.String(");"),
-	).RenderAsSyslogNGConfig(ctx)
-}
-
+// +kubebuilder:object:generate=true
 type TLS struct {
 	//TODO
 }
 
+// +kubebuilder:object:generate=true
 type SyslogNGDiskBuffer struct {
-	Reliable     *bool
+	DiskBufSize  float64
+	Reliable     bool
 	Compaction   *bool
 	Dir          string
-	DiskBufSize  float64
 	MemBufLength int64
 	MemBufSize   float64
 	QOutSize     int64
-}
-
-func (o SyslogNGDiskBuffer) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	return nil
 }

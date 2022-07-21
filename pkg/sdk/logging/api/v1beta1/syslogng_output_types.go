@@ -18,7 +18,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // +name:"SyslogNGOutputSpec"
@@ -34,13 +33,6 @@ type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
 type SyslogNGOutputSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 	Syslog     *output.SyslogNGSyslogOutput
-}
-
-func (s SyslogNGOutputSpec) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	if s.Syslog != nil {
-		return s.Syslog.RenderAsSyslogNGConfig(ctx)
-	}
-	return nil
 }
 
 type SyslogNGOutputStatus OutputStatus
@@ -59,15 +51,6 @@ type SyslogNGOutput struct {
 
 	Spec   SyslogNGOutputSpec   `json:"spec,omitempty"`
 	Status SyslogNGOutputStatus `json:"status,omitempty"`
-}
-
-func (o SyslogNGOutput) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	ctx.SecretLoader = ctx.SecretLoaderFactory.OutputSecretLoaderForNamespace(o.Namespace)
-	return syslogng.AllOf(
-		syslogng.Printf("destination output_%s_%s {\n", o.Namespace, o.Name),
-		syslogng.Indent(o.Spec),
-		syslogng.String("};\n"),
-	).RenderAsSyslogNGConfig(ctx)
 }
 
 // +kubebuilder:object:root=true

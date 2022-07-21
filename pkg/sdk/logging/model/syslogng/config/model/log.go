@@ -12,17 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1beta1
+package model
 
-import (
-	"regexp"
-	"strings"
-)
-
-var leadingTabs = regexp.MustCompile("(?m:^\t+)")
-
-func UseSpaces(yaml string) string {
-	return leadingTabs.ReplaceAllStringFunc(yaml, func(match string) string {
-		return strings.Repeat("    ", len(match))
-	})
+type LogDef struct {
+	SourceNames      []string
+	OptionalElements []LogElement
+	DestinationNames []string
 }
+
+func NewLogElement[Alt LogElementAlts](alt Alt) LogElement {
+	return LogElementAlt[Alt]{
+		Alt: alt,
+	}
+}
+
+type LogElement interface {
+	__LogElement_union()
+}
+
+type LogElementAlts interface {
+	FilterDef | ParserDef | RewriteDef
+}
+
+type LogElementAlt[Alt LogElementAlts] struct {
+	Alt Alt
+}
+
+func (LogElementAlt[Alt]) __LogElement_union() {}
