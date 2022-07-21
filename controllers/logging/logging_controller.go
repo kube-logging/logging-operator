@@ -28,6 +28,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
 	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
+	syslogngconfig "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
@@ -43,7 +44,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	rendersyslogng "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
@@ -243,37 +243,16 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 		Client: r.Client,
 	}
 
-	preamble := `@version: 3.37
-	`
-
-	components := []rendersyslogng.ConfigRenderer{
-		rendersyslogng.String(preamble),
-		resources.Logging,
+	in := syslogngconfig.Input{
+		Logging:             resources.Logging,
+		ClusterOutputs:      resources.ClusterOutputs,
+		Outputs:             resources.Outputs,
+		ClusterFlows:        resources.ClusterFlows,
+		Flows:               resources.Flows,
+		SecretLoaderFactory: &slf,
 	}
-	for _, c := range resources.ClusterOutputs {
-		components = append(components, c)
-	}
-	for _, c := range resources.Outputs {
-		components = append(components, c)
-	}
-	for _, c := range resources.ClusterFlows {
-		components = append(components, c)
-	}
-	for _, c := range resources.Flows {
-		components = append(components, c)
-	}
-	config := rendersyslogng.AllOf(components...)
 	var b strings.Builder
-	ctx := rendersyslogng.Context{
-		Out:    &b,
-		Indent: "    ",
-
-		ControlNamespace: resources.Logging.Spec.ControlNamespace,
-		SecretLoaderFactory: &secretLoaderFactory{
-			Client: r.Client,
-		},
-	}
-	if err := config.RenderAsSyslogNGConfig(ctx); err != nil {
+	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
 	}
 

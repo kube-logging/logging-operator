@@ -18,7 +18,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
 // +name:"SyslogNGFlowSpec"
@@ -39,7 +38,7 @@ type SyslogNGFlowSpec struct {
 	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
 }
 
-type SyslogNGMatch filter.MatchConfig
+type SyslogNGMatch filter.MatchExpr
 
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {
@@ -63,67 +62,6 @@ type SyslogNGFlow struct {
 
 	Spec   SyslogNGFlowSpec   `json:"spec,omitempty"`
 	Status SyslogNGFlowStatus `json:"status,omitempty"`
-}
-
-func (f SyslogNGFlow) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	const sourceName = "the_input"
-	return syslogng.AllOf(
-		syslogng.Printf("log flow_%s_%s {\n", f.Namespace, f.Name),
-		syslogng.Indent(syslogng.AllOf(
-			syslogng.Indentation(),
-			syslogng.String("source("+sourceName+");\n"),
-			syslogng.Indentation(),
-			filter.MatchConfig{
-				Not: (*filter.NotExpr)(&filter.MatchExpr{
-					Regexp: &filter.RegexpMatchExpr{
-						Pattern: f.Namespace,
-						Value:   ".kubernetes.namespace_name",
-						Type:    "string",
-					},
-				}),
-			},
-			syslogng.String(" # filter messages from other namespaces"),
-			syslogng.String("\n"),
-			syslogng.RenderIf(f.Spec.Match != nil, syslogng.AllOf(
-				syslogng.Indentation(),
-				(*filter.MatchConfig)(f.Spec.Match),
-				syslogng.String(" # flow match"),
-				syslogng.String("\n"),
-			)),
-			syslogng.ConfigRendererFunc(func(ctx syslogng.Context) error {
-				for _, filter := range f.Spec.Filters {
-					if err := syslogng.AllOf(
-						syslogng.Indentation(),
-						syslogng.RenderIf(filter.Match != nil, filter.Match),
-						syslogng.RenderIf(filter.Rewrite != nil, filter.Rewrite),
-						syslogng.String("\n"),
-					).RenderAsSyslogNGConfig(ctx); err != nil {
-						return err
-					}
-				}
-				for _, ref := range f.Spec.LocalOutputRefs {
-					c := syslogng.AllOf(
-						syslogng.Indentation(),
-						syslogng.Printf("destination(output_%s_%s);\n", f.Namespace, ref),
-					)
-					if err := c.RenderAsSyslogNGConfig(ctx); err != nil {
-						return err
-					}
-				}
-				for _, ref := range f.Spec.GlobalOutputRefs {
-					c := syslogng.AllOf(
-						syslogng.Indentation(),
-						syslogng.Printf("destination(clusteroutput_%s_%s);\n", ctx.ControlNamespace, ref),
-					)
-					if err := c.RenderAsSyslogNGConfig(ctx); err != nil {
-						return err
-					}
-				}
-				return nil
-			}),
-		)),
-		syslogng.String("};\n"),
-	).RenderAsSyslogNGConfig(ctx)
 }
 
 // +kubebuilder:object:root=true
