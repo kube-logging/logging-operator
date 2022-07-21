@@ -355,6 +355,7 @@ func (l *Logging) SetDefaults() error {
 		}
 	}
 
+	if l.Spec.SyslogNGSpec != nil {
 		if l.Spec.SyslogNGSpec.Metrics != nil {
 			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
 				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
@@ -367,13 +368,6 @@ func (l *Logging) SetDefaults() error {
 			}
 			if l.Spec.SyslogNGSpec.Metrics.Interval == "" {
 				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
-			}
-
-			if l.Spec.SyslogNGSpec.Metrics.PrometheusAnnotations {
-				l.Spec.SyslogNGSpec.Annotations["prometheus.io/scrape"] = "true"
-
-				l.Spec.SyslogNGSpec.Annotations["prometheus.io/path"] = l.Spec.SyslogNGSpec.Metrics.Path
-				l.Spec.SyslogNGSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", l.Spec.SyslogNGSpec.Metrics.Port)
 			}
 		}
 
