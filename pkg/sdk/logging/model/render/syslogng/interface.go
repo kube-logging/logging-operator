@@ -14,17 +14,27 @@
 
 package syslogng
 
-import "io"
+import (
+	"io"
+
+	"github.com/banzaicloud/operator-tools/pkg/secret"
+)
 
 type ConfigRenderer interface {
 	RenderAsSyslogNGConfig(ctx Context) error
 }
 
+type SecretLoaderFactory interface {
+	OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader
+}
+
 type Context struct {
 	Out io.Writer
 
-	Depth  int
-	Indent string
+	Depth               int
+	Indent              string
+	SecretLoaderFactory SecretLoaderFactory
+	SecretLoader        secret.SecretLoader
 
 	ControlNamespace string
 }

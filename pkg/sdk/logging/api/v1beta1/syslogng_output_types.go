@@ -17,6 +17,7 @@ package v1beta1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render/syslogng"
 )
 
@@ -32,11 +33,14 @@ type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
 // SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 type SyslogNGOutputSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
-	// TODO
+	Syslog     *output.SyslogNGSyslogOutput
 }
 
 func (s SyslogNGOutputSpec) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
-	return nil // TODO
+	if s.Syslog != nil {
+		return s.Syslog.RenderAsSyslogNGConfig(ctx)
+	}
+	return nil
 }
 
 type SyslogNGOutputStatus OutputStatus
@@ -58,6 +62,7 @@ type SyslogNGOutput struct {
 }
 
 func (o SyslogNGOutput) RenderAsSyslogNGConfig(ctx syslogng.Context) error {
+	ctx.SecretLoader = ctx.SecretLoaderFactory.OutputSecretLoaderForNamespace(o.Namespace)
 	return syslogng.AllOf(
 		syslogng.Printf("destination output_%s_%s {\n", o.Namespace, o.Name),
 		syslogng.Indent(o.Spec),

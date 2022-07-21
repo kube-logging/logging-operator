@@ -269,6 +269,9 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 		Indent: "    ",
 
 		ControlNamespace: resources.Logging.Spec.ControlNamespace,
+		SecretLoaderFactory: &secretLoaderFactory{
+			Client: r.Client,
+		},
 	}
 	if err := config.RenderAsSyslogNGConfig(ctx); err != nil {
 		return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
