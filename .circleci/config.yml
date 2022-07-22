@@ -13,31 +13,6 @@ executors:
       - image: ghcr.io/banzaicloud/helm:0.0.7
 
 jobs:
-  build:
-    docker:
-      - image: cimg/go:1.18.3
-        environment:
-          GOFLAGS: -mod=readonly
-
-    steps:
-      - checkout
-
-      - run:
-          name: Check generators for unwanted diffs
-          command: |
-            make check-diff
-
-      - run:
-          name: Run lint
-          command: make lint
-          environment:
-            LINTER_FLAGS: '--timeout 5m'
-
-      - run:
-          name: Run tests
-          command: |
-            make test
-
   e2e-test:
     machine:
       image: ubuntu-2004:202201-02
@@ -227,10 +202,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - build
-      - e2e-test:
-          requires:
-            - build
+      - e2e-test
       - docker/publish:
           name: Publish master docker image
           executor:

@@ -5,6 +5,8 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GOFLAGS: -mod=readonly
 
     steps:
       - name: Set up Go
@@ -24,6 +26,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make license-check
+
+      - name: Check generators for unwanted diffs
+        run: make check-diff
+
+      - name: Run lint
+        env:
+          LINTER_FLAGS: '--timeout 5m'
+        run: make lint
+
+      - name: Run tests
+        run: make test
 #
 #      - name: Lint Helm charts
 #        id: lint
