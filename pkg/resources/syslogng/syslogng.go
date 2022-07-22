@@ -261,7 +261,3 @@ func requirementMust(req *labels.Requirement, err error) labels.Requirement {
 	}
 	return *req
 }
-
-func jobSuccessfullyCompleted(job batchv1.Job) bool {
-	return job.Status.CompletionTime != nil && job.Status.Succeeded > 0
-}

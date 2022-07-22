@@ -14,7 +14,10 @@
 
 package kubetool
 
-import corev1 "k8s.io/api/core/v1"
+import (
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+)
 
 func FindVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
 	for i := range vols {
@@ -24,4 +27,8 @@ func FindVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
 		}
 	}
 	return nil
+}
+
+func JobSuccessfullyCompleted(job *batchv1.Job) bool {
+	return job.Status.CompletionTime != nil && job.Status.Succeeded > 0
 }

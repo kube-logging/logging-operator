@@ -313,7 +313,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		}
 
 		job, hasJob := jobOfPVC[pvc.Name]
-		if hasJob && jobSuccessfullyCompleted(job) {
+		if hasJob && kubetool.JobSuccessfullyCompleted(&job) {
 			pvcLog.Info("drainer job for PVC has completed, adding drained label and deleting job")
 
 			patch := client.MergeFrom(pvc.DeepCopy())
@@ -350,7 +350,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 			continue
 		}
 
-		if hasJob && !jobSuccessfullyCompleted(job) {
+		if hasJob && !kubetool.JobSuccessfullyCompleted(&job) {
 			if job.Status.Failed > 0 {
 				cr.CombineErr(errors.NewWithDetails("draining PVC failed", "pvc", pvc.Name, "attempts", job.Status.Failed))
 			} else {
@@ -411,8 +411,4 @@ const drainStatusLabelValue = "drained"
 
 func markedAsDrained(pvc corev1.PersistentVolumeClaim) bool {
 	return pvc.Labels[drainStatusLabelKey] == drainStatusLabelValue
-}
-
-func jobSuccessfullyCompleted(job batchv1.Job) bool {
-	return job.Status.CompletionTime != nil && job.Status.Succeeded > 0
 }
