@@ -108,7 +108,7 @@ eventTailer: {}
   #     - ReadWriteOnce
   #   volumeMode: Filesystem
   #   storage: 1Gi
-  #   storageClass: standard
+  #   storageClassName: standard
 
 # HostTailer config
 hostTailer: {}
