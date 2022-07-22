@@ -156,7 +156,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", syslogNGConfig)
 
-			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, &syslogNGConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
 	}
 

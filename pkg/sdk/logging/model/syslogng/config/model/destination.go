@@ -71,11 +71,11 @@ type SyslogDestinationDriverTLS struct {
 }
 
 type DiskBufferDef struct {
-	DiskBufSize  float64
+	DiskBufSize  int64
 	Reliable     bool
 	Compaction   *bool
 	Dir          string
-	MemBufLength int64
-	MemBufSize   float64
-	QOutSize     int64
+	MemBufLength *int64
+	MemBufSize   *int64
+	QOutSize     *int64
 }

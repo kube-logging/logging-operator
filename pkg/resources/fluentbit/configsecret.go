@@ -22,6 +22,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
+	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
@@ -107,7 +108,7 @@ type fluentForwardOutputUpstreamConfig struct {
 
 type syslogNGOutputConfig struct {
 	Host           string
-	Port           string
+	Port           int
 	JSONDateKey    string
 	JSONDateFormat string
 	Workers        *int
@@ -119,15 +120,32 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
 		}, reconciler.StateAbsent, nil
 	}
-	monitor := struct {
-		Enabled bool
-		Port    int32
-		Path    string
-	}{}
+
+	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter
+
+	if !disableKubernetesFilter {
+		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize == "" {
+			log.Log.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+			r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize = "0"
+		} else if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize != "0" {
+			log.Log.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+		}
+	}
+
+	input := fluentBitConfig{
+		Flush:                   r.Logging.Spec.FluentbitSpec.Flush,
+		Grace:                   r.Logging.Spec.FluentbitSpec.Grace,
+		LogLevel:                r.Logging.Spec.FluentbitSpec.LogLevel,
+		CoroStackSize:           r.Logging.Spec.FluentbitSpec.CoroStackSize,
+		Namespace:               r.Logging.Spec.ControlNamespace,
+		DisableKubernetesFilter: disableKubernetesFilter,
+		FilterModify:            r.Logging.Spec.FluentbitSpec.FilterModify,
+	}
+
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
-		monitor.Enabled = true
-		monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
-		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
+		input.Monitor.Enabled = true
+		input.Monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
+		input.Monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
 
 	if r.Logging.Spec.FluentbitSpec.InputTail.Parser == "" {
@@ -141,28 +159,34 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	var fluentbitTargetHost string
-	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetHost == "" {
-		fluentbitTargetHost = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
-	} else {
-		fluentbitTargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
-	}
+	if r.Logging.Spec.FluentdSpec != nil {
+		fluentbitTargetHost := r.Logging.Spec.FluentbitSpec.TargetHost
+		if fluentbitTargetHost == "" {
+			fluentbitTargetHost = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace)
+		}
 
-	var fluentbitTargetPort int32
-	if r.Logging.Spec.FluentdSpec != nil && r.Logging.Spec.FluentbitSpec.TargetPort == 0 {
-		fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
-	} else {
-		fluentbitTargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
+		fluentbitTargetPort := r.Logging.Spec.FluentbitSpec.TargetPort
+		if fluentbitTargetPort == 0 {
+			fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
+		}
+
+		input.FluentForwardOutput = &fluentForwardOutputConfig{
+			TargetHost: fluentbitTargetHost,
+			TargetPort: fluentbitTargetPort,
+			TLS: fluentForwardOutputTLSConfig{
+				Enabled:   *r.Logging.Spec.FluentbitSpec.TLS.Enabled,
+				SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
+			},
+		}
 	}
 
 	mapper := types.NewStructToStringMapper(nil)
 
 	// FluentBit input Values
-	fluentbitInput := fluentbitInputConfig{}
 	inputTail := r.Logging.Spec.FluentbitSpec.InputTail
 
 	if len(inputTail.MultilineParser) > 0 {
-		fluentbitInput.MultilineParser = inputTail.MultilineParser
+		input.Input.MultilineParser = inputTail.MultilineParser
 		inputTail.MultilineParser = nil
 
 		// If MultilineParser is set, remove other parser fields
@@ -181,7 +205,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		inputTail.DockerModeParser = ""
 
 	} else if len(inputTail.ParserN) > 0 {
-		fluentbitInput.ParserN = inputTail.ParserN
+		input.Input.ParserN = inputTail.ParserN
 		inputTail.ParserN = nil
 	}
 
@@ -189,50 +213,18 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
-	fluentbitInput.Values = fluentbitInputValues
+	input.Input.Values = fluentbitInputValues
 
-	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter
-
-	if !disableKubernetesFilter {
-		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize == "" {
-			log.Log.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
-			r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize = "0"
-		} else if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize != "0" {
-			log.Log.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
-		}
-	}
-
-	fluentbitKubernetesFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
+	input.KubernetesFilter, err = mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
 	}
 
-	fluentbitBufferStorage, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
+	input.BufferStorage, err = mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map buffer storage for fluentbit")
 	}
 
-	input := fluentBitConfig{
-		Flush:         r.Logging.Spec.FluentbitSpec.Flush,
-		Grace:         r.Logging.Spec.FluentbitSpec.Grace,
-		LogLevel:      r.Logging.Spec.FluentbitSpec.LogLevel,
-		CoroStackSize: r.Logging.Spec.FluentbitSpec.CoroStackSize,
-		Namespace:     r.Logging.Spec.ControlNamespace,
-		FluentForwardOutput: &fluentForwardOutputConfig{
-			TargetHost: fluentbitTargetHost,
-			TargetPort: fluentbitTargetPort,
-			TLS: fluentForwardOutputTLSConfig{
-				Enabled:   *r.Logging.Spec.FluentbitSpec.TLS.Enabled,
-				SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
-			},
-		},
-		Monitor:                 monitor,
-		Input:                   fluentbitInput,
-		DisableKubernetesFilter: disableKubernetesFilter,
-		KubernetesFilter:        fluentbitKubernetesFilter,
-		FilterModify:            r.Logging.Spec.FluentbitSpec.FilterModify,
-		BufferStorage:           fluentbitBufferStorage,
-	}
 	if r.Logging.Spec.FluentbitSpec.FilterAws != nil {
 		awsFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterAws)
 		if err != nil {
@@ -320,6 +312,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 				input.FluentForwardOutput.Upstream.Config.Nodes = append(input.FluentForwardOutput.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 			}
 		}
+	}
+
+	if r.Logging.Spec.SyslogNGSpec != nil {
+		input.SyslogNGOutput = &syslogNGOutputConfig{}
+		input.SyslogNGOutput.Host = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(syslogng.ServiceName), r.Logging.Spec.ControlNamespace)
+		input.SyslogNGOutput.Port = syslogng.ServicePort
 	}
 
 	conf, err := generateConfig(input)

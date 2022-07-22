@@ -27,21 +27,22 @@ type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
 // +description:"SyslogNGSpec defines the desired state of SyslogNG"
 type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
-// +kubebuilder:object:generate[=true
+// +kubebuilder:object:generate=true
 
 // SyslogNGSpec defines the desired state of SyslogNG
 type SyslogNGSpec struct {
+	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
+	ReadinessDefaultCheck               ReadinessDefaultCheck        `json:"readinessDefaultCheck,omitempty"`
+	SkipRBACCreate                      bool                         `json:"skipRBACCreate,omitempty"`
 	StatefulSetOverrides                *typeoverride.StatefulSet    `json:"statefulSet,omitempty"`
 	ServiceOverrides                    *typeoverride.Service        `json:"service,omitempty"`
 	ServiceAccountOverrides             *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	SkipRoleBasedAccessControlCreate    bool                         `json:"roleBasedAccessControlCreate,omitempty"`
 	ConfigCheckPodOverrides             *typeoverride.PodSpec        `json:"configCheckPod,omitempty"`
-	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
 	Metrics                             *Metrics                     `json:"metrics,omitempty"`
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	BufferVolumeMetrics                 *Metrics                     `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
-	ReadinessDefaultCheck               ReadinessDefaultCheck        `json:"readinessDefaultCheck,omitempty"`
+	// TODO: option to turn on/off buffer volume PVC
 }
 
 // +kubebuilder:object:generate=true

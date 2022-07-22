@@ -47,24 +47,26 @@ spec:
                         and:
                           items: {}
                           type: array
-                        not:
-                          items: {}
-                          type: array
+                        not: {}
                         or:
                           items: {}
                           type: array
                         regexp:
                           properties:
+                            flags:
+                              items:
+                                type: string
+                              type: array
                             pattern:
                               type: string
                             template:
+                              type: string
+                            type:
                               type: string
                             value:
                               type: string
                           required:
                           - pattern
-                          - template
-                          - value
                           type: object
                       type: object
                     rewrite:
@@ -76,24 +78,26 @@ spec:
                                 and:
                                   items: {}
                                   type: array
-                                not:
-                                  items: {}
-                                  type: array
+                                not: {}
                                 or:
                                   items: {}
                                   type: array
                                 regexp:
                                   properties:
+                                    flags:
+                                      items:
+                                        type: string
+                                      type: array
                                     pattern:
                                       type: string
                                     template:
+                                      type: string
+                                    type:
                                       type: string
                                     value:
                                       type: string
                                   required:
                                   - pattern
-                                  - template
-                                  - value
                                   type: object
                               type: object
                             newName:
@@ -111,24 +115,26 @@ spec:
                                 and:
                                   items: {}
                                   type: array
-                                not:
-                                  items: {}
-                                  type: array
+                                not: {}
                                 or:
                                   items: {}
                                   type: array
                                 regexp:
                                   properties:
+                                    flags:
+                                      items:
+                                        type: string
+                                      type: array
                                     pattern:
                                       type: string
                                     template:
+                                      type: string
+                                    type:
                                       type: string
                                     value:
                                       type: string
                                   required:
                                   - pattern
-                                  - template
-                                  - value
                                   type: object
                               type: object
                             field:
@@ -146,24 +152,26 @@ spec:
                                 and:
                                   items: {}
                                   type: array
-                                not:
-                                  items: {}
-                                  type: array
+                                not: {}
                                 or:
                                   items: {}
                                   type: array
                                 regexp:
                                   properties:
+                                    flags:
+                                      items:
+                                        type: string
+                                      type: array
                                     pattern:
                                       type: string
                                     template:
+                                      type: string
+                                    type:
                                       type: string
                                     value:
                                       type: string
                                   required:
                                   - pattern
-                                  - template
-                                  - value
                                   type: object
                               type: object
                             field:
@@ -190,24 +198,26 @@ spec:
                                 and:
                                   items: {}
                                   type: array
-                                not:
-                                  items: {}
-                                  type: array
+                                not: {}
                                 or:
                                   items: {}
                                   type: array
                                 regexp:
                                   properties:
+                                    flags:
+                                      items:
+                                        type: string
+                                      type: array
                                     pattern:
                                       type: string
                                     template:
+                                      type: string
+                                    type:
                                       type: string
                                     value:
                                       type: string
                                   required:
                                   - pattern
-                                  - template
-                                  - value
                                   type: object
                               type: object
                             field:
@@ -225,32 +235,32 @@ spec:
               loggingRef:
                 type: string
               match:
-                items:
-                  properties:
-                    and:
-                      items: {}
-                      type: array
-                    not:
-                      items: {}
-                      type: array
-                    or:
-                      items: {}
-                      type: array
-                    regexp:
-                      properties:
-                        pattern:
+                properties:
+                  and:
+                    items: {}
+                    type: array
+                  not: {}
+                  or:
+                    items: {}
+                    type: array
+                  regexp:
+                    properties:
+                      flags:
+                        items:
                           type: string
-                        template:
-                          type: string
-                        value:
-                          type: string
-                      required:
-                      - pattern
-                      - template
-                      - value
-                      type: object
-                  type: object
-                type: array
+                        type: array
+                      pattern:
+                        type: string
+                      template:
+                        type: string
+                      type:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                    - pattern
+                    type: object
+                type: object
             type: object
           status:
             properties:

@@ -18,12 +18,14 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"io"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/operator-tools/pkg/merge"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,19 +36,9 @@ type ConfigCheckResult struct {
 	Message string
 }
 
-func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
-	data := make(map[string][]byte)
-	data[AppConfigKey] = []byte(*r.config)
-	return &corev1.Secret{
-		ObjectMeta: r.SyslogNGObjectMeta(AppSecretConfigName, ComponentSyslogNG),
-		Data:       data,
-	}, reconciler.StatePresent, nil
-}
-
 func (r *Reconciler) configHash() (string, error) {
 	hasher := fnv.New32()
-	_, err := hasher.Write([]byte(*r.config))
-	if err != nil {
+	if _, err := io.WriteString(hasher, r.config); err != nil {
 		return "", errors.WrapIf(err, "failed to calculate hash for the configmap data")
 	}
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
@@ -76,7 +68,10 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		return nil, errors.WrapIf(err, "failed to create output secret for syslog-ng configcheck")
 	}
 
-	pod := r.newCheckPod(hashKey)
+	pod, err := r.newCheckPod(hashKey)
+	if err != nil {
+		return nil, errors.WrapIff(err, "failed to create resource description for config check pod %s", hashKey)
+	}
 
 	existingPods := &corev1.PodList{}
 	err = r.Client.List(ctx, existingPods, client.MatchingLabels(pod.Labels))
@@ -170,7 +165,12 @@ func (r *Reconciler) configCheckCleanup(currentHash string) (removedHashes []str
 				continue
 			}
 		}
-		if err := r.Client.Delete(context.TODO(), r.newCheckPod(configHash)); err != nil {
+		checkPod, err := r.newCheckPod(configHash)
+		if err != nil {
+			multierr = errors.Append(multierr, errors.WrapIff(err, "failed to create resource description for config check pod %s", configHash))
+			continue
+		}
+		if err := r.Client.Delete(context.TODO(), checkPod); err != nil {
 			if !apierrors.IsNotFound(err) {
 				multierr = errors.Combine(multierr,
 					errors.Wrapf(err, "failed to remove config check pod %s", configHash))
@@ -183,20 +183,16 @@ func (r *Reconciler) configCheckCleanup(currentHash string) (removedHashes []str
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
-	data, err := r.generateConfigSecret()
-	if err != nil {
-		return nil, err
-	}
-	data[ConfigCheckKey] = []byte(*r.config)
-	data["syslog-ng.conf"] = []byte(SyslogNGConfigCheckTemplate)
 	return &corev1.Secret{
 		ObjectMeta: r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-%s", hashKey), ComponentConfigCheck),
-		Data:       data,
+		Data: map[string][]byte{
+			configKey: []byte(r.config),
+		},
 	}, nil
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error) {
-	obj, _, err := r.outputSecret(r.secrets, OutputSecretPath)
+	obj, _, err := r.outputSecret(r.secrets, outputSecretPath)
 	if err != nil {
 		return nil, err
 	}
@@ -207,22 +203,12 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
 }
 
-func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
+func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 	pod := &corev1.Pod{
 		ObjectMeta: r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
-			ServiceAccountName: r.getServiceAccount(),
-			NodeSelector:       r.Logging.Spec.SyslogNGSpec.NodeSelector,
-			Tolerations:        r.Logging.Spec.SyslogNGSpec.Tolerations,
-			Affinity:           r.Logging.Spec.SyslogNGSpec.Affinity,
-			PriorityClassName:  r.Logging.Spec.SyslogNGSpec.PodPriorityClassName,
-			SecurityContext: &corev1.PodSecurityContext{
-				RunAsNonRoot: r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsNonRoot,
-				FSGroup:      r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.FSGroup,
-				RunAsUser:    r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsUser,
-				RunAsGroup:   r.Logging.Spec.SyslogNGSpec.Security.PodSecurityContext.RunAsGroup,
-			},
+			ServiceAccountName: r.getServiceAccountName(),
 			Volumes: []corev1.Volume{
 				{
 					Name: "config",
@@ -241,42 +227,37 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 					},
 				},
 			},
-			ImagePullSecrets: r.Logging.Spec.SyslogNGSpec.Image.ImagePullSecrets,
 			Containers: []corev1.Container{
 				{
 					Name:            "syslog-ng",
-					Image:           r.Logging.Spec.SyslogNGSpec.Image.RepositoryWithTag(),
-					ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.SyslogNGSpec.Image.PullPolicy),
+					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
+					ImagePullPolicy: corev1.PullIfNotPresent,
 					Args: []string{
 						"-s",
-						//fmt.Sprintf("/syslog-ng/etc/%s", ConfigKey),
+					},
+					Resources: corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							corev1.ResourceMemory: resource.MustParse("400M"),
+							corev1.ResourceCPU:    resource.MustParse("1000m"),
+						},
+						Requests: corev1.ResourceList{
+							corev1.ResourceMemory: resource.MustParse("100M"),
+							corev1.ResourceCPU:    resource.MustParse("500m"),
+						},
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
 							Name:      "config",
-							MountPath: "/etc/syslog-ng/",
+							MountPath: configDir,
 						},
 						{
 							Name:      "output-secret",
-							MountPath: OutputSecretPath,
+							MountPath: outputSecretPath,
 						},
 					},
-					SecurityContext: &corev1.SecurityContext{
-						RunAsUser:                r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.RunAsUser,
-						RunAsGroup:               r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.RunAsGroup,
-						ReadOnlyRootFilesystem:   r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-						AllowPrivilegeEscalation: r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-						Privileged:               r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.Privileged,
-						RunAsNonRoot:             r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.RunAsNonRoot,
-						SELinuxOptions:           r.Logging.Spec.SyslogNGSpec.Security.SecurityContext.SELinuxOptions,
-					},
-					Resources: r.Logging.Spec.SyslogNGSpec.ConfigCheckResources,
 				},
 			},
 		},
-	}
-	if r.Logging.Spec.SyslogNGSpec.ConfigCheckAnnotations != nil {
-		pod.Annotations = r.Logging.Spec.SyslogNGSpec.ConfigCheckAnnotations
 	}
 	if r.Logging.Spec.SyslogNGSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
@@ -294,11 +275,8 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 		}
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
-	for _, n := range r.Logging.Spec.SyslogNGSpec.ExtraVolumes {
-		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
-			r.Log.Error(err, "Syslog-ng Config check pod extraVolume attachment failed.")
-		}
-	}
 
-	return pod
+	err := merge.Merge(pod, r.Logging.Spec.SyslogNGSpec.ConfigCheckPodOverrides)
+
+	return pod, err
 }

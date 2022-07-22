@@ -58,7 +58,7 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 	// Initialise output secret
 	syslogNGOutputSecret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      r.Logging.QualifiedName(OutputSecretName),
+			Name:      r.Logging.QualifiedName(outputSecretName),
 			Namespace: r.Logging.Spec.ControlNamespace,
 		},
 	}

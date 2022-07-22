@@ -31,8 +31,8 @@ type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 type SyslogNGOutputSpec struct {
-	LoggingRef string `json:"loggingRef,omitempty"`
-	Syslog     *output.SyslogNGSyslogOutput
+	LoggingRef string                       `json:"loggingRef,omitempty"`
+	Syslog     *output.SyslogNGSyslogOutput `json:"syslog,omitempty"`
 }
 
 type SyslogNGOutputStatus OutputStatus

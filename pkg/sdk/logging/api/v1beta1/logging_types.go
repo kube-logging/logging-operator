@@ -373,24 +373,6 @@ func (l *Logging) SetDefaults() error {
 				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
 			}
 		}
-
-		if !l.Spec.SyslogNGSpec.DisablePVC {
-			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
-				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
-					PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
-				}
-			}
-			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes == nil {
-				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []v1.PersistentVolumeAccessMode{
-					v1.ReadWriteOnce,
-				}
-			}
-			if l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests == nil {
-				l.Spec.SyslogNGSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
-					"storage": resource.MustParse("20Gi"),
-				}
-			}
-		}
 	}
 
 	if l.Spec.FluentbitSpec != nil { // nolint:nestif

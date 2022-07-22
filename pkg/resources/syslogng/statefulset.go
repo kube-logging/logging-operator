@@ -30,11 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-//func statefulSetDefaults(userDefined **v1beta1.SyslogNGSpec) (*v1beta1.SyslogNGSpec, error) {
-//
-//}
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
-
 	containers := []corev1.Container{
 		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
 		configReloadContainer(r.Logging.Spec.SyslogNGSpec),
@@ -42,13 +38,12 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
-
 	if c := r.syslogNGMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
 
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
+		ObjectMeta: r.Logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG),
 		Spec: appsv1.StatefulSetSpec{
 			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
 			Selector: &metav1.LabelSelector{
@@ -69,8 +64,8 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 		},
 	}
-	if !r.Logging.Spec.SyslogNGSpec.SkipRoleBasedAccessControlCreate {
-		desired.Spec.Template.Spec.ServiceAccountName = r.Logging.QualifiedName(defaultServiceAccountName)
+	if !r.Logging.Spec.SyslogNGSpec.SkipRBACCreate {
+		desired.Spec.Template.Spec.ServiceAccountName = r.getServiceAccountName()
 	}
 	err := merge.Merge(desired, r.Logging.Spec.SyslogNGSpec.StatefulSetOverrides)
 	if err != nil {
@@ -81,14 +76,13 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 }
 
 func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
-
-	container := corev1.Container{
+	return corev1.Container{
 		Name:            containerName,
-		Image:           v1beta1.RepositoryWithTag(imageRepository, imageTag),
+		Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{{
 			Name:          "syslog-ng-tcp",
-			ContainerPort: 601,
+			ContainerPort: ServicePort,
 			Protocol:      corev1.ProtocolTCP,
 		}},
 		VolumeMounts: generateVolumeMounts(spec),
@@ -116,8 +110,6 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		},
 		ReadinessProbe: generateReadinessCheck(spec),
 	}
-
-	return container
 }
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.SyslogNGSpec) []corev1.ContainerPort {
@@ -163,7 +155,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			Name: configVolumeName,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(SecretConfigName),
+					SecretName: r.Logging.QualifiedName(configSecretName),
 				},
 			},
 		},
@@ -332,17 +324,17 @@ func generateConfigReloaderConfig(configDir string) string {
 				"exec": {
 				  "key": "info",
 				  "command": "echo config secret changed!"
-				}  
+				}
 			  },
 			  {
 				"exec": {
 					"key": "reload",
 					"command": "echo RELOAD | socat - UNIX-CONNECT:%s"
 				}
-			  }  
+			  }
 			]
 		  }
 		}
-	  }	  
+	  }
 	`, configDir, socketPath)
 }

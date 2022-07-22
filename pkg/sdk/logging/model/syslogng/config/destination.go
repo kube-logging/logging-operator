@@ -78,13 +78,13 @@ func diskBufferDef(def model.DiskBufferDef) Renderer {
 	if def.Dir != "" {
 		opts = append(opts, optionExpr("dir", def.Dir))
 	}
-	if def.MemBufLength != 0 {
+	if def.MemBufLength != nil {
 		opts = append(opts, optionExpr("mem-buf-length", def.MemBufLength))
 	}
-	if def.MemBufSize != 0 {
+	if def.MemBufSize != nil {
 		opts = append(opts, optionExpr("mem-buf-size", def.MemBufSize))
 	}
-	if def.QOutSize != 0 {
+	if def.QOutSize != nil {
 		opts = append(opts, optionExpr("qout-size", def.QOutSize))
 	}
 	return AllOf(String("disk-buffer("), SpaceSeparated(opts...), String(")"))

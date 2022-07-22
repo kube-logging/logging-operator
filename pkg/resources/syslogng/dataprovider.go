@@ -36,7 +36,7 @@ func NewDataProvider(client client.Client) *DataProvider {
 
 func (p *DataProvider) GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error) {
 	sts := &v1.StatefulSet{}
-	om := logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG)
+	om := logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG)
 	err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 	if err != nil {
 		return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting syslog-ng statefulset")

@@ -28,7 +28,6 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -36,25 +35,23 @@ import (
 )
 
 const (
-	SecretConfigName      = "syslog-ng"
-	ConfigCheckKey        = "generated.conf"
-	ConfigKey             = "syslog-ng.conf"
-	StatefulSetName       = "syslog-ng"
-	PodSecurityPolicyName = "syslog-ng"
-	ServiceName           = "syslog-ng"
-	OutputSecretName      = "syslog-ng-output"
-	OutputSecretPath      = "/etc/syslog-ng/secret"
-
+	ServiceName                       = "syslog-ng"
+	ServicePort                       = 601
+	configSecretName                  = "syslog-ng"
+	configKey                         = "syslog-ng.conf"
+	statefulSetName                   = "syslog-ng"
+	outputSecretName                  = "syslog-ng-output"
+	outputSecretPath                  = "/etc/syslog-ng/secret"
 	bufferPath                        = "/buffers"
-	defaultServiceAccountName         = "syslog-ng"
+	serviceAccountName                = "syslog-ng"
 	roleBindingName                   = "syslog-ng"
 	roleName                          = "syslog-ng"
 	clusterRoleBindingName            = "syslog-ng"
 	clusterRoleName                   = "syslog-ng"
 	containerName                     = "syslog-ng"
 	defaultBufferVolumeMetricsPort    = 9200
-	imageRepository                   = "balabit/syslog-ng"
-	imageTag                          = "3.37.1"
+	syslogngImageRepository           = "balabit/syslog-ng"
+	syslogngImageTag                  = "3.37.1"
 	bufferStorageVolumeName           = "buffer"
 	prometheusExporterImageRepository = "jabes1993/syslog-ng_exporter"
 	prometheusExporterImageTag        = "latest"
@@ -75,7 +72,7 @@ const (
 type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
-	config  *string
+	config  string
 	secrets *secret.MountSecrets
 }
 
@@ -87,8 +84,14 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
-func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
+func New(
+	client client.Client,
+	log logr.Logger,
+	logging *v1beta1.Logging,
+	config string,
+	secrets *secret.MountSecrets,
+	opts reconciler.ReconcilerOpts,
+) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
@@ -108,9 +111,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.roleBinding,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspRole,
-		r.pspRoleBinding,
 	} {
 		o, state, err := res()
 		if err != nil {
@@ -183,7 +183,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	// Prepare output secret
-	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, OutputSecretPath)
+	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, outputSecretPath)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create output secret")
 	}
@@ -209,8 +209,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	for _, res := range []resources.Resource{
-		r.secretConfig,
-		r.appConfigSecret,
+		r.configSecret,
 		r.statefulset,
 		r.service,
 		r.headlessService,
@@ -240,6 +239,10 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	return nil, nil
 }
 
+func (r *Reconciler) getServiceAccountName() string {
+	return r.Logging.QualifiedName(serviceAccountName)
+}
+
 func RegisterWatches(builder *builder.Builder) *builder.Builder {
 	return builder.
 		Owns(&corev1.ConfigMap{}).
@@ -250,14 +253,4 @@ func RegisterWatches(builder *builder.Builder) *builder.Builder {
 		Owns(&corev1.ServiceAccount{}).
 		Owns(&batchv1.Job{}).
 		Owns(&corev1.PersistentVolumeClaim{})
-}
-
-func requirementMust(req *labels.Requirement, err error) labels.Requirement {
-	if err != nil {
-		panic(err)
-	}
-	if req == nil {
-		panic("requirement is nil")
-	}
-	return *req
 }
