@@ -15,7 +15,7 @@ executors:
 jobs:
   build:
     docker:
-      - image: cimg/go:1.18
+      - image: cimg/go:1.18.3
         environment:
           GOFLAGS: -mod=readonly
 
