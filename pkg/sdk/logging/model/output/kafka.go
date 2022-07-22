@@ -92,7 +92,7 @@ type KafkaOutputConfig struct {
 	// +kubebuilder:validation:Optional
 	SaslOverSSL bool `json:"sasl_over_ssl"`
 	Principal string `json:"principal"`
-	Keytab *secret.Secret `json:"keytab"`
+	Keytab *secret.Secret `json:"keytab,omitempty"`
 	// Username when using PLAIN/SCRAM SASL authentication
 	Username *secret.Secret `json:"username,omitempty"`
 	// Password when using PLAIN/SCRAM SASL authentication
