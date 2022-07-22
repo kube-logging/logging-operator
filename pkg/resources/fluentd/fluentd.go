@@ -21,6 +21,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
+	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
@@ -267,7 +268,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 
 	pvcsInUse := make(map[string]bool)
 	for _, pod := range stsPods.Items {
-		if bufVol := findVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
+		if bufVol := kubetool.FindVolumeByName(pod.Spec.Volumes, bufVolName); bufVol != nil {
 			pvcsInUse[bufVol.PersistentVolumeClaim.ClaimName] = true
 		}
 	}
@@ -289,7 +290,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 
 	jobOfPVC := make(map[string]batchv1.Job)
 	for _, job := range jobList.Items {
-		if bufVol := findVolumeByName(job.Spec.Template.Spec.Volumes, bufVolName); bufVol != nil {
+		if bufVol := kubetool.FindVolumeByName(job.Spec.Template.Spec.Volumes, bufVolName); bufVol != nil {
 			jobOfPVC[bufVol.PersistentVolumeClaim.ClaimName] = job
 		}
 	}
@@ -410,16 +411,6 @@ const drainStatusLabelValue = "drained"
 
 func markedAsDrained(pvc corev1.PersistentVolumeClaim) bool {
 	return pvc.Labels[drainStatusLabelKey] == drainStatusLabelValue
-}
-
-func findVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
-	for i := range vols {
-		vol := &vols[i]
-		if vol.Name == name {
-			return vol
-		}
-	}
-	return nil
 }
 
 func jobSuccessfullyCompleted(job batchv1.Job) bool {

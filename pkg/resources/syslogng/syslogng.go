@@ -262,16 +262,6 @@ func requirementMust(req *labels.Requirement, err error) labels.Requirement {
 	return *req
 }
 
-func findVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
-	for i := range vols {
-		vol := &vols[i]
-		if vol.Name == name {
-			return vol
-		}
-	}
-	return nil
-}
-
 func jobSuccessfullyCompleted(job batchv1.Job) bool {
 	return job.Status.CompletionTime != nil && job.Status.Succeeded > 0
 }
