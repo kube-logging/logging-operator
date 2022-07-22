@@ -91,6 +91,8 @@ type KafkaOutputConfig struct {
 	// SASL over SSL (default: true)
 	// +kubebuilder:validation:Optional
 	SaslOverSSL bool `json:"sasl_over_ssl"`
+	Principal string `json:"principal"`
+	Keytab *secret.Secret `json:"keytab"`
 	// Username when using PLAIN/SCRAM SASL authentication
 	Username *secret.Secret `json:"username,omitempty"`
 	// Password when using PLAIN/SCRAM SASL authentication
