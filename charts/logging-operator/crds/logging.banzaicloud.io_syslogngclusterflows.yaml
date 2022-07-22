@@ -45,12 +45,11 @@ spec:
                     match:
                       properties:
                         and:
-                          items: {}
-                          type: array
-                        not: {}
+                          x-kubernetes-preserve-unknown-fields: true
+                        not:
+                          x-kubernetes-preserve-unknown-fields: true
                         or:
-                          items: {}
-                          type: array
+                          x-kubernetes-preserve-unknown-fields: true
                         regexp:
                           properties:
                             flags:
@@ -76,12 +75,11 @@ spec:
                             condition:
                               properties:
                                 and:
-                                  items: {}
-                                  type: array
-                                not: {}
+                                  x-kubernetes-preserve-unknown-fields: true
+                                not:
+                                  x-kubernetes-preserve-unknown-fields: true
                                 or:
-                                  items: {}
-                                  type: array
+                                  x-kubernetes-preserve-unknown-fields: true
                                 regexp:
                                   properties:
                                     flags:
@@ -113,12 +111,11 @@ spec:
                             condition:
                               properties:
                                 and:
-                                  items: {}
-                                  type: array
-                                not: {}
+                                  x-kubernetes-preserve-unknown-fields: true
+                                not:
+                                  x-kubernetes-preserve-unknown-fields: true
                                 or:
-                                  items: {}
-                                  type: array
+                                  x-kubernetes-preserve-unknown-fields: true
                                 regexp:
                                   properties:
                                     flags:
@@ -150,12 +147,11 @@ spec:
                             condition:
                               properties:
                                 and:
-                                  items: {}
-                                  type: array
-                                not: {}
+                                  x-kubernetes-preserve-unknown-fields: true
+                                not:
+                                  x-kubernetes-preserve-unknown-fields: true
                                 or:
-                                  items: {}
-                                  type: array
+                                  x-kubernetes-preserve-unknown-fields: true
                                 regexp:
                                   properties:
                                     flags:
@@ -196,12 +192,11 @@ spec:
                             condition:
                               properties:
                                 and:
-                                  items: {}
-                                  type: array
-                                not: {}
+                                  x-kubernetes-preserve-unknown-fields: true
+                                not:
+                                  x-kubernetes-preserve-unknown-fields: true
                                 or:
-                                  items: {}
-                                  type: array
+                                  x-kubernetes-preserve-unknown-fields: true
                                 regexp:
                                   properties:
                                     flags:
@@ -237,12 +232,11 @@ spec:
               match:
                 properties:
                   and:
-                    items: {}
-                    type: array
-                  not: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                  not:
+                    x-kubernetes-preserve-unknown-fields: true
                   or:
-                    items: {}
-                    type: array
+                    x-kubernetes-preserve-unknown-fields: true
                   regexp:
                     properties:
                       flags:

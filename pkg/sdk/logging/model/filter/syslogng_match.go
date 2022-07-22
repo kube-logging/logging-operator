@@ -36,12 +36,18 @@ type MatchConfig MatchExpr
 // +kubebuilder:object:generate=true
 type MatchExpr struct {
 	// +docLink:"And Directive,#And-Directive"
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
 	And []MatchExpr `json:"and,omitempty"`
 	// +docLink:"Not Directive,#Exclude-Directive"
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
 	Not *MatchExpr `json:"not,omitempty"`
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp *RegexpMatchExpr `json:"regexp,omitempty"`
 	// +docLink:"Or Directive,#Or-Directive"
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
 	Or []MatchExpr `json:"or,omitempty"`
 }
 
