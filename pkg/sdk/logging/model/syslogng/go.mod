@@ -3,7 +3,6 @@ module github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng
 go 1.18
 
 require (
-	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
 	github.com/banzaicloud/operator-tools v0.28.2
 	github.com/siliconbrain/go-seqs v0.2.0
