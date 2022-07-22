@@ -16,3 +16,5 @@ require (
 )
 
 replace github.com/banzaicloud/logging-operator/pkg/sdk => ../pkg/sdk
+
+replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng => ../pkg/sdk/logging/model/syslogng
