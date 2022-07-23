@@ -85,6 +85,10 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			ContainerPort: ServicePort,
 			Protocol:      corev1.ProtocolTCP,
 		}},
+		Args: []string{
+			"--control=" + socketPath,
+			"--no-caps",
+		},
 		VolumeMounts: generateVolumeMounts(spec),
 		Resources: corev1.ResourceRequirements{
 			Limits: corev1.ResourceList{
@@ -100,7 +104,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		LivenessProbe: &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
-					Command: []string{`syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get "destination.file.processed"`}},
+					Command: []string{`syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get global.sdata_updates.processed`}},
 			},
 			InitialDelaySeconds: 30,
 			TimeoutSeconds:      0,
