@@ -30,6 +30,7 @@ type _docFile interface{} //nolint:deadcode,unused
 type _metaFile interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
+// Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044
 type FileOutput struct {
 	// Store file path
 	Path string `json:"path"`
