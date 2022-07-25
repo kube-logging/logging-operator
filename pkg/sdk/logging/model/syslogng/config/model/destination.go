@@ -81,7 +81,11 @@ type DiskBufferDef struct {
 }
 
 type FileDestinationDriver struct {
-	Path string
+	Path       string
+	CreateDirs bool
+	DirGroup   string
+	DirOwner   string
+	DirPerm    int
 }
 
 func (FileDestinationDriver) Name() string {

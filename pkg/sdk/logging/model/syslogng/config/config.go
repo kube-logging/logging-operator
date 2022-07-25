@@ -165,7 +165,13 @@ func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutp
 			DiskBuffer:     outputDiskBufferToModelDiskBuffer(s.Syslog.DiskBuffer),
 		}), nil
 	case s.File != nil:
-		return model.NewDestinationDriver(model.FileDestinationDriver{Path: s.File.Path}), nil
+		return model.NewDestinationDriver(model.FileDestinationDriver{
+			Path:       s.File.Path,
+			CreateDirs: s.File.CreateDirs,
+			DirGroup:   s.File.DirGroup,
+			DirOwner:   s.File.DirOwner,
+			DirPerm:    s.File.DirPerm,
+		}), nil
 
 	default:
 		return nil, errors.New("unsupported output type")
