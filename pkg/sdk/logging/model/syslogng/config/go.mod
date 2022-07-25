@@ -1,4 +1,4 @@
-module github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng
+module github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config
 
 go 1.18
 
@@ -67,3 +67,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace github.com/banzaicloud/logging-operator/pkg/sdk => ../../../../../../pkg/sdk

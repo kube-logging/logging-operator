@@ -69,8 +69,6 @@ github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hC
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
-github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26 h1:T4u5CyrFEivkPWxJCb30xr8lOHDz31HdF4GqlqQDSYQ=
-github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26/go.mod h1:6QzhsxVK5uIbh8/cO8IYIOyfWiRkkJfjxe+nsOngbSE=
 github.com/banzaicloud/operator-tools v0.28.2 h1:/xelZg4tyvtUEWuciTSkYiDRo11bSJkMlRphWvHe0xg=
 github.com/banzaicloud/operator-tools v0.28.2/go.mod h1:JN/n0ARxBhtmIOCTCByGubtlqgQFKRGjJQ6ezhQ2zxE=
 github.com/benbjohnson/clock v1.0.3/go.mod h1:bGMdMPoPVvcYyt1gHDf4J2KE153Yf9BuiUKYMaxlTDM=

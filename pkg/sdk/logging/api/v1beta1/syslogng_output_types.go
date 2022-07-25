@@ -15,9 +15,8 @@
 package v1beta1
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
 )
 
 // +name:"SyslogNGOutputSpec"
@@ -31,8 +30,9 @@ type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 type SyslogNGOutputSpec struct {
-	LoggingRef string                       `json:"loggingRef,omitempty"`
-	Syslog     *output.SyslogNGSyslogOutput `json:"syslog,omitempty"`
+	LoggingRef string               `json:"loggingRef,omitempty"`
+	Syslog     *output.SyslogOutput `json:"syslog,omitempty"`
+	File       *output.FileOutput   `json:"file,omitempty"`
 }
 
 type SyslogNGOutputStatus OutputStatus

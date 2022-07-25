@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	filter2 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,7 +67,7 @@ func TestRenderConfigInto(t *testing.T) {
 							Name:      "test-syslog-out",
 						},
 						Spec: v1beta1.SyslogNGOutputSpec{
-							Syslog: &output.SyslogNGSyslogOutput{
+							Syslog: &output.SyslogOutput{
 								Host:      "test.local",
 								Transport: "tcp",
 							},
@@ -82,15 +82,15 @@ func TestRenderConfigInto(t *testing.T) {
 						},
 						Spec: v1beta1.SyslogNGFlowSpec{
 							Match: &v1beta1.SyslogNGMatch{
-								Regexp: &filter.RegexpMatchExpr{
+								Regexp: &filter2.RegexpMatchExpr{
 									Pattern: "nginx",
 									Value:   ".kubernetes.labels.app",
 								},
 							},
 							Filters: []v1beta1.SyslogNGFilter{
 								{
-									Rewrite: &filter.RewriteConfig{
-										Set: &filter.SetConfig{
+									Rewrite: &filter2.RewriteConfig{
+										Set: &filter2.SetConfig{
 											FieldName: "cluster",
 											Value:     "test-cluster",
 										},

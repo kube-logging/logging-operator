@@ -7,8 +7,8 @@ COPY go.mod go.mod
 COPY go.sum go.sum
 COPY pkg/sdk/go.mod pkg/sdk/go.mod
 COPY pkg/sdk/go.sum pkg/sdk/go.sum
-COPY pkg/sdk/logging/model/syslogng/go.mod pkg/sdk/logging/model/syslogng/go.mod
-COPY pkg/sdk/logging/model/syslogng/go.sum pkg/sdk/logging/model/syslogng/go.sum
+COPY pkg/sdk/logging/model/syslogng/config/go.mod pkg/sdk/logging/model/syslogng/go.mod
+COPY pkg/sdk/logging/model/syslogng/config/go.sum pkg/sdk/logging/model/syslogng/go.sum
 
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer

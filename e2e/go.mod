@@ -4,10 +4,11 @@ go 1.16
 
 require (
 	emperror.dev/errors v0.8.0
-	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.4
+	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
 	github.com/banzaicloud/operator-tools v0.28.2
 	github.com/go-logr/logr v1.2.2
-	github.com/stretchr/testify v1.7.0
+	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/stretchr/testify v1.8.0
 	k8s.io/api v0.23.4
 	k8s.io/apiextensions-apiserver v0.23.1
 	k8s.io/apimachinery v0.23.4
@@ -17,4 +18,4 @@ require (
 
 replace github.com/banzaicloud/logging-operator/pkg/sdk => ../pkg/sdk
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng => ../pkg/sdk/logging/model/syslogng
+replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config => ../pkg/sdk/logging/model/syslogng/config

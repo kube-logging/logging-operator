@@ -61,6 +61,9 @@ func destinationDriverDefStmt(drv model.DestinationDriver) Renderer {
 		if drv.Alt.DiskBuffer != nil {
 			args = append(args, diskBufferDef(*drv.Alt.DiskBuffer))
 		}
+	case model.DestinationDriverAlt[model.FileDestinationDriver]:
+		args = append(args, Quoted(drv.Alt.Path))
+
 	default:
 		return Error(fmt.Errorf("unsupported destination driver %q", drv.Name()))
 	}

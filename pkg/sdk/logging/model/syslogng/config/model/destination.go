@@ -25,7 +25,7 @@ type DestinationDriver interface {
 }
 
 type DestinationDriverAlts interface {
-	SyslogDestinationDriver
+	SyslogDestinationDriver | FileDestinationDriver
 	Name() string
 }
 
@@ -78,4 +78,12 @@ type DiskBufferDef struct {
 	MemBufLength *int64
 	MemBufSize   *int64
 	QOutSize     *int64
+}
+
+type FileDestinationDriver struct {
+	Path string
+}
+
+func (FileDestinationDriver) Name() string {
+	return "file"
 }

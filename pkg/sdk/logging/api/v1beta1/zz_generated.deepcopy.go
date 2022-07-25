@@ -23,6 +23,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	syslogngfilter "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	syslogngoutput "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -2176,24 +2178,24 @@ func (in *SyslogNGClusterMatch) DeepCopyInto(out *SyslogNGClusterMatch) {
 	*out = *in
 	if in.And != nil {
 		in, out := &in.And, &out.And
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make([]syslogngfilter.MatchExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.Not != nil {
 		in, out := &in.Not, &out.Not
-		*out = new(filter.MatchExpr)
+		*out = new(syslogngfilter.MatchExpr)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Regexp != nil {
 		in, out := &in.Regexp, &out.Regexp
-		*out = new(filter.RegexpMatchExpr)
+		*out = new(syslogngfilter.RegexpMatchExpr)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Or != nil {
 		in, out := &in.Or, &out.Or
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make([]syslogngfilter.MatchExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2295,12 +2297,12 @@ func (in *SyslogNGFilter) DeepCopyInto(out *SyslogNGFilter) {
 	*out = *in
 	if in.Match != nil {
 		in, out := &in.Match, &out.Match
-		*out = new(filter.MatchConfig)
+		*out = new(syslogngfilter.MatchConfig)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Rewrite != nil {
 		in, out := &in.Rewrite, &out.Rewrite
-		*out = new(filter.RewriteConfig)
+		*out = new(syslogngfilter.RewriteConfig)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -2441,24 +2443,24 @@ func (in *SyslogNGMatch) DeepCopyInto(out *SyslogNGMatch) {
 	*out = *in
 	if in.And != nil {
 		in, out := &in.And, &out.And
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make([]syslogngfilter.MatchExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.Not != nil {
 		in, out := &in.Not, &out.Not
-		*out = new(filter.MatchExpr)
+		*out = new(syslogngfilter.MatchExpr)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Regexp != nil {
 		in, out := &in.Regexp, &out.Regexp
-		*out = new(filter.RegexpMatchExpr)
+		*out = new(syslogngfilter.RegexpMatchExpr)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Or != nil {
 		in, out := &in.Or, &out.Or
-		*out = make([]filter.MatchExpr, len(*in))
+		*out = make([]syslogngfilter.MatchExpr, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -2539,7 +2541,12 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 	*out = *in
 	if in.Syslog != nil {
 		in, out := &in.Syslog, &out.Syslog
-		*out = new(output.SyslogNGSyslogOutput)
+		*out = new(syslogngoutput.SyslogOutput)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.File != nil {
+		in, out := &in.File, &out.File
+		*out = new(syslogngoutput.FileOutput)
 		(*in).DeepCopyInto(*out)
 	}
 }

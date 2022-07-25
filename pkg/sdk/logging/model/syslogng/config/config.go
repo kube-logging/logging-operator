@@ -20,9 +20,9 @@ import (
 	"io"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	filter2 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 )
@@ -164,6 +164,9 @@ func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutp
 			TSFormat:       s.Syslog.TSFormat,
 			DiskBuffer:     outputDiskBufferToModelDiskBuffer(s.Syslog.DiskBuffer),
 		}), nil
+	case s.File != nil:
+		return model.NewDestinationDriver(model.FileDestinationDriver{Path: s.File.Path}), nil
+
 	default:
 		return nil, errors.New("unsupported output type")
 	}
@@ -177,7 +180,7 @@ func clusterFlowToLogDef(sourceName string, f v1beta1.SyslogNGClusterFlow) (def 
 	}))
 	if match := f.Spec.Match; match != nil {
 		def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter.MatchExpr(*match)),
+			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*match)),
 		}))
 	}
 	def.OptionalElements = append(def.OptionalElements, seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.Filters), loggingFilterToLogElement))...)
@@ -196,13 +199,13 @@ func flowToLogDef(controlNS string, sourceName string, f v1beta1.SyslogNGFlow) (
 	def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
 		Expr: model.NewFilterExpr(model.FilterExprMatch{
 			Pattern: f.Namespace,
-			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue(".kubernetes.namespace_name")),
+			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("kubernetes.namespace_name")),
 			Type:    "string",
 		}),
 	}))
 	if match := f.Spec.Match; match != nil {
 		def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter.MatchExpr(*match)),
+			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*match)),
 		}))
 	}
 	def.OptionalElements = append(def.OptionalElements, seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.Filters), loggingFilterToLogElement))...)
@@ -215,12 +218,12 @@ func flowToLogDef(controlNS string, sourceName string, f v1beta1.SyslogNGFlow) (
 	return
 }
 
-func filterExprFromMatchExpr(expr filter.MatchExpr) model.FilterExpr {
+func filterExprFromMatchExpr(expr filter2.MatchExpr) model.FilterExpr {
 	switch {
 	case len(expr.And) > 0:
 		return model.NewFilterExpr(model.FilterExprAnd(seqs.ToSlice(seqs.Map(seqs.FromSlice(expr.And), filterExprFromMatchExpr))))
 	case expr.Not != nil:
-		return model.NewFilterExpr(model.FilterExprNot{Expr: filterExprFromMatchExpr(filter.MatchExpr(*expr.Not))})
+		return model.NewFilterExpr(model.FilterExprNot{Expr: filterExprFromMatchExpr(filter2.MatchExpr(*expr.Not))})
 	case len(expr.Or) > 0:
 		return model.NewFilterExpr(model.FilterExprOr(seqs.ToSlice(seqs.Map(seqs.FromSlice(expr.Or), filterExprFromMatchExpr))))
 	case expr.Regexp != nil:
@@ -245,7 +248,7 @@ func loggingFilterToLogElement(f v1beta1.SyslogNGFilter) model.LogElement {
 	switch {
 	case f.Match != nil:
 		return model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter.MatchExpr(*f.Match)),
+			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*f.Match)),
 		})
 	case f.Rewrite != nil:
 		return model.NewLogElement(model.RewriteDef{
@@ -256,7 +259,7 @@ func loggingFilterToLogElement(f v1beta1.SyslogNGFilter) model.LogElement {
 	}
 }
 
-func rewriteRuleFromRewriteConfig(cfg filter.RewriteConfig) model.RewriteRule {
+func rewriteRuleFromRewriteConfig(cfg filter2.RewriteConfig) model.RewriteRule {
 	switch {
 	case cfg.Rename != nil:
 		return model.NewRewriteRule(model.RenameRule{
@@ -289,7 +292,7 @@ func rewriteRuleFromRewriteConfig(cfg filter.RewriteConfig) model.RewriteRule {
 	}
 }
 
-func outputDiskBufferToModelDiskBuffer(b *output.SyslogNGDiskBuffer) *model.DiskBufferDef {
+func outputDiskBufferToModelDiskBuffer(b *output.DiskBuffer) *model.DiskBufferDef {
 	if b == nil {
 		return nil
 	}
@@ -304,7 +307,7 @@ func outputDiskBufferToModelDiskBuffer(b *output.SyslogNGDiskBuffer) *model.Disk
 	}
 }
 
-func rewriteConditionFromMatchExpr(c *filter.MatchExpr) *model.RewriteCondition {
+func rewriteConditionFromMatchExpr(c *filter2.MatchExpr) *model.RewriteCondition {
 	if c == nil {
 		return nil
 	}

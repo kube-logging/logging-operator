@@ -7,7 +7,7 @@ require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
-	github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng v0.0.0
+	github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/banzaicloud/operator-tools v0.28.2
 	github.com/go-logr/logr v1.2.2
 	github.com/onsi/ginkgo v1.16.5
@@ -98,4 +98,4 @@ require (
 
 replace github.com/banzaicloud/logging-operator/pkg/sdk => ./pkg/sdk
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng => ./pkg/sdk/logging/model/syslogng
+replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config => ./pkg/sdk/logging/model/syslogng/config
