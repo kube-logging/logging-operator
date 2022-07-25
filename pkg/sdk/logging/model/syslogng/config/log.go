@@ -30,7 +30,7 @@ func logDefStmt(def model.LogDef) Renderer {
 }
 
 func sourceRefStmt(name string) Renderer {
-	return Line(AllOf(String("source("), literal(name), String(")")))
+	return Line(AllOf(String("source("), literal(name), String(");")))
 }
 
 func destinationRefStmt(name string) Renderer {
