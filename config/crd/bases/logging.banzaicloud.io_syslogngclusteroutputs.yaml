@@ -43,6 +43,43 @@ spec:
                 items:
                   type: string
                 type: array
+              file:
+                properties:
+                  create_dirs:
+                    type: boolean
+                  dir_group:
+                    type: string
+                  dir_owner:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  path:
+                    type: string
+                required:
+                - path
+                type: object
               loggingRef:
                 type: string
               syslog:
