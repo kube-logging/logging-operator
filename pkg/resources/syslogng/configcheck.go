@@ -234,6 +234,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					ImagePullPolicy: corev1.PullIfNotPresent,
 					Args: []string{
 						"-s",
+						"--no-caps",
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
