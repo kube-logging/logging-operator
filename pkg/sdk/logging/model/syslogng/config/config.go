@@ -66,7 +66,7 @@ func configRenderer(in Input) (Renderer, error) {
 		Drivers: []model.SourceDriver{
 			model.NewSourceDriver(model.NetworkSourceDriver{
 				Transport: "tcp",
-				Port:      2000,
+				Port:      601,
 				Flags:     []string{"no-parse"},
 			}),
 		},
