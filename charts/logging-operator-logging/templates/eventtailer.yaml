@@ -22,8 +22,8 @@ spec:
           requests:
             storage: {{ .storage | default "1Gi" }}
         volumeMode: {{ .volumeMode | default "Filesystem" }}
-{{- with .storageClass }}
-        storageClassName: {{ .storageClass }}
+{{- with .storageClassName }}
+        storageClassName: {{ . }}
 {{- end }}
 {{- end }}
 {{- end }}
