@@ -15,8 +15,6 @@
 package config
 
 import (
-	"strings"
-
 	"github.com/siliconbrain/go-seqs/seqs"
 )
 
@@ -58,11 +56,10 @@ func parenDefStmt(kind string, args ...Renderer) Renderer {
 
 func literal(v any) Renderer {
 	switch v := v.(type) {
+	case Renderer:
+		return v
 	case string:
-		if strings.ContainsAny(v, " ${}") {
-			return Quoted(v)
-		}
-		return String(v)
+		return Quoted(v)
 	case bool:
 		if v {
 			return String("yes")
