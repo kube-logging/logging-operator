@@ -90,9 +90,9 @@ type KafkaOutputConfig struct {
 	Idempotent bool `json:"idempotent,omitempty"`
 	// SASL over SSL (default: true)
 	// +kubebuilder:validation:Optional
-	SaslOverSSL bool `json:"sasl_over_ssl"`
-	Principal string `json:"principal,omitempty"`
-	Keytab *secret.Secret `json:"keytab,omitempty"`
+	SaslOverSSL bool           `json:"sasl_over_ssl"`
+	Principal   string         `json:"principal,omitempty"`
+	Keytab      *secret.Secret `json:"keytab,omitempty"`
 	// Username when using PLAIN/SCRAM SASL authentication
 	Username *secret.Secret `json:"username,omitempty"`
 	// Password when using PLAIN/SCRAM SASL authentication
