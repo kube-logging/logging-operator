@@ -252,6 +252,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 		ClusterFlows:        resources.ClusterFlows,
 		Flows:               resources.Flows,
 		SecretLoaderFactory: &slf,
+		SourcePort:          syslogng.ServicePort,
 	}
 	var b strings.Builder
 	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {

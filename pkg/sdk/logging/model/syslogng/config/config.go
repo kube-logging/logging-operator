@@ -48,6 +48,7 @@ type Input struct {
 	ClusterFlows        []v1beta1.SyslogNGClusterFlow
 	Flows               []v1beta1.SyslogNGFlow
 	SecretLoaderFactory SecretLoaderFactory
+	SourcePort          int
 }
 
 type SecretLoaderFactory interface {
@@ -66,7 +67,7 @@ func configRenderer(in Input) (Renderer, error) {
 		Drivers: []model.SourceDriver{
 			model.NewSourceDriver(model.NetworkSourceDriver{
 				Transport: "tcp",
-				Port:      601,
+				Port:      uint16(in.SourcePort),
 				Flags:     []string{"no-parse"},
 			}),
 		},
