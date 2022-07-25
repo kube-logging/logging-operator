@@ -114,7 +114,7 @@ destination output_default_test-syslog-out {
 };
 
 log {
-	source(main_input)
+	source(main_input);
 	parser {
 		json-parser();
 	};
@@ -127,7 +127,7 @@ log {
 	rewrite {
 		set("test-cluster" value(cluster));
 	};
-	destination(output_default_test-syslog-out)
+	destination(output_default_test-syslog-out);
 };
 `),
 		},
