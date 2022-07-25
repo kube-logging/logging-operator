@@ -30,11 +30,11 @@ func logDefStmt(def model.LogDef) Renderer {
 }
 
 func sourceRefStmt(name string) Renderer {
-	return Line(AllOf(String("source("), literal(name), String(");")))
+	return parenDefStmt("source", literal(name))
 }
 
 func destinationRefStmt(name string) Renderer {
-	return Line(AllOf(String("destination("), literal(name), String(")")))
+	return parenDefStmt("destination", literal(name))
 }
 
 func optionalLogElement(e model.LogElement) Renderer {
