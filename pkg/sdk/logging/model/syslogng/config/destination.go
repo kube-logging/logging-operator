@@ -37,11 +37,15 @@ func destinationDriverDefStmt(drv model.DestinationDriver) Renderer {
 		if drv.Alt.Transport != "" {
 			args = append(args, optionExpr("transport", drv.Alt.Transport))
 		}
-		if drv.Alt.CADir != "" {
-			args = append(args, optionExpr("ca-dir", drv.Alt.CADir))
-		}
-		if drv.Alt.CAFile != "" {
-			args = append(args, optionExpr("ca-file", drv.Alt.CAFile))
+		if drv.Alt.TLS != nil {
+			var tlsArgs []Renderer
+			if drv.Alt.TLS.CaDir != "" {
+				tlsArgs = append(tlsArgs, optionExpr("ca-dir", drv.Alt.TLS.CaDir))
+			}
+			if drv.Alt.TLS.CaFile != "" {
+				tlsArgs = append(tlsArgs, optionExpr("ca-file", drv.Alt.TLS.CaFile))
+			}
+			args = append(args, optionExpr("tls", tlsArgs...))
 		}
 		// CloseOnInput   *bool
 		if flags := drv.Alt.Flags; len(flags) > 0 {

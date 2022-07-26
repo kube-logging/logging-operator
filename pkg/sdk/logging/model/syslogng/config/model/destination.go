@@ -49,8 +49,6 @@ type SyslogDestinationDriver struct {
 	Host           string
 	Port           int
 	Transport      string
-	CADir          string
-	CAFile         string
 	CloseOnInput   *bool
 	Flags          []string
 	FlushLines     int
@@ -68,6 +66,8 @@ func (SyslogDestinationDriver) Name() string {
 }
 
 type SyslogDestinationDriverTLS struct {
+	CaDir  string `json:"ca_dir,omitempty"`
+	CaFile string `json:"ca_file,omitempty"`
 }
 
 type DiskBufferDef struct {

@@ -41,7 +41,7 @@ const (
 	configKey                         = "syslog-ng.conf"
 	statefulSetName                   = "syslog-ng"
 	outputSecretName                  = "syslog-ng-output"
-	outputSecretPath                  = "/etc/syslog-ng/secret"
+	OutputSecretPath                  = "/etc/syslog-ng/secret"
 	bufferPath                        = "/buffers"
 	serviceAccountName                = "syslog-ng"
 	roleBindingName                   = "syslog-ng"
@@ -61,7 +61,7 @@ const (
 	configReloaderImageTag            = "v1.0.1"
 	socketVolumeName                  = "socket"
 	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
-	configDir                         = "/etc/syslog-ng/"
+	configDir                         = "/etc/syslog-ng/config"
 	configVolumeName                  = "config"
 	tlsVolumeName                     = "tls"
 	metricsPortNumber                 = 9577
@@ -183,7 +183,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 	}
 	// Prepare output secret
-	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, outputSecretPath)
+	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, OutputSecretPath)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create output secret")
 	}

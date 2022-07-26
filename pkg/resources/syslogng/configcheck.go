@@ -192,7 +192,7 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error) {
-	obj, _, err := r.outputSecret(r.secrets, outputSecretPath)
+	obj, _, err := r.outputSecret(r.secrets, OutputSecretPath)
 	if err != nil {
 		return nil, err
 	}
@@ -233,6 +233,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 					ImagePullPolicy: corev1.PullIfNotPresent,
 					Args: []string{
+						"--cfgfile=" + configDir + "/" + configKey,
 						"-s",
 						"--no-caps",
 					},
@@ -253,7 +254,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 						},
 						{
 							Name:      "output-secret",
-							MountPath: outputSecretPath,
+							MountPath: OutputSecretPath,
 						},
 					},
 				},

@@ -86,6 +86,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			Protocol:      corev1.ProtocolTCP,
 		}},
 		Args: []string{
+			"--cfgfile=" + configDir + "/" + configKey,
 			"--control=" + socketPath,
 			"--no-caps",
 		},
@@ -148,6 +149,10 @@ func generateVolumeMounts(spec *v1beta1.SyslogNGSpec) []corev1.VolumeMount {
 			Name:      socketVolumeName,
 			MountPath: "/tmp/syslog-ng",
 		})
+		res = append(res, corev1.VolumeMount{
+			Name:      outputSecretName,
+			MountPath: OutputSecretPath,
+		})
 	}
 
 	return res
@@ -185,7 +190,15 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 	v = append(v, socketVolume)
-
+	outputSecretVolume := corev1.Volume{
+		Name: outputSecretName,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(outputSecretName),
+			},
+		},
+	}
+	v = append(v, outputSecretVolume)
 	return
 }
 

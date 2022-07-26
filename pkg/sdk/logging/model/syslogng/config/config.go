@@ -139,20 +139,10 @@ func outputToDestinationDef(secretLoaderFactory SecretLoaderFactory, o v1beta1.S
 func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutputSpec) (model.DestinationDriver, error) {
 	switch {
 	case s.Syslog != nil:
-		caDir, err := loadSecretIfNotNil(secretLoader, s.Syslog.CaDir)
-		if err != nil {
-			return nil, err
-		}
-		caFile, err := loadSecretIfNotNil(secretLoader, s.Syslog.CaFile)
-		if err != nil {
-			return nil, err
-		}
-		return model.NewDestinationDriver(model.SyslogDestinationDriver{
+		drv := model.SyslogDestinationDriver{
 			Host:           s.Syslog.Host,
 			Port:           s.Syslog.Port,
 			Transport:      s.Syslog.Transport,
-			CADir:          caDir,
-			CAFile:         caFile,
 			CloseOnInput:   s.Syslog.CloseOnInput,
 			Flags:          s.Syslog.Flags,
 			FlushLines:     s.Syslog.FlushLines,
@@ -160,10 +150,25 @@ func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutp
 			Suppress:       s.Syslog.Suppress,
 			Template:       s.Syslog.Template,
 			TemplateEscape: s.Syslog.TemplateEscape,
-			TLS:            (*model.SyslogDestinationDriverTLS)(s.Syslog.TLS), // TODO
 			TSFormat:       s.Syslog.TSFormat,
 			DiskBuffer:     outputDiskBufferToModelDiskBuffer(s.Syslog.DiskBuffer),
-		}), nil
+		}
+		if s.Syslog.TLS != nil {
+
+			caDir, err := loadSecretIfNotNil(secretLoader, s.Syslog.TLS.CaDir)
+			if err != nil {
+				return nil, err
+			}
+			caFile, err := loadSecretIfNotNil(secretLoader, s.Syslog.TLS.CaFile)
+			if err != nil {
+				return nil, err
+			}
+			drv.TLS = &model.SyslogDestinationDriverTLS{
+				CaDir:  caDir,
+				CaFile: caFile,
+			}
+		}
+		return model.NewDestinationDriver(drv), nil
 	case s.File != nil:
 		return model.NewDestinationDriver(model.FileDestinationDriver{
 			Path:       s.File.Path,
