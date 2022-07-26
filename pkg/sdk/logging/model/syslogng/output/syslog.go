@@ -21,24 +21,23 @@ import (
 // +kubebuilder:object:generate=true
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type SyslogOutput struct {
-	Host           string         `json:"host"`
-	Port           int            `json:"port,omitempty"`
-	Transport      string         `json:"transport,omitempty"`
-	CaDir          *secret.Secret `json:"ca_dir,omitempty"`
-	CaFile         *secret.Secret `json:"ca_file,omitempty"`
-	CloseOnInput   *bool          `json:"close_on_input,omitempty"`
-	Flags          []string       `json:"flags,omitempty"`
-	FlushLines     int            `json:"flush_lines,omitempty"`
-	SoKeepalive    *bool          `json:"so_keepalive,omitempty"`
-	Suppress       int            `json:"suppress,omitempty"`
-	Template       string         `json:"template,omitempty"`
-	TemplateEscape *bool          `json:"template_escape,omitempty"`
-	TLS            *TLS           `json:"tls,omitempty"`
-	TSFormat       string         `json:"ts_format,omitempty"`
-	DiskBuffer     *DiskBuffer    `json:"disk_buffer,omitempty"`
+	Host           string      `json:"host"`
+	Port           int         `json:"port,omitempty"`
+	Transport      string      `json:"transport,omitempty"`
+	CloseOnInput   *bool       `json:"close_on_input,omitempty"`
+	Flags          []string    `json:"flags,omitempty"`
+	FlushLines     int         `json:"flush_lines,omitempty"`
+	SoKeepalive    *bool       `json:"so_keepalive,omitempty"`
+	Suppress       int         `json:"suppress,omitempty"`
+	Template       string      `json:"template,omitempty"`
+	TemplateEscape *bool       `json:"template_escape,omitempty"`
+	TLS            *TLS        `json:"tls,omitempty"`
+	TSFormat       string      `json:"ts_format,omitempty"`
+	DiskBuffer     *DiskBuffer `json:"disk_buffer,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
 type TLS struct {
-	//TODO
+	CaDir  *secret.Secret `json:"ca_dir,omitempty"`
+	CaFile *secret.Secret `json:"ca_file,omitempty"`
 }
