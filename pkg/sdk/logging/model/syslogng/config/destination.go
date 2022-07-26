@@ -63,6 +63,10 @@ func destinationDriverDefStmt(drv model.DestinationDriver) Renderer {
 		}
 	case model.DestinationDriverAlt[model.FileDestinationDriver]:
 		args = append(args, Quoted(drv.Alt.Path))
+	case model.DestinationDriverAlt[model.SumologicHTTPDriver]:
+		args = append(args, Quoted(drv.Alt.CAFile))
+	case model.DestinationDriverAlt[model.SumologicSyslogDriver]:
+		args = append(args, Quoted(drv.Alt.CAFile))
 
 	default:
 		return Error(fmt.Errorf("unsupported destination driver %q", drv.Name()))

@@ -25,7 +25,7 @@ type DestinationDriver interface {
 }
 
 type DestinationDriverAlts interface {
-	SyslogDestinationDriver | FileDestinationDriver
+	SyslogDestinationDriver | FileDestinationDriver | SumologicHTTPDriver | SumologicSyslogDriver
 	Name() string
 }
 
@@ -90,4 +90,34 @@ type FileDestinationDriver struct {
 
 func (FileDestinationDriver) Name() string {
 	return "file"
+}
+
+type SumologicHTTPDriver struct {
+	CADir  string
+	CAFile string
+
+	Collector  string
+	Deployment string
+	Headers    string
+	Tls        string
+	TimeReopen int
+}
+
+func (SumologicHTTPDriver) Name() string {
+	return "sumologic-http"
+}
+
+type SumologicSyslogDriver struct {
+	CADir      string
+	CAFile     string
+	Port       int
+	Deployment string
+	Tag        string
+	Token      int
+	Tls        string
+	TimeReopen int
+}
+
+func (SumologicSyslogDriver) Name() string {
+	return "sumologic-syslog"
 }
