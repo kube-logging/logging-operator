@@ -127,7 +127,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}()
 
 	reconcilers := []resources.ComponentReconciler{
-		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client}),
+		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
 	if logging.Spec.FluentdSpec != nil {
@@ -217,6 +217,7 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 
 	slf := secretLoaderFactory{
 		Client: r.Client,
+		Path:   fluentd.OutputSecretPath,
 	}
 
 	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
@@ -243,6 +244,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 
 	slf := secretLoaderFactory{
 		Client: r.Client,
+		Path:   syslogng.OutputSecretPath,
 	}
 
 	in := syslogngconfig.Input{
@@ -265,10 +267,11 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 type secretLoaderFactory struct {
 	Client  client.Client
 	Secrets secret.MountSecrets
+	Path    string
 }
 
 func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.Client, namespace, fluentd.OutputSecretPath, &f.Secrets)
+	return secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets)
 }
 
 // SetupLoggingWithManager setup logging manager
