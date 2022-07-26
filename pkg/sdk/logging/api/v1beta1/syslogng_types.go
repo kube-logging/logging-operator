@@ -42,6 +42,8 @@ type SyslogNGSpec struct {
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	BufferVolumeMetrics                 *Metrics                     `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
+	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
+
 	// TODO: option to turn on/off buffer volume PVC
 }
 
@@ -52,4 +54,9 @@ type SyslogNGTLS struct {
 	Enabled    bool   `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
+}
+
+type GlobalOptions struct {
+	StatsLevel *int `json:"stats_level,omitempty"`
+	StatsFreq  *int `json:"stats_freq,omitempty"`
 }

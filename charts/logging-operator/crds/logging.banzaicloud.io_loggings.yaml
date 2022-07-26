@@ -12989,6 +12989,13 @@ spec:
                           type: object
                         type: array
                     type: object
+                  globalOptions:
+                    properties:
+                      stats_freq:
+                        type: integer
+                      stats_level:
+                        type: integer
+                    type: object
                   metrics:
                     properties:
                       interval:

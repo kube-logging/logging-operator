@@ -107,6 +107,10 @@ func configRenderer(in Input) (Renderer, error) {
 
 	return AllOf(
 		versionStmt(configVersion),
+		globalOptionsDefStmt(globalOptionsDef{
+			StatsLevel: setStatLevel(in),
+			StatsFreq:  setStatFreq(in),
+		}),
 		Line(Empty),
 		sourceDefStmt(srcDef),
 		Line(Empty),
@@ -114,6 +118,27 @@ func configRenderer(in Input) (Renderer, error) {
 		Line(Empty),
 		AllFrom(seqs.Map(seqs.FromSlice(logDefs), logDefStmt)),
 	), nil
+}
+
+func setStatLevel(in Input) *int {
+	if in.Logging.Spec.SyslogNGSpec.GlobalOptions != nil && in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
+		return in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel
+	}
+	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
+		x := 3
+		return &x
+	}
+	return nil
+}
+func setStatFreq(in Input) *int {
+	if in.Logging.Spec.SyslogNGSpec.GlobalOptions != nil && in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq != nil {
+		return in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq
+	}
+	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
+		x := 10
+		return &x
+	}
+	return nil
 }
 
 func clusterOutputToDestinationDef(secretLoaderFactory SecretLoaderFactory, o v1beta1.SyslogNGClusterOutput) (def model.DestinationDef, err error) {
