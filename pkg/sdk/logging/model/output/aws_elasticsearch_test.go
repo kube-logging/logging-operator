@@ -46,6 +46,7 @@ buffer:
 	@type aws-elasticsearch-service
 	@id test
 	exception_backup true
+	fail_on_detecting_es_version_retry_exceed true
 	fail_on_putting_template_retry_exceed true
 	flush_interval 1s
 	include_tag_key true

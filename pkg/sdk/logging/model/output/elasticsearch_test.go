@@ -40,6 +40,7 @@ buffer:
 	@type elasticsearch
 	@id test
 	exception_backup true
+	fail_on_detecting_es_version_retry_exceed true
 	fail_on_putting_template_retry_exceed true
 	host elasticsearch-elasticsearch-cluster.default.svc.cluster.local
 	port 9200

@@ -257,6 +257,11 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.FailOnDetectingEsVersionRetryExceed != nil {
+		in, out := &in.FailOnDetectingEsVersionRetryExceed, &out.FailOnDetectingEsVersionRetryExceed
+		*out = new(bool)
+		**out = **in
+	}
 	if in.ReloadConnections != nil {
 		in, out := &in.ReloadConnections, &out.ReloadConnections
 		*out = new(bool)

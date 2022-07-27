@@ -142,6 +142,9 @@ type ElasticsearchOutput struct {
 	// Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)
 	// +kubebuilder:validation:Optional
 	FailOnPuttingTemplateRetryExceed *bool `json:"fail_on_putting_template_retry_exceed,omitempty" plugin:"default:true"`
+	// fail_on_detecting_es_version_retry_exceed (default: true)
+	// +kubebuilder:validation:Optional
+	FailOnDetectingEsVersionRetryExceed *bool `json:"fail_on_detecting_es_version_retry_exceed,omitempty" plugin:"default:true"`
 	// You can specify times of retry obtaining Elasticsearch version.(default: 15)
 	MaxRetryGetEsVersion string `json:"max_retry_get_es_version,omitempty"`
 	// You can specify HTTP request timeout.(default: 5s)
