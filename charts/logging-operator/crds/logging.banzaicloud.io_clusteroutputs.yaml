@@ -543,6 +543,8 @@ spec:
                     type: object
                   exception_backup:
                     type: boolean
+                  fail_on_detecting_es_version_retry_exceed:
+                    type: boolean
                   fail_on_putting_template_retry_exceed:
                     type: boolean
                   flatten_hashes:
@@ -1580,6 +1582,8 @@ spec:
                   enable_ilm:
                     type: boolean
                   exception_backup:
+                    type: boolean
+                  fail_on_detecting_es_version_retry_exceed:
                     type: boolean
                   fail_on_putting_template_retry_exceed:
                     type: boolean
@@ -6392,6 +6396,8 @@ spec:
                     type: object
                   exception_backup:
                     type: boolean
+                  fail_on_detecting_es_version_retry_exceed:
+                    type: boolean
                   fail_on_putting_template_retry_exceed:
                     type: boolean
                   flatten_hashes:
@@ -7429,6 +7435,8 @@ spec:
                   enable_ilm:
                     type: boolean
                   exception_backup:
+                    type: boolean
+                  fail_on_detecting_es_version_retry_exceed:
                     type: boolean
                   fail_on_putting_template_retry_exceed:
                     type: boolean
