@@ -27,10 +27,17 @@ func includeStmt(file string) Renderer {
 }
 
 func globalOptionsDefStmt(def globalOptionsDef) Renderer {
-	return braceDefStmt("options", "", AllOf(
-		If(def.StatsLevel != nil, parenDefStmt("stats-level", literal(*def.StatsLevel))),
-		If(def.StatsFreq != nil, parenDefStmt("stats-freq", literal(*def.StatsFreq))),
-	))
+	var opts []Renderer
+
+	if def.StatsLevel != nil {
+		opts = append(opts, parenDefStmt("stats-level", literal(*def.StatsLevel)))
+	}
+
+	if def.StatsFreq != nil {
+		opts = append(opts, parenDefStmt("stats-freq", literal(*def.StatsFreq)))
+	}
+
+	return braceDefStmt("options", "", AllOf(opts...))
 }
 
 type globalOptionsDef struct {
