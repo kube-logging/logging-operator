@@ -270,7 +270,12 @@ type secretLoaderFactory struct {
 	Path    string
 }
 
+// Deprecated: use SecretLoaderForNamespace instead
 func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
+	return f.SecretLoaderForNamespace(namespace)
+}
+
+func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.SecretLoader {
 	return secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets)
 }
 

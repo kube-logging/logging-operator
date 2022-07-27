@@ -15,51 +15,19 @@
 package config
 
 import (
-	"fmt"
+	"reflect"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
-	"github.com/siliconbrain/go-seqs/seqs"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
-func rewriteDefStmt(def model.RewriteDef) Renderer {
-	return braceDefStmt("rewrite", def.Name, AllFrom(seqs.Map(seqs.FromSlice(def.Rules), rewriteRuleStmt)))
+func rewriteDefStmt(name string, body render.Renderer) render.Renderer {
+	return braceDefStmt("rewrite", name, body)
 }
 
-func rewriteRuleStmt(rule model.RewriteRule) Renderer {
-	var args []Renderer
-	switch rule := rule.(type) {
-	case model.RewriteRuleAlt[model.RenameRule]:
-		args = append(args, Quoted(rule.Alt.OldFieldName), Quoted(rule.Alt.NewFieldName))
-		if rule.Alt.Condition != nil {
-			args = append(args, rewriteCondition(*rule.Alt.Condition))
-		}
-	case model.RewriteRuleAlt[model.SetRule]:
-		args = append(args, Quoted(rule.Alt.Value), optionExpr("value", rule.Alt.FieldName))
-		if rule.Alt.Condition != nil {
-			args = append(args, rewriteCondition(*rule.Alt.Condition))
-		}
-	case model.RewriteRuleAlt[model.SubstituteRule]:
-		args = append(args, Quoted(rule.Alt.Pattern), Quoted(rule.Alt.Replacement))
-		if rule.Alt.Type != "" {
-			args = append(args, optionExpr("type", rule.Alt.Type))
-		}
-		if flags := rule.Alt.Flags; len(flags) > 0 {
-			args = append(args, flagsOption(flags))
-		}
-		if rule.Alt.Condition != nil {
-			args = append(args, rewriteCondition(*rule.Alt.Condition))
-		}
-	case model.RewriteRuleAlt[model.UnsetRule]:
-		args = append(args, optionExpr("value", rule.Alt.FieldName))
-		if rule.Alt.Condition != nil {
-			args = append(args, rewriteCondition(*rule.Alt.Condition))
-		}
-	default:
-		return Error(fmt.Errorf("unsupported rewrite rule type %q", rule.Name()))
-	}
-	return parenDefStmt(rule.Name(), args...)
+func isActiveRewriteDriver(f Field) bool {
+	return hasRewriteDriverTag(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
 }
 
-func rewriteCondition(cond model.RewriteCondition) Renderer {
-	return AllOf(String("condition("), filterExpr(cond.Expr), String(")"))
+func hasRewriteDriverTag(f Field) bool {
+	return structFieldSettings(f.Meta).Has("rewrite-drv")
 }

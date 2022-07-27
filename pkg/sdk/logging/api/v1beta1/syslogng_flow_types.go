@@ -15,7 +15,7 @@
 package v1beta1
 
 import (
-	filter2 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	filter "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -37,13 +37,13 @@ type SyslogNGFlowSpec struct {
 	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
 }
 
-type SyslogNGMatch filter2.MatchExpr
+type SyslogNGMatch filter.MatchExpr
 
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {
-	Match   *filter2.MatchConfig   `json:"match,omitempty"`
-	Rewrite *filter2.RewriteConfig `json:"rewrite,omitempty"`
-	Parser  *filter2.ParserConfig  `json:"parser,omitempty"`
+	Match   *filter.MatchConfig   `json:"match,omitempty" syslog-ng:"xform-kind=filter"`
+	Rewrite *filter.RewriteConfig `json:"rewrite,omitempty" syslog-ng:"xform-kind=rewrite"`
+	Parser  *filter.ParserConfig  `json:"parser,omitempty" syslog-ng:"xform-kind=parser"`
 }
 
 type SyslogNGFlowStatus FlowStatus

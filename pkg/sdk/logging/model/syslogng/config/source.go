@@ -15,35 +15,17 @@
 package config
 
 import (
-	"fmt"
-
-	"github.com/siliconbrain/go-seqs/seqs"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
-func sourceDefStmt(def model.SourceDef) Renderer {
-	return braceDefStmt("source", def.Name, AllFrom(seqs.Map(seqs.FromSlice(def.Drivers), sourceDriverDefStmt)))
+type NetworkSourceDriver struct {
+	__meta    struct{} `syslog-ng:"name=network"`
+	Flags     []string `syslog-ng:"name=flags,optional"`
+	IP        string   `syslog-ng:"name=ip,optional"`
+	Port      uint16   `syslog-ng:"name=port,optional"`
+	Transport string   `syslog-ng:"name=transport,optional"`
 }
 
-func sourceDriverDefStmt(drv model.SourceDriver) Renderer {
-	var args []Renderer
-	switch drv := drv.(type) {
-	case model.SourceDriverAlt[model.NetworkSourceDriver]:
-		if transport := drv.Alt.Transport; transport != "" {
-			args = append(args, optionExpr("transport", transport))
-		}
-		if ip := drv.Alt.IP; ip != "" {
-			args = append(args, optionExpr("ip", ip))
-		}
-		if port := drv.Alt.Port; port != 0 {
-			args = append(args, optionExpr("port", port))
-		}
-		if flags := drv.Alt.Flags; len(flags) > 0 {
-			args = append(args, flagsOption(flags))
-		}
-	default:
-		return Error(fmt.Errorf("unsupported source driver %q", drv.Name()))
-	}
-	return parenDefStmt(drv.Name(), args...)
+func sourceDefStmt(name string, body render.Renderer) render.Renderer {
+	return braceDefStmt("source", name, body)
 }

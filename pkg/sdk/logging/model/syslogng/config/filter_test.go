@@ -19,97 +19,9 @@ import (
 	"testing"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/stretchr/testify/require"
 )
-
-func TestFilterDefStmt(t *testing.T) {
-	tests := map[string]struct {
-		def     model.FilterDef
-		wantOut string
-		wantErr any
-	}{
-		"empty def": {
-			def:     model.FilterDef{},
-			wantErr: true,
-		},
-		"and": {
-			def: model.FilterDef{
-				Expr: model.NewFilterExpr(model.FilterExprAnd{
-					model.NewFilterExpr(model.FilterExprMatch{
-						Pattern: "^foo",
-						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
-					}),
-					model.NewFilterExpr(model.FilterExprMatch{
-						Pattern: "bar$",
-						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
-					}),
-				}),
-			},
-			wantOut: untab(`filter {
-	(match("^foo" value(MESSAGE)) and match("bar$" value(MESSAGE)));
-};
-`),
-		},
-		"not": {
-			def: model.FilterDef{
-				Expr: model.NewFilterExpr(model.FilterExprNot{
-					Expr: model.NewFilterExpr(model.FilterExprMatch{
-						Pattern: "^foo",
-						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
-					}),
-				}),
-			},
-			wantOut: untab(`filter {
-	(not match("^foo" value(MESSAGE)));
-};
-`),
-		},
-		"or": {
-			def: model.FilterDef{
-				Expr: model.NewFilterExpr(model.FilterExprOr{
-					model.NewFilterExpr(model.FilterExprMatch{
-						Pattern: "^foo",
-						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
-					}),
-					model.NewFilterExpr(model.FilterExprMatch{
-						Pattern: "bar$",
-						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
-					}),
-				}),
-			},
-			wantOut: untab(`filter {
-	(match("^foo" value(MESSAGE)) or match("bar$" value(MESSAGE)));
-};
-`),
-		},
-		"regexp": {
-			def: model.FilterDef{
-				Expr: model.NewFilterExpr(model.FilterExprMatch{
-					Pattern: "^foo",
-					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeTemplate("${HOST}|${MESSAGE}")),
-				}),
-			},
-			wantOut: untab(`filter {
-	match("^foo" template("${HOST}|${MESSAGE}"));
-};
-`),
-		},
-	}
-	for name, testCase := range tests {
-		testCase := testCase
-		t.Run(name, func(t *testing.T) {
-			b := strings.Builder{}
-			err := filterDefStmt(testCase.def)(RenderContext{
-				Out:        &b,
-				IndentWith: "    ",
-			})
-			checkError(t, testCase.wantErr, err)
-			if err == nil {
-				require.Equal(t, testCase.wantOut, b.String())
-			}
-		})
-	}
-}
 
 func TestFilterExpr(t *testing.T) {
 	tests := map[string]struct {
@@ -117,6 +29,10 @@ func TestFilterExpr(t *testing.T) {
 		wantOut string
 		wantErr any
 	}{
+		"empty expr": {
+			expr:    nil,
+			wantErr: true,
+		},
 		"empty match expr": {
 			expr:    model.NewFilterExpr(model.FilterExprMatch{}),
 			wantOut: `match("")`,
@@ -140,12 +56,66 @@ func TestFilterExpr(t *testing.T) {
 			}),
 			wantOut: `match("^foo" value(MESSAGE) type(pcre) flags(utf-8 global))`,
 		},
+		"and": {
+			expr: model.NewFilterExpr(model.FilterExprAnd{
+				model.NewFilterExpr(model.FilterExprMatch{
+					Pattern: "^foo",
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
+				}),
+				model.NewFilterExpr(model.FilterExprMatch{
+					Pattern: "bar$",
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
+				}),
+			}),
+			wantOut: untab(`filter {
+	(match("^foo" value(MESSAGE)) and match("bar$" value(MESSAGE)));
+};
+`),
+		},
+		"not": {
+			expr: model.NewFilterExpr(model.FilterExprNot{
+				Expr: model.NewFilterExpr(model.FilterExprMatch{
+					Pattern: "^foo",
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
+				}),
+			}),
+			wantOut: untab(`filter {
+	(not match("^foo" value(MESSAGE)));
+};
+`),
+		},
+		"or": {
+			expr: model.NewFilterExpr(model.FilterExprOr{
+				model.NewFilterExpr(model.FilterExprMatch{
+					Pattern: "^foo",
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
+				}),
+				model.NewFilterExpr(model.FilterExprMatch{
+					Pattern: "bar$",
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
+				}),
+			}),
+			wantOut: untab(`filter {
+	(match("^foo" value(MESSAGE)) or match("bar$" value(MESSAGE)));
+};
+`),
+		},
+		"regexp": {
+			expr: model.NewFilterExpr(model.FilterExprMatch{
+				Pattern: "^foo",
+				Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeTemplate("${HOST}|${MESSAGE}")),
+			}),
+			wantOut: untab(`filter {
+	match("^foo" template("${HOST}|${MESSAGE}"));
+};
+`),
+		},
 	}
 	for name, testCase := range tests {
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			b := strings.Builder{}
-			err := filterExpr(testCase.expr)(RenderContext{
+			err := filterExpr(testCase.expr)(render.RenderContext{
 				Out:        &b,
 				IndentWith: "    ",
 			})

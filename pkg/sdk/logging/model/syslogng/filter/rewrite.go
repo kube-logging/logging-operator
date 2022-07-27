@@ -32,42 +32,42 @@ type _metaRewrite interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RewriteConfig struct {
-	Rename     *RenameConfig     `json:"rename,omitempty"`
-	Set        *SetConfig        `json:"set,omitempty"`
-	Substitute *SubstituteConfig `json:"subst,omitempty"`
-	Unset      *UnsetConfig      `json:"unset,omitempty"`
+	Rename     *RenameConfig     `json:"rename,omitempty" syslog-ng:"rewrite-drv,name=rename"`
+	Set        *SetConfig        `json:"set,omitempty" syslog-ng:"rewrite-drv,name=set"`
+	Substitute *SubstituteConfig `json:"subst,omitempty" syslog-ng:"rewrite-drv,name=subst"`
+	Unset      *UnsetConfig      `json:"unset,omitempty" syslog-ng:"rewrite-drv,name=unset"`
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829213
 type RenameConfig struct {
-	OldFieldName string     `json:"oldName"`
-	NewFieldName string     `json:"newName"`
-	Condition    *MatchExpr `json:"condition,omitempty"`
+	OldFieldName string     `json:"oldName" syslog-ng:"pos=0"`
+	NewFieldName string     `json:"newName" syslog-ng:"pos=1"`
+	Condition    *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829207
 type SetConfig struct {
-	FieldName string     `json:"field"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
-	Value     string     `json:"value"`
-	Condition *MatchExpr `json:"condition,omitempty"`
+	FieldName string     `json:"field" syslog-ng:"name=value"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
+	Value     string     `json:"value" syslog-ng:"pos=0"`
+	Condition *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829206
 type SubstituteConfig struct {
-	Pattern     string     `json:"pattern"`
-	Replacement string     `json:"replace"`
-	FieldName   string     `json:"field"`
-	Flags       []string   `json:"flags,omitempty"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
-	Type        string     `json:"type,omitempty"`  // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
-	Condition   *MatchExpr `json:"condition,omitempty"`
+	Pattern     string     `json:"pattern" syslog-ng:"pos=0"`
+	Replacement string     `json:"replace" syslog-ng:"pos=1"`
+	FieldName   string     `json:"field" syslog-ng:"name=value"`
+	Flags       []string   `json:"flags,omitempty" syslog-ng:"name=flags,optional"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
+	Type        string     `json:"type,omitempty" syslog-ng:"name=type,optional"`   // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
+	Condition   *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }
 
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 type UnsetConfig struct {
-	FieldName string     `json:"field"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
-	Condition *MatchExpr `json:"condition,omitempty"`
+	FieldName string     `json:"field" syslog-ng:"name=value"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
+	Condition *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }

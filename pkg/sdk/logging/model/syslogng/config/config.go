@@ -16,13 +16,11 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"io"
+	"reflect"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
-	filter2 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 )
@@ -35,7 +33,7 @@ func RenderConfigInto(in Input, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return rnd(RenderContext{
+	return rnd(render.RenderContext{
 		Out:        out,
 		IndentWith: "    ",
 	})
@@ -52,310 +50,96 @@ type Input struct {
 }
 
 type SecretLoaderFactory interface {
-	OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader
+	SecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
 const configVersion = "3.37"
+const sourceName = "main_input"
 
-func configRenderer(in Input) (Renderer, error) {
+func configRenderer(in Input) (render.Renderer, error) {
 	if in.Logging.Spec.SyslogNGSpec == nil {
 		return nil, errors.New("missing syslog-ng spec")
 	}
 
-	srcDef := model.SourceDef{
-		Name: "main_input",
-		Drivers: []model.SourceDriver{
-			model.NewSourceDriver(model.NetworkSourceDriver{
-				Transport: "tcp",
-				Port:      uint16(in.SourcePort),
-				Flags:     []string{"no-parse"},
-			}),
-		},
+	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq, amp(10))
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel, amp(3))
 	}
 
-	destinationDefs := make([]model.DestinationDef, 0, len(in.ClusterOutputs)+len(in.Outputs))
+	destinationDefs := make([]render.Renderer, 0, len(in.ClusterOutputs)+len(in.Outputs))
 	for _, co := range in.ClusterOutputs {
-		def, err := clusterOutputToDestinationDef(in.SecretLoaderFactory, co)
-		if err != nil {
-			return nil, err
-		}
-		destinationDefs = append(destinationDefs, def)
+		destinationDefs = append(destinationDefs, renderClusterOutput(co, in.SecretLoaderFactory))
 	}
 	for _, o := range in.Outputs {
-		def, err := outputToDestinationDef(in.SecretLoaderFactory, o)
-		if err != nil {
-			return nil, err
-		}
-		destinationDefs = append(destinationDefs, def)
+		destinationDefs = append(destinationDefs, renderOutput(o, in.SecretLoaderFactory))
 	}
 
-	logDefs := make([]model.LogDef, 0, len(in.ClusterFlows)+len(in.Flows))
+	logDefs := make([]render.Renderer, 0, len(in.ClusterFlows)+len(in.Flows))
 	for _, cf := range in.ClusterFlows {
-		def, err := clusterFlowToLogDef(srcDef.Name, cf)
-		if err != nil {
-			return nil, err
+		def := renderClusterFlow(sourceName, cf, in.SecretLoaderFactory)
+		if def != nil {
+			logDefs = append(logDefs, def)
 		}
-		logDefs = append(logDefs, def)
 	}
 	for _, f := range in.Flows {
-		def, err := flowToLogDef(in.Logging.Spec.ControlNamespace, srcDef.Name, f)
-		if err != nil {
-			return nil, err
+		def := renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory)
+		if def != nil {
+			logDefs = append(logDefs, def)
 		}
-		logDefs = append(logDefs, def)
 	}
 
-	return AllOf(
-		versionStmt(configVersion),
-		globalOptionsDefStmt(globalOptionsDef{
-			StatsLevel: setStatLevel(in),
-			StatsFreq:  setStatFreq(in),
-		}),
-		Line(Empty),
-		sourceDefStmt(srcDef),
-		Line(Empty),
-		AllFrom(seqs.Map(seqs.FromSlice(destinationDefs), destinationDefStmt)),
-		Line(Empty),
-		AllFrom(seqs.Map(seqs.FromSlice(logDefs), logDefStmt)),
-	), nil
+	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))
+
+	return render.AllFrom(seqs.Intersperse(
+		seqs.Filter(
+			seqs.Concat(
+				seqs.FromValues(
+					versionStmt(configVersion),
+					globalOptionsDefStmt(globalOptions...),
+					sourceDefStmt(sourceName, renderDriver(Field{
+						Value: reflect.ValueOf(NetworkSourceDriver{
+							Transport: "tcp",
+							Port:      uint16(in.SourcePort),
+							Flags:     []string{"no-parse"},
+						}),
+					}, nil)),
+				),
+				seqs.FromSlice(destinationDefs),
+				seqs.FromSlice(logDefs),
+			),
+			func(rnd render.Renderer) bool { return rnd != nil },
+		),
+		render.Line(render.Empty),
+	)), nil
 }
 
-func setStatLevel(in Input) *int {
-	if in.Logging.Spec.SyslogNGSpec.GlobalOptions != nil && in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
-		return in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel
-	}
-	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
-		x := 3
-		return &x
-	}
-	return nil
-}
-func setStatFreq(in Input) *int {
-	if in.Logging.Spec.SyslogNGSpec.GlobalOptions != nil && in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq != nil {
-		return in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq
-	}
-	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
-		x := 10
-		return &x
-	}
-	return nil
+func versionStmt(version string) render.Renderer {
+	return render.Line(render.Formatted("@version: %s", version))
 }
 
-func clusterOutputToDestinationDef(secretLoaderFactory SecretLoaderFactory, o v1beta1.SyslogNGClusterOutput) (def model.DestinationDef, err error) {
-	def.Name = fmt.Sprintf("clusteroutput_%s_%s", o.Namespace, o.Name)
-	driver, err := outputSpecToDriver(secretLoaderFactory.OutputSecretLoaderForNamespace(o.Namespace), o.Spec.SyslogNGOutputSpec)
-	if err != nil {
-		return
-	}
-	def.Drivers = []model.DestinationDriver{driver}
-	return
+func includeStmt(file string) render.Renderer {
+	return render.Line(render.Formatted("@include %q", file))
 }
 
-func outputToDestinationDef(secretLoaderFactory SecretLoaderFactory, o v1beta1.SyslogNGOutput) (def model.DestinationDef, err error) {
-	def.Name = fmt.Sprintf("output_%s_%s", o.Namespace, o.Name)
-	driver, err := outputSpecToDriver(secretLoaderFactory.OutputSecretLoaderForNamespace(o.Namespace), o.Spec)
-	if err != nil {
-		return
-	}
-	def.Drivers = []model.DestinationDriver{driver}
-	return
-}
-
-func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutputSpec) (model.DestinationDriver, error) {
-	switch {
-	case s.Syslog != nil:
-		drv := model.SyslogDestinationDriver{
-			Host:           s.Syslog.Host,
-			Port:           s.Syslog.Port,
-			Transport:      s.Syslog.Transport,
-			CloseOnInput:   s.Syslog.CloseOnInput,
-			Flags:          s.Syslog.Flags,
-			FlushLines:     s.Syslog.FlushLines,
-			SoKeepalive:    s.Syslog.SoKeepalive,
-			Suppress:       s.Syslog.Suppress,
-			Template:       s.Syslog.Template,
-			TemplateEscape: s.Syslog.TemplateEscape,
-			TSFormat:       s.Syslog.TSFormat,
-			DiskBuffer:     outputDiskBufferToModelDiskBuffer(s.Syslog.DiskBuffer),
-		}
-		if s.Syslog.TLS != nil {
-
-			caDir, err := loadSecretIfNotNil(secretLoader, s.Syslog.TLS.CaDir)
-			if err != nil {
-				return nil, err
-			}
-			caFile, err := loadSecretIfNotNil(secretLoader, s.Syslog.TLS.CaFile)
-			if err != nil {
-				return nil, err
-			}
-			drv.TLS = &model.SyslogDestinationDriverTLS{
-				CaDir:  caDir,
-				CaFile: caFile,
-			}
-		}
-		return model.NewDestinationDriver(drv), nil
-	case s.File != nil:
-		return model.NewDestinationDriver(model.FileDestinationDriver{
-			Path:       s.File.Path,
-			CreateDirs: s.File.CreateDirs,
-			DirGroup:   s.File.DirGroup,
-			DirOwner:   s.File.DirOwner,
-			DirPerm:    s.File.DirPerm,
-			Template:   s.File.Template,
-		}), nil
-
-	default:
-		return nil, errors.New("unsupported output type")
-	}
-}
-
-func clusterFlowToLogDef(sourceName string, f v1beta1.SyslogNGClusterFlow) (def model.LogDef, err error) {
-	//def.Name = fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
-	def.SourceNames = []string{sourceName}
-	def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.ParserDef{
-		Parsers: []model.Parser{model.NewParser(model.JSONParser{})},
-	}))
-	if match := f.Spec.Match; match != nil {
-		def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*match)),
-		}))
-	}
-	def.OptionalElements = append(def.OptionalElements, seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.Filters), loggingFilterToLogElement))...)
-	for _, o := range f.Spec.GlobalOutputRefs {
-		def.DestinationNames = append(def.DestinationNames, fmt.Sprintf("clusteroutput_%s_%s", f.Namespace, o))
-	}
-	return
-}
-
-func flowToLogDef(controlNS string, sourceName string, f v1beta1.SyslogNGFlow) (def model.LogDef, err error) {
-	//def.Name = fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
-	def.SourceNames = []string{sourceName}
-	def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.ParserDef{
-		Parsers: []model.Parser{model.NewParser(model.JSONParser{})},
-	}))
-	def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
-		Expr: model.NewFilterExpr(model.FilterExprMatch{
-			Pattern: f.Namespace,
-			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("kubernetes.namespace_name")),
-			Type:    "string",
-		}),
-	}))
-	if match := f.Spec.Match; match != nil {
-		def.OptionalElements = append(def.OptionalElements, model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*match)),
-		}))
-	}
-	def.OptionalElements = append(def.OptionalElements, seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.Filters), loggingFilterToLogElement))...)
-	for _, o := range f.Spec.GlobalOutputRefs {
-		def.DestinationNames = append(def.DestinationNames, fmt.Sprintf("clusteroutput_%s_%s", controlNS, o))
-	}
-	for _, o := range f.Spec.LocalOutputRefs {
-		def.DestinationNames = append(def.DestinationNames, fmt.Sprintf("output_%s_%s", f.Namespace, o))
-	}
-	return
-}
-
-func filterExprFromMatchExpr(expr filter2.MatchExpr) model.FilterExpr {
-	switch {
-	case len(expr.And) > 0:
-		return model.NewFilterExpr(model.FilterExprAnd(seqs.ToSlice(seqs.Map(seqs.FromSlice(expr.And), filterExprFromMatchExpr))))
-	case expr.Not != nil:
-		return model.NewFilterExpr(model.FilterExprNot{Expr: filterExprFromMatchExpr(filter2.MatchExpr(*expr.Not))})
-	case len(expr.Or) > 0:
-		return model.NewFilterExpr(model.FilterExprOr(seqs.ToSlice(seqs.Map(seqs.FromSlice(expr.Or), filterExprFromMatchExpr))))
-	case expr.Regexp != nil:
-		m := model.FilterExprMatch{
-			Pattern: expr.Regexp.Pattern,
-			Type:    expr.Regexp.Type,
-			Flags:   expr.Regexp.Flags,
-		}
-		switch {
-		case expr.Regexp.Template != "":
-			m.Scope = model.NewFilterExprMatchScope(model.FilterExprMatchScopeTemplate(expr.Regexp.Template))
-		case expr.Regexp.Value != "":
-			m.Scope = model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue(expr.Regexp.Value))
-		}
-		return model.NewFilterExpr(m)
-	default:
+func globalOptionsDefStmt(options ...render.Renderer) render.Renderer {
+	if len(options) == 0 {
 		return nil
 	}
+	return braceDefStmt("options", "", render.AllFrom(seqs.Map(seqs.FromSlice(options),
+		func(rnd render.Renderer) render.Renderer {
+			return render.Line(render.AllOf(rnd, render.String(";")))
+		},
+	)))
 }
 
-func loggingFilterToLogElement(f v1beta1.SyslogNGFilter) model.LogElement {
-	switch {
-	case f.Match != nil:
-		return model.NewLogElement(model.FilterDef{
-			Expr: filterExprFromMatchExpr(filter2.MatchExpr(*f.Match)),
-		})
-	case f.Rewrite != nil:
-		return model.NewLogElement(model.RewriteDef{
-			Rules: []model.RewriteRule{rewriteRuleFromRewriteConfig(*f.Rewrite)},
-		})
-	default:
-		return nil
+func setDefault[T comparable](ptr *T, def T) {
+	var zero T
+	if *ptr == zero {
+		*ptr = def
 	}
 }
 
-func rewriteRuleFromRewriteConfig(cfg filter2.RewriteConfig) model.RewriteRule {
-	switch {
-	case cfg.Rename != nil:
-		return model.NewRewriteRule(model.RenameRule{
-			OldFieldName: cfg.Rename.OldFieldName,
-			NewFieldName: cfg.Rename.NewFieldName,
-			Condition:    rewriteConditionFromMatchExpr(cfg.Rename.Condition),
-		})
-	case cfg.Set != nil:
-		return model.NewRewriteRule(model.SetRule{
-			FieldName: cfg.Set.FieldName,
-			Value:     cfg.Set.Value,
-			Condition: rewriteConditionFromMatchExpr(cfg.Set.Condition),
-		})
-	case cfg.Substitute != nil:
-		return model.NewRewriteRule(model.SubstituteRule{
-			FieldName:   cfg.Substitute.FieldName,
-			Pattern:     cfg.Substitute.Pattern,
-			Replacement: cfg.Substitute.Replacement,
-			Type:        cfg.Substitute.Type,
-			Flags:       cfg.Substitute.Flags,
-			Condition:   rewriteConditionFromMatchExpr(cfg.Substitute.Condition),
-		})
-	case cfg.Unset != nil:
-		return model.NewRewriteRule(model.UnsetRule{
-			FieldName: cfg.Unset.FieldName,
-			Condition: rewriteConditionFromMatchExpr(cfg.Unset.Condition),
-		})
-	default:
-		return nil
-	}
-}
-
-func outputDiskBufferToModelDiskBuffer(b *output.DiskBuffer) *model.DiskBufferDef {
-	if b == nil {
-		return nil
-	}
-	return &model.DiskBufferDef{
-		Reliable:     b.Reliable,
-		Compaction:   b.Compaction,
-		Dir:          b.Dir,
-		DiskBufSize:  b.DiskBufSize,
-		MemBufLength: b.MemBufLength,
-		MemBufSize:   b.MemBufSize,
-		QOutSize:     b.QOutSize,
-	}
-}
-
-func rewriteConditionFromMatchExpr(c *filter2.MatchExpr) *model.RewriteCondition {
-	if c == nil {
-		return nil
-	}
-	return &model.RewriteCondition{
-		Expr: filterExprFromMatchExpr(*c),
-	}
-}
-
-func loadSecretIfNotNil(loader secret.SecretLoader, secret *secret.Secret) (string, error) {
-	if secret == nil {
-		return "", nil
-	}
-	return loader.Load(secret)
+func amp[T any](v T) *T {
+	return &v
 }

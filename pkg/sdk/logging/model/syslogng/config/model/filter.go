@@ -14,11 +14,6 @@
 
 package model
 
-type FilterDef struct {
-	Name string
-	Expr FilterExpr
-}
-
 type FilterExpr interface {
 	__FilterExpr_union()
 }

@@ -15,34 +15,27 @@
 package config
 
 import (
-	"fmt"
+	"reflect"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
-	"github.com/siliconbrain/go-seqs/seqs"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
-func parserDefStmt(def model.ParserDef) Renderer {
-	return braceDefStmt("parser", def.Name, AllFrom(seqs.Map(seqs.FromSlice(def.Parsers), parserStmt)))
+type JSONParser struct {
+	__meta        struct{} `syslog-ng:"name=json-parser"`
+	ExtractPrefix string   `syslog-ng:"name=extract-prefix,optional"`
+	Marker        string   `syslog-ng:"name=marker,optional"`
+	Prefix        string   `syslog-ng:"name=prefix,optional"`
+	Template      string   `syslog-ng:"name=template,optional"`
 }
 
-func parserStmt(parser model.Parser) Renderer {
-	var args []Renderer
-	switch parser := parser.(type) {
-	case model.ParserAlt[model.JSONParser]:
-		if parser.Alt.ExtractPrefix != "" {
-			args = append(args, optionExpr("extract-prefix", parser.Alt.ExtractPrefix))
-		}
-		if parser.Alt.Marker != "" {
-			args = append(args, optionExpr("marker", parser.Alt.Marker))
-		}
-		if parser.Alt.Prefix != "" {
-			args = append(args, optionExpr("prefix", parser.Alt.Prefix))
-		}
-		if parser.Alt.Template != "" {
-			args = append(args, optionExpr("template", parser.Alt.Template))
-		}
-	default:
-		return Error(fmt.Errorf("unsupported parser type %q", parser.Name()))
-	}
-	return parenDefStmt(parser.Name(), args...)
+func parserDefStmt(name string, body render.Renderer) render.Renderer {
+	return braceDefStmt("parser", name, body)
+}
+
+func isActiveParserDriver(f Field) bool {
+	return hasParserDriverTag(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
+}
+
+func hasParserDriverTag(f Field) bool {
+	return structFieldSettings(f.Meta).Has("parser-drv")
 }

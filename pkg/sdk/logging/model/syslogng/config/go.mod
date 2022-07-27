@@ -5,8 +5,9 @@ go 1.18
 require (
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
 	github.com/banzaicloud/operator-tools v0.28.2
-	github.com/siliconbrain/go-seqs v0.2.0
+	github.com/siliconbrain/go-seqs v0.3.1
 	github.com/stretchr/testify v1.8.0
+	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
 	k8s.io/apimachinery v0.23.4
 )
 
@@ -42,7 +43,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983 // indirect
 	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect

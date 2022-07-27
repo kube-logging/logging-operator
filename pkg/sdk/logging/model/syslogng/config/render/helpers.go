@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package render
 
 import (
 	"fmt"
@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/siliconbrain/go-seqs/seqs"
+	"golang.org/x/exp/constraints"
 )
 
 type Renderer func(ctx RenderContext) error
@@ -115,6 +116,24 @@ func Indented(r Renderer) Renderer {
 		ctx.IndentDepth += 1
 		return r(ctx)
 	}
+}
+
+func Literal[T LiteralTypes](v T) Renderer {
+	switch v := any(v).(type) {
+	case string:
+		return Quoted(v)
+	case bool:
+		if v {
+			return String("yes")
+		}
+		return String("no")
+	default:
+		return Formatted("%v", v)
+	}
+}
+
+type LiteralTypes interface {
+	bool | string | constraints.Float | constraints.Integer
 }
 
 func writeString(w io.Writer, s string) error {

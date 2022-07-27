@@ -15,37 +15,22 @@
 package config
 
 import (
-	"fmt"
-
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/siliconbrain/go-seqs/seqs"
 )
 
-func logDefStmt(def model.LogDef) Renderer {
-	return braceDefStmt("log", "", AllOf(
-		AllFrom(seqs.Map(seqs.FromSlice(def.SourceNames), sourceRefStmt)),
-		AllFrom(seqs.Map(seqs.FromSlice(def.OptionalElements), optionalLogElement)),
-		AllFrom(seqs.Map(seqs.FromSlice(def.DestinationNames), destinationRefStmt)),
+func logDefStmt(sourceRefs []string, transforms []render.Renderer, destRefs []string) render.Renderer {
+	return braceDefStmt("log", "", render.AllOf(
+		render.AllFrom(seqs.Map(seqs.FromSlice(sourceRefs), sourceRefStmt)),
+		render.AllOf(transforms...),
+		render.AllFrom(seqs.Map(seqs.FromSlice(destRefs), destinationRefStmt)),
 	))
 }
 
-func sourceRefStmt(name string) Renderer {
-	return parenDefStmt("source", literal(name))
+func sourceRefStmt(name string) render.Renderer {
+	return parenDefStmt("source", render.Literal(name))
 }
 
-func destinationRefStmt(name string) Renderer {
-	return parenDefStmt("destination", literal(name))
-}
-
-func optionalLogElement(e model.LogElement) Renderer {
-	switch e := e.(type) {
-	case model.LogElementAlt[model.FilterDef]:
-		return filterDefStmt(e.Alt)
-	case model.LogElementAlt[model.ParserDef]:
-		return parserDefStmt(e.Alt)
-	case model.LogElementAlt[model.RewriteDef]:
-		return rewriteDefStmt(e.Alt)
-	default:
-		return Error(fmt.Errorf("unsupported optional log element type %T", e))
-	}
+func destinationRefStmt(name string) render.Renderer {
+	return parenDefStmt("destination", render.Literal(name))
 }

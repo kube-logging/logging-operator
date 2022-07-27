@@ -18,57 +18,58 @@ import (
 	"fmt"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/siliconbrain/go-seqs/seqs"
 )
 
-func filterDefStmt(def model.FilterDef) Renderer {
-	return braceDefStmt("filter", def.Name, filterExprStmt(def.Expr))
+func filterDefStmt(name string, body render.Renderer) render.Renderer {
+	return braceDefStmt("filter", name, body)
 }
 
-func filterExprStmt(expr model.FilterExpr) Renderer {
-	return Line(AllOf(filterExpr(expr), String(";")))
+func filterExprStmt(expr model.FilterExpr) render.Renderer {
+	return render.Line(render.AllOf(filterExpr(expr), render.String(";")))
 }
 
-func filterExpr(expr model.FilterExpr) Renderer {
+func filterExpr(expr model.FilterExpr) render.Renderer {
 	switch expr := expr.(type) {
 	case model.FilterExprAlt[model.FilterExprAnd]:
-		return AllOf(
-			String("("),
-			AllFrom(seqs.Intersperse(seqs.Map(seqs.FromSlice(expr.Alt), filterExpr), String(" and "))),
-			String(")"),
+		return render.AllOf(
+			render.String("("),
+			render.AllFrom(seqs.Intersperse(seqs.Map(seqs.FromSlice(expr.Alt), filterExpr), render.String(" and "))),
+			render.String(")"),
 		)
 	case model.FilterExprAlt[model.FilterExprMatch]:
-		args := []Renderer{
-			Quoted(expr.Alt.Pattern),
+		args := []render.Renderer{
+			render.Quoted(expr.Alt.Pattern),
 		}
 		if expr.Alt.Scope != nil {
 			switch scope := expr.Alt.Scope.(type) {
 			case model.FilterExprMatchScopeAlt[model.FilterExprMatchScopeValue]:
-				args = append(args, optionExpr("value", string(scope.Alt)))
+				args = append(args, optionExpr("value", render.Literal(string(scope.Alt))))
 			case model.FilterExprMatchScopeAlt[model.FilterExprMatchScopeTemplate]:
-				args = append(args, optionExpr("template", string(scope.Alt)))
+				args = append(args, optionExpr("template", render.Literal(string(scope.Alt))))
 			}
 		}
 		if typ := expr.Alt.Type; typ != "" {
-			args = append(args, optionExpr("type", typ))
+			args = append(args, optionExpr("type", render.Literal(typ)))
 		}
 		if flags := expr.Alt.Flags; len(flags) > 0 {
-			args = append(args, flagsOption(flags))
+			args = append(args, optionExpr("flags", seqs.ToSlice(seqs.Map(seqs.FromSlice(flags), render.Literal[string]))...))
 		}
-		return AllOf(
-			String("match("),
-			SpaceSeparated(args...),
-			String(")"),
+		return render.AllOf(
+			render.String("match("),
+			render.SpaceSeparated(args...),
+			render.String(")"),
 		)
 	case model.FilterExprAlt[model.FilterExprNot]:
-		return AllOf(String("(not "), filterExpr(expr.Alt.Expr), String(")"))
+		return render.AllOf(render.String("(not "), filterExpr(expr.Alt.Expr), render.String(")"))
 	case model.FilterExprAlt[model.FilterExprOr]:
-		return AllOf(
-			String("("),
-			AllFrom(seqs.Intersperse(seqs.Map(seqs.FromSlice(expr.Alt), filterExpr), String(" or "))),
-			String(")"),
+		return render.AllOf(
+			render.String("("),
+			render.AllFrom(seqs.Intersperse(seqs.Map(seqs.FromSlice(expr.Alt), filterExpr), render.String(" or "))),
+			render.String(")"),
 		)
 	default:
-		return Error(fmt.Errorf("unsupported filter expression %T", expr))
+		return render.Error(fmt.Errorf("unsupported filter expression %T", expr))
 	}
 }

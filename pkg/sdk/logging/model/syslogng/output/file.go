@@ -33,7 +33,7 @@ type _metaFile interface{} //nolint:deadcode,unused
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044
 type FileOutput struct {
 	// Store file path
-	Path string `json:"path"`
+	Path string `json:"path" syslog-ng:"pos=0"`
 	// Enable creating non-existing directories. (default: false)
 	CreateDirs bool `json:"create_dirs,omitempty"`
 	// The group of the directories created by syslog-ng. To preserve the original properties of an existing directory, use the option without specifying an attribute: dir-group(). (default: Use the global settings)
