@@ -22,55 +22,28 @@ type _hugoParser interface{} //nolint:deadcode,unused
 // +docName:"[Syslog-NG Parser Filter](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)"
 type _docParser interface{} //nolint:deadcode,unused
 
-// +name:"Syslog-NG Match"
+// +name:"Syslog-NG Parser"
 // +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90"
 // +version:"more info"
-// +description:"Selectively keep records"
+// +description:"Parse data from records"
 // +status:"GA"
 type _metaParser interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-type ParserConfig ParserExpr
+// +docName:"[Parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#TOPIC-1768819)"
+type ParserConfig struct {
+	Regexp *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
+}
 
 // +kubebuilder:object:generate=true
-// +docName:"[Regexp Directive](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90) {#Regexp-Directive}"
-// Specify filtering rule.
-type ParserExpr struct {
+// +docName:"[Regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)"
+type RegexpParser struct {
 	// The regular expression patterns that you want to find a match. regexp-parser() supports multiple patterns, and stops the processing at the first successful match.
-	Patterns string `json:"patterns"`
+	Patterns []string `json:"patterns"`
 	// Insert a prefix before the name part of the parsed name-value pairs to help further processing.
-	Prefix string `json:"prefgix,omitempty"`
+	Prefix string `json:"prefix,omitempty"`
 	// Specify a template of the record fields to match against.
 	Template string `json:"template,omitempty"`
 	// Pattern flags
 	Flags []string `json:"flags,omitempty"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
 }
-
-// #### Example `Regexp` filter configurations
-// ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - match:
-//        regexp:
-//        - value: first
-//          pattern: ^5\d\d$
-//  match: {}
-//  localOutputRefs:
-//    - demo-output
-// ```
-//
-// #### Syslog-NG Config Result
-// ```
-// log {
-//    source(main_input);
-//    filter {
-//        match("^5\d\d$" value("first"));
-//    };
-//    destination(output_default_demo-output);
-// };
-// ```
-type _expRegexpParser interface{} //nolint:deadcode,unused

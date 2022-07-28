@@ -54,7 +54,7 @@ func TestFilterExpr(t *testing.T) {
 				},
 				Type: "pcre",
 			}),
-			wantOut: `match("^foo" value(MESSAGE) type(pcre) flags(utf-8 global))`,
+			wantOut: `match("^foo" value("MESSAGE") type("pcre") flags("utf-8" "global"))`,
 		},
 		"and": {
 			expr: model.NewFilterExpr(model.FilterExprAnd{
@@ -67,10 +67,7 @@ func TestFilterExpr(t *testing.T) {
 					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
 				}),
 			}),
-			wantOut: untab(`filter {
-	(match("^foo" value(MESSAGE)) and match("bar$" value(MESSAGE)));
-};
-`),
+			wantOut: `(match("^foo" value("MESSAGE")) and match("bar$" value("MESSAGE")))`,
 		},
 		"not": {
 			expr: model.NewFilterExpr(model.FilterExprNot{
@@ -79,10 +76,7 @@ func TestFilterExpr(t *testing.T) {
 					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
 				}),
 			}),
-			wantOut: untab(`filter {
-	(not match("^foo" value(MESSAGE)));
-};
-`),
+			wantOut: `(not match("^foo" value("MESSAGE")))`,
 		},
 		"or": {
 			expr: model.NewFilterExpr(model.FilterExprOr{
@@ -95,20 +89,14 @@ func TestFilterExpr(t *testing.T) {
 					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("MESSAGE")),
 				}),
 			}),
-			wantOut: untab(`filter {
-	(match("^foo" value(MESSAGE)) or match("bar$" value(MESSAGE)));
-};
-`),
+			wantOut: `(match("^foo" value("MESSAGE")) or match("bar$" value("MESSAGE")))`,
 		},
 		"regexp": {
 			expr: model.NewFilterExpr(model.FilterExprMatch{
 				Pattern: "^foo",
 				Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeTemplate("${HOST}|${MESSAGE}")),
 			}),
-			wantOut: untab(`filter {
-	match("^foo" template("${HOST}|${MESSAGE}"));
-};
-`),
+			wantOut: `match("^foo" template("${HOST}|${MESSAGE}"))`,
 		},
 	}
 	for name, testCase := range tests {

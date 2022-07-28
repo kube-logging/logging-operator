@@ -286,6 +286,62 @@ destination output_default_my-output {
 };
 `,
 		},
+		"parser": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							Filters: []v1beta1.SyslogNGFilter{
+								{
+									Parser: &filter.ParserConfig{
+										Regexp: &filter.RegexpParser{
+											Patterns: []string{
+												".*test_field -> (?<test_field>.*)$",
+											},
+											Prefix: ".regexp.",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &secretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: `@version: 3.37
+
+source main_input {
+    network(flags("no-parse") port(601) transport("tcp"));
+};
+
+log {
+    source("main_input");
+    parser {
+        json-parser();
+    };
+    filter {
+        match("default" value("kubernetes.namespace_name") type("string"));
+    };
+    parser {
+        regexp-parser(patterns(".*test_field -> (?<test_field>.*)$") prefix(".regexp."));
+    };
+};
+`,
+		},
 	}
 	for name, testCase := range testCases {
 		testCase := testCase

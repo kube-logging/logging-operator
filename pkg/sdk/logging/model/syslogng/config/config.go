@@ -61,11 +61,14 @@ func configRenderer(in Input) (render.Renderer, error) {
 		return nil, errors.New("missing syslog-ng spec")
 	}
 
+	// TODO: this should happen at the spec level, in something like `SyslogNGSpec.FinalGlobalOptions() GlobalOptions`
 	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
 		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
 		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq, amp(10))
 		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel, amp(3))
 	}
+
+	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))
 
 	destinationDefs := make([]render.Renderer, 0, len(in.ClusterOutputs)+len(in.Outputs))
 	for _, co := range in.ClusterOutputs {
@@ -77,25 +80,18 @@ func configRenderer(in Input) (render.Renderer, error) {
 
 	logDefs := make([]render.Renderer, 0, len(in.ClusterFlows)+len(in.Flows))
 	for _, cf := range in.ClusterFlows {
-		def := renderClusterFlow(sourceName, cf, in.SecretLoaderFactory)
-		if def != nil {
-			logDefs = append(logDefs, def)
-		}
+		logDefs = append(logDefs, renderClusterFlow(sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
-		def := renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory)
-		if def != nil {
-			logDefs = append(logDefs, def)
-		}
+		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory))
 	}
-
-	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))
 
 	return render.AllFrom(seqs.Intersperse(
 		seqs.Filter(
 			seqs.Concat(
 				seqs.FromValues(
 					versionStmt(configVersion),
+					// includeStmt("scl.conf"),
 					globalOptionsDefStmt(globalOptions...),
 					sourceDefStmt(sourceName, renderDriver(Field{
 						Value: reflect.ValueOf(NetworkSourceDriver{
