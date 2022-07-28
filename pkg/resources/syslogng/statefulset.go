@@ -16,6 +16,7 @@ package syslogng
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"emperror.dev/errors"
@@ -336,11 +337,11 @@ func generateConfigReloaderConfig(configDir string) string {
 	{
 		"events": {
 		  "onFileCreate": {
-			"%s..data" : [
+			"%s" : [
 			  {
 				"exec": {
 				  "key": "info",
-				  "command": "echo config secret changed!"
+				  "command": "echo $(date) config secret changed!"
 				}
 			  },
 			  {
@@ -353,5 +354,5 @@ func generateConfigReloaderConfig(configDir string) string {
 		  }
 		}
 	  }
-	`, configDir, socketPath)
+	`, filepath.Join(configDir, "..data"), socketPath)
 }

@@ -201,6 +201,7 @@ func outputSpecToDriver(secretLoader secret.SecretLoader, s v1beta1.SyslogNGOutp
 			DirGroup:   s.File.DirGroup,
 			DirOwner:   s.File.DirOwner,
 			DirPerm:    s.File.DirPerm,
+			Template:   s.File.Template,
 		}), nil
 
 	default:

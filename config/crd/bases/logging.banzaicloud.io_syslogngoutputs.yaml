@@ -75,6 +75,8 @@ spec:
                     type: object
                   path:
                     type: string
+                  template:
+                    type: string
                 required:
                 - path
                 type: object

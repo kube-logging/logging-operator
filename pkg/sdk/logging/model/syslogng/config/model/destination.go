@@ -86,6 +86,7 @@ type FileDestinationDriver struct {
 	DirGroup   string
 	DirOwner   string
 	DirPerm    int
+	Template   string
 }
 
 func (FileDestinationDriver) Name() string {

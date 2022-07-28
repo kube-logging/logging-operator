@@ -43,6 +43,7 @@ type SyslogNGMatch filter2.MatchExpr
 type SyslogNGFilter struct {
 	Match   *filter2.MatchConfig   `json:"match,omitempty"`
 	Rewrite *filter2.RewriteConfig `json:"rewrite,omitempty"`
+	Parser  *filter2.ParserConfig  `json:"parser,omitempty"`
 }
 
 type SyslogNGFlowStatus FlowStatus

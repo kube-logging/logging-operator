@@ -43,4 +43,5 @@ type FileOutput struct {
 	DirPerm int `json:"dir_perm,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
+	Template   string      `json:"template,omitempty"`
 }

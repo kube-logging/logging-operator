@@ -68,6 +68,21 @@ spec:
                           - pattern
                           type: object
                       type: object
+                    parser:
+                      properties:
+                        flags:
+                          items:
+                            type: string
+                          type: array
+                        patterns:
+                          type: string
+                        prefgix:
+                          type: string
+                        template:
+                          type: string
+                      required:
+                      - patterns
+                      type: object
                     rewrite:
                       properties:
                         rename:

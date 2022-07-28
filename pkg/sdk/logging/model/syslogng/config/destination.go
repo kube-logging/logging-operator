@@ -67,6 +67,9 @@ func destinationDriverDefStmt(drv model.DestinationDriver) Renderer {
 		}
 	case model.DestinationDriverAlt[model.FileDestinationDriver]:
 		args = append(args, Quoted(drv.Alt.Path))
+		if drv.Alt.Template != "" {
+			args = append(args, optionExpr("template", drv.Alt.Template))
+		}
 	case model.DestinationDriverAlt[model.SumologicHTTPDriver]:
 		args = append(args, Quoted(drv.Alt.CAFile))
 	case model.DestinationDriverAlt[model.SumologicSyslogDriver]:
