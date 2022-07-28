@@ -70,18 +70,23 @@ spec:
                       type: object
                     parser:
                       properties:
-                        flags:
-                          items:
-                            type: string
-                          type: array
-                        patterns:
-                          type: string
-                        prefgix:
-                          type: string
-                        template:
-                          type: string
-                      required:
-                      - patterns
+                        regexp:
+                          properties:
+                            flags:
+                              items:
+                                type: string
+                              type: array
+                            patterns:
+                              items:
+                                type: string
+                              type: array
+                            prefix:
+                              type: string
+                            template:
+                              type: string
+                          required:
+                          - patterns
+                          type: object
                       type: object
                     rewrite:
                       properties:
