@@ -38,6 +38,8 @@ type SyslogOutput struct {
 
 // +kubebuilder:object:generate=true
 type TLS struct {
-	CaDir  *secret.Secret `json:"ca_dir,omitempty"`
-	CaFile *secret.Secret `json:"ca_file,omitempty"`
+	CaDir    *secret.Secret `json:"ca_dir,omitempty"`
+	CaFile   *secret.Secret `json:"ca_file,omitempty"`
+	KeyFile  *secret.Secret `json:"key_file,omitempty"`
+	CertFile *secret.Secret `json:"cert_file,omitempty"`
 }
