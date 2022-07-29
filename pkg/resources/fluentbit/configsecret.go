@@ -106,6 +106,7 @@ type fluentForwardOutputUpstreamConfig struct {
 	Config  upstream
 }
 
+// https://docs.fluentbit.io/manual/pipeline/outputs/tcp-and-tls
 type syslogNGOutputConfig struct {
 	Host           string
 	Port           int
