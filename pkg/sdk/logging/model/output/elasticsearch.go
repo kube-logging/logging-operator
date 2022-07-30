@@ -242,7 +242,7 @@ type ElasticsearchOutput struct {
 	// Specify whether overwriting ilm policy or not.
 	IlmPolicyOverwrite bool `json:"ilm_policy_overwrite,omitempty"`
 	// Use @type elasticsearch_data_stream
-	DataStreamEnable *bool `json:"data_stream_enable,omitempty"`
+	DataStreamEnable *bool `json:"data_stream_enable,omitempty" plugin:"hidden"`
 	// You can specify Elasticsearch data stream name by this parameter. This parameter is mandatory for elasticsearch_data_stream. There are some limitations about naming rule. For more details https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-create-data-stream.html#indices-create-data-stream-api-path-params
 	DataStreamName string `json:"data_stream_name,omitempty"`
 	// Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream. (default: data_stream_name) Further details here https://github.com/uken/fluent-plugin-elasticsearch#configuration---elasticsearch-output-data-stream
