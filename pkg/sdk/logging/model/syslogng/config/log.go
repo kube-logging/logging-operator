@@ -31,6 +31,10 @@ func sourceRefStmt(name string) render.Renderer {
 	return parenDefStmt("source", render.Literal(name))
 }
 
+func filterRefStmt(name string) render.Renderer {
+	return parenDefStmt("filter", render.Literal(name))
+}
+
 func destinationRefStmt(name string) render.Renderer {
 	return parenDefStmt("destination", render.Literal(name))
 }

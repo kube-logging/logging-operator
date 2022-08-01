@@ -28,48 +28,56 @@ import (
 )
 
 func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
-	return logDefStmt(
-		[]string{sourceName},
-		seqs.ToSlice(seqs.Concat(
-			seqs.FromValues(
-				renderFlowMatch(f.Spec.Match),
-			),
-			seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
-				return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
-			}),
-		)),
-		seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) })),
+	matchFilterName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
+	return render.AllOf(
+		renderFlowMatch(matchFilterName, f.Spec.Match),
+		logDefStmt(
+			[]string{sourceName},
+			seqs.ToSlice(seqs.Concat(
+				seqs.FromValues(
+					filterRefStmt(matchFilterName),
+				),
+				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
+					return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+				}),
+			)),
+			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) })),
+		),
 	)
 }
 
 func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
-	return logDefStmt(
-		[]string{sourceName},
-		seqs.ToSlice(seqs.Concat(
-			seqs.FromValues(
-				filterDefStmt("", filterExprStmt(model.NewFilterExpr(model.FilterExprMatch{
-					Pattern: f.Namespace,
-					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
-					Type:    "string",
-				}))),
-				renderFlowMatch(f.Spec.Match),
-			),
-			seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
-				return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
-			}),
-		)),
-		seqs.ToSlice(seqs.Concat(
-			seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) }),
-			seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) string { return outputDestName(f.Namespace, ref) }),
-		)),
+	matchFilterName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
+	return render.AllOf(
+		renderFlowMatch(matchFilterName, f.Spec.Match),
+		logDefStmt(
+			[]string{sourceName},
+			seqs.ToSlice(seqs.Concat(
+				seqs.FromValues(
+					filterDefStmt("", filterExprStmt(model.NewFilterExpr(model.FilterExprMatch{
+						Pattern: f.Namespace,
+						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
+						Type:    "string",
+					}))),
+					filterRefStmt(matchFilterName),
+				),
+				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
+					return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+				}),
+			)),
+			seqs.ToSlice(seqs.Concat(
+				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) }),
+				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) string { return outputDestName(f.Namespace, ref) }),
+			)),
+		),
 	)
 }
 
-func renderFlowMatch(m *v1beta1.SyslogNGMatch) render.Renderer {
+func renderFlowMatch(name string, m *v1beta1.SyslogNGMatch) render.Renderer {
 	if m == nil {
 		return nil
 	}
-	return filterDefStmt("", renderMatchExpr(filter.MatchExpr(*m)))
+	return filterDefStmt(name, renderMatchExpr(filter.MatchExpr(*m)))
 }
 
 func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int, secretLoader secret.SecretLoader) render.Renderer {
