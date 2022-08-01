@@ -24,6 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/slices"
 )
 
@@ -155,7 +156,20 @@ func renderDriver(f Field, secretLoader secret.SecretLoader) render.Renderer {
 	if err != nil {
 		return render.Error(err)
 	}
-	return parenDefStmt(name, render.SpaceSeparated(renderValue(f.Value, secretLoader)...))
+	switch f.Value.Kind() {
+	case reflect.Array, reflect.Slice:
+		var stmts []render.Renderer
+		l := f.Value.Len()
+		if l > 0 {
+			stmts = make([]render.Renderer, l)
+		}
+		for i := 0; i < l; i++ {
+			stmts[i] = parenDefStmt(name, render.SpaceSeparated(renderValue(f.Value.Index(i), secretLoader)...))
+		}
+		return render.AllFrom(seqs.Map(seqs.FromSlice(stmts), render.Line))
+	default:
+		return parenDefStmt(name, render.SpaceSeparated(renderValue(f.Value, secretLoader)...))
+	}
 }
 
 var capitalSubstrings = regexp.MustCompile("[A-Z]+")
