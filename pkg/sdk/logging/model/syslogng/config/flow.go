@@ -121,7 +121,7 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 					stmts = make([]render.Renderer, l)
 				}
 				for i := 0; i < l; i++ {
-					stmts[i] = renderRewriteDriver(xformField.Value, xformField.KeyOrEmpty(), index, flow, secretLoader)
+					stmts[i] = renderRewriteDriver(xformField.Value.Index(i), xformField.KeyOrEmpty(), index, flow, secretLoader)
 				}
 				return rewriteDefStmt("", render.AllOf(stmts...))
 			default:
