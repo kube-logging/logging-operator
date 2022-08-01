@@ -109,14 +109,14 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 			switch len(driverFields) {
 			case 0:
 				return render.Error(fmt.Errorf(
-					"no rewrite driver specified on parser %s of filter %d of flow %s/%s",
+					"no rewrite driver specified on rewrite %s of filter %d of flow %s/%s",
 					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
 				))
 			case 1:
 				return rewriteDefStmt("", renderDriver(driverFields[0], secretLoader))
 			default:
 				return render.Error(fmt.Errorf(
-					"multiple rewrite drivers (%v) specified on parser %s of filter %d of flow %s/%s",
+					"multiple rewrite drivers (%v) specified on rewrite %s of filter %d of flow %s/%s",
 					seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), Field.KeyOrEmpty)),
 					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
 				))
