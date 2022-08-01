@@ -15,8 +15,6 @@
 package config
 
 import (
-	"reflect"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
@@ -25,7 +23,7 @@ func rewriteDefStmt(name string, body render.Renderer) render.Renderer {
 }
 
 func isActiveRewriteDriver(f Field) bool {
-	return hasRewriteDriverTag(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
+	return hasRewriteDriverTag(f) && isActiveField(f)
 }
 
 func hasRewriteDriverTag(f Field) bool {

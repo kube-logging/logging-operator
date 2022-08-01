@@ -193,3 +193,12 @@ type Derefable[T any] interface {
 	Kind() reflect.Kind
 	Elem() T
 }
+
+func isActiveField(f Field) bool {
+	switch f.Meta.Type.Kind() {
+	case reflect.Array, reflect.Interface, reflect.Pointer, reflect.Slice:
+		return !f.Value.IsZero()
+	default:
+		return true
+	}
+}

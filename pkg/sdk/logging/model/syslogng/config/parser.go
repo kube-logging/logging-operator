@@ -15,8 +15,6 @@
 package config
 
 import (
-	"reflect"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
@@ -33,7 +31,7 @@ func parserDefStmt(name string, body render.Renderer) render.Renderer {
 }
 
 func isActiveParserDriver(f Field) bool {
-	return hasParserDriverTag(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
+	return hasParserDriverTag(f) && isActiveField(f)
 }
 
 func hasParserDriverTag(f Field) bool {

@@ -15,8 +15,6 @@
 package config
 
 import (
-	"reflect"
-
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
@@ -25,7 +23,7 @@ func destinationDefStmt(name string, body render.Renderer) render.Renderer {
 }
 
 func isActiveDestinationDriver(f Field) bool {
-	return hasDestDriverTag(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
+	return hasDestDriverTag(f) && isActiveField(f)
 }
 
 func hasDestDriverTag(f Field) bool {

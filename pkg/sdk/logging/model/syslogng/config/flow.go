@@ -164,7 +164,7 @@ func filterExprFromMatchExpr(expr filter.MatchExpr) model.FilterExpr {
 }
 
 func isActiveTransform(f Field) bool {
-	return isTransform(f) && f.Meta.Type.Kind() == reflect.Pointer && !f.Value.IsNil()
+	return isTransform(f) && isActiveField(f)
 }
 
 func isTransform(f Field) bool {
