@@ -46,7 +46,7 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{render.Literal(sec)}
 	}
 
-	if value.CanConvert(reflect.TypeOf(matchExprType)) {
+	if value := derefAll(value); value.CanConvert(matchExprType) {
 		matchExpr := value.Convert(matchExprType).Interface().(filter.MatchExpr)
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),

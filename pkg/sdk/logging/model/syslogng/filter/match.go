@@ -44,7 +44,7 @@ type MatchExpr struct {
 	// +kubebuilder:validation:Schemaless
 	Not *MatchExpr `json:"not,omitempty"`
 	// +docLink:"Regexp Directive,#Regexp-Directive"
-	Regexp *RegexpMatchExpr `json:"regexp,omitempty"`
+	Regexp *RegexpMatchExpr `json:"regexp,omitempty" syslog-ng:"name=match,optional"`
 	// +docLink:"Or Directive,#Or-Directive"
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless

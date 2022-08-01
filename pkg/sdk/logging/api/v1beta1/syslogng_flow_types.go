@@ -41,9 +41,9 @@ type SyslogNGMatch filter.MatchExpr
 
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {
-	Match   *filter.MatchConfig   `json:"match,omitempty" syslog-ng:"xform-kind=filter"`
-	Rewrite *filter.RewriteConfig `json:"rewrite,omitempty" syslog-ng:"xform-kind=rewrite"`
-	Parser  *filter.ParserConfig  `json:"parser,omitempty" syslog-ng:"xform-kind=parser"`
+	Match   *filter.MatchConfig    `json:"match,omitempty" syslog-ng:"xform-kind=filter"`
+	Rewrite []filter.RewriteConfig `json:"rewrite,omitempty" syslog-ng:"xform-kind=rewrite"`
+	Parser  *filter.ParserConfig   `json:"parser,omitempty" syslog-ng:"xform-kind=parser"`
 }
 
 type SyslogNGFlowStatus FlowStatus

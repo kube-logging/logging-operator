@@ -32,9 +32,6 @@ func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretL
 		[]string{sourceName},
 		seqs.ToSlice(seqs.Concat(
 			seqs.FromValues(
-				parserDefStmt("", renderDriver(Field{
-					Value: reflect.ValueOf(JSONParser{}),
-				}, nil)),
 				renderFlowMatch(f.Spec.Match),
 			),
 			seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
@@ -50,12 +47,9 @@ func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, sec
 		[]string{sourceName},
 		seqs.ToSlice(seqs.Concat(
 			seqs.FromValues(
-				parserDefStmt("", renderDriver(Field{
-					Value: reflect.ValueOf(JSONParser{}),
-				}, nil)),
 				filterDefStmt("", filterExprStmt(model.NewFilterExpr(model.FilterExprMatch{
 					Pattern: f.Namespace,
-					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("kubernetes.namespace_name")),
+					Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
 					Type:    "string",
 				}))),
 				renderFlowMatch(f.Spec.Match),

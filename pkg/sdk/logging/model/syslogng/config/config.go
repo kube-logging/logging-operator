@@ -93,13 +93,21 @@ func configRenderer(in Input) (render.Renderer, error) {
 					versionStmt(configVersion),
 					// includeStmt("scl.conf"),
 					globalOptionsDefStmt(globalOptions...),
-					sourceDefStmt(sourceName, renderDriver(Field{
-						Value: reflect.ValueOf(NetworkSourceDriver{
-							Transport: "tcp",
-							Port:      uint16(in.SourcePort),
-							Flags:     []string{"no-parse"},
-						}),
-					}, nil)),
+					sourceDefStmt(sourceName,
+						channelDefStmt(
+							sourceDefStmt("", renderDriver(Field{
+								Value: reflect.ValueOf(NetworkSourceDriver{
+									Transport: "tcp",
+									Port:      uint16(in.SourcePort),
+									Flags:     []string{"no-parse"},
+								}),
+							}, nil)),
+							[]render.Renderer{
+								parserDefStmt("", renderDriver(Field{
+									Value: reflect.ValueOf(JSONParser{Prefix: "json."}),
+								}, nil)),
+							},
+						)),
 				),
 				seqs.FromSlice(destinationDefs),
 				seqs.FromSlice(logDefs),

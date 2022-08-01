@@ -2327,8 +2327,10 @@ func (in *SyslogNGFilter) DeepCopyInto(out *SyslogNGFilter) {
 	}
 	if in.Rewrite != nil {
 		in, out := &in.Rewrite, &out.Rewrite
-		*out = new(syslogngfilter.RewriteConfig)
-		(*in).DeepCopyInto(*out)
+		*out = make([]syslogngfilter.RewriteConfig, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
 	}
 	if in.Parser != nil {
 		in, out := &in.Parser, &out.Parser
