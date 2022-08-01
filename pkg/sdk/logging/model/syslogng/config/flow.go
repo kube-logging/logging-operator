@@ -105,21 +105,19 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 				))
 			}
 		case "rewrite":
-			driverFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(xformField.Value)), isActiveRewriteDriver))
-			switch len(driverFields) {
-			case 0:
-				return render.Error(fmt.Errorf(
-					"no rewrite driver specified on rewrite %s of filter %d of flow %s/%s",
-					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
-				))
-			case 1:
-				return rewriteDefStmt("", renderDriver(driverFields[0], secretLoader))
+			switch xformField.Value.Kind() {
+			case reflect.Array, reflect.Slice:
+				var stmts []render.Renderer
+				l := xformField.Value.Len()
+				if l > 0 {
+					stmts = make([]render.Renderer, l)
+				}
+				for i := 0; i < l; i++ {
+					stmts[i] = renderRewriteDriver(xformField.Value, xformField.KeyOrEmpty(), index, flow, secretLoader)
+				}
+				return rewriteDefStmt("", render.AllFrom(seqs.Map(seqs.FromSlice(stmts), render.Line)))
 			default:
-				return render.Error(fmt.Errorf(
-					"multiple rewrite drivers (%v) specified on rewrite %s of filter %d of flow %s/%s",
-					seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), Field.KeyOrEmpty)),
-					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
-				))
+				return rewriteDefStmt("", renderRewriteDriver(xformField.Value, xformField.KeyOrEmpty(), index, flow, secretLoader))
 			}
 		default:
 			return render.Error(fmt.Errorf("unsupported transformation kind %q", xformKind))
@@ -129,6 +127,25 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 			"multiple transformations (%v) specified on filter %d of flow %s/%s",
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(xformFields), Field.KeyOrEmpty)),
 			index, flow.GetNamespace(), flow.GetName(),
+		))
+	}
+}
+
+func renderRewriteDriver(value reflect.Value, key string, filter int, flow metav1.Object, secretLoader secret.SecretLoader) render.Renderer {
+	driverFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(value)), isActiveRewriteDriver))
+	switch len(driverFields) {
+	case 0:
+		return render.Error(fmt.Errorf(
+			"no rewrite driver specified on rewrite %s of filter %d of flow %s/%s",
+			key, filter, flow.GetNamespace(), flow.GetName(),
+		))
+	case 1:
+		return renderDriver(driverFields[0], secretLoader)
+	default:
+		return render.Error(fmt.Errorf(
+			"multiple rewrite drivers (%v) specified on rewrite %s of filter %d of flow %s/%s",
+			seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), Field.KeyOrEmpty)),
+			key, filter, flow.GetNamespace(), flow.GetName(),
 		))
 	}
 }
