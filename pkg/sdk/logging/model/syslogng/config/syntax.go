@@ -18,7 +18,7 @@ import "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/c
 
 func braceDefStmt(kind string, name string, body render.Renderer) render.Renderer {
 	return render.AllOf(
-		render.Line(render.SpaceSeparated(render.String(kind), render.If(name != "", render.String(name)), render.String("{"))),
+		render.Line(render.SpaceSeparated(render.String(kind), render.If(name != "", render.Quoted(name)), render.String("{"))),
 		render.Indented(body),
 		render.Line(render.String("};")),
 	)

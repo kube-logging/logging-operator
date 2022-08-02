@@ -47,7 +47,7 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{render.Literal(sec)}
 	}
 
-	if value := derefAll(value); value.CanConvert(matchExprType) {
+	if value.CanConvert(matchExprType) {
 		matchExpr := value.Convert(matchExprType).Interface().(filter.MatchExpr)
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),
@@ -57,6 +57,8 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 	switch value.Kind() {
 	case reflect.Invalid:
 		return nil
+	case reflect.Pointer:
+		return renderValue(derefAll(value), secretLoader)
 	case reflect.Bool:
 		return []render.Renderer{render.Literal(value.Bool())}
 	case reflect.String:
@@ -85,8 +87,6 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{render.Literal(value.Uint())}
 	case reflect.Uint8:
 		return []render.Renderer{render.Literal(uint8(value.Uint()))}
-	case reflect.Pointer:
-		return renderValue(derefAll(value), secretLoader)
 	case reflect.Array, reflect.Slice:
 		if value.Len() == 0 {
 			return nil

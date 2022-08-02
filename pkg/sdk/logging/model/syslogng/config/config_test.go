@@ -95,10 +95,12 @@ func TestRenderConfigInto(t *testing.T) {
 							},
 							Filters: []v1beta1.SyslogNGFilter{
 								{
-									Rewrite: &filter.RewriteConfig{
-										Set: &filter.SetConfig{
-											FieldName: "cluster",
-											Value:     "test-cluster",
+									Rewrite: []filter.RewriteConfig{
+										{
+											Set: &filter.SetConfig{
+												FieldName: "cluster",
+												Value:     "test-cluster",
+											},
 										},
 									},
 								},
@@ -111,28 +113,34 @@ func TestRenderConfigInto(t *testing.T) {
 			},
 			wantOut: untab(`@version: 3.37
 
-source main_input {
-	network(flags("no-parse") port(601) transport("tcp"));
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
 };
 
-destination output_default_test-syslog-out {
+destination "output_default_test-syslog-out" {
 	syslog("test.local" transport("tcp"));
 };
 
+filter "flow_default_test-flow_match" {
+	match("nginx" value("kubernetes.labels.app"));
+};
+rewrite "flow_default_test-flow_filters_0" {
+	set("test-cluster" value("cluster"));
+};
 log {
 	source("main_input");
-	parser {
-		json-parser();
-	};
 	filter {
-		match("default" value("kubernetes.namespace_name") type("string"));
+		match("default" value("json.kubernetes.namespace_name") type("string"));
 	};
-	filter {
-		match("nginx" value("kubernetes.labels.app"));
-	};
-	rewrite {
-		set("test-cluster" value("cluster"));
-	};
+	filter("flow_default_test-flow_match");
+	rewrite("flow_default_test-flow_filters_0");
 	destination("output_default_test-syslog-out");
 };
 `),
@@ -159,8 +167,15 @@ options {
     stats_freq(10);
 };
 
-source main_input {
-    network(flags("no-parse") port(601) transport("tcp"));
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
 };
 `,
 		},
@@ -182,15 +197,17 @@ source main_input {
 						Spec: v1beta1.SyslogNGFlowSpec{
 							Filters: []v1beta1.SyslogNGFilter{
 								{
-									Rewrite: &filter.RewriteConfig{
-										Unset: &filter.UnsetConfig{
-											FieldName: "MESSAGE",
-											Condition: &filter.MatchExpr{
-												Not: &filter.MatchExpr{
-													Regexp: &filter.RegexpMatchExpr{
-														Pattern: "foo",
-														Value:   "MESSAGE",
-														Type:    "string",
+									Rewrite: []filter.RewriteConfig{
+										{
+											Unset: &filter.UnsetConfig{
+												FieldName: "MESSAGE",
+												Condition: &filter.MatchExpr{
+													Not: &filter.MatchExpr{
+														Regexp: &filter.RegexpMatchExpr{
+															Pattern: "foo",
+															Value:   "MESSAGE",
+															Type:    "string",
+														},
 													},
 												},
 											},
@@ -204,21 +221,26 @@ source main_input {
 			},
 			wantOut: `@version: 3.37
 
-source main_input {
-    network(flags("no-parse") port(601) transport("tcp"));
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
 };
 
+rewrite "flow_default_test-flow_filters_0" {
+    unset(value("MESSAGE") condition((not match("foo" value("MESSAGE") type("string")))));
+};
 log {
     source("main_input");
-    parser {
-        json-parser();
-    };
     filter {
-        match("default" value("kubernetes.namespace_name") type("string"));
+        match("default" value("json.kubernetes.namespace_name") type("string"));
     };
-    rewrite {
-        unset(value("MESSAGE") condition(not(regexp(pattern("foo") value("MESSAGE") type("string")))));
-    };
+    rewrite("flow_default_test-flow_filters_0");
 };
 `,
 		},
@@ -274,14 +296,22 @@ log {
 					},
 					mountPath: "/etc/syslog-ng/secret",
 				},
+				SourcePort: 601,
 			},
 			wantOut: `@version: 3.37
 
-source main_input {
-    network(flags("no-parse") transport("tcp"));
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
 };
 
-destination output_default_my-output {
+destination "output_default_my-output" {
     syslog("127.0.0.1" tls(ca_file("/etc/syslog-ng/secret/default-my-secret-tls.crt")));
 };
 `,
@@ -324,21 +354,87 @@ destination output_default_my-output {
 			},
 			wantOut: `@version: 3.37
 
-source main_input {
-    network(flags("no-parse") port(601) transport("tcp"));
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
 };
 
+parser "flow_default_test-flow_filters_0" {
+    regexp-parser(patterns(".*test_field -> (?<test_field>.*)$") prefix(".regexp."));
+};
 log {
     source("main_input");
-    parser {
-        json-parser();
-    };
     filter {
-        match("default" value("kubernetes.namespace_name") type("string"));
+        match("default" value("json.kubernetes.namespace_name") type("string"));
     };
-    parser {
-        regexp-parser(patterns(".*test_field -> (?<test_field>.*)$") prefix(".regexp."));
+    parser("flow_default_test-flow_filters_0");
+};
+`,
+		},
+		"filter with name": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							Filters: []v1beta1.SyslogNGFilter{
+								{
+									ID: "remove message",
+									Rewrite: []filter.RewriteConfig{
+										{
+											Unset: &filter.UnsetConfig{
+												FieldName: "MESSAGE",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &secretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: `@version: 3.37
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
     };
+};
+
+rewrite "flow_default_test-flow_filters_remove message" {
+    unset(value("MESSAGE"));
+};
+log {
+    source("main_input");
+    filter {
+        match("default" value("json.kubernetes.namespace_name") type("string"));
+    };
+    rewrite("flow_default_test-flow_filters_remove message");
 };
 `,
 		},

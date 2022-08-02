@@ -17,6 +17,7 @@ package config
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
@@ -28,17 +29,22 @@ import (
 )
 
 func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
-	matchFilterName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
+	baseName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
+	matchName := fmt.Sprintf("%s_match", baseName)
+	filterDefs := seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
+		return renderFlowFilter(flt, &f, idx, baseName, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+	})
 	return render.AllOf(
-		renderFlowMatch(matchFilterName, f.Spec.Match),
+		renderFlowMatch(matchName, f.Spec.Match),
+		render.AllFrom(filterDefs),
 		logDefStmt(
 			[]string{sourceName},
 			seqs.ToSlice(seqs.Concat(
 				seqs.FromValues(
-					filterRefStmt(matchFilterName),
+					render.If(f.Spec.Match != nil, filterRefStmt(matchName)),
 				),
 				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
-					return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
 				}),
 			)),
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) })),
@@ -47,9 +53,14 @@ func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretL
 }
 
 func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
-	matchFilterName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
+	baseName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
+	matchName := fmt.Sprintf("%s_match", baseName)
+	filterDefs := render.AllFrom(seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
+		return renderFlowFilter(flt, &f, idx, baseName, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+	}))
 	return render.AllOf(
-		renderFlowMatch(matchFilterName, f.Spec.Match),
+		renderFlowMatch(matchName, f.Spec.Match),
+		filterDefs,
 		logDefStmt(
 			[]string{sourceName},
 			seqs.ToSlice(seqs.Concat(
@@ -59,10 +70,10 @@ func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, sec
 						Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
 						Type:    "string",
 					}))),
-					filterRefStmt(matchFilterName),
+					render.If(f.Spec.Match != nil, filterRefStmt(matchName)),
 				),
 				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
-					return renderFlowFilter(flt, &f, idx, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
+					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
 				}),
 			)),
 			seqs.ToSlice(seqs.Concat(
@@ -80,11 +91,13 @@ func renderFlowMatch(name string, m *v1beta1.SyslogNGMatch) render.Renderer {
 	return filterDefStmt(name, renderMatchExpr(filter.MatchExpr(*m)))
 }
 
-func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int, secretLoader secret.SecretLoader) render.Renderer {
+func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int, baseName string, secretLoader secret.SecretLoader) render.Renderer {
+	filterID := filterID(flt, index, baseName)
+
 	xformFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(reflect.ValueOf(flt))), isActiveTransform))
 	switch len(xformFields) {
 	case 0:
-		return render.Error(fmt.Errorf("no transformation specified on filter %d of flow %s/%s", index, flow.GetNamespace(), flow.GetName()))
+		return render.Error(fmt.Errorf("no transformation specified on filter %s of flow %s/%s", filterID, flow.GetNamespace(), flow.GetName()))
 	case 1:
 		xformField := xformFields[0]
 		settings := structFieldSettings(xformField.Meta)
@@ -94,22 +107,22 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 			if !val.CanConvert(matchExprType) {
 				return render.Error(fmt.Errorf("value of type %s is not a valid filter expression", xformField.Value.Type()))
 			}
-			return filterDefStmt("", filterExprStmt(filterExprFromMatchExpr(val.Convert(matchExprType).Interface().(filter.MatchExpr))))
+			return filterDefStmt(filterID, filterExprStmt(filterExprFromMatchExpr(val.Convert(matchExprType).Interface().(filter.MatchExpr))))
 		case "parser":
 			driverFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(xformField.Value)), isActiveParserDriver))
 			switch len(driverFields) {
 			case 0:
 				return render.Error(fmt.Errorf(
-					"no parser driver specified on parser %s of filter %d of flow %s/%s",
-					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
+					"no parser driver specified on parser %s of filter %s of flow %s/%s",
+					xformField.KeyOrEmpty(), filterID, flow.GetNamespace(), flow.GetName(),
 				))
 			case 1:
-				return parserDefStmt("", renderDriver(driverFields[0], secretLoader))
+				return parserDefStmt(filterID, renderDriver(driverFields[0], secretLoader))
 			default:
 				return render.Error(fmt.Errorf(
-					"multiple parser drivers (%v) specified on parser %s of filter %d of flow %s/%s",
+					"multiple parser drivers (%v) specified on parser %s of filter %s of flow %s/%s",
 					seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), Field.KeyOrEmpty)),
-					xformField.KeyOrEmpty(), index, flow.GetNamespace(), flow.GetName(),
+					xformField.KeyOrEmpty(), filterID, flow.GetNamespace(), flow.GetName(),
 				))
 			}
 		case "rewrite":
@@ -121,37 +134,37 @@ func renderFlowFilter(flt v1beta1.SyslogNGFilter, flow metav1.Object, index int,
 					stmts = make([]render.Renderer, l)
 				}
 				for i := 0; i < l; i++ {
-					stmts[i] = renderRewriteDriver(xformField.Value.Index(i), xformField.KeyOrEmpty(), index, flow, secretLoader)
+					stmts[i] = renderRewriteDriver(xformField.Value.Index(i), xformField.KeyOrEmpty(), filterID, flow, secretLoader)
 				}
-				return rewriteDefStmt("", render.AllOf(stmts...))
+				return rewriteDefStmt(filterID, render.AllOf(stmts...))
 			default:
-				return rewriteDefStmt("", renderRewriteDriver(xformField.Value, xformField.KeyOrEmpty(), index, flow, secretLoader))
+				return rewriteDefStmt(filterID, renderRewriteDriver(xformField.Value, xformField.KeyOrEmpty(), filterID, flow, secretLoader))
 			}
 		default:
 			return render.Error(fmt.Errorf("unsupported transformation kind %q", xformKind))
 		}
 	default:
 		return render.Error(fmt.Errorf(
-			"multiple transformations (%v) specified on filter %d of flow %s/%s",
+			"multiple transformations (%v) specified on filter %s of flow %s/%s",
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(xformFields), Field.KeyOrEmpty)),
-			index, flow.GetNamespace(), flow.GetName(),
+			filterID, flow.GetNamespace(), flow.GetName(),
 		))
 	}
 }
 
-func renderRewriteDriver(value reflect.Value, key string, filter int, flow metav1.Object, secretLoader secret.SecretLoader) render.Renderer {
+func renderRewriteDriver(value reflect.Value, key string, filter string, flow metav1.Object, secretLoader secret.SecretLoader) render.Renderer {
 	driverFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(value)), isActiveRewriteDriver))
 	switch len(driverFields) {
 	case 0:
 		return render.Error(fmt.Errorf(
-			"no rewrite driver specified on rewrite %s of filter %d of flow %s/%s",
+			"no rewrite driver specified on rewrite %s of filter %s of flow %s/%s",
 			key, filter, flow.GetNamespace(), flow.GetName(),
 		))
 	case 1:
 		return renderDriver(driverFields[0], secretLoader)
 	default:
 		return render.Error(fmt.Errorf(
-			"multiple rewrite drivers (%v) specified on rewrite %s of filter %d of flow %s/%s",
+			"multiple rewrite drivers (%v) specified on rewrite %s of filter %s of flow %s/%s",
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), Field.KeyOrEmpty)),
 			key, filter, flow.GetNamespace(), flow.GetName(),
 		))
@@ -186,6 +199,24 @@ func filterExprFromMatchExpr(expr filter.MatchExpr) model.FilterExpr {
 	default:
 		return nil
 	}
+}
+
+func filterID(filter v1beta1.SyslogNGFilter, index int, baseName string) string {
+	filterID := filter.ID
+	if filterID == "" {
+		filterID = strconv.FormatInt(int64(index), 10)
+	}
+	return baseName + "_filters_" + filterID
+}
+
+func filterKind(filter v1beta1.SyslogNGFilter) string {
+	xformFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(reflect.ValueOf(filter))), isActiveTransform))
+	if len(xformFields) != 1 {
+		return ""
+	}
+	xformField := xformFields[0]
+	settings := structFieldSettings(xformField.Meta)
+	return settings[xformKindKey]
 }
 
 func isActiveTransform(f Field) bool {
