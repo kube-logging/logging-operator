@@ -50,11 +50,11 @@ Options for match statement content as well. The syntax is slightly different th
 ```
 
 ```yaml
-	pattern // expression or string value to compare to
-	template // Optional template expression to evaluate against
-	value // Specify a field name of the record to match against the value of.
-	flags // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
-	type // Match type can be string for exact match or leave empty fo Regexp  https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
+    pattern // expression or string value to compare to
+    template // Optional template expression to evaluate against
+    value // Specify a field name of the record to match against the value of.
+    flags // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
+    type // Match type can be string for exact match or leave empty fo Regexp  https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
 ```
 
 ## Filters
