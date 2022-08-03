@@ -42,6 +42,8 @@ spec:
               filters:
                 items:
                   properties:
+                    id:
+                      type: string
                     match:
                       properties:
                         and:
