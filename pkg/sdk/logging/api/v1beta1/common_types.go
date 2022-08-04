@@ -64,6 +64,12 @@ type Metrics struct {
 	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
 }
 
+// BufferMetrics defines the service monitor endpoints
+type BufferMetrics struct {
+	Metrics   `json:",inline"`
+	MountName string `json:"mount_name,omitempty"`
+}
+
 // ServiceMonitorConfig defines the ServiceMonitor properties
 type ServiceMonitorConfig struct {
 	AdditionalLabels   map[string]string   `json:"additionalLabels,omitempty"`

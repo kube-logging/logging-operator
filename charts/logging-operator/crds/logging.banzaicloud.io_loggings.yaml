@@ -9718,6 +9718,8 @@ spec:
                     properties:
                       interval:
                         type: string
+                      mount_name:
+                        type: string
                       path:
                         type: string
                       port:

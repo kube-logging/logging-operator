@@ -250,7 +250,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      r.Logging.QualifiedName(bufferStorageVolumeName),
+					Name:      r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName,
 					MountPath: bufferPath,
 				},
 			},

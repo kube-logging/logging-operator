@@ -52,7 +52,6 @@ const (
 	defaultBufferVolumeMetricsPort    = 9200
 	syslogngImageRepository           = "balabit/syslog-ng"
 	syslogngImageTag                  = "3.37.1"
-	bufferStorageVolumeName           = "buffer"
 	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
 	prometheusExporterImageTag        = "0.0.6"
 	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"

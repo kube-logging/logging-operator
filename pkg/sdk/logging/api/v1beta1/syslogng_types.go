@@ -40,7 +40,7 @@ type SyslogNGSpec struct {
 	ConfigCheckPodOverrides             *typeoverride.PodSpec        `json:"configCheckPod,omitempty"`
 	Metrics                             *Metrics                     `json:"metrics,omitempty"`
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
-	BufferVolumeMetrics                 *Metrics                     `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 
