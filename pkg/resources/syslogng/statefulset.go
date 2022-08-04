@@ -106,7 +106,8 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		LivenessProbe: &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
-					Command: []string{"/bin/sh", "-c", "syslog-ng-ctl --control=/tmp/syslog-ng/syslog-ng.ctl query get global.sdata_updates.processed"}},
+					Command: []string{"/usr/sbin/syslog-ng-ctl", "--control=/tmp/syslog-ng/syslog-ng.ctl", "query", "get", "global.sdata_updates.processed"},
+				},
 			},
 			InitialDelaySeconds: 30,
 			TimeoutSeconds:      0,
