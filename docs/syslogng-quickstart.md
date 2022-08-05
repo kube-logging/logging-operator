@@ -201,3 +201,84 @@ Example kubernetes message:
 ```json
 {"user":"-","ts":"2022-08-02T07:41:34.090763Z","time":"02/Aug/2022:07:41:34 +0000","stream":"stdout","source":"/var/log/log-generator","size":"1628","remote":"85.151.230.190","referer":"-","path":"/index.html","method":"POST","logtag":"F","kubernetes":{"pod_name":"one-eye-log-generator-57988cbd65-gpgc4","pod_id":"010d4598-2e34-4165-accd-2b77e4fc4bb6","namespace_name":"default","labels":{"pod-template-hash":"57988cbd65","app.kubernetes.io/name":"log-generator","app.kubernetes.io/instance":"one-eye-log-generator"},"host":"ip-192-168-6-51.eu-west-1.compute.internal","docker_id":"89e7cf414b5e6ff1fbee977d62cbc96794d2debd6a52803857d5dbad57d4f772","container_name":"log-generator","container_image":"033498657557.dkr.ecr.us-east-2.amazonaws.com/banzaicloud/log-generator:0.3.20","container_hash":"033498657557.dkr.ecr.us-east-2.amazonaws.com/banzaicloud/log-generator@sha256:b031138718194a17fdac2964bacf9543f96b037a65cd50138a5754ddb7897bb5"},"http_x_forwarded_for":"\"-\"","host":"-","code":"403","cluster":"xxxxx","agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"}
 ```
+
+## Complex example
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: TestFlow
+  namespace: default
+spec:
+  match:
+    and:
+    - regexp:
+        value: json.kubernetes.labels.app.kubernetes.io/instance
+        pattern: one-eye-log-generator
+        type: string
+    - regexp:
+        value:  json.kubernetes.labels.app.kubernetes.io/name
+        pattern: log-generator
+        type: string
+  filters:
+  -  parser:
+       regexp: 
+         patterns:
+         - '^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$'
+         template: ${json.message}
+         prefix: json.
+  - rewrite:
+    -  set:
+         field: json.cluster
+         value: xxxxx
+    -  unset:
+         field: json.message
+    -  set:
+         field: json.source
+         value: /var/log/log-generator
+         condition:
+           regexp:
+             value:  json.kubernetes.container_name
+             pattern: log-generator
+             type: string
+  localOutputRefs:
+    - syslog-output
+```
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: test
+  namespace: default
+spec:
+  syslog:
+    host: 10.20.9.89
+    port: 601
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffer
+      reliable: true
+    template: "$(format-json
+                --subkeys json.
+                --exclude json.kubernetes.labels.*
+                json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))\n"
+    tls:
+      ca_file:
+        mountFrom:
+          secretKeyRef:
+            key: ca.crt
+            name: syslog-tls-cert
+      cert_file:
+        mountFrom:
+          secretKeyRef:
+            key: tls.crt
+            name: syslog-tls-cert
+      key_file:
+        mountFrom:
+          secretKeyRef:
+            key: tls.key
+            name: syslog-tls-cert
+    transport: tls
+```
