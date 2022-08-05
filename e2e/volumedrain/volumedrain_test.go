@@ -132,7 +132,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		require.NoError(t, c.GetClient().Create(ctx, &flow))
 
 		fluentdReplicaName := logging.Name + "-fluentd-1"
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 2*time.Minute, 5*time.Second)
+		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 5*time.Minute, 5*time.Second)
 
 		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
