@@ -21,6 +21,7 @@ import (
 
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -77,22 +78,23 @@ type FluentbitSpec struct {
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	BufferStorageVolume     volume.KubernetesVolume      `json:"bufferStorageVolume,omitempty"`
-	BufferVolumeMetrics     *Metrics                     `json:"bufferVolumeMetrics,omitempty"`
-	BufferVolumeImage       ImageSpec                    `json:"bufferVolumeImage,omitempty"`
-	BufferVolumeArgs        []string                     `json:"bufferVolumeArgs,omitempty"`
-	CustomConfigSecret      string                       `json:"customConfigSecret,omitempty"`
-	PodPriorityClassName    string                       `json:"podPriorityClassName,omitempty"`
-	LivenessProbe           *corev1.Probe                `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck    bool                         `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe          *corev1.Probe                `json:"readinessProbe,omitempty"`
-	Network                 *FluentbitNetwork            `json:"network,omitempty"`
-	ForwardOptions          *ForwardOptions              `json:"forwardOptions,omitempty"`
-	EnableUpstream          bool                         `json:"enableUpstream,omitempty"`
-	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
-	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
-	HostNetwork             bool                         `json:"HostNetwork,omitempty"`
+	BufferStorageVolume     volume.KubernetesVolume        `json:"bufferStorageVolume,omitempty"`
+	BufferVolumeMetrics     *Metrics                       `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeImage       ImageSpec                      `json:"bufferVolumeImage,omitempty"`
+	BufferVolumeArgs        []string                       `json:"bufferVolumeArgs,omitempty"`
+	CustomConfigSecret      string                         `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName    string                         `json:"podPriorityClassName,omitempty"`
+	LivenessProbe           *corev1.Probe                  `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck    bool                           `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe          *corev1.Probe                  `json:"readinessProbe,omitempty"`
+	Network                 *FluentbitNetwork              `json:"network,omitempty"`
+	ForwardOptions          *ForwardOptions                `json:"forwardOptions,omitempty"`
+	EnableUpstream          bool                           `json:"enableUpstream,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount   `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
+	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
+	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
