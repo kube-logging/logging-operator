@@ -88,6 +88,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					Containers: containers,
 				},
 			},
+			UpdateStrategy: r.Logging.Spec.FluentbitSpec.UpdateStrategy,
 		},
 	}
 
