@@ -282,3 +282,30 @@ spec:
             name: syslog-tls-cert
     transport: tls
 ```
+
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+  name: test
+spec:
+  syslogNG:
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: syslog-ng
+              volumeMounts:
+              - mountPath: /buffers
+                name: buffer
+        volumeClaimTemplates:
+        - metadata:
+            name: buffer
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+```
