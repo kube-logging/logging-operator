@@ -159,6 +159,7 @@ SyslogNGOutput and SyslogNGClusterOutput resources have almost the same structur
 Logging Operator currently supports 2 kinds of outputs for syslog-ng:
 - file
 - syslog
+- sumologic-http
 
 ### File output
 The `file` output stores log records to a plain text file.
@@ -193,6 +194,42 @@ The `syslog` output sends log records over a socket using the Syslog protocol (R
             secretKeyRef:
               name: tls-secret
               key: tls.key
+```
+
+### Sumologic-http output
+
+The `sumologic-http` output sends log records over HTTP to Sumologic.
+
+Parameters
+```yaml
+  body: # Body content template to send
+  deployment: # Deployment code for sumologic. More info: https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security
+  collector: # Sumo Logic service token (secret)
+  headers: # Extra headers for Sumologic like X-Sumo-Name
+  tls: # Required TLS configuration for Sumologic. Minimal config is use-system-cert-store: true
+```
+
+```
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: test-sumo
+  namespace: default
+spec:
+  sumologic-http:
+    body: $(format-json --subkeys json. --exclude json.kubernetes.labels.* json.kubernetes.labels=literal($(format-flat-json
+      --subkeys json.kubernetes.labels.)))
+    collector:
+      valueFrom:
+        secretKeyRef:
+          key: token
+          name: sumo-collector
+    deployment: us2
+    headers:
+    - 'X-Sumo-Name: source-name'
+    - 'X-Sumo-Category: source-category'
+    tls:
+      use-system-cert-store: true
 ```
 
 ---

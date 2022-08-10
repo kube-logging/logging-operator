@@ -91,7 +91,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 			seqs.Concat(
 				seqs.FromValues(
 					versionStmt(configVersion),
-					includeStmt("/usr/share/syslog-ng/include/scl/*/*.conf"),
+					includeStmt("scl.conf"),
 					globalOptionsDefStmt(globalOptions...),
 					sourceDefStmt(sourceName,
 						channelDefStmt(

@@ -91,10 +91,20 @@ func (in *SumologicHTTPOutput) DeepCopyInto(out *SumologicHTTPOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Collector != nil {
+		in, out := &in.Collector, &out.Collector
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Headers != nil {
 		in, out := &in.Headers, &out.Headers
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.TLS != nil {
+		in, out := &in.TLS, &out.TLS
+		*out = new(TLS)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.DiskBuffer != nil {
 		in, out := &in.DiskBuffer, &out.DiskBuffer
@@ -210,6 +220,11 @@ func (in *TLS) DeepCopyInto(out *TLS) {
 		in, out := &in.CertFile, &out.CertFile
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.UseSystemCertStore != nil {
+		in, out := &in.UseSystemCertStore, &out.UseSystemCertStore
+		*out = new(bool)
+		**out = **in
 	}
 }
 
