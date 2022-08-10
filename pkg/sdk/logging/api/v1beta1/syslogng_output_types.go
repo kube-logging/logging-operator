@@ -30,9 +30,11 @@ type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 type SyslogNGOutputSpec struct {
-	LoggingRef string               `json:"loggingRef,omitempty"`
-	Syslog     *output.SyslogOutput `json:"syslog,omitempty" syslog-ng:"dest-drv"`
-	File       *output.FileOutput   `json:"file,omitempty" syslog-ng:"dest-drv"`
+	LoggingRef      string                        `json:"loggingRef,omitempty"`
+	Syslog          *output.SyslogOutput          `json:"syslog,omitempty" syslog-ng:"dest-drv"`
+	File            *output.FileOutput            `json:"file,omitempty" syslog-ng:"dest-drv"`
+	SumologicHTTP   *output.SumologicHTTPOutput   `json:"sumologic-http,omitempty" syslog-ng:"dest-drv"`
+	SumologicSyslog *output.SumologicSyslogOutput `json:"sumologic-syslog,omitempty" syslog-ng:"dest-drv"`
 }
 
 type SyslogNGOutputStatus OutputStatus

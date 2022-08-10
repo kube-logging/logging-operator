@@ -43,11 +43,11 @@ type SumologicHTTPOutput struct {
 	// This option specifies your Sumo Logic deployment.https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security  (default: empty)
 	Deployment string `json:"deployment,omitempty"`
 	// Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").  (default: empty)
-	Headers string `json:"headers,omitempty"`
+	Headers []string `json:"headers,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`
 	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193
-	Tls string `json:"tls,omitempty"`
+	TLS string `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 }

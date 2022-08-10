@@ -89,6 +89,13 @@ spec:
                           required:
                           - patterns
                           type: object
+                        syslog-parser:
+                          properties:
+                            flags:
+                              items:
+                                type: string
+                              type: array
+                          type: object
                       type: object
                     rewrite:
                       items:

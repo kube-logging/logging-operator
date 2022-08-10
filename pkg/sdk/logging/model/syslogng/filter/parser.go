@@ -32,7 +32,8 @@ type _metaParser interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"[Parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#TOPIC-1768819)"
 type ParserConfig struct {
-	Regexp *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
+	Regexp       *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
+	SyslogParser *SyslogParser `json:"syslog-parser,omitempty," syslog-ng:"parser-drv,name=syslog-parser"`
 }
 
 // +kubebuilder:object:generate=true
@@ -46,4 +47,11 @@ type RegexpParser struct {
 	Template string `json:"template,omitempty"`
 	// Pattern flags
 	Flags []string `json:"flags,omitempty"` // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
+}
+
+// +kubebuilder:object:generate=true
+// +docName:"[Syslog Parser] https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90
+type SyslogParser struct {
+	// Pattern flags
+	Flags []string `json:"flags,omitempty"`
 }

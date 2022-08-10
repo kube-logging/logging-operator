@@ -82,6 +82,214 @@ spec:
                 type: object
               loggingRef:
                 type: string
+              sumologic-http:
+                properties:
+                  ca_dir:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  ca_file:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  collector:
+                    type: string
+                  deployment:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  headers:
+                    items:
+                      type: string
+                    type: array
+                  time_reopen:
+                    type: integer
+                  tls:
+                    type: string
+                type: object
+              sumologic-syslog:
+                properties:
+                  ca_dir:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  ca_file:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  deployment:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  port:
+                    type: integer
+                  tag:
+                    type: string
+                  tls:
+                    type: string
+                  token:
+                    type: integer
+                type: object
               syslog:
                 properties:
                   close_on_input:

@@ -91,6 +91,11 @@ func (in *SumologicHTTPOutput) DeepCopyInto(out *SumologicHTTPOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Headers != nil {
+		in, out := &in.Headers, &out.Headers
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.DiskBuffer != nil {
 		in, out := &in.DiskBuffer, &out.DiskBuffer
 		*out = new(DiskBuffer)
