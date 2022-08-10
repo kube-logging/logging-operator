@@ -207,6 +207,7 @@ Parameters
   collector: # Sumo Logic service token (secret)
   headers: # Extra headers for Sumologic like X-Sumo-Name
   tls: # Required TLS configuration for Sumologic. Minimal config is use-system-cert-store: true
+  disk_buffer: # Disk buffer parameters
 ```
 
 ```
@@ -217,6 +218,10 @@ metadata:
   namespace: default
 spec:
   sumologic-http:
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffers
+      reliable: true
     body: $(format-json --subkeys json. --exclude json.kubernetes.labels.* json.kubernetes.labels=literal($(format-flat-json
       --subkeys json.kubernetes.labels.)))
     collector:
@@ -230,6 +235,17 @@ spec:
     - 'X-Sumo-Category: source-category'
     tls:
       use-system-cert-store: true
+```
+Based on the official docs: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/disk-buffer
+### Disk buffer
+```yaml
+	DiskBufSize  int64  `json:"disk_buf_size"`
+	Reliable     bool   `json:"reliable"`
+	Compaction   *bool  `json:"compaction,omitempty"`
+	Dir          string `json:"dir,omitempty"`
+	MemBufLength *int64 `json:"mem_buf_length,omitempty"`
+	MemBufSize   *int64 `json:"mem_buf_size,omitempty"`
+	QOutSize     *int64 `json:"q_out_size,omitempty"`
 ```
 
 ---
