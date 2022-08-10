@@ -213,7 +213,7 @@ Parameters
   batch-timeout: # Time out for sending batch if no input available
 ```
 
-```
+```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
 metadata:
@@ -226,8 +226,12 @@ spec:
       disk_buf_size: 512000000
       dir: /buffers
       reliable: true
-    body: $(format-json --subkeys json. --exclude json.kubernetes.labels.* json.kubernetes.labels=literal($(format-flat-json
-      --subkeys json.kubernetes.labels.)))
+    body: "$(format-json
+                --subkeys json.
+                --exclude json.kubernetes.annotations.*
+                json.kubernetes.annotations=literal($(format-flat-json --subkeys json.kubernetes.annotations.))
+                --exclude json.kubernetes.labels.*
+                json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))"
     collector:
       valueFrom:
         secretKeyRef:
