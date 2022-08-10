@@ -208,9 +208,9 @@ Parameters
   headers: # Extra headers for Sumologic like X-Sumo-Name
   tls: # Required TLS configuration for Sumologic. Minimal config is use-system-cert-store: true
   disk_buffer: # Disk buffer parameters
-	batch-lines: # Collect messages into batches number of lines (recommended)
-	batch-bytes: # Collect messages into batches size of batch 
-	batch-timeout: # Time out for sending batch if no input available
+  batch-lines: # Collect messages into batches number of lines (recommended)
+  batch-bytes: # Collect messages into batches size of batch 
+  batch-timeout: # Time out for sending batch if no input available
 ```
 
 ```
