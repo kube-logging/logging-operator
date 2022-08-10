@@ -93,6 +93,7 @@ These filters have the same options and syntax as syslog-ng flow match expressio
 Parser filters can be used to extract key-value pairs from message data.
 Logging Operator currently supports the following parsers:
 - regexp
+- syslog-parser
 
 ##### Regexp parser
 The regexp parser can parse fields from a message with the help of regular expressions.
@@ -107,6 +108,16 @@ The regexp parser can parse fields from a message with the help of regular expre
 ```
 
 For more info, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90
+
+#### Syslog-parser
+
+The syslog parser can parse syslog messages. Docs: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/83#TOPIC-1829231
+
+```yaml
+filters:
+-  parser:
+      syslog-parser: {} 
+```
 
 #### Rewrite filter
 Rewrite filters can be used to modify record contents.
