@@ -49,6 +49,9 @@ type SumologicHTTPOutput struct {
 	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193
 	TLS *TLS `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
-	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
-	Body       string      `json:"body,omitempty"`
+	DiskBuffer   *DiskBuffer `json:"disk_buffer,omitempty"`
+	Body         string      `json:"body,omitempty"`
+	BatchLines   int         `json:"batch-lines,omitempty"`
+	BatchBytes   int         `json:"batch-bytes,omitempty"`
+	BatchTimeout int         `json:"batch-timeout,omitempty"`
 }

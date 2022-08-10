@@ -84,6 +84,12 @@ spec:
                 type: string
               sumologic-http:
                 properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
                   body:
                     type: string
                   ca_dir:
