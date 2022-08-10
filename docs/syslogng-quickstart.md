@@ -258,13 +258,13 @@ spec:
 Based on the official docs: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/disk-buffer
 ### Disk buffer
 ```yaml
-	DiskBufSize  int64  `json:"disk_buf_size"`
-	Reliable     bool   `json:"reliable"`
-	Compaction   *bool  `json:"compaction,omitempty"`
-	Dir          string `json:"dir,omitempty"`
-	MemBufLength *int64 `json:"mem_buf_length,omitempty"`
-	MemBufSize   *int64 `json:"mem_buf_size,omitempty"`
-	QOutSize     *int64 `json:"q_out_size,omitempty"`
+  DiskBufSize  int64  `json:"disk_buf_size"`
+  Reliable     bool   `json:"reliable"`
+  Compaction   *bool  `json:"compaction,omitempty"`
+  Dir          string `json:"dir,omitempty"`
+  MemBufLength *int64 `json:"mem_buf_length,omitempty"`
+  MemBufSize   *int64 `json:"mem_buf_size,omitempty"`
+  QOutSize     *int64 `json:"q_out_size,omitempty"`
 ```
 
 ---
