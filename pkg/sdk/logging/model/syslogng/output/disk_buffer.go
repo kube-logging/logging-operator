@@ -14,7 +14,12 @@
 
 package output
 
+// +name:"Disk buffer"
+// +weight:"200"
+type _hugoFile interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
+// The parameters of the syslog-ng disk buffer. Using a disk buffer on the output helps avoid message loss in case of a system failure on the destination side.
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type DiskBuffer struct {
 	DiskBufSize  int64  `json:"disk_buf_size"`
