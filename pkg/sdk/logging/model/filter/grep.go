@@ -37,13 +37,13 @@ type _metaGrep interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GrepConfig struct {
-	// +docLink:"Regexp Directive,#Regexp-Directive"
+	// +docLink:"Regexp Directive,#grepconfig-regexp"
 	Regexp []RegexpSection `json:"regexp,omitempty"`
-	// +docLink:"Exclude Directive,#Exclude-Directive"
+	// +docLink:"Exclude Directive,#grepconfig-exclude"
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
-	// +docLink:"Or Directive,#Or-Directive"
+	// +docLink:"Or Directive,#grepconfig-or"
 	Or []OrSection `json:"or,omitempty"`
-	// +docLink:"And Directive,#And-Directive"
+	// +docLink:"And Directive,#grepconfig-and"
 	And []AndSection `json:"and,omitempty"`
 }
 
