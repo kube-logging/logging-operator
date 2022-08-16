@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Elasticsearch GenId"
+// +weight:"200"
+type _hugoFile interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 type ElasticsearchGenId struct {
 	// You can specify generated hash storing key.

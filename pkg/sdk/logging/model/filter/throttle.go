@@ -19,6 +19,10 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
+// +name:"Throttle"
+// +weight:"200"
+type _hugoFile interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 // +docName:"[Throttle Filter](https://github.com/rubrikinc/fluent-plugin-throttle)"
 // A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group.
