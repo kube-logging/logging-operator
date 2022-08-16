@@ -34,9 +34,11 @@ func main() {
 func plugins() {
 	lister := docgen.NewSourceLister(
 		map[string]docgen.SourceDir{
-			"filters": {Path: "pkg/sdk/logging/model/filter", DestPath: "docs/configuration/plugins/filters"},
-			"outputs": {Path: "pkg/sdk/logging/model/output", DestPath: "docs/configuration/plugins/outputs"},
-			"common":  {Path: "pkg/sdk/logging/model/common", DestPath: "docs/configuration/plugins/common"},
+			"filters":           {Path: "pkg/sdk/logging/model/filter", DestPath: "docs/configuration/plugins/filters"},
+			"syslog-ng-filters": {Path: "pkg/sdk/logging/model/syslogng/filter", DestPath: "docs/configuration/plugins/syslog-ng-filters"},
+			"outputs":           {Path: "pkg/sdk/logging/model/output", DestPath: "docs/configuration/plugins/outputs"},
+			"syslog-ng-outputs": {Path: "pkg/sdk/logging/model/syslogng/output", DestPath: "docs/configuration/plugins/syslog-ng-outputs"},
+			"common":            {Path: "pkg/sdk/logging/model/common", DestPath: "docs/configuration/plugins/common"},
 		},
 		logger.WithName("pluginlister"))
 
