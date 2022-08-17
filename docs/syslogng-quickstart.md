@@ -175,16 +175,22 @@ Logging Operator currently supports 2 kinds of outputs for syslog-ng:
 ### File output
 The `file` output stores log records to a plain text file.
 ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
   spec:
     file:
       path: /mnt/archive/logs/${YEAR}/${MONTH}/${DAY}/app.log
       create_dirs: true
+    template: |
+      $(format-json --subkeys json. --exclude json.kubernetes.labels.* json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))
 ```
 
 ### Syslog output
 The `syslog` output sends log records over a socket using the Syslog protocol (RFC 5424).
 
 ```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
   spec:
     syslog:
       host: 10.12.34.56

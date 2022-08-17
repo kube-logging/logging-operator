@@ -278,7 +278,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
 
-	err := merge.Merge(pod, r.Logging.Spec.SyslogNGSpec.ConfigCheckPodOverrides)
+	err := merge.Merge(&pod.Spec, r.Logging.Spec.SyslogNGSpec.ConfigCheckPodOverrides)
 
 	return pod, err
 }
