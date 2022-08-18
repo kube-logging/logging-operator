@@ -72,23 +72,7 @@ type fluentBitConfig struct {
 }
 
 type fluentForwardOutputConfig struct {
-	Network struct {
-		ConnectTimeoutSet         bool
-		ConnectTimeout            uint32
-		ConnectTimeoutLogErrorSet bool
-		ConnectTimeoutLogError    bool
-		DNSMode                   string
-		DNSPreferIPV4Set          bool
-		DNSPreferIPV4             bool
-		DNSResolver               string
-		KeepaliveSet              bool
-		Keepalive                 bool
-		KeepaliveIdleTimeoutSet   bool
-		KeepaliveIdleTimeout      uint32
-		KeepaliveMaxRecycleSet    bool
-		KeepaliveMaxRecycle       uint32
-		SourceAddress             string
-	}
+	Network    FluentbitNetwork
 	Options    map[string]string
 	TargetHost string
 	TargetPort int32
@@ -105,6 +89,23 @@ type fluentForwardOutputUpstreamConfig struct {
 	Enabled bool
 	Config  upstream
 }
+type FluentbitNetwork struct {
+	ConnectTimeoutSet         bool
+	ConnectTimeout            uint32
+	ConnectTimeoutLogErrorSet bool
+	ConnectTimeoutLogError    bool
+	DNSMode                   string
+	DNSPreferIPV4Set          bool
+	DNSPreferIPV4             bool
+	DNSResolver               string
+	KeepaliveSet              bool
+	Keepalive                 bool
+	KeepaliveIdleTimeoutSet   bool
+	KeepaliveIdleTimeout      uint32
+	KeepaliveMaxRecycleSet    bool
+	KeepaliveMaxRecycle       uint32
+	SourceAddress             string
+}
 
 // https://docs.fluentbit.io/manual/pipeline/outputs/tcp-and-tls
 type syslogNGOutputConfig struct {
@@ -113,6 +114,52 @@ type syslogNGOutputConfig struct {
 	JSONDateKey    string
 	JSONDateFormat string
 	Workers        *int
+	Network        FluentbitNetwork
+}
+
+func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetwork) {
+	if network.ConnectTimeout != nil {
+		result.ConnectTimeoutSet = true
+		result.ConnectTimeout = *network.ConnectTimeout
+	}
+
+	if network.ConnectTimeoutLogError != nil {
+		result.ConnectTimeoutLogErrorSet = true
+		result.ConnectTimeoutLogError = *network.ConnectTimeoutLogError
+	}
+
+	if network.DNSMode != "" {
+		result.DNSMode = network.DNSMode
+	}
+
+	if network.DNSPreferIPV4 != nil {
+		result.DNSPreferIPV4Set = true
+		result.DNSPreferIPV4 = *network.DNSPreferIPV4
+	}
+
+	if network.DNSResolver != "" {
+		result.DNSResolver = network.DNSResolver
+	}
+
+	if network.Keepalive != nil {
+		result.KeepaliveSet = true
+		result.Keepalive = *network.Keepalive
+	}
+
+	if network.KeepaliveIdleTimeout != nil {
+		result.KeepaliveIdleTimeoutSet = true
+		result.KeepaliveIdleTimeout = *network.KeepaliveIdleTimeout
+	}
+
+	if network.KeepaliveMaxRecycle != nil {
+		result.KeepaliveMaxRecycleSet = true
+		result.KeepaliveMaxRecycle = *network.KeepaliveMaxRecycle
+	}
+
+	if network.SourceAddress != "" {
+		result.SourceAddress = network.SourceAddress
+	}
+	return
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
@@ -233,6 +280,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 		input.AwsFilter = awsFilter
 	}
+
 	if input.FluentForwardOutput != nil {
 		if r.Logging.Spec.FluentbitSpec.TargetHost != "" {
 			input.FluentForwardOutput.TargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
@@ -248,47 +296,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			input.FluentForwardOutput.Options = forwardOptions
 		}
 		if r.Logging.Spec.FluentbitSpec.Network != nil {
-			if r.Logging.Spec.FluentbitSpec.Network.ConnectTimeout != nil {
-				input.FluentForwardOutput.Network.ConnectTimeoutSet = true
-				input.FluentForwardOutput.Network.ConnectTimeout = *r.Logging.Spec.FluentbitSpec.Network.ConnectTimeout
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.ConnectTimeoutLogError != nil {
-				input.FluentForwardOutput.Network.ConnectTimeoutLogErrorSet = true
-				input.FluentForwardOutput.Network.ConnectTimeoutLogError = *r.Logging.Spec.FluentbitSpec.Network.ConnectTimeoutLogError
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.DNSMode != "" {
-				input.FluentForwardOutput.Network.DNSMode = r.Logging.Spec.FluentbitSpec.Network.DNSMode
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.DNSPreferIPV4 != nil {
-				input.FluentForwardOutput.Network.DNSPreferIPV4Set = true
-				input.FluentForwardOutput.Network.DNSPreferIPV4 = *r.Logging.Spec.FluentbitSpec.Network.DNSPreferIPV4
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.DNSResolver != "" {
-				input.FluentForwardOutput.Network.DNSResolver = r.Logging.Spec.FluentbitSpec.Network.DNSResolver
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.Keepalive != nil {
-				input.FluentForwardOutput.Network.KeepaliveSet = true
-				input.FluentForwardOutput.Network.Keepalive = *r.Logging.Spec.FluentbitSpec.Network.Keepalive
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.KeepaliveIdleTimeout != nil {
-				input.FluentForwardOutput.Network.KeepaliveIdleTimeoutSet = true
-				input.FluentForwardOutput.Network.KeepaliveIdleTimeout = *r.Logging.Spec.FluentbitSpec.Network.KeepaliveIdleTimeout
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle != nil {
-				input.FluentForwardOutput.Network.KeepaliveMaxRecycleSet = true
-				input.FluentForwardOutput.Network.KeepaliveMaxRecycle = *r.Logging.Spec.FluentbitSpec.Network.KeepaliveMaxRecycle
-			}
-
-			if r.Logging.Spec.FluentbitSpec.Network.SourceAddress != "" {
-				input.FluentForwardOutput.Network.SourceAddress = r.Logging.Spec.FluentbitSpec.Network.SourceAddress
-			}
+			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.Logging.Spec.FluentbitSpec.Network)
 		}
 
 		fluentdReplicas, err := r.fluentdDataProvider.GetReplicaCount(context.TODO(), r.Logging)
@@ -322,6 +330,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.JSONDateKey = "ts"
 		input.SyslogNGOutput.JSONDateFormat = "iso8601"
 
+	}
+
+	if input.SyslogNGOutput != nil {
+		if r.Logging.Spec.FluentbitSpec.Network != nil {
+			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.Logging.Spec.FluentbitSpec.Network)
+		}
 	}
 
 	conf, err := generateConfig(input)
