@@ -34,6 +34,7 @@ type SyslogOutput struct {
 	TLS            *TLS        `json:"tls,omitempty"`
 	TSFormat       string      `json:"ts_format,omitempty"`
 	DiskBuffer     *DiskBuffer `json:"disk_buffer,omitempty"`
+	PersistName    string      `json:"persist_name,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

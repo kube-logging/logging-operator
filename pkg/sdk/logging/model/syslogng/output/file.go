@@ -19,8 +19,8 @@ package output
 type _hugoFile interface{} //nolint:deadcode,unused
 
 // +docName:"File output plugin for syslog-ng"
-//Storing messages in plain-text files
-//More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
+// Storing messages in plain-text files
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type _docFile interface{} //nolint:deadcode,unused
 
 // +name:"File"
@@ -43,6 +43,7 @@ type FileOutput struct {
 	// The permission mask of directories created by syslog-ng. Log directories are only created if a file after macro expansion refers to a non-existing directory, and directory creation is enabled (see also the create-dirs() option). For octal numbers prefix the number with 0, for example use 0755 for rwxr-xr-x.(default: Use the global settings)
 	DirPerm int `json:"dir_perm,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
-	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
-	Template   string      `json:"template,omitempty"`
+	DiskBuffer  *DiskBuffer `json:"disk_buffer,omitempty"`
+	Template    string      `json:"template,omitempty"`
+	PersistName string      `json:"persist_name,omitempty"`
 }

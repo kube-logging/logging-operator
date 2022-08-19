@@ -21,7 +21,7 @@ import "github.com/banzaicloud/operator-tools/pkg/secret"
 type _hugoSumologicHTTP interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over http"
-//More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
 type _docSumologicHTTP interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic HTTP"
@@ -54,4 +54,5 @@ type SumologicHTTPOutput struct {
 	BatchLines   int         `json:"batch-lines,omitempty"`
 	BatchBytes   int         `json:"batch-bytes,omitempty"`
 	BatchTimeout int         `json:"batch-timeout,omitempty"`
+	PersistName  string      `json:"persist_name,omitempty"`
 }

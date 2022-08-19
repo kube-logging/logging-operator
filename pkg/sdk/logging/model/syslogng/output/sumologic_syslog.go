@@ -21,7 +21,7 @@ import "github.com/banzaicloud/operator-tools/pkg/secret"
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over http"
-//More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
 type _docSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic Syslog"
@@ -49,5 +49,6 @@ type SumologicSyslogOutput struct {
 	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193
 	Tls string `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
-	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
+	DiskBuffer  *DiskBuffer `json:"disk_buffer,omitempty"`
+	PersistName string      `json:"persist_name,omitempty"`
 }
