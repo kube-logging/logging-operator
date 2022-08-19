@@ -109,6 +109,7 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 				res = append(res, render.Error(fmt.Errorf("cannot render map entry with key type %s", keyVal.Type())))
 			}
 		}
+		return res
 	case reflect.Struct:
 		fs := fieldsOf(value)
 		type posArg struct {
