@@ -75,6 +75,8 @@ spec:
                     type: object
                   path:
                     type: string
+                  persist_name:
+                    type: string
                   template:
                     type: string
                 required:
@@ -221,6 +223,8 @@ spec:
                     items:
                       type: string
                     type: array
+                  persist_name:
+                    type: string
                   time_reopen:
                     type: integer
                   tls:
@@ -455,6 +459,8 @@ spec:
                     - disk_buf_size
                     - reliable
                     type: object
+                  persist_name:
+                    type: string
                   port:
                     type: integer
                   tag:
@@ -499,6 +505,8 @@ spec:
                   flush_lines:
                     type: integer
                   host:
+                    type: string
+                  persist_name:
                     type: string
                   port:
                     type: integer
