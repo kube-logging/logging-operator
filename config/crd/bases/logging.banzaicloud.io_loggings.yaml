@@ -2864,6 +2864,13 @@ spec:
                           type: object
                         type: array
                     type: object
+                  syslogng_output:
+                    properties:
+                      json_date_format:
+                        type: string
+                      json_date_key:
+                        type: string
+                    type: object
                   targetHost:
                     type: string
                   targetPort:

@@ -93,6 +93,7 @@ type FluentbitSpec struct {
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	HostNetwork             bool                         `json:"HostNetwork,omitempty"`
+	SyslogNGOutput          *FluentbitTCPOutput          `json:"syslogng_output,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -102,6 +103,14 @@ type FluentbitTLS struct {
 	Enabled    *bool  `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+// FluentbitTCPOutput defines the TLS configs
+type FluentbitTCPOutput struct {
+	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
+	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit

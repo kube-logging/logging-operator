@@ -330,6 +330,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.JSONDateKey = "ts"
 		input.SyslogNGOutput.JSONDateFormat = "iso8601"
 
+		if r.Logging.Spec.FluentbitSpec.SyslogNGOutput != nil {
+			input.SyslogNGOutput.JSONDateKey = r.Logging.Spec.FluentbitSpec.SyslogNGOutput.JsonDateKey
+			input.SyslogNGOutput.JSONDateFormat = r.Logging.Spec.FluentbitSpec.SyslogNGOutput.JsonDateFormat
+		}
 	}
 
 	if input.SyslogNGOutput != nil {
