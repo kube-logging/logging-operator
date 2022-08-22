@@ -53,7 +53,7 @@ const (
 	syslogngImageRepository           = "balabit/syslog-ng"
 	syslogngImageTag                  = "3.37.1"
 	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
-	prometheusExporterImageTag        = "0.0.11"
+	prometheusExporterImageTag        = "0.0.13"
 	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
 	bufferVolumeImageTag              = "0.1.0"
 	configReloaderImageRepository     = "ghcr.io/banzaicloud/syslogng-reload"

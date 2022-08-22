@@ -154,7 +154,7 @@ log {
 						SyslogNGSpec: &v1beta1.SyslogNGSpec{
 							GlobalOptions: &v1beta1.GlobalOptions{
 								StatsLevel: amp(3),
-								StatsFreq:  amp(10),
+								StatsFreq:  amp(0),
 							},
 						},
 					},

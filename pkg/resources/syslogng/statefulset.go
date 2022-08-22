@@ -90,6 +90,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			"--cfgfile=" + configDir + "/" + configKey,
 			"--control=" + socketPath,
 			"--no-caps",
+			"-Fe",
 		},
 		VolumeMounts: generateVolumeMounts(spec),
 		Resources: corev1.ResourceRequirements{
