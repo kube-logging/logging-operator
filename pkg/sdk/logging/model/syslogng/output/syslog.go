@@ -14,10 +14,6 @@
 
 package output
 
-import (
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-)
-
 // +kubebuilder:object:generate=true
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type SyslogOutput struct {
@@ -35,13 +31,4 @@ type SyslogOutput struct {
 	TSFormat       string      `json:"ts_format,omitempty"`
 	DiskBuffer     *DiskBuffer `json:"disk_buffer,omitempty"`
 	PersistName    string      `json:"persist_name,omitempty"`
-}
-
-// +kubebuilder:object:generate=true
-type TLS struct {
-	CaDir              *secret.Secret `json:"ca_dir,omitempty"`
-	CaFile             *secret.Secret `json:"ca_file,omitempty"`
-	KeyFile            *secret.Secret `json:"key_file,omitempty"`
-	CertFile           *secret.Secret `json:"cert_file,omitempty"`
-	UseSystemCertStore *bool          `json:"use-system-cert-store,omitempty"`
 }
