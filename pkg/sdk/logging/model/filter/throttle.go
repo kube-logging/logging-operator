@@ -21,7 +21,7 @@ import (
 
 // +name:"Throttle"
 // +weight:"200"
-type _hugoFile interface{} //nolint:deadcode,unused
+type _hugoThrottle interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Throttle Filter](https://github.com/rubrikinc/fluent-plugin-throttle)"

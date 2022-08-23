@@ -16,7 +16,7 @@ package output
 
 // +name:"File"
 // +weight:"200"
-type _hugoFile interface{} //nolint:deadcode,unused
+type _hugoSyslogNGFile interface{} //nolint:deadcode,unused
 
 // +docName:"File output plugin for syslog-ng"
 //Storing messages in plain-text files

@@ -21,7 +21,7 @@ import (
 
 // +name:"Elasticsearch GenId"
 // +weight:"200"
-type _hugoFile interface{} //nolint:deadcode,unused
+type _hugoElasticsearchGenId interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ElasticsearchGenId struct {
