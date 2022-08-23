@@ -26,9 +26,10 @@ import (
 )
 
 func renderClusterOutput(o v1beta1.SyslogNGClusterOutput, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+	name := clusterOutputDestName(o.Namespace, o.Name)
 	return destinationDefStmt(
-		clusterOutputDestName(o.Namespace, o.Name),
-		renderOutputSpec(o.Spec.SyslogNGOutputSpec, &o, secretLoaderFactory.SecretLoaderForNamespace(o.Namespace)),
+		name,
+		renderOutputSpec(o.Spec.SyslogNGOutputSpec, name, &o, secretLoaderFactory.SecretLoaderForNamespace(o.Namespace)),
 	)
 }
 
@@ -37,9 +38,10 @@ func clusterOutputDestName(ns string, name string) string {
 }
 
 func renderOutput(o v1beta1.SyslogNGOutput, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+	name := outputDestName(o.Namespace, o.Name)
 	return destinationDefStmt(
-		outputDestName(o.Namespace, o.Name),
-		renderOutputSpec(o.Spec, &o, secretLoaderFactory.SecretLoaderForNamespace(o.Namespace)),
+		name,
+		renderOutputSpec(o.Spec, name, &o, secretLoaderFactory.SecretLoaderForNamespace(o.Namespace)),
 	)
 }
 
@@ -47,24 +49,34 @@ func outputDestName(ns string, name string) string {
 	return fmt.Sprintf("output_%s_%s", ns, name)
 }
 
-func renderOutputSpec(spec v1beta1.SyslogNGOutputSpec, output metav1.Object, secretLoader secret.SecretLoader) render.Renderer {
+func renderOutputSpec(spec v1beta1.SyslogNGOutputSpec, destName string, output metav1.Object, secretLoader secret.SecretLoader) render.Renderer {
 	specValue := reflect.ValueOf(spec)
-	driverFields := seqs.ToSlice(
-		seqs.Filter(
-			seqs.Filter(seqs.FromSlice(fieldsOf(specValue)), hasDestDriverTag),
-			func(f Field) bool { return !f.Value.IsNil() },
-		),
-	)
+	driverFields := seqs.ToSlice(seqs.Filter(seqs.FromSlice(fieldsOf(specValue)), isActiveDestinationDriver))
 	switch len(driverFields) {
 	case 0:
 		return render.Error(fmt.Errorf("no destination driver specified on output %s/%s", output.GetNamespace(), output.GetName()))
 	case 1:
-		return renderDriver(driverFields[0], secretLoader)
+		driverField := driverFields[0]
+		defaultPersistName(driverField.Value, destName) // HACK: defaulting should be done properly
+		return renderDriver(driverField, secretLoader)
 	default:
 		return render.Error(fmt.Errorf(
 			"multiple drivers (%v) specified on output %s/%s",
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(driverFields), func(f Field) string { return f.Meta.Name })),
 			output.GetNamespace(), output.GetName(),
 		))
+	}
+}
+
+func defaultPersistName(value reflect.Value, name string) {
+	switch value.Kind() {
+	case reflect.Pointer:
+		defaultPersistName(derefAll(value), name)
+	case reflect.Struct:
+		if persistName := value.FieldByName("PersistName"); persistName.IsValid() && persistName.Kind() == reflect.String {
+			if persistName.String() == "" {
+				persistName.SetString(name)
+			}
+		}
 	}
 }

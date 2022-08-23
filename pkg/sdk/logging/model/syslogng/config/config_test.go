@@ -113,6 +113,8 @@ func TestRenderConfigInto(t *testing.T) {
 			},
 			wantOut: untab(`@version: 3.37
 
+@include "scl.conf"
+
 source "main_input" {
     channel {
         source {
@@ -125,7 +127,7 @@ source "main_input" {
 };
 
 destination "output_default_test-syslog-out" {
-	syslog("test.local" transport("tcp"));
+	syslog("test.local" transport("tcp") persist_name("output_default_test-syslog-out"));
 };
 
 filter "flow_default_test-flow_match" {
@@ -152,7 +154,7 @@ log {
 						SyslogNGSpec: &v1beta1.SyslogNGSpec{
 							GlobalOptions: &v1beta1.GlobalOptions{
 								StatsLevel: amp(3),
-								StatsFreq:  amp(10),
+								StatsFreq:  amp(0),
 							},
 						},
 					},
@@ -161,6 +163,8 @@ log {
 				SecretLoaderFactory: &secretLoaderFactory{},
 			},
 			wantOut: `@version: 3.37
+
+@include "scl.conf"
 
 options {
     stats_level(3);
@@ -220,6 +224,8 @@ source "main_input" {
 				},
 			},
 			wantOut: `@version: 3.37
+
+@include "scl.conf"
 
 source "main_input" {
     channel {
@@ -300,6 +306,8 @@ log {
 			},
 			wantOut: `@version: 3.37
 
+@include "scl.conf"
+
 source "main_input" {
     channel {
         source {
@@ -312,7 +320,7 @@ source "main_input" {
 };
 
 destination "output_default_my-output" {
-    syslog("127.0.0.1" tls(ca_file("/etc/syslog-ng/secret/default-my-secret-tls.crt")));
+    syslog("127.0.0.1" tls(ca_file("/etc/syslog-ng/secret/default-my-secret-tls.crt")) persist_name("output_default_my-output"));
 };
 `,
 		},
@@ -353,6 +361,8 @@ destination "output_default_my-output" {
 				SourcePort:          601,
 			},
 			wantOut: `@version: 3.37
+
+@include "scl.conf"
 
 source "main_input" {
     channel {
@@ -414,6 +424,8 @@ log {
 				SourcePort:          601,
 			},
 			wantOut: `@version: 3.37
+
+@include "scl.conf"
 
 source "main_input" {
     channel {

@@ -19,7 +19,7 @@ import (
 )
 
 type JSONParser struct {
-	__meta        struct{} `syslog-ng:"name=json-parser"`
+	__meta        struct{} `syslog-ng:"name=json-parser"` //lint:ignore U1000 field used for adding tag to the type
 	ExtractPrefix string   `syslog-ng:"name=extract-prefix,optional"`
 	Marker        string   `syslog-ng:"name=marker,optional"`
 	Prefix        string   `syslog-ng:"name=prefix,optional"`

@@ -163,6 +163,33 @@ var fluentBitConfigTemplate = `
     {{- with .Workers }}
     Workers {{ . }}
     {{- end }}
+    {{- if .Network.ConnectTimeoutSet }}
+    net.connect_timeout {{.Network.ConnectTimeout}}
+    {{- end }}
+    {{- if .Network.ConnectTimeoutLogErrorSet }}
+    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
+    {{- end }}
+    {{- if .Network.DNSMode }}
+    net.dns.mode {{.Network.DNSMode}}
+    {{- end }}
+    {{- if .Network.DNSPreferIPV4Set }}
+    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
+    {{- end }}
+    {{- if .Network.DNSResolver }}
+    net.dns.resolver {{.Network.DNSResolver}}
+    {{- end }}
+    {{- if .Network.KeepaliveSet}}
+    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- end }}
+    {{- if .Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    {{- end }}
+    {{- if .Network.KeepaliveMaxRecycleSet }}
+    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    {{- end }}
+    {{- if .Network.SourceAddress }}
+    net.source_address {{.Network.SourceAddress}}
+    {{- end }}
 {{- end }}
 `
 

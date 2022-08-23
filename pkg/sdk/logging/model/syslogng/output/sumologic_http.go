@@ -21,7 +21,7 @@ import "github.com/banzaicloud/operator-tools/pkg/secret"
 type _hugoSumologicHTTP interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over http"
-//More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
 type _docSumologicHTTP interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic HTTP"
@@ -32,12 +32,6 @@ type _metaSumologicHTTP interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SumologicHTTPOutput struct {
-	// The name of a directory that contains a set of trusted CA certificates in PEM format.
-	// +docLink:"Secret,../secret/" (default: none)
-	CaDir *secret.Secret `json:"ca_dir,omitempty"`
-	// The name of a file that contains a set of trusted CA certificates in PEM format. The syslog-ng OSE application uses the CA certificates in this file to validate the certificate of the peer.
-	// +docLink:"Secret,../secret/" (default: empty)
-	CaFile *secret.Secret `json:"ca_file,omitempty"`
 	// The Cloud Syslog Cloud Token that you received from the Sumo Logic service while configuring your cloud syslog source. (default: empty)
 	Collector *secret.Secret `json:"collector,omitempty"`
 	// This option specifies your Sumo Logic deployment.https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security  (default: empty)
@@ -54,4 +48,5 @@ type SumologicHTTPOutput struct {
 	BatchLines   int         `json:"batch-lines,omitempty"`
 	BatchBytes   int         `json:"batch-bytes,omitempty"`
 	BatchTimeout int         `json:"batch-timeout,omitempty"`
+	PersistName  string      `json:"persist_name,omitempty"`
 }
