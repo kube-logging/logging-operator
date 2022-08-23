@@ -14,8 +14,6 @@
 
 package output
 
-import "github.com/banzaicloud/operator-tools/pkg/secret"
-
 // +name:"Sumo Logic HTTP"
 // +weight:"200"
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
@@ -32,12 +30,6 @@ type _metaSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SumologicSyslogOutput struct {
-	// The name of a directory that contains a set of trusted CA certificates in PEM format.
-	// +docLink:"Secret,../secret/" (default: none)
-	CaDir *secret.Secret `json:"ca_dir,omitempty"`
-	// The name of a file that contains a set of trusted CA certificates in PEM format. The syslog-ng OSE application uses the CA certificates in this file to validate the certificate of the peer.
-	// +docLink:"Secret,../secret/" (default: empty)
-	CaFile *secret.Secret `json:"ca_file,omitempty"`
 	// This option sets the port number of the Sumo Logic server to connect to. (default: 6514)
 	Port int `json:"port,omitempty"`
 	// This option specifies your Sumo Logic deployment.https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security  (default: empty)
