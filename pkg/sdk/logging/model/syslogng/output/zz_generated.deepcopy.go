@@ -136,6 +136,11 @@ func (in *SumologicSyslogOutput) DeepCopyInto(out *SumologicSyslogOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.TLS != nil {
+		in, out := &in.TLS, &out.TLS
+		*out = new(TLS)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.DiskBuffer != nil {
 		in, out := &in.DiskBuffer, &out.DiskBuffer
 		*out = new(DiskBuffer)
