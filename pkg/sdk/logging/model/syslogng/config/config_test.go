@@ -15,7 +15,6 @@
 package config
 
 import (
-	"context"
 	"strings"
 	"testing"
 
@@ -25,10 +24,7 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestRenderConfigInto(t *testing.T) {
@@ -39,7 +35,7 @@ func TestRenderConfigInto(t *testing.T) {
 	}{
 		"empty input": {
 			input: Input{
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
 			wantErr: true,
 		},
@@ -50,7 +46,7 @@ func TestRenderConfigInto(t *testing.T) {
 						SyslogNGSpec: nil,
 					},
 				},
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
 			wantErr: true,
 		},
@@ -109,9 +105,9 @@ func TestRenderConfigInto(t *testing.T) {
 						},
 					},
 				},
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
-			wantOut: untab(`@version: 3.37
+			wantOut: Untab(`@version: 3.37
 
 @include "scl.conf"
 
@@ -160,7 +156,7 @@ log {
 					},
 				},
 				SourcePort:          601,
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
 			wantOut: `@version: 3.37
 
@@ -191,7 +187,7 @@ source "main_input" {
 					},
 				},
 				SourcePort:          601,
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -286,7 +282,7 @@ log {
 						},
 					},
 				},
-				SecretLoaderFactory: &secretLoaderFactory{
+				SecretLoaderFactory: &TestSecretLoaderFactory{
 					reader: secretReader{
 						secrets: []corev1.Secret{
 							{
@@ -357,7 +353,7 @@ destination "output_default_my-output" {
 						},
 					},
 				},
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
 			wantOut: `@version: 3.37
@@ -420,7 +416,7 @@ log {
 						},
 					},
 				},
-				SecretLoaderFactory: &secretLoaderFactory{},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
 			wantOut: `@version: 3.37
@@ -456,47 +452,8 @@ log {
 		t.Run(name, func(t *testing.T) {
 			var buf strings.Builder
 			err := RenderConfigInto(testCase.input, &buf)
-			checkError(t, testCase.wantErr, err)
+			CheckError(t, testCase.wantErr, err)
 			require.Equal(t, testCase.wantOut, buf.String())
 		})
 	}
 }
-
-type secretLoaderFactory struct {
-	reader    client.Reader
-	mountPath string
-	secrets   secret.MountSecrets
-}
-
-func (f *secretLoaderFactory) SecretLoaderForNamespace(ns string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.reader, ns, f.mountPath, &f.secrets)
-}
-
-type secretReader struct {
-	secrets []corev1.Secret
-}
-
-func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object) error {
-	if secret, ok := obj.(*corev1.Secret); ok {
-		if secret == nil {
-			return nil
-		}
-		for _, s := range r.secrets {
-			if s.Namespace == key.Namespace && s.Name == key.Name {
-				*secret = s
-				return nil
-			}
-		}
-		return apierrors.NewNotFound(corev1.Resource("secret"), key.String())
-	}
-	return apierrors.NewNotFound(schema.GroupResource{
-		Group:    obj.GetObjectKind().GroupVersionKind().Group,
-		Resource: strings.ToLower(obj.GetObjectKind().GroupVersionKind().Kind),
-	}, key.String())
-}
-
-func (r secretReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
-	panic("not implemented")
-}
-
-var _ client.Reader = (*secretReader)(nil)

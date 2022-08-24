@@ -15,14 +15,21 @@
 package config
 
 import (
+	"context"
 	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func checkError(t *testing.T, expected interface{}, actual error, msgAndArgs ...interface{}) {
+func CheckError(t *testing.T, expected interface{}, actual error, msgAndArgs ...interface{}) {
 	t.Helper()
 	switch expected := expected.(type) {
 	case nil:
@@ -42,8 +49,47 @@ func checkError(t *testing.T, expected interface{}, actual error, msgAndArgs ...
 
 var leadingTabs = regexp.MustCompile("(?m:^\t+)")
 
-func untab(s string) string {
+func Untab(s string) string {
 	return leadingTabs.ReplaceAllStringFunc(s, func(match string) string {
 		return strings.Repeat("    ", len(match))
 	})
 }
+
+type TestSecretLoaderFactory struct {
+	reader    client.Reader
+	mountPath string
+	secrets   secret.MountSecrets
+}
+
+func (f *TestSecretLoaderFactory) SecretLoaderForNamespace(ns string) secret.SecretLoader {
+	return secret.NewSecretLoader(f.reader, ns, f.mountPath, &f.secrets)
+}
+
+type secretReader struct {
+	secrets []corev1.Secret
+}
+
+func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object) error {
+	if secret, ok := obj.(*corev1.Secret); ok {
+		if secret == nil {
+			return nil
+		}
+		for _, s := range r.secrets {
+			if s.Namespace == key.Namespace && s.Name == key.Name {
+				*secret = s
+				return nil
+			}
+		}
+		return apierrors.NewNotFound(corev1.Resource("secret"), key.String())
+	}
+	return apierrors.NewNotFound(schema.GroupResource{
+		Group:    obj.GetObjectKind().GroupVersionKind().Group,
+		Resource: strings.ToLower(obj.GetObjectKind().GroupVersionKind().Kind),
+	}, key.String())
+}
+
+func (r secretReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	panic("not implemented")
+}
+
+var _ client.Reader = (*secretReader)(nil)

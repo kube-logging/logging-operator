@@ -107,7 +107,7 @@ func TestFilterExpr(t *testing.T) {
 				Out:        &b,
 				IndentWith: "    ",
 			})
-			checkError(t, testCase.wantErr, err)
+			CheckError(t, testCase.wantErr, err)
 			if err == nil {
 				require.Equal(t, testCase.wantOut, b.String())
 			}

@@ -112,34 +112,11 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return res
 	case reflect.Struct:
 		fs := fieldsOf(value)
-		type posArg struct {
-			pos  int
-			rnds []render.Renderer
-		}
+
 		var posArgs []posArg
 		var nonPos []render.Renderer
 		for _, f := range fs {
-			settings := structFieldSettings(f.Meta)
-			if posStr := settings["pos"]; posStr != "" {
-				// this field is a positional argument
-				pos64, err := strconv.ParseInt(posStr, 10, 8)
-				if err != nil {
-					nonPos = append(nonPos, render.Error(fmt.Errorf("invalid position specifier %q in tag: %w", posStr, err)))
-					continue
-				}
-				posArgs = append(posArgs, posArg{
-					pos:  int(pos64),
-					rnds: renderValue(f.Value, secretLoader),
-				})
-				continue
-			}
-			// this field is an option (keyword argument)
-			key, err := fieldKey(f, settings)
-			if err != nil {
-				nonPos = append(nonPos, render.Error(err))
-				continue
-			}
-			nonPos = append(nonPos, optionExpr(key, renderValue(f.Value, secretLoader)...))
+			renderField(f, secretLoader, &nonPos, &posArgs)
 		}
 		slices.SortFunc(posArgs, func(a, b posArg) bool { return a.pos < b.pos })
 		var res []render.Renderer
@@ -150,6 +127,41 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return res
 	}
 	return []render.Renderer{render.Error(fmt.Errorf("cannot render value of type %s", value.Type()))}
+}
+
+type posArg struct {
+	pos  int
+	rnds []render.Renderer
+}
+
+func renderField(f Field, secretLoader secret.SecretLoader, nonPos *[]render.Renderer, posArgs *[]posArg) {
+	if f.Meta.Anonymous {
+		for _, ff := range fieldsOf(f.Value) {
+			renderField(ff, secretLoader, nonPos, posArgs)
+		}
+		return
+	}
+	settings := structFieldSettings(f.Meta)
+	if posStr := settings["pos"]; posStr != "" {
+		// this field is a positional argument
+		pos64, err := strconv.ParseInt(posStr, 10, 8)
+		if err != nil {
+			*nonPos = append(*nonPos, render.Error(fmt.Errorf("invalid position specifier %q in tag: %w", posStr, err)))
+			return
+		}
+		*posArgs = append(*posArgs, posArg{
+			pos:  int(pos64),
+			rnds: renderValue(f.Value, secretLoader),
+		})
+		return
+	}
+	// this field is an option (keyword argument)
+	key, err := fieldKey(f, settings)
+	if err != nil {
+		*nonPos = append(*nonPos, render.Error(err))
+		return
+	}
+	*nonPos = append(*nonPos, optionExpr(key, renderValue(f.Value, secretLoader)...))
 }
 
 func renderDriver(f Field, secretLoader secret.SecretLoader) render.Renderer {
