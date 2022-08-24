@@ -22,6 +22,7 @@ import (
 	"emperror.dev/errors"
 	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	extensionsconfig "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/crds"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/rbac"
@@ -66,6 +67,7 @@ type ComponentConfig struct {
 	WatchNamespace         string               `json:"watchNamespace,omitempty"`
 	WatchLoggingName       string               `json:"watchLoggingName,omitempty"`
 	DisableWebhook         bool                 `json:"disableWebhook,omitempty"`
+	Metrics                *v1beta1.Metrics     `json:"installServiceMonitor,omitempty"`
 	InstallPrometheusRules bool                 `json:"-"`
 }
 
@@ -99,6 +101,9 @@ func ResourceBuildersWithReader(reader client.Reader) reconciler.ResourceBuilder
 
 		if config.InstallPrometheusRules {
 			resources = AppendPrometheusRulesResourceBuilders(resources, parent, config)
+		}
+		if config.Metrics != nil {
+			resources = AppendServiceMonitorBuilder(resources, parent, config)
 		}
 		return resources
 	}
@@ -408,6 +413,56 @@ func ClusterRole(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 	role.TypeMeta.APIVersion = ""
 
 	return role, reconciler.StatePresent, err
+}
+
+func AppendServiceMonitorBuilder(rbs []reconciler.ResourceBuilder, parent reconciler.ResourceOwner, config *ComponentConfig) []reconciler.ResourceBuilder {
+	rbs = append(rbs,
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return &corev1.Service{
+				ObjectMeta: config.MetaOverrides.Merge(config.objectMeta(parent)),
+				Spec: corev1.ServiceSpec{
+					Ports: []corev1.ServicePort{
+						{
+							Protocol:   corev1.ProtocolTCP,
+							Name:       "http-metrics",
+							Port:       8080,
+							TargetPort: intstr.IntOrString{IntVal: 8080},
+						},
+					},
+					Selector:  config.labelSelector(parent),
+					Type:      corev1.ServiceTypeClusterIP,
+					ClusterIP: "None",
+				},
+			}, reconciler.StatePresent, nil
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return &monitoringv1.ServiceMonitor{
+				ObjectMeta: config.MetaOverrides.Merge(config.objectMeta(parent)),
+				Spec: monitoringv1.ServiceMonitorSpec{
+					JobLabel:        "",
+					TargetLabels:    nil,
+					PodTargetLabels: nil,
+					Endpoints: []monitoringv1.Endpoint{{
+						Port:                 "http-metrics",
+						Path:                 config.Metrics.Path,
+						Interval:             config.Metrics.Interval,
+						ScrapeTimeout:        config.Metrics.Timeout,
+						HonorLabels:          config.Metrics.ServiceMonitorConfig.HonorLabels,
+						RelabelConfigs:       config.Metrics.ServiceMonitorConfig.Relabelings,
+						MetricRelabelConfigs: config.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+						Scheme:               config.Metrics.ServiceMonitorConfig.Scheme,
+						TLSConfig:            config.Metrics.ServiceMonitorConfig.TLSConfig,
+					}},
+					Selector:          v1.LabelSelector{MatchLabels: config.MetaOverrides.Merge(config.objectMeta(parent)).Labels},
+					NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{config.MetaOverrides.Merge(config.objectMeta(parent)).Namespace}},
+					SampleLimit:       0,
+				},
+			}, reconciler.StatePresent, nil
+		},
+	)
+
+	return rbs
+
 }
 
 func (c *ComponentConfig) objectMeta(parent reconciler.ResourceOwner) v1.ObjectMeta {
