@@ -32,6 +32,7 @@ type _metaRewrite interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RewriteConfig struct {
+	GroupUnset *GroupUnsetConfig `json:"group_unset,omitempty" syslog-ng:"rewrite-drv,name=groupunset"`
 	Rename     *RenameConfig     `json:"rename,omitempty" syslog-ng:"rewrite-drv,name=rename"`
 	Set        *SetConfig        `json:"set,omitempty" syslog-ng:"rewrite-drv,name=set"`
 	Substitute *SubstituteConfig `json:"subst,omitempty" syslog-ng:"rewrite-drv,name=subst"`
@@ -69,5 +70,12 @@ type SubstituteConfig struct {
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 type UnsetConfig struct {
 	FieldName string     `json:"field" syslog-ng:"name=value"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
+	Condition *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
+}
+
+// +kubebuilder:object:generate=true
+// https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
+type GroupUnsetConfig struct {
+	Pattern   string     `json:"pattern" syslog-ng:"name=value"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
 	Condition *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }

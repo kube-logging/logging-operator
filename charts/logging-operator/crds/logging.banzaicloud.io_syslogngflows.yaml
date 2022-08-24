@@ -100,6 +100,39 @@ spec:
                     rewrite:
                       items:
                         properties:
+                          group_unset:
+                            properties:
+                              condition:
+                                properties:
+                                  and:
+                                    x-kubernetes-preserve-unknown-fields: true
+                                  not:
+                                    x-kubernetes-preserve-unknown-fields: true
+                                  or:
+                                    x-kubernetes-preserve-unknown-fields: true
+                                  regexp:
+                                    properties:
+                                      flags:
+                                        items:
+                                          type: string
+                                        type: array
+                                      pattern:
+                                        type: string
+                                      template:
+                                        type: string
+                                      type:
+                                        type: string
+                                      value:
+                                        type: string
+                                    required:
+                                    - pattern
+                                    type: object
+                                type: object
+                              pattern:
+                                type: string
+                            required:
+                            - pattern
+                            type: object
                           rename:
                             properties:
                               condition:

@@ -126,6 +126,9 @@ destination "output_default_test-syslog-out" {
 	syslog("test.local" transport("tcp") persist_name("output_default_test-syslog-out"));
 };
 
+filter "flow_default_test-flow_ns_filter" {
+	match("default" value("json.kubernetes.namespace_name") type("string"));
+};
 filter "flow_default_test-flow_match" {
 	match("nginx" value("kubernetes.labels.app"));
 };
@@ -134,9 +137,7 @@ rewrite "flow_default_test-flow_filters_0" {
 };
 log {
 	source("main_input");
-	filter {
-		match("default" value("json.kubernetes.namespace_name") type("string"));
-	};
+	filter("flow_default_test-flow_ns_filter");
 	filter("flow_default_test-flow_match");
 	rewrite("flow_default_test-flow_filters_0");
 	destination("output_default_test-syslog-out");
@@ -164,7 +165,7 @@ log {
 
 options {
     stats_level(3);
-    stats_freq(10);
+    stats_freq(0);
 };
 
 source "main_input" {
@@ -219,7 +220,7 @@ source "main_input" {
 					},
 				},
 			},
-			wantOut: `@version: 3.37
+			wantOut: Untab(`@version: 3.37
 
 @include "scl.conf"
 
@@ -234,17 +235,18 @@ source "main_input" {
     };
 };
 
+filter "flow_default_test-flow_ns_filter" {
+	match("default" value("json.kubernetes.namespace_name") type("string"));
+};
 rewrite "flow_default_test-flow_filters_0" {
     unset(value("MESSAGE") condition((not match("foo" value("MESSAGE") type("string")))));
 };
 log {
     source("main_input");
-    filter {
-        match("default" value("json.kubernetes.namespace_name") type("string"));
-    };
+	filter("flow_default_test-flow_ns_filter");
     rewrite("flow_default_test-flow_filters_0");
 };
-`,
+`),
 		},
 		"output with secret": {
 			input: Input{
@@ -371,14 +373,15 @@ source "main_input" {
     };
 };
 
+filter "flow_default_test-flow_ns_filter" {
+    match("default" value("json.kubernetes.namespace_name") type("string"));
+};
 parser "flow_default_test-flow_filters_0" {
     regexp-parser(patterns(".*test_field -> (?<test_field>.*)$") prefix(".regexp."));
 };
 log {
     source("main_input");
-    filter {
-        match("default" value("json.kubernetes.namespace_name") type("string"));
-    };
+    filter("flow_default_test-flow_ns_filter");
     parser("flow_default_test-flow_filters_0");
 };
 `,
@@ -419,7 +422,7 @@ log {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: `@version: 3.37
+			wantOut: Untab(`@version: 3.37
 
 @include "scl.conf"
 
@@ -434,17 +437,82 @@ source "main_input" {
     };
 };
 
+filter "flow_default_test-flow_ns_filter" {
+	match("default" value("json.kubernetes.namespace_name") type("string"));
+};
 rewrite "flow_default_test-flow_filters_remove message" {
     unset(value("MESSAGE"));
 };
 log {
     source("main_input");
-    filter {
-        match("default" value("json.kubernetes.namespace_name") type("string"));
-    };
+	filter("flow_default_test-flow_ns_filter");
     rewrite("flow_default_test-flow_filters_remove message");
 };
-`,
+`),
+		},
+		"groupunset": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							Filters: []v1beta1.SyslogNGFilter{
+								{
+									ID: "remove message",
+									Rewrite: []filter.RewriteConfig{
+										{
+											GroupUnset: &filter.GroupUnsetConfig{
+												Pattern: ".SDATA.*",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: Untab(`@version: 3.37
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+
+filter "flow_default_test-flow_ns_filter" {
+	match("default" value("json.kubernetes.namespace_name") type("string"));
+};
+rewrite "flow_default_test-flow_filters_remove message" {
+    groupunset(value(".SDATA.*"));
+};
+log {
+    source("main_input");
+	filter("flow_default_test-flow_ns_filter");
+    rewrite("flow_default_test-flow_filters_remove message");
+};
+`),
 		},
 	}
 	for name, testCase := range testCases {

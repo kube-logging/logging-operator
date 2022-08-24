@@ -60,12 +60,12 @@ func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, sec
 		return renderFlowFilter(flt, &f, idx, baseName, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
 	}))
 	return render.AllOf(
-		renderFlowMatch(matchName, f.Spec.Match),
 		filterDefStmt(nsFilterName, filterExprStmt(model.NewFilterExpr(model.FilterExprMatch{
 			Pattern: f.Namespace,
 			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
 			Type:    "string",
 		}))),
+		renderFlowMatch(matchName, f.Spec.Match),
 		filterDefs,
 		logDefStmt(
 			[]string{sourceName},
