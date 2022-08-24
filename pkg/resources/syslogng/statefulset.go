@@ -122,7 +122,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.SyslogNGSpec) []corev1.ContainerPort {
 	port := int32(defaultBufferVolumeMetricsPort)
-	if spec.Metrics != nil && spec.BufferVolumeMetrics.Port != 0 {
+	if spec.BufferVolumeMetrics.Port != 0 {
 		port = spec.BufferVolumeMetrics.Port
 	}
 	return []corev1.ContainerPort{
@@ -247,7 +247,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Name:            "buffer-metrics-sidecar",
 			Image:           v1beta1.RepositoryWithTag(bufferVolumeImageRepository, bufferVolumeImageTag),
 			ImagePullPolicy: corev1.PullIfNotPresent,
-			Args:            []string{"--startup", customRunner},
+			Args:            []string{"--port", "7358", "--startup", customRunner},
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
