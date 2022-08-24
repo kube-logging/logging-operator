@@ -76,6 +76,6 @@ type UnsetConfig struct {
 // +kubebuilder:object:generate=true
 // https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 type GroupUnsetConfig struct {
-	Pattern   string     `json:"pattern" syslog-ng:"name=value"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
+	Pattern   string     `json:"pattern" syslog-ng:"name=values"` // NOTE: this is specified as `value(<field name>)` in the syslog-ng config
 	Condition *MatchExpr `json:"condition,omitempty" syslog-ng:"name=condition,optional"`
 }
