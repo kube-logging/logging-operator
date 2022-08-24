@@ -111,31 +111,33 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// metrics
 	defer func() {
-		gv := getResourceStateMetrics(log)
-		gv.Reset()
+		stateMetrics, problemsMetrics := getResourceStateMetrics(log)
+		// reseting the vectors should remove all orphaned metrics
+		stateMetrics.Reset()
+		problemsMetrics.Reset()
 		for _, ob := range loggingResources.Fluentd.Flows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.ClusterFlows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.Outputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.ClusterOutputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.Flows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.ClusterFlows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.Outputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.ClusterOutputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 	}()
 
@@ -192,24 +194,44 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
-func updateResourceStateMetrics(obj client.Object, active bool, gv *prometheus.GaugeVec) {
-	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "active", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(active))
-	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "inactive", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(!active))
+func updateResourceStateMetrics(obj client.Object, active bool, problemsCount int, statusMetric *prometheus.GaugeVec, problemsMetric *prometheus.GaugeVec) {
+	statusMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "active", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(active))
+	statusMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "inactive", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(!active))
+
+	problemsMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(float64(problemsCount))
 }
 
-func getResourceStateMetrics(logger logr.Logger) *prometheus.GaugeVec {
-	gv := prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
-	err := metrics.Registry.Register(gv)
+func getResourceStateMetrics(logger logr.Logger) (stateMetrics *prometheus.GaugeVec, problemsMetrics *prometheus.GaugeVec) {
+	var err error
+
+	stateMetrics = prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
+	stateMetrics, err = getOrRegisterGaugeVec(metrics.Registry, stateMetrics)
 	if err != nil {
+		logger.Error(err, "couldn't register metrics vector for resource", "metric", stateMetrics)
+	}
+
+	problemsMetrics = prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_problems"}, []string{"name", "namespace", "kind"})
+	problemsMetrics, err = getOrRegisterGaugeVec(metrics.Registry, problemsMetrics)
+	if err != nil {
+		logger.Error(err, "couldn't register metrics vector for resource", "metric", problemsMetrics)
+	}
+
+	return
+}
+
+func getOrRegisterGaugeVec(reg prometheus.Registerer, gv *prometheus.GaugeVec) (*prometheus.GaugeVec, error) {
+	if err := reg.Register(gv); err != nil {
 		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok = err.ExistingCollector.(*prometheus.GaugeVec); !ok {
-				logger.Error(err, "already registered metric name with different type ", "metric", gv)
+			if gv, ok := err.ExistingCollector.(*prometheus.GaugeVec); ok {
+				return gv, nil
+			} else {
+				return nil, errors.WrapIfWithDetails(err, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
-			logger.Error(err, "couldn't register metrics vector for resource", "metric", gv)
+			return nil, err
 		}
 	}
-	return gv
+	return gv, nil
 }
 
 func boolToFloat64(b bool) float64 {
