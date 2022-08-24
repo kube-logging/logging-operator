@@ -108,6 +108,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
+	syslogNGLoggingResources, err := loggingResourceRepo.SyslogNGLoggingResourcesFor(ctx, logging)
+	if err != nil {
+		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
+	}
+
 	// metrics
 	defer func() {
 		gv := getResourceStateMetrics(log)
@@ -122,6 +127,18 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
 		for _, ob := range loggingResources.ClusterOutputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range syslogNGLoggingResources.Flows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range syslogNGLoggingResources.ClusterFlows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range syslogNGLoggingResources.Outputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		}
+		for _, ob := range syslogNGLoggingResources.ClusterOutputs {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
 	}()
