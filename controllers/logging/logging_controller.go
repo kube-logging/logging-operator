@@ -108,37 +108,33 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
-	syslogNGLoggingResources, err := loggingResourceRepo.SyslogNGLoggingResourcesFor(ctx, logging)
-	if err != nil {
-		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
-	}
 
 	// metrics
 	defer func() {
 		gv := getResourceStateMetrics(log)
 		gv.Reset()
-		for _, ob := range loggingResources.Flows {
+		for _, ob := range loggingResources.Fluentd.Flows {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range loggingResources.ClusterFlows {
+		for _, ob := range loggingResources.Fluentd.ClusterFlows {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range loggingResources.Outputs {
+		for _, ob := range loggingResources.Fluentd.Outputs {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range loggingResources.ClusterOutputs {
+		for _, ob := range loggingResources.Fluentd.ClusterOutputs {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range syslogNGLoggingResources.Flows {
+		for _, ob := range loggingResources.SyslogNG.Flows {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range syslogNGLoggingResources.ClusterFlows {
+		for _, ob := range loggingResources.SyslogNG.ClusterFlows {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range syslogNGLoggingResources.Outputs {
+		for _, ob := range loggingResources.SyslogNG.Outputs {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
-		for _, ob := range syslogNGLoggingResources.ClusterOutputs {
+		for _, ob := range loggingResources.SyslogNG.ClusterOutputs {
 			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
 		}
 	}()
@@ -162,10 +158,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
-		loggingResources, err := loggingResourceRepo.SyslogNGLoggingResourcesFor(ctx, logging)
-		if err != nil {
-			return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
-		}
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
@@ -254,7 +246,7 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	return output.String(), &slf.Secrets, nil
 }
 
-func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogNGLoggingResources) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
 	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
 		return cfg, nil, nil
 	}
@@ -266,10 +258,10 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.SyslogN
 
 	in := syslogngconfig.Input{
 		Logging:             resources.Logging,
-		ClusterOutputs:      resources.ClusterOutputs,
-		Outputs:             resources.Outputs,
-		ClusterFlows:        resources.ClusterFlows,
-		Flows:               resources.Flows,
+		ClusterOutputs:      resources.SyslogNG.ClusterOutputs,
+		Outputs:             resources.SyslogNG.Outputs,
+		ClusterFlows:        resources.SyslogNG.ClusterFlows,
+		Flows:               resources.SyslogNG.Flows,
 		SecretLoaderFactory: &slf,
 		SourcePort:          syslogng.ServicePort,
 	}

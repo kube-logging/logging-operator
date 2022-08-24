@@ -39,10 +39,16 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 
 	var err error
 
-	res.ClusterFlows, err = r.ClusterFlowsFor(ctx, logging)
+	res.Fluentd.ClusterFlows, err = r.ClusterFlowsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	res.ClusterOutputs, err = r.ClusterOutputsFor(ctx, logging)
+	res.Fluentd.ClusterOutputs, err = r.ClusterOutputsFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
+	res.SyslogNG.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
+	res.SyslogNG.ClusterOutputs, err = r.SyslogNGClusterOutputsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
 	watchNamespaces := logging.Spec.WatchNamespaces
@@ -60,13 +66,29 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	sort.Strings(watchNamespaces)
 
 	for _, ns := range watchNamespaces {
-		flows, err := r.FlowsInNamespaceFor(ctx, ns, logging)
-		res.Flows = append(res.Flows, flows...)
-		errs = errors.Append(errs, err)
+		{
+			flows, err := r.FlowsInNamespaceFor(ctx, ns, logging)
+			res.Fluentd.Flows = append(res.Fluentd.Flows, flows...)
+			errs = errors.Append(errs, err)
+		}
 
-		outputs, err := r.OutputsInNamespaceFor(ctx, ns, logging)
-		res.Outputs = append(res.Outputs, outputs...)
-		errs = errors.Append(errs, err)
+		{
+			outputs, err := r.OutputsInNamespaceFor(ctx, ns, logging)
+			res.Fluentd.Outputs = append(res.Fluentd.Outputs, outputs...)
+			errs = errors.Append(errs, err)
+		}
+
+		{
+			flows, err := r.SyslogNGFlowsInNamespaceFor(ctx, ns, logging)
+			res.SyslogNG.Flows = append(res.SyslogNG.Flows, flows...)
+			errs = errors.Append(errs, err)
+		}
+
+		{
+			outputs, err := r.SyslogNGOutputsInNamespaceFor(ctx, ns, logging)
+			res.SyslogNG.Outputs = append(res.SyslogNG.Outputs, outputs...)
+			errs = errors.Append(errs, err)
+		}
 	}
 
 	return
@@ -146,44 +168,6 @@ func (r LoggingResourceRepository) OutputsInNamespaceFor(ctx context.Context, na
 		}
 	}
 	return res, nil
-}
-
-func (r LoggingResourceRepository) SyslogNGLoggingResourcesFor(ctx context.Context, logging v1beta1.Logging) (res SyslogNGLoggingResources, errs error) {
-	res.Logging = logging
-
-	var err error
-
-	res.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
-	errs = errors.Append(errs, err)
-
-	res.ClusterOutputs, err = r.SyslogNGClusterOutputsFor(ctx, logging)
-	errs = errors.Append(errs, err)
-
-	watchNamespaces := logging.Spec.WatchNamespaces
-	if len(watchNamespaces) == 0 {
-		var nsList corev1.NamespaceList
-		if err := r.Client.List(ctx, &nsList); err != nil {
-			errs = errors.Append(errs, errors.WrapIf(err, "listing namespaces"))
-			return
-		}
-
-		for _, i := range nsList.Items {
-			watchNamespaces = append(watchNamespaces, i.Name)
-		}
-	}
-	sort.Strings(watchNamespaces)
-
-	for _, ns := range watchNamespaces {
-		flows, err := r.SyslogNGFlowsInNamespaceFor(ctx, ns, logging)
-		res.Flows = append(res.Flows, flows...)
-		errs = errors.Append(errs, err)
-
-		outputs, err := r.SyslogNGOutputsInNamespaceFor(ctx, ns, logging)
-		res.Outputs = append(res.Outputs, outputs...)
-		errs = errors.Append(errs, err)
-	}
-
-	return
 }
 
 func (r LoggingResourceRepository) SyslogNGClusterFlowsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.SyslogNGClusterFlow, error) {

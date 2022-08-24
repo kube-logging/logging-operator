@@ -45,8 +45,8 @@ func NewValidationReconciler(
 			})
 		}
 
-		for i := range resources.ClusterOutputs {
-			output := &resources.ClusterOutputs[i]
+		for i := range resources.Fluentd.ClusterOutputs {
+			output := &resources.Fluentd.ClusterOutputs[i]
 			registerForPatching(output)
 
 			output.Status.Active = utils.BoolPointer(false)
@@ -61,8 +61,8 @@ func NewValidationReconciler(
 			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
-		for i := range resources.Outputs {
-			output := &resources.Outputs[i]
+		for i := range resources.Fluentd.Outputs {
+			output := &resources.Fluentd.Outputs[i]
 			registerForPatching(output)
 
 			output.Status.Active = utils.BoolPointer(false)
@@ -73,8 +73,8 @@ func NewValidationReconciler(
 			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
-		for i := range resources.ClusterFlows {
-			flow := &resources.ClusterFlows[i]
+		for i := range resources.Fluentd.ClusterFlows {
+			flow := &resources.Fluentd.ClusterFlows[i]
 			registerForPatching(flow)
 
 			flow.Status.Active = utils.BoolPointer(false)
@@ -85,7 +85,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
+				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
@@ -95,8 +95,8 @@ func NewValidationReconciler(
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
-		for i := range resources.Flows {
-			flow := &resources.Flows[i]
+		for i := range resources.Fluentd.Flows {
+			flow := &resources.Fluentd.Flows[i]
 			registerForPatching(flow)
 
 			flow.Status.Active = utils.BoolPointer(false)
@@ -107,7 +107,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
+				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
@@ -116,7 +116,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
-				if output := resources.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
+				if output := resources.Fluentd.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
