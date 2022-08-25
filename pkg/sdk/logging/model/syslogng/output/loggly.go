@@ -20,7 +20,8 @@ import "github.com/banzaicloud/operator-tools/pkg/secret"
 // Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 
 type Loggly struct {
-	SyslogOutput `json:",inline"`
+	Host         string         `json:"host,omitempty"`
 	Tag          string         `json:"tag,omitempty"`
 	Token        *secret.Secret `json:"token"`
+	SyslogOutput `json:",inline"`
 }

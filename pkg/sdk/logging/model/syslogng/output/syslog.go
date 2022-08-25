@@ -17,7 +17,7 @@ package output
 // +kubebuilder:object:generate=true
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type SyslogOutput struct {
-	Host           string      `json:"host" syslog-ng:"pos=0"`
+	Host           string      `json:"host,omitempty" syslog-ng:"pos=0"`
 	Port           int         `json:"port,omitempty"`
 	Transport      string      `json:"transport,omitempty"`
 	CloseOnInput   *bool       `json:"close_on_input,omitempty"`

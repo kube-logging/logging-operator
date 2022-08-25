@@ -315,7 +315,6 @@ spec:
                   ts_format:
                     type: string
                 required:
-                - host
                 - token
                 type: object
               sumologic-http:
@@ -902,8 +901,6 @@ spec:
                     type: string
                   ts_format:
                     type: string
-                required:
-                - host
                 type: object
             type: object
           status:
