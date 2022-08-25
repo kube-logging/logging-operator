@@ -38,6 +38,22 @@ The following example filters for specific Pod labels
         type: string
 ```
 
+Using `not` in a match statement
+
+```yaml
+match:
+  not:
+    and:
+    - regexp:
+        value: json.kubernetes.labels.app.kubernetes.io/instance
+        pattern: one-eye-log-generator
+        type: string
+    - regexp:
+        value: json.kubernetes.labels.app.kubernetes.io/name
+        pattern: log-generator
+        type: string
+```
+
 > Note: You need to use the `json.` prefix in field names.
 
 Fields can be referenced using *dot notation*, e.g. in `{"kubernetes": {"namespace_name": "default"}}` the `namespace_name` field can be referenced using `json.kubernetes.namespace_name`.
@@ -126,6 +142,7 @@ Logging Operator currently supports the following rewrite functions:
 - set
 - substitute
 - unset
+- group_unset
 
 > Note: All rewrite functions support an optional `condition` which has the same syntax as match expressions described above.
 
@@ -163,6 +180,17 @@ The `subst` function replaces parts of a field with a replacement value based on
 ```
 
 The function also supports the `type` and `flags` fields for specifying pattern type and flags as described above for match expression regexp function.
+
+#### Group Unset
+
+The `group_unset` function removes keys based on a patterns. If an object have multiple sub-object you have to use this instead of `unset`
+
+```yaml
+  filters:
+  - rewrite:
+    - group_unset:
+        pattern: json.kubernetes.annotations.*
+```
 
 ## Outputs
 SyslogNGOutput and SyslogNGClusterOutput resources have almost the same structure as Output and ClusterOutput resources with the main difference being the number and kind of supported destinations.
