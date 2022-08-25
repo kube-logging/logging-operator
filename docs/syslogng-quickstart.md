@@ -241,6 +241,45 @@ kind: SyslogNGOutput
               key: tls.key
 ```
 
+### Loggly Output
+
+The `loggly` output is a specialised `syslog` output. Extended with `token` and `tag`.
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+  spec:
+    loggly:
+      tag: "test-tag"
+      token: 
+        valueFrom:
+          secretKeyRef:
+            name: loggly-secret
+            key: token
+      ...SyslogParams...
+```
+
+Message templating example:
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+  spec:
+    loggly:
+      tag: "test-tag"
+      token: 
+        valueFrom:
+          secretKeyRef:
+            name: loggly-secret
+            key: token
+      template: "$(format-json
+            --subkeys json.
+            --exclude json.kubernetes.labels.*
+            json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))\n"
+      ...SyslogParams...
+```
+
+Loggly config in syslog: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
+
 ### Sumologic-http output
 
 The `sumologic-http` output sends log records over HTTP to Sumologic.
