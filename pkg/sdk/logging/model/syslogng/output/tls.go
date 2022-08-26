@@ -16,12 +16,32 @@ package output
 
 import "github.com/banzaicloud/operator-tools/pkg/secret"
 
+// +name:"TLS config for syslog-ng outputs"
+// +weight:"200"
+type _hugoTLS interface{} //nolint:deadcode,unused
+
+// +docName:"TLS config for syslog-ng outputs"
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+type _docTLS interface{} //nolint:deadcode,unused
+
+// +name:"TLS config for syslog-ng outputs"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338"
+// +description:"TLS config for syslog-ng outputs"
+// +status:"Testing"
+type _metaTLS interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 type TLS struct {
-	CaDir              *secret.Secret `json:"ca_dir,omitempty"`
-	CaFile             *secret.Secret `json:"ca_file,omitempty"`
-	KeyFile            *secret.Secret `json:"key_file,omitempty"`
-	CertFile           *secret.Secret `json:"cert_file,omitempty"`
-	PeerVerify         string         `json:"peer_verify,omitempty"`
-	UseSystemCertStore *bool          `json:"use-system-cert-store,omitempty"`
+	// The name of a directory that contains a set of trusted CA certificates in PEM format. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3142)
+	CaDir *secret.Secret `json:"ca_dir,omitempty"`
+	// The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3144)
+	CaFile *secret.Secret `json:"ca_file,omitempty"`
+	// The name of a file that contains an unencrypted private key in PEM format, suitable as a TLS key. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3163)
+	KeyFile *secret.Secret `json:"key_file,omitempty"`
+	// Name of a file, that contains an X.509 certificate (or a certificate chain) in PEM format, suitable as a TLS certificate, matching the private key set in the key-file() option. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3146)
+	CertFile *secret.Secret `json:"cert_file,omitempty"`
+	// Verification method of the peer. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#tls-options-peer-verify)
+	PeerVerify string `json:"peer_verify,omitempty"`
+	// Use the certificate store of the system for verifying HTTPS certificates. [more information](https://curl.se/docs/sslcerts.html)
+	UseSystemCertStore *bool `json:"use-system-cert-store,omitempty"`
 }

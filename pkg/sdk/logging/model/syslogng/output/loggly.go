@@ -16,12 +16,30 @@ package output
 
 import "github.com/banzaicloud/operator-tools/pkg/secret"
 
+// +name:"Loggly output"
+// +weight:"200"
+type _hugoLoggly interface{} //nolint:deadcode,unused
+
+// +docName:"Loggly output plugin for syslog-ng"
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072
+type _docLoggly interface{} //nolint:deadcode,unused
+
+// +name:"Loggly"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072"
+// +description:"Send your logs to loggly"
+// +status:"Testing"
+type _metaLoggly interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 // Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 
 type Loggly struct {
-	Host         string         `json:"host,omitempty"`
-	Tag          string         `json:"tag,omitempty"`
-	Token        *secret.Secret `json:"token"`
+	// Address of the destination host
+	Host string `json:"host,omitempty"`
+	// Event tag [more information](https://documentation.solarwinds.com/en/success_center/loggly/content/admin/tags.htm)
+	Tag string `json:"tag,omitempty"`
+	// Your Customer Token that you received from Loggly [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#loggly-option-token)
+	Token *secret.Secret `json:"token"`
+	// syslog output configuration
 	SyslogOutput `json:",inline"`
 }

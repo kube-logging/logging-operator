@@ -14,14 +14,35 @@
 
 package output
 
+// +name:"Syslog-ng DiskBuffer"
+// +weight:"200"
+type _hugoDiskBuffer interface{} //nolint:deadcode,unused
+
+// +docName:disk-buffer configuration"
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+type _docDiskBuffer interface{} //nolint:deadcode,unused
+
+// +name:"disk-buffer configuration"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338"
+// +description:"disk-buffer configuration"
+// +status:"Testing"
+type _metaDiskBuffer interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 // Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
 type DiskBuffer struct {
-	DiskBufSize  int64  `json:"disk_buf_size"`
-	Reliable     bool   `json:"reliable"`
-	Compaction   *bool  `json:"compaction,omitempty"`
-	Dir          string `json:"dir,omitempty"`
+	// This is a required option. The maximum size of the disk-buffer in bytes. The minimum value is 1048576 bytes.
+	DiskBufSize int64 `json:"disk_buf_size"`
+	//  If set to yes, syslog-ng OSE cannot lose logs in case of reload/restart, unreachable destination or syslog-ng OSE crash. This solution provides a slower, but reliable disk-buffer option.
+	Reliable bool `json:"reliable"`
+	// Prunes the unused space in the LogMessage representation
+	Compaction *bool `json:"compaction,omitempty"`
+	// Description: Defines the folder where the disk-buffer files are stored.
+	Dir string `json:"dir,omitempty"`
+	// Use this option if the option reliable() is set to no. This option contains the number of messages stored in overflow queue.
 	MemBufLength *int64 `json:"mem_buf_length,omitempty"`
-	MemBufSize   *int64 `json:"mem_buf_size,omitempty"`
-	QOutSize     *int64 `json:"q_out_size,omitempty"`
+	// Use this option if the option reliable() is set to yes. This option contains the size of the messages in bytes that is used in the memory part of the disk buffer.
+	MemBufSize *int64 `json:"mem_buf_size,omitempty"`
+	// The number of messages stored in the output buffer of the destination.
+	QOutSize *int64 `json:"q_out_size,omitempty"`
 }
