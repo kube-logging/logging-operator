@@ -62,6 +62,8 @@ func plugins() {
 		title: Supported Plugins
 		generated_file: true
 		---
+
+		# Supported Plugins
 		
 		For more information please click on the plugin name
 		<center>
