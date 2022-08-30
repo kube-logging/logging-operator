@@ -55,7 +55,7 @@ const (
 	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
 	prometheusExporterImageTag        = "0.0.13"
 	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
-	bufferVolumeImageTag              = "0.1.0"
+	bufferVolumeImageTag              = "0.1.3"
 	configReloaderImageRepository     = "ghcr.io/banzaicloud/syslogng-reload"
 	configReloaderImageTag            = "v1.0.1"
 	socketVolumeName                  = "socket"
