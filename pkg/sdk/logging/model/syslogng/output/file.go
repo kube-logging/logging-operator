@@ -42,7 +42,7 @@ type FileOutput struct {
 	DirOwner string `json:"dir_owner,omitempty"`
 	// The permission mask of directories created by syslog-ng. Log directories are only created if a file after macro expansion refers to a non-existing directory, and directory creation is enabled (see also the create-dirs() option). For octal numbers prefix the number with 0, for example use 0755 for rwxr-xr-x.(default: Use the global settings)
 	DirPerm int `json:"dir_perm,omitempty"`
-	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
+	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer  *DiskBuffer `json:"disk_buffer,omitempty"`
 	Template    string      `json:"template,omitempty"`
 	PersistName string      `json:"persist_name,omitempty"`

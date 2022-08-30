@@ -55,7 +55,7 @@ type SyslogOutput struct {
 	TLS *TLS `json:"tls,omitempty"`
 	// Override the global timestamp format (set in the global ts-format() parameter) for the specific destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor912)
 	TSFormat string `json:"ts_format,omitempty"`
-	// Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor860)
+	// Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 	// Unique name for the syslog-ng driver [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.16/administration-guide/persist-name)
 	PersistName string `json:"persist_name,omitempty"`
