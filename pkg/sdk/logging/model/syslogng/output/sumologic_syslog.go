@@ -14,17 +14,17 @@
 
 package output
 
-// +name:"Sumo Logic Syslog"
+// +name:"Sumo Logic HTTP"
 // +weight:"200"
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
 
-// +docName:"Storing messages in Sumo Logic over syslog"
+// +docName:"Storing messages in Sumo Logic over http"
 // More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
 type _docSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic Syslog"
 // +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122"
-// +description:"Storing messages in Sumo Logic over syslog"
+// +description:"Storing messages in Sumo Logic over http"
 // +status:"Testing"
 type _metaSumologicSyslog interface{} //nolint:deadcode,unused
 
