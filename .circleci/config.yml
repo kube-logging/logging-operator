@@ -44,24 +44,19 @@ jobs:
       docker_layer_caching: true
     environment:
       GO_VERSION: '1.13'
-      K8S_VERSION: 'v1.17.9'
+      K8S_VERSION: 'v1.17.17'
       VAULT_VERSION: '1.0.0'
       KUBECONFIG: '/home/circleci/.kube/config'
-      MINIKUBE_WANTUPDATENOTIFICATION: 'false'
-      MINIKUBE_WANTREPORTERRORPROMPT: 'false'
-      MINIKUBE_HOME: '/home/circleci'
-      CHANGE_MINIKUBE_NONE_USER: 'true'
       GOPATH: '/home/circleci/go'
     steps:
       - checkout
 
       - run:
-          name: Setup minikube
+          name: Setup Kind
           command: |
-            curl -Lo minikube.deb https://github.com/kubernetes/minikube/releases/download/v1.25.2/minikube_1.25.2-0_amd64.deb  \
-            && sudo dpkg -i minikube.deb \
-            && sudo apt update \
-            && sudo apt install -y conntrack
+            curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
+            chmod +x ./kind
+            sudo mv ./kind /usr/local/bin/kind
 
       - run:
           name: Setup kubectl
@@ -74,10 +69,9 @@ jobs:
             touch ${HOME}/.kube/config
 
       - run:
-          name: Start minikube
-          background: true
+          name: Create Kind cluster
           command: |
-            minikube start --vm-driver=docker --kubernetes-version=${K8S_VERSION}
+            kind create cluster --image kindest/node:${K8S_VERSION}
 
       - run:
           name: Create go directory

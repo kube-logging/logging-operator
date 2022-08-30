@@ -24,7 +24,7 @@ function load_images()
 {
     local images=( "fluentd:local" "controller:local")
     for image in ${images[@]}; do
-        minikube image load "${image}"
+        kind load docker-image "${image}"
     done
 }
 
