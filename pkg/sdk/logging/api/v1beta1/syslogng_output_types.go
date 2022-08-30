@@ -36,6 +36,7 @@ type SyslogNGOutputSpec struct {
 	File            *output.FileOutput            `json:"file,omitempty" syslog-ng:"dest-drv"`
 	SumologicHTTP   *output.SumologicHTTPOutput   `json:"sumologic-http,omitempty" syslog-ng:"dest-drv"`
 	SumologicSyslog *output.SumologicSyslogOutput `json:"sumologic-syslog,omitempty" syslog-ng:"dest-drv"`
+	HTTP            *output.HTTPOutput            `json:"http,omitempty" syslog-ng:"dest-drv"`
 }
 
 type SyslogNGOutputStatus OutputStatus

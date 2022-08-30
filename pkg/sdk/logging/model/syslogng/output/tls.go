@@ -44,4 +44,6 @@ type TLS struct {
 	PeerVerify string `json:"peer_verify,omitempty"`
 	// Use the certificate store of the system for verifying HTTPS certificates. [more information](https://curl.se/docs/sslcerts.html)
 	UseSystemCertStore *bool `json:"use-system-cert-store,omitempty"`
+	// Description: Specifies the cipher, hash, and key-exchange algorithms used for the encryption, for example, ECDHE-ECDSA-AES256-SHA384. The list of available algorithms depends on the version of OpenSSL used to compile syslog-ng OSE
+	CipherSuite string `json:"cipher-suite,omitempty"`
 }
