@@ -13005,6 +13005,10 @@ spec:
                       stats_level:
                         type: integer
                     type: object
+                  jsonKeyDelim:
+                    type: string
+                  jsonKeyPrefix:
+                    type: string
                   metrics:
                     properties:
                       interval:

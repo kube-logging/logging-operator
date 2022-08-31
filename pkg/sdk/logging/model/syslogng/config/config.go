@@ -86,6 +86,10 @@ func configRenderer(in Input) (render.Renderer, error) {
 		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory))
 	}
 
+	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {
+		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json."
+	}
+
 	return render.AllFrom(seqs.Intersperse(
 		seqs.Filter(
 			seqs.Concat(
@@ -104,7 +108,10 @@ func configRenderer(in Input) (render.Renderer, error) {
 							}, nil)),
 							[]render.Renderer{
 								parserDefStmt("", renderDriver(Field{
-									Value: reflect.ValueOf(JSONParser{Prefix: "json."}),
+									Value: reflect.ValueOf(JSONParser{
+										Prefix:       in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix,
+										KeyDelimiter: in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter,
+									}),
 								}, nil)),
 							},
 						)),

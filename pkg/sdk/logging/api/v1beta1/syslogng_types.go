@@ -43,6 +43,8 @@ type SyslogNGSpec struct {
 	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
+	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
+	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
 
 	// TODO: option to turn on/off buffer volume PVC
 }

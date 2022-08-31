@@ -505,12 +505,76 @@ filter "flow_default_test-flow_ns_filter" {
 	match("default" value("json.kubernetes.namespace_name") type("string"));
 };
 rewrite "flow_default_test-flow_filters_remove message" {
-    groupunset(value(".SDATA.*"));
+    groupunset(values(".SDATA.*"));
 };
 log {
     source("main_input");
 	filter("flow_default_test-flow_ns_filter");
     rewrite("flow_default_test-flow_filters_remove message");
+};
+`),
+		},
+		"custom json key delimiter": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{
+							JSONKeyDelimiter: ";",
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: Untab(`@version: 3.37
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json.") key-delimiter(";"));
+        };
+    };
+};
+`),
+		},
+		"custom json key prefix": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{
+							JSONKeyPrefix: "asdf.",
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: Untab(`@version: 3.37
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("asdf."));
+        };
+    };
 };
 `),
 		},
