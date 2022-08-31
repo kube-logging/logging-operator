@@ -83,11 +83,11 @@ func configRenderer(in Input) (render.Renderer, error) {
 		logDefs = append(logDefs, renderClusterFlow(sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
-		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
 
 	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {
-		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json."
+		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter)
 	}
 
 	return render.AllFrom(seqs.Intersperse(
@@ -142,6 +142,13 @@ func globalOptionsDefStmt(options ...render.Renderer) render.Renderer {
 			return render.Line(render.AllOf(rnd, render.String(";")))
 		},
 	)))
+}
+
+func keyDelim(delim string) string {
+	if delim != "" {
+		return delim
+	}
+	return "."
 }
 
 func setDefault[T comparable](ptr *T, def T) {

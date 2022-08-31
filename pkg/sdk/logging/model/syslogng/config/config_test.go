@@ -527,6 +527,26 @@ log {
 						},
 					},
 				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							Filters: []v1beta1.SyslogNGFilter{
+								{
+									Match: &filter.MatchConfig{
+										Regexp: &filter.RegexpMatchExpr{
+											Pattern: "asdf",
+											Value:   "ghjk",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
@@ -540,9 +560,21 @@ source "main_input" {
             network(flags("no-parse") port(601) transport("tcp"));
         };
         parser {
-            json-parser(prefix("json.") key-delimiter(";"));
+            json-parser(prefix("json;") key-delimiter(";"));
         };
     };
+};
+
+filter "flow_default_test-flow_ns_filter" {
+    match("default" value("json;kubernetes;namespace_name") type("string"));
+};
+filter "flow_default_test-flow_filters_0" {
+    match("asdf" value("ghjk"));
+};
+log {
+    source("main_input");
+    filter("flow_default_test-flow_ns_filter");
+    filter("flow_default_test-flow_filters_0");
 };
 `),
 		},
