@@ -295,15 +295,21 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		if len(r.Logging.Spec.FluentbitSpec.BufferVolumeArgs) != 0 {
 			args = append(args, r.Logging.Spec.FluentbitSpec.BufferVolumeArgs...)
 		} else {
-			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
+			args = append(args, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/")
 		}
-		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
+		customRunner := fmt.Sprintf("./bin/node_exporter %v & /prometheus/buffer-size.sh;", strings.Join(args, " "))
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.Logging.Spec.FluentbitSpec.BufferVolumeImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy),
 			Args:            []string{"--startup", customRunner},
-			Ports:           r.generatePortsBufferVolumeMetrics(),
+			Env: []corev1.EnvVar{
+				{
+					Name:  "BUFFER_PATH",
+					Value: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
+				},
+			},
+			Ports: r.generatePortsBufferVolumeMetrics(),
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      BufferStorageVolume,
