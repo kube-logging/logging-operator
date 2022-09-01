@@ -1,6 +1,10 @@
 name: CI
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -24,10 +28,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make license-check
-#
-#      - name: Lint Helm charts
-#        id: lint
-#        uses: helm/chart-testing-action@dev-v2
-#        with:
-#          command: lint
-#          config: charts/helm_testing.yaml
+
+      - name: Check Diff
+        run: |
+          make check-diff
+
+      - name: Lint
+        env:
+          LINTER_FLAGS: '--timeout 5m'
+        run: |
+          make lint
+
+      - name: Run tests
+        run: |
+          make test
