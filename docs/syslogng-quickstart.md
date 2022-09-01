@@ -22,7 +22,7 @@ SyslogNGFlow and SyslogNGClusterFlow resources have almost the same structure as
 
 As `syslog-ng` by default uses `.` (dots) to separate key-value pairs during JSON parsing there can be unintended splits if there is dots in the key name.
 
-Example:
+Example input:
 ```json
 {
   "ts2": 1662035132,
@@ -40,6 +40,8 @@ Example:
 }
 ```
 during JSON rendering syslog-ng will split keys at dots
+
+Example output:
 ```json
 {
   "ts2": 1662035132,
@@ -75,9 +77,10 @@ spec:
     jsonKeyDelim: ';'
 ```
 
-However you need to be extra carefull to follow through this change on all resources!
+> However you need to be extra carefull to follow through this change on all resources!
 
-FLow
+### Flow
+#### Match
 You MUST use the new delimiter on each match statement
 ```yaml
   match:
@@ -91,8 +94,8 @@ You MUST use the new delimiter on each match statement
         type: string
         value: json;kubernetes;labels;app.kubernetes.io/name
 ```
+#### Filters
 Every field definition should use the new delimiter!
-
 ```yaml
 filters:
   - parser:
@@ -110,6 +113,8 @@ filters:
     - unset:
         field: json;message
 ```
+
+### Output
 
 In the `Output` template you should also be aware to set the special **delimiter**.
 
