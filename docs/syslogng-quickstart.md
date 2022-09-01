@@ -18,6 +18,108 @@ Also, the Logging CRD has been extended with a section for configuring syslog-ng
 
 SyslogNGFlow and SyslogNGClusterFlow resources have almost the same structure as Flow and ClusterFlow resources with the main differences explained in the following sections.
 
+## Custom JSON delimiter
+
+As `syslog-ng` by default uses `.` (dots) to separate key-value pairs during JSON parsing there can be unintended splits if there is dots in the key name.
+
+Example:
+```json
+{
+  "ts2": 1662035132,
+  "stream": "stdout",
+  "logtag": "F",
+  "kubernetes": {
+    "labels": {
+      "pod-template-hash": "57988cbd65",
+      "app.kubernetes.io/name": "log-generator"
+    },
+    "host": "ip-192-168-4-79.eu-west-1.compute.internal",
+    "container_name": "log-generator"
+  },
+  "cluster": "xxxxx"
+}
+```
+during JSON rendering syslog-ng will split keys at dots
+```json
+{
+  "ts2": 1662035132,
+  "stream": "stdout",
+  "logtag": "F",
+  "kubernetes": {
+    "labels": {
+      "pod-template-hash": "57988cbd65",
+      "app": {
+        "kubernetes": {
+          "io/name": "log-generator"
+        }
+      },
+      "host": "ip-192-168-4-79.eu-west-1.compute.internal",
+      "container_name": "log-generator"
+    },
+    "cluster": "xxxxx"
+  }
+}
+```
+
+If you have many dots in your keys you can change the delimiter in the `Logging` resource.
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: logging-demo
+spec:
+  controlNamespace: default
+  fluentbit:
+    ...
+  syslogNG:
+    jsonKeyDelim: ';'
+```
+
+However you need to be extra carefull to follow through this change on all resources!
+
+FLow
+You MUST use the new delimiter on each match statement
+```yaml
+  match:
+    and:
+    - regexp:
+        pattern: one-eye-log-generator
+        type: string
+        value: json;kubernetes;labels;app.kubernetes.io/instance
+    - regexp:
+        pattern: log-generator
+        type: string
+        value: json;kubernetes;labels;app.kubernetes.io/name
+```
+Every field definition should use the new delimiter!
+
+```yaml
+filters:
+  - parser:
+      regexp:
+        patterns:
+        - '^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?:
+          +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)"
+          "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$'
+        prefix: json.
+        template: ${json;message}
+  - rewrite:
+    - set:
+        field: json;cluster
+        value: xxxxx
+    - unset:
+        field: json;message
+```
+
+In the `Output` template you should also be aware to set the special **delimiter**.
+
+```yaml
+spec:
+  file:
+    template: |
+      $(format-json --subkeys json; --key-delimiter ;)
+```
+
 ### Routing
 
 The `match` field used to define routing rules has become more powerful by supporting [syslog-ng's *filter expressions*](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/65#TOPIC-1829159).
