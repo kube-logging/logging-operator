@@ -37,6 +37,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
 
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Determine tag or commit
         uses: haya14busa/action-cond@v1
         id: refortag
@@ -50,13 +56,13 @@ jobs:
         env:
           TAG_OR_BRANCH: ${{ steps.refortag.outputs.value }}
       - name: Build logging-operator
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
-          tags: ghcr.io/banzaicloud/logging-operator:${{ steps.imagetag.outputs.value }}
           file: Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
-
+          tags: |
+            ghcr.io/banzaicloud/logging-operator:${{ steps.imagetag.outputs.value }}
+            banzaicloud/logging-operator:${{ steps.imagetag.outputs.value }}

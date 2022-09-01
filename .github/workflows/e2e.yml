@@ -6,6 +6,12 @@ on:
     branches:
       - master
 
+env:
+  GO_VERSION: '1.17'
+  K8S_VERSION: 'v1.17.17'
+  KIND_VERSION: 'v0.11.1'
+  KUBECTL_VERSION: 'v1.21.2'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,12 +19,72 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
-          version: v1.21.2
+          version: ${{ env.KUBECTL_VERSION }}
+
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Run e2e tests
         run: make test-e2e
+
+  basic_flow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Setup Kind
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.11.1"
+          image: "kindest/node:${{ env.K8S_VERSION }}"
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build controller image
+        run: |
+          make docker-build IMG='controller:local'
+
+      - name: Build e2e fluentd image
+        run: |
+          make docker-build-e2e-fluentd IMG='fluentd:local'
+
+      - name: Create logging namespace
+        run: |
+          kubectl create namespace logging
+
+      - name: Start Minio
+        run: |
+          kubectl create -f hack/minio.yaml
+          kubectl wait --namespace logging --for=condition=available deployment/minio-deployment --timeout=120s
+          minio="$(kubectl get pod --namespace logging -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
+          kubectl wait --namespace logging --for=condition=Ready pod "${minio}" --timeout=120s
+
+      - name: Setup minio cli
+        run: |
+          kubectl create -f hack/minio-mc.yaml
+          kubectl wait --namespace logging --for=condition=available deployment/minio-mc-deployment --timeout=120s
+          mc_pod="$(kubectl get pod --namespace logging -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}')"
+          kubectl wait --namespace logging --for=condition=Ready pod "${mc_pod}" --timeout=120s
+          kubectl exec --namespace logging "${mc_pod}" -- \
+            mc config host add minio \
+            'http://minio-service.logging.svc.cluster.local:9000' \
+            'minio_access_key' \
+            'minio_secret_key'
+
+      - name: Run test
+        run: |
+          hack/test.sh
