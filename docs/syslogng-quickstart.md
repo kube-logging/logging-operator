@@ -193,15 +193,20 @@ The `group_unset` function removes keys based on a patterns. If an object have m
 ```
 
 ## Outputs
+
 SyslogNGOutput and SyslogNGClusterOutput resources have almost the same structure as Output and ClusterOutput resources with the main difference being the number and kind of supported destinations.
 
-Logging Operator currently supports 2 kinds of outputs for syslog-ng:
-- file
-- syslog
-- sumologic-http
+Logging Operator currently supports the following kinds of outputs for syslog-ng:
+- [file](#file-output)
+- [http](#http-output)
+- [loggly](#loggly-output)
+- [sumologic-http](#sumologic-http-output)
+- [syslog](#syslog-output)
 
 ### File output
+
 The `file` output stores log records to a plain text file.
+
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
@@ -213,32 +218,55 @@ kind: SyslogNGOutput
       $(format-json --subkeys json. --exclude json.kubernetes.labels.* json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))
 ```
 
-### Syslog output
-The `syslog` output sends log records over a socket using the Syslog protocol (RFC 5424).
+### HTTP output
+
+The `http` output sends log records over HTTP to the specified URL.
+
+#### Parameters
+```yaml
+  url:            # Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: http://127.0.0.1:8000
+  headers:        # Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").  (default: empty)
+  time_reopen:    # The time to wait in seconds before a dead connection is reestablished. (default: 60)
+  tls:            # This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193
+  disk_buffer:    # This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.
+  batch-lines:    # Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set batch-lines() to 100, syslog-ng OSE waits for 100 messages.
+  batch-bytes:    # Sets the maximum size of payload in a batch. If the size of the messages reaches this value, syslog-ng OSE sends the batch to the destination even if the number of messages is less than the value of the batch-lines() option. Note that if the batch-timeout() option is enabled and the queue becomes empty, syslog-ng OSE flushes the messages only if batch-timeout() expires, or the batch reaches the limit set in batch-bytes().
+  batch-timeout:  # Specifies the time syslog-ng OSE waits for lines to accumulate in the output buffer. The syslog-ng OSE application sends batches to the destinations evenly. The timer starts when the first message arrives to the buffer, so if only few messages arrive, syslog-ng OSE sends messages to the destination at most once every batch-timeout() milliseconds.
+  body:           # The body of the HTTP request, for example, body("${ISODATE} ${MESSAGE}"). You can use strings, macros, and template functions in the body. If not set, it will contain the message received from the source by default.
+  body-prefix:    # The string syslog-ng OSE puts at the beginning of the body of the HTTP request, before the log message.
+  body-suffix:    # The string syslog-ng OSE puts to the end of the body of the HTTP request, after the log message.
+  delimiter:      # By default, syslog-ng OSE separates the log messages of the batch with a newline character.
+  method:         # Specifies the HTTP method to use when sending the message to the server. POST | PUT
+  retries:        # The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches retries, then drops the message.
+  user:           # The username that syslog-ng OSE uses to authenticate on the server where it sends the messages.
+  password:       # The password that syslog-ng OSE uses to authenticate on the server where it sends the messages.
+  user-agent:     # The value of the USER-AGENT header in the messages sent to the server.
+  workers:        # Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.
+```
 
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
-  spec:
-    syslog:
-      host: 10.12.34.56
-      transport: tls
-      tls:
-        ca_file:
-          mountFrom:
-            secretKeyRef:
-              name: tls-secret
-              key: ca.crt
-        cert_file:
-          mountFrom:
-            secretKeyRef:
-              name: tls-secret
-              key: tls.crt
-        key_file:
-          mountFrom:
-            secretKeyRef:
-              name: tls-secret
-              key: tls.key
+metadata:
+  name: test-http
+  namespace: default
+spec:
+  http:
+    batch-lines: 1000
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffers
+      reliable: true
+    body: "$(format-json
+                --subkeys json.
+                --exclude json.kubernetes.annotations.*
+                json.kubernetes.annotations=literal($(format-flat-json --subkeys json.kubernetes.annotations.))
+                --exclude json.kubernetes.labels.*
+                json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))"
+    headers:
+    - 'X-App-Header: example'
+    tls:
+      use-system-cert-store: true
 ```
 
 ### Loggly Output
@@ -284,7 +312,7 @@ Loggly config in syslog: https://github.com/syslog-ng/syslog-ng/blob/master/scl/
 
 The `sumologic-http` output sends log records over HTTP to Sumologic.
 
-Parameters
+#### Parameters
 ```yaml
   body: # Body content template to send
   deployment: # Deployment code for sumologic. More info: https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security
@@ -328,17 +356,52 @@ spec:
     tls:
       use-system-cert-store: true
 ```
-Based on the official docs: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/disk-buffer
-### Disk buffer
+
+### Syslog output
+
+The `syslog` output sends log records over a socket using the Syslog protocol (RFC 5424).
+
 ```yaml
-  DiskBufSize  int64  `json:"disk_buf_size"`
-  Reliable     bool   `json:"reliable"`
-  Compaction   *bool  `json:"compaction,omitempty"`
-  Dir          string `json:"dir,omitempty"`
-  MemBufLength *int64 `json:"mem_buf_length,omitempty"`
-  MemBufSize   *int64 `json:"mem_buf_size,omitempty"`
-  QOutSize     *int64 `json:"q_out_size,omitempty"`
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+  spec:
+    syslog:
+      host: 10.12.34.56
+      transport: tls
+      tls:
+        ca_file:
+          mountFrom:
+            secretKeyRef:
+              name: tls-secret
+              key: ca.crt
+        cert_file:
+          mountFrom:
+            secretKeyRef:
+              name: tls-secret
+              key: tls.crt
+        key_file:
+          mountFrom:
+            secretKeyRef:
+              name: tls-secret
+              key: tls.key
 ```
+
+### Disk buffer
+
+All syslog-ng outputs support buffering to disk.
+
+#### Parameters
+```yaml
+  reliable:        # if set to true, syslog-ng cannot lose logs in case of a reload, restart, unreachable destination, or crash
+  compaction:      # if set to true, syslog-ng prunes the unused space in the LogMessage representation
+  dir:             # the folder where disk-buffer files are stored
+  disk_buf_size:   # required; the maximum size of the disk-buffer in bytes
+  mem_buf_length:  # the number of messages stored in overflow queue
+  mem_buf_size:    # the size of messages in bytes that is used in the memory part of the disk buffer
+  q_out_size:      # the number of messages stored in the output buffer of the destination
+```
+
+For more details, see [the official docs](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/disk-buffer).
 
 ---
 
