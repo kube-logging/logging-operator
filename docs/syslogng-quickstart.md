@@ -132,7 +132,7 @@ The syslog parser can parse syslog messages. Docs: https://www.syslog-ng.com/tec
 ```yaml
 filters:
 -  parser:
-      syslog-parser: {} 
+      syslog-parser: {}
 ```
 
 #### Rewrite filter
@@ -251,7 +251,7 @@ kind: SyslogNGOutput
   spec:
     loggly:
       tag: "test-tag"
-      token: 
+      token:
         valueFrom:
           secretKeyRef:
             name: loggly-secret
@@ -266,7 +266,7 @@ kind: SyslogNGOutput
   spec:
     loggly:
       tag: "test-tag"
-      token: 
+      token:
         valueFrom:
           secretKeyRef:
             name: loggly-secret
@@ -293,7 +293,7 @@ Parameters
   tls: # Required TLS configuration for Sumologic. Minimal config is use-system-cert-store: true
   disk_buffer: # Disk buffer parameters
   batch-lines: # Collect messages into batches number of lines (recommended)
-  batch-bytes: # Collect messages into batches size of batch 
+  batch-bytes: # Collect messages into batches size of batch
   batch-timeout: # Time out for sending batch if no input available
 ```
 
@@ -368,7 +368,7 @@ spec:
         type: string
   filters:
   -  parser:
-       regexp: 
+       regexp:
          patterns:
          - '^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)"(?:\s+(?<http_x_forwarded_for>[^ ]+))?)?$'
          template: ${json.message}
