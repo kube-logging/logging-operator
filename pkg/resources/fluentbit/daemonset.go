@@ -295,7 +295,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		if len(r.Logging.Spec.FluentbitSpec.BufferVolumeArgs) != 0 {
 			args = append(args, r.Logging.Spec.FluentbitSpec.BufferVolumeArgs...)
 		} else {
-			args = append(args, "--collector.disable-defaults", "--collector.filesystem")
+			args = append(args, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/")
 		}
 
 		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))

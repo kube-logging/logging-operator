@@ -1,5 +1,5 @@
 FROM ghcr.io/banzaicloud/custom-runner:0.1.4 as custom-runner
-FROM quay.io/prometheus/node-exporter:latest
+FROM quay.io/prometheus/node-exporter:master
 WORKDIR /
 COPY --from=custom-runner /runner .
 USER root
