@@ -53,7 +53,7 @@ type SecretLoaderFactory interface {
 	SecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
-const configVersion = "3.37"
+const configVersion = "4.0"
 const sourceName = "main_input"
 
 func configRenderer(in Input) (render.Renderer, error) {
