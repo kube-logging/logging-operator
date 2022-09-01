@@ -18,17 +18,17 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 )
 
-// +name:"Sumo Logic HTTP"
+// +name:"HTTP"
 // +weight:"200"
 type _hugoHTTP interface{} //nolint:deadcode,unused
 
-// +docName:"Storing messages in Sumo Logic over http"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
+// +docName:"Sending messages over HTTP"
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058
 type _docSHTTP interface{} //nolint:deadcode,unused
 
-// +name:"Sumo Logic HTTP"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55"
-// +description:"Storing messages in Sumo Logic over http"
+// +name:"HTTP"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058"
+// +description:"Sending messages over HTTP"
 // +status:"Testing"
 type _metaHTTP interface{} //nolint:deadcode,unused
 
@@ -42,7 +42,7 @@ type HTTPOutput struct {
 	TimeReopen int `json:"time_reopen,omitempty"`
 	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193
 	TLS *TLS `json:"tls,omitempty"`
-	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.  (default: false)
+	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side.
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 	// Batching parameters
 	Batch `json:",inline"`
