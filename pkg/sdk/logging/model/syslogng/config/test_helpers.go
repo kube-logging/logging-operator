@@ -20,7 +20,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -28,6 +31,54 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
+
+func CheckConfigForOutput(t *testing.T, output v1beta1.SyslogNGOutput, expected string, opts ...OutputConfigCheckOption) {
+	options := OutputConfigCheckOptions{
+		IndentWith: "    ",
+	}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if options.SecretLoaderFactory == nil {
+		options.SecretLoaderFactory = &TestSecretLoaderFactory{}
+	}
+	renderer := renderOutput(output, options.SecretLoaderFactory)
+	result := &strings.Builder{}
+	err := renderer(render.RenderContext{
+		Out:        result,
+		IndentWith: options.IndentWith,
+	})
+	CheckError(t, options.ExpectedError, err)
+	assert.Equal(t, strings.TrimSpace(Untab(expected))+"\n", result.String())
+}
+
+func CheckConfigForClusterOutput(t *testing.T, output v1beta1.SyslogNGClusterOutput, expected string, opts ...OutputConfigCheckOption) {
+	options := OutputConfigCheckOptions{
+		IndentWith: "    ",
+	}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if options.SecretLoaderFactory == nil {
+		options.SecretLoaderFactory = &TestSecretLoaderFactory{}
+	}
+	renderer := renderClusterOutput(output, options.SecretLoaderFactory)
+	result := &strings.Builder{}
+	err := renderer(render.RenderContext{
+		Out:        result,
+		IndentWith: options.IndentWith,
+	})
+	CheckError(t, options.ExpectedError, err)
+	assert.Equal(t, strings.TrimSpace(Untab(expected))+"\n", result.String())
+}
+
+type OutputConfigCheckOptions struct {
+	ExpectedError       interface{}
+	IndentWith          string
+	SecretLoaderFactory SecretLoaderFactory
+}
+
+type OutputConfigCheckOption func(options *OutputConfigCheckOptions)
 
 func CheckError(t *testing.T, expected interface{}, actual error, msgAndArgs ...interface{}) {
 	t.Helper()
