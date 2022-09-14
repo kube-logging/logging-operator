@@ -45,6 +45,8 @@ type SyslogNGSpec struct {
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
+	MaxConnections                      int                          `json:"maxConnections,omitempty"`
+	LogIWSize                           int                          `json:"logIWSize,omitempty"`
 
 	// TODO: option to turn on/off buffer volume PVC
 }

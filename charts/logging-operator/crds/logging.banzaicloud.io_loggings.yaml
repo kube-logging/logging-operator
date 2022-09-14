@@ -13009,6 +13009,10 @@ spec:
                     type: string
                   jsonKeyPrefix:
                     type: string
+                  logIWSize:
+                    type: integer
+                  maxConnections:
+                    type: integer
                   metrics:
                     properties:
                       interval:
