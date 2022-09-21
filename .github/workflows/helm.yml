@@ -20,9 +20,9 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: azure/setup-helm@v1
+      - uses: azure/setup-helm@v3
         with:
           version: ${{ env.HELM_VERSION }}
 

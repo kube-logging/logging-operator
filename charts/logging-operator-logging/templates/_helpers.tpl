@@ -43,3 +43,14 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+Formats the cluster domain as a suffix, e.g.:
+.Values.clusterDomain == "", returns ""
+.Values.clusterDomain == "cluster.local", returns ".cluster.local"
+*/}}
+{{- define "logging-operator-logging.clusterDomainAsSuffix" -}}
+{{- if .Values.clusterDomain -}}
+{{- printf ".%s" .Values.clusterDomain -}}
+{{- end -}}
+{{- end -}}
