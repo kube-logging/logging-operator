@@ -44,10 +44,18 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.http.port }}
-
-          {{- if .Values.securityContext }}
+        {{- with .Values.env }}
+          env: {{ toYaml . | nindent 12 }}
+        {{- end }}
+        {{- if .Values.securityContext }}
           securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
-          {{- end }}
+        {{- end }}
+        {{- with .Values.volumeMounts }} 
+          volumeMounts: {{ toYaml . | nindent 12 }}
+        {{- end }}
+    {{- with .Values.volumes }} 
+      volumes: {{ toYaml . | nindent 8 }}
+    {{- end }}
     {{- if .Values.podSecurityContext }}
       securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
     {{- end }}
