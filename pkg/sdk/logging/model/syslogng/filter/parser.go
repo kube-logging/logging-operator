@@ -14,12 +14,42 @@
 
 package filter
 
-// +name:"Syslog-NG parser"
+// +name:"Parser"
 // +weight:"200"
 type _hugoParser interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Syslog-NG Parser Filter](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)"
+// +kubebuilder:object:generate=true
+//Parser filters can be used to extract key-value pairs from message data. Logging operator currently supports the following parsers:
+//
+//- [regexp](#regexp)
+//- [syslog-parser](#syslog)
+//
+//## Regexp parser {#regexp}
+//
+//The regexp parser can use regular expressions to parse fields from a message.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - parser:
+//      regexp:
+//        patterns:
+//        - ".*test_field -> (?<test_field>.*)$"
+//        prefix: .regexp.
+//{{</ highlight >}}
+//
+//For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90#TOPIC-1768848).
+//
+//## Syslog parser {#syslog}
+//
+//The syslog parser can parse syslog messages. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/83#TOPIC-1829231).
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - parser:
+//      syslog-parser: {}
+//{{</ highlight >}}
 type _docParser interface{} //nolint:deadcode,unused
 
 // +name:"Syslog-NG Parser"

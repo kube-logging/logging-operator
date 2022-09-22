@@ -14,13 +14,72 @@
 
 package filter
 
-// +name:"Syslog-NG rewrite"
+// +name:"Rewrite"
 // +weight:"200"
 type _hugoRewrite interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Syslog-NG Rewrite Filter](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77)"
-// The syslog-ng rewrite filter can be used to replace message parts.
+//Rewrite filters can be used to modify record contents. Logging operator currently supports the following rewrite functions:
+//
+//- [rename](#rename)
+//- [set](#set)
+//- [substitute](#subst)
+//- [unset](#unset)
+//
+//> Note: All rewrite functions support an optional `condition` which has the same syntax as the [match filter](../match/).
+//
+//## Rename
+//
+//The `rename` function changes the name of an existing field name.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - rewrite:
+//    - rename:
+//        oldName: "json.kubernetes.labels.app"
+//        newName: "json.kubernetes.labels.app.kubernetes.io/name"
+//{{</ highlight >}}
+//
+//## Set
+//
+//The `set` function sets the value of a field.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - rewrite:
+//    - set:
+//        field: "json.kubernetes.cluster"
+//        value: "prod-us"
+//{{</ highlight >}}
+//
+//## Substitute (subst) {#subst}
+//
+//The `subst` function replaces parts of a field with a replacement value based on a pattern.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - rewrite:
+//    - subst:
+//        pattern: "\d\d\d\d-\d\d\d\d-\d\d\d\d-\d\d\d\d"
+//        replace: "[redacted bank card number]"
+//        field: "MESSAGE"
+//{{</ highlight >}}
+//
+//The function also supports the `type` and `flags` fields for specifying pattern type and flags as described in the [match expression regexp function](../match/).
+//
+//## Unset
+//
+//You can unset macros or fields of the message.
+//
+//> Note: Unsetting a field completely deletes any previous value of the field.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - rewrite:
+//    - unset:
+//        field: "json.kubernetes.cluster"
+//{{</ highlight >}}
 type _docRewrite interface{} //nolint:deadcode,unused
 
 // +name:"Syslog-NG Rewrite"

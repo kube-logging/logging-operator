@@ -14,11 +14,12 @@
 
 package output
 
-// +name:"Syslog-ng DiskBuffer"
+// +name:"Disk buffer"
 // +weight:"200"
 type _hugoDiskBuffer interface{} //nolint:deadcode,unused
 
-// +docName:disk-buffer configuration"
+// +docName:"Disk buffer configuration"
+// The parameters of the syslog-ng disk buffer. Using a disk buffer on the output helps avoid message loss in case of a system failure on the destination side.
 // More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
 type _docDiskBuffer interface{} //nolint:deadcode,unused
 
