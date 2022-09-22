@@ -22,13 +22,13 @@ import (
 // +weight:"200"
 type _hugoHTTP interface{} //nolint:deadcode,unused
 
-// +docName:"Forwarding messages over HTTP"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55
+// +docName:"Sending messages over HTTP"
+// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058
 type _docSHTTP interface{} //nolint:deadcode,unused
 
 // +name:"HTTP"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55"
-// +description:"Forwarding messages over HTTP"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058"
+// +description:"Sending messages over HTTP"
 // +status:"Testing"
 type _metaHTTP interface{} //nolint:deadcode,unused
 

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
@@ -52,7 +53,7 @@ func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretL
 	)
 }
 
-func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderFlow(controlNS string, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	nsFilterName := fmt.Sprintf("%s_ns_filter", baseName)
@@ -62,7 +63,7 @@ func renderFlow(controlNS string, sourceName string, f v1beta1.SyslogNGFlow, sec
 	return render.AllOf(
 		filterDefStmt(nsFilterName, filterExprStmt(model.NewFilterExpr(model.FilterExprMatch{
 			Pattern: f.Namespace,
-			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue("json.kubernetes.namespace_name")),
+			Scope:   model.NewFilterExprMatchScope(model.FilterExprMatchScopeValue(strings.Join([]string{"json", "kubernetes", "namespace_name"}, keyDelim))),
 			Type:    "string",
 		}))),
 		renderFlowMatch(matchName, f.Spec.Match),

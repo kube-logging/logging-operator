@@ -24,6 +24,7 @@ type JSONParser struct {
 	Marker        string   `syslog-ng:"name=marker,optional"`
 	Prefix        string   `syslog-ng:"name=prefix,optional"`
 	Template      string   `syslog-ng:"name=template,optional"`
+	KeyDelimiter  string   `syslog-ng:"name=key-delimiter,optional"`
 }
 
 func parserDefStmt(name string, body render.Renderer) render.Renderer {

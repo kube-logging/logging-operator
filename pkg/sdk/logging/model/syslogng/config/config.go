@@ -53,7 +53,7 @@ type SecretLoaderFactory interface {
 	SecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
-const configVersion = "3.37"
+const configVersion = "4.0"
 const sourceName = "main_input"
 
 func configRenderer(in Input) (render.Renderer, error) {
@@ -83,7 +83,11 @@ func configRenderer(in Input) (render.Renderer, error) {
 		logDefs = append(logDefs, renderClusterFlow(sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
-		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Logging.Spec.ControlNamespace, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
+	}
+
+	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {
+		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter)
 	}
 
 	return render.AllFrom(seqs.Intersperse(
@@ -97,14 +101,19 @@ func configRenderer(in Input) (render.Renderer, error) {
 						channelDefStmt(
 							sourceDefStmt("", renderDriver(Field{
 								Value: reflect.ValueOf(NetworkSourceDriver{
-									Transport: "tcp",
-									Port:      uint16(in.SourcePort),
-									Flags:     []string{"no-parse"},
+									Transport:      "tcp",
+									Port:           uint16(in.SourcePort),
+									MaxConnections: in.Logging.Spec.SyslogNGSpec.MaxConnections,
+									LogIWSize:      logIWSizeCalculator(in),
+									Flags:          []string{"no-parse"},
 								}),
 							}, nil)),
 							[]render.Renderer{
 								parserDefStmt("", renderDriver(Field{
-									Value: reflect.ValueOf(JSONParser{Prefix: "json."}),
+									Value: reflect.ValueOf(JSONParser{
+										Prefix:       in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix,
+										KeyDelimiter: in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter,
+									}),
 								}, nil)),
 							},
 						)),
@@ -137,6 +146,13 @@ func globalOptionsDefStmt(options ...render.Renderer) render.Renderer {
 	)))
 }
 
+func keyDelim(delim string) string {
+	if delim != "" {
+		return delim
+	}
+	return "."
+}
+
 func setDefault[T comparable](ptr *T, def T) {
 	var zero T
 	if *ptr == zero {
@@ -146,4 +162,11 @@ func setDefault[T comparable](ptr *T, def T) {
 
 func amp[T any](v T) *T {
 	return &v
+}
+
+func logIWSizeCalculator(in Input) int {
+	if in.Logging.Spec.SyslogNGSpec.MaxConnections != 0 && in.Logging.Spec.SyslogNGSpec.LogIWSize == 0 {
+		return in.Logging.Spec.SyslogNGSpec.MaxConnections * 100
+	}
+	return in.Logging.Spec.SyslogNGSpec.LogIWSize
 }

@@ -13005,6 +13005,14 @@ spec:
                       stats_level:
                         type: integer
                     type: object
+                  jsonKeyDelim:
+                    type: string
+                  jsonKeyPrefix:
+                    type: string
+                  logIWSize:
+                    type: integer
+                  maxConnections:
+                    type: integer
                   metrics:
                     properties:
                       interval:
