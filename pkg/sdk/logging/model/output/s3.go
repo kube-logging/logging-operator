@@ -148,6 +148,10 @@ type S3OutputConfig struct {
 	AwsIamRetries string `json:"aws_iam_retries,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Assume Role Credentials,#assume-role-credentials"
