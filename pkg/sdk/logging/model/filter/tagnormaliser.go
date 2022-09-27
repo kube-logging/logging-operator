@@ -52,7 +52,7 @@ type TagNormaliser struct {
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
 }
 
-// #### Example `Parser` filter configurations
+// ## Example `Parser` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

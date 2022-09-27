@@ -57,7 +57,7 @@ type RegexpSection struct {
 	Pattern string `json:"pattern"`
 }
 
-// #### Example `Regexp` filter configurations
+// ## Example `Regexp` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
@@ -97,7 +97,7 @@ type ExcludeSection struct {
 	Pattern string `json:"pattern"`
 }
 
-// #### Example `Exclude` filter configurations
+// ## Example `Exclude` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
@@ -137,7 +137,7 @@ type OrSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
-// #### Example `Or` filter configurations
+// ## Example `Or` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
@@ -183,7 +183,7 @@ type AndSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
-// #### Example `And` filter configurations
+// ## Example `And` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

@@ -41,7 +41,7 @@ type StdOutFilterConfig struct {
 	OutputType string `json:"output_type,omitempty"`
 }
 
-// #### Example `StdOut` filter configurations
+// ## Example `StdOut` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

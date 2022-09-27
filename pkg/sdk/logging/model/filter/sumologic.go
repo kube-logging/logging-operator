@@ -90,7 +90,7 @@ type SumoLogic struct {
 	CollectorValue string `json:"collector_value,omitempty"`
 }
 
-// #### Example `Parser` filter configurations
+// ## Example `Parser` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

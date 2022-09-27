@@ -29,7 +29,7 @@ type _hugoExceptionDetector interface{} //nolint:deadcode,unused
 //
 // > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 //filters:
 //  - detectExceptions:
@@ -65,7 +65,7 @@ type DetectExceptions struct {
 	ForceLineBreaks bool `json:"force_line_breaks,omitempty"`
 }
 
-// #### Example `Exception Detector` filter configurations
+// ## Example `Exception Detector` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
