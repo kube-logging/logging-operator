@@ -33,9 +33,9 @@ type _metaHostTailer = interface{} //nolint:deadcode,unused
 
 // HostTailerSpec defines the desired state of HostTailer
 type HostTailerSpec struct {
-	// List of file tailers
+	// List of [file tailers](#filetailer).
 	FileTailers []FileTailer `json:"fileTailers,omitempty"`
-	// List of systemd tailers
+	// List of [systemd tailers](#systemdtailer).
 	SystemdTailers []SystemdTailer `json:"systemdTailers,omitempty"`
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// daemonset (and possibly other resource in the future) in case there is a change in an immutable field
@@ -48,7 +48,7 @@ type HostTailerSpec struct {
 	WorkloadBase *types.PodSpecBase `json:"workloadOverrides,omitempty"`
 }
 
-// HostTailerStatus defines the observed state of HostTailer
+// HostTailerStatus defines the observed state of [HostTailer](#hosttailer).
 type HostTailerStatus struct {
 }
 
@@ -65,7 +65,7 @@ type HostTailer struct {
 
 // +kubebuilder:object:root=true
 
-// HostTailerList contains a list of HostTailer
+// HostTailerList contains a list of [HostTailers](#hosttailer).
 type HostTailerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
