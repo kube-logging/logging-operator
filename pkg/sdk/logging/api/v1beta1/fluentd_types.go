@@ -92,6 +92,7 @@ type FluentdSpec struct {
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
+	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
