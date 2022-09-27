@@ -28,7 +28,7 @@ type _hugoNewRelic interface{} //nolint:deadcode,unused
 // +docName:"New Relic Logs plugin for Fluentd"
 //**newrelic** output plugin send log data to New Relic Logs
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   newrelic:

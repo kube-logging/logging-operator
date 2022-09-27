@@ -28,7 +28,7 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 // Sends logs to Redis endpoints.
 // More info at https://github.com/fluent-plugins-nursery/fluent-plugin-redis
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   redis:

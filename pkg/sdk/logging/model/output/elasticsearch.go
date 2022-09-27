@@ -27,7 +27,7 @@ type _hugoElasticsearch interface{} //nolint:deadcode,unused
 //More info at https://github.com/uken/fluent-plugin-elasticsearch
 //>Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   elasticsearch:

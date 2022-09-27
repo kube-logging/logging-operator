@@ -29,7 +29,7 @@ type _hugoLoki interface{} //nolint:deadcode,unused
 //More info at https://github.com/banzaicloud/fluent-plugin-kubernetes-loki
 //>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   loki:

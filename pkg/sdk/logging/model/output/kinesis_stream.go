@@ -26,7 +26,7 @@ type _hugoKinesisStream interface{} //nolint:deadcode,unused
 // +docName:"Kinesis Stream output plugin for Fluentd"
 //  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   kinesisStream:

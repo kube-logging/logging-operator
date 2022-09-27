@@ -27,7 +27,7 @@ type _hugoAwsElasticsearch interface{} //nolint:deadcode,unused
 // +docName:"Amazon Elasticsearch output plugin for Fluentd"
 //  More info at https://github.com/atomita/fluent-plugin-aws-elasticsearch-service
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   kinesisStream:

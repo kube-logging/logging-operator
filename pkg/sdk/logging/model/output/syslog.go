@@ -69,7 +69,7 @@ type SyslogOutputConfig struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-// #### Example `File` output configurations
+// ## Example `File` output configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Output

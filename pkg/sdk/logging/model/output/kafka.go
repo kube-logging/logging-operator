@@ -27,7 +27,7 @@ type _hugoKafka interface{} //nolint:deadcode,unused
 //  More info at https://github.com/fluent/fluent-plugin-kafka
 //>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   kafka:

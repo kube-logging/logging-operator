@@ -57,7 +57,7 @@ type LogDNAOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
-// #### Example `LogDNA` filter configurations
+// ## Example `LogDNA` filter configurations
 // ```yaml
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: Output
