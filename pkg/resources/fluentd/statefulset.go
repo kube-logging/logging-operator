@@ -68,6 +68,9 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
+	if i := generateInitContainer(r.Logging.Spec.FluentdSpec); i != nil {
+		initContainers = append(initContainers, *i)
+	}
 
 	containers := []corev1.Container{
 		fluentContainer(r.Logging.Spec.FluentdSpec),
@@ -165,27 +168,46 @@ func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 }
 
 func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
-	return &corev1.Container{
+	var args []string
+	vm := []corev1.VolumeMount{
+		{
+			Name:      "app-config",
+			MountPath: "/fluentd/app-config",
+		},
+	}
+
+	if spec.CompressConfigFile {
+		args = append(args,
+			"--volume-dir-archive=/tmp/archive",
+			"--dir-for-unarchive=/fluentd/app-config",
+			"--webhook-url=http://127.0.0.1:24444/api/config.reload",
+		)
+		vm = append(vm, corev1.VolumeMount{
+			Name:      "app-config-compress",
+			MountPath: "tmp/archive",
+		})
+	} else {
+		args = append(args,
+			"--volume-dir=/fluentd/etc",
+			"--volume-dir=/fluentd/app-config",
+			"--webhook-url=http://127.0.0.1:24444/api/config.reload",
+		)
+		vm = append(vm, corev1.VolumeMount{
+			Name:      "config",
+			MountPath: "/fluentd/etc",
+		})
+	}
+
+	c := &corev1.Container{
 		Name:            "config-reloader",
 		ImagePullPolicy: corev1.PullPolicy(spec.ConfigReloaderImage.PullPolicy),
 		Image:           spec.ConfigReloaderImage.RepositoryWithTag(),
 		Resources:       spec.ConfigReloaderResources,
-		Args: []string{
-			"-volume-dir=/fluentd/etc",
-			"-volume-dir=/fluentd/app-config/",
-			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
-		},
-		VolumeMounts: []corev1.VolumeMount{
-			{
-				Name:      "config",
-				MountPath: "/fluentd/etc",
-			},
-			{
-				Name:      "app-config",
-				MountPath: "/fluentd/app-config/",
-			},
-		},
+		Args:            args,
+		VolumeMounts:    vm,
 	}
+
+	return c
 }
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
@@ -228,7 +250,7 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 		},
 		{
 			Name:      "app-config",
-			MountPath: "/fluentd/app-config/",
+			MountPath: "/fluentd/app-config",
 		},
 		{
 			Name:      "output-secret",
@@ -255,14 +277,6 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 		{
-			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
-				},
-			},
-		},
-		{
 			Name: "output-secret",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -271,6 +285,33 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
+
+	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+		v = append(v, corev1.Volume{
+			Name: "app-config",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		})
+		v = append(v, corev1.Volume{
+			Name: "app-config-compress",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
+				},
+			},
+		})
+	} else {
+		v = append(v, corev1.Volume{
+			Name: "app-config",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
+				},
+			},
+		})
+	}
+
 	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",
@@ -367,6 +408,33 @@ func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
 			PeriodSeconds:       spec.ReadinessDefaultCheck.PeriodSeconds,
 			SuccessThreshold:    spec.ReadinessDefaultCheck.SuccessThreshold,
 			FailureThreshold:    spec.ReadinessDefaultCheck.FailureThreshold,
+		}
+	}
+	return nil
+}
+
+func generateInitContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
+	if spec.CompressConfigFile {
+		return &corev1.Container{
+			Name:            "init-config-reloader",
+			Image:           spec.ConfigReloaderImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
+			Resources:       spec.ConfigReloaderResources,
+			Args: []string{
+				"--init-mode=true",
+				"--volume-dir-archive=/tmp/archive",
+				"--dir-for-unarchive=/fluentd/app-config",
+			},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "app-config",
+					MountPath: "/fluentd/app-config",
+				},
+				{
+					Name:      "app-config-compress",
+					MountPath: "/tmp/archive",
+				},
+			},
 		}
 	}
 	return nil

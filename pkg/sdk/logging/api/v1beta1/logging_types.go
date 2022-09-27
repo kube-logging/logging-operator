@@ -131,8 +131,8 @@ const (
 	DefaultFluentdDrainPauseImageTag            = "latest"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
-	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
-	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
+	DefaultFluentdConfigReloaderImageRepository = "zvlb/config-reloader"
+	DefaultFluentdConfigReloaderImageTag        = "v0.1.0"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
 	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
