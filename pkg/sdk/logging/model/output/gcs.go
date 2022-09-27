@@ -29,7 +29,7 @@ type _hugoGCS interface{} //nolint:deadcode,unused
 //## Example
 //```yaml
 // spec:
-//  format:
+//  gcs:
 //    project: logging-example
 //    bucket: banzai-log-test
 //    path: logs/${tag}/%Y/%m/%d/
