@@ -39,6 +39,8 @@ spec:
             type: object
           spec:
             properties:
+              excludeLabelFromRouter:
+                type: boolean
               filters:
                 items:
                   properties:
@@ -967,6 +969,8 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowLabel:
+                type: string
               globalOutputRefs:
                 items:
                   type: string
@@ -1058,6 +1062,8 @@ spec:
             type: object
           spec:
             properties:
+              excludeLabelFromRouter:
+                type: boolean
               filters:
                 items:
                   properties:
@@ -1986,6 +1992,8 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowLabel:
+                type: string
               globalOutputRefs:
                 items:
                   type: string

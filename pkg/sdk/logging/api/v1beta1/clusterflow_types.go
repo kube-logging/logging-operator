@@ -71,8 +71,10 @@ type ClusterFlowSpec struct {
 	Filters    []Filter          `json:"filters,omitempty"`
 	LoggingRef string            `json:"loggingRef,omitempty"`
 	// Deprecated
-	OutputRefs       []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
+	OutputRefs             []string `json:"outputRefs,omitempty"`
+	GlobalOutputRefs       []string `json:"globalOutputRefs,omitempty"`
+	FlowLabel              string   `json:"flowLabel,omitempty"`
+	ExcludeLabelFromRouter bool     `json:"excludeLabelFromRouter,omitempty"`
 }
 
 // +kubebuilder:object:root=true

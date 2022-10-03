@@ -57,6 +57,8 @@ spec:
                 type: string
               defaultFlow:
                 properties:
+                  excludeLabelFromRouter:
+                    type: boolean
                   filters:
                     items:
                       properties:
@@ -985,6 +987,8 @@ spec:
                           type: object
                       type: object
                     type: array
+                  flowLabel:
+                    type: string
                   globalOutputRefs:
                     items:
                       type: string
