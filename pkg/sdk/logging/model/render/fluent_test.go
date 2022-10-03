@@ -313,7 +313,7 @@ func TestMultipleOutput(t *testing.T) {
 				"key1": "val1",
 				"key2": "val2"},
 				Namespaces: []string{"ns-test"}},
-		}, "", "", "")
+		}, "", "", "", "", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -392,7 +392,7 @@ func TestRenderFullFluentConfig(t *testing.T) {
 				"key1": "val1",
 				"key2": "val2"},
 				Namespaces: []string{"ns-test"}},
-		}, "", "", "")
+		}, "", "", "", "", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -519,7 +519,7 @@ func TestRenderFullFluentConfigWithGlobalFilter(t *testing.T) {
 				"key1": "val1",
 				"key2": "val2"},
 				Namespaces: []string{"ns-test"}},
-		}, "", "", "")
+		}, "", "", "", "", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -731,7 +731,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 				"key1": "val1",
 				"key2": "val2"},
 				Namespaces: []string{"ns-test"}},
-		}, "", "", "")
+		}, "", "", "", "", false)
 	if err != nil {
 		return err
 	}
@@ -787,7 +787,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 }
 
 func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
-	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "", "")
+	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "", "", "", false)
 	if err != nil {
 		panic(err)
 	}
@@ -805,7 +805,7 @@ func newComplexFlow(namespace string, labels map[string]string, hosts []string, 
 				Negate:         negate,
 			},
 		},
-		"", "", "")
+		"", "", "", "", false)
 	if err != nil {
 		panic(err)
 	}

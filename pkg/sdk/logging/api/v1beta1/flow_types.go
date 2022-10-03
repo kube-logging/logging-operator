@@ -36,9 +36,11 @@ type FlowSpec struct {
 	Filters    []Filter          `json:"filters,omitempty"`
 	LoggingRef string            `json:"loggingRef,omitempty"`
 	// Deprecated
-	OutputRefs       []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
-	LocalOutputRefs  []string `json:"localOutputRefs,omitempty"`
+	OutputRefs             []string `json:"outputRefs,omitempty"`
+	GlobalOutputRefs       []string `json:"globalOutputRefs,omitempty"`
+	LocalOutputRefs        []string `json:"localOutputRefs,omitempty"`
+	FlowLabel              string   `json:"flowLabel,omitempty"`
+	ExcludeLabelFromRouter bool     `json:"excludeLabelFromRouter,omitempty"`
 }
 
 type Match struct {

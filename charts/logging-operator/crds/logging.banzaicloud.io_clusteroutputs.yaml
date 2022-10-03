@@ -4744,6 +4744,13 @@ spec:
                   ttl:
                     type: integer
                 type: object
+              relabel:
+                properties:
+                  label:
+                    type: string
+                required:
+                - label
+                type: object
               s3:
                 properties:
                   acl:
@@ -10640,6 +10647,13 @@ spec:
                     type: string
                   ttl:
                     type: integer
+                type: object
+              relabel:
+                properties:
+                  label:
+                    type: string
+                required:
+                - label
                 type: object
               s3:
                 properties:
