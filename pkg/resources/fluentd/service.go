@@ -91,6 +91,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				objectMetadata.Labels[k] = v
 			}
 		}
+		metricScrapePath := r.Logging.Spec.FluentdSpec.Metrics.Path
+		if r.Logging.Spec.FluentdSpec.Workers > 1 {
+			metricScrapePath = "/aggregated_metrics"
+		}
 
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
@@ -100,7 +104,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "http-metrics",
-					Path:                 r.Logging.Spec.FluentdSpec.Metrics.Path,
+					Path:                 metricScrapePath,
 					Interval:             r.Logging.Spec.FluentdSpec.Metrics.Interval,
 					ScrapeTimeout:        r.Logging.Spec.FluentdSpec.Metrics.Timeout,
 					HonorLabels:          r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
