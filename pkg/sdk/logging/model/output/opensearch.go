@@ -27,7 +27,7 @@ type _hugoOpenSearch interface{} //nolint:deadcode,unused
 //More info at https://github.com/fluent/fluent-plugin-opensearch
 //>Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   opensearch:

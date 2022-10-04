@@ -43,7 +43,7 @@ type KubeEventsTimestampConfig struct {
 	MappedTimeKey string `json:"mapped_time_key,omitempty"`
 }
 
-// #### Example `Kubernetes Events Timestamp` filter configurations
+// ## Example `Kubernetes Events Timestamp` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
