@@ -49,7 +49,7 @@ type _metaDDetectExceptions interface{} //nolint:deadcode,unused
 type DetectExceptions struct {
 	// The field which contains the raw message text in the input JSON data. (default: "")
 	Message string `json:"message,omitempty"`
-	// The prefix to be removed from the input tag when outputting a record. (default: "")
+	// The prefix to be removed from the input tag when outputting a record. (default: kubernetes)
 	RemoveTagPrefix string `json:"remove_tag_prefix,omitempty"`
 	// The interval of flushing the buffer for multiline format. (default: nil)
 	MultilineFlushInterval string `json:"multiline_flush_interval,omitempty"`
@@ -63,6 +63,8 @@ type DetectExceptions struct {
 	Stream string `json:"stream,omitempty"`
 	// Force line breaks between each lines when comibining exception stacks. (default: false)
 	ForceLineBreaks bool `json:"force_line_breaks,omitempty"`
+	// Tag used in match directive. (default: kubernetes.**)
+	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`
 }
 
 // ## Example `Exception Detector` filter configurations
@@ -97,16 +99,21 @@ type _expDetectExceptions interface{} //nolint:deadcode,unused
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "detect_exceptions"
+	detect := d.DeepCopy()
+	if detect.RemoveTagPrefix == "" {
+		detect.RemoveTagPrefix = "kubernetes"
+	}
+	if detect.MatchTag == "" {
+		detect.MatchTag = "kubernetes.**"
+	}
 	detector := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
-			Tag:       "kubernetes.**",
+			Tag:       detect.MatchTag,
 			Id:        id,
 		},
 	}
-	detect := d.DeepCopy()
-	detect.RemoveTagPrefix = "kubernetes"
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(detect); err != nil {
 		return nil, err
 	} else {
