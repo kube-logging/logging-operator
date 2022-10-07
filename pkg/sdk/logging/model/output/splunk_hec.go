@@ -28,7 +28,7 @@ type _hugoSplunk interface{} //nolint:deadcode,unused
 // +docName:"Splunk via Hec output plugin for Fluentd"
 //More info at https://github.com/splunk/fluent-plugin-splunk-hec
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   splunkHec:

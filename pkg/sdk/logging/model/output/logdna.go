@@ -61,7 +61,7 @@ type LogDNAOutput struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
-// #### Example `LogDNA` filter configurations
+// ## Example `LogDNA` filter configurations
 // ```yaml
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: Output

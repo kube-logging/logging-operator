@@ -23,6 +23,19 @@ import (
 // +weight:"200"
 type _hugoGCS interface{} //nolint:deadcode,unused
 
+// +docName:"Google Cloud Storage"
+// Store logs in Google Cloud Storage. For details, see [https://github.com/banzaicloud/fluent-plugin-gcs](https://github.com/banzaicloud/fluent-plugin-gcs).
+//
+//## Example
+//```yaml
+// spec:
+//  gcs:
+//    project: logging-example
+//    bucket: banzai-log-test
+//    path: logs/${tag}/%Y/%m/%d/
+//```
+type _docGCS interface{} //nolint:deadcode,unused
+
 // +name:"Google Cloud Storage"
 // +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
 // +version:"0.4.0"

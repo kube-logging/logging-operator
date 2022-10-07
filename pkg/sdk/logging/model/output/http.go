@@ -28,7 +28,7 @@ type _hugoHTTP interface{} //nolint:deadcode,unused
 // Sends logs to HTTP/HTTPS endpoints.
 // More info at https://docs.fluentd.org/output/http.
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   http:

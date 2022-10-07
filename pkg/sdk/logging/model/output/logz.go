@@ -30,7 +30,7 @@ type _hugoLogZ interface{} //nolint:deadcode,unused
 // +docName:"LogZ output plugin for Fluentd"
 //More info at https://github.com/tarokkk/fluent-plugin-logzio
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   logz:

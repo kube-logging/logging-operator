@@ -51,7 +51,7 @@ type GeoIP struct {
 	Records []Record `json:"records,omitempty"`
 }
 
-// #### Example `GeoIP` filter configurations
+// ## Example `GeoIP` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

@@ -198,7 +198,7 @@ type GrokSection struct {
 	Timezone string `json:"timezone,omitempty"`
 }
 
-// #### Example `Parser` filter configurations
+// ## Example `Parser` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

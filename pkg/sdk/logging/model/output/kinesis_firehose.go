@@ -26,7 +26,7 @@ type _hugoKinesisFirehose interface{} //nolint:deadcode,unused
 // +docName:"Kinesis Firehose output plugin for Fluentd"
 //  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   kinesisFirehose:

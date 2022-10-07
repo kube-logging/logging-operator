@@ -50,9 +50,11 @@ type _metaTagNormaliser interface{} //nolint:deadcode,unused
 type TagNormaliser struct {
 	// Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
+	// Tag used in match directive. (default: kubernetes.**)
+	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`
 }
 
-// #### Example `Parser` filter configurations
+// ## Example `Parser` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow
@@ -79,10 +81,13 @@ type _expTagNormaliser interface{} //nolint:deadcode,unused
 
 func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "tag_normaliser"
+	if t.MatchTag == "" {
+		t.MatchTag = "kubernetes.**"
+	}
 	return types.NewFlatDirective(types.PluginMeta{
 		Type:      pluginType,
 		Directive: "match",
-		Tag:       "kubernetes.**",
+		Tag:       t.MatchTag,
 		Id:        id,
 	}, t, secretLoader)
 }
