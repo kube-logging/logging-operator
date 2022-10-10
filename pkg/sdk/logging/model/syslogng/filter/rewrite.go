@@ -22,6 +22,7 @@ type _hugoRewrite interface{} //nolint:deadcode,unused
 // +docName:"[Rewrite](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/76#TOPIC-1829205)"
 //Rewrite filters can be used to modify record contents. Logging operator currently supports the following rewrite functions:
 //
+//- [group_unset](#groupunset)
 //- [rename](#rename)
 //- [set](#set)
 //- [substitute](#subst)
