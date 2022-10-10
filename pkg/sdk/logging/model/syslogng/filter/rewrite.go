@@ -30,6 +30,17 @@ type _hugoRewrite interface{} //nolint:deadcode,unused
 //
 //> Note: All rewrite functions support an optional `condition` which has the same syntax as the [match filter](../match/).
 //
+//## Group unset {#groupunset}
+//
+//The `group_unset` function removes from the record a group of fields matching a pattern.
+//
+//{{< highlight yaml >}}
+//  filters:
+//  - rewrite:
+//    - group_unset:
+//        pattern: "json.kubernetes.annotations.*"
+//{{</ highlight >}}
+//
 //## Rename
 //
 //The `rename` function changes the name of an existing field name.
