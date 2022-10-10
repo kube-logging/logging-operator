@@ -19,7 +19,7 @@ package filter
 type _hugoParser interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Syslog-NG Parser Filter](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)"
+// +docName:"[Parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/82#TOPIC-1829229)"
 // +kubebuilder:object:generate=true
 //Parser filters can be used to extract key-value pairs from message data. Logging operator currently supports the following parsers:
 //
