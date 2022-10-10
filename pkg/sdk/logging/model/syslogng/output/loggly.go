@@ -21,7 +21,11 @@ import "github.com/banzaicloud/operator-tools/pkg/secret"
 type _hugoLoggly interface{} //nolint:deadcode,unused
 
 // +docName:"Loggly output plugin for syslog-ng"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072
+//The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider. You can send log messages over TCP, or encrypted with TLS. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072).
+//
+//## Prerequisites
+//
+//You need a Loggly account and your user token to use this output.
 type _docLoggly interface{} //nolint:deadcode,unused
 
 // +name:"Loggly"

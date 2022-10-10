@@ -14,12 +14,76 @@
 
 package output
 
-// +name:"syslog-ng syslog (rfc5424) output"
+// +name:"Syslog (RFC5424) output"
 // +weight:"200"
 type _hugoSyslogOutput interface{} //nolint:deadcode,unused
 
 // +docName:"Syslog output configuration"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+//The `syslog` output sends log records over a socket using the Syslog protocol (RFC 5424).
+//
+//{{< highlight yaml >}}
+//  spec:
+//    syslog:
+//      host: 10.12.34.56
+//      transport: tls
+//      tls:
+//        ca_file:
+//          mountFrom:
+//            secretKeyRef:
+//              name: tls-secret
+//              key: ca.crt
+//        cert_file:
+//          mountFrom:
+//            secretKeyRef:
+//              name: tls-secret
+//              key: tls.crt
+//        key_file:
+//          mountFrom:
+//            secretKeyRef:
+//              name: tls-secret
+//              key: tls.key
+//{{</ highlight >}}
+//
+//The following example also configures disk-based buffering for the output. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+//
+//{{< highlight yaml >}}
+//apiVersion: logging.banzaicloud.io/v1beta1
+//kind: SyslogNGOutput
+//metadata:
+//  name: test
+//  namespace: default
+//spec:
+//  syslog:
+//    host: 10.20.9.89
+//    port: 601
+//    disk_buffer:
+//      disk_buf_size: 512000000
+//      dir: /buffer
+//      reliable: true
+//    template: "$(format-json
+//                --subkeys json.
+//                --exclude json.kubernetes.labels.*
+//                json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))\n"
+//    tls:
+//      ca_file:
+//        mountFrom:
+//          secretKeyRef:
+//            key: ca.crt
+//            name: syslog-tls-cert
+//      cert_file:
+//        mountFrom:
+//          secretKeyRef:
+//            key: tls.crt
+//            name: syslog-tls-cert
+//      key_file:
+//        mountFrom:
+//          secretKeyRef:
+//            key: tls.key
+//            name: syslog-tls-cert
+//    transport: tls
+//{{</ highlight >}}
+//
+//For details on the available options of the output, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124).
 type _docSyslogOutput interface{} //nolint:deadcode,unused
 
 // +name:"Syslog output configuration"
@@ -55,7 +119,7 @@ type SyslogOutput struct {
 	TLS *TLS `json:"tls,omitempty"`
 	// Override the global timestamp format (set in the global ts-format() parameter) for the specific destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor912)
 	TSFormat string `json:"ts_format,omitempty"`
-	// Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor860)
+	// Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 	// Unique name for the syslog-ng driver [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.16/administration-guide/persist-name)
 	PersistName string `json:"persist_name,omitempty"`
