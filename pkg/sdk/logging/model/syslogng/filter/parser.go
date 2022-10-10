@@ -39,7 +39,7 @@ type _hugoParser interface{} //nolint:deadcode,unused
 //        prefix: .regexp.
 //{{</ highlight >}}
 //
-//For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90#TOPIC-1768848).
+//For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/91#TOPIC-1829263).
 //
 //## Syslog parser {#syslog}
 //
