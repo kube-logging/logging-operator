@@ -19,7 +19,7 @@ package filter
 type _hugoRewrite interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Syslog-NG Rewrite Filter](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77)"
+// +docName:"[Rewrite](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/76#TOPIC-1829205)"
 //Rewrite filters can be used to modify record contents. Logging operator currently supports the following rewrite functions:
 //
 //- [rename](#rename)
