@@ -78,21 +78,27 @@ type EnhanceK8s struct {
 
 // #### Example `EnhanceK8s` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Logging
-//metadata:
-//  name: demo-flow
-//spec:
-//  globalFilters:
-//    - enhanceK8s: {}
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Logging
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	globalFilters:
+//	  - enhanceK8s: {}
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//<filter **>
-//  @type enhance_k8s_metadata
-//  @id test_enhanceK8s
-//</filter>
+// <filter **>
+//
+//	@type enhance_k8s_metadata
+//	@id test_enhanceK8s
+//
+// </filter>
 // ```
 type _expEnhanceK8s interface{} //nolint:deadcode,unused
 

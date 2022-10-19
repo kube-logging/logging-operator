@@ -24,16 +24,19 @@ import (
 type _hugoKinesisStream interface{} //nolint:deadcode,unused
 
 // +docName:"Kinesis Stream output plugin for Fluentd"
-//  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
+//
+//	More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
 //
 // #### Example output configurations
 // ```yaml
 // spec:
-//   kinesisStream:
-//     stream_name: example-stream-name
-//     region: us-east-1
-//     format:
-//       type: json
+//
+//	kinesisStream:
+//	  stream_name: example-stream-name
+//	  region: us-east-1
+//	  format:
+//	    type: json
+//
 // ```
 type _docKinesisStream interface{} //nolint:deadcode,unused
 

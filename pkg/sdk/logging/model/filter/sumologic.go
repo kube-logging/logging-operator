@@ -24,7 +24,7 @@ import (
 type _hugoSumoLogic interface{} //nolint:deadcode,unused
 
 // +docName:"Sumo Logic collection solution for Kubernetes"
-//More info at https://github.com/SumoLogic/sumologic-kubernetes-collection
+// More info at https://github.com/SumoLogic/sumologic-kubernetes-collection
 type _docSumologic interface{} //nolint:deadcode,unused
 
 // +name:"SumoLogic"
@@ -92,26 +92,32 @@ type SumoLogic struct {
 
 // #### Example `Parser` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - sumologic:
-//        source_name: "elso"
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - sumologic:
+//	      source_name: "elso"
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//<filter **>
-//  @type kubernetes_sumologic
-//  @id test_sumologic
-//  source_name elso
-//</filter>
+// <filter **>
+//
+//	@type kubernetes_sumologic
+//	@id test_sumologic
+//	source_name elso
+//
+// </filter>
 // ```
 type _expSumologic interface{} //nolint:deadcode,unused
 

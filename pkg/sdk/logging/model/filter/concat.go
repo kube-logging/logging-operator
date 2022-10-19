@@ -71,30 +71,36 @@ type Concat struct {
 
 // #### Example `Concat` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - concat:
-//        partial_key: "partial_message"
-//        separator: ""
-//        n_lines: 10
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - concat:
+//	      partial_key: "partial_message"
+//	      separator: ""
+//	      n_lines: 10
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//<filter **>
-//  @type concat
-//  @id test_concat
-//  key message
-//  n_lines 10
-//  partial_key partial_message
-//</filter>
+// <filter **>
+//
+//	@type concat
+//	@id test_concat
+//	key message
+//	n_lines 10
+//	partial_key partial_message
+//
+// </filter>
 // ```
 type _expConcat interface{} //nolint:deadcode,unused
 

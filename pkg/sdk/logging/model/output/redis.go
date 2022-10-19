@@ -31,11 +31,13 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 // #### Example output configurations
 // ```yaml
 // spec:
-//   redis:
-//     host: redis-master.prod.svc.cluster.local
-//     buffer:
-//       tags: "[]"
-//       flush_interval: 10s
+//
+//	redis:
+//	  host: redis-master.prod.svc.cluster.local
+//	  buffer:
+//	    tags: "[]"
+//	    flush_interval: 10s
+//
 // ```
 type _docRedis interface{} //nolint:deadcode,unused
 

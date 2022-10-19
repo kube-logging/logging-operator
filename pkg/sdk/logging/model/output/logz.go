@@ -28,29 +28,31 @@ import (
 type _hugoLogZ interface{} //nolint:deadcode,unused
 
 // +docName:"LogZ output plugin for Fluentd"
-//More info at https://github.com/tarokkk/fluent-plugin-logzio
+// More info at https://github.com/tarokkk/fluent-plugin-logzio
 //
 // #### Example output configurations
 // ```yaml
 // spec:
-//   logz:
-//     endpoint:
-//       url: https://listener.logz.io
-//       port: 8071
-//       token:
-//         valueFrom:
-//          secretKeyRef:
-//      	  name: logz-token
-//            key: token
-//     output_include_tags: true
-//     output_include_time: true
-//     buffer:
-//       type: file
-//       flush_mode: interval
-//       flush_thread_count: 4
-//       flush_interval: 5s
-//       chunk_limit_size: 16m
-//       queue_limit_length: 4096
+//
+//	logz:
+//	  endpoint:
+//	    url: https://listener.logz.io
+//	    port: 8071
+//	    token:
+//	      valueFrom:
+//	       secretKeyRef:
+//	   	  name: logz-token
+//	         key: token
+//	  output_include_tags: true
+//	  output_include_time: true
+//	  buffer:
+//	    type: file
+//	    flush_mode: interval
+//	    flush_thread_count: 4
+//	    flush_interval: 5s
+//	    chunk_limit_size: 16m
+//	    queue_limit_length: 4096
+//
 // ```
 type _docLogZ interface{} //nolint:deadcode,unused
 

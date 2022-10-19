@@ -50,27 +50,32 @@ type GELFOutputConfig struct {
 	TLSOptions map[string]string `json:"tls_options,omitempty"`
 }
 
-//
 // #### Example `GELF` output configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Output
-//metadata:
-//  name: gelf-output-sample
-//spec:
-//  gelf:
-//    host: gelf-host
-//    port: 12201
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Output
+// metadata:
+//
+//	name: gelf-output-sample
+//
+// spec:
+//
+//	gelf:
+//	  host: gelf-host
+//	  port: 12201
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```
-//  <match **>
-//	@type gelf
-//	@id test_gelf
-//	host gelf-host
-//	port 12201
-//  </match>
+//
+//	 <match **>
+//		@type gelf
+//		@id test_gelf
+//		host gelf-host
+//		port 12201
+//	 </match>
+//
 // ```
 type _expGELF interface{} //nolint:deadcode,unused
 

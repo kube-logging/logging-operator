@@ -258,11 +258,10 @@ func (n *nodeAgentInstance) getServiceAccount() string {
 	return n.QualifiedName(defaultServiceAccountName)
 }
 
-//
-//type DesiredObject struct {
-//	Object runtime.Object
-//	State  reconciler.DesiredState
-//}
+//	type DesiredObject struct {
+//		Object runtime.Object
+//		State  reconciler.DesiredState
+//	}
 //
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {

@@ -25,16 +25,19 @@ import (
 type _hugoAwsElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Amazon Elasticsearch output plugin for Fluentd"
-//  More info at https://github.com/atomita/fluent-plugin-aws-elasticsearch-service
+//
+//	More info at https://github.com/atomita/fluent-plugin-aws-elasticsearch-service
 //
 // #### Example output configurations
 // ```yaml
 // spec:
-//   kinesisStream:
-//     stream_name: example-stream-name
-//     region: us-east-1
-//     format:
-//       type: json
+//
+//	kinesisStream:
+//	  stream_name: example-stream-name
+//	  region: us-east-1
+//	  format:
+//	    type: json
+//
 // ```
 type _docAwsElasticsearch interface{} //nolint:deadcode,unused
 

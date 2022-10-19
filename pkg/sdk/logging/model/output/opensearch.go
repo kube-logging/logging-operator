@@ -24,22 +24,24 @@ import (
 type _hugoOpenSearch interface{} //nolint:deadcode,unused
 
 // +docName:"OpenSearch output plugin for Fluentd"
-//More info at https://github.com/fluent/fluent-plugin-opensearch
-//>Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
+// More info at https://github.com/fluent/fluent-plugin-opensearch
+// >Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
 //
 // #### Example output configurations
 // ```yaml
 // spec:
-//   opensearch:
-//     host: opensearch-cluster.default.svc.cluster.local
-//     port: 9200
-//     scheme: https
-//     ssl_verify: false
-//     ssl_version: TLSv1_2
-//     buffer:
-//       timekey: 1m
-//       timekey_wait: 30s
-//       timekey_use_utc: true
+//
+//	opensearch:
+//	  host: opensearch-cluster.default.svc.cluster.local
+//	  port: 9200
+//	  scheme: https
+//	  ssl_verify: false
+//	  ssl_version: TLSv1_2
+//	  buffer:
+//	    timekey: 1m
+//	    timekey_wait: 30s
+//	    timekey_use_utc: true
+//
 // ```
 type _docOpenSearch interface{} //nolint:deadcode,unused
 

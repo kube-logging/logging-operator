@@ -56,29 +56,35 @@ type RecordTransformer struct {
 
 // #### Example `Record Transformer` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - record_transformer:
-//        records:
-//        - foo: "bar"
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - record_transformer:
+//	      records:
+//	      - foo: "bar"
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//<filter **>
-//  @type record_transformer
-//  @id test_record_transformer
-//  <record>
-//    foo bar
-//  </record>
-//</filter>
+// <filter **>
+//
+//	@type record_transformer
+//	@id test_record_transformer
+//	<record>
+//	  foo bar
+//	</record>
+//
+// </filter>
 // ```
 type _expRecordTransformer interface{} //nolint:deadcode,unused
 

@@ -955,6 +955,8 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowGroupRef:
+                type: string
               globalOutputRefs:
                 items:
                   type: string
@@ -1962,6 +1964,8 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowGroupRef:
+                type: string
               globalOutputRefs:
                 items:
                   type: string

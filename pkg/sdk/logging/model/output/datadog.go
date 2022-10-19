@@ -24,8 +24,8 @@ import (
 type _hugoDatadog interface{} //nolint:deadcode,unused
 
 // +docName:"Datadog output plugin for Fluentd"
-//It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
-//More info at https://github.com/DataDog/fluent-plugin-datadog
+// It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
+// More info at https://github.com/DataDog/fluent-plugin-datadog
 type _docDatadog interface{} //nolint:deadcode,unused
 
 // +name:"Datadog"

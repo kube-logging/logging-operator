@@ -31,11 +31,13 @@ type _hugoHTTP interface{} //nolint:deadcode,unused
 // #### Example output configurations
 // ```yaml
 // spec:
-//   http:
-//     endpoint: http://logserver.com:9000/api
-//     buffer:
-//       tags: "[]"
-//       flush_interval: 10s
+//
+//	http:
+//	  endpoint: http://logserver.com:9000/api
+//	  buffer:
+//	    tags: "[]"
+//	    flush_interval: 10s
+//
 // ```
 type _docHTTP interface{} //nolint:deadcode,unused
 
