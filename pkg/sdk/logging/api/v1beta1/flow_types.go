@@ -39,6 +39,7 @@ type FlowSpec struct {
 	OutputRefs       []string `json:"outputRefs,omitempty"`
 	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
 	LocalOutputRefs  []string `json:"localOutputRefs,omitempty"`
+	FLowGroupRef     string   `json:"flowGroupRef,omitempty"`
 }
 
 type Match struct {
