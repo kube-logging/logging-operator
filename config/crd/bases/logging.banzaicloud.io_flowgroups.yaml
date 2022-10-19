@@ -10,11 +10,11 @@ metadata:
 spec:
   group: logging.banzaicloud.io
   names:
+    categories:
+    - logging-all
     kind: FlowGroup
     listKind: FlowGroupList
     plural: flowgroups
-    shortNames:
-    - fg
     singular: flowgroup
   scope: Namespaced
   versions:

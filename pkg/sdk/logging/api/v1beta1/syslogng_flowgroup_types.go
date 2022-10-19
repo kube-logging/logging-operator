@@ -26,7 +26,6 @@ type SyslogNGFlowGroupSpec struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:storageversion
-// +kubebuilder:resource:shortName=sfg
 
 // SyslogNGFlowGroup Kubernetes object
 type SyslogNGFlowGroup struct {

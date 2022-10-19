@@ -26,7 +26,6 @@ type FlowGroupSpec struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:storageversion
-// +kubebuilder:resource:shortName=fg
 
 // FlowGroup Kubernetes object
 type FlowGroup struct {
@@ -34,13 +33,11 @@ type FlowGroup struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec FlowGroupSpec `json:"spec,omitempty"`
-	// Status FlowStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:shortName=fgl
 
-// FlowGroupList contains a list of Flow
+// FlowGroupList contains a list of FlowGroup
 type FlowGroupList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
