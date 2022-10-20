@@ -80,7 +80,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		flow, err := FlowForFlow(flowCr, resources.ClusterOutputs, resources.Outputs, secrets)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
-				logger.Error(err, "Flow contains errors.")
+				logger.Error(err, "Flow contains errors, skipping.")
+				continue
 			} else {
 				return nil, err
 			}
@@ -94,7 +95,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		flow, err := FlowForClusterFlow(flowCr, resources.ClusterOutputs, secrets)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
-				logger.Error(err, "ClusterFlow contains errors.")
+				logger.Error(err, "ClusterFlow contains errors, skipping.")
+				continue
 			} else {
 				return nil, err
 			}
