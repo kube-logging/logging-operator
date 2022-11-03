@@ -122,7 +122,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				{
 					Alert: "FluentdPredictedBufferGrowth",
-					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(fluentd_output_status_buffer_total_bytes{%[1]s}[10m], 600) > fluentd_output_status_buffer_total_bytes{%[1]s}", nsJobLabel)),
+					Expr:  intstr.FromString(fmt.Sprintf("sum(predict_linear(fluentd_output_status_buffer_total_bytes{%[1]s}[10m], 600)) > sum(fluentd_output_status_buffer_total_bytes{%[1]s}) * 1.5", nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
@@ -130,7 +130,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 						"severity":  "warning",
 					},
 					Annotations: map[string]string{
-						"summary":     `Fluentd buffer size prediction warning.`,
+						"summary":     `Fluentd buffer size is predicted to increase more than 50% in the next 10 minutes.`,
 						"description": `Fluentd buffer trending watcher.`,
 					},
 				},
