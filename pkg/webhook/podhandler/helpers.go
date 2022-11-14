@@ -80,7 +80,7 @@ func (p *PodHandler) Containers(filePaths []string, volumePaths []string, contai
 			WithName(p.ContainerizedVolumeName(containerName, *path)).
 			VolumeMount
 		command := p.Command(filePath)
-		containerName := volumepath.ConvertFilePath(filePath)
+		containerName := p.ContainerizedVolumeName(containerName, filePath)
 		containers = append(containers, p.Container(containerName, volumeMount, command))
 	}
 	return containers

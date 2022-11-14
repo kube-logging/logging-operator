@@ -31,7 +31,7 @@ type _hugoS3 interface{} //nolint:deadcode,unused
 //**s3** output plugin buffers event logs in local file and upload it to S3 periodically. This plugin splits files exactly by using the time of event logs (not the time when the logs are received). For example, a log '2011-01-02 message B' is reached, and then another log '2011-01-03 message B' is reached in this order, the former one is stored in "20110102.gz" file, and latter one in "20110103.gz" file.
 //>Example: [S3 Output Deployment](../../../../quickstarts/example-s3/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //  s3:
@@ -148,6 +148,10 @@ type S3OutputConfig struct {
 	AwsIamRetries string `json:"aws_iam_retries,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Assume Role Credentials,#assume-role-credentials"

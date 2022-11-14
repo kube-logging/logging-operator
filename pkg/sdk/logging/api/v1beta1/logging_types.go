@@ -63,7 +63,9 @@ type LoggingSpec struct {
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
 	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
-	// Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput.
+	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
+	ClusterDomain *string `json:"clusterDomain,omitempty"`
+	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
@@ -139,6 +141,9 @@ const (
 
 // SetDefaults fills empty attributes
 func (l *Logging) SetDefaults() error {
+	if l.Spec.ClusterDomain == nil {
+		l.Spec.ClusterDomain = util.StringPointer("cluster.local")
+	}
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
 	}
@@ -578,6 +583,16 @@ func (l *Logging) SetDefaultsOnCopy() (*Logging, error) {
 // QualifiedName is the "logging-resource" name combined
 func (l *Logging) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", l.Name, name)
+}
+
+// ClusterDomainAsSuffix formats the cluster domain as a suffix, e.g.:
+// .Spec.ClusterDomain == "", returns ""
+// .Spec.ClusterDomain == "cluster.local", returns ".cluster.local"
+func (l *Logging) ClusterDomainAsSuffix() string {
+	if l.Spec.ClusterDomain == nil || *l.Spec.ClusterDomain == "" {
+		return ""
+	}
+	return fmt.Sprintf(".%s", *l.Spec.ClusterDomain)
 }
 
 func init() {

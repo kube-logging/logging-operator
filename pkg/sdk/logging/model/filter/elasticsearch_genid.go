@@ -39,7 +39,7 @@ type ElasticsearchGenId struct {
 	HashType string `json:"hash_type,omitempty"`
 }
 
-// #### Example `Elasticsearch Genid` filter configurations
+// ## Example `Elasticsearch Genid` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

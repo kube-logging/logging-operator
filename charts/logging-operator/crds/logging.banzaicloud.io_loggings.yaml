@@ -51,6 +51,8 @@ spec:
             properties:
               allowClusterResourcesFromAllNamespaces:
                 type: boolean
+              clusterDomain:
+                type: string
               controlNamespace:
                 type: string
               defaultFlow:
@@ -106,6 +108,8 @@ spec:
                               items:
                                 type: string
                               type: array
+                            match_tag:
+                              type: string
                             max_bytes:
                               type: integer
                             max_lines:
@@ -952,6 +956,8 @@ spec:
                         tag_normaliser:
                           properties:
                             format:
+                              type: string
+                            match_tag:
                               type: string
                           type: object
                         throttle:
@@ -2903,6 +2909,24 @@ spec:
                           type: string
                       type: object
                     type: array
+                  updateStrategy:
+                    properties:
+                      rollingUpdate:
+                        properties:
+                          maxSurge:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                          maxUnavailable:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                        type: object
+                      type:
+                        type: string
+                    type: object
                 type: object
               fluentd:
                 properties:
@@ -4441,6 +4465,8 @@ spec:
                             additionalProperties:
                               type: string
                             type: object
+                          deleteVolume:
+                            type: boolean
                           enabled:
                             type: boolean
                           image:
@@ -4800,6 +4826,8 @@ spec:
                           items:
                             type: string
                           type: array
+                        match_tag:
+                          type: string
                         max_bytes:
                           type: integer
                         max_lines:
@@ -5646,6 +5674,8 @@ spec:
                     tag_normaliser:
                       properties:
                         format:
+                          type: string
+                        match_tag:
                           type: string
                       type: object
                     throttle:

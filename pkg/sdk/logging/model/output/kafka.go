@@ -27,7 +27,7 @@ type _hugoKafka interface{} //nolint:deadcode,unused
 //  More info at https://github.com/fluent/fluent-plugin-kafka
 //>Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   kafka:
@@ -129,6 +129,10 @@ type KafkaOutputConfig struct {
 	Format *Format `json:"format"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

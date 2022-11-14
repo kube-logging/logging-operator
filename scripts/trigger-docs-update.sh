@@ -2,23 +2,19 @@
 
 set -euf
 
-PROJECT_SLUG='gh/banzaicloud/logging-operator-docs'
+OWNER='banzaicloud'
+REPO='logging-operator-docs'
+WORKFLOW='generate-docs.yml'
 RELEASE_TAG="$1"
 
 function main()
 {
     curl \
-        -u "${CIRCLE_TOKEN}:" \
-        -X POST \
-        --header "Content-Type: application/json" \
-        -d "{
-            \"branch\": \"master\",
-            \"parameters\": {
-                \"remote-trigger\": true,
-                \"generated-docs-update\": true,
-                \"release-tag\": \"${RELEASE_TAG}\"
-            }
-        }" "https://circleci.com/api/v2/project/${PROJECT_SLUG}/pipeline"
+      -X POST \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: token ${GITHUB_TOKEN}" \
+      "https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches" \
+      -d "{\"ref\":\"master\",\"inputs\":{\"release-tag\":\"${RELEASE_TAG}\"}}"
 }
 
 main "$@"

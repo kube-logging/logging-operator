@@ -27,7 +27,7 @@ type _hugoElasticsearch interface{} //nolint:deadcode,unused
 //More info at https://github.com/uken/fluent-plugin-elasticsearch
 //>Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   elasticsearch:
@@ -233,6 +233,10 @@ type ElasticsearchOutput struct {
 	SnifferClassName string `json:"sniffer_class_name,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 	// Enable Index Lifecycle Management (ILM).
 	EnableIlm bool `json:"enable_ilm,omitempty"`
 	// Specify ILM policy id.

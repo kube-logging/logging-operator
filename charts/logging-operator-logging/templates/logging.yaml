@@ -27,6 +27,7 @@ spec:
   watchNamespaces:
 {{ toYaml .Values.watchNamespaces | indent 4 }}
   {{- end }}
+  clusterDomain: {{ .Values.clusterDomain }}
   controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
   {{- if .Values.defaultFlow }}
   defaultFlow:

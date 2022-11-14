@@ -28,7 +28,7 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 // Sends logs to Redis endpoints.
 // More info at https://github.com/fluent-plugins-nursery/fluent-plugin-redis
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   redis:
@@ -69,6 +69,10 @@ type RedisOutputConfig struct {
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 func (c *RedisOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

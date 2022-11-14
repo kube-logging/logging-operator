@@ -25,7 +25,17 @@ type _hugoDatadog interface{} //nolint:deadcode,unused
 
 // +docName:"Datadog output plugin for Fluentd"
 //It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
-//More info at https://github.com/DataDog/fluent-plugin-datadog
+//More info at [https://github.com/DataDog/fluent-plugin-datadog](https://github.com/DataDog/fluent-plugin-datadog).
+//
+//## Example
+//```yaml
+// spec:
+//  datadog:
+//    api_key '<YOUR_API_KEY>'
+//    dd_source: '<INTEGRATION_NAME>'
+//    dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
+//    dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
+//```
 type _docDatadog interface{} //nolint:deadcode,unused
 
 // +name:"Datadog"
@@ -81,6 +91,10 @@ type DatadogOutput struct {
 	Host string `json:"host,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 func (a *DatadogOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

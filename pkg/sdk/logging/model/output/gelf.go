@@ -51,7 +51,7 @@ type GELFOutputConfig struct {
 }
 
 //
-// #### Example `GELF` output configurations
+// ## Example `GELF` output configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Output
@@ -63,7 +63,7 @@ type GELFOutputConfig struct {
 //    port: 12201
 // ```
 //
-// #### Fluentd Config Result
+// ## Fluentd Config Result
 // ```
 //  <match **>
 //	@type gelf
