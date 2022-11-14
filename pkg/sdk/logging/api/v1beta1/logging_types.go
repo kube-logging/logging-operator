@@ -132,7 +132,7 @@ const (
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
-	DefaultFluentdConfigReloaderImageTag        = "v0.1.0"
+	DefaultFluentdConfigReloaderImageTag        = "0.0.1"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
 	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
