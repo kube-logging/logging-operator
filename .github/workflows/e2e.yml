@@ -7,10 +7,10 @@ on:
       - master
 
 env:
-  GO_VERSION: '1.17'
+  GO_VERSION: '1.19.3'
   K8S_VERSION: 'v1.17.17'
-  KIND_VERSION: 'v0.11.1'
-  KUBECTL_VERSION: 'v1.21.2'
+  KIND_VERSION: 'v0.17.0'
+  KUBECTL_VERSION: 'v1.24.1'
 
 jobs:
   build:
