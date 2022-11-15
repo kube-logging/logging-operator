@@ -22,19 +22,21 @@ type _hugoMatch interface{} //nolint:deadcode,unused
 // +docName:"Match"
 // Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/logging-operator/configuration/plugins/syslog-ng-filters/match.md" >}}).
 //
-//{{< highlight yaml >}}
-//  filters:
-//  - match:
-//      or:
-//      - regexp:
-//          value: json.kubernetes.labels.app.kubernetes.io/name
-//          pattern: apache
-//          type: string
-//      - regexp:
-//          value: json.kubernetes.labels.app.kubernetes.io/name
-//          pattern: nginx
-//          type: string
-//{{</ highlight >}}
+// {{< highlight yaml >}}
+//
+//	filters:
+//	- match:
+//	    or:
+//	    - regexp:
+//	        value: json.kubernetes.labels.app.kubernetes.io/name
+//	        pattern: apache
+//	        type: string
+//	    - regexp:
+//	        value: json.kubernetes.labels.app.kubernetes.io/name
+//	        pattern: nginx
+//	        type: string
+//
+// {{</ highlight >}}
 type _docMatch interface{} //nolint:deadcode,unused
 
 // +name:"Syslog-NG Match"
@@ -83,29 +85,35 @@ type RegexpMatchExpr struct {
 
 // #### Example `Regexp` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - match:
-//        regexp:
-//        - value: first
-//          pattern: ^5\d\d$
-//  match: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - match:
+//	      regexp:
+//	      - value: first
+//	        pattern: ^5\d\d$
+//	match: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Syslog-NG Config Result
 // ```
-// log {
-//    source(main_input);
-//    filter {
-//        match("^5\d\d$" value("first"));
-//    };
-//    destination(output_default_demo-output);
-// };
+//
+//	log {
+//	   source(main_input);
+//	   filter {
+//	       match("^5\d\d$" value("first"));
+//	   };
+//	   destination(output_default_demo-output);
+//	};
+//
 // ```
 type _expRegexpMatch interface{} //nolint:deadcode,unused

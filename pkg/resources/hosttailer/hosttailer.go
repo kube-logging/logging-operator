@@ -92,7 +92,7 @@ func (h *HostTailer) Name(suffix string) string {
 	return strings.Join(strs, "-")
 }
 
-//Run is the implementation of type Resource interface, generates Deamonset for fileTailers
+// Run is the implementation of type Resource interface, generates Deamonset for fileTailers
 func (h *HostTailer) Run() (runtime.Object, reconciler.DesiredState, error) {
 	tailers := h.MergeTailers()
 	volumePaths := h.GatherPathStrings(tailers)
