@@ -122,7 +122,7 @@ const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.5"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/custom-runner"
-	DefaultFluentbitBufferVolumeImageTag        = "0.1.3"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
@@ -135,8 +135,8 @@ const (
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
 	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
-	DefaultFluentdBufferVolumeImageTag          = "0.1.3"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/node-exporter"
+	DefaultFluentdBufferVolumeImageTag          = "v0.1.0"
 )
 
 // SetDefaults fills empty attributes
