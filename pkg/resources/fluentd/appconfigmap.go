@@ -40,7 +40,7 @@ func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState,
 
 	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
 		AppConfigKeyCompress := AppConfigKey + ".gz"
-		data[AppConfigKeyCompress] = compression.CompressString(*r.config)
+		data[AppConfigKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
 		data[AppConfigKey] = []byte(*r.config)
 	}
@@ -206,7 +206,7 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 	}
 	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
 		ConfigCheckKeyCompress := ConfigCheckKey + ".gz"
-		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config)
+		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
 		data[ConfigCheckKey] = []byte(*r.config)
 	}
@@ -222,7 +222,7 @@ func (r *Reconciler) newCheckSecretAppConfig(hashKey string) (*corev1.Secret, er
 
 	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
 		ConfigCheckKeyCompress := ConfigCheckKey + ".gz"
-		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config)
+		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
 		data[ConfigCheckKey] = []byte(*r.config)
 	}
