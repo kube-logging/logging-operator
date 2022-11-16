@@ -23,6 +23,19 @@ import (
 // +weight:"200"
 type _hugoGCS interface{} //nolint:deadcode,unused
 
+// +docName:"Google Cloud Storage"
+// Store logs in Google Cloud Storage. For details, see [https://github.com/banzaicloud/fluent-plugin-gcs](https://github.com/banzaicloud/fluent-plugin-gcs).
+//
+//## Example
+//```yaml
+// spec:
+//  gcs:
+//    project: logging-example
+//    bucket: banzai-log-test
+//    path: logs/${tag}/%Y/%m/%d/
+//```
+type _docGCS interface{} //nolint:deadcode,unused
+
 // +name:"Google Cloud Storage"
 // +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
 // +version:"0.4.0"
@@ -74,6 +87,10 @@ type GCSOutput struct {
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

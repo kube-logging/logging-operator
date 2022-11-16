@@ -59,7 +59,7 @@ type MetricSection struct {
 	Labels Label `json:"labels,omitempty"`
 }
 
-// #### Example `Prometheus` filter configurations
+// ## Example `Prometheus` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

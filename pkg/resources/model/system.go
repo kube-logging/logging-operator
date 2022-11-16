@@ -80,7 +80,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		flow, err := FlowForFlow(flowCr, resources.ClusterOutputs, resources.Outputs, secrets)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
-				logger.Error(err, "Flow contains errors.")
+				logger.Error(err, "Flow contains errors, skipping.")
+				continue
 			} else {
 				return nil, err
 			}
@@ -94,7 +95,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		flow, err := FlowForClusterFlow(flowCr, resources.ClusterOutputs, secrets)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
-				logger.Error(err, "ClusterFlow contains errors.")
+				logger.Error(err, "ClusterFlow contains errors, skipping.")
+				continue
 			} else {
 				return nil, err
 			}
@@ -269,7 +271,7 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
 			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {
-				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %s", outputRef))
 				continue
 			}
 			allOutputs = append(allOutputs, plugin)
@@ -282,12 +284,12 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 			outputID := fmt.Sprintf("%s:output:%s:%s", flowID, output.Namespace, output.Name)
 			plugin, err := plugins.CreateOutput(output.Spec, outputID, secrets.OutputSecretLoaderForNamespace(output.Namespace))
 			if err != nil {
-				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %q", outputRef))
+				errs = errors.Append(errs, errors.WrapIff(err, "failed to create configured output %s/%s", output.Namespace, output.Name))
 				continue
 			}
 			allOutputs = append(allOutputs, plugin)
 		} else {
-			errs = errors.Append(errs, errors.Errorf("referenced output not found: %s", outputRef))
+			errs = errors.Append(errs, errors.Errorf("referenced output %s not found for flow %s/%s", outputRef, flow.Namespace, flow.Name))
 		}
 	}
 	result.WithOutputs(allOutputs...)

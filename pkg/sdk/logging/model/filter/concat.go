@@ -69,7 +69,7 @@ type Concat struct {
 	KeepPartialMetadata string `json:"keep_partial_metadata,omitempty"`
 }
 
-// #### Example `Concat` filter configurations
+// ## Example `Concat` filter configurations
 // ```yaml
 //apiVersion: logging.banzaicloud.io/v1beta1
 //kind: Flow

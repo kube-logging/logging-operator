@@ -28,7 +28,7 @@ type _hugoSplunk interface{} //nolint:deadcode,unused
 // +docName:"Splunk via Hec output plugin for Fluentd"
 //More info at https://github.com/splunk/fluent-plugin-splunk-hec
 //
-// #### Example output configurations
+// ## Example output configurations
 // ```yaml
 // spec:
 //   splunkHec:
@@ -116,6 +116,10 @@ type SplunkHecOutput struct {
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 type Fields map[string]string

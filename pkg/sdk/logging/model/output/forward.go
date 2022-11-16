@@ -100,6 +100,10 @@ type ForwardOutput struct {
 	VerifyConnectionAtStartup bool `json:"verify_connection_at_startup,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
+	// The threshold for chunk flush performance check.
+	// Parameter type is float, not time, default: 20.0 (seconds)
+	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 func (f *ForwardOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
