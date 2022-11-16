@@ -17,18 +17,19 @@ package compression
 import (
 	"bytes"
 	"compress/gzip"
-	"log"
+
+	"github.com/go-logr/logr"
 )
 
-func CompressString(str string) []byte {
+func CompressString(str string, log logr.Logger) []byte {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 	if _, err := gz.Write([]byte(str)); err != nil {
-		log.Fatal(err)
+		log.Error(err, "Failed to compress string")
 	}
 
 	if err := gz.Close(); err != nil {
-		log.Fatal(err)
+		log.Error(err, "Failed to close writer for compress string")
 	}
 
 	return b.Bytes()
