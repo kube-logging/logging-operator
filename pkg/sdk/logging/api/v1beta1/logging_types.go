@@ -133,8 +133,8 @@ const (
 	DefaultFluentdDrainPauseImageTag            = "latest"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
-	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
-	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
+	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
+	DefaultFluentdConfigReloaderImageTag        = "0.0.1"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/node-exporter"
 	DefaultFluentdBufferVolumeImageTag          = "v0.1.0"
 )

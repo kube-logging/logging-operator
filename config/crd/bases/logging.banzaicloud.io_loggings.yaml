@@ -3578,6 +3578,8 @@ spec:
                       timeout:
                         type: string
                     type: object
+                  compressConfigFile:
+                    type: boolean
                   configCheckAnnotations:
                     additionalProperties:
                       type: string
