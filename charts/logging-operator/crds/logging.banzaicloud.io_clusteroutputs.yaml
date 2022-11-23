@@ -4203,6 +4203,12 @@ spec:
                     type: string
                   customize_template:
                     type: string
+                  data_stream_enable:
+                    type: boolean
+                  data_stream_name:
+                    type: string
+                  data_stream_template_name:
+                    type: string
                   default_opensearch_version:
                     type: integer
                   emit_error_for_missing_id:
@@ -10099,6 +10105,12 @@ spec:
                   custom_headers:
                     type: string
                   customize_template:
+                    type: string
+                  data_stream_enable:
+                    type: boolean
+                  data_stream_name:
+                    type: string
+                  data_stream_template_name:
                     type: string
                   default_opensearch_version:
                     type: integer

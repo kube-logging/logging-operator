@@ -250,7 +250,7 @@ type OpenSearchOutput struct {
 func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "opensearch"
 	if e.DataStreamEnable != nil && *e.DataStreamEnable {
-		pluginType := "opensearch_data_stream"
+		pluginType = "opensearch_data_stream"
 	}
 	opensearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
