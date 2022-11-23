@@ -69,3 +69,53 @@ buffer:
 	test := render.NewOutputPluginTest(t, es)
 	test.DiffResult(expected)
 }
+
+func TestOpenSearchDataStream(t *testing.T) {
+	CONFIG := []byte(`
+host: opensearch-cluster.default.svc.cluster.local
+port: 9200
+scheme: https
+ssl_version: TLSv1_2
+ssl_verify: false
+data_stream_enable: true
+data_stream_name: test-ds
+buffer:
+  timekey: 1m
+  timekey_wait: 30s
+  timekey_use_utc: true
+`)
+	expected := `
+  <match **>
+    @type opensearch_data_stream
+    @id test
+    catch_transport_exception_on_retry true
+		data_stream_name test-ds
+    emit_error_label_event true
+    exception_backup true
+    fail_on_detecting_os_version_retry_exceed true
+    fail_on_putting_template_retry_exceed true
+    host opensearch-cluster.default.svc.cluster.local
+    http_backend_excon_nonblock true
+    port 9200
+    reload_connections true
+    scheme https
+    ssl_verify false
+    use_legacy_template true
+    utc_index true
+    verify_os_version_at_startup true
+    <buffer tag,time>
+      @type file
+      chunk_limit_size 8MB
+      path /buffers/test.*.buffer
+      retry_forever true
+      timekey 1m
+      timekey_use_utc true
+      timekey_wait 30s
+    </buffer>
+  </match>
+`
+	es := &output.OpenSearchOutput{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, es))
+	test := render.NewOutputPluginTest(t, es)
+	test.DiffResult(expected)
+}
