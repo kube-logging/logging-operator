@@ -37,7 +37,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 			Name: ruleGroupName,
 			Rules: []v1.Rule{
 				{
-					Alert: "fluentbitBufferSize",
+					Alert: "FluentbitBufferSize",
 					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
 					For:   "10m",
 					Labels: map[string]string{
