@@ -9,7 +9,7 @@ rules:
 - apiGroups:
   - security.openshift.io 
   resourceNames:
-  - scc-privileged 
+  - privileged 
   resources:
   - securitycontextconstraints 
   verbs: 
@@ -40,7 +40,7 @@ rules:
 - apiGroups:
   - security.openshift.io 
   resourceNames:
-  - scc-anyuid 
+  - anyuid 
   resources:
   - securitycontextconstraints 
   verbs: 
