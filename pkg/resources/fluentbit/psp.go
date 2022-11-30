@@ -36,6 +36,13 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 			ReadOnly:   true,
 		}}
 
+		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
+			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+				PathPrefix: r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath.Path,
+				ReadOnly:   false,
+			})
+		}
+
 		for _, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: vMnt.Source,
@@ -50,6 +57,14 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
 				ReadOnly:   false,
+			})
+		}
+
+		hostPorts := []policyv1beta1.HostPortRange{}
+		if r.Logging.Spec.FluentbitSpec.HostNetwork && r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
+			hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
+				Min: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+				Max: r.Logging.Spec.FluentbitSpec.Metrics.Port,
 			})
 		}
 
@@ -76,6 +91,8 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),
 				AllowedHostPaths:         allowedHostPaths,
+				HostNetwork:              r.Logging.Spec.FluentbitSpec.HostNetwork,
+				HostPorts:                hostPorts,
 			},
 		}, reconciler.StatePresent, nil
 	}
