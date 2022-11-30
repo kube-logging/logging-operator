@@ -61,11 +61,13 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 		}
 
 		hostPorts := []policyv1beta1.HostPortRange{}
-		if r.Logging.Spec.FluentbitSpec.HostNetwork && r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
-			hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
-				Min: r.Logging.Spec.FluentbitSpec.Metrics.Port,
-				Max: r.Logging.Spec.FluentbitSpec.Metrics.Port,
-			})
+		if r.Logging.Spec.FluentbitSpec.HostNetwork {
+			if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
+				hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
+					Min: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+					Max: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+				})
+			}
 		}
 
 		return &policyv1beta1.PodSecurityPolicy{
