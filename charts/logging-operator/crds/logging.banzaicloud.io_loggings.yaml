@@ -1815,6 +1815,8 @@ spec:
                         type: string
                       Kube_CA_Path:
                         type: string
+                      Kube_Meta_Cache_TTL:
+                        type: string
                       Kube_Tag_Prefix:
                         type: string
                       Kube_Token_File:
@@ -9022,6 +9024,8 @@ spec:
                             Kube_CA_File:
                               type: string
                             Kube_CA_Path:
+                              type: string
+                            Kube_Meta_Cache_TTL:
                               type: string
                             Kube_Tag_Prefix:
                               type: string
