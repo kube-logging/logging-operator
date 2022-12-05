@@ -1819,6 +1819,8 @@ spec:
                         type: string
                       Kube_Token_File:
                         type: string
+                      Kube_Token_TTL:
+                        type: string
                       Kube_URL:
                         type: string
                       Kube_meta_preload_cache_dir:
@@ -9033,6 +9035,8 @@ spec:
                             Kube_Tag_Prefix:
                               type: string
                             Kube_Token_File:
+                              type: string
+                            Kube_Token_TTL:
                               type: string
                             Kube_URL:
                               type: string

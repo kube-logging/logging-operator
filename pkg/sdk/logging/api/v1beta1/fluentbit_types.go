@@ -236,6 +236,8 @@ type FilterKubernetes struct {
 	KubeCAPath string `json:"Kube_CA_Path,omitempty"`
 	// Token file  (default:/var/run/secrets/kubernetes.io/serviceaccount/token)
 	KubeTokenFile string `json:"Kube_Token_File,omitempty" plugin:"default:/var/run/secrets/kubernetes.io/serviceaccount/token"`
+	// Token TTL configurable 'time to live' for the K8s token. By default, it is set to 600 seconds. After this time, the token is reloaded from Kube_Token_File or the Kube_Token_Command.  (default:"600")
+	KubeTokenTTL string `json:"Kube_Token_TTL,omitempty" plugin:"default:600"`
 	// When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.)
 	KubeTagPrefix string `json:"Kube_Tag_Prefix,omitempty" plugin:"default:kubernetes.var.log.containers"`
 	// When enabled, it checks if the log field content is a JSON string map, if so, it append the map fields as part of the log structure. (default:Off)
