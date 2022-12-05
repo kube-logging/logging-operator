@@ -49,7 +49,7 @@ This operator helps you bundle logging information with your applications: you c
 
 You can define `outputs` (destinations where you want to send your log messages, for example, Elasticsearch, or and Amazon S3 bucket), and `flows` that use filters and selectors to route log messages to the appropriate outputs. You can also define cluster-wide outputs and flows, for example, to use a centralized output that namespaced users cannot modify.
 
-You can configure the Logging operator using the following Custom Resource Descriptions.
+You can configure the Logging operator using the following Custom Resource Definitions.
 
 - [logging](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/logging_types/) - Represents a logging system. Includes `Fluentd` and `Fluent-bit` configuration. Specifies the `controlNamespace`. Fluentd and Fluent-bit will be deployed in the `controlNamespace`
 - [output](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/output_types/) - Defines an Output for a logging flow. This is a namespaced resource. See also `clusteroutput`.
@@ -57,7 +57,7 @@ You can configure the Logging operator using the following Custom Resource Descr
 - [clusteroutput](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/clusteroutput_types/) - Defines an output without namespace restriction. Only effective in `controlNamespace`.
 - [clusterflow](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/output_types/) - Defines a logging flow without namespace restriction.
 
-See the [detailed CRD documentation](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/).
+See the [detailed CRDs documentation](https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/).
 
 <p align="center"><img src="https://banzaicloud.com/docs/one-eye/logging-operator/img/logging-operator-v2-architecture.png" ></p>
 
