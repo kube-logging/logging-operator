@@ -43,12 +43,12 @@ jobs:
           if_false: latest
       - name: Determine image tag
         id: imagetag
-        run: echo "::set-output name=value::$(echo ${TAG_OR_BRANCH##*/}| sed 's/fluentd-//g')"
+        run: echo "value=$(echo ${TAG_OR_BRANCH##*/}| sed 's/fluentd-//g')" >> $GITHUB_OUTPUT
         env:
           TAG_OR_BRANCH: ${{ steps.refortag.outputs.value }}
       - name: Path from tag
         id: pathfromtag
-        run: echo "::set-output name=value::$(echo $TAG | sed -E 's/^(v[0-9]+\.[0-9]+).*/\1/')"
+        run: echo "value=$(echo $TAG | sed -E 's/^(v[0-9]+\.[0-9]+).*/\1/')" >> $GITHUB_OUTPUT
         env:
           TAG: ${{ steps.imagetag.outputs.value }}
       - name: Build Fluentd Image
