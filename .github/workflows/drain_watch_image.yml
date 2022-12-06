@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - name: Determine image tag
         id: imagetag
-        run: echo "::set-output name=value::$(echo ${GITHUB_REF##*/} | sed 's/fluentd-drain-watch-//g')"
+        run: echo "value=$(echo ${GITHUB_REF##*/} | sed 's/fluentd-drain-watch-//g')" >> $GITHUB_OUTPUT
         env:
           GITHUB_REF: ${{ github.ref }}
       - name: Build and push image
