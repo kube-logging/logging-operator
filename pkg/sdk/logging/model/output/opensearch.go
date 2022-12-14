@@ -240,10 +240,20 @@ type OpenSearchOutput struct {
 	// Parameter type is float, not time, default: 20.0 (seconds)
 	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
+
+	// Use @type opensearch_data_stream
+	DataStreamEnable *bool `json:"data_stream_enable,omitempty" plugin:"hidden"`
+	// You can specify Opensearch data stream name by this parameter. This parameter is mandatory for opensearch_data_stream.
+	DataStreamName string `json:"data_stream_name,omitempty"`
+	// Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream. (default: data_stream_name)
+	DataStreamTemplateName string `json:"data_stream_template_name,omitempty"`
 }
 
 func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "opensearch"
+	if e.DataStreamEnable != nil && *e.DataStreamEnable {
+		pluginType = "opensearch_data_stream"
+	}
 	opensearch := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,

@@ -121,7 +121,7 @@ type DefaultFlowSpec struct {
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.5"
-	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
@@ -135,8 +135,8 @@ const (
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "0.0.1"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.1.0"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
+	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
 
 // SetDefaults fills empty attributes

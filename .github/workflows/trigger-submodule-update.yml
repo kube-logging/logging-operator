@@ -20,7 +20,7 @@ jobs:
           GIT_REFNAME="$(echo "${{ github.ref }}" | sed -r 's@refs/(heads|pull|tags)/@@g')"
 
           echo "GIT_REFNAME=${GIT_REFNAME}"
-          echo ::set-output name=git_refname::${GIT_REFNAME}
+          echo "git_refname=${GIT_REFNAME}" >> $GITHUB_OUTPUT
 
       - name: Trigger
         env:
