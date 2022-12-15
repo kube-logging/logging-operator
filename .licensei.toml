@@ -17,6 +17,7 @@ ignored = [
   "sigs.k8s.io/yaml",
   "gomodules.xyz/jsonpatch/v2",
   "cloud.google.com/go",
+  "github.com/form3tech-oss/jwt-go", # MIT
 ]
 
 [header]
