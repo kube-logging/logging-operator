@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"regexp"
+	"strings"
 
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/resources"
@@ -25,7 +26,9 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/model"
 	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
+	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
+	syslogngconfig "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/banzaicloud/operator-tools/pkg/reconciler"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
@@ -59,6 +62,8 @@ type LoggingReconciler struct {
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
@@ -97,34 +102,51 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	loggingResources, err := model.NewLoggingResourceRepository(r.Client).LoggingResourcesFor(ctx, logging)
+	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client)
+
+	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
+
 	// metrics
 	defer func() {
-		gv := getResourceStateMetrics(log)
-		gv.Reset()
-		for _, ob := range loggingResources.Flows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		stateMetrics, problemsMetrics := getResourceStateMetrics(log)
+		// reseting the vectors should remove all orphaned metrics
+		stateMetrics.Reset()
+		problemsMetrics.Reset()
+		for _, ob := range loggingResources.Fluentd.Flows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
-		for _, ob := range loggingResources.ClusterFlows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		for _, ob := range loggingResources.Fluentd.ClusterFlows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
-		for _, ob := range loggingResources.Outputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		for _, ob := range loggingResources.Fluentd.Outputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
-		for _, ob := range loggingResources.ClusterOutputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), gv)
+		for _, ob := range loggingResources.Fluentd.ClusterOutputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+		}
+		for _, ob := range loggingResources.SyslogNG.Flows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+		}
+		for _, ob := range loggingResources.SyslogNG.ClusterFlows {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+		}
+		for _, ob := range loggingResources.SyslogNG.Outputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+		}
+		for _, ob := range loggingResources.SyslogNG.ClusterOutputs {
+			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 	}()
 
 	reconcilers := []resources.ComponentReconciler{
-		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client}),
+		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
 	if logging.Spec.FluentdSpec != nil {
-		fluentdConfig, secretList, err := r.clusterConfiguration(loggingResources)
+		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
 			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
@@ -134,6 +156,20 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+		}
+	}
+
+	if logging.Spec.SyslogNGSpec != nil {
+		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
+		if err != nil {
+			// TODO: move config generation into Syslog-NG reconciler
+			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+				return &reconcile.Result{}, err
+			})
+		} else {
+			log.V(1).Info("flow configuration", "config", syslogNGConfig)
+
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
 	}
 
@@ -158,24 +194,44 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
-func updateResourceStateMetrics(obj client.Object, active bool, gv *prometheus.GaugeVec) {
-	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "active", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(active))
-	gv.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "inactive", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(!active))
+func updateResourceStateMetrics(obj client.Object, active bool, problemsCount int, statusMetric *prometheus.GaugeVec, problemsMetric *prometheus.GaugeVec) {
+	statusMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "active", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(active))
+	statusMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "status": "inactive", "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(boolToFloat64(!active))
+
+	problemsMetric.With(prometheus.Labels{"name": obj.GetName(), "namespace": obj.GetNamespace(), "kind": obj.GetObjectKind().GroupVersionKind().Kind}).Set(float64(problemsCount))
 }
 
-func getResourceStateMetrics(logger logr.Logger) *prometheus.GaugeVec {
-	gv := prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
-	err := metrics.Registry.Register(gv)
+func getResourceStateMetrics(logger logr.Logger) (stateMetrics *prometheus.GaugeVec, problemsMetrics *prometheus.GaugeVec) {
+	var err error
+
+	stateMetrics = prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
+	stateMetrics, err = getOrRegisterGaugeVec(metrics.Registry, stateMetrics)
 	if err != nil {
+		logger.Error(err, "couldn't register metrics vector for resource", "metric", stateMetrics)
+	}
+
+	problemsMetrics = prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_problems"}, []string{"name", "namespace", "kind"})
+	problemsMetrics, err = getOrRegisterGaugeVec(metrics.Registry, problemsMetrics)
+	if err != nil {
+		logger.Error(err, "couldn't register metrics vector for resource", "metric", problemsMetrics)
+	}
+
+	return
+}
+
+func getOrRegisterGaugeVec(reg prometheus.Registerer, gv *prometheus.GaugeVec) (*prometheus.GaugeVec, error) {
+	if err := reg.Register(gv); err != nil {
 		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok = err.ExistingCollector.(*prometheus.GaugeVec); !ok {
-				logger.Error(err, "already registered metric name with different type ", "metric", gv)
+			if gv, ok := err.ExistingCollector.(*prometheus.GaugeVec); ok {
+				return gv, nil
+			} else {
+				return nil, errors.WrapIfWithDetails(err, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
-			logger.Error(err, "couldn't register metrics vector for resource", "metric", gv)
+			return nil, err
 		}
 	}
-	return gv
+	return gv, nil
 }
 
 func boolToFloat64(b bool) float64 {
@@ -185,13 +241,14 @@ func boolToFloat64(b bool) float64 {
 	return 0
 }
 
-func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
 	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
 		return cfg, nil, nil
 	}
 
 	slf := secretLoaderFactory{
 		Client: r.Client,
+		Path:   fluentd.OutputSecretPath,
 	}
 
 	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
@@ -211,13 +268,46 @@ func (r *LoggingReconciler) clusterConfiguration(resources model.LoggingResource
 	return output.String(), &slf.Secrets, nil
 }
 
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
+		return cfg, nil, nil
+	}
+
+	slf := secretLoaderFactory{
+		Client: r.Client,
+		Path:   syslogng.OutputSecretPath,
+	}
+
+	in := syslogngconfig.Input{
+		Logging:             resources.Logging,
+		ClusterOutputs:      resources.SyslogNG.ClusterOutputs,
+		Outputs:             resources.SyslogNG.Outputs,
+		ClusterFlows:        resources.SyslogNG.ClusterFlows,
+		Flows:               resources.SyslogNG.Flows,
+		SecretLoaderFactory: &slf,
+		SourcePort:          syslogng.ServicePort,
+	}
+	var b strings.Builder
+	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
+		return "", nil, errors.WrapIfWithDetails(err, "failed to render syslog-ng config", "logging", resources.Logging)
+	}
+
+	return b.String(), &slf.Secrets, nil
+}
+
 type secretLoaderFactory struct {
 	Client  client.Client
 	Secrets secret.MountSecrets
+	Path    string
 }
 
+// Deprecated: use SecretLoaderForNamespace instead
 func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.Client, namespace, fluentd.OutputSecretPath, &f.Secrets)
+	return f.SecretLoaderForNamespace(namespace)
+}
+
+func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.SecretLoader {
+	return secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets)
 }
 
 // SetupLoggingWithManager setup logging manager
@@ -238,6 +328,14 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		case *loggingv1beta1.Flow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.ClusterFlow:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.SyslogNGClusterOutput:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.SyslogNGOutput:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.SyslogNGClusterFlow:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
 			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
@@ -264,11 +362,16 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterOutput{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterFlow{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
+		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
 		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
 	nodeagent.RegisterWatches(builder)
+	syslogng.RegisterWatches(builder)
 
 	return builder
 }

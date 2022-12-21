@@ -35,11 +35,14 @@ func NewDataProvider(client client.Client) *DataProvider {
 }
 
 func (p *DataProvider) GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error) {
-	sts := &v1.StatefulSet{}
-	om := logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
-	err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
-	if err != nil {
-		return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")
+	if logging.Spec.FluentdSpec != nil {
+		sts := &v1.StatefulSet{}
+		om := logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
+		err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
+		if err != nil {
+			return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")
+		}
+		return sts.Spec.Replicas, nil
 	}
-	return sts.Spec.Replicas, nil
+	return nil, nil
 }
