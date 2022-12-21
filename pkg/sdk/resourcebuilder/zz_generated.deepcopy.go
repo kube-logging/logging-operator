@@ -20,6 +20,7 @@
 package resourcebuilder
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/types"
 )
 
@@ -45,6 +46,11 @@ func (in *ComponentConfig) DeepCopyInto(out *ComponentConfig) {
 	if in.ContainerOverrides != nil {
 		in, out := &in.ContainerOverrides, &out.ContainerOverrides
 		*out = new(types.ContainerBase)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Metrics != nil {
+		in, out := &in.Metrics, &out.Metrics
+		*out = new(v1beta1.Metrics)
 		(*in).DeepCopyInto(*out)
 	}
 }

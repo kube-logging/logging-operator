@@ -41,9 +41,13 @@ type ImageSpec struct {
 }
 
 func (s ImageSpec) RepositoryWithTag() string {
-	res := s.Repository
-	if s.Tag != "" {
-		res += ":" + s.Tag
+	return RepositoryWithTag(s.Repository, s.Tag)
+}
+
+func RepositoryWithTag(repository, tag string) string {
+	res := repository
+	if tag != "" {
+		res += ":" + tag
 	}
 	return res
 }
@@ -58,6 +62,12 @@ type Metrics struct {
 	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
+}
+
+// BufferMetrics defines the service monitor endpoints
+type BufferMetrics struct {
+	Metrics   `json:",inline"`
+	MountName string `json:"mount_name,omitempty"`
 }
 
 // ServiceMonitorConfig defines the ServiceMonitor properties

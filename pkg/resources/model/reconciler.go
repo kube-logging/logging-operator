@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/operator-tools/pkg/secret"
 	"github.com/banzaicloud/operator-tools/pkg/utils"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -45,8 +44,8 @@ func NewValidationReconciler(
 			})
 		}
 
-		for i := range resources.ClusterOutputs {
-			output := &resources.ClusterOutputs[i]
+		for i := range resources.Fluentd.ClusterOutputs {
+			output := &resources.Fluentd.ClusterOutputs[i]
 			registerForPatching(output)
 
 			output.Status.Active = utils.BoolPointer(false)
@@ -61,8 +60,8 @@ func NewValidationReconciler(
 			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
-		for i := range resources.Outputs {
-			output := &resources.Outputs[i]
+		for i := range resources.Fluentd.Outputs {
+			output := &resources.Fluentd.Outputs[i]
 			registerForPatching(output)
 
 			output.Status.Active = utils.BoolPointer(false)
@@ -73,8 +72,36 @@ func NewValidationReconciler(
 			output.Status.ProblemsCount = len(output.Status.Problems)
 		}
 
-		for i := range resources.ClusterFlows {
-			flow := &resources.ClusterFlows[i]
+		for i := range resources.SyslogNG.ClusterOutputs {
+			output := &resources.SyslogNG.ClusterOutputs[i]
+			registerForPatching(output)
+
+			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Problems = nil
+
+			if output.Name == resources.Logging.Spec.ErrorOutputRef {
+				output.Status.Active = utils.BoolPointer(true)
+			}
+
+			output.Status.Problems = append(output.Status.Problems,
+				validateOutputSpec(output.Spec.SyslogNGOutputSpec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
+			output.Status.ProblemsCount = len(output.Status.Problems)
+		}
+
+		for i := range resources.SyslogNG.Outputs {
+			output := &resources.SyslogNG.Outputs[i]
+			registerForPatching(output)
+
+			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Problems = nil
+
+			output.Status.Problems = append(output.Status.Problems,
+				validateOutputSpec(output.Spec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
+			output.Status.ProblemsCount = len(output.Status.Problems)
+		}
+
+		for i := range resources.Fluentd.ClusterFlows {
+			flow := &resources.Fluentd.ClusterFlows[i]
 			registerForPatching(flow)
 
 			flow.Status.Active = utils.BoolPointer(false)
@@ -85,7 +112,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
+				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
@@ -95,8 +122,8 @@ func NewValidationReconciler(
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
-		for i := range resources.Flows {
-			flow := &resources.Flows[i]
+		for i := range resources.Fluentd.Flows {
+			flow := &resources.Fluentd.Flows[i]
 			registerForPatching(flow)
 
 			flow.Status.Active = utils.BoolPointer(false)
@@ -107,7 +134,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.ClusterOutputs.FindByName(ref); output != nil {
+				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
@@ -116,7 +143,52 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
-				if output := resources.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
+				if output := resources.Fluentd.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
+				} else {
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
+				}
+			}
+			flow.Status.ProblemsCount = len(flow.Status.Problems)
+		}
+
+		for i := range resources.SyslogNG.ClusterFlows {
+			flow := &resources.SyslogNG.ClusterFlows[i]
+			registerForPatching(flow)
+
+			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Problems = nil
+
+			for _, ref := range flow.Spec.GlobalOutputRefs {
+				if output := resources.SyslogNG.ClusterOutputs.FindByName(ref); output != nil {
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
+				} else {
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+				}
+			}
+			flow.Status.ProblemsCount = len(flow.Status.Problems)
+		}
+
+		for i := range resources.SyslogNG.Flows {
+			flow := &resources.SyslogNG.Flows[i]
+			registerForPatching(flow)
+
+			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Problems = nil
+
+			for _, ref := range flow.Spec.GlobalOutputRefs {
+				if output := resources.SyslogNG.ClusterOutputs.FindByName(ref); output != nil {
+					flow.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = utils.BoolPointer(true)
+				} else {
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+				}
+			}
+
+			for _, ref := range flow.Spec.LocalOutputRefs {
+				if output := resources.SyslogNG.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {
@@ -141,21 +213,13 @@ func NewValidationReconciler(
 	}
 }
 
-func validateOutputSpec(spec v1beta1.OutputSpec, secrets secret.SecretLoader) (problems []string) {
+func validateOutputSpec(spec interface{}, secrets secret.SecretLoader) (problems []string) {
 	var configuredFields []string
 	it := mirror.StructRange(spec)
 	for it.Next() {
 		if it.Field().Type.Kind() == reflect.Ptr && !it.Value().IsNil() {
 			configuredFields = append(configuredFields, jsonFieldName(it.Field()))
-			it := mirror.StructRange(it.Value().Elem().Interface())
-			for it.Next() {
-				if s, _ := it.Value().Interface().(*secret.Secret); s != nil {
-					_, err := secrets.Load(s)
-					if err != nil {
-						problems = append(problems, err.Error())
-					}
-				}
-			}
+			problems = append(problems, checkSecrets(it.Value().Elem(), secrets)...)
 		}
 	}
 
@@ -166,6 +230,27 @@ func validateOutputSpec(spec v1beta1.OutputSpec, secrets secret.SecretLoader) (p
 		// OK
 	default:
 		problems = append(problems, fmt.Sprintf("multiple output targets configured: %s", configuredFields))
+	}
+	return
+}
+
+func checkSecrets(v reflect.Value, secrets secret.SecretLoader) (problems []string) {
+	switch v.Kind() {
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < v.Len(); i++ {
+			problems = append(problems, checkSecrets(v.Index(i), secrets)...)
+		}
+	case reflect.Pointer:
+		problems = checkSecrets(v.Elem(), secrets)
+	case reflect.Struct:
+		it := mirror.NewStructIter(v)
+		for it.Next() {
+			if s, _ := it.Value().Interface().(*secret.Secret); s != nil {
+				if _, err := secrets.Load(s); err != nil {
+					problems = append(problems, err.Error())
+				}
+			}
+		}
 	}
 	return
 }

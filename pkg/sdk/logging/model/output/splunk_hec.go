@@ -26,15 +26,17 @@ import (
 type _hugoSplunk interface{} //nolint:deadcode,unused
 
 // +docName:"Splunk via Hec output plugin for Fluentd"
-//More info at https://github.com/splunk/fluent-plugin-splunk-hec
+// More info at https://github.com/splunk/fluent-plugin-splunk-hec
 //
 // ## Example output configurations
 // ```yaml
 // spec:
-//   splunkHec:
-//     hec_host: splunk.default.svc.cluster.local
-//     hec_port: 8088
-//     protocol: http
+//
+//	splunkHec:
+//	  hec_host: splunk.default.svc.cluster.local
+//	  hec_port: 8088
+//	  protocol: http
+//
 // ```
 type _docSplunkHec interface{} //nolint:deadcode,unused
 

@@ -24,22 +24,24 @@ import (
 type _hugoElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Elasticsearch output plugin for Fluentd"
-//More info at https://github.com/uken/fluent-plugin-elasticsearch
-//>Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
+// More info at https://github.com/uken/fluent-plugin-elasticsearch
+// >Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
 //
 // ## Example output configurations
 // ```yaml
 // spec:
-//   elasticsearch:
-//     host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
-//     port: 9200
-//     scheme: https
-//     ssl_verify: false
-//     ssl_version: TLSv1_2
-//     buffer:
-//       timekey: 1m
-//       timekey_wait: 30s
-//       timekey_use_utc: true
+//
+//	elasticsearch:
+//	  host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+//	  port: 9200
+//	  scheme: https
+//	  ssl_verify: false
+//	  ssl_version: TLSv1_2
+//	  buffer:
+//	    timekey: 1m
+//	    timekey_wait: 30s
+//	    timekey_use_utc: true
+//
 // ```
 type _docElasticsearch interface{} //nolint:deadcode,unused
 

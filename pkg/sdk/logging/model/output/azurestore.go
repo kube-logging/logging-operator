@@ -24,8 +24,8 @@ import (
 type _hugoAzure interface{} //nolint:deadcode,unused
 
 // +docName:"Azure Storage output plugin for Fluentd"
-//Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
-//More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
+// Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
+// More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
 type _docAzure interface{} //nolint:deadcode,unused
 
 // +name:"Azure Storage"

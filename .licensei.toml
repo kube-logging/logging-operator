@@ -1,5 +1,6 @@
 approved = [
   "mit",
+  "mit-0",
   "apache-2.0",
   "bsd-3-clause",
   "bsd-2-clause",
@@ -16,6 +17,7 @@ ignored = [
   "sigs.k8s.io/yaml",
   "gomodules.xyz/jsonpatch/v2",
   "cloud.google.com/go",
+  "github.com/form3tech-oss/jwt-go", # MIT
 ]
 
 [header]

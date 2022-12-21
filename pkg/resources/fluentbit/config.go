@@ -89,11 +89,12 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
+{{- with .FluentForwardOutput }}
 [OUTPUT]
     Name          forward
     Match         *
     {{- if .Upstream.Enabled }}
-    Upstream upstream.conf
+    Upstream      upstream.conf
     {{- else }}
     Host          {{ .TargetHost }}
     Port          {{ .TargetPort }}
@@ -137,13 +138,59 @@ var fluentBitConfigTemplate = `
     {{- if .Network.SourceAddress }}
     net.source_address {{.Network.SourceAddress}}
     {{- end }}
-    {{- if .ForwardOptions }}
-    {{- range $key, $value := .ForwardOptions }}
+    {{- with .Options }}
+    {{- range $key, $value := . }}
     {{- if $value }}
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}
     {{- end }}
+{{- end }}
+
+{{- with .SyslogNGOutput }}
+[OUTPUT]
+    Name tcp
+    Match *
+    Host {{ .Host }}
+    Port {{ .Port }}
+    Format json_lines
+    {{- with .JSONDateKey }}
+    json_date_key {{ . }}
+    {{- end }}
+    {{- with .JSONDateFormat }}
+    json_date_format {{ . }}
+    {{- end }}
+    {{- with .Workers }}
+    Workers {{ . }}
+    {{- end }}
+    {{- if .Network.ConnectTimeoutSet }}
+    net.connect_timeout {{.Network.ConnectTimeout}}
+    {{- end }}
+    {{- if .Network.ConnectTimeoutLogErrorSet }}
+    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
+    {{- end }}
+    {{- if .Network.DNSMode }}
+    net.dns.mode {{.Network.DNSMode}}
+    {{- end }}
+    {{- if .Network.DNSPreferIPV4Set }}
+    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
+    {{- end }}
+    {{- if .Network.DNSResolver }}
+    net.dns.resolver {{.Network.DNSResolver}}
+    {{- end }}
+    {{- if .Network.KeepaliveSet}}
+    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- end }}
+    {{- if .Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    {{- end }}
+    {{- if .Network.KeepaliveMaxRecycleSet }}
+    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    {{- end }}
+    {{- if .Network.SourceAddress }}
+    net.source_address {{.Network.SourceAddress}}
+    {{- end }}
+{{- end }}
 `
 
 var upstreamConfigTemplate = `
