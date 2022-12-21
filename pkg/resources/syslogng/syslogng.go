@@ -50,8 +50,8 @@ const (
 	clusterRoleName                   = "syslog-ng"
 	containerName                     = "syslog-ng"
 	defaultBufferVolumeMetricsPort    = 9200
-	syslogngImageRepository           = "ghcr.io/banzaicloud/syslog-ng"
-	syslogngImageTag                  = "3.38.3"
+	syslogngImageRepository           = "balabit/syslog-ng"
+	syslogngImageTag                  = "4.0.1"
 	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
 	prometheusExporterImageTag        = "0.0.13"
 	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
