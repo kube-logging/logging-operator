@@ -264,6 +264,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - syslogngclusterflows
+  - syslogngclusteroutputs
+  - syslogngflows
+  - syslogngoutputs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - syslogngclusterflows/status
+  - syslogngclusteroutputs/status
+  - syslogngflows/status
+  - syslogngoutputs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - monitoring.coreos.com
   resources:
   - prometheusrules

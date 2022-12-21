@@ -53,6 +53,8 @@ type LoggingSpec struct {
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
+	// Syslog-NG statefulset configuration
+	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
 	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
 	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
 	// GlobalOutput name to flush ERROR events to
@@ -361,6 +363,23 @@ func (l *Logging) SetDefaults() error {
 		}
 	}
 
+	if l.Spec.SyslogNGSpec != nil {
+		if l.Spec.SyslogNGSpec.Metrics != nil {
+			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
+				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Port == 0 {
+				l.Spec.SyslogNGSpec.Metrics.Port = 9577
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Timeout == "" {
+				l.Spec.SyslogNGSpec.Metrics.Timeout = "5s"
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Interval == "" {
+				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
+			}
+		}
+	}
+
 	if l.Spec.FluentbitSpec != nil { // nolint:nestif
 		if l.Spec.FluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
@@ -608,6 +627,35 @@ func (l *Logging) GetFluentdLabels(component string) map[string]string {
 		l.Spec.FluentdSpec.Labels,
 		map[string]string{
 			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": component,
+		},
+		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+	)
+}
+
+// SyslogNGObjectMeta creates an objectMeta for resource syslog-ng
+func (l *Logging) SyslogNGObjectMeta(name, component string) metav1.ObjectMeta {
+	o := metav1.ObjectMeta{
+		Name:      l.QualifiedName(name),
+		Namespace: l.Spec.ControlNamespace,
+		Labels:    l.GetSyslogNGLabels(component),
+		OwnerReferences: []metav1.OwnerReference{
+			{
+				APIVersion: l.APIVersion,
+				Kind:       l.Kind,
+				Name:       l.Name,
+				UID:        l.UID,
+				Controller: util.BoolPointer(true),
+			},
+		},
+	}
+	return o
+}
+
+func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
+	return util.MergeLabels(
+		map[string]string{
+			"app.kubernetes.io/name":      "syslog-ng",
 			"app.kubernetes.io/component": component,
 		},
 		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),

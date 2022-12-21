@@ -1,0 +1,8 @@
+go 1.18
+
+use (
+	.
+	./e2e
+	./pkg/sdk
+	./pkg/sdk/logging/model/syslogng/config
+)
