@@ -130,7 +130,7 @@ const (
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag            = "v0.0.2"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
-	DefaultFluentdDrainPauseImageTag            = "latest"
+	DefaultFluentdDrainPauseImageTag            = "3.2"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
