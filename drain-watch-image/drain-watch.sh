@@ -18,7 +18,7 @@ done
 # this loop will not go on indefinitely because the custom-runner's HTTP endpoint should
 # come up eventually and won't terminate without a signal from outside (barring errors)
 echo '['$(date)']' 'waiting for custom-runner HTTP endpoint to become available'
-while [ "$(curl -so /dev/null-w '%{http_code}' localhost:735)"=="000" ]
+until curl -so /dev/null ${CUSTOM_RUNNER_ADDRESS}
 do 
   [ -z "$DEBUG" ] && echo '['$(date)']' 'custom-runner HTTP endpoint not available, waiting'
   sleep 1
