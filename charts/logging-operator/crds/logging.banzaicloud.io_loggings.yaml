@@ -1537,6 +1537,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -1549,6 +1569,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -1559,6 +1580,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -1571,6 +1612,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -2197,6 +2239,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -2209,6 +2271,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -2219,6 +2282,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -2231,6 +2314,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -3451,6 +3535,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -3463,6 +3567,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -3473,6 +3578,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -3485,6 +3610,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -4196,6 +4322,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -4208,6 +4354,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -4218,6 +4365,26 @@ spec:
                             items:
                               properties:
                                 action:
+                                  default: replace
+                                  enum:
+                                  - replace
+                                  - Replace
+                                  - keep
+                                  - Keep
+                                  - drop
+                                  - Drop
+                                  - hashmod
+                                  - HashMod
+                                  - labelmap
+                                  - LabelMap
+                                  - labeldrop
+                                  - LabelDrop
+                                  - labelkeep
+                                  - LabelKeep
+                                  - lowercase
+                                  - Lowercase
+                                  - uppercase
+                                  - Uppercase
                                   type: string
                                 modulus:
                                   format: int64
@@ -4230,6 +4397,7 @@ spec:
                                   type: string
                                 sourceLabels:
                                   items:
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                     type: string
                                   type: array
                                 targetLabel:
@@ -4735,6 +4903,11 @@ spec:
                                 type: string
                               type: object
                           type: object
+                        matchLabelKeys:
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
                         maxSkew:
                           format: int32
                           type: integer
@@ -8235,6 +8408,11 @@ spec:
                                                       type: string
                                                     type: object
                                                 type: object
+                                              matchLabelKeys:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               maxSkew:
                                                 format: int32
                                                 type: integer
@@ -9171,6 +9349,26 @@ spec:
                                   items:
                                     properties:
                                       action:
+                                        default: replace
+                                        enum:
+                                        - replace
+                                        - Replace
+                                        - keep
+                                        - Keep
+                                        - drop
+                                        - Drop
+                                        - hashmod
+                                        - HashMod
+                                        - labelmap
+                                        - LabelMap
+                                        - labeldrop
+                                        - LabelDrop
+                                        - labelkeep
+                                        - LabelKeep
+                                        - lowercase
+                                        - Lowercase
+                                        - uppercase
+                                        - Uppercase
                                         type: string
                                       modulus:
                                         format: int64
@@ -9183,6 +9381,7 @@ spec:
                                         type: string
                                       sourceLabels:
                                         items:
+                                          pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                           type: string
                                         type: array
                                       targetLabel:
@@ -9193,6 +9392,26 @@ spec:
                                   items:
                                     properties:
                                       action:
+                                        default: replace
+                                        enum:
+                                        - replace
+                                        - Replace
+                                        - keep
+                                        - Keep
+                                        - drop
+                                        - Drop
+                                        - hashmod
+                                        - HashMod
+                                        - labelmap
+                                        - LabelMap
+                                        - labeldrop
+                                        - LabelDrop
+                                        - labelkeep
+                                        - LabelKeep
+                                        - lowercase
+                                        - Lowercase
+                                        - uppercase
+                                        - Uppercase
                                         type: string
                                       modulus:
                                         format: int64
@@ -9205,6 +9424,7 @@ spec:
                                         type: string
                                       sourceLabels:
                                         items:
+                                          pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
                                           type: string
                                         type: array
                                       targetLabel:

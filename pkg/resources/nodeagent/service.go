@@ -75,8 +75,8 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					HonorLabels:          n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-					Interval:             n.nodeAgent.FluentbitSpec.Metrics.Interval,
-					ScrapeTimeout:        n.nodeAgent.FluentbitSpec.Metrics.Timeout,
+					Interval:             v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Interval),
+					ScrapeTimeout:        v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Timeout),
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),

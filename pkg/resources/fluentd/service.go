@@ -101,8 +101,8 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				Endpoints: []v1.Endpoint{{
 					Port:                 "http-metrics",
 					Path:                 r.Logging.Spec.FluentdSpec.Metrics.Path,
-					Interval:             r.Logging.Spec.FluentdSpec.Metrics.Interval,
-					ScrapeTimeout:        r.Logging.Spec.FluentdSpec.Metrics.Timeout,
+					Interval:             v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Timeout),
 					HonorLabels:          r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
@@ -167,8 +167,8 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				Endpoints: []v1.Endpoint{{
 					Port:                 "buffer-metrics",
 					Path:                 r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Path,
-					Interval:             r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Interval,
-					ScrapeTimeout:        r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Timeout,
+					Interval:             v1.Duration(r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Timeout),
 					HonorLabels:          r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
