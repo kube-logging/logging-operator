@@ -162,8 +162,8 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				Endpoints: []v1.Endpoint{{
 					Port:                 "buffer-metrics",
 					Path:                 r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Path,
-					Interval:             r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Interval,
-					ScrapeTimeout:        r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Timeout,
+					Interval:             v1.Duration(r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Timeout),
 					HonorLabels:          r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
