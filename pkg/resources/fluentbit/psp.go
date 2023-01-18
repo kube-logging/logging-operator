@@ -36,7 +36,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 			ReadOnly:   true,
 		}}
 
-		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume != nil && r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
+		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath.Path,
 				ReadOnly:   false,
