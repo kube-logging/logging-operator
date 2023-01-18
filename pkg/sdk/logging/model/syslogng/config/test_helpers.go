@@ -120,7 +120,7 @@ type secretReader struct {
 	secrets []corev1.Secret
 }
 
-func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object) error {
+func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	if secret, ok := obj.(*corev1.Secret); ok {
 		if secret == nil {
 			return nil

@@ -445,8 +445,8 @@ func AppendServiceMonitorBuilder(rbs []reconciler.ResourceBuilder, parent reconc
 					Endpoints: []monitoringv1.Endpoint{{
 						Port:                 "http-metrics",
 						Path:                 config.Metrics.Path,
-						Interval:             config.Metrics.Interval,
-						ScrapeTimeout:        config.Metrics.Timeout,
+						Interval:             monitoringv1.Duration(config.Metrics.Interval),
+						ScrapeTimeout:        monitoringv1.Duration(config.Metrics.Timeout),
 						HonorLabels:          config.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       config.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: config.Metrics.ServiceMonitorConfig.MetricsRelabelings,
