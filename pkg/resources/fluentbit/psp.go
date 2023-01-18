@@ -36,7 +36,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 			ReadOnly:   true,
 		}}
 
-		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
+		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume != nil && r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath.Path,
 				ReadOnly:   false,
@@ -69,7 +69,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 				})
 			}
 
-			if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+			if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
 				hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
 					Min: r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port,
 					Max: r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port,
