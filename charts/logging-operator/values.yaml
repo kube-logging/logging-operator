@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/banzaicloud/logging-operator
-  tag: 3.17.10
+  tag: 4.0.0-rc17
   pullPolicy: IfNotPresent
 
 env: []
