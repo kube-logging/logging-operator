@@ -1,0 +1,1205 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.0
+  creationTimestamp: null
+  name: syslogngclusteroutputs.logging.banzaicloud.io
+spec:
+  group: logging.banzaicloud.io
+  names:
+    categories:
+    - logging-all
+    kind: SyslogNGClusterOutput
+    listKind: SyslogNGClusterOutputList
+    plural: syslogngclusteroutputs
+    singular: syslogngclusteroutput
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Is the output active?
+      jsonPath: .status.active
+      name: Active
+      type: boolean
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              enabledNamespaces:
+                items:
+                  type: string
+                type: array
+              file:
+                properties:
+                  create_dirs:
+                    type: boolean
+                  dir_group:
+                    type: string
+                  dir_owner:
+                    type: string
+                  dir_perm:
+                    type: integer
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  path:
+                    type: string
+                  persist_name:
+                    type: string
+                  template:
+                    type: string
+                required:
+                - path
+                type: object
+              http:
+                properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  body:
+                    type: string
+                  body-prefix:
+                    type: string
+                  body-suffix:
+                    type: string
+                  delimiter:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  headers:
+                    items:
+                      type: string
+                    type: array
+                  method:
+                    type: string
+                  password:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  persist_name:
+                    type: string
+                  retries:
+                    type: integer
+                  time_reopen:
+                    type: integer
+                  tls:
+                    properties:
+                      ca_dir:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cert_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cipher-suite:
+                        type: string
+                      key_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      peer_verify:
+                        type: string
+                      use-system-cert-store:
+                        type: boolean
+                    type: object
+                  url:
+                    type: string
+                  user:
+                    type: string
+                  user-agent:
+                    type: string
+                  workers:
+                    type: integer
+                type: object
+              loggingRef:
+                type: string
+              loggly:
+                properties:
+                  close_on_input:
+                    type: boolean
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  flags:
+                    items:
+                      type: string
+                    type: array
+                  flush_lines:
+                    type: integer
+                  host:
+                    type: string
+                  persist_name:
+                    type: string
+                  port:
+                    type: integer
+                  so_keepalive:
+                    type: boolean
+                  suppress:
+                    type: integer
+                  tag:
+                    type: string
+                  template:
+                    type: string
+                  template_escape:
+                    type: boolean
+                  tls:
+                    properties:
+                      ca_dir:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cert_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cipher-suite:
+                        type: string
+                      key_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      peer_verify:
+                        type: string
+                      use-system-cert-store:
+                        type: boolean
+                    type: object
+                  token:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  transport:
+                    type: string
+                  ts_format:
+                    type: string
+                required:
+                - token
+                type: object
+              sumologic-http:
+                properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  body:
+                    type: string
+                  collector:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  deployment:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  headers:
+                    items:
+                      type: string
+                    type: array
+                  persist_name:
+                    type: string
+                  time_reopen:
+                    type: integer
+                  tls:
+                    properties:
+                      ca_dir:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cert_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cipher-suite:
+                        type: string
+                      key_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      peer_verify:
+                        type: string
+                      use-system-cert-store:
+                        type: boolean
+                    type: object
+                  url:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                type: object
+              sumologic-syslog:
+                properties:
+                  deployment:
+                    type: string
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  persist_name:
+                    type: string
+                  port:
+                    type: integer
+                  tag:
+                    type: string
+                  tls:
+                    properties:
+                      ca_dir:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cert_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cipher-suite:
+                        type: string
+                      key_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      peer_verify:
+                        type: string
+                      use-system-cert-store:
+                        type: boolean
+                    type: object
+                  token:
+                    type: integer
+                type: object
+              syslog:
+                properties:
+                  close_on_input:
+                    type: boolean
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  flags:
+                    items:
+                      type: string
+                    type: array
+                  flush_lines:
+                    type: integer
+                  host:
+                    type: string
+                  persist_name:
+                    type: string
+                  port:
+                    type: integer
+                  so_keepalive:
+                    type: boolean
+                  suppress:
+                    type: integer
+                  template:
+                    type: string
+                  template_escape:
+                    type: boolean
+                  tls:
+                    properties:
+                      ca_dir:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      ca_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cert_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      cipher-suite:
+                        type: string
+                      key_file:
+                        properties:
+                          mountFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                          value:
+                            type: string
+                          valueFrom:
+                            properties:
+                              secretKeyRef:
+                                properties:
+                                  key:
+                                    type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        type: object
+                      peer_verify:
+                        type: string
+                      use-system-cert-store:
+                        type: boolean
+                    type: object
+                  transport:
+                    type: string
+                  ts_format:
+                    type: string
+                type: object
+            type: object
+          status:
+            properties:
+              active:
+                type: boolean
+              problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+*"
 
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
@@ -52,7 +52,7 @@ jobs:
           if_false: latest
       - name: Determine image tag
         id: imagetag
-        run: echo "::set-output name=value::${TAG_OR_BRANCH##*/}"
+        run: echo "value=${TAG_OR_BRANCH##*/}" >> $GITHUB_OUTPUT
         env:
           TAG_OR_BRANCH: ${{ steps.refortag.outputs.value }}
       - name: Build logging-operator

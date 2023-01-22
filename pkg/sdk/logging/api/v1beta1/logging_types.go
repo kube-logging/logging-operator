@@ -53,6 +53,8 @@ type LoggingSpec struct {
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
+	// Syslog-NG statefulset configuration
+	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
 	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
 	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
 	// GlobalOutput name to flush ERROR events to
@@ -126,9 +128,9 @@ const (
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.0.2"
+	DefaultFluentdDrainWatchImageTag            = "v0.0.5"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
-	DefaultFluentdDrainPauseImageTag            = "latest"
+	DefaultFluentdDrainPauseImageTag            = "3.2"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
@@ -357,6 +359,23 @@ func (l *Logging) SetDefaults() error {
 			}
 			if e.Volume == nil {
 				e.Volume = &volume.KubernetesVolume{}
+			}
+		}
+	}
+
+	if l.Spec.SyslogNGSpec != nil {
+		if l.Spec.SyslogNGSpec.Metrics != nil {
+			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
+				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Port == 0 {
+				l.Spec.SyslogNGSpec.Metrics.Port = 9577
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Timeout == "" {
+				l.Spec.SyslogNGSpec.Metrics.Timeout = "5s"
+			}
+			if l.Spec.SyslogNGSpec.Metrics.Interval == "" {
+				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
 			}
 		}
 	}
@@ -608,6 +627,35 @@ func (l *Logging) GetFluentdLabels(component string) map[string]string {
 		l.Spec.FluentdSpec.Labels,
 		map[string]string{
 			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": component,
+		},
+		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+	)
+}
+
+// SyslogNGObjectMeta creates an objectMeta for resource syslog-ng
+func (l *Logging) SyslogNGObjectMeta(name, component string) metav1.ObjectMeta {
+	o := metav1.ObjectMeta{
+		Name:      l.QualifiedName(name),
+		Namespace: l.Spec.ControlNamespace,
+		Labels:    l.GetSyslogNGLabels(component),
+		OwnerReferences: []metav1.OwnerReference{
+			{
+				APIVersion: l.APIVersion,
+				Kind:       l.Kind,
+				Name:       l.Name,
+				UID:        l.UID,
+				Controller: util.BoolPointer(true),
+			},
+		},
+	}
+	return o
+}
+
+func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
+	return util.MergeLabels(
+		map[string]string{
+			"app.kubernetes.io/name":      "syslog-ng",
 			"app.kubernetes.io/component": component,
 		},
 		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),

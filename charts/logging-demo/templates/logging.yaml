@@ -3,7 +3,9 @@ kind: Logging
 metadata:
   name: {{ include "logging-demo.fullname" . }}
 spec:
-  fluentd:
+  syslogNG:
+    metrics:
+       path: "/metrics"
     {{- if .Values.loggingOperator.tls.enabled }}
     tls:
       enabled: true

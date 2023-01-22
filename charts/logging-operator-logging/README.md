@@ -33,8 +33,8 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `fluentd.volumeModImage.tag`                        | Fluentd volumeModImage container image tag                               | `latest`                                                   |
 | `fluentd.volumeModImage.repository`                 | Fluentd volumeModImage container image repository                        | `busybox`                                                  |
 | `fluentd.volumeModImage.pullPolicy`                 | Fluentd volumeModImage container pull policy                             | `IfNotPresent`                                             |
-| `fluentd.configReloaderImage.tag`                   | Fluentd configReloaderImage container image tag                          | `v0.2.2`                                                   |
-| `fluentd.configReloaderImage.repository`            | Fluentd configReloaderImage container image repository                   | `jimmidyson/configmap-reload`                              |
+| `fluentd.configReloaderImage.tag`                   | Fluentd configReloaderImage container image tag                          | `0.0.1`                                                   |
+| `fluentd.configReloaderImage.repository`            | Fluentd configReloaderImage container image repository                   | `ghcr.io/banzaicloud/config-reloader`                              |
 | `fluentd.configReloaderImage.pullPolicy`            | Fluentd configReloaderImage container pull policy                        | `IfNotPresent`                                             |
 | `fluentd.fluentdPvcSpec.accessModes`                | Fluentd persistence volume access modes                                  | `[ReadWriteOnce]`                                          |
 | `fluentd.fluentdPvcSpec.resources.requests.storage` | Fluentd persistence volume size                                          | `21Gi`                                                     |
@@ -63,4 +63,4 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `hostTailer.containerOverrides`                     | HostTailer container overrides                                           | none                                                       |
 | `hostTailer.fileTailers`                            | HostTailer file tailers                                                  | none                                                       |
 | `hostTailer.systemdTailers`                         | HostTailer systemd tailers                                               | none                                                       |
-| `scc.enabled`                                       | OpenShift SecurityContextConstraints enabled                                               | false                                                      |
+| `scc.enabled`                                       | OpenShift SecurityContextConstraints enabled                             | false                                                      |

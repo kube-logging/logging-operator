@@ -94,6 +94,7 @@ type FluentbitSpec struct {
 	DNSPolicy               corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
 	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
+	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 }
 
@@ -104,6 +105,14 @@ type FluentbitTLS struct {
 	Enabled    *bool  `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+// FluentbitTCPOutput defines the TLS configs
+type FluentbitTCPOutput struct {
+	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
+	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit
@@ -227,6 +236,8 @@ type FilterKubernetes struct {
 	KubeCAPath string `json:"Kube_CA_Path,omitempty"`
 	// Token file  (default:/var/run/secrets/kubernetes.io/serviceaccount/token)
 	KubeTokenFile string `json:"Kube_Token_File,omitempty" plugin:"default:/var/run/secrets/kubernetes.io/serviceaccount/token"`
+	// Token TTL configurable 'time to live' for the K8s token. By default, it is set to 600 seconds. After this time, the token is reloaded from Kube_Token_File or the Kube_Token_Command.  (default:"600")
+	KubeTokenTTL string `json:"Kube_Token_TTL,omitempty" plugin:"default:600"`
 	// When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.)
 	KubeTagPrefix string `json:"Kube_Tag_Prefix,omitempty" plugin:"default:kubernetes.var.log.containers"`
 	// When enabled, it checks if the log field content is a JSON string map, if so, it append the map fields as part of the log structure. (default:Off)
@@ -269,6 +280,8 @@ type FilterKubernetes struct {
 	UseKubelet string `json:"Use_Kubelet,omitempty"`
 	// kubelet port using for HTTP request, this only works when Use_Kubelet  set to On (default:10250)
 	KubeletPort string `json:"Kubelet_Port,omitempty"`
+	// Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted. (default:0)
+	KubeMetaCacheTTL string `json:"Kube_Meta_Cache_TTL,omitempty"`
 }
 
 // FilterAws The AWS Filter Enriches logs with AWS Metadata.

@@ -119,10 +119,10 @@ func (*PanicObject) GetOwnerReferences() []metav1.OwnerReference {
 func (*PanicObject) SetOwnerReferences([]metav1.OwnerReference) {
 	panic("not implemented")
 }
-func (*PanicObject) GetClusterName() string {
+func (*PanicObject) GetZZZ_DeprecatedClusterName() string {
 	panic("not implemented")
 }
-func (*PanicObject) SetClusterName(clusterName string) {
+func (*PanicObject) SetZZZ_DeprecatedClusterName(clusterName string) {
 	panic("not implemented")
 }
 func (*PanicObject) GetManagedFields() []metav1.ManagedFieldsEntry {

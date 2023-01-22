@@ -59,31 +59,37 @@ type RegexpSection struct {
 
 // ## Example `Regexp` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - grep:
-//        regexp:
-//        - key: first
-//          pattern: /^5\d\d$/
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - grep:
+//	      regexp:
+//	      - key: first
+//	        pattern: /^5\d\d$/
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//  <filter **>
-//    @type grep
-//    @id demo-flow_1_grep
-//    <regexp>
-//      key first
-//      pattern /^5\d\d$/
-//    </regexp>
-//  </filter>
+//
+//	<filter **>
+//	  @type grep
+//	  @id demo-flow_1_grep
+//	  <regexp>
+//	    key first
+//	    pattern /^5\d\d$/
+//	  </regexp>
+//	</filter>
+//
 // ```
 type _expRegexp interface{} //nolint:deadcode,unused
 
@@ -99,31 +105,37 @@ type ExcludeSection struct {
 
 // ## Example `Exclude` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - grep:
-//        exclude:
-//        - key: first
-//          pattern: /^5\d\d$/
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - grep:
+//	      exclude:
+//	      - key: first
+//	        pattern: /^5\d\d$/
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//  <filter **>
-//    @type grep
-//    @id demo-flow_0_grep
-//    <exclude>
-//      key first
-//      pattern /^5\d\d$/
-//    </exclude>
-//  </filter>
+//
+//	<filter **>
+//	  @type grep
+//	  @id demo-flow_0_grep
+//	  <exclude>
+//	    key first
+//	    pattern /^5\d\d$/
+//	  </exclude>
+//	</filter>
+//
 // ```
 type _expExclude interface{} //nolint:deadcode,unused
 
@@ -139,37 +151,43 @@ type OrSection struct {
 
 // ## Example `Or` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - grep:
-//        or:
-//          - exclude:
-//            - key: first
-//              pattern: /^5\d\d$/
-//            - key: second
-//              pattern: /\.css$/
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
 //
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
-//```
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - grep:
+//	      or:
+//	        - exclude:
+//	          - key: first
+//	            pattern: /^5\d\d$/
+//	          - key: second
+//	            pattern: /\.css$/
+//
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
+// ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//    <or>
-//      <exclude>
-//        key first
-//        pattern /^5\d\d$/
-//      </exclude>
-//      <exclude>
-//        key second
-//        pattern /\.css$/
-//      </exclude>
-//    </or>
+//
+//	<or>
+//	  <exclude>
+//	    key first
+//	    pattern /^5\d\d$/
+//	  </exclude>
+//	  <exclude>
+//	    key second
+//	    pattern /\.css$/
+//	  </exclude>
+//	</or>
+//
 // ```
 type _expOR interface{} //nolint:deadcode,unused
 
@@ -185,37 +203,43 @@ type AndSection struct {
 
 // ## Example `And` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - grep:
-//        and:
-//          - regexp:
-//            - key: first
-//              pattern: /^5\d\d$/
-//            - key: second
-//              pattern: /\.css$/
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
 //
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
-//```
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - grep:
+//	      and:
+//	        - regexp:
+//	          - key: first
+//	            pattern: /^5\d\d$/
+//	          - key: second
+//	            pattern: /\.css$/
+//
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
+// ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//    <and>
-//      <regexp>
-//        key first
-//        pattern /^5\d\d$/
-//      </regexp>
-//      <regexp>
-//        key second
-//        pattern /\.css$/
-//      </regexp>
-//    </and>
+//
+//	<and>
+//	  <regexp>
+//	    key first
+//	    pattern /^5\d\d$/
+//	  </regexp>
+//	  <regexp>
+//	    key second
+//	    pattern /\.css$/
+//	  </regexp>
+//	</and>
+//
 // ```
 type _expAND interface{} //nolint:deadcode,unused
 
