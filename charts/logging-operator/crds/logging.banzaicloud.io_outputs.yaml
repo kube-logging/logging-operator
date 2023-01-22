@@ -3793,6 +3793,8 @@ spec:
                     type: object
                   extract_kubernetes_labels:
                     type: boolean
+                  include_thread_label:
+                    type: boolean
                   insecure_tls:
                     type: boolean
                   key:
@@ -9689,6 +9691,8 @@ spec:
                       type: string
                     type: object
                   extract_kubernetes_labels:
+                    type: boolean
+                  include_thread_label:
                     type: boolean
                   insecure_tls:
                     type: boolean

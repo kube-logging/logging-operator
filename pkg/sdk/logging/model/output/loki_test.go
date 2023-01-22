@@ -42,6 +42,7 @@ buffer:
     @id test
     extra_labels {"testing":"testing"}
     extract_kubernetes_labels true
+	include_thread_label true
     line_format json
     remove_keys ["kubernetes"]
     url http://loki:3100
