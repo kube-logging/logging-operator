@@ -60,7 +60,13 @@ spec:
                           type: string
                         n_lines:
                           type: integer
+                        partial_cri_logtag_key:
+                          type: string
+                        partial_cri_stream_key:
+                          type: string
                         partial_key:
+                          type: string
+                        partial_metadata_format:
                           type: string
                         partial_value:
                           type: string
@@ -71,6 +77,8 @@ spec:
                         timeout_label:
                           type: string
                         use_first_timestamp:
+                          type: boolean
+                        use_partial_cri_logtag:
                           type: boolean
                         use_partial_metadata:
                           type: string
@@ -1071,7 +1079,13 @@ spec:
                           type: string
                         n_lines:
                           type: integer
+                        partial_cri_logtag_key:
+                          type: string
+                        partial_cri_stream_key:
+                          type: string
                         partial_key:
+                          type: string
+                        partial_metadata_format:
                           type: string
                         partial_value:
                           type: string
@@ -1082,6 +1096,8 @@ spec:
                         timeout_label:
                           type: string
                         use_first_timestamp:
+                          type: boolean
+                        use_partial_cri_logtag:
                           type: boolean
                         use_partial_metadata:
                           type: string

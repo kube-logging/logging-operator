@@ -67,6 +67,14 @@ type Concat struct {
 	UsePartialMetadata string `json:"use_partial_metadata,omitempty"`
 	//If true, keep partial metadata
 	KeepPartialMetadata string `json:"keep_partial_metadata,omitempty"`
+	//Input format of the partial metadata (fluentd or journald docker log driver)( docker-fluentd, docker-journald, docker-journald-lowercase)
+	PartialMetadataFormat string `json:"partial_metadata_format,omitempty"`
+	//Use cri log tag to concatenate multiple records
+	UsePartialCriLogtag bool `json:"use_partial_cri_logtag,omitempty"`
+	//The key name that is referred to concatenate records on cri log
+	PartialCriLogtagKey string `json:"partial_cri_logtag_key,omitempty"`
+	//The key name that is referred to detect stream name on cri log
+	PartialCriStreamKey string `json:"partial_cri_stream_key,omitempty"`
 }
 
 // ## Example `Concat` filter configurations
