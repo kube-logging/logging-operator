@@ -34,7 +34,9 @@ func NewCached(config *rest.Config) (meta.RESTMapper, error) {
 			return apiutil.NewDiscoveryRESTMapper(config)
 		},
 	}
-	c.flush()
+	if err := c.flush(); err != nil {
+		return nil, err
+	}
 	return c, nil
 }
 
