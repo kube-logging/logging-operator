@@ -2618,6 +2618,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.Loggly)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MQTT != nil {
+		in, out := &in.MQTT, &out.MQTT
+		*out = new(syslogngoutput.MQTT)
+		**out = **in
+	}
 	if in.Syslog != nil {
 		in, out := &in.Syslog, &out.Syslog
 		*out = new(syslogngoutput.SyslogOutput)
