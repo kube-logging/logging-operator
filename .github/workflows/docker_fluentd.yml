@@ -52,7 +52,7 @@ jobs:
         env:
           TAG: ${{ steps.imagetag.outputs.value }}
       - name: Build Fluentd Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: fluentd-image/${{ steps.pathfromtag.outputs.value }}/
           tags: ghcr.io/banzaicloud/fluentd:${{ steps.imagetag.outputs.value }}
