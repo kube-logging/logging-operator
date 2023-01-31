@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_REF: ${{ github.ref }}
       - name: Build and push image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: drain-watch-image/
           tags: ghcr.io/banzaicloud/fluentd-drain-watch:${{ steps.imagetag.outputs.value }}
