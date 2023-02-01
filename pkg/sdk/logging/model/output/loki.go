@@ -45,7 +45,7 @@ type _docLoki interface{} //nolint:deadcode,unused
 
 // +name:"Grafana Loki"
 // +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
-// +version:"1.2.17"
+// +version:"1.2.19"
 // +description:"Transfer logs to Loki"
 // +status:"GA"
 type _metaLoki interface{} //nolint:deadcode,unused
@@ -88,6 +88,8 @@ type LokiOutput struct {
 	DropSingleKey *bool `json:"drop_single_key,omitempty"`
 	// Configure Kubernetes metadata in a Prometheus like format (default: false)
 	ConfigureKubernetesLabels *bool `json:"configure_kubernetes_labels,omitempty"`
+	// whether to include the fluentd_thread label when multiple threads are used for flushing. (default: true)
+	IncludeThreadLabel *bool `json:"include_thread_label,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
 	// The threshold for chunk flush performance check.
@@ -147,6 +149,9 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		}
 		if l.ExtractKubernetesLabels == nil {
 			l.ExtractKubernetesLabels = util.BoolPointer(true)
+		}
+		if l.IncludeThreadLabel == nil {
+			l.IncludeThreadLabel = util.BoolPointer(true)
 		}
 		// Prevent meta configuration from marshalling
 		l.ConfigureKubernetesLabels = nil

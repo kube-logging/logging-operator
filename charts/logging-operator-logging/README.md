@@ -63,3 +63,4 @@ The following tables lists the configurable parameters of the logging-operator-l
 | `hostTailer.containerOverrides`                     | HostTailer container overrides                                           | none                                                       |
 | `hostTailer.fileTailers`                            | HostTailer file tailers                                                  | none                                                       |
 | `hostTailer.systemdTailers`                         | HostTailer systemd tailers                                               | none                                                       |
+| `scc.enabled`                                       | OpenShift SecurityContextConstraints enabled                             | false                                                      |
