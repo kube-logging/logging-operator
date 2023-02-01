@@ -126,3 +126,7 @@ hostTailer: {}
   #     disabled: false
   #     maxEntries: 20
   #     systemdFilter: kubelet.service
+
+# SecurityContextConstraints Roles and RoleBindings for a deployment in OpenShift
+scc:
+  enabled: false
