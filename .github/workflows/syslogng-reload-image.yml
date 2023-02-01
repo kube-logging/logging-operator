@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_REF: ${{ github.ref }}
       - name: Build and push image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: syslogng-reload-image/
           tags: ghcr.io/banzaicloud/syslogng-reload:${{ steps.imagetag.outputs.value }}
