@@ -89,6 +89,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		Args: []string{
 			"--cfgfile=" + configDir + "/" + configKey,
 			"--control=" + socketPath,
+			"--persist-file=" + filepath.Join(bufferPath, "/syslog-ng.persist"),
 			"--no-caps",
 			"-Fe",
 		},
