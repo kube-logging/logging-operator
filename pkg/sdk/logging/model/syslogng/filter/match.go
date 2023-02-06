@@ -51,25 +51,22 @@ type MatchConfig MatchExpr
 
 // +kubebuilder:object:generate=true
 type MatchExpr struct {
-	// +docLink:"And Directive,#And-Directive"
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	And []MatchExpr `json:"and,omitempty"`
-	// +docLink:"Not Directive,#Exclude-Directive"
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Not *MatchExpr `json:"not,omitempty"`
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp *RegexpMatchExpr `json:"regexp,omitempty" syslog-ng:"name=match,optional"`
-	// +docLink:"Or Directive,#Or-Directive"
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Or []MatchExpr `json:"or,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
-// +docName:"[Regexp Directive](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/68#TOPIC-1829171) {#Regexp-Directive}"
-// Specify filtering rule.
+// +docName:"Regexp Directive"
+// Specify filtering rule. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/68#TOPIC-1829171).
 type RegexpMatchExpr struct {
 	// Pattern expression to evaluate
 	Pattern string `json:"pattern"`
