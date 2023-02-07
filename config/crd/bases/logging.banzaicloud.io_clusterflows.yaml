@@ -82,6 +82,8 @@ spec:
                           type: boolean
                         use_partial_metadata:
                           type: string
+                      required:
+                      - separator
                       type: object
                     dedot:
                       properties:
@@ -1105,6 +1107,8 @@ spec:
                           type: boolean
                         use_partial_metadata:
                           type: string
+                      required:
+                      - separator
                       type: object
                     dedot:
                       properties:

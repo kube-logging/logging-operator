@@ -40,7 +40,7 @@ type Concat struct {
 	// Specify field name in the record to parse. If you leave empty the Container Runtime default will be used.
 	Key string `json:"key,omitempty"`
 	//The separator of lines. (default: "\n")
-	Separator string `json:"separator,omitempty"`
+	Separator string `json:"separator"`
 	//The number of lines. This is exclusive with multiline_start_regex.
 	NLines int `json:"n_lines,omitempty"`
 	//The regexp to match beginning of multiline. This is exclusive with n_lines.
