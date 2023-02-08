@@ -1,11 +1,11 @@
 name: E2E tests
 
 on:
-  pull_request:
   push:
     branches:
       - master
       - release-3.17
+  pull_request:
 
 env:
   GO_VERSION: '1.17'
@@ -15,7 +15,9 @@ env:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
+
     steps:
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -34,7 +36,9 @@ jobs:
         run: make test-e2e
 
   basic_flow:
+    name: Basic flow
     runs-on: ubuntu-latest
+
     steps:
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -46,35 +50,32 @@ jobs:
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
-      - name: Setup Kind
+      - name: Set up KinD
         uses: engineerd/setup-kind@v0.5.0
         with:
-          version: "v0.11.1"
+          version: "${{ env.KIND_VERSION }}"
           image: "kindest/node:${{ env.K8S_VERSION }}"
 
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Build controller image
-        run: |
-          make docker-build IMG='controller:local'
+        run: make docker-build IMG='controller:local'
 
       - name: Build e2e fluentd image
-        run: |
-          make docker-build-e2e-fluentd IMG='fluentd:local'
+        run: make docker-build-e2e-fluentd IMG='fluentd:local'
 
       - name: Create logging namespace
-        run: |
-          kubectl create namespace logging
+        run: kubectl create namespace logging
 
-      - name: Start Minio
+      - name: Start MinIO
         run: |
           kubectl create -f hack/minio.yaml
           kubectl wait --namespace logging --for=condition=available deployment/minio-deployment --timeout=120s
           minio="$(kubectl get pod --namespace logging -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
           kubectl wait --namespace logging --for=condition=Ready pod "${minio}" --timeout=120s
 
-      - name: Setup minio cli
+      - name: Setup MinIO CLI
         run: |
           kubectl create -f hack/minio-mc.yaml
           kubectl wait --namespace logging --for=condition=available deployment/minio-mc-deployment --timeout=120s
@@ -86,6 +87,5 @@ jobs:
             'minio_access_key' \
             'minio_secret_key'
 
-      - name: Run test
-        run: |
-          hack/test.sh
+      - name: Test
+        run: hack/test.sh
