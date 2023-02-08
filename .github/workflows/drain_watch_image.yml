@@ -8,6 +8,9 @@ on:
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
 
+permissions:
+  packages: write
+
 jobs:
   docker:
     name: Build and publish fluentd-drain-watch Docker image to the GitHub Container Registry
