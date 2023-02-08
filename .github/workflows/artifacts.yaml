@@ -9,6 +9,7 @@ on:
 
 permissions:
   packages: write
+  security-events: write
 
 jobs:
   container-images:
