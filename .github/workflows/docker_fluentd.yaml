@@ -7,9 +7,6 @@ on:
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
 
-permissions:
-  packages: write
-
 jobs:
   docker:
     name: Docker
@@ -34,8 +31,9 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
       - name: Determine tag or commit
         uses: haya14busa/action-cond@v1
         id: refortag
@@ -57,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: fluentd-image/${{ steps.pathfromtag.outputs.value }}/
-          tags: ghcr.io/kube-logging/fluentd:${{ steps.imagetag.outputs.value }}
+          tags: ghcr.io/banzaicloud/fluentd:${{ steps.imagetag.outputs.value }}
           file: fluentd-image/${{ steps.pathfromtag.outputs.value }}/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true

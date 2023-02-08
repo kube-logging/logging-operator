@@ -8,9 +8,6 @@ on:
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
 
-permissions:
-  packages: write
-
 jobs:
   docker:
     name: Build and publish node-exporter Docker image to the GitHub Container Registry
@@ -33,8 +30,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
       - name: Determine image tag
         id: imagetag
         run: echo "::set-output name=value::$(echo ${GITHUB_REF##*/} | sed 's/node-exporter-//g')"
@@ -44,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: node-exporter-image/
-          tags: ghcr.io/kube-logging/node-exporter:${{ steps.imagetag.outputs.value }}
+          tags: ghcr.io/banzaicloud/node-exporter:${{ steps.imagetag.outputs.value }}
           file: node-exporter-image/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
