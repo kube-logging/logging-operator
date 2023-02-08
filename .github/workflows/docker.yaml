@@ -10,6 +10,9 @@ on:
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
 
+permissions:
+  packages: write
+
 jobs:
   docker:
     name: Docker
@@ -34,14 +37,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: Determine tag or commit
         uses: haya14busa/action-cond@v1
@@ -64,5 +61,4 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
-            ghcr.io/banzaicloud/logging-operator:${{ steps.imagetag.outputs.value }}
-            banzaicloud/logging-operator:${{ steps.imagetag.outputs.value }}
+            ghcr.io/kube-logging/logging-operator:${{ steps.imagetag.outputs.value }}

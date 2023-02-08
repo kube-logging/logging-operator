@@ -1,48 +1,51 @@
-name: Build and publish fluentd-drain-watch Docker image
+name: Build and publish syslog-ng config reload image
 
 on:
   push:
     tags:
-      - fluentd-drain-watch-v[0-9]+.[0-9]+.[0-9]+*
+      - syslogng-reload-v[0-9]+.[0-9]+.[0-9]+*
 
 env:
   PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
 
+permissions:
+  packages: write
+
 jobs:
   docker:
-    name: Build and publish fluentd-drain-watch Docker image to the GitHub Container Registry
+    name: Build and publish syslog-ng config reload Docker image to the GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v1
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.ref }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
       - name: Determine image tag
         id: imagetag
-        run: echo "value=$(echo ${GITHUB_REF##*/} | sed 's/fluentd-drain-watch-//g')" >> $GITHUB_OUTPUT
+        run: echo "::set-output name=value::$(echo ${GITHUB_REF##*/} | sed 's/syslogng-reload-//g')"
         env:
           GITHUB_REF: ${{ github.ref }}
       - name: Build and push image
         uses: docker/build-push-action@v4
         with:
-          context: drain-watch-image/
-          tags: ghcr.io/banzaicloud/fluentd-drain-watch:${{ steps.imagetag.outputs.value }}
-          file: drain-watch-image/Dockerfile
+          context: syslogng-reload-image/
+          tags: ghcr.io/kube-logging/syslogng-reload:${{ steps.imagetag.outputs.value }}
+          file: syslogng-reload-image/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
