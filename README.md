@@ -9,10 +9,6 @@
     <img src="https://img.shields.io/docker/pulls/banzaicloud/logging-operator.svg?style=shield" alt="Docker Pulls">
   </a>
 
-  <a href="https://circleci.com/gh/banzaicloud/logging-operator">
-    <img src="https://circleci.com/gh/banzaicloud/logging-operator.svg?style=shield" alt="CircleCI">
-  </a>
-
   <a href="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator">
     <img src="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator" alt="Go Report Card">
   </a>
