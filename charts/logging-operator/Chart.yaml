@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "4.0.0-rc19"
-description: A Helm chart to install Banzai Cloud logging-operator
-name: logging-operator
-version: 4.0.0-rc19
