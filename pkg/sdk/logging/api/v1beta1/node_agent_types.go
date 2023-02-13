@@ -15,9 +15,9 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 )
 
 // +name:"NodeAgent"
@@ -56,7 +56,7 @@ type NodeAgentFluentbit struct {
 	Metrics        *Metrics              `json:"metrics,omitempty"`
 	MetricsService *typeoverride.Service `json:"metricsService,omitempty"`
 	Security       *Security             `json:"security,omitempty"`
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	PositionDB              volume.KubernetesVolume `json:"positiondb,omitempty"`
 	ContainersPath          string                  `json:"containersPath,omitempty"`
 	VarLogsPath             string                  `json:"varLogsPath,omitempty"`
@@ -66,7 +66,7 @@ type NodeAgentFluentbit struct {
 	FilterKubernetes        FilterKubernetes        `json:"filterKubernetes,omitempty"`
 	DisableKubernetesFilter *bool                   `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage           `json:"bufferStorage,omitempty"`
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume  volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	CustomConfigSecret   string                  `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName string                  `json:"podPriorityClassName,omitempty"`

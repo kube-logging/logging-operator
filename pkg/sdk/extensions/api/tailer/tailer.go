@@ -14,7 +14,7 @@
 
 package tailer
 
-import "github.com/banzaicloud/operator-tools/pkg/types"
+import "github.com/cisco-open/operator-tools/pkg/types"
 
 // Tailer .
 type Tailer interface {

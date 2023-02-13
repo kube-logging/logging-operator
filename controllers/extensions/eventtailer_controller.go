@@ -26,7 +26,7 @@ import (
 
 	"github.com/banzaicloud/logging-operator/pkg/resources/eventtailer"
 	loggingextensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 )
 
 // EventTailerReconciler reconciles a EventTailer object

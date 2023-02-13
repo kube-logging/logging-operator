@@ -20,7 +20,7 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 

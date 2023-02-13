@@ -21,9 +21,9 @@ import (
 	"time"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/resourcebuilder"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	logrtesting "github.com/go-logr/logr/testing"
 	"github.com/stretchr/testify/require"

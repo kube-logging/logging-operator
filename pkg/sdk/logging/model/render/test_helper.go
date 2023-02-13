@@ -22,7 +22,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 
 func toDirective(t *testing.T, converter plugins.DirectiveConverter) types.Directive {

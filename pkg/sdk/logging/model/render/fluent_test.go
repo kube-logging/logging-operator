@@ -27,8 +27,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 )
 
 func TestRenderDirective(t *testing.T) {

@@ -15,7 +15,7 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 )
 
 // +name:"SyslogNGSpec"
