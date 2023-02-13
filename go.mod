@@ -6,10 +6,10 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
-	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
+	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
+	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.1
 	github.com/pborman/uuid v1.2.1
@@ -109,4 +109,4 @@ require (
 
 replace github.com/kube-logging/logging-operator/pkg/sdk => ./pkg/sdk
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config => ./pkg/sdk/logging/model/syslogng/config
+replace github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config => ./pkg/sdk/logging/model/syslogng/config

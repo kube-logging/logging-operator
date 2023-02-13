@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
 	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
+	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
 	github.com/stretchr/testify v1.8.0
 	k8s.io/api v0.25.4
 	k8s.io/apiextensions-apiserver v0.25.4
@@ -84,6 +84,6 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk => ../pkg/sdk
+replace github.com/kube-logging/logging-operator/pkg/sdk => ../pkg/sdk
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config => ../pkg/sdk/logging/model/syslogng/config
+replace github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config => ../pkg/sdk/logging/model/syslogng/config
