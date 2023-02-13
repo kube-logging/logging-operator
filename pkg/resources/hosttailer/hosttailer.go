@@ -25,7 +25,7 @@ import (
 	v1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
 
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"

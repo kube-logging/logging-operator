@@ -17,7 +17,7 @@ package output
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"

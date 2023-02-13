@@ -14,7 +14,7 @@
 
 package output
 
-import "github.com/banzaicloud/operator-tools/pkg/secret"
+import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"TLS config for syslog-ng outputs"
 // +weight:"200"

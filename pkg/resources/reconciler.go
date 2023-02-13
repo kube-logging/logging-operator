@@ -15,7 +15,7 @@
 package resources
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"

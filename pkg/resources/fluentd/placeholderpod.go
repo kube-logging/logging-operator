@@ -17,7 +17,7 @@ package fluentd
 import (
 	"strings"
 
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 )
 

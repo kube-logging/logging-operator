@@ -24,7 +24,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	filter "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

@@ -3,12 +3,12 @@ module github.com/banzaicloud/logging-operator
 go 1.18
 
 require (
-	emperror.dev/errors v0.8.0
+	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
 	github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
-	github.com/banzaicloud/operator-tools v0.28.10
+	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.1
@@ -36,10 +36,10 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/banzaicloud/k8s-objectmatcher v1.8.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/briandowns/spinner v1.12.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cisco-open/k8s-objectmatcher v1.9.0 // indirect
 	github.com/cppforlife/go-patch v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect

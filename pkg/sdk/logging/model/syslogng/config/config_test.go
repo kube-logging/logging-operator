@@ -21,7 +21,7 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

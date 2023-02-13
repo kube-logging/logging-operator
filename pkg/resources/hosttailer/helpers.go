@@ -18,8 +18,8 @@ import (
 	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
 	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
 	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

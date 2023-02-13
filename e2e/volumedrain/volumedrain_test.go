@@ -23,7 +23,7 @@ import (
 
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"

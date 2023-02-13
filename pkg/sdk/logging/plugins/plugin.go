@@ -20,7 +20,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 
 type DirectiveConverter interface {

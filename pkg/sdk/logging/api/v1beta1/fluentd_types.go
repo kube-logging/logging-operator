@@ -16,8 +16,8 @@ package v1beta1
 
 import (
 	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -43,7 +43,7 @@ type FluentdSpec struct {
 	Image                  ImageSpec         `json:"image,omitempty"`
 	DisablePvc             bool              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
 	// Deprecated, use bufferStorageVolume
