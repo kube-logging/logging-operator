@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/common"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/common"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 

@@ -15,7 +15,7 @@
 package v1beta1_test
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/types"

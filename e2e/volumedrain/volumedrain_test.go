@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,9 +37,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/banzaicloud/logging-operator/e2e/common"
-	"github.com/banzaicloud/logging-operator/e2e/common/cond"
-	"github.com/banzaicloud/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
 func TestVolumeDrain_Downscale(t *testing.T) {

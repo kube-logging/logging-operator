@@ -24,8 +24,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	ht "github.com/banzaicloud/logging-operator/pkg/resources/hosttailer"
-	loggingextensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	ht "github.com/kube-logging/logging-operator/pkg/resources/hosttailer"
+	loggingextensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 )
 

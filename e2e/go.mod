@@ -1,10 +1,10 @@
-module github.com/banzaicloud/logging-operator/e2e
+module github.com/kube-logging/logging-operator/e2e
 
 go 1.18
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
+	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
 	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
 	github.com/stretchr/testify v1.8.0

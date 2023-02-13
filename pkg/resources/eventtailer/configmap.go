@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

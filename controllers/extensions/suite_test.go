@@ -19,7 +19,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	loggingextensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	loggingextensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"

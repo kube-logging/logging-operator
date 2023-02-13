@@ -27,7 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
 )
 
 func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {

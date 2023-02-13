@@ -17,7 +17,7 @@ package eventtailer
 import (
 	"fmt"
 
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

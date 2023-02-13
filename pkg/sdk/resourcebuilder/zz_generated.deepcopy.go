@@ -20,7 +20,7 @@
 package resourcebuilder
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/cisco-open/operator-tools/pkg/types"
 )
 

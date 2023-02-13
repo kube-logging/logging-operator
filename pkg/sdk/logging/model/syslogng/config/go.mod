@@ -1,10 +1,10 @@
-module github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config
+module github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config
 
 go 1.18
 
 require (
-	github.com/banzaicloud/logging-operator/pkg/sdk v0.7.26
 	github.com/cisco-open/operator-tools v0.29.0
+	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
 	github.com/siliconbrain/go-seqs v0.3.1
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
@@ -77,4 +77,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/banzaicloud/logging-operator/pkg/sdk => ../../../../../../pkg/sdk
+replace github.com/kube-logging/logging-operator/pkg/sdk => ../../../../../../pkg/sdk

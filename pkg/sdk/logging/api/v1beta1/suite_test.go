@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/go-logr/zapr"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

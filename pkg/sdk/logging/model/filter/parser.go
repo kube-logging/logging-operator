@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 

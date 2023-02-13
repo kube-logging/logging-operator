@@ -22,7 +22,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/pborman/uuid"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

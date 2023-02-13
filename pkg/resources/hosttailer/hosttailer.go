@@ -19,11 +19,11 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/tailer"
-	v1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
+	v1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"

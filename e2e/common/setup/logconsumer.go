@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
 )
 
 func LogConsumer(t *testing.T, c client.Client, opts ...LogConsumerOption) LogConsumerResult {

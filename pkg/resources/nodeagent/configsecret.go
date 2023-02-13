@@ -21,8 +21,8 @@ import (
 	"text/template"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"

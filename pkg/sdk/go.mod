@@ -1,4 +1,4 @@
-module github.com/banzaicloud/logging-operator/pkg/sdk
+module github.com/kube-logging/logging-operator/pkg/sdk
 
 go 1.18
 

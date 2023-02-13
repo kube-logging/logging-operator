@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	corev1 "k8s.io/api/core/v1"
 )

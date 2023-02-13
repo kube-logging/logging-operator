@@ -20,8 +20,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -20,9 +20,9 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"

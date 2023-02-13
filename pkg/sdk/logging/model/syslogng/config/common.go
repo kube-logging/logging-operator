@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/slices"

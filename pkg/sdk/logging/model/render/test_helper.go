@@ -19,9 +19,9 @@ import (
 	"testing"
 
 	"github.com/andreyvit/diff"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 

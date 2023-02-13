@@ -15,7 +15,7 @@
 package eventtailer
 
 import (
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"

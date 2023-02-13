@@ -26,7 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/banzaicloud/logging-operator/pkg/mirror"
+	"github.com/kube-logging/logging-operator/pkg/mirror"
 )
 
 func NewValidationReconciler(

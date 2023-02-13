@@ -15,7 +15,7 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
