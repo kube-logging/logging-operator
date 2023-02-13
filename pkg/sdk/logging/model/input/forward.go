@@ -15,9 +15,9 @@
 package input
 
 import (
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/common"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 
 // +kubebuilder:object:generate=true

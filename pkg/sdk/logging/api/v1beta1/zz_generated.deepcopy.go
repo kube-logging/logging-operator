@@ -20,13 +20,13 @@
 package v1beta1
 
 import (
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	syslogngfilter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
-	"github.com/cisco-open/operator-tools/pkg/typeoverride"
-	"github.com/cisco-open/operator-tools/pkg/volume"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

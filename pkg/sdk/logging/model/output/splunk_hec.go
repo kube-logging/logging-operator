@@ -17,8 +17,8 @@ package output
 import (
 	"errors"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Splunk"
