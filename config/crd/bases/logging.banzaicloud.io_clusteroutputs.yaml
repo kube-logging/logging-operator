@@ -5904,6 +5904,56 @@ spec:
                 required:
                 - host
                 type: object
+              mattermost:
+                properties:
+                  webhook_url:
+                    type: string
+                  channel_id:
+                    type: string
+                  message_color:
+                    type: string
+                  message_title:
+                    type: string
+                  message:
+                    type: string
+                  enable_tls:
+                    type: boolean
+                  ca_path:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                              - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                              - key
+                            type: object
+                        type: object
+                    type: object
+                required:
+                  - webhook_url
+                type: object
             type: object
           status:
             properties:
