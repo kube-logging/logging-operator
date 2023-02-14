@@ -52,7 +52,7 @@ type _metaMattermost interface{} //nolint:deadcode,unused
 // +docName:"Output Config"
 type MattermostOutputConfig struct {
 	// webhook_url Incoming Webhook URI (Required for Incoming Webhook mode).
-	WebhookURL string `json:"webhook_url"`
+	WebhookURL *secret.Secret `json:"webhook_url"`
 	// channel_id the id of the channel where you want to receive the information.
 	ChannelID string `json:"channel_id,omitempty"`
 	// message_color color of the message you are sending, the format is hex code. (default: #A9A9A9)

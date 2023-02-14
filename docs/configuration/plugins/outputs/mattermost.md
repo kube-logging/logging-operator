@@ -24,7 +24,7 @@ generated_file: true
 ## Configuration
 ## Output Config
 
-### webhook_url (string, required) {#output config-webhook_url}
+### webhook_url (*secret.Secret, required) {#output config-webhook_url}
 
 webhook_url Incoming Webhook URI (Required for Incoming Webhook mode). 
 
