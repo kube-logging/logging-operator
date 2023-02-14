@@ -75,6 +75,7 @@ RUN apk update \
          fluent-plugin-sqs \
          fluent-plugin-kube-events-timestamp \
          fluent-plugin-grok-parser \
+         fluent-plugin-mattermost \
  && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
  && gem specific_install -l https://github.com/acquia/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
