@@ -108,7 +108,7 @@ If you find this project useful, help us:
 
 ## License
 
-Copyright (c) 2021-2023 [Cisco Systems, Inc.](https://cisco.com)
+Copyright (c) 2021-2023 [Cisco Systems, Inc. and its affiliates](https://cisco.com)
 Copyright (c) 2017-2020 [Banzai Cloud, Inc.](https://banzaicloud.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
