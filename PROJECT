@@ -1,6 +1,6 @@
 version: "2"
 domain: banzaicloud.io
-repo: github.com/banzaicloud/logging-operator
+repo: github.com/kube-logging/logging-operator
 resources:
 - group: logging
   version: v1beta1

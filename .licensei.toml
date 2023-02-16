@@ -9,7 +9,7 @@ approved = [
 ]
 
 ignored = [
- "github.com/banzaicloud/logging-operator/pkg/sdk", # go submodule
+ "github.com/kube-logging/logging-operator/pkg/sdk", # go submodule
   "github.com/davecgh/go-spew", # ISC
   # Unsupported VCS
   "google.golang.org/protobuf",
