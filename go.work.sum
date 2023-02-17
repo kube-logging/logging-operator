@@ -696,6 +696,7 @@ k8s.io/gengo v0.0.0-20220902162205-c0856e24416d h1:U9tB195lKdzwqicbJvyJeOXV7Klv+
 k8s.io/gengo v0.0.0-20220902162205-c0856e24416d/go.mod h1:FiNAH4ZV3gBg2Kwh89tzAEV2be7d5xI0vBa/VySYy3E=
 k8s.io/klog/v2 v2.0.0/go.mod h1:PBfzABfn139FHAV07az/IF9Wp1bkk3vpT2XSJ76fSDE=
 k8s.io/klog/v2 v2.2.0/go.mod h1:Od+F08eJP+W3HUb4pSrPpgp9DGU4GzlpG/TmITuYh/Y=
+k8s.io/klog/v2 v2.90.0/go.mod h1:y1WjHnz7Dj687irZUWR/WLkLc5N1YHtjLdmgWjndZn0=
 k8s.io/kms v0.26.1 h1:JE0n4J4+8/Z+egvXz2BTJeJ9ecsm4ZSLKF7ttVXXm/4=
 k8s.io/kms v0.26.1/go.mod h1:ReC1IEGuxgfN+PDCIpR6w8+XMmDE7uJhxcCwMZFdIYc=
 k8s.io/kubectl v0.24.2 h1:+RfQVhth8akUmIc2Ge8krMl/pt66V7210ka3RE/p0J4=
