@@ -19,8 +19,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -61,7 +61,7 @@ type FluentbitSpec struct {
 	Affinity      *corev1.Affinity            `json:"affinity,omitempty"`
 	Metrics       *Metrics                    `json:"metrics,omitempty"`
 	Security      *Security                   `json:"security,omitempty"`
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	PositionDB volume.KubernetesVolume `json:"positiondb,omitempty"`
 	// Deprecated, use positiondb
 	PosisionDBLegacy  *volume.KubernetesVolume `json:"position_db,omitempty"`
@@ -77,7 +77,7 @@ type FluentbitSpec struct {
 	// Disable Kubernetes metadata filter
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume     volume.KubernetesVolume        `json:"bufferStorageVolume,omitempty"`
 	BufferVolumeMetrics     *Metrics                       `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeImage       ImageSpec                      `json:"bufferVolumeImage,omitempty"`

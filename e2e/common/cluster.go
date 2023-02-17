@@ -23,7 +23,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/kind"
+	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
 
 const defaultClusterName = "e2e-test"

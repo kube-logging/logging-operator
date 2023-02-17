@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 )
 
 // OutputPlugin plugin: https://github.com/banzaicloud/fluent-plugin-label-router

@@ -22,8 +22,8 @@ import (
 
 	"emperror.dev/errors"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/maps/mapstrstr"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 type FluentRender struct {

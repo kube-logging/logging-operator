@@ -14,7 +14,7 @@
 
 package config
 
-import "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+import "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 
 func braceDefStmt(kind string, name string, body render.Renderer) render.Renderer {
 	return render.AllOf(

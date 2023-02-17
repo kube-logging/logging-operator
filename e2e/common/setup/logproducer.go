@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -27,7 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
 )
 
 func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {

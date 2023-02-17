@@ -21,18 +21,18 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/resources/model"
-	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
-	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
-	syslogngconfig "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
+	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -43,7 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance

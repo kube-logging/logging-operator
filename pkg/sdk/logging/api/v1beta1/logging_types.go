@@ -18,8 +18,8 @@ import (
 	"errors"
 	"fmt"
 
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"

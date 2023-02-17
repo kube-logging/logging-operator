@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 
 type Converter func(interface{}) (string, error)

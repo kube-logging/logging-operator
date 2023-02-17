@@ -7,6 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
+DOCKER = docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
@@ -73,21 +74,21 @@ deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	docker build . -t ${IMG}
+	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-e2e-fluentd
 docker-build-e2e-fluentd: ## Build fluentd docker image
-	docker build ./fluentd-image/e2e-test -t ${IMG}
+	${DOCKER} build ./fluentd-image/e2e-test -t ${IMG}
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
-	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
+	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
-	docker push ${IMG}
+	${DOCKER} push ${IMG}
 
 .PHONY: docs
 docs: ## Generate docs
@@ -145,8 +146,8 @@ manager: generate fmt vet ## Build manager binary
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
-	cp config/crd/bases/* charts/logging-operator/crds/
-	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml && cat config/rbac/role.yaml |sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | cat >> ./charts/logging-operator/templates/clusterrole.yaml && echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
+	# cp config/crd/bases/* charts/logging-operator/crds/
+	# echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml && cat config/rbac/role.yaml |sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | cat >> ./charts/logging-operator/templates/clusterrole.yaml && echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
 
 .PHONY: run
 run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config

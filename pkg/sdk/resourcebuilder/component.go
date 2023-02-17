@@ -17,18 +17,18 @@ package resourcebuilder
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	"emperror.dev/errors"
-	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	extensionsconfig "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/crds"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/static/gen/rbac"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/utils"
+	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	extensionsconfig "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/crds"
+	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/rbac"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	admissionregistration "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -235,7 +235,7 @@ func CRD(group string, kind string, modifiers ...CRDModifier) (runtime.Object, r
 	if err != nil {
 		return nil, nil, errors.WrapIff(err, "failed to open %s crd", kind)
 	}
-	bytes, err := ioutil.ReadAll(crdFile)
+	bytes, err := io.ReadAll(crdFile)
 	if err != nil {
 		return nil, nil, errors.WrapIff(err, "failed to read %s crd", kind)
 	}
@@ -394,7 +394,7 @@ func ClusterRole(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 	if err != nil {
 		return nil, nil, errors.WrapIf(err, "failed to open role.yaml")
 	}
-	roleAsByte, err := ioutil.ReadAll(roleFile)
+	roleAsByte, err := io.ReadAll(roleFile)
 	if err != nil {
 		return nil, nil, err
 	}
