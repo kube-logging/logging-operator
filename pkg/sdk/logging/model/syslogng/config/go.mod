@@ -75,4 +75,6 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
+replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.11.0
+
 replace github.com/kube-logging/logging-operator/pkg/sdk => ../../../../../../pkg/sdk
