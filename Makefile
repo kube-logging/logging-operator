@@ -7,6 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
+DOCKER = docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
@@ -73,21 +74,21 @@ deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	docker build . -t ${IMG}
+	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-e2e-fluentd
 docker-build-e2e-fluentd: ## Build fluentd docker image
-	docker build ./fluentd-image/e2e-test -t ${IMG}
+	${DOCKER} build ./fluentd-image/e2e-test -t ${IMG}
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
-	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
+	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
-	docker push ${IMG}
+	${DOCKER} push ${IMG}
 
 .PHONY: docs
 docs: ## Generate docs
