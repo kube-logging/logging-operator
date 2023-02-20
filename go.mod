@@ -15,7 +15,7 @@ require (
 	github.com/pborman/uuid v1.2.1
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.62.0
 	github.com/prometheus/client_golang v1.14.0
-	github.com/spf13/cast v1.4.1
+	github.com/spf13/cast v1.5.0
 	golang.org/x/time v0.3.0
 	k8s.io/api v0.26.1
 	k8s.io/apiextensions-apiserver v0.26.1
