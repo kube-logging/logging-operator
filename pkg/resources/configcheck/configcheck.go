@@ -18,7 +18,6 @@ import (
 	"context"
 	"emperror.dev/errors"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -27,6 +26,9 @@ const hashLabel = "logging.banzaicloud.io/config-hash"
 
 func WithHashLabel(accessor v1.Object, hash string) {
 	l := accessor.GetLabels()
+	if l == nil {
+		l = map[string]string{}
+	}
 	l[hashLabel] = hash
 	accessor.SetLabels(l)
 }
@@ -43,10 +45,10 @@ type ConfigCheckCleaner struct {
 	labels client.MatchingLabels
 }
 
-func NewConfigCheckCleaner(client client.Client, component string) *ConfigCheckCleaner {
+func NewConfigCheckCleaner(c client.Client, component string) *ConfigCheckCleaner {
 	return &ConfigCheckCleaner{
-		client: client,
-		labels: map[string]string{
+		client: c,
+		labels: client.MatchingLabels{
 			"app.kubernetes.io/component": component,
 		},
 	}
@@ -56,7 +58,7 @@ func NewConfigCheckCleaner(client client.Client, component string) *ConfigCheckC
 // doesn't match the current config hash
 func (c *ConfigCheckCleaner) SecretCleanup(ctx context.Context, hash string) (multierr error) {
 	allCheckSecrets := &corev1.SecretList{}
-	if err := c.client.List(context.TODO(), allCheckSecrets, c.labels); err != nil {
+	if err := c.client.List(ctx, allCheckSecrets, c.labels); err != nil {
 		return errors.Wrap(err, "failed to list configcheck secrets")
 	}
 
@@ -64,12 +66,10 @@ func (c *ConfigCheckCleaner) SecretCleanup(ctx context.Context, hash string) (mu
 		if _, match := hasHashLabel(&secret, hash); match {
 			continue
 		}
-		if err := c.client.Delete(ctx, &secret); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check secret %s", secret.Name))
-				continue
-			}
+		if err := client.IgnoreNotFound(c.client.Delete(ctx, &secret)); err != nil {
+			multierr = errors.Combine(multierr,
+				errors.Wrapf(err, "failed to remove config check secret %s", secret.Name))
+			continue
 		}
 	}
 
@@ -80,7 +80,7 @@ func (c *ConfigCheckCleaner) SecretCleanup(ctx context.Context, hash string) (mu
 // doesn't match the current config hash
 func (c *ConfigCheckCleaner) PodCleanup(ctx context.Context, hash string) (multierr error) {
 	allCheckPods := &corev1.PodList{}
-	if err := c.client.List(context.TODO(), allCheckPods, c.labels); err != nil {
+	if err := c.client.List(ctx, allCheckPods, c.labels); err != nil {
 		return errors.Wrap(err, "failed to list configcheck pods")
 	}
 
@@ -88,12 +88,10 @@ func (c *ConfigCheckCleaner) PodCleanup(ctx context.Context, hash string) (multi
 		if _, match := hasHashLabel(&pod, hash); match {
 			continue
 		}
-		if err := c.client.Delete(ctx, &pod); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check pod %s", pod.Name))
-				continue
-			}
+		if err := client.IgnoreNotFound(c.client.Delete(ctx, &pod)); err != nil {
+			multierr = errors.Combine(multierr,
+				errors.Wrapf(err, "failed to remove config check pod %s", pod.Name))
+			continue
 		}
 	}
 

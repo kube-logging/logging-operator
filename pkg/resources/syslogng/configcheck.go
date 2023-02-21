@@ -140,7 +140,7 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 	return &corev1.Secret{
-		ObjectMeta: r.SyslogNGObjectMeta(resourceName(hashKey), ComponentConfigCheck),
+		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Data: map[string][]byte{
 			configKey: []byte(r.config),
 		},
@@ -161,7 +161,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 
 func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 	pod := &corev1.Pod{
-		ObjectMeta: r.SyslogNGObjectMeta(resourceName(hashKey), ComponentConfigCheck),
+		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccountName(),
@@ -170,7 +170,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Name: "config",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: r.Logging.QualifiedName(resourceName(hashKey)),
+							SecretName: r.Logging.QualifiedName(configCheckResourceName(hashKey)),
 						},
 					},
 				},
@@ -239,6 +239,6 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 	return pod, err
 }
 
-func resourceName(hash string) string {
+func configCheckResourceName(hash string) string {
 	return fmt.Sprintf("syslog-ng-configcheck-%s", hash)
 }
