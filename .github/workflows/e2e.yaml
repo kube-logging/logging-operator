@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: '1.19.3'
+  GO_VERSION: '1.20'
   KIND_VERSION: 'v0.17.0'
   KIND_NODE_VERSION: 'v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61'
   KUBECTL_VERSION: 'v1.24.1'
