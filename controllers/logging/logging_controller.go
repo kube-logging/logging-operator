@@ -145,6 +145,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
+	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
+		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
+	}
+
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
