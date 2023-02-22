@@ -23,7 +23,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 )
 
-// OutputPlugin plugin: https://github.com/banzaicloud/fluent-plugin-label-router
+// OutputPlugin plugin: https://github.com/kube-logging/fluent-plugin-label-router
 type Router struct {
 	PluginMeta
 	Routes []Directive `json:"routes"`

@@ -121,22 +121,22 @@ type DefaultFlowSpec struct {
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.5"
-	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/node-exporter"
+	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
-	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
+	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
-	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/banzaicloud/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.0.5"
+	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/kube-logging/fluentd-drain-watch"
+	DefaultFluentdDrainWatchImageTag            = "v0.2.0"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag            = "3.2"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "0.0.1"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
-	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/custom-runner"
+	DefaultFluentdBufferVolumeImageTag          = "0.4.0"
 )
 
 // SetDefaults fills empty attributes
