@@ -167,9 +167,9 @@ func getResourceStateMetrics(logger logr.Logger) *prometheus.GaugeVec {
 	gv := prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "logging_resource_state"}, []string{"name", "namespace", "status", "kind"})
 	err := metrics.Registry.Register(gv)
 	if err != nil {
-		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok = err.ExistingCollector.(*prometheus.GaugeVec); !ok {
-				logger.Error(err, "already registered metric name with different type ", "metric", gv)
+		if suberr, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			if gv, ok = suberr.ExistingCollector.(*prometheus.GaugeVec); !ok {
+				logger.Error(suberr, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
 			logger.Error(err, "couldn't register metrics vector for resource", "metric", gv)
@@ -240,7 +240,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		case *loggingv1beta1.ClusterFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
-			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
 			for key := range o.Annotations {
 				if result := r.FindStringSubmatch(key); len(result) > 1 {

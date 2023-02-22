@@ -8,10 +8,10 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: '1.17'
-  K8S_VERSION: 'v1.17.17'
-  KIND_VERSION: 'v0.11.1'
-  KUBECTL_VERSION: 'v1.21.2'
+  GO_VERSION: '1.20'
+  KIND_VERSION: 'v0.17.0'
+  KIND_NODE_VERSION: 'v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61'
+  KUBECTL_VERSION: 'v1.24.1'
 
 jobs:
   build:

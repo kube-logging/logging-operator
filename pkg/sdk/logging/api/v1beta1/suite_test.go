@@ -26,7 +26,6 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"k8s.io/client-go/kubernetes/scheme"
@@ -45,11 +44,7 @@ var testEnv *envtest.Environment
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecsWithDefaultAndCustomReporters(t,
-		"v1beta1 Suite",
-		[]Reporter{
-			printer.NewlineReporter{},
-		})
+	RunSpecs(t, "v1beta1 Suite")
 }
 
 var _ = BeforeSuite(func(done Done) {
