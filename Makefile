@@ -7,7 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
-DOCKER = docker
+DOCKER ?= docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
