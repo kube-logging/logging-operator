@@ -6,7 +6,7 @@ generated_file: true
 
 # [LogDNA Output](https://github.com/logdna/fluent-plugin-logdna)
 ## Overview
- This plugin has been designed to output logs to LogDNA. Example Deployment: [Transport Nginx Access Logs into LogDNA with Logging Operator](https://raw.githubusercontent.com/kube-logging/logging-operator/master/docs/examples/logging_output_logdna.yaml)
+ This plugin has been designed to output logs to LogDNA.
 
 ## Configuration
 ## LogDNA
