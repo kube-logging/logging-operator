@@ -25,6 +25,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -132,26 +133,25 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return nil, err
 		}
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
-			// We already have an existing configcheck result:
-			// - bail out if it was unsuccessful
-			// - cleanup previous results if it's successful
-			if !result {
-				return nil, errors.Errorf("current config is invalid")
-			}
-			var removedHashes []string
-			if removedHashes, err = r.configCheckCleanup(hash); err != nil {
-				r.Log.Error(err, "failed to cleanup resources")
-			} else {
-				if len(removedHashes) > 0 {
-					for _, removedHash := range removedHashes {
-						delete(r.Logging.Status.ConfigCheckResults, removedHash)
-					}
-					if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
-						return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
-					} else {
-						// explicitly ask for a requeue to short circuit the controller loop after the status update
-						return &reconcile.Result{Requeue: true}, nil
-					}
+			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck)
+
+			var cleanupErrs error
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.SecretCleanup(ctx, hash))
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.PodCleanup(ctx, hash))
+
+			if cleanupErrs != nil {
+				// Errors with the cleanup should not block the reconciliation, we just note it
+				r.Log.Error(err, "issues during configcheck cleanup, moving on")
+			} else if len(r.Logging.Status.ConfigCheckResults) > 1 {
+				//
+				r.Logging.Status.ConfigCheckResults = map[string]bool{
+					hash: result,
+				}
+				if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
+				} else {
+					// explicitly ask for a requeue to short circuit the controller loop after the status update
+					return &reconcile.Result{Requeue: true}, nil
 				}
 			}
 		} else {

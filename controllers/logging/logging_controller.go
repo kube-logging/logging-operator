@@ -145,6 +145,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
+	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
+		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
+	}
+
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
@@ -221,11 +225,11 @@ func getResourceStateMetrics(logger logr.Logger) (stateMetrics *prometheus.Gauge
 
 func getOrRegisterGaugeVec(reg prometheus.Registerer, gv *prometheus.GaugeVec) (*prometheus.GaugeVec, error) {
 	if err := reg.Register(gv); err != nil {
-		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok := err.ExistingCollector.(*prometheus.GaugeVec); ok {
+		if suberr, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			if gv, ok := suberr.ExistingCollector.(*prometheus.GaugeVec); ok {
 				return gv, nil
 			} else {
-				return nil, errors.WrapIfWithDetails(err, "already registered metric name with different type ", "metric", gv)
+				return nil, errors.WrapIfWithDetails(suberr, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
 			return nil, err
@@ -338,7 +342,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
-			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
 			for key := range o.Annotations {
 				if result := r.FindStringSubmatch(key); len(result) > 1 {
