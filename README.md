@@ -1,19 +1,11 @@
 <p align="center"><img src="docs/img/lo.svg" width="260"></p>
 <p align="center">
 
-  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
-    <img src="https://img.shields.io/docker/automated/banzaicloud/logging-operator.svg" alt="Docker Automated build">
-  </a>
-
-  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
-    <img src="https://img.shields.io/docker/pulls/banzaicloud/logging-operator.svg?style=shield" alt="Docker Pulls">
-  </a>
-
   <a href="https://goreportcard.com/badge/github.com/kube-logging/logging-operator">
     <img src="https://goreportcard.com/badge/github.com/kube-logging/logging-operator" alt="Go Report Card">
   </a>
 
-  <a href="https://github.com/banzaicloud/logging-operator/">
+  <a href="https://github.com/kube-logging/logging-operator/">
     <img src="https://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
   </a>
 
@@ -100,7 +92,7 @@ If you encounter problems while using the Logging operator the documentation doe
 If you find this project useful, help us:
 
 - Support the development of this project and star this repo! :star:
-- If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
+- If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/kube-logging/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
 - Help new users with issues they may encounter :muscle:
 - Send a pull request with your new features and bug fixes :rocket: 
 
