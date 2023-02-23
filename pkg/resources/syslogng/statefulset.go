@@ -76,8 +76,10 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 	// HACK: try to _guess_ if user has configured a persistent volume for buffers and move syslog-ng's persist file there
 	buffersVolumeName := "buffers"
-	if name := r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
-		buffersVolumeName = name
+	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
+		if name := r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
+			buffersVolumeName = name
+		}
 	}
 	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, containerName)
 	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
