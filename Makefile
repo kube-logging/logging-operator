@@ -41,7 +41,7 @@ KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.7.0
+LICENSEI_VERSION = v0.8.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
