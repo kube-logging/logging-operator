@@ -17,8 +17,8 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/tailer"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
 func (s SystemdTailer) defaults() SystemdTailer {

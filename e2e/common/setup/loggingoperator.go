@@ -20,17 +20,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/resourcebuilder"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/sdk/resourcebuilder"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	logrtesting "github.com/go-logr/logr/testing"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/banzaicloud/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {

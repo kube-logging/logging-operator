@@ -20,7 +20,7 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 

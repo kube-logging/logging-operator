@@ -19,11 +19,12 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -52,11 +53,11 @@ const (
 	defaultBufferVolumeMetricsPort    = 9200
 	syslogngImageRepository           = "balabit/syslog-ng"
 	syslogngImageTag                  = "4.0.1"
-	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
-	prometheusExporterImageTag        = "0.0.13"
-	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
-	bufferVolumeImageTag              = "0.1.3"
-	configReloaderImageRepository     = "ghcr.io/banzaicloud/syslogng-reload"
+	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
+	prometheusExporterImageTag        = "v0.0.14"
+	bufferVolumeImageRepository       = "ghcr.io/kube-logging/custom-runner"
+	bufferVolumeImageTag              = "v0.4.0"
+	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
 	configReloaderImageTag            = "v1.0.1"
 	socketVolumeName                  = "socket"
 	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
@@ -132,27 +133,33 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Fail when the current config is invalid
+		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
+			return nil, errors.Errorf("current config is invalid")
+		}
+
+		// Cleanup previous configcheck results
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
-			// We already have an existing configcheck result:
-			// - bail out if it was unsuccessful
-			// - cleanup previous results if it's successful
-			if !result {
-				return nil, errors.Errorf("current config is invalid")
-			}
-			var removedHashes []string
-			if removedHashes, err = r.configCheckCleanup(hash); err != nil {
-				r.Log.Error(err, "failed to cleanup resources")
-			} else {
-				if len(removedHashes) > 0 {
-					for _, removedHash := range removedHashes {
-						delete(r.Logging.Status.ConfigCheckResults, removedHash)
-					}
-					if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
-						return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
-					} else {
-						// explicitly ask for a requeue to short circuit the controller loop after the status update
-						return &reconcile.Result{Requeue: true}, nil
-					}
+			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck)
+
+			var cleanupErrs error
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.SecretCleanup(ctx, hash))
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.PodCleanup(ctx, hash))
+
+			if cleanupErrs != nil {
+				// Errors with the cleanup should not block the reconciliation, we just note it
+				r.Log.Error(err, "issues during configcheck cleanup, moving on")
+			} else if len(r.Logging.Status.ConfigCheckResults) > 1 {
+				//
+				r.Logging.Status.ConfigCheckResults = map[string]bool{
+					hash: result,
+				}
+				if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
+				} else {
+					// explicitly ask for a requeue to short circuit the controller loop after the status update
+					return &reconcile.Result{Requeue: true}, nil
 				}
 			}
 		} else {

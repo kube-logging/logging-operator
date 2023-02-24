@@ -7,7 +7,7 @@
     "list": [
     ]
   },
-  "description": "This is a simple dashboard for: https://github.com/banzaicloud/logging-operator utilising Fluent-bit and Fluentd",
+  "description": "This is a simple dashboard for: https://github.com/kube-logging/logging-operator utilising Fluent-bit and Fluentd",
   "editable": true,
   "gnetId": 7752,
   "graphTooltip": 0,

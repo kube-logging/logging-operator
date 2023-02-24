@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"os/exec"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/kind"
+	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
 
 const KindClusterCreationTimeout = "3m"

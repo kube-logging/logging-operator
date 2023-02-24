@@ -13,6 +13,7 @@ function main()
     remove_test_bucket "${mc_pod}"
     create_test_bucket "${mc_pod}"
     kubectl apply -f "${SCRIPT_PATH}/secret.yaml"
+    helm_add_repo
     helm_deploy_logging_operator
     configure_logging
 
@@ -42,19 +43,28 @@ function create_test_bucket()
         mc mb --region 'test_region' "${BUCKET}"
 }
 
+function helm_add_repo()
+{
+    helm repo add kube-logging https://kube-logging.github.io/helm-charts
+    helm repo update kube-logging
+}
+
 function helm_deploy_logging_operator()
 {
+    # TODO: remove version once there is a semver stable version in the repo
     helm install \
         --debug \
         --wait \
-        logging-operator \
         --set image.tag='local' \
         --set image.repository='controller' \
-        "${SCRIPT_PATH}/../charts/logging-operator"
+        --version 4.0.0-rc19-3 \
+        logging-operator \
+        "kube-logging/logging-operator"
 }
 
 function configure_logging()
 {
+    # TODO: remove version once there is a semver stable version in the repo
     helm install \
         --debug \
         --wait \
@@ -62,8 +72,9 @@ function configure_logging()
         --namespace logging \
         --set fluentd.image.tag='local' \
         --set fluentd.image.repository='fluentd' \
+        --version 4.0.0-rc18-1 \
         'logging-operator-logging-tls' \
-        "${SCRIPT_PATH}/../charts/logging-operator-logging"
+        "kube-logging/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
     kubectl apply -f "${SCRIPT_PATH}/clusterflow.yaml"
 }

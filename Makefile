@@ -7,6 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
+DOCKER ?= docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
@@ -15,14 +16,10 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
-DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
+DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 VERSION := $(shell git describe --abbrev=0 --tags)
-
-# Where do we use these???
-DOCKER_IMAGE = banzaicloud/logging-operator
-DOCKER_TAG ?= ${VERSION}
 
 E2E_TEST_TIMEOUT ?= 20m
 
@@ -35,7 +32,7 @@ ENVTEST_K8S_VERSION := 1.24.1
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
-GOLANGCI_LINT_VERSION := v1.47.2
+GOLANGCI_LINT_VERSION := v1.51.2
 
 KIND := ${BIN}/kind
 KIND_VERSION := v0.11.1
@@ -44,7 +41,7 @@ KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.5.0
+LICENSEI_VERSION = v0.7.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
@@ -73,21 +70,21 @@ deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	docker build . -t ${IMG}
+	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-e2e-fluentd
 docker-build-e2e-fluentd: ## Build fluentd docker image
-	docker build ./fluentd-image/e2e-test -t ${IMG}
+	${DOCKER} build ./fluentd-image/e2e-test -t ${IMG}
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
-	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
+	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
-	docker push ${IMG}
+	${DOCKER} push ${IMG}
 
 .PHONY: docs
 docs: ## Generate docs
@@ -145,8 +142,8 @@ manager: generate fmt vet ## Build manager binary
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
-	cp config/crd/bases/* charts/logging-operator/crds/
-	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml && cat config/rbac/role.yaml |sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | cat >> ./charts/logging-operator/templates/clusterrole.yaml && echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
+	# cp config/crd/bases/* charts/logging-operator/crds/
+	# echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml && cat config/rbac/role.yaml |sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | cat >> ./charts/logging-operator/templates/clusterrole.yaml && echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
 
 .PHONY: run
 run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config

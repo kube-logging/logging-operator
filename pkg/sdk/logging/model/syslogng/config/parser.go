@@ -15,7 +15,7 @@
 package config
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
 type JSONParser struct {

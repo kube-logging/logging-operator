@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Tag Normaliser"
@@ -24,7 +24,7 @@ import (
 type _hugoTagNormaliser interface{} //nolint:deadcode,unused
 
 // +docName:"Fluentd Plugin to re-tag based on log metadata"
-// More info at https://github.com/banzaicloud/fluent-plugin-tag-normaliser
+// More info at https://github.com/kube-logging/fluent-plugin-tag-normaliser
 //
 // # Available kubernetes metadata
 //
@@ -40,7 +40,7 @@ type _hugoTagNormaliser interface{} //nolint:deadcode,unused
 type _docTagNormaliser interface{} //nolint:deadcode,unused
 
 // +name:"Tag Normaliser"
-// +url:"https://github.com/banzaicloud/fluent-plugin-tag-normaliser"
+// +url:"https://github.com/kube-logging/fluent-plugin-tag-normaliser"
 // +version:"0.1.1"
 // +description:"Re-tag based on log metadata"
 // +status:"GA"
@@ -48,7 +48,7 @@ type _metaTagNormaliser interface{} //nolint:deadcode,unused
 
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {
-	// Re-Tag log messages info at [github](https://github.com/banzaicloud/fluent-plugin-tag-normaliser)
+	// Re-Tag log messages info at [github](https://github.com/kube-logging/fluent-plugin-tag-normaliser)
 	Format string `json:"format,omitempty" plugin:"default:${namespace_name}.${pod_name}.${container_name}"`
 	// Tag used in match directive. (default: kubernetes.**)
 	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`

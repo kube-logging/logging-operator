@@ -21,18 +21,18 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/resources/model"
-	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
-	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
-	syslogngconfig "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
+	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -43,7 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
@@ -145,6 +145,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
+	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
+		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
+	}
+
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
@@ -221,11 +225,11 @@ func getResourceStateMetrics(logger logr.Logger) (stateMetrics *prometheus.Gauge
 
 func getOrRegisterGaugeVec(reg prometheus.Registerer, gv *prometheus.GaugeVec) (*prometheus.GaugeVec, error) {
 	if err := reg.Register(gv); err != nil {
-		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok := err.ExistingCollector.(*prometheus.GaugeVec); ok {
+		if suberr, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			if gv, ok := suberr.ExistingCollector.(*prometheus.GaugeVec); ok {
 				return gv, nil
 			} else {
-				return nil, errors.WrapIfWithDetails(err, "already registered metric name with different type ", "metric", gv)
+				return nil, errors.WrapIfWithDetails(suberr, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
 			return nil, err
@@ -338,7 +342,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
-			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
 			for key := range o.Annotations {
 				if result := r.FindStringSubmatch(key); len(result) > 1 {

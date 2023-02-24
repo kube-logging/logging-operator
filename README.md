@@ -1,23 +1,11 @@
 <p align="center"><img src="docs/img/lo.svg" width="260"></p>
 <p align="center">
 
-  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
-    <img src="https://img.shields.io/docker/automated/banzaicloud/logging-operator.svg" alt="Docker Automated build">
+  <a href="https://goreportcard.com/badge/github.com/kube-logging/logging-operator">
+    <img src="https://goreportcard.com/badge/github.com/kube-logging/logging-operator" alt="Go Report Card">
   </a>
 
-  <a href="https://hub.docker.com/r/banzaicloud/logging-operator/">
-    <img src="https://img.shields.io/docker/pulls/banzaicloud/logging-operator.svg?style=shield" alt="Docker Pulls">
-  </a>
-
-  <a href="https://circleci.com/gh/banzaicloud/logging-operator">
-    <img src="https://circleci.com/gh/banzaicloud/logging-operator.svg?style=shield" alt="CircleCI">
-  </a>
-
-  <a href="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator">
-    <img src="https://goreportcard.com/badge/github.com/banzaicloud/logging-operator" alt="Go Report Card">
-  </a>
-
-  <a href="https://github.com/banzaicloud/logging-operator/">
+  <a href="https://github.com/kube-logging/logging-operator/">
     <img src="https://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
   </a>
 
@@ -104,7 +92,7 @@ If you encounter problems while using the Logging operator the documentation doe
 If you find this project useful, help us:
 
 - Support the development of this project and star this repo! :star:
-- If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/banzaicloud/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
+- If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/kube-logging/logging-operator/blob/master/ADOPTERS.md).:metal: <br> 
 - Help new users with issues they may encounter :muscle:
 - Send a pull request with your new features and bug fixes :rocket: 
 
@@ -112,7 +100,7 @@ If you find this project useful, help us:
 
 ## License
 
-Copyright (c) 2021-2023 [Cisco Systems, Inc.](https://cisco.com)
+Copyright (c) 2021-2023 [Cisco Systems, Inc. and its affiliates](https://cisco.com)
 Copyright (c) 2017-2020 [Banzai Cloud, Inc.](https://banzaicloud.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");

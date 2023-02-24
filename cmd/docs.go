@@ -20,7 +20,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/MakeNowJust/heredoc"
-	"github.com/banzaicloud/operator-tools/pkg/docgen"
+	"github.com/cisco-open/operator-tools/pkg/docgen"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 

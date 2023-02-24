@@ -20,7 +20,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/maps/mapstrstr"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/maps/mapstrstr"
 )
 
 type FluentConfig interface {

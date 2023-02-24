@@ -85,7 +85,7 @@ Default: -
 
 ### positiondb (volume.KubernetesVolume, optional) {#nodeagentfluentbit-positiondb}
 
-[volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types) 
+[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
 
 Default: -
 
@@ -123,7 +123,7 @@ Default: -
 
 ### bufferStorageVolume (volume.KubernetesVolume, optional) {#nodeagentfluentbit-bufferstoragevolume}
 
-[volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types) 
+[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
 
 Default: -
 

@@ -21,14 +21,14 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/andreyvit/diff"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/filter"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 func TestRenderDirective(t *testing.T) {

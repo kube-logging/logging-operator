@@ -38,7 +38,7 @@ RUN apk update \
  && gem install elasticsearch -v 7.13.3 \
  && gem install elasticsearch-xpack -v 7.13.3 \
  && gem install fluent-plugin-detect-exceptions -v 0.0.14 \
- # FMI https://github.com/banzaicloud/logging-operator/issues/887 \
+ # FMI https://github.com/kube-logging/logging-operator/issues/887 \
  && find /usr/lib/ruby/gems/2.*/gems/fluent-plugin-detect-exceptions-* -type f -print0 | xargs -0 chmod 644 \
  && gem install \
          specific_install \
@@ -77,7 +77,7 @@ RUN apk update \
          fluent-plugin-grok-parser \
  && gem specific_install -l https://github.com/tarokkk/fluent-plugin-logzio.git \
  && gem specific_install -l https://github.com/acquia/fluent-plugin-syslog_rfc5424.git \
- && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
+ && gem specific_install -l https://github.com/kube-logging/fluent-plugin-gcs.git \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-sumologic \

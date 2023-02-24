@@ -20,8 +20,9 @@ import (
 	"hash/fnv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/compression"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/compression"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -70,10 +71,12 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	if err != nil {
 		return nil, err
 	}
+	configcheck.WithHashLabel(checkSecret, hashKey)
 	checkSecretAppConfig, err := r.newCheckSecretAppConfig(hashKey)
 	if err != nil {
 		return nil, err
 	}
+	configcheck.WithHashLabel(checkSecretAppConfig, hashKey)
 
 	err = r.Client.Create(ctx, checkSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
@@ -88,12 +91,14 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	if err != nil {
 		return nil, err
 	}
+	configcheck.WithHashLabel(checkOutputSecret, hashKey)
 	err = r.Client.Create(ctx, checkOutputSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create output secret for fluentd configcheck")
 	}
 
 	pod := r.newCheckPod(hashKey)
+	configcheck.WithHashLabel(pod, hashKey)
 
 	existingPods := &corev1.PodList{}
 	err = r.Client.List(ctx, existingPods, client.MatchingLabels(pod.Labels))
@@ -154,49 +159,6 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	}
 
 	return &ConfigCheckResult{}, nil
-}
-
-func (r *Reconciler) configCheckCleanup(currentHash string) (removedHashes []string, multierr error) {
-	for configHash := range r.Logging.Status.ConfigCheckResults {
-		if configHash == currentHash {
-			continue
-		}
-		newSecret, err := r.newCheckSecret(configHash)
-		if err != nil {
-			multierr = errors.Combine(multierr,
-				errors.Wrapf(err, "failed to create config check secret %s", configHash))
-			continue
-		}
-		if err := r.Client.Delete(context.TODO(), newSecret); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check secret %s", configHash))
-				continue
-			}
-		}
-		checkOutputSecret, err := r.newCheckOutputSecret(configHash)
-		if err != nil {
-			multierr = errors.Combine(multierr,
-				errors.Wrapf(err, "failed to create config check output secret %s", configHash))
-			continue
-		}
-		if err := r.Client.Delete(context.TODO(), checkOutputSecret); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check output secret %s", configHash))
-				continue
-			}
-		}
-		if err := r.Client.Delete(context.TODO(), r.newCheckPod(configHash)); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check pod %s", configHash))
-				continue
-			}
-		}
-		removedHashes = append(removedHashes, configHash)
-	}
-	return
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
