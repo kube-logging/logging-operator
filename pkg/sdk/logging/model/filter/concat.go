@@ -107,6 +107,7 @@ type Concat struct {
 //	key message
 //	n_lines 10
 //	partial_key partial_message
+//	separator ""
 //
 // </filter>
 // ```
