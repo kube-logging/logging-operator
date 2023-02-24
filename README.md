@@ -65,7 +65,7 @@ You can configure the Logging operator using the following Custom Resource Defin
 
 See the [detailed CRDs documentation](https://kube-logging.github.io/docs/configuration/crds/).
 
-<p align="center"><img src="hhttps://kube-logging.github.io/docs/img/logging-operator-v2-architecture.png" ></p>
+<p align="center"><img src="https://kube-logging.github.io/docs/img/logging-operator-v2-architecture.png" ></p>
 
 ## Quickstart
 
