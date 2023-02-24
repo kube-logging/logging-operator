@@ -51,7 +51,7 @@ You can filter and process the incoming log messages using the **flow** custom r
 
 You can configure the Logging operator using the following Custom Resource Definitions.
 
-- [logging](https://kube-logging.github.io/docs/logging-infrastructure/logging/) - The `logging` resource defines the logging infrastructure (the log collectors and forwarders) for your cluster that collects and transports your log messages. It also contains configurations for Fluent Bit, Fluentd, and syslog-ng.
+- [Logging](https://kube-logging.github.io/docs/logging-infrastructure/logging/) - The `logging` resource defines the logging infrastructure (the log collectors and forwarders) for your cluster that collects and transports your log messages. It also contains configurations for Fluent Bit, Fluentd, and syslog-ng.
 - CRDs for Fluentd:
     - [Output](https://kube-logging.github.io/docs/configuration/output/) - Defines a Fluentd Output for a logging flow, where the log messages are sent using Fluentd. This is a namespaced resource. See also `clusteroutput`. To configure syslog-ng outputs, see `SyslogNGOutput`.
     - [Flow](https://kube-logging.github.io/docs/configuration/flow/) - Defines a Fluentd logging flow using `filters` and `outputs`. Basically, the flow routes the selected log messages to the specified outputs. This is a namespaced resource. See also `clusterflow`. To configure syslog-ng flows, see `SyslogNGFlow`.
