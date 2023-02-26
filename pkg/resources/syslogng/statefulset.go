@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -73,6 +74,22 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 	}
 
+	// HACK: try to _guess_ if user has configured a persistent volume for buffers and move syslog-ng's persist file there
+	buffersVolumeName := "buffers"
+	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
+		if name := r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
+			buffersVolumeName = name
+		}
+	}
+	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, containerName)
+	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
+		if !sliceAny(syslogngContainer.Args, func(arg string) bool { return strings.Contains(arg, "--persist-file") }) {
+			persistFilePath := filepath.Join(mnt.MountPath, "/syslog-ng.persist")
+			persistFileFlag := fmt.Sprintf("--persist-file=%q", persistFilePath)
+			syslogngContainer.Args = append(syslogngContainer.Args, persistFileFlag)
+		}
+	}
+
 	return desired, reconciler.StatePresent, nil
 }
 
@@ -89,7 +106,6 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		Args: []string{
 			"--cfgfile=" + configDir + "/" + configKey,
 			"--control=" + socketPath,
-			"--persist-file=" + filepath.Join(bufferPath, "/syslog-ng.persist"),
 			"--no-caps",
 			"-Fe",
 		},
@@ -358,4 +374,13 @@ func generateConfigReloaderConfig(configDir string) string {
 		}
 	  }
 	`, filepath.Join(configDir, "..data"), socketPath)
+}
+
+func sliceAny[S ~[]E, E any](s S, fn func(E) bool) bool {
+	for _, e := range s {
+		if fn(e) {
+			return true
+		}
+	}
+	return false
 }

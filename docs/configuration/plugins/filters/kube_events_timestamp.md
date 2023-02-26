@@ -4,7 +4,7 @@ weight: 200
 generated_file: true
 ---
 
-# [Kubernetes Events Timestamp Filter](https://github.com/banzaicloud/fluentd-filter-kube-events-timestamp)
+# [Kubernetes Events Timestamp Filter](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp)
 ## Overview
  Fluentd Filter plugin to select particular timestamp into an additional field
 

@@ -7,7 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
-DOCKER = docker
+DOCKER ?= docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
@@ -16,14 +16,10 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
-DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
+DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 VERSION := $(shell git describe --abbrev=0 --tags)
-
-# Where do we use these???
-DOCKER_IMAGE = banzaicloud/logging-operator
-DOCKER_TAG ?= ${VERSION}
 
 E2E_TEST_TIMEOUT ?= 20m
 
@@ -36,7 +32,7 @@ ENVTEST_K8S_VERSION := 1.24.1
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
-GOLANGCI_LINT_VERSION := v1.47.2
+GOLANGCI_LINT_VERSION := v1.51.2
 
 KIND := ${BIN}/kind
 KIND_VERSION := v0.11.1
@@ -45,7 +41,7 @@ KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.5.0
+LICENSEI_VERSION = v0.8.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
