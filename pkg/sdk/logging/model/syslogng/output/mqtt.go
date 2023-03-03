@@ -28,14 +28,18 @@ type _hugoMQTT interface{} //nolint:deadcode,unused
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: SyslogNGOutput
 // metadata:
-//   name: mqtt
-//   namespace: default
+//
+//	name: mqtt
+//	namespace: default
+//
 // spec:
-//   mqtt:
-//     address: tcp://mosquitto:1883
-//     template: |
-//       $(format-json --subkeys json~ --key-delimiter ~)
-//     topic: test/demo
+//
+//	mqtt:
+//	  address: tcp://mosquitto:1883
+//	  template: |
+//	    $(format-json --subkeys json~ --key-delimiter ~)
+//	  topic: test/demo
+//
 // {{</ highlight >}}
 type _docMQTT interface{} //nolint:deadcode,unused
 
