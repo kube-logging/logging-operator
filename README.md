@@ -11,6 +11,9 @@
 
 </p>
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_large)
+
 # Logging operator
 
 The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline.
@@ -70,6 +73,7 @@ See the [detailed CRDs documentation](https://kube-logging.github.io/docs/config
 ## Quickstart
 
 [![asciicast](https://asciinema.org/a/315998.svg)](https://asciinema.org/a/315998)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_shield)
 
 Follow these [quickstart guides](https://kube-logging.github.io/docs/quickstarts/) to try out the Logging operator!
 
