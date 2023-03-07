@@ -41,7 +41,7 @@ KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.7.0
+LICENSEI_VERSION = v0.8.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
@@ -161,7 +161,7 @@ test-e2e: ${KIND} docker-build generate fmt vet manifests ## Run E2E tests
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
-	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
+	find . -iname "go.mod" -not -path "./.devcontainer/*" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
 
 .PHONY: vet
 vet: ## Run go vet against code

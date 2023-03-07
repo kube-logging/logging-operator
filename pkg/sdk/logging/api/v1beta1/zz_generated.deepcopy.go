@@ -2628,6 +2628,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.FileOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MQTT != nil {
+		in, out := &in.MQTT, &out.MQTT
+		*out = new(syslogngoutput.MQTT)
+		**out = **in
+	}
 	if in.SumologicHTTP != nil {
 		in, out := &in.SumologicHTTP, &out.SumologicHTTP
 		*out = new(syslogngoutput.SumologicHTTPOutput)

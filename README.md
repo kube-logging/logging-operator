@@ -51,12 +51,12 @@ You can filter and process the incoming log messages using the **flow** custom r
 
 You can configure the Logging operator using the following Custom Resource Definitions.
 
-- [logging](https://kube-logging.github.io/docs/logging-infrastructure/logging/) - The `logging` resource defines the logging infrastructure (the log collectors and forwarders) for your cluster that collects and transports your log messages. It also contains configurations for Fluent Bit, Fluentd, and syslog-ng.
+- [Logging](https://kube-logging.github.io/docs/logging-infrastructure/logging/) - The `Logging` resource defines the logging infrastructure (the log collectors and forwarders) for your cluster that collects and transports your log messages. It also contains configurations for Fluent Bit, Fluentd, and syslog-ng.
 - CRDs for Fluentd:
-    - [output](https://kube-logging.github.io/docs/configuration/output/) - Defines a Fluentd Output for a logging flow, where the log messages are sent using Fluentd. This is a namespaced resource. See also `clusteroutput`. To configure syslog-ng outputs, see `SyslogNGOutput`.
-    - [flow](https://kube-logging.github.io/docs/configuration/flow/) - Defines a Fluentd logging flow using `filters` and `outputs`. Basically, the flow routes the selected log messages to the specified outputs. This is a namespaced resource. See also `clusterflow`. To configure syslog-ng flows, see `SyslogNGFlow`.
-    - [clusteroutput](https://kube-logging.github.io/docs/configuration/output/) - Defines a Fluentd output that is available from all flows and clusterflows. The operator evaluates clusteroutputs in the `controlNamespace` only unless `allowClusterResourcesFromAllNamespaces` is set to true.
-    - [clusterflow](https://kube-logging.github.io/docs/configuration/flow/) - Defines a Fluentd logging flow that collects logs from all namespaces by default. The operator evaluates clusterflows in the `controlNamespace` only unless `allowClusterResourcesFromAllNamespaces` is set to true. To configure syslog-ng clusterflows, see `SyslogNGClusterFlow`.
+    - [Output](https://kube-logging.github.io/docs/configuration/output/) - Defines a Fluentd Output for a logging flow, where the log messages are sent using Fluentd. This is a namespaced resource. See also `ClusterOutput`. To configure syslog-ng outputs, see `SyslogNGOutput`.
+    - [Flow](https://kube-logging.github.io/docs/configuration/flow/) - Defines a Fluentd logging flow using `filters` and `outputs`. Basically, the flow routes the selected log messages to the specified outputs. This is a namespaced resource. See also `ClusterFlow`. To configure syslog-ng flows, see `SyslogNGFlow`.
+    - [ClusterOutput](https://kube-logging.github.io/docs/configuration/output/) - Defines a Fluentd output that is available from all flows and clusterflows. The operator evaluates clusteroutputs in the `controlNamespace` only unless `allowClusterResourcesFromAllNamespaces` is set to true.
+    - [ClusterFlow](https://kube-logging.github.io/docs/configuration/flow/) - Defines a Fluentd logging flow that collects logs from all namespaces by default. The operator evaluates clusterflows in the `controlNamespace` only unless `allowClusterResourcesFromAllNamespaces` is set to true. To configure syslog-ng clusterflows, see `SyslogNGClusterFlow`.
 - CRDs for syslog-ng (these resources like their Fluentd counterparts, but are tailored to features available via syslog-ng):
     - [SyslogNGOutput](https://kube-logging.github.io/docs/configuration/output/#syslogngoutput) - Defines a syslog-ng Output for a logging flow, where the log messages are sent using Fluentd. This is a namespaced resource. See also `SyslogNGClusterOutput`. To configure Fluentd outputs, see `output`.
     - [SyslogNGFlow](https://kube-logging.github.io/docs/configuration/flow/#syslogngflow) - Defines a syslog-ng logging flow using `filters` and `outputs`. Basically, the flow routes the selected log messages to the specified outputs. This is a namespaced resource. See also `SyslogNGClusterFlow`. To configure Fluentd flows, see `flow`.
@@ -65,7 +65,7 @@ You can configure the Logging operator using the following Custom Resource Defin
 
 See the [detailed CRDs documentation](https://kube-logging.github.io/docs/configuration/crds/).
 
-<p align="center"><img src="hhttps://kube-logging.github.io/docs/img/logging-operator-v2-architecture.png" ></p>
+<p align="center"><img src="https://kube-logging.github.io/docs/img/logging-operator-v2-architecture.png" ></p>
 
 ## Quickstart
 

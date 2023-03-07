@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,8 +51,8 @@ const (
 	clusterRoleName                   = "syslog-ng"
 	containerName                     = "syslog-ng"
 	defaultBufferVolumeMetricsPort    = 9200
-	syslogngImageRepository           = "balabit/syslog-ng"
-	syslogngImageTag                  = "4.0.1"
+	syslogngImageRepository           = "ghcr.io/axoflow/syslog-ng"
+	syslogngImageTag                  = "4.0.1_git20230225"
 	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
 	prometheusExporterImageTag        = "v0.0.14"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/custom-runner"

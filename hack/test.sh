@@ -57,7 +57,7 @@ function helm_deploy_logging_operator()
         --wait \
         --set image.tag='local' \
         --set image.repository='controller' \
-        --version 4.0.0-rc19-3 \
+        --version 4.0.0 \
         logging-operator \
         "kube-logging/logging-operator"
 }
@@ -72,7 +72,7 @@ function configure_logging()
         --namespace logging \
         --set fluentd.image.tag='local' \
         --set fluentd.image.repository='fluentd' \
-        --version 4.0.0-rc18-1 \
+        --version 4.0.0 \
         'logging-operator-logging-tls' \
         "kube-logging/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
