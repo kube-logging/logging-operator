@@ -49,6 +49,11 @@ type _metaMatch interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 type MatchConfig MatchExpr
 
+// IsEmpty returns true if the config is not specified, i.e. empty.
+func (c *MatchConfig) IsEmpty() bool {
+	return (*MatchExpr)(c).IsEmpty()
+}
+
 // +kubebuilder:object:generate=true
 type MatchExpr struct {
 	// +kubebuilder:pruning:PreserveUnknownFields
@@ -62,6 +67,11 @@ type MatchExpr struct {
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Or []MatchExpr `json:"or,omitempty"`
+}
+
+// IsEmpty returns true if the expression is not specified, i.e. empty.
+func (expr *MatchExpr) IsEmpty() bool {
+	return expr == nil || (len(expr.And) == 0 && expr.Not == nil && len(expr.Or) == 0 && expr.Regexp == nil)
 }
 
 // +kubebuilder:object:generate=true
