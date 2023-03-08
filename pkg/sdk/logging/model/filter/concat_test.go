@@ -24,23 +24,49 @@ import (
 )
 
 func TestConcat(t *testing.T) {
-	CONFIG := []byte(`
+	testData := []struct {
+		Config   []byte
+		Expected string
+	}{
+		{
+			Config: []byte(`
 partial_key: "partial_message"
-separator: ""
 n_lines: 10
-
-`)
-	expected := `
+`),
+			Expected: `
 <filter **>
   @type concat
   @id test
   key message
   n_lines 10
   partial_key partial_message
+  separator "\n"
 </filter>
-`
-	parser := &filter.Concat{}
-	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
-	test := render.NewOutputPluginTest(t, parser)
-	test.DiffResult(expected)
+			`,
+		},
+		{
+			Config: []byte(`
+partial_key: "partial_message"
+n_lines: 10
+separator: ""
+`),
+			Expected: `
+<filter **>
+  @type concat
+  @id test
+  key message
+  n_lines 10
+  partial_key partial_message
+  separator
+</filter>
+			`,
+		},
+	}
+
+	for _, d := range testData {
+		parser := &filter.Concat{}
+		require.NoError(t, yaml.Unmarshal(d.Config, parser))
+		test := render.NewOutputPluginTest(t, parser)
+		test.DiffResult(d.Expected)
+	}
 }

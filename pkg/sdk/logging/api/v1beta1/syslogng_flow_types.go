@@ -39,6 +39,11 @@ type SyslogNGFlowSpec struct {
 
 type SyslogNGMatch filter.MatchExpr
 
+// IsEmpty returns true if the match is not specified, i.e. empty.
+func (m *SyslogNGMatch) IsEmpty() bool {
+	return (*filter.MatchExpr)(m).IsEmpty()
+}
+
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {
 	ID      string                 `json:"id,omitempty" syslog-ng:"ignore"`

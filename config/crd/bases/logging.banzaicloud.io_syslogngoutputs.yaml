@@ -550,6 +550,19 @@ spec:
                 required:
                 - token
                 type: object
+              mqtt:
+                properties:
+                  address:
+                    type: string
+                  fallback-topic:
+                    type: string
+                  qos:
+                    type: integer
+                  template:
+                    type: string
+                  topic:
+                    type: string
+                type: object
               sumologic-http:
                 properties:
                   batch-bytes:
