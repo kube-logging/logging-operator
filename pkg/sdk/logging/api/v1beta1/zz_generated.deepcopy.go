@@ -459,7 +459,7 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 	if in.Concat != nil {
 		in, out := &in.Concat, &out.Concat
 		*out = new(filter.Concat)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.DetectExceptions != nil {
 		in, out := &in.DetectExceptions, &out.DetectExceptions
