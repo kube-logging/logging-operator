@@ -67,7 +67,7 @@ func (t TailerWebhookConfig) VersionedFluentBitPathArgs(filePath string) []strin
 var Global = GlobalConfig{
 	FluentBitPosFilePath:   "/var/pos",
 	FluentBitPosVolumeName: "positions",
-	OperatorImage:          "033498657557.dkr.ecr.us-east-2.amazonaws.com/banzaicloud/logging-extensions:0.2.0",
+	OperatorImage:          "ghcr.io/kube-logging/logging-operator:4.0.0",
 }
 
 // HostTailer configuration

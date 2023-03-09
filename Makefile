@@ -7,7 +7,7 @@ export PATH := $(BIN):$(PATH)
 OS = $(shell go env GOOS)
 ARCH = $(shell go env GOARCH)
 
-DOCKER = docker
+DOCKER ?= docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
@@ -16,14 +16,10 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
-DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
+DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 VERSION := $(shell git describe --abbrev=0 --tags)
-
-# Where do we use these???
-DOCKER_IMAGE = banzaicloud/logging-operator
-DOCKER_TAG ?= ${VERSION}
 
 E2E_TEST_TIMEOUT ?= 20m
 
@@ -45,7 +41,7 @@ KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.7.0
+LICENSEI_VERSION = v0.8.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
@@ -165,7 +161,7 @@ test-e2e: ${KIND} docker-build generate fmt vet manifests ## Run E2E tests
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
-	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
+	find . -iname "go.mod" -not -path "./.devcontainer/*" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
 
 .PHONY: vet
 vet: ## Run go vet against code

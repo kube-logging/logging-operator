@@ -20,11 +20,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -42,7 +42,7 @@ func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretL
 			[]string{sourceName},
 			seqs.ToSlice(seqs.Concat(
 				seqs.FromValues(
-					render.If(f.Spec.Match != nil, filterRefStmt(matchName)),
+					render.If(!f.Spec.Match.IsEmpty(), filterRefStmt(matchName)),
 				),
 				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
 					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
@@ -88,7 +88,7 @@ func renderFlow(controlNS string, sourceName string, keyDelim string, f v1beta1.
 }
 
 func renderFlowMatch(name string, m *v1beta1.SyslogNGMatch) render.Renderer {
-	if m == nil {
+	if m.IsEmpty() {
 		return nil
 	}
 	return filterDefStmt(name, renderMatchExpr(filter.MatchExpr(*m)))

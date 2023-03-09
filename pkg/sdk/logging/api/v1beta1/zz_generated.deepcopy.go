@@ -477,7 +477,7 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 	if in.Concat != nil {
 		in, out := &in.Concat, &out.Concat
 		*out = new(filter.Concat)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.DetectExceptions != nil {
 		in, out := &in.DetectExceptions, &out.DetectExceptions
@@ -2632,6 +2632,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		in, out := &in.File, &out.File
 		*out = new(syslogngoutput.FileOutput)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.MQTT != nil {
+		in, out := &in.MQTT, &out.MQTT
+		*out = new(syslogngoutput.MQTT)
+		**out = **in
 	}
 	if in.SumologicHTTP != nil {
 		in, out := &in.SumologicHTTP, &out.SumologicHTTP
