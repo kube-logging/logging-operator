@@ -104,6 +104,8 @@ If you find this project useful, help us:
 
 ## License
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_large)
+
 Copyright (c) 2021-2023 [Cisco Systems, Inc. and its affiliates](https://cisco.com)
 Copyright (c) 2017-2020 [Banzai Cloud, Inc.](https://banzaicloud.com)
 
