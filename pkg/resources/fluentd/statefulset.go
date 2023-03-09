@@ -207,6 +207,18 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		VolumeMounts:    vm,
 	}
 
+	if spec.Security != nil && spec.Security.SecurityContext != nil {
+		c.SecurityContext = &corev1.SecurityContext{
+			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
+			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
+			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               spec.Security.SecurityContext.Privileged,
+			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
+			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+		}
+	}
+
 	return c
 }
 
