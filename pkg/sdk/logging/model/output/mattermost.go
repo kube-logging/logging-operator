@@ -62,7 +62,7 @@ type MattermostOutputConfig struct {
 	// message The message you want to send, can be a static message, which you add at this point, or you can receive the fluent infos with the %s
 	Message string `json:"message,omitempty"`
 	// enable_tls you can set the communication channel if it uses tls. (default: true)
-	EnableTLS bool `json:"enable_tls,omitempty"`
+	EnableTLS *bool `json:"enable_tls,omitempty"`
 	// ca_path you can set the path of the certificates.
 	CAPath *secret.Secret `json:"ca_path,omitempty"`
 }

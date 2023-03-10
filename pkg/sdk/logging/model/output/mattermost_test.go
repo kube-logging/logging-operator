@@ -25,10 +25,12 @@ import (
 
 func TestMattermost(t *testing.T) {
 	CONFIG := []byte(`
-webhook_url: https://mattermost:8080/webhooks/j4nrh34brj43br34jrb
+webhook_url: 
+  value: https://mattermost:8080/webhooks/j4nrh34brj43br34jrb
 channel_id: rfrf4r4r4ad
 message_color: "#D9B9C9"
 message_title: Test message
+enable_tls: false
 `)
 
 	expected := `
@@ -36,6 +38,7 @@ message_title: Test message
     @type mattermost
     @id test
     channel_id rfrf4r4r4ad
+	enable_tls false
     message_color #D9B9C9
     message_title Test message
     webhook_url https://mattermost:8080/webhooks/j4nrh34brj43br34jrb
