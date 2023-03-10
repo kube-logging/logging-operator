@@ -120,7 +120,7 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                    = "1.9.5"
+	DefaultFluentbitImageTag                    = "1.9.10"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
