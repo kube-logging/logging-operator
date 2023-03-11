@@ -53,3 +53,37 @@ records:
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
 }
+
+func TestGeoIPKeepNull(t *testing.T) {
+	CONFIG := []byte(`
+geoip_lookup_keys: remote_addr
+skip_adding_null_record: false
+records:
+  - city: ${city.names.en["remote_addr"]}
+    location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
+    country: ${country.iso_code["remote_addr"]}
+    country_name: ${country.names.en["remote_addr"]}
+    postal_code:  ${postal.code["remote_addr"]}
+`)
+
+	expected := `
+<filter **>
+  @type geoip
+  @id test
+  geoip_lookup_keys remote_addr
+  skip_adding_null_record false
+  <record>
+    city ${city.names.en["remote_addr"]}
+    country ${country.iso_code["remote_addr"]}
+    country_name ${country.names.en["remote_addr"]}
+    location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
+    postal_code ${postal.code["remote_addr"]}
+  </record>
+</filter>
+`
+
+	parser := &filter.GeoIP{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
+}

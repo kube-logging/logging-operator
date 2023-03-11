@@ -46,7 +46,7 @@ type GeoIP struct {
 	//Specify backend library (geoip2_c, geoip, geoip2_compat)
 	BackendLibrary string `json:"backend_library,omitempty"`
 	// To avoid get stacktrace error with `[null, null]` array for elasticsearch.
-	SkipAddingNullRecord bool `json:"skip_adding_null_record,omitempty" plugin:"default:true"`
+	SkipAddingNullRecord *bool `json:"skip_adding_null_record,omitempty" plugin:"default:true"`
 	// Records are represented as maps: `key: value`
 	Records []Record `json:"records,omitempty"`
 }
