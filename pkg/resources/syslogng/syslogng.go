@@ -52,7 +52,7 @@ const (
 	containerName                     = "syslog-ng"
 	defaultBufferVolumeMetricsPort    = 9200
 	syslogngImageRepository           = "ghcr.io/axoflow/syslog-ng"
-	syslogngImageTag                  = "4.1.0"
+	syslogngImageTag                  = "4.1.1"
 	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
 	prometheusExporterImageTag        = "v0.0.14"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/custom-runner"
