@@ -11,7 +11,7 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.27.2
+	github.com/onsi/gomega v1.27.3
 	github.com/pborman/uuid v1.2.1
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.63.0
 	github.com/prometheus/client_golang v1.14.0
@@ -44,7 +44,7 @@ require (
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
