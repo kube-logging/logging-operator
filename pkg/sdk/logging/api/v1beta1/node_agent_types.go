@@ -52,11 +52,13 @@ type NodeAgentSpec struct {
 type NodeAgentStatus struct {
 }
 
+// +kubebuilder:object:root=true
+
 // NodeAgentList
 type NodeAgentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Logging `json:"items"`
+	Items           []NodeAgent `json:"items"`
 }
 
 // +kubebuilder:object:generate=true
