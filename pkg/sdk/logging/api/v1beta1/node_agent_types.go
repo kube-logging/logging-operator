@@ -26,7 +26,7 @@ import (
 type _hugoNodeAgent interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories=logging-all
+// +kubebuilder:resource:categories=logging-all,scope=Cluster
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
@@ -112,4 +112,8 @@ type NodeAgentFluentbit struct {
 	Network              *FluentbitNetwork       `json:"network,omitempty"`
 	ForwardOptions       *ForwardOptions         `json:"forwardOptions,omitempty"`
 	EnableUpstream       *bool                   `json:"enableUpstream,omitempty"`
+}
+
+func init() {
+	SchemeBuilder.Register(&NodeAgent{}, &NodeAgentList{})
 }
