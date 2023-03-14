@@ -290,6 +290,7 @@ type nodeAgentInstance struct {
 
 // Reconcile reconciles the InlineNodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+	combinedResult := reconciler.CombinedResult{}
 	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
 		NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(&userDefinedAgent)
@@ -327,15 +328,9 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		}
 
 		result, err := instance.Reconcile()
-		if err != nil {
-			return nil, errors.WrapWithDetails(err,
-				"failed to reconcile instances", "NodeName", userDefinedAgent.Name)
-		}
-		if result != nil {
-			return result, nil
-		}
+		combinedResult.Combine(result, err)
 	}
-	return nil, nil
+	return &combinedResult.Result, combinedResult.Err
 }
 
 // Reconcile reconciles the nodeAgentInstance resource

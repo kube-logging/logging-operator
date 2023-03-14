@@ -181,7 +181,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
-	if len(logging.Spec.NodeAgents) > 0 {
+	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
 		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
