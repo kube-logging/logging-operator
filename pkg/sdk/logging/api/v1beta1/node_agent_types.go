@@ -18,16 +18,52 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/volume"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // +name:"NodeAgent"
 // +weight:"200"
 type _hugoNodeAgent interface{} //nolint:deadcode,unused
 
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+
+// NodeAgent
+type NodeAgent struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NodeAgentSpec   `json:"spec,omitempty"`
+	Status NodeAgentStatus `json:"status,omitempty"`
+}
+
+// NodeAgentSpec
+type NodeAgentSpec struct {
+	// Specify the Logging-Operator nodeAgents profile. It can be linux or windows . (default:linux)
+	Profile       string              `json:"profile,omitempty"`
+	Metadata      types.MetaBase      `json:"metadata,omitempty"`
+	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
+}
+
+// NodeAgentStatus
+type NodeAgentStatus struct {
+}
+
+// NodeAgentList
+type NodeAgentList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Logging `json:"items"`
+}
+
 // +kubebuilder:object:generate=true
 
-type NodeAgent struct {
-	//NodeAgent unique name.
+// InlineNodeAgent
+// @deprecated, replaced by NodeAgent
+type InlineNodeAgent struct {
+	//InlineNodeAgent unique name.
 	Name string `json:"name,omitempty"`
 	// Specify the Logging-Operator nodeAgents profile. It can be linux or windows . (default:linux)
 	Profile       string              `json:"profile,omitempty"`

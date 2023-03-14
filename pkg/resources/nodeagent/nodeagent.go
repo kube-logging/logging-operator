@@ -48,8 +48,8 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeAgent, error) {
-	programDefault := &v1beta1.NodeAgent{
+func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1.InlineNodeAgent, error) {
+	programDefault := &v1beta1.InlineNodeAgent{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 			DaemonSetOverrides: &typeoverride.DaemonSet{
 				Spec: typeoverride.DaemonSetSpec{
@@ -196,7 +196,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeA
 	return programDefault, nil
 }
 
-var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
+var NodeAgentFluentbitWindowsDefaults = &v1beta1.InlineNodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		FilterKubernetes: v1beta1.FilterKubernetes{
 			KubeURL:       "https://kubernetes.default.svc:443",
@@ -236,7 +236,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 			}},
 	},
 }
-var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgent{
+var NodeAgentFluentbitLinuxDefaults = &v1beta1.InlineNodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{},
 }
 
@@ -271,7 +271,7 @@ type Reconciler struct {
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
-// NewReconciler creates a new NodeAgent reconciler
+// NewReconciler creates a new InlineNodeAgent reconciler
 func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
@@ -281,14 +281,14 @@ func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opt
 }
 
 type nodeAgentInstance struct {
-	nodeAgent           *v1beta1.NodeAgent
+	nodeAgent           *v1beta1.InlineNodeAgent
 	reconciler          *reconciler.GenericResourceReconciler
 	logging             *v1beta1.Logging
 	configs             map[string][]byte
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
-// Reconcile reconciles the NodeAgent resource
+// Reconcile reconciles the InlineNodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
 		var instance nodeAgentInstance
