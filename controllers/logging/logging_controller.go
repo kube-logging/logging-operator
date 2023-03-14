@@ -17,6 +17,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -181,8 +182,34 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
+	agentExists := func(name string, agents []loggingv1beta1.NodeAgent) bool {
+		for _, a := range agents {
+			if name == a.Name {
+				return true
+			}
+		}
+		return false
+	}
+
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
+		// for compatibility reasons
+		var agents []loggingv1beta1.NodeAgentSpec
+		for _, a := range loggingResources.NodeAgents {
+			agents = append(agents, a.Spec)
+		}
+		for _, a := range logging.Spec.NodeAgents {
+			if !agentExists(a.Name, loggingResources.NodeAgents) {
+				agents = append(agents, loggingv1beta1.NodeAgentSpec{
+					LoggingRef:      logging.Spec.LoggingRef,
+					InlineNodeAgent: a,
+				})
+			} else {
+				log.Error(errors.New("nodeagent definition conflict"),
+					fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name))
+			}
+		}
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {

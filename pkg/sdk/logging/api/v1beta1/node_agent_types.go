@@ -44,7 +44,7 @@ type NodeAgentSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 
 	//InlineNodeAgent
-	InlineNodeAgent `json:",inline"`
+	*InlineNodeAgent `json:",inline"`
 }
 
 // NodeAgentStatus

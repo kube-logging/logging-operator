@@ -268,14 +268,16 @@ type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
 	configs             map[string][]byte
+	agents              []v1beta1.NodeAgentSpec
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
-// NewReconciler creates a new InlineNodeAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+// New creates a new NodeAgent reconciler
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents []v1beta1.NodeAgentSpec, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
+		agents:                    agents,
 		fluentdDataProvider:       fluentdDataProvider,
 	}
 }
@@ -291,8 +293,8 @@ type nodeAgentInstance struct {
 // Reconcile reconciles the InlineNodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	combinedResult := reconciler.CombinedResult{}
-	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
-		result, err := r.processAgent(userDefinedAgent)
+	for _, userDefinedAgent := range r.agents {
+		result, err := r.processAgent(userDefinedAgent.InlineNodeAgent)
 		combinedResult.Combine(result, err)
 	}
 	return &combinedResult.Result, combinedResult.Err
