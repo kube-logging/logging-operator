@@ -292,45 +292,49 @@ type nodeAgentInstance struct {
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	combinedResult := reconciler.CombinedResult{}
 	for _, userDefinedAgent := range r.Logging.Spec.NodeAgents {
-		var instance nodeAgentInstance
-		NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(&userDefinedAgent)
-		if err != nil {
-			return nil, err
-		}
-
-		switch userDefinedAgent.Profile {
-		case "windows":
-			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
-			if err != nil {
-				return nil, err
-			}
-
-			// Overwrite Kubernetes endpoint with a ClusterDomain templated value.
-			NodeAgentFluentbitDefaults.FluentbitSpec.FilterKubernetes.KubeURL = fmt.Sprintf("https://kubernetes.default.svc%s:443", r.Logging.ClusterDomainAsSuffix())
-
-		default:
-			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
-			if err != nil {
-				return nil, err
-			}
-
-		}
-		err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
-		if err != nil {
-			return nil, err
-		}
-
-		instance = nodeAgentInstance{
-			nodeAgent:           NodeAgentFluentbitDefaults,
-			reconciler:          r.GenericResourceReconciler,
-			logging:             r.Logging,
-			fluentdDataProvider: r.fluentdDataProvider,
-		}
-
-		result, err := instance.Reconcile()
+		result, err := r.processAgent(userDefinedAgent)
 		combinedResult.Combine(result, err)
 	}
 	return &combinedResult.Result, combinedResult.Err
+}
+
+func (r *Reconciler) processAgent(userDefinedAgent *v1beta1.InlineNodeAgent) (*reconcile.Result, error) {
+	var instance nodeAgentInstance
+	NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(&userDefinedAgent)
+	if err != nil {
+		return nil, err
+	}
+
+	switch userDefinedAgent.Profile {
+	case "windows":
+		err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
+		if err != nil {
+			return nil, err
+		}
+
+		// Overwrite Kubernetes endpoint with a ClusterDomain templated value.
+		NodeAgentFluentbitDefaults.FluentbitSpec.FilterKubernetes.KubeURL = fmt.Sprintf("https://kubernetes.default.svc%s:443", r.Logging.ClusterDomainAsSuffix())
+
+	default:
+		err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
+	if err != nil {
+		return nil, err
+	}
+
+	instance = nodeAgentInstance{
+		nodeAgent:           NodeAgentFluentbitDefaults,
+		reconciler:          r.GenericResourceReconciler,
+		logging:             r.Logging,
+		fluentdDataProvider: r.fluentdDataProvider,
+	}
+
+	return instance.Reconcile()
 }
 
 // Reconcile reconciles the nodeAgentInstance resource
