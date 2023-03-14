@@ -41,6 +41,7 @@ type NodeAgent struct {
 
 // NodeAgentSpec
 type NodeAgentSpec struct {
+	LoggingRef string `json:"loggingRef,omitempty"`
 	// Specify the Logging-Operator nodeAgents profile. It can be linux or windows . (default:linux)
 	Profile       string              `json:"profile,omitempty"`
 	Metadata      types.MetaBase      `json:"metadata,omitempty"`

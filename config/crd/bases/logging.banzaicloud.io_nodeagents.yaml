@@ -30,6 +30,8 @@ spec:
             type: object
           spec:
             properties:
+              loggingRef:
+                type: string
               metadata:
                 properties:
                   annotations:
