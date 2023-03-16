@@ -43,8 +43,6 @@ spec:
                       type: string
                     type: object
                 type: object
-              name:
-                type: string
               nodeAgentFluentbit:
                 properties:
                   bufferStorage:

@@ -262,15 +262,6 @@ func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1
 	var res []v1beta1.NodeAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-			if i.Spec.Name != "" && i.Spec.Name != i.Name {
-				return nil, errors.Errorf(
-					"NodeAgent has an inconsistent name in metadata (%s) and in spec (%s). "+
-						"Use the same or leave the spec.name empty",
-					i.Name, i.Spec.Name,
-				)
-			}
-			// set the name in the spec for compatibility with the legacy scheme
-			i.Spec.Name = i.Name
 			res = append(res, i)
 		}
 	}

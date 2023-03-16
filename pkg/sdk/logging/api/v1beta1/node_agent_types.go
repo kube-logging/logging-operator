@@ -39,13 +39,25 @@ type NodeAgent struct {
 	Status NodeAgentStatus `json:"status,omitempty"`
 }
 
+// +kubebuilder:object:generate=true
+
 // NodeAgentSpec
 type NodeAgentSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 
 	//InlineNodeAgent
-	*InlineNodeAgent `json:",inline"`
+	NodeAgentConfig `json:",inline"`
 }
+
+// +kubebuilder:object:generate=true
+
+type NodeAgentConfig struct {
+	Profile       string              `json:"profile,omitempty"`
+	Metadata      types.MetaBase      `json:"metadata,omitempty"`
+	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
 
 // NodeAgentStatus
 type NodeAgentStatus struct {
@@ -67,10 +79,8 @@ type NodeAgentList struct {
 type InlineNodeAgent struct {
 	//InlineNodeAgent unique name.
 	Name string `json:"name,omitempty"`
-	// Specify the Logging-Operator nodeAgents profile. It can be linux or windows . (default:linux)
-	Profile       string              `json:"profile,omitempty"`
-	Metadata      types.MetaBase      `json:"metadata,omitempty"`
-	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
+
+	NodeAgentConfig `json:",inline"`
 }
 
 // +kubebuilder:object:generate=true

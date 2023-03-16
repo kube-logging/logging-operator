@@ -48,8 +48,8 @@ const (
 	containerName                  = "fluent-bit"
 )
 
-func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1.InlineNodeAgent, error) {
-	programDefault := &v1beta1.InlineNodeAgent{
+func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.NodeAgentConfig, error) {
+	programDefault := &v1beta1.NodeAgentConfig{
 		FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 			DaemonSetOverrides: &typeoverride.DaemonSet{
 				Spec: typeoverride.DaemonSetSpec{
@@ -108,12 +108,11 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1
 			},
 		},
 	}
-	if (*userDefined).FluentbitSpec == nil {
-		(*userDefined).FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
+	if userDefined.FluentbitSpec == nil {
+		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
 	}
 
-	if (*userDefined).FluentbitSpec.FilterAws != nil {
-
+	if userDefined.FluentbitSpec.FilterAws != nil {
 		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
 			ImdsVersion:     "v2",
 			AZ:              util.BoolPointer(true),
@@ -127,14 +126,14 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1
 			Match:           "*",
 		}
 
-		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, (*userDefined).FluentbitSpec.FilterAws)
+		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, userDefined.FluentbitSpec.FilterAws)
 		if err != nil {
 			return nil, err
 		}
 
 	}
-	if (*userDefined).FluentbitSpec.LivenessDefaultCheck == nil || *(*userDefined).FluentbitSpec.LivenessDefaultCheck {
-		if (*userDefined).Profile != "windows" {
+	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
+		if userDefined.Profile != "windows" {
 			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 				Port: 2020,
 				Path: "/",
@@ -142,7 +141,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1
 		}
 	}
 
-	if (*userDefined).FluentbitSpec.Metrics != nil {
+	if userDefined.FluentbitSpec.Metrics != nil {
 
 		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 			Interval: "15s",
@@ -150,12 +149,12 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1
 			Port:     2020,
 			Path:     "/api/v1/metrics/prometheus",
 		}
-		err := merge.Merge(programDefault.FluentbitSpec.Metrics, (*userDefined).FluentbitSpec.Metrics)
+		err := merge.Merge(programDefault.FluentbitSpec.Metrics, userDefined.FluentbitSpec.Metrics)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if programDefault.FluentbitSpec.Metrics != nil && (*userDefined).FluentbitSpec.Metrics != nil && (*userDefined).FluentbitSpec.Metrics.PrometheusAnnotations {
+	if programDefault.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics.PrometheusAnnotations {
 		defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
 			Annotations: map[string]string{
 				"prometheus.io/scrape": "true",
@@ -196,7 +195,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.InlineNodeAgent) (*v1beta1
 	return programDefault, nil
 }
 
-var NodeAgentFluentbitWindowsDefaults = &v1beta1.InlineNodeAgent{
+var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentConfig{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		FilterKubernetes: v1beta1.FilterKubernetes{
 			KubeURL:       "https://kubernetes.default.svc:443",
@@ -236,7 +235,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.InlineNodeAgent{
 			}},
 	},
 }
-var NodeAgentFluentbitLinuxDefaults = &v1beta1.InlineNodeAgent{
+var NodeAgentFluentbitLinuxDefaults = &v1beta1.NodeAgentConfig{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{},
 }
 
@@ -247,7 +246,7 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 func (n *nodeAgentInstance) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
 		"app.kubernetes.io/name":     "fluentbit",
-		"app.kubernetes.io/instance": n.nodeAgent.Name,
+		"app.kubernetes.io/instance": n.name,
 	}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
 }
 
@@ -268,12 +267,12 @@ type Reconciler struct {
 	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
 	configs             map[string][]byte
-	agents              []v1beta1.NodeAgentSpec
+	agents              map[string]v1beta1.NodeAgentConfig
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
 // New creates a new NodeAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents []v1beta1.NodeAgentSpec, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
@@ -283,7 +282,8 @@ func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, age
 }
 
 type nodeAgentInstance struct {
-	nodeAgent           *v1beta1.InlineNodeAgent
+	name                string
+	nodeAgent           *v1beta1.NodeAgentConfig
 	reconciler          *reconciler.GenericResourceReconciler
 	logging             *v1beta1.Logging
 	configs             map[string][]byte
@@ -293,16 +293,16 @@ type nodeAgentInstance struct {
 // Reconcile reconciles the InlineNodeAgent resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	combinedResult := reconciler.CombinedResult{}
-	for _, userDefinedAgent := range r.agents {
-		result, err := r.processAgent(userDefinedAgent.InlineNodeAgent)
+	for name, userDefinedAgent := range r.agents {
+		result, err := r.processAgent(name, userDefinedAgent)
 		combinedResult.Combine(result, err)
 	}
 	return &combinedResult.Result, combinedResult.Err
 }
 
-func (r *Reconciler) processAgent(userDefinedAgent *v1beta1.InlineNodeAgent) (*reconcile.Result, error) {
+func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgentConfig) (*reconcile.Result, error) {
 	var instance nodeAgentInstance
-	NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(&userDefinedAgent)
+	NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(userDefinedAgent)
 	if err != nil {
 		return nil, err
 	}
@@ -330,6 +330,7 @@ func (r *Reconciler) processAgent(userDefinedAgent *v1beta1.InlineNodeAgent) (*r
 	}
 
 	instance = nodeAgentInstance{
+		name:                name,
 		nodeAgent:           NodeAgentFluentbitDefaults,
 		reconciler:          r.GenericResourceReconciler,
 		logging:             r.Logging,
@@ -384,7 +385,7 @@ func RegisterWatches(builder *builder.Builder) *builder.Builder {
 
 // nodeAgent QualifiedName
 func (n *nodeAgentInstance) QualifiedName(name string) string {
-	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.nodeAgent.Name, name)
+	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.name, name)
 }
 
 // nodeAgent FluentdQualifiedName

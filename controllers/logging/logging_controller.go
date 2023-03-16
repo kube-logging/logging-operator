@@ -194,16 +194,13 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
 		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
 		// for compatibility reasons
-		var agents []loggingv1beta1.NodeAgentSpec
+		agents := make(map[string]loggingv1beta1.NodeAgentConfig)
 		for _, a := range loggingResources.NodeAgents {
-			agents = append(agents, a.Spec)
+			agents[a.Name] = a.Spec.NodeAgentConfig
 		}
 		for _, a := range logging.Spec.NodeAgents {
 			if !agentExists(a.Name, loggingResources.NodeAgents) {
-				agents = append(agents, loggingv1beta1.NodeAgentSpec{
-					LoggingRef:      logging.Spec.LoggingRef,
-					InlineNodeAgent: a,
-				})
+				agents[a.Name] = a.NodeAgentConfig
 			} else {
 				log.Error(errors.New("nodeagent definition conflict"),
 					fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name))
