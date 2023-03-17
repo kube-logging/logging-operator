@@ -135,8 +135,8 @@ const (
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "v0.0.2"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/custom-runner"
-	DefaultFluentdBufferVolumeImageTag          = "v0.4.0"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
+	DefaultFluentdBufferVolumeImageTag          = "v0.2.0"
 )
 
 // SetDefaults fills empty attributes
