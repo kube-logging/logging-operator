@@ -1071,6 +1071,11 @@ func (in *MattermostOutputConfig) DeepCopyInto(out *MattermostOutputConfig) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.EnableTLS != nil {
+		in, out := &in.EnableTLS, &out.EnableTLS
+		*out = new(bool)
+		**out = **in
+	}
 	if in.CAPath != nil {
 		in, out := &in.CAPath, &out.CAPath
 		*out = new(secret.Secret)
