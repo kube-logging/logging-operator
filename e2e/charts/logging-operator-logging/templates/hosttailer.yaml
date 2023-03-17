@@ -1,0 +1,24 @@
+{{- with $.Values.hostTailer }}
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: HostTailer
+metadata:
+  name: {{ .name | default "hosttailer" }}
+spec:
+  enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.enableRecreateWorkloadOnImmutableFieldChange }}
+{{- with .workloadOverrides }}
+  workloadOverrides:
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .containerOverrides }}
+  containerOverrides:
+{{- toYaml . | nindent 4 }}
+{{- end }}
+{{- with .fileTailers }}
+  fileTailers:
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .systemdTailers }}
+  systemdTailers:
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- end }}
