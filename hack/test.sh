@@ -13,9 +13,10 @@ function main()
     remove_test_bucket "${mc_pod}"
     create_test_bucket "${mc_pod}"
     kubectl apply -f "${SCRIPT_PATH}/secret.yaml"
-    helm_add_repo
     helm_deploy_logging_operator
     configure_logging
+
+
 
     wait_for_log_files "${mc_pod}" 300
     print_logs "${mc_pod}"
@@ -59,7 +60,7 @@ function helm_deploy_logging_operator()
         --set image.repository='controller' \
         --version 4.0.0 \
         logging-operator \
-        "kube-logging/logging-operator"
+        "e2e/charts/logging-operator"
 }
 
 function configure_logging()
@@ -74,7 +75,7 @@ function configure_logging()
         --set fluentd.image.repository='fluentd' \
         --version 4.0.0 \
         'logging-operator-logging-tls' \
-        "kube-logging/logging-operator-logging"
+        "e2e/charts/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
     kubectl apply -f "${SCRIPT_PATH}/clusterflow.yaml"
 }

@@ -242,6 +242,7 @@ rules:
   - clusteroutputs
   - flows
   - loggings
+  - nodeagents
   - outputs
   verbs:
   - create
@@ -258,6 +259,7 @@ rules:
   - clusteroutputs/status
   - flows/status
   - loggings/status
+  - nodeagents/status
   - outputs/status
   verbs:
   - get
