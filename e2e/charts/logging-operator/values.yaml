@@ -9,7 +9,7 @@ image:
   repository: ghcr.io/kube-logging/logging-operator
 
   # -- Image tag override for the default value (chart appVersion).
-  tag: 4.0.0
+  tag: ""
 
   # -- [Image pull policy](https://kubernetes.io/docs/concepts/containers/images/#updating-images) for updating already existing images on a node.
   pullPolicy: IfNotPresent
