@@ -43,7 +43,7 @@ type _hugoMongoDB interface{} //nolint:deadcode,unused
 type _docMongoDB interface{} //nolint:deadcode,unused
 
 // +name:"MongoDB Destination"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/45#TOPIC-1829079"
+// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.17/administration-guide/38#TOPIC-989689"
 // +description:"Sending messages into MongoDB Server"
 // +status:"Testing"
 type _metaMongoDB interface{} //nolint:deadcode,unused
