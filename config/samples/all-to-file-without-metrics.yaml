@@ -1,0 +1,33 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: all-to-file
+spec:
+  fluentd: {}
+  controlNamespace: default
+  fluentbit: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+spec:
+  filters:
+    - tag_normaliser: {}
+  match:
+    - select: {}
+  localOutputRefs:
+    - file
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: file
+spec:
+  file:
+    path: /tmp/logs/${tag}
+    append: true
+    buffer:
+      timekey: 1m
+      timekey_wait: 10s
+      timekey_use_utc: true

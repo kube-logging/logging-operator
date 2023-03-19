@@ -1,0 +1,35 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: all-to-es
+spec:
+  syslogNG: {}
+  controlNamespace: default
+  fluentbit: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all
+spec:
+  localOutputRefs:
+    - es
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: es
+spec:
+  elasticsearch:
+    url: "https://quickstart-es-http:9200/_bulk"
+    persist_name: "output_default_test-elasticsearch-out"
+    index: "lo-index2"
+    type: ""
+    user: "elastic"
+    password: 
+      value: "5d44mhOThi9h4l30DS0h7In9"
+    tls:
+      peer-verify: false
+
+
+    

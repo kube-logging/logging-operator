@@ -1,0 +1,45 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: all-to-file
+spec:
+  controlNamespace: default
+  syslogNG:
+    bufferVolumeMetrics:
+      mount_name: buffers
+      serviceMonitor: true
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: syslog-ng
+                volumeMounts:
+                  - mountPath: /buffers
+                    name: buffers
+        volumeClaimTemplates:
+          - metadata:
+              name: buffers
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 3Gi
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all
+spec:
+  localOutputRefs:
+    - file
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: file
+spec:
+  file:
+    path: /tmp/logs/${tag}

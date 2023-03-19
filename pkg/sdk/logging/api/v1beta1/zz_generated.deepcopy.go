@@ -2897,6 +2897,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.MQTT)
 		**out = **in
 	}
+	if in.Redis != nil {
+		in, out := &in.Redis, &out.Redis
+		*out = new(syslogngoutput.Redis)
+		**out = **in
+	}
 	if in.SumologicHTTP != nil {
 		in, out := &in.SumologicHTTP, &out.SumologicHTTP
 		*out = new(syslogngoutput.SumologicHTTPOutput)
