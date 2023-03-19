@@ -13,6 +13,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.9
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
+	github.com/siliconbrain/go-seqs v0.6.0
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.24.0

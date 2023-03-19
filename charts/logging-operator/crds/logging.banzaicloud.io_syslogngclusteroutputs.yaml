@@ -943,6 +943,27 @@ spec:
                   topic:
                     type: string
                 type: object
+              redis:
+                properties:
+                  command:
+                    type: string
+                  command_and_arguments:
+                    items:
+                      type: string
+                    type: array
+                  host:
+                    type: string
+                  port:
+                    type: integer
+                  retries:
+                    type: integer
+                  throttle:
+                    type: integer
+                  time-reopen:
+                    type: integer
+                  workers:
+                    type: integer
+                type: object
               sumologic-http:
                 properties:
                   batch-bytes:
