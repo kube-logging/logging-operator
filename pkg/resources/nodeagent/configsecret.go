@@ -171,25 +171,30 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 	}
 
 	input := fluentBitConfig{
-		Flush:         n.nodeAgent.FluentbitSpec.Flush,
-		Grace:         n.nodeAgent.FluentbitSpec.Grace,
-		LogLevel:      n.nodeAgent.FluentbitSpec.LogLevel,
-		CoroStackSize: n.nodeAgent.FluentbitSpec.CoroStackSize,
-		Namespace:     n.logging.Spec.ControlNamespace,
-		TLS: struct {
+		Flush:                   n.nodeAgent.FluentbitSpec.Flush,
+		Grace:                   n.nodeAgent.FluentbitSpec.Grace,
+		LogLevel:                n.nodeAgent.FluentbitSpec.LogLevel,
+		CoroStackSize:           n.nodeAgent.FluentbitSpec.CoroStackSize,
+		Namespace:               n.logging.Spec.ControlNamespace,
+		Monitor:                 monitor,
+		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
+		Input:                   fluentbitInput,
+		DisableKubernetesFilter: disableKubernetesFilter,
+		KubernetesFilter:        fluentbitKubernetesFilter,
+		BufferStorage:           fluentbitBufferStorage,
+	}
+
+	if n.nodeAgent.FluentbitSpec != nil && n.nodeAgent.FluentbitSpec.TLS != nil {
+		input.TLS = struct {
 			Enabled   bool
 			SharedKey string
 		}{
 			Enabled:   *n.nodeAgent.FluentbitSpec.TLS.Enabled,
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
-		},
-		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
-		TargetPort:              n.logging.Spec.FluentdSpec.Port,
-		Input:                   fluentbitInput,
-		DisableKubernetesFilter: disableKubernetesFilter,
-		KubernetesFilter:        fluentbitKubernetesFilter,
-		BufferStorage:           fluentbitBufferStorage,
+		}
+	}
+	if n.logging.Spec.FluentdSpec != nil {
+		input.TargetPort = n.logging.Spec.FluentdSpec.Port
 	}
 	if n.nodeAgent.FluentbitSpec.FilterAws != nil {
 		awsFilter, err := mapper.StringsMap(n.nodeAgent.FluentbitSpec.FilterAws)

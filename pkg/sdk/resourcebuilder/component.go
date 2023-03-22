@@ -149,6 +149,9 @@ func AppendCRDResourceBuilders(rbs []reconciler.ResourceBuilder, modifiers ...CR
 			return CRD(loggingv1beta1.GroupVersion.Group, "syslogngclusteroutputs", modifiers...)
 		},
 		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(loggingv1beta1.GroupVersion.Group, "nodeagents", modifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
 			return CRD(extensionsv1alpha1.GroupVersion.Group, "hosttailers", modifiers...)
 		},
 		func() (runtime.Object, reconciler.DesiredState, error) {
