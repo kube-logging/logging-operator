@@ -1,0 +1,15 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: nodeagent-withref
+spec:
+  loggingRef: nodeagent
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: NodeAgent
+metadata:
+  name: fluentbit-withref
+spec:
+  loggingRef: nodeagent
+  nodeAgentFluentbit: {}
