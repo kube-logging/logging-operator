@@ -85,7 +85,7 @@ Deploy Logging Operator with our [Helm chart](https://kube-logging.github.io/doc
 
 ## Support
 
-If you encounter problems while using the Logging operator the documentation does not address, [open an issue](https://github.com/kube-logging/logging-operator/issues) or talk to us on the Banzai Cloud Slack channel [#logging-operator](https://banzaicloud.com/invite-slack/).
+If you encounter problems while using the Logging operator the documentation does not address, [open an issue](https://github.com/kube-logging/logging-operator/issues) or talk to us on the [#logging-operator Discord channel](https://discord.gg/eAcqmAVU2u).
 
 ## Documentation
 
