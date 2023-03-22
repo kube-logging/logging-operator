@@ -182,15 +182,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
-	agentExists := func(name string, agents []loggingv1beta1.NodeAgent) bool {
-		for _, a := range agents {
-			if name == a.Name {
-				return true
-			}
-		}
-		return false
-	}
-
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
 		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
 		// for compatibility reasons
@@ -199,7 +190,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			agents[a.Name] = a.Spec.NodeAgentConfig
 		}
 		for _, a := range logging.Spec.NodeAgents {
-			if !agentExists(a.Name, loggingResources.NodeAgents) {
+			if _, exists := agents[a.Name]; !exists {
 				agents[a.Name] = a.NodeAgentConfig
 			} else {
 				log.Error(errors.New("nodeagent definition conflict"),
