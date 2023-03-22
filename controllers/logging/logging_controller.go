@@ -193,8 +193,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if _, exists := agents[a.Name]; !exists {
 				agents[a.Name] = a.NodeAgentConfig
 			} else {
-				log.Error(errors.New("nodeagent definition conflict"),
-					fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name))
+				problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name)
+				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
 		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)

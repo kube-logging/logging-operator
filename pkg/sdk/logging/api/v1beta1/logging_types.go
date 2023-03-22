@@ -86,6 +86,7 @@ type LoggingSpec struct {
 // LoggingStatus defines the observed state of Logging
 type LoggingStatus struct {
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
+	Problems           []string        `json:"problems,omitempty"`
 }
 
 // +kubebuilder:object:root=true

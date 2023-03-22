@@ -7,6 +7,8 @@ spec:
   nodeAgents:
     - name: fluentbit-inline
       nodeAgentFluentbit: {}
+    - name: fluentbit-standalone
+      nodeAgentFluentbit: { }
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: NodeAgent

@@ -17387,6 +17387,10 @@ spec:
                 additionalProperties:
                   type: boolean
                 type: object
+              problems:
+                items:
+                  type: string
+                type: array
             type: object
         type: object
     served: true
