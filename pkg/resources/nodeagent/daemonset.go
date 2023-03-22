@@ -153,7 +153,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
+	if n.nodeAgent.FluentbitSpec != nil && n.nodeAgent.FluentbitSpec.TLS != nil && util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-bit-tls",

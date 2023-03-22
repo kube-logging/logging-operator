@@ -1,0 +1,18 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: nodeagent
+spec:
+  controlNamespace: default
+  nodeAgents:
+    - name: fluentbit-inline
+      nodeAgentFluentbit: {}
+    - name: fluentbit-standalone
+      nodeAgentFluentbit: { }
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: NodeAgent
+metadata:
+  name: fluentbit-standalone
+spec:
+  nodeAgentFluentbit: {}

@@ -50,6 +50,8 @@ type LoggingSpec struct {
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
 	// Fluentbit daemonset configuration.
+	// Deprecated, will be removed with next major version
+	// Migrate to the standalone NodeAgent resource
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
@@ -71,8 +73,9 @@ type LoggingSpec struct {
 	ControlNamespace string `json:"controlNamespace"`
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
-	// NodeAgent Configuration
-	NodeAgents []*NodeAgent `json:"nodeAgents,omitempty"`
+	// InlineNodeAgent Configuration
+	// Deprecated, will be removed with next major version
+	NodeAgents []*InlineNodeAgent `json:"nodeAgents,omitempty"`
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
 	// in case there is a change in an immutable field
@@ -83,6 +86,7 @@ type LoggingSpec struct {
 // LoggingStatus defines the observed state of Logging
 type LoggingStatus struct {
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
+	Problems           []string        `json:"problems,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -135,8 +139,8 @@ const (
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "v0.0.2"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/custom-runner"
-	DefaultFluentdBufferVolumeImageTag          = "v0.4.0"
+	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
+	DefaultFluentdBufferVolumeImageTag          = "v0.2.0"
 )
 
 // SetDefaults fills empty attributes
