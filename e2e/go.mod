@@ -7,7 +7,7 @@ require (
 	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.7.26
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.2
 	k8s.io/api v0.26.2
 	k8s.io/apiextensions-apiserver v0.26.2
 	k8s.io/apimachinery v0.26.2
