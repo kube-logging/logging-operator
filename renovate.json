@@ -1,6 +1,20 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
-  ]
+    "config:base",
+    "schedule:daily",
+    "group:all"
+  ],
+  "automerge": true,
+  "major": {
+    "automerge": false
+  },
+  "gomodTidy": true,
+  "requiredStatusChecks": null,
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "constraints": {
+    "go": "1.20"
+  }
 }
