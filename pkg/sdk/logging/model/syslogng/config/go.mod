@@ -8,8 +8,8 @@ require (
 	github.com/siliconbrain/go-seqs v0.3.1
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
-	k8s.io/api v0.26.2
-	k8s.io/apimachinery v0.26.2
+	k8s.io/api v0.26.3
+	k8s.io/apimachinery v0.26.3
 	sigs.k8s.io/controller-runtime v0.14.5
 )
 
