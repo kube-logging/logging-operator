@@ -1,5 +1,5 @@
 # Workaround for https://gitlab.alpinelinux.org/alpine/aports/-/issues/12821
-FROM alpine:3.13
+FROM alpine:3.17
 LABEL Description="Fluentd docker image" Vendor="Banzai Cloud" Version="1.14.6"
 
 # Do not split this into multiple RUN!
