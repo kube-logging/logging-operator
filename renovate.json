@@ -16,5 +16,9 @@
   ],
   "constraints": {
     "go": "1.20"
-  }
+  },
+  "ignoreDeps": [
+    "github.com/MakeNowJust/heredoc/v2",
+    "github.com/onsi/ginkgo/v2"
+  ]
 }

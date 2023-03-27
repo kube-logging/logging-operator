@@ -4,13 +4,13 @@ go 1.20
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/MakeNowJust/heredoc/v2 v2.0.1
+	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/cisco-open/operator-tools v0.29.0
 	github.com/go-logr/logr v1.2.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
-	github.com/onsi/ginkgo/v2 v2.9.2
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.5
 	github.com/pborman/uuid v1.2.1
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.63.0
@@ -26,7 +26,6 @@ require (
 )
 
 require (
-	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/briandowns/spinner v1.12.0 // indirect
