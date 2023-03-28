@@ -56,7 +56,7 @@ const (
 	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
 	prometheusExporterImageTag        = "v0.0.14"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.2.0"
+	bufferVolumeImageTag              = "v0.3.0"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
 	configReloaderImageTag            = "v1.0.1"
 	socketVolumeName                  = "socket"
