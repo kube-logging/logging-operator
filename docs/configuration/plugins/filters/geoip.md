@@ -24,7 +24,7 @@ Specify optional geoip database (using bundled GeoLiteCity databse by default)
 
 Default: -
 
-### geoip_2_database (string, optional) {#geoip-geoip_2_database}
+### geoip2_database (string, optional) {#geoip-geoip2_database}
 
 Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default) 
 
