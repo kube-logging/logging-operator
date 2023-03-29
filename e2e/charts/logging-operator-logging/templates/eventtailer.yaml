@@ -5,15 +5,7 @@ metadata:
   name: {{ .name | default "event-tailer" }}
 spec:
   controlNamespace: {{ $.Values.controlNamespace | default $.Release.Namespace }}
-{{- with .workloadOverrides }}
-  workloadOverrides:
-{{ toYaml . | indent 4 }}
-{{- end }}
-{{- with .containerOverrides }}
-  containerOverrides:
-{{- toYaml . | nindent 4 }}
-{{- end }}
-{{- with .pvc }}
+  {{- with .pvc }}
   positionVolume:
     pvc:
       spec:
@@ -22,8 +14,20 @@ spec:
           requests:
             storage: {{ .storage | default "1Gi" }}
         volumeMode: {{ .volumeMode | default "Filesystem" }}
-{{- with .storageClassName }}
+        {{- with .storageClassName }}
         storageClassName: {{ . }}
-{{- end }}
-{{- end }}
+        {{- end }}
+  {{- end }}
+  {{- with .workloadMetaOverrides }}
+  workloadMetaOverrides:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .workloadOverrides }}
+  workloadOverrides:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .containerOverrides }}
+  containerOverrides:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
