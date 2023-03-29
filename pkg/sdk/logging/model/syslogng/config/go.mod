@@ -10,7 +10,7 @@ require (
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
 	k8s.io/api v0.26.3
 	k8s.io/apimachinery v0.26.3
-	sigs.k8s.io/controller-runtime v0.14.5
+	sigs.k8s.io/controller-runtime v0.14.6
 )
 
 require (
