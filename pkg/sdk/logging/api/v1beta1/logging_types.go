@@ -45,7 +45,7 @@ type LoggingSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 	// Disable configuration check before applying new fluentd configuration.
 	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
-	// Skip Invalid Resources
+	// Whether to skip invalid Flow and ClusterFlow resources
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`

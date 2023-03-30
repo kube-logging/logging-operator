@@ -22,7 +22,7 @@ Default: -
 
 ### skipInvalidResources (bool, optional) {#loggingspec-skipinvalidresources}
 
-Skip Invalid Resources 
+Whether to skip invalid Flow and ClusterFlow resources 
 
 Default: -
 

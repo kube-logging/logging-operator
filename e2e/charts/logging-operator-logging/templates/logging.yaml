@@ -5,51 +5,17 @@ metadata:
   labels:
 {{ include "logging-operator-logging.labels" . | indent 4 }}
 spec:
-  {{- with .Values.enableRecreateWorkloadOnImmutableFieldChange }}
-  enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
-  {{- end}}
   {{- with .Values.loggingRef }}
   loggingRef: {{ . }}
   {{- end }}
   {{- with .Values.flowConfigCheckDisabled }}
   flowConfigCheckDisabled: {{ . }}
   {{- end }}
-  {{- with .Values.flowConfigOverride }}
-  flowConfigOverride: {{ . }}
-  {{- end }}
-  {{- with .Values.allowClusterResourcesFromAllNamespaces }}
-  allowClusterResourcesFromAllNamespaces: {{ . }}
-  {{- end }}
   {{- with .Values.skipInvalidResources }}
   skipInvalidResources: {{ . }}
   {{- end }}
-  {{- if .Values.watchNamespaces }}
-  watchNamespaces:
-{{ toYaml .Values.watchNamespaces | indent 4 }}
-  {{- end }}
-  clusterDomain: {{ .Values.clusterDomain }}
-  controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
-  {{- if .Values.defaultFlow }}
-  defaultFlow:
-{{ toYaml .Values.defaultFlow | indent 4 }}
-  {{- end }}
-  {{- if .Values.globalFilters }}
-  globalFilters:
-{{ toYaml .Values.globalFilters | indent 4 }}
-  {{- end }}
-  {{- if or .Values.tls.enabled .Values.fluentd }}
-  fluentd:
-    {{- if .Values.tls.enabled }}
-    tls:
-      enabled: true
-      secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
-      sharedKey: "{{ .Values.tls.sharedKey }}"
-    {{- end }}
-    {{- if .Values.fluentd }}
-{{ toYaml .Values.fluentd | indent 4 }}
-    {{- end }}
-  {{- else }}
-  fluentd: {}
+  {{- with .Values.flowConfigOverride }}
+  flowConfigOverride: {{ . }}
   {{- end }}
   {{- if or .Values.tls.enabled .Values.fluentbit }}
   fluentbit:
@@ -59,15 +25,50 @@ spec:
       secretName: {{ .Values.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
       sharedKey: "{{ .Values.tls.sharedKey }}"
     {{- end }}
-    {{- if .Values.fluentbit }}
-{{ toYaml .Values.fluentbit | indent 4 }}
+    {{- with .Values.fluentbit }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- else }}
-  fluentbit: {}
   {{- end }}
-  {{- if .Values.nodeAgents }}
+  {{- if or .Values.tls.enabled .Values.fluentd }}
+  fluentd:
+    {{- if .Values.tls.enabled }}
+    tls:
+      enabled: true
+      secretName: {{ .Values.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
+      sharedKey: "{{ .Values.tls.sharedKey }}"
+    {{- end }}
+    {{- with .Values.fluentd }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.syslogNG }}
+  syslogNG:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.defaultFlow }}
+  defaultFlow:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.errorOutputRef }}
+  errorOutputRef: {{ . }}
+  {{- end }}
+  {{- with .Values.globalFilters }}
+  globalFilters:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.watchNamespaces }}
+  watchNamespaces:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  clusterDomain: {{ .Values.clusterDomain }}
+  controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
+  {{- with .Values.allowClusterResourcesFromAllNamespaces }}
+  allowClusterResourcesFromAllNamespaces: {{ . }}
+  {{- end }}
+  {{- with .Values.nodeAgents }}
   nodeAgents:
-{{ toYaml .Values.nodeAgents | indent 4 }}
-  {{- else }}
-  nodeAgents: []
+    {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- with .Values.enableRecreateWorkloadOnImmutableFieldChange }}
+  enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
+  {{- end}}

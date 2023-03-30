@@ -2,18 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Reference name of the logging deployment
-loggingRef: ""
-# Disable configuration check before deploy
-flowConfigCheckDisabled: false
-# Use static configuration instead of generated config.
-flowConfigOverride: ""
-
 nameOverride: ""
 fullnameOverride: ""
-
-# -- Permit deletion and recreation of resources on update of immutable field.
-enableRecreateWorkloadOnImmutableFieldChange: false
 
 tls:
   # -- Enable secure connection between fluentd and fluent-bit
@@ -28,10 +18,24 @@ tls:
   # Shared key between nodes (fluentd-fluentbit)
   sharedKey: ""
 
-# -- Fluent-bit configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/fluentbit_types/
+
+
+# -- Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset.
+loggingRef: ""
+
+# -- Disable configuration check before applying new fluentd configuration.
+flowConfigCheckDisabled: false
+
+# -- Whether to skip invalid Flow and ClusterFlow resources
+skipInvalidResources: false
+
+# -- Override generated config. This is a raw configuration string for troubleshooting purposes.
+flowConfigOverride: ""
+
+# -- Fluent-bit configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentbit_types/
 fluentbit: {}
 
-# -- Fluentd configurations https://banzaicloud.com/docs/one-eye/logging-operator/configuration/crds/v1beta1/fluentd_types/
+# -- Fluentd configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentd_types/
 fluentd: {}
 # 20Gi persistent storage is configured for fluentd by default.
 # Here is an example, on how to override it:
@@ -44,7 +48,31 @@ fluentd: {}
 #          requests:
 #            storage: 40Gi
 
-# -- Node agents definitions
+# -- Syslog-NG statefulset configuration
+syslogNG: {}
+
+# -- Default flow for unmatched logs. This Flow configuration collects all logs that didn’t matched any other Flow.
+defaultFlow: {}
+
+# -- GlobalOutput name to flush ERROR events to
+errorOutputRef: ""
+
+# -- Global filters to apply on logs before any match or filter mechanism.
+globalFilters: []
+
+# -- Limit namespaces to watch Flow and Output custom resources.
+watchNamespaces: []
+
+# -- Cluster domain name to be used when templating URLs to services
+clusterDomain: "cluster.local"
+
+# -- Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well.
+controlNamespace: ""
+
+# -- Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
+allowClusterResourcesFromAllNamespaces: false
+
+# -- NodeAgent Configuration
 nodeAgents: {}
 #  - name: win-agent
 #    profile: windows
@@ -67,26 +95,8 @@ nodeAgents: {}
 #      tls:
 #        enabled: false
 
-# -- Whether to skip invalid Flow and ClusterFlow resources
-skipInvalidResources: false
-
-# -- Limit namespaces from where to read Flow and Output specs
-watchNamespaces: []
-
-# -- Cluster domain name to be used when templating URLs to services
-clusterDomain: "cluster.local"
-
-# -- Control namespace that contains ClusterOutput and ClusterFlow resources
-controlNamespace: ""
-
-# -- Allow configuration of cluster resources from any namespace
-allowClusterResourcesFromAllNamespaces: false
-
-# -- Default flow
-defaultFlow: {}
-
-# -- Global filters
-globalFilters: []
+# -- EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update.
+enableRecreateWorkloadOnImmutableFieldChange: false
 
 # -- ClusterFlows to deploy
 clusterFlows: []
