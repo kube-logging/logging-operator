@@ -28,8 +28,6 @@ spec:
     {{- with .Values.fluentbit }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- else }}
-  fluentbit: {}
   {{- end }}
   {{- if or .Values.tls.enabled .Values.fluentd }}
   fluentd:
@@ -42,8 +40,6 @@ spec:
     {{- with .Values.fluentd }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- else }}
-  fluentd: {}
   {{- end }}
   {{- with .Values.syslogNG }}
   syslogNG:
@@ -72,8 +68,6 @@ spec:
   {{- with .Values.nodeAgents }}
   nodeAgents:
     {{ toYaml . | nindent 4 }}
-  {{- else }}
-  nodeAgents: []
   {{- end }}
   {{- with .Values.enableRecreateWorkloadOnImmutableFieldChange }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
