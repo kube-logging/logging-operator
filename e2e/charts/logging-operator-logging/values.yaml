@@ -19,7 +19,6 @@ tls:
   sharedKey: ""
 
 
-
 # -- Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset.
 loggingRef: ""
 
