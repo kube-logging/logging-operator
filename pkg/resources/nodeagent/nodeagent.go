@@ -38,14 +38,50 @@ import (
 )
 
 const (
-	defaultServiceAccountName      = "fluentbit"
-	clusterRoleBindingName         = "fluentbit"
-	clusterRoleName                = "fluentbit"
-	fluentBitSecretConfigName      = "fluentbit"
-	fluentbitDaemonSetName         = "fluentbit"
-	fluentbitPodSecurityPolicyName = "fluentbit"
-	fluentbitServiceName           = "fluentbit"
-	containerName                  = "fluent-bit"
+	serviceAccountNameFluentbit     = "fluentbit"
+	clusterRoleBindingNameFluentbit = "fluentbit"
+	clusterRoleNameFluentbit        = "fluentbit"
+	SecretConfigNameFluentbit       = "fluentbit"
+	DaemonSetNameFluentbit          = "fluentbit"
+	PodSecurityPolicyNameFluentbit  = "fluentbit"
+	ServiceNameFluentbit            = "fluentbit"
+	containerNameFluentbit          = "fluent-bit"
+)
+const (
+	serviceAccountNameSyslogNG                = "syslog-ng"
+	secretConfigNameSyslogNG                  = "syslog-ng"
+	DaemonSetNameSyslogNG                     = "syslog-ng"
+	PodSecurityPolicyNameSyslogNG             = "syslog-ng"
+	serviceNameSyslogNG                       = "syslog-ng"
+	imageImageRepositorySyslogNG              = "ghcr.io/axoflow/syslog-ng"
+	ServicePortSyslogNG                       = 601
+	configSecretNameSyslogNG                  = "syslog-ng"
+	configKeySyslogNG                         = "syslog-ng.conf"
+	statefulSetNameSyslogNG                   = "syslog-ng"
+	outputSecretNameSyslogNG                  = "syslog-ng-output"
+	OutputSecretPathSyslogNG                  = "/etc/syslog-ng/secret"
+	bufferPathSyslogNG                        = "/buffers"
+	roleBindingNameSyslogNG                   = "syslog-ng"
+	roleNameSyslogNG                          = "syslog-ng"
+	clusterRoleBindingNameSyslogNG            = "syslog-ng"
+	clusterRoleNameSyslogNG                   = "syslog-ng"
+	containerNameSyslogNG                     = "syslog-ng"
+	defaultBufferVolumeMetricsPortSyslogNG    = 9200
+	imageRepositorySyslogNG                   = "ghcr.io/axoflow/syslog-ng"
+	imageTagSyslogNG                          = "4.1.1"
+	prometheusExporterImageRepositorySyslogNG = "ghcr.io/kube-logging/syslog-ng-exporter"
+	prometheusExporterImageTagSyslogNG        = "v0.0.14"
+	bufferVolumeImageRepositorySyslogNG       = "ghcr.io/kube-logging/node-exporter"
+	bufferVolumeImageTagSyslogNG              = "v0.2.0"
+	configReloaderImageRepositorySyslogNG     = "ghcr.io/kube-logging/syslogng-reload"
+	configReloaderImageTagSyslogNG            = "v1.0.1"
+	socketVolumeNameSyslogNG                  = "socket"
+	socketPathSyslogNG                        = "/tmp/syslog-ng/syslog-ng.ctl"
+	configDirSyslogNG                         = "/etc/syslog-ng/config"
+	configVolumeNameSyslogNG                  = "config"
+	tlsVolumeNameSyslogNG                     = "tls"
+	metricsPortNumberSyslogNG                 = 9577
+	metricsPortNameSyslogNG                   = "exporter"
 )
 
 func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.NodeAgentConfig, error) {
@@ -60,7 +96,7 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 						Spec: typeoverride.PodSpec{
 							Containers: []v1.Container{
 								{
-									Name:            containerName,
+									Name:            containerNameFluentbit,
 									Image:           "fluent/fluent-bit:1.9.10",
 									Command:         []string{"/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/conf_operator/fluent-bit.conf"},
 									ImagePullPolicy: v1.PullIfNotPresent,
@@ -195,6 +231,139 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 	return programDefault, nil
 }
 
+func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.NodeAgentConfig, error) {
+	programDefault := &v1beta1.NodeAgentConfig{
+		SyslogNGSpec: &v1beta1.NodeAgentSyslogNG{
+			DaemonSetOverrides: &typeoverride.DaemonSet{
+				Spec: typeoverride.DaemonSetSpec{
+					Template: typeoverride.PodTemplateSpec{
+						ObjectMeta: typeoverride.ObjectMeta{
+							Annotations: map[string]string{},
+						},
+						Spec: typeoverride.PodSpec{
+							Containers: []v1.Container{
+								{
+									Name:  containerNameSyslogNG,
+									Image: v1beta1.RepositoryWithTag(imageRepositorySyslogNG, imageTagSyslogNG),
+									Args: []string{
+										"--cfgfile=" + configDirSyslogNG + "/" + configKeySyslogNG,
+										"--control=" + socketPathSyslogNG,
+										"--no-caps",
+										"-Fe",
+									},
+									ImagePullPolicy: v1.PullIfNotPresent,
+									Resources: v1.ResourceRequirements{
+										Limits: v1.ResourceList{
+											v1.ResourceMemory: resource.MustParse("400M"),
+											v1.ResourceCPU:    resource.MustParse("1000m"),
+										},
+										Requests: v1.ResourceList{
+											v1.ResourceMemory: resource.MustParse("100M"),
+											v1.ResourceCPU:    resource.MustParse("500m"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Security: &v1beta1.Security{
+				RoleBasedAccessControlCreate: util.BoolPointer(true),
+				SecurityContext:              &v1.SecurityContext{},
+				PodSecurityContext:           &v1.PodSecurityContext{},
+			},
+			ContainersPath: "/var/lib/docker/containers",
+			VarLogsPath:    "/var/log",
+		},
+	}
+	if userDefined.FluentbitSpec == nil {
+		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
+	}
+
+	if userDefined.FluentbitSpec.FilterAws != nil {
+		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
+			ImdsVersion:     "v2",
+			AZ:              util.BoolPointer(true),
+			Ec2InstanceID:   util.BoolPointer(true),
+			Ec2InstanceType: util.BoolPointer(false),
+			PrivateIP:       util.BoolPointer(false),
+			AmiID:           util.BoolPointer(false),
+			AccountID:       util.BoolPointer(false),
+			Hostname:        util.BoolPointer(false),
+			VpcID:           util.BoolPointer(false),
+			Match:           "*",
+		}
+
+		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, userDefined.FluentbitSpec.FilterAws)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
+		if userDefined.Profile != "windows" {
+			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
+				Port: 2020,
+				Path: "/",
+			}
+		}
+	}
+
+	if userDefined.FluentbitSpec.Metrics != nil {
+
+		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
+			Interval: "15s",
+			Timeout:  "5s",
+			Port:     2020,
+			Path:     "/api/v1/metrics/prometheus",
+		}
+		err := merge.Merge(programDefault.FluentbitSpec.Metrics, userDefined.FluentbitSpec.Metrics)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if programDefault.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics.PrometheusAnnotations {
+		defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
+			Annotations: map[string]string{
+				"prometheus.io/scrape": "true",
+				"prometheus.io/path":   programDefault.FluentbitSpec.Metrics.Path,
+				"prometheus.io/port":   fmt.Sprintf("%d", programDefault.FluentbitSpec.Metrics.Port),
+			},
+		}
+		err := merge.Merge(&(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if programDefault.FluentbitSpec.Metrics != nil {
+		defaultLivenessProbe := &v1.Probe{
+			ProbeHandler: v1.ProbeHandler{
+				HTTPGet: &v1.HTTPGetAction{
+					Path: programDefault.FluentbitSpec.Metrics.Path,
+					Port: intstr.IntOrString{
+						IntVal: programDefault.FluentbitSpec.Metrics.Port,
+					},
+				}},
+			InitialDelaySeconds: 10,
+			TimeoutSeconds:      0,
+			PeriodSeconds:       10,
+			SuccessThreshold:    0,
+			FailureThreshold:    3,
+		}
+		if programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
+			programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
+		}
+
+		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return programDefault, nil
+}
+
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentConfig{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		FilterKubernetes: v1beta1.FilterKubernetes{
@@ -214,7 +383,7 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentConfig{
 					Spec: typeoverride.PodSpec{
 						Containers: []v1.Container{
 							{
-								Name:    containerName,
+								Name:    containerNameFluentbit,
 								Image:   "rancher/fluent-bit:1.6.10-rc7",
 								Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
 								Resources: v1.ResourceRequirements{
@@ -243,18 +412,28 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
 }
 
-func (n *nodeAgentInstance) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
-		"app.kubernetes.io/name":     "fluentbit",
-		"app.kubernetes.io/instance": n.name,
-	}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
+func (n *nodeAgentInstance) getNodeAgentLabels() map[string]string {
+	if n.nodeAgent.FluentbitSpec != nil {
+		return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
+			"app.kubernetes.io/name":     "fluentbit",
+			"app.kubernetes.io/instance": n.name,
+		}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
+
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
+			"app.kubernetes.io/name":     "syslog-ng",
+			"app.kubernetes.io/instance": n.name,
+		}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
+
+	}
+	return nil
 }
 
 func (n *nodeAgentInstance) getServiceAccount() string {
 	if n.nodeAgent.FluentbitSpec.Security.ServiceAccount != "" {
 		return n.nodeAgent.FluentbitSpec.Security.ServiceAccount
 	}
-	return n.QualifiedName(defaultServiceAccountName)
+	return n.QualifiedName(serviceAccountNameFluentbit)
 }
 
 //	type DesiredObject struct {

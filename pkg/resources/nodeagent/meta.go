@@ -24,7 +24,7 @@ func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:        n.QualifiedName(name),
 		Namespace:   n.logging.Spec.ControlNamespace,
-		Labels:      n.getFluentBitLabels(),
+		Labels:      n.getNodeAgentLabels(),
 		Annotations: n.nodeAgent.Metadata.Annotations,
 		OwnerReferences: []metav1.OwnerReference{
 			{
@@ -43,7 +43,7 @@ func (n *nodeAgentInstance) NodeAgentObjectMeta(name string) metav1.ObjectMeta {
 func (n *nodeAgentInstance) NodeAgentObjectMetaClusterScope(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:        n.QualifiedName(name),
-		Labels:      n.getFluentBitLabels(),
+		Labels:      n.getNodeAgentLabels(),
 		Annotations: n.nodeAgent.Metadata.Annotations,
 		OwnerReferences: []metav1.OwnerReference{
 			{

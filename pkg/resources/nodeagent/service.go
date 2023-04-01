@@ -27,67 +27,136 @@ import (
 )
 
 func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if n.nodeAgent.FluentbitSpec.Metrics != nil {
-		desired := &corev1.Service{
-			ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
-			Spec: corev1.ServiceSpec{
-				Ports: []corev1.ServicePort{
-					{
-						Protocol:   corev1.ProtocolTCP,
-						Name:       "http-metrics",
-						Port:       n.nodeAgent.FluentbitSpec.Metrics.Port,
-						TargetPort: intstr.IntOrString{IntVal: n.nodeAgent.FluentbitSpec.Metrics.Port},
+	if n.nodeAgent.FluentbitSpec != nil {
+		if n.nodeAgent.FluentbitSpec.Metrics != nil {
+			desired := &corev1.Service{
+				ObjectMeta: n.NodeAgentObjectMeta(ServiceNameFluentbit + "-monitor"),
+				Spec: corev1.ServiceSpec{
+					Ports: []corev1.ServicePort{
+						{
+							Protocol:   corev1.ProtocolTCP,
+							Name:       "http-metrics",
+							Port:       n.nodeAgent.FluentbitSpec.Metrics.Port,
+							TargetPort: intstr.IntOrString{IntVal: n.nodeAgent.FluentbitSpec.Metrics.Port},
+						},
 					},
+					Selector:  n.getNodeAgentLabels(),
+					Type:      corev1.ServiceTypeClusterIP,
+					ClusterIP: "None",
 				},
-				Selector:  n.getFluentBitLabels(),
-				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
-			},
+			}
+			err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.MetricsService)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+			return desired, reconciler.StatePresent, nil
 		}
-		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.MetricsService)
-		if err != nil {
-			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		return &corev1.Service{
+			ObjectMeta: n.NodeAgentObjectMeta(ServiceNameFluentbit + "-monitor"),
+			Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		if n.nodeAgent.SyslogNGSpec.Metrics != nil {
+			desired := &corev1.Service{
+				ObjectMeta: n.NodeAgentObjectMeta(serviceNameSyslogNG + "-monitor"),
+				Spec: corev1.ServiceSpec{
+					Ports: []corev1.ServicePort{
+						{
+							Protocol:   corev1.ProtocolTCP,
+							Name:       "http-metrics",
+							Port:       n.nodeAgent.SyslogNGSpec.Metrics.Port,
+							TargetPort: intstr.IntOrString{IntVal: n.nodeAgent.SyslogNGSpec.Metrics.Port},
+						},
+					},
+					Selector:  n.getNodeAgentLabels(),
+					Type:      corev1.ServiceTypeClusterIP,
+					ClusterIP: "None",
+				},
+			}
+			err := merge.Merge(desired, n.nodeAgent.SyslogNGSpec.MetricsService)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+			return desired, reconciler.StatePresent, nil
 		}
-		return desired, reconciler.StatePresent, nil
+		return &corev1.Service{
+			ObjectMeta: n.NodeAgentObjectMeta(serviceNameSyslogNG + "-monitor"),
+			Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 	}
-	return &corev1.Service{
-		ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
-		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitor {
-		objectMetadata := n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics")
-		if n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
+	if n.nodeAgent.FluentbitSpec != nil {
+		if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitor {
+			objectMetadata := n.NodeAgentObjectMeta(ServiceNameFluentbit + "-metrics")
+			if n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+				for k, v := range n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+					objectMetadata.Labels[k] = v
+				}
 			}
+			return &v1.ServiceMonitor{
+				ObjectMeta: objectMetadata,
+				Spec: v1.ServiceMonitorSpec{
+					JobLabel:        "",
+					TargetLabels:    nil,
+					PodTargetLabels: nil,
+					Endpoints: []v1.Endpoint{{
+						Port:                 "http-metrics",
+						Path:                 n.nodeAgent.FluentbitSpec.Metrics.Path,
+						HonorLabels:          n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+						RelabelConfigs:       n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
+						MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+						Interval:             v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Interval),
+						ScrapeTimeout:        v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Timeout),
+					}},
+					Selector: v12.LabelSelector{
+						MatchLabels: util.MergeLabels(n.getNodeAgentLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
+					},
+					NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
+					SampleLimit:       0,
+				},
+			}, reconciler.StatePresent, nil
 		}
 		return &v1.ServiceMonitor{
-			ObjectMeta: objectMetadata,
-			Spec: v1.ServiceMonitorSpec{
-				JobLabel:        "",
-				TargetLabels:    nil,
-				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{{
-					Port:                 "http-metrics",
-					Path:                 n.nodeAgent.FluentbitSpec.Metrics.Path,
-					HonorLabels:          n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs:       n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
-					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-					Interval:             v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Interval),
-					ScrapeTimeout:        v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Timeout),
-				}},
-				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
+			ObjectMeta: n.NodeAgentObjectMeta(ServiceNameFluentbit + "-metrics"),
+			Spec:       v1.ServiceMonitorSpec{},
+		}, reconciler.StateAbsent, nil
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+
+		if n.nodeAgent.SyslogNGSpec.Metrics != nil && n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitor {
+			objectMetadata := n.NodeAgentObjectMeta(ServiceNameFluentbit + "-metrics")
+			if n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+				for k, v := range n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+					objectMetadata.Labels[k] = v
+				}
+			}
+			return &v1.ServiceMonitor{
+				ObjectMeta: objectMetadata,
+				Spec: v1.ServiceMonitorSpec{
+					JobLabel:        "",
+					TargetLabels:    nil,
+					PodTargetLabels: nil,
+					Endpoints: []v1.Endpoint{{
+						Port:                 "http-metrics",
+						Path:                 n.nodeAgent.SyslogNGSpec.Metrics.Path,
+						HonorLabels:          n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+						RelabelConfigs:       n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
+						MetricRelabelConfigs: n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+						Interval:             v1.Duration(n.nodeAgent.SyslogNGSpec.Metrics.Interval),
+						ScrapeTimeout:        v1.Duration(n.nodeAgent.SyslogNGSpec.Metrics.Timeout),
+					}},
+					Selector: v12.LabelSelector{
+						MatchLabels: util.MergeLabels(n.getNodeAgentLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
+					},
+					NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
+					SampleLimit:       0,
 				},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
-			},
-		}, reconciler.StatePresent, nil
+			}, reconciler.StatePresent, nil
+		}
+		return &v1.ServiceMonitor{
+			ObjectMeta: n.NodeAgentObjectMeta(serviceNameSyslogNG + "-metrics"),
+			Spec:       v1.ServiceMonitorSpec{},
+		}, reconciler.StateAbsent, nil
 	}
-	return &v1.ServiceMonitor{
-		ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics"),
-		Spec:       v1.ServiceMonitorSpec{},
-	}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }

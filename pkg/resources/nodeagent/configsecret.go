@@ -90,7 +90,7 @@ type fluentBitConfig struct {
 func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
-			ObjectMeta: n.NodeAgentObjectMeta(fluentBitSecretConfigName),
+			ObjectMeta: n.NodeAgentObjectMeta(SecretConfigNameFluentbit),
 		}, reconciler.StateAbsent, nil
 	}
 	monitor := struct {
@@ -272,7 +272,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
 	}
 	confs := map[string][]byte{
-		BaseConfigName: []byte(conf),
+		BaseConfigNameFluentbit: []byte(conf),
 	}
 
 	if input.Upstream.Enabled {
@@ -280,13 +280,13 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		if err != nil {
 			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate upstream config for fluentbit")
 		}
-		confs[UpstreamConfigName] = []byte(upstreamConfig)
+		confs[UpstreamConfigNameFluentbit] = []byte(upstreamConfig)
 	}
 
 	n.configs = confs
 
 	return &corev1.Secret{
-		ObjectMeta: n.NodeAgentObjectMeta(fluentBitSecretConfigName),
+		ObjectMeta: n.NodeAgentObjectMeta(SecretConfigNameFluentbit),
 		Data:       confs,
 	}, reconciler.StatePresent, nil
 }

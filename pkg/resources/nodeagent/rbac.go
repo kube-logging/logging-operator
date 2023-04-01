@@ -24,66 +24,140 @@ import (
 )
 
 func (n *nodeAgentInstance) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
-		return &rbacv1.ClusterRole{
-			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName),
-			Rules: []rbacv1.PolicyRule{
-				{
-					APIGroups: []string{""},
-					Resources: []string{"pods", "namespaces"},
-					Verbs:     []string{"get", "list", "watch"},
+	if n.nodeAgent.FluentbitSpec != nil {
+		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+			return &rbacv1.ClusterRole{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameFluentbit),
+				Rules: []rbacv1.PolicyRule{
+					{
+						APIGroups: []string{""},
+						Resources: []string{"pods", "namespaces"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
 				},
-			},
-		}, reconciler.StatePresent, nil
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRole{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameFluentbit),
+			Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+
+		if n.nodeAgent.SyslogNGSpec != nil {
+			if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate {
+				return &rbacv1.ClusterRole{
+					ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameSyslogNG),
+					Rules: []rbacv1.PolicyRule{
+						{
+							APIGroups: []string{""},
+							Resources: []string{"pods", "namespaces"},
+							Verbs:     []string{"get", "list", "watch"},
+						},
+					},
+				}, reconciler.StatePresent, nil
+			}
+			return &rbacv1.ClusterRole{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameSyslogNG),
+				Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+		}
+
 	}
-	return &rbacv1.ClusterRole{
-		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName),
-		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
-		return &rbacv1.ClusterRoleBinding{
-			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName),
-			RoleRef: rbacv1.RoleRef{
-				Kind:     "ClusterRole",
-				APIGroup: "rbac.authorization.k8s.io",
-				Name:     n.QualifiedName(clusterRoleName),
-			},
-			Subjects: []rbacv1.Subject{
-				{
-					Kind:      "ServiceAccount",
-					Name:      n.getServiceAccount(),
-					Namespace: n.logging.Spec.ControlNamespace,
+	if n.nodeAgent.FluentbitSpec != nil {
+
+		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+			return &rbacv1.ClusterRoleBinding{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameFluentbit),
+				RoleRef: rbacv1.RoleRef{
+					Kind:     "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+					Name:     n.QualifiedName(clusterRoleNameFluentbit),
 				},
-			},
-		}, reconciler.StatePresent, nil
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      n.getServiceAccount(),
+						Namespace: n.logging.Spec.ControlNamespace,
+					},
+				},
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameFluentbit),
+			RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate {
+			return &rbacv1.ClusterRoleBinding{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameSyslogNG),
+				RoleRef: rbacv1.RoleRef{
+					Kind:     "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+					Name:     n.QualifiedName(clusterRoleNameSyslogNG),
+				},
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      n.getServiceAccount(),
+						Namespace: n.logging.Spec.ControlNamespace,
+					},
+				},
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameSyslogNG),
+			RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 	}
-	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName),
-		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
-	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {
-		desired := &corev1.ServiceAccount{
-			ObjectMeta: n.nodeAgent.Metadata.Merge(n.NodeAgentObjectMeta(defaultServiceAccountName)),
+	if n.nodeAgent.FluentbitSpec != nil {
+		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.ServiceAccount == "" {
+			desired := &corev1.ServiceAccount{
+				ObjectMeta: n.nodeAgent.Metadata.Merge(n.NodeAgentObjectMeta(serviceAccountNameFluentbit)),
+			}
+			err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+
+			return desired, reconciler.StatePresent, nil
+		} else {
+			desired := &corev1.ServiceAccount{
+				ObjectMeta: n.NodeAgentObjectMeta(serviceAccountNameFluentbit),
+			}
+
+			err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+			return desired, reconciler.StateAbsent, nil
 		}
-		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
-		if err != nil {
-			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.SyslogNGSpec.Security.ServiceAccount == "" {
+			desired := &corev1.ServiceAccount{
+				ObjectMeta: n.nodeAgent.Metadata.Merge(n.NodeAgentObjectMeta(serviceAccountNameSyslogNG)),
+			}
+			err := merge.Merge(desired, n.nodeAgent.SyslogNGSpec.ServiceAccountOverrides)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+
+			return desired, reconciler.StatePresent, nil
+		} else {
+			desired := &corev1.ServiceAccount{
+				ObjectMeta: n.NodeAgentObjectMeta(serviceAccountNameSyslogNG),
+			}
+
+			err := merge.Merge(desired, n.nodeAgent.SyslogNGSpec.ServiceAccountOverrides)
+			if err != nil {
+				return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+			}
+			return desired, reconciler.StateAbsent, nil
 		}
 
-		return desired, reconciler.StatePresent, nil
-	} else {
-		desired := &corev1.ServiceAccount{
-			ObjectMeta: n.NodeAgentObjectMeta(defaultServiceAccountName),
-		}
-
-		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.ServiceAccountOverrides)
-		if err != nil {
-			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
-		}
-		return desired, reconciler.StateAbsent, nil
 	}
+	return nil, reconciler.StateAbsent, nil
 }

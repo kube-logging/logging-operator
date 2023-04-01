@@ -14,8 +14,9 @@
 
 package nodeagent
 
-const BaseConfigName = "fluent-bit.conf"
-const UpstreamConfigName = "upstream.conf"
+const BaseConfigNameFluentbit = "fluent-bit.conf"
+const BaseConfigNameSyslogNG = "syslog-ng.conf"
+const UpstreamConfigNameFluentbit = "upstream.conf"
 
 var fluentBitConfigTemplate = `
 [SERVICE]
