@@ -1579,6 +1579,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -1622,6 +1626,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -2285,6 +2293,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -2328,6 +2340,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -3642,6 +3658,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -3685,6 +3705,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -4481,6 +4505,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -4524,6 +4552,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -9610,6 +9642,10 @@ spec:
                                         - Lowercase
                                         - uppercase
                                         - Uppercase
+                                        - keepequal
+                                        - KeepEqual
+                                        - dropequal
+                                        - DropEqual
                                         type: string
                                       modulus:
                                         format: int64
@@ -9653,6 +9689,10 @@ spec:
                                         - Lowercase
                                         - uppercase
                                         - Uppercase
+                                        - keepequal
+                                        - KeepEqual
+                                        - dropequal
+                                        - DropEqual
                                         type: string
                                       modulus:
                                         format: int64
@@ -10270,6 +10310,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -10313,6 +10357,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -13664,6 +13712,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -13707,6 +13759,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
