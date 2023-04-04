@@ -25,6 +25,7 @@ import (
 
 func TestGeoIP(t *testing.T) {
 	CONFIG := []byte(`
+geoip2_database: /opt/geoip-city.mmdb
 geoip_lookup_keys: remote_addr
 records:
   - city: ${city.names.en["remote_addr"]}
@@ -37,6 +38,7 @@ records:
 <filter **>
   @type geoip
   @id test
+  geoip2_database /opt/geoip-city.mmdb
   geoip_lookup_keys remote_addr
   skip_adding_null_record true
   <record>
