@@ -63,6 +63,7 @@ RUN apk update \
  && gem install fluent-plugin-aws-elasticsearch-service -v 2.4.1 \
  && gem install fluent-plugin-kube-events-timestamp -v 0.1.3 \
  && gem install fluent-plugin-grok-parser -v 2.6.2 \
+ && gem install fluent-plugin-mattermost -v 0.2.2 \
   # main branch
  && gem specific_install -l https://github.com/acquia/fluent-plugin-syslog_rfc5424.git --ref 5199be67d1a385f529fa1d6b6023e95ba7fac27d \
   # master branch

@@ -112,6 +112,10 @@ Default: -
 
 Default: -
 
+### mattermost (*output.MattermostOutputConfig, optional) {#outputspec-mattermost}
+
+Default: -
+
 
 ## OutputStatus
 
