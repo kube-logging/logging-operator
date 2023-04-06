@@ -140,7 +140,7 @@ const (
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag        = "v0.0.2"
+	DefaultFluentdConfigReloaderImageTag        = "v0.0.4"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentdBufferVolumeImageTag          = "v0.3.0"
 )
