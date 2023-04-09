@@ -39,8 +39,6 @@ spec:
             type: object
           spec:
             properties:
-              excludeLabelFromRouter:
-                type: boolean
               filters:
                 items:
                   properties:
@@ -975,6 +973,8 @@ spec:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               localOutputRefs:
                 items:
                   type: string
@@ -1062,8 +1062,6 @@ spec:
             type: object
           spec:
             properties:
-              excludeLabelFromRouter:
-                type: boolean
               filters:
                 items:
                   properties:
@@ -1998,6 +1996,8 @@ spec:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               localOutputRefs:
                 items:
                   type: string

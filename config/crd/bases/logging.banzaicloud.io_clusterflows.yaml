@@ -39,8 +39,6 @@ spec:
             type: object
           spec:
             properties:
-              excludeLabelFromRouter:
-                type: boolean
               filters:
                 items:
                   properties:
@@ -975,6 +973,8 @@ spec:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               loggingRef:
                 type: string
               match:
@@ -1066,8 +1066,6 @@ spec:
             type: object
           spec:
             properties:
-              excludeLabelFromRouter:
-                type: boolean
               filters:
                 items:
                   properties:
@@ -2002,6 +2000,8 @@ spec:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               loggingRef:
                 type: string
               match:

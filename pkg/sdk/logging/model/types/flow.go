@@ -68,8 +68,8 @@ type Flow struct {
 	// Fluentd label
 	FlowLabel string `json:"-"`
 
-	// Flag whether to exclude flow from label_router
-	ExcludeLabelFromRouter bool
+	// Flag whether to include flow in label_router
+	IncludeLabelInRouter *bool
 }
 
 func (f *Flow) GetPluginMeta() *PluginMeta {
@@ -107,7 +107,7 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 	return f
 }
 
-func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, excludeLabelFromRouter bool) (*Flow, error) {
+func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, includeLabelInRouter *bool) (*Flow, error) {
 	if flowLabel == "" {
 		var err error
 		flowLabel, err = calculateFlowLabel(matches, name, namespace)
@@ -120,10 +120,10 @@ func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, exclude
 			Directive: "label",
 			Tag:       flowLabel,
 		},
-		FlowID:                 id,
-		FlowLabel:              flowLabel,
-		Matches:                matches,
-		ExcludeLabelFromRouter: excludeLabelFromRouter,
+		FlowID:               id,
+		FlowLabel:            flowLabel,
+		Matches:              matches,
+		IncludeLabelInRouter: includeLabelInRouter,
 	}, nil
 }
 
