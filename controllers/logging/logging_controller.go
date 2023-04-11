@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -103,7 +104,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client)
+	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client, log)
 
 	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
@@ -387,8 +388,13 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterFlow{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper).
 		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
+
+	// TODO remove with the next major release
+	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
+		logger.Info("processing NodeAgent CRDs is explicitly disabled (can be enabled with ENABLE_NODEAGENT_CRD=1)")
+		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
+	}
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)

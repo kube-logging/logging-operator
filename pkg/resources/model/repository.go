@@ -16,22 +16,26 @@ package model
 
 import (
 	"context"
+	"os"
 	"sort"
 
 	"emperror.dev/errors"
+	"github.com/go-logr/logr"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NewLoggingResourceRepository(client client.Reader) *LoggingResourceRepository {
+func NewLoggingResourceRepository(client client.Reader, logger logr.Logger) *LoggingResourceRepository {
 	return &LoggingResourceRepository{
 		Client: client,
+		Logger: logger,
 	}
 }
 
 type LoggingResourceRepository struct {
 	Client client.Reader
+	Logger logr.Logger
 }
 
 func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logging v1beta1.Logging) (res LoggingResources, errs error) {
@@ -250,6 +254,11 @@ func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Con
 }
 
 func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.NodeAgent, error) {
+	if os.Getenv("ENABLE_NODEAGENT_CRD") == "" {
+		r.Logger.Info("processing NodeAgent CRDs is explicitly disabled (can be enabled with ENABLE_NODEAGENT_CRD=1)")
+		return nil, nil
+	}
+
 	var list v1beta1.NodeAgentList
 	if err := r.Client.List(ctx, &list); err != nil {
 		return nil, err
