@@ -26,7 +26,6 @@ import (
 	"emperror.dev/errors"
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
-	"github.com/kube-logging/logging-operator/pkg/k8sutil"
 	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
@@ -38,15 +37,18 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	// +kubebuilder:scaffold:imports
@@ -123,8 +125,10 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
-		MapperProvider:     k8sutil.NewCached,
-		Port:               9443,
+		MapperProvider: func(c *rest.Config) (meta.RESTMapper, error) {
+			return apiutil.NewDynamicRESTMapper(c)
+		},
+		Port: 9443,
 	}
 
 	customMgrOptions, err := setupCustomCache(&mgrOptions, namespace, loggingRef)
@@ -200,7 +204,6 @@ func main() {
 
 		setupLog.Info("Registering webhooks...")
 		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
-
 	}
 
 	// +kubebuilder:scaffold:builder
