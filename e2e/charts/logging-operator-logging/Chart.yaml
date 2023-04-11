@@ -26,6 +26,6 @@ annotations:
     - name: logging-operator
       image: ghcr.io/kube-logging/logging-operator:4.0.0
     - name: config-reloader
-      image: ghcr.io/kube-logging/config-reloader:v0.0.2
+      image: ghcr.io/kube-logging/config-reloader:v0.0.4
     - name: node-exporter
-      image: ghcr.io/kube-logging/node-exporter:v0.3.0
+      image: ghcr.io/kube-logging/node-exporter:v0.4.0
