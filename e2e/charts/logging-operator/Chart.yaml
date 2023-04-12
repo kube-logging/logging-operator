@@ -1,8 +1,8 @@
 apiVersion: v2
 type: application
 name: logging-operator
-version: 4.1.0-dev.2
-appVersion: 4.0.0
+version: 4.1.0
+appVersion: 4.1.0
 kubeVersion: ">=1.16.0-0"
 description: Logging operator for Kubernetes based on Fluentd and Fluentbit.
 keywords:
