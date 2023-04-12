@@ -84,9 +84,8 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, containerName)
 	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
 		if !sliceAny(syslogngContainer.Args, func(arg string) bool { return strings.Contains(arg, "--persist-file") }) {
-			persistFilePath := filepath.Join(mnt.MountPath, "/syslog-ng.persist")
-			persistFileFlag := fmt.Sprintf("--persist-file=%q", persistFilePath)
-			syslogngContainer.Args = append(syslogngContainer.Args, persistFileFlag)
+			syslogngContainer.Args = append(syslogngContainer.Args,
+				"--persist-file", filepath.Join(mnt.MountPath, "/syslog-ng.persist"))
 		}
 	}
 
