@@ -35,7 +35,7 @@ type _metaRelabel interface{} //nolint:deadcode,unused
 // +docName:"Output Config"
 type RelabelOutputConfig struct {
 	// Specifies new label for events
-	Label string `json:"label" binding:"required"`
+	Label string `json:"label"`
 }
 
 func (c *RelabelOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
