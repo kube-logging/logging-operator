@@ -69,7 +69,7 @@ type Flow struct {
 	FlowLabel string `json:"-"`
 
 	// Flag whether to include flow in label_router
-	IncludeLabelInRouter *bool
+	IncludeLabelInRouter bool
 }
 
 func (f *Flow) GetPluginMeta() *PluginMeta {
@@ -108,11 +108,19 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 }
 
 func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, includeLabelInRouter *bool) (*Flow, error) {
+	var tmpIncludeLabelInRouter bool = true
 	if flowLabel == "" {
 		var err error
 		flowLabel, err = calculateFlowLabel(matches, name, namespace)
 		if err != nil {
 			return nil, err
+		}
+		if includeLabelInRouter != nil && !*includeLabelInRouter {
+			tmpIncludeLabelInRouter = false
+		}
+	} else {
+		if includeLabelInRouter == nil || !*includeLabelInRouter {
+			tmpIncludeLabelInRouter = false
 		}
 	}
 	return &Flow{
@@ -123,7 +131,7 @@ func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, include
 		FlowID:               id,
 		FlowLabel:            flowLabel,
 		Matches:              matches,
-		IncludeLabelInRouter: includeLabelInRouter,
+		IncludeLabelInRouter: tmpIncludeLabelInRouter,
 	}, nil
 }
 
