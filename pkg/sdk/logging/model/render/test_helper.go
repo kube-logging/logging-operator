@@ -20,6 +20,7 @@ import (
 
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
@@ -88,7 +89,7 @@ func NewOutputPluginTest(t *testing.T, plugin plugins.DirectiveConverter) *Plugi
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
 			{Namespaces: []string{"ns-test"}},
-		}, "test", "flow-test", "ns-test", "", &[]bool{true}[0])
+		}, "test", "flow-test", "ns-test", "", util.BoolPointer(true))
 	if err != nil {
 		t.Fatal(err)
 	}

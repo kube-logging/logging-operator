@@ -42,7 +42,7 @@ func (s *SystemBuilder) RegisterFlow(f *Flow) error {
 		}
 	}
 	s.flows = append(s.flows, f)
-	if f.IncludeLabelInRouter {
+	if f.AddRoute {
 		s.router.AddRoute(f)
 	}
 	return nil
