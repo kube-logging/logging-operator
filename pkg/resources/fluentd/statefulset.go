@@ -48,8 +48,16 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		}
 	}
 	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
-		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
-			return nil, reconciler.StatePresent, err
+		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil {
+			if err := n.Volume.ApplyPVCForStatefulSet(n.ContainerName, n.Path, spec, func(name string) metav1.ObjectMeta {
+				return r.FluentdObjectMeta(name, ComponentFluentd)
+			}); err != nil {
+				return nil, reconciler.StatePresent, err
+			}
+		} else {
+			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
+				return nil, reconciler.StatePresent, err
+			}
 		}
 	}
 
