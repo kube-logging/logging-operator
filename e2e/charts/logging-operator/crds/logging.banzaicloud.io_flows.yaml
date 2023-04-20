@@ -967,10 +967,14 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowLabel:
+                type: string
               globalOutputRefs:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               localOutputRefs:
                 items:
                   type: string
@@ -1986,10 +1990,14 @@ spec:
                       type: object
                   type: object
                 type: array
+              flowLabel:
+                type: string
               globalOutputRefs:
                 items:
                   type: string
                 type: array
+              includeLabelInRouter:
+                type: boolean
               localOutputRefs:
                 items:
                   type: string
