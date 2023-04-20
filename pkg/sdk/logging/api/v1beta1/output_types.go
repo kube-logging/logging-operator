@@ -57,6 +57,7 @@ type OutputSpec struct {
 	GELFOutputConfig             *output.GELFOutputConfig             `json:"gelf,omitempty"`
 	SQSOutputConfig              *output.SQSOutputConfig              `json:"sqs,omitempty"`
 	MattermostOutputConfig       *output.MattermostOutputConfig       `json:"mattermost,omitempty"`
+	RelabelOutputConfig          *output.RelabelOutputConfig          `json:"relabel,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

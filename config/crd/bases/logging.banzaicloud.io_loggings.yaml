@@ -985,10 +985,14 @@ spec:
                           type: object
                       type: object
                     type: array
+                  flowLabel:
+                    type: string
                   globalOutputRefs:
                     items:
                       type: string
                     type: array
+                  includeLabelInRouter:
+                    type: boolean
                   outputRefs:
                     items:
                       type: string

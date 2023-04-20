@@ -29,6 +29,11 @@
     {
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchPackagePrefixes": ["k8s.io"],
+      "stabilityDays": 30
     }
   ]
 }
