@@ -37,26 +37,30 @@ type _metaBuffer interface{} //nolint:deadcode,unused
 type Buffer struct {
 	// Disable buffer section (default: false)
 	Disabled bool `json:"disabled,omitempty" plugin:"default:false,hidden"`
-	// Fluentd core bundles memory and file plugins. 3rd party plugins are also available when installed.
-	Type string `json:"type,omitempty"`
+	// Fluentd core bundles memory and file plugins. 3rd party plugins are also available when installed. (default: file)
+	Type string `json:"type,omitempty" plugin:"default:file"`
 	// When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags. (default: tag,time)
 	Tags *string `json:"tags,omitempty"`
 	// The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default. (default: operator generated)
 	Path string `json:"path,omitempty"`
-	// The max size of each chunks: events will be written into chunks until the size of chunks become this size (default: 8MB)
-	ChunkLimitSize string `json:"chunk_limit_size,omitempty" plugin:"default:8MB"`
+	// The max size of each chunks: events will be written into chunks until the size of chunks become this size (default: 256MB)
+	ChunkLimitSize string `json:"chunk_limit_size,omitempty" plugin:"default:256MB"`
 	// The max number of events that each chunks can store in it
 	ChunkLimitRecords int `json:"chunk_limit_records,omitempty"`
-	// The size limitation of this buffer plugin instance. Once the total size of stored buffer reached this threshold, all append operations will fail with error (and data will be lost)
-	TotalLimitSize string `json:"total_limit_size,omitempty"`
-	//The queue length limitation of this buffer plugin instance
+	// The size limitation of this buffer plugin instance. Once the total size of stored buffer reached this threshold, all append operations will fail with error (and data will be lost)  (default: 64GB)
+	TotalLimitSize string `json:"total_limit_size,omitempty" plugin:"default:64GB"`
+	// The queue length limitation of this buffer plugin instance
 	QueueLimitLength int `json:"queue_limit_length,omitempty"`
 	// The percentage of chunk size threshold for flushing. output plugin will flush the chunk when actual size reaches chunk_limit_size * chunk_full_threshold (== 8MB * 0.95 in default)
 	ChunkFullThreshold string `json:"chunk_full_threshold,omitempty"`
-	//Limit the number of queued chunks. If you set smaller flush_interval, e.g. 1s, there are lots of small queued chunks in buffer. This is not good with file buffer because it consumes lots of fd resources when output destination has a problem. This parameter mitigates such situations.
+	// Default: 1 (equals to the same value as the flush_thread_count
+	// Limit the number of queued chunks.
+	// If you set smaller flush_interval, e.g. 1s, there are lots of small queued chunks in buffer. This is not good with file buffer because it consumes lots of fd resources when output destination has a problem. This parameter mitigates such situations.
 	QueuedChunksLimitSize int `json:"queued_chunks_limit_size,omitempty"`
 	// If you set this option to gzip, you can get Fluentd to compress data records before writing to buffer chunks.
-	Compress string `json:"compress,omitempty"`
+	// Fluentd will decompress these compressed chunks automatically before passing them to the output plugin (The exceptional case is when the output plugin can transfer data in compressed form. In this case, the data will be passed to the plugin as is).
+	// The default text means that no compression is applied	
+	Compress string `json:"compress,omitempty" plugin:"default:text"`
 	// The value to specify to flush/write all buffer chunks at shutdown, or not
 	FlushAtShutdown bool `json:"flush_at_shutdown,omitempty"`
 	// Default: default (equals to lazy if time is specified as chunk key, interval otherwise)
@@ -65,24 +69,24 @@ type Buffer struct {
 	// immediate: flush/write chunks immediately after events are appended into chunks
 	FlushMode string `json:"flush_mode,omitempty"`
 	// Default: 60s
-	FlushInterval string `json:"flush_interval,omitempty"`
+	FlushInterval string `json:"flush_interval,omitempty" plugin:"default:60s"`
 	// The number of threads of output plugins, which is used to write chunks in parallel
-	FlushThreadCount int `json:"flush_thread_count,omitempty"`
+	FlushThreadCount int `json:"flush_thread_count,omitempty" plugin:"default:1"`
 	// The sleep interval seconds of threads to wait next flush trial (when no chunks are waiting)
-	FlushThreadInterval string `json:"flush_thread_interval,omitempty"`
+	FlushThreadInterval string `json:"flush_thread_interval,omitempty" plugin:"default:1.0"`
 	// The sleep interval seconds of threads between flushes when output plugin flushes waiting chunks next to next
-	FlushThreadBurstInterval string `json:"flush_thread_burst_interval,omitempty"`
+	FlushThreadBurstInterval string `json:"flush_thread_burst_interval,omitempty" plugin:"default:1.0"`
 	// The timeout seconds until output plugin decides that async write operation fails
-	DelayedCommitTimeout string `json:"delayed_commit_timeout,omitempty"`
+	DelayedCommitTimeout string `json:"delayed_commit_timeout,omitempty" plugin:"default:60"`
 	// How output plugin behaves when its buffer queue is full
 	// throw_exception: raise exception to show this error in log
 	// block: block processing of input plugin to emit events into that buffer
 	// drop_oldest_chunk: drop/purge oldest chunk to accept newly incoming chunk
-	OverflowAction string `json:"overflow_action,omitempty"`
+	OverflowAction string `json:"overflow_action,omitempty" plugin:"default:throw_exception"`
 	// The maximum seconds to retry to flush while failing, until plugin discards buffer chunks
-	RetryTimeout string `json:"retry_timeout,omitempty"`
+	RetryTimeout string `json:"retry_timeout,omitempty" plugin:"default:72h"`
 	// If true, plugin will ignore retry_timeout and retry_max_times options and retry flushing forever
-	RetryForever *bool `json:"retry_forever,omitempty" plugin:"default:true"`
+	RetryForever *bool `json:"retry_forever,omitempty" plugin:"default:false"`
 	// The maximum number of times to retry to flush while failing
 	RetryMaxTimes int `json:"retry_max_times,omitempty"`
 	// The ratio of retry_timeout to switch to use secondary while failing (Maximum valid value is 1.0)
