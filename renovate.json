@@ -33,7 +33,7 @@
     {
       "matchUpdateTypes": ["minor"],
       "matchPackagePrefixes": ["k8s.io"],
-      "stabilityDays": 30
+      "stabilityDays": 60
     }
   ]
 }
