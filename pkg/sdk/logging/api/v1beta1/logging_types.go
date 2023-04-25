@@ -45,11 +45,13 @@ type LoggingSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 	// Disable configuration check before applying new fluentd configuration.
 	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
-	// Skip Invalid Resources
+	// Whether to skip invalid Flow and ClusterFlow resources
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
 	// Fluentbit daemonset configuration.
+	// Deprecated, will be removed with next major version
+	// Migrate to the standalone NodeAgent resource
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
@@ -71,8 +73,9 @@ type LoggingSpec struct {
 	ControlNamespace string `json:"controlNamespace"`
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
-	// NodeAgent Configuration
-	NodeAgents []*NodeAgent `json:"nodeAgents,omitempty"`
+	// InlineNodeAgent Configuration
+	// Deprecated, will be removed with next major version
+	NodeAgents []*InlineNodeAgent `json:"nodeAgents,omitempty"`
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
 	// in case there is a change in an immutable field
@@ -83,6 +86,7 @@ type LoggingSpec struct {
 // LoggingStatus defines the observed state of Logging
 type LoggingStatus struct {
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
+	Problems           []string        `json:"problems,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -114,15 +118,17 @@ type LoggingList struct {
 type DefaultFlowSpec struct {
 	Filters []Filter `json:"filters,omitempty"`
 	// Deprecated
-	OutputRefs       []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs []string `json:"globalOutputRefs,omitempty"`
+	OutputRefs           []string `json:"outputRefs,omitempty"`
+	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
+	FlowLabel            string   `json:"flowLabel,omitempty"`
+	IncludeLabelInRouter *bool    `json:"includeLabelInRouter,omitempty"`
 }
 
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.10"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.4.0"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
 	DefaultFluentdImageTag                      = "v1.14"
@@ -134,9 +140,9 @@ const (
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag        = "v0.0.2"
+	DefaultFluentdConfigReloaderImageTag        = "v0.0.4"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.2.0"
+	DefaultFluentdBufferVolumeImageTag          = "v0.4.0"
 )
 
 // SetDefaults fills empty attributes

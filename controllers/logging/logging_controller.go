@@ -17,6 +17,8 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -60,8 +62,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -102,7 +104,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client)
+	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client, log)
 
 	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
@@ -181,8 +183,22 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
-	if len(logging.Spec.NodeAgents) > 0 {
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
+		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
+		// for compatibility reasons
+		agents := make(map[string]loggingv1beta1.NodeAgentConfig)
+		for _, a := range loggingResources.NodeAgents {
+			agents[a.Name] = a.Spec.NodeAgentConfig
+		}
+		for _, a := range logging.Spec.NodeAgents {
+			if _, exists := agents[a.Name]; !exists {
+				agents[a.Name] = a.NodeAgentConfig
+			} else {
+				problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name)
+				log.Error(errors.New("nodeagent definition conflict"), problem)
+			}
+		}
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -341,6 +357,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.NodeAgent:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -371,6 +389,12 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
 		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
+
+	// TODO remove with the next major release
+	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
+		logger.Info("processing NodeAgent CRDs is explicitly disabled (can be enabled with ENABLE_NODEAGENT_CRD=1)")
+		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
+	}
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)

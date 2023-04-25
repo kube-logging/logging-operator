@@ -1,0 +1,20 @@
+{{ template "chart.baseHead" . }}
+
+## Introduction
+
+This chart bootstraps a [Logging Operator](https://github.com/kube-logging/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+
+## Prerequisites
+
+- Kubernetes 1.19+
+
+## Installing CRDs
+
+Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+
+{{ template "chart.valuesSection" . }}
+
+## Installing Fluentd and Fluent-bit via logging
+
+The previous chart does **not** install `logging` resource to deploy Fluentd and Fluent-bit on cluster.
+To install them please use the [Logging Operator Logging](https://github.com/kube-logging/helm-charts/tree/main/charts/logging-operator-logging) chart.
