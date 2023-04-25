@@ -152,6 +152,10 @@ type NodeAgentSyslogNG struct {
 	JSONKeyDelimiter                    string                  `json:"jsonKeyDelim,omitempty"`
 	MaxConnections                      int                     `json:"maxConnections,omitempty"`
 	LogIWSize                           int                     `json:"logIWSize,omitempty"`
+	KeepTimestamp                       *bool                   `json:"keepTimestamp,omitempty"`
+	LogFetchLimit                       int                     `json:"logFetchLimit,omitempty"`
+	FollowFreq                          int                     `json:"followFreq,omitempty"`
+	LogMSGSize                          int                     `json:"logMSGSize,omitempty"`
 }
 
 func init() {

@@ -307,7 +307,7 @@ func generateConfig(input fluentBitConfig) (string, error) {
 
 func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
-	tmpl, err := template.New("upstream").Parse(upstreamConfigTemplate)
+	tmpl, err := template.New("upstream").Parse(fluentBitUpstreamConfigTemplate)
 	if err != nil {
 		return "", err
 	}
