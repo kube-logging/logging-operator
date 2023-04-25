@@ -13896,6 +13896,8 @@ spec:
                             - source
                             type: object
                           type: array
+                        followFreq:
+                          type: integer
                         globalOptions:
                           properties:
                             stats_freq:
@@ -13907,7 +13909,13 @@ spec:
                           type: string
                         jsonKeyPrefix:
                           type: string
+                        keepTimestamp:
+                          type: boolean
+                        logFetchLimit:
+                          type: integer
                         logIWSize:
+                          type: integer
+                        logMSGSize:
                           type: integer
                         maxConnections:
                           type: integer

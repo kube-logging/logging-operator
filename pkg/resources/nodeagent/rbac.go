@@ -41,7 +41,6 @@ func (n *nodeAgentInstance) clusterRole() (runtime.Object, reconciler.DesiredSta
 			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameFluentbit),
 			Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
 	} else if n.nodeAgent.SyslogNGSpec != nil {
-
 		if n.nodeAgent.SyslogNGSpec != nil {
 			if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate {
 				return &rbacv1.ClusterRole{
@@ -66,7 +65,6 @@ func (n *nodeAgentInstance) clusterRole() (runtime.Object, reconciler.DesiredSta
 
 func (n *nodeAgentInstance) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec != nil {
-
 		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate {
 			return &rbacv1.ClusterRoleBinding{
 				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameFluentbit),

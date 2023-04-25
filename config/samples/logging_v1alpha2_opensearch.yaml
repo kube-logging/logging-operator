@@ -1,0 +1,44 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: opensearch
+spec:
+  fluentd: {}
+  fluentbit: {}
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: opensearch
+spec:
+  match:
+    - select: {}
+  filters:
+    - stdout: {}
+  localOutputRefs:
+    - "opensearch"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: opensearch
+spec:
+  opensearch:
+    buffer:
+      flush_interval: 10s
+      flush_mode: interval
+    hosts: hosts
+    include_timestamp: true
+    log_os_400_reason: true
+    logstash_dateformat: '%Y%m%d'
+    logstash_format: true
+    logstash_prefix: some-prefix
+    password:
+      value: asd
+    port: 443
+    reload_connections: false
+    request_timeout: 20s
+    scheme: https
+    suppress_type_name: true
+    user: user

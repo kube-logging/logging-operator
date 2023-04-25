@@ -131,7 +131,7 @@ type NodeAgentSyslogNG struct {
 	Enabled                 *bool                        `json:"enabled,omitempty"`
 	DaemonSetOverrides      *typeoverride.DaemonSet      `json:"daemonSet,omitempty"`
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	TLS                     *SyslogNGTLS                 `json:"tls,omitempty"`
+	TLS                     SyslogNGTLS                  `json:"tls,omitempty"`
 	TargetHost              string                       `json:"targetHost,omitempty"`
 	TargetPort              int32                        `json:"targetPort,omitempty"`
 	Metrics                 *Metrics                     `json:"metrics,omitempty"`

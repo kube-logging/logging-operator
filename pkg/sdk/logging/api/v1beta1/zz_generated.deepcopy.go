@@ -1948,11 +1948,7 @@ func (in *NodeAgentSyslogNG) DeepCopyInto(out *NodeAgentSyslogNG) {
 		*out = new(typeoverride.ServiceAccount)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.TLS != nil {
-		in, out := &in.TLS, &out.TLS
-		*out = new(SyslogNGTLS)
-		**out = **in
-	}
+	out.TLS = in.TLS
 	if in.Metrics != nil {
 		in, out := &in.Metrics, &out.Metrics
 		*out = new(Metrics)
@@ -1995,6 +1991,11 @@ func (in *NodeAgentSyslogNG) DeepCopyInto(out *NodeAgentSyslogNG) {
 		in, out := &in.GlobalOptions, &out.GlobalOptions
 		*out = new(GlobalOptions)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.KeepTimestamp != nil {
+		in, out := &in.KeepTimestamp, &out.KeepTimestamp
+		*out = new(bool)
+		**out = **in
 	}
 }
 

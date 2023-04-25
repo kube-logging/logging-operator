@@ -275,74 +275,36 @@ func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.No
 			},
 			ContainersPath: "/var/lib/docker/containers",
 			VarLogsPath:    "/var/log",
+			BufferStorage: v1beta1.BufferStorage{
+				StoragePath: "/buffers",
+			},
 		},
 	}
-	if userDefined.FluentbitSpec == nil {
-		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
+	if userDefined.SyslogNGSpec == nil {
+		userDefined.SyslogNGSpec = &v1beta1.NodeAgentSyslogNG{}
 	}
 
-	if userDefined.FluentbitSpec.FilterAws != nil {
-		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
-			ImdsVersion:     "v2",
-			AZ:              util.BoolPointer(true),
-			Ec2InstanceID:   util.BoolPointer(true),
-			Ec2InstanceType: util.BoolPointer(false),
-			PrivateIP:       util.BoolPointer(false),
-			AmiID:           util.BoolPointer(false),
-			AccountID:       util.BoolPointer(false),
-			Hostname:        util.BoolPointer(false),
-			VpcID:           util.BoolPointer(false),
-			Match:           "*",
-		}
-
-		err := merge.Merge(programDefault.FluentbitSpec.FilterAws, userDefined.FluentbitSpec.FilterAws)
-		if err != nil {
-			return nil, err
-		}
-
-	}
-	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
-		if userDefined.Profile != "windows" {
-			programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
-				Port: 2020,
-				Path: "/",
+	if userDefined.SyslogNGSpec.Metrics != nil {
+		// TODO implement the same as implemented in the aggregator
+		if userDefined.SyslogNGSpec.Metrics.PrometheusAnnotations {
+			defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
+				Annotations: map[string]string{
+					"prometheus.io/scrape": "true",
+					"prometheus.io/path":   programDefault.SyslogNGSpec.Metrics.Path,
+					"prometheus.io/port":   fmt.Sprintf("%d", programDefault.SyslogNGSpec.Metrics.Port),
+				},
+			}
+			err := merge.Merge(&(programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
+			if err != nil {
+				return nil, err
 			}
 		}
-	}
-
-	if userDefined.FluentbitSpec.Metrics != nil {
-
-		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
-			Interval: "15s",
-			Timeout:  "5s",
-			Port:     2020,
-			Path:     "/api/v1/metrics/prometheus",
-		}
-		err := merge.Merge(programDefault.FluentbitSpec.Metrics, userDefined.FluentbitSpec.Metrics)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if programDefault.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics != nil && userDefined.FluentbitSpec.Metrics.PrometheusAnnotations {
-		defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
-			Annotations: map[string]string{
-				"prometheus.io/scrape": "true",
-				"prometheus.io/path":   programDefault.FluentbitSpec.Metrics.Path,
-				"prometheus.io/port":   fmt.Sprintf("%d", programDefault.FluentbitSpec.Metrics.Port),
-			},
-		}
-		err := merge.Merge(&(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if programDefault.FluentbitSpec.Metrics != nil {
 		defaultLivenessProbe := &v1.Probe{
 			ProbeHandler: v1.ProbeHandler{
 				HTTPGet: &v1.HTTPGetAction{
-					Path: programDefault.FluentbitSpec.Metrics.Path,
+					Path: programDefault.SyslogNGSpec.Metrics.Path,
 					Port: intstr.IntOrString{
-						IntVal: programDefault.FluentbitSpec.Metrics.Port,
+						IntVal: programDefault.SyslogNGSpec.Metrics.Port,
 					},
 				}},
 			InitialDelaySeconds: 10,
@@ -351,11 +313,11 @@ func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.No
 			SuccessThreshold:    0,
 			FailureThreshold:    3,
 		}
-		if programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
-			programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
+		if programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
+			programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
 		}
 
-		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
+		err := merge.Merge(programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
 		if err != nil {
 			return nil, err
 		}
@@ -430,10 +392,19 @@ func (n *nodeAgentInstance) getNodeAgentLabels() map[string]string {
 }
 
 func (n *nodeAgentInstance) getServiceAccount() string {
-	if n.nodeAgent.FluentbitSpec.Security.ServiceAccount != "" {
-		return n.nodeAgent.FluentbitSpec.Security.ServiceAccount
+	if n.nodeAgent.FluentbitSpec != nil {
+		if n.nodeAgent.FluentbitSpec.Security != nil && n.nodeAgent.FluentbitSpec.Security.ServiceAccount != "" {
+			return n.nodeAgent.FluentbitSpec.Security.ServiceAccount
+		}
+		return n.QualifiedName(serviceAccountNameFluentbit)
 	}
-	return n.QualifiedName(serviceAccountNameFluentbit)
+	if n.nodeAgent.SyslogNGSpec != nil {
+		if n.nodeAgent.SyslogNGSpec.Security != nil && n.nodeAgent.SyslogNGSpec.Security.ServiceAccount != "" {
+			return n.nodeAgent.SyslogNGSpec.Security.ServiceAccount
+		}
+		return n.QualifiedName(serviceAccountNameSyslogNG)
+	}
+	return ""
 }
 
 //	type DesiredObject struct {
@@ -481,36 +452,45 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 
 func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgentConfig) (*reconcile.Result, error) {
 	var instance nodeAgentInstance
-	NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(userDefinedAgent)
-	if err != nil {
-		return nil, err
+	var nodeAgentConfig *v1beta1.NodeAgentConfig
+	var err error
+
+	if userDefinedAgent.FluentbitSpec != nil && userDefinedAgent.SyslogNGSpec != nil {
+		return nil, errors.New("only one agent implementation can be specified for a single nodeAgent")
 	}
 
-	switch userDefinedAgent.Profile {
-	case "windows":
-		err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitWindowsDefaults)
-		if err != nil {
+	if userDefinedAgent.FluentbitSpec != nil {
+		if nodeAgentConfig, err = NodeAgentFluentbitDefaults(userDefinedAgent); err != nil {
 			return nil, err
 		}
-
-		// Overwrite Kubernetes endpoint with a ClusterDomain templated value.
-		NodeAgentFluentbitDefaults.FluentbitSpec.FilterKubernetes.KubeURL = fmt.Sprintf("https://kubernetes.default.svc%s:443", r.Logging.ClusterDomainAsSuffix())
-
-	default:
-		err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
-		if err != nil {
-			return nil, err
+		switch userDefinedAgent.Profile {
+		case "windows":
+			if err := merge.Merge(nodeAgentConfig, NodeAgentFluentbitWindowsDefaults); err != nil {
+				return nil, err
+			}
+			// Overwrite Kubernetes endpoint with a ClusterDomain templated value.
+			nodeAgentConfig.FluentbitSpec.FilterKubernetes.KubeURL = fmt.Sprintf("https://kubernetes.default.svc%s:443", r.Logging.ClusterDomainAsSuffix())
+		default:
+			if err := merge.Merge(nodeAgentConfig, NodeAgentFluentbitLinuxDefaults); err != nil {
+				return nil, err
+			}
 		}
-
 	}
-	err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
+
+	if userDefinedAgent.SyslogNGSpec != nil {
+		if nodeAgentConfig, err = NodeAgentSyslogNGDefaults(userDefinedAgent); err != nil {
+			return nil, err
+		}
+	}
+
+	err = merge.Merge(nodeAgentConfig, &userDefinedAgent)
 	if err != nil {
 		return nil, err
 	}
 
 	instance = nodeAgentInstance{
 		name:                name,
-		nodeAgent:           NodeAgentFluentbitDefaults,
+		nodeAgent:           nodeAgentConfig,
 		reconciler:          r.GenericResourceReconciler,
 		logging:             r.Logging,
 		fluentdDataProvider: r.fluentdDataProvider,
@@ -567,7 +547,7 @@ func (n *nodeAgentInstance) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.name, name)
 }
 
-// nodeAgent FluentdQualifiedName
-func (n *nodeAgentInstance) FluentdQualifiedName(name string) string {
+// nodeAgent AggregatorQualifiedName
+func (n *nodeAgentInstance) AggregatorQualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", n.logging.Name, name)
 }

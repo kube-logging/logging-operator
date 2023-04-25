@@ -38,39 +38,27 @@ const (
 
 func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState, error) {
 	var containerPorts []corev1.ContainerPort
-	if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.Port != 0 {
-		containerPorts = append(containerPorts, corev1.ContainerPort{
-			Name:          "monitor",
-			ContainerPort: n.nodeAgent.FluentbitSpec.Metrics.Port,
-			Protocol:      corev1.ProtocolTCP,
-		})
-	} else if n.nodeAgent.SyslogNGSpec.Metrics != nil && n.nodeAgent.SyslogNGSpec.Metrics.Port != 0 {
-		containerPorts = append(containerPorts, corev1.ContainerPort{
-			Name:          "monitor",
-			ContainerPort: n.nodeAgent.SyslogNGSpec.Metrics.Port,
-			Protocol:      corev1.ProtocolTCP,
-		})
-	}
 	podSecurityContext := corev1.PodSecurityContext{}
+	containerSecurityContext := corev1.SecurityContext{}
+	var desired *appsv1.DaemonSet
+	meta := metav1.ObjectMeta{}
+	var containerName string
+
 	if n.nodeAgent.FluentbitSpec != nil {
+		if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.Port != 0 {
+			containerPorts = append(containerPorts, corev1.ContainerPort{
+				Name:          "monitor",
+				ContainerPort: n.nodeAgent.FluentbitSpec.Metrics.Port,
+				Protocol:      corev1.ProtocolTCP,
+			})
+		}
 		podSecurityContext = corev1.PodSecurityContext{
 			FSGroup:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
 			RunAsNonRoot: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
 			RunAsUser:    n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
 			RunAsGroup:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 		}
-
-	} else if n.nodeAgent.SyslogNGSpec != nil {
-		podSecurityContext = corev1.PodSecurityContext{
-			FSGroup:      n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.FSGroup,
-			RunAsNonRoot: n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsNonRoot,
-			RunAsUser:    n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsUser,
-			RunAsGroup:   n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsGroup,
-		}
-	}
-	ContainerSecurityContext := corev1.SecurityContext{}
-	if n.nodeAgent.FluentbitSpec != nil {
-		ContainerSecurityContext = corev1.SecurityContext{
+		containerSecurityContext = corev1.SecurityContext{
 			RunAsUser:                n.nodeAgent.FluentbitSpec.Security.SecurityContext.RunAsUser,
 			RunAsNonRoot:             n.nodeAgent.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
 			ReadOnlyRootFilesystem:   n.nodeAgent.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
@@ -78,9 +66,42 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 			Privileged:               n.nodeAgent.FluentbitSpec.Security.SecurityContext.Privileged,
 			SELinuxOptions:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
 		}
+		meta = n.NodeAgentObjectMeta(DaemonSetNameFluentbit)
+		containerName = containerNameFluentbit
 
-	} else if n.nodeAgent.SyslogNGSpec != nil {
-		ContainerSecurityContext = corev1.SecurityContext{
+		desired = n.prepareDaemonSet(meta, podSecurityContext, containerName, containerPorts, containerSecurityContext)
+
+		n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
+			fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
+		n.nodeAgent.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
+			fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
+		if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerNameFluentbit, "/tail-db", &desired.Spec.Template.Spec); err != nil {
+			return desired, reconciler.StatePresent, err
+		}
+		if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerNameFluentbit, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+			return desired, reconciler.StatePresent, err
+		}
+		if mergeErr := merge.Merge(desired, n.nodeAgent.FluentbitSpec.DaemonSetOverrides); mergeErr != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(mergeErr, "unable to merge overrides to base object")
+		}
+		return desired, reconciler.StatePresent, nil
+	}
+
+	if n.nodeAgent.SyslogNGSpec != nil {
+		if n.nodeAgent.SyslogNGSpec.Metrics != nil && n.nodeAgent.SyslogNGSpec.Metrics.Port != 0 {
+			containerPorts = append(containerPorts, corev1.ContainerPort{
+				Name:          "monitor",
+				ContainerPort: n.nodeAgent.SyslogNGSpec.Metrics.Port,
+				Protocol:      corev1.ProtocolTCP,
+			})
+		}
+		podSecurityContext = corev1.PodSecurityContext{
+			FSGroup:      n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.FSGroup,
+			RunAsNonRoot: n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsNonRoot,
+			RunAsUser:    n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsUser,
+			RunAsGroup:   n.nodeAgent.SyslogNGSpec.Security.PodSecurityContext.RunAsGroup,
+		}
+		containerSecurityContext = corev1.SecurityContext{
 			RunAsUser:                n.nodeAgent.SyslogNGSpec.Security.SecurityContext.RunAsUser,
 			RunAsNonRoot:             n.nodeAgent.SyslogNGSpec.Security.SecurityContext.RunAsNonRoot,
 			ReadOnlyRootFilesystem:   n.nodeAgent.SyslogNGSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
@@ -88,15 +109,26 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 			Privileged:               n.nodeAgent.SyslogNGSpec.Security.SecurityContext.Privileged,
 			SELinuxOptions:           n.nodeAgent.SyslogNGSpec.Security.SecurityContext.SELinuxOptions,
 		}
-	}
-	meta := metav1.ObjectMeta{}
-
-	if n.nodeAgent.FluentbitSpec != nil {
-		meta = n.NodeAgentObjectMeta(DaemonSetNameFluentbit)
-	} else if n.nodeAgent.SyslogNGSpec != nil {
 		meta = n.NodeAgentObjectMeta(DaemonSetNameSyslogNG)
-	}
+		containerName = containerNameSyslogNG
 
+		desired = n.prepareDaemonSet(meta, podSecurityContext, containerName, containerPorts, containerSecurityContext)
+
+		n.nodeAgent.SyslogNGSpec.BufferStorageVolume.WithDefaultHostPath(
+			fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
+
+		// TODO take care of persistfile
+		if err := n.nodeAgent.SyslogNGSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerNameSyslogNG, n.nodeAgent.SyslogNGSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+			return desired, reconciler.StatePresent, err
+		}
+		if mergeErr := merge.Merge(desired, n.nodeAgent.SyslogNGSpec.DaemonSetOverrides); mergeErr != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(mergeErr, "unable to merge overrides to base object")
+		}
+	}
+	return desired, reconciler.StatePresent, nil
+}
+
+func (n *nodeAgentInstance) prepareDaemonSet(meta metav1.ObjectMeta, podSecurityContext corev1.PodSecurityContext, containerName string, containerPorts []corev1.ContainerPort, containerSecurityContext corev1.SecurityContext) *appsv1.DaemonSet {
 	podMeta := metav1.ObjectMeta{
 		Labels:      n.getNodeAgentLabels(),
 		Annotations: n.nodeAgent.Metadata.Annotations,
@@ -108,12 +140,6 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 			_, _ = h.Write(config)
 			podMeta = templates.Annotate(podMeta, fmt.Sprintf("checksum/%s", key), fmt.Sprintf("%x", h.Sum(nil)))
 		}
-	}
-	var containerName string
-	if n.nodeAgent.FluentbitSpec != nil {
-		containerName = containerNameFluentbit
-	} else if n.nodeAgent.SyslogNGSpec != nil {
-		containerName = containerNameSyslogNG
 	}
 
 	desired := &appsv1.DaemonSet{
@@ -131,44 +157,18 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 							Name:            containerName,
 							Ports:           containerPorts,
 							VolumeMounts:    n.generateVolumeMounts(),
-							SecurityContext: &ContainerSecurityContext,
+							SecurityContext: &containerSecurityContext,
 						},
 					},
 				},
 			},
 		},
 	}
-
-	n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
-	n.nodeAgent.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, n.logging.Name, BufferStorageVolume))
-
-	if err := n.nodeAgent.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerNameFluentbit, "/tail-db", &desired.Spec.Template.Spec); err != nil {
-		return desired, reconciler.StatePresent, err
-	}
-	if err := n.nodeAgent.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerNameFluentbit, n.nodeAgent.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
-		return desired, reconciler.StatePresent, err
-	} else if err := n.nodeAgent.SyslogNGSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerNameSyslogNG, n.nodeAgent.SyslogNGSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
-		return desired, reconciler.StatePresent, err
-	}
-
-	mergeErr := error(nil)
-	if n.nodeAgent.FluentbitSpec != nil {
-		mergeErr = merge.Merge(desired, n.nodeAgent.FluentbitSpec.DaemonSetOverrides)
-	} else if n.nodeAgent.SyslogNGSpec != nil {
-		mergeErr = merge.Merge(desired, n.nodeAgent.SyslogNGSpec.DaemonSetOverrides)
-	}
-	if mergeErr != nil {
-		return desired, reconciler.StatePresent, errors.WrapIf(mergeErr, "unable to merge overrides to base object")
-	}
-
-	return desired, reconciler.StatePresent, nil
+	return desired
 }
 
 func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 	if n.nodeAgent.FluentbitSpec != nil {
-
 		v = []corev1.VolumeMount{
 			{
 				Name:      "containerspath",
@@ -217,7 +217,6 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 		}
 
 	} else if n.nodeAgent.SyslogNGSpec != nil {
-
 		v = []corev1.VolumeMount{
 			{
 				Name:      "containerspath",
@@ -243,10 +242,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 				MountPath: "/etc/syslog-ng/config/syslog-ng.conf",
 			})
 		} else {
-			v = append(v, corev1.VolumeMount{
-				Name:      "config",
-				MountPath: "/etc/syslog-ng/config/syslog-ng.conf",
-			})
+			// TODO
 		}
 
 		if n.nodeAgent.SyslogNGSpec != nil && n.nodeAgent.SyslogNGSpec.TLS.Enabled {
@@ -395,7 +391,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 				},
 			})
 		}
-		if n.nodeAgent.SyslogNGSpec.TLS != nil && n.nodeAgent.SyslogNGSpec.TLS.Enabled {
+		if n.nodeAgent.SyslogNGSpec.TLS.Enabled {
 			tlsRelatedVolume := corev1.Volume{
 				Name: "syslog-ng-tls",
 				VolumeSource: corev1.VolumeSource{

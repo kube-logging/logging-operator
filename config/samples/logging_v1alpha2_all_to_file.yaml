@@ -1,0 +1,44 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: all-to-file
+spec:
+  fluentd: {}
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all-to-file
+spec:
+  filters:
+    - record_modifier:
+        records:
+          - logger_index_name: "${record.dig('kubernetes', 'labels', 'app.kubernetes.io/instance')|| 'unknown'}"
+  match:
+    - select: {}
+  localOutputRefs:
+    - "file-output"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: file-output
+spec:
+  file:
+    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+    append: true
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: NodeAgent
+metadata:
+  name: fluentbit-standalone
+spec:
+  nodeAgentFluentbit: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: NodeAgent
+metadata:
+  name: syslogng-standalone
+spec:
+  nodeAgentSyslogNG: {}

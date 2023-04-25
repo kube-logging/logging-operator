@@ -122,9 +122,8 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 			Spec:       v1.ServiceMonitorSpec{},
 		}, reconciler.StateAbsent, nil
 	} else if n.nodeAgent.SyslogNGSpec != nil {
-
 		if n.nodeAgent.SyslogNGSpec.Metrics != nil && n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitor {
-			objectMetadata := n.NodeAgentObjectMeta(ServiceNameFluentbit + "-metrics")
+			objectMetadata := n.NodeAgentObjectMeta(serviceNameSyslogNG + "-metrics")
 			if n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 				for k, v := range n.nodeAgent.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 					objectMetadata.Labels[k] = v

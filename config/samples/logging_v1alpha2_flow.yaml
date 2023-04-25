@@ -8,8 +8,8 @@ kind: Flow
 metadata:
   name: flow-sample
 spec:
-  selectors:
-    sampleKey: sampleValue
+  match:
+    - select: {}
   filters:
     - stdout: {}
   localOutputRefs:
