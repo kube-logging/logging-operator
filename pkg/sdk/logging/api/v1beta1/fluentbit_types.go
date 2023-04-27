@@ -23,6 +23,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // +name:"FluentbitSpec"
@@ -33,6 +34,29 @@ type _hugoFluentbitSpec interface{} //nolint:deadcode,unused
 // +version:"v1beta1"
 // +description:"FluentbitSpec defines the desired state of Fluentbit"
 type _metaFluentbitSpec interface{} //nolint:deadcode,unused
+
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:path=fluentbits,scope=Cluster,categories=logging-all
+// +kubebuilder:storageversion
+
+// Fluentbit is the Schema for the loggings API
+type Fluentbit struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   FluentbitSpec   `json:"spec,omitempty"`
+	Status FluentbitStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// FluentbitList contains a list of Fluentbit
+type FluentbitList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Logging `json:"items"`
+}
 
 // +kubebuilder:object:generate=true
 
@@ -96,6 +120,10 @@ type FluentbitSpec struct {
 	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
 	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+}
+
+// FluentbitStatus defines the resource status for Fluentbit
+type FluentbitStatus struct {
 }
 
 // +kubebuilder:object:generate=true
