@@ -454,3 +454,7 @@ type ForwardOptions struct {
 	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
 	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&FluentbitAgent{}, &FluentbitAgentList{})
+}
