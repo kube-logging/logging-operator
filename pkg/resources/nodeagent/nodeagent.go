@@ -24,7 +24,7 @@ import (
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/kube-logging/logging-operator/pkg/resources"
-	"github.com/kube-logging/logging-operator/pkg/resources/fluentddataprovider"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -268,11 +268,11 @@ type Reconciler struct {
 	*reconciler.GenericResourceReconciler
 	configs             map[string][]byte
 	agents              map[string]v1beta1.NodeAgentConfig
-	fluentdDataProvider fluentddataprovider.FluentdDataProvider
+	fluentdDataProvider loggingdataprovider.LoggingDataProvider
 }
 
 // New creates a new NodeAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
@@ -287,7 +287,7 @@ type nodeAgentInstance struct {
 	reconciler          *reconciler.GenericResourceReconciler
 	logging             *v1beta1.Logging
 	configs             map[string][]byte
-	fluentdDataProvider fluentddataprovider.FluentdDataProvider
+	fluentdDataProvider loggingdataprovider.LoggingDataProvider
 }
 
 // Reconcile reconciles the InlineNodeAgent resource

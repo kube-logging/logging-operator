@@ -16,7 +16,7 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
-	"github.com/kube-logging/logging-operator/pkg/resources/fluentddataprovider"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -71,11 +71,16 @@ type Reconciler struct {
 	Logging             *v1beta1.Logging
 	configs             map[string][]byte
 	fluentbitSpec       *v1beta1.FluentbitSpec
-	fluentdDataProvider fluentddataprovider.FluentdDataProvider
+	fluentdDataProvider loggingdataprovider.LoggingDataProvider
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentbitSpec *v1beta1.FluentbitSpec, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+func New(client client.Client,
+	logger logr.Logger,
+	logging *v1beta1.Logging,
+	opts reconciler.ReconcilerOpts,
+	fluentbitSpec *v1beta1.FluentbitSpec,
+	fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),

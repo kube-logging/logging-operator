@@ -111,6 +111,12 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
 
+	for i, f := range loggingResources.Fluentbits {
+		if err := loggingv1beta1.FluentBitDefaults(&loggingResources.Fluentbits[i].Spec); err != nil {
+			return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to set fluentbit defaults", "logging", logging, "fluentbit", f)
+		}
+	}
+
 	// metrics
 	defer func() {
 		stateMetrics, problemsMetrics := getResourceStateMetrics(log)
@@ -180,11 +186,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, *logging.Spec.FluentbitSpec, fluentd.NewDataProvider(r.Client)).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, logging.Spec.FluentbitSpec, fluentd.NewDataProvider(r.Client)).Reconcile)
 	}
 	if len(loggingResources.Fluentbits) > 0 {
 		for _, f := range loggingResources.Fluentbits {
-			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, f.Spec, fluentd.NewDataProvider(r.Client)).Reconcile)
+			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, &f.Spec, fluentd.NewDataProvider(r.Client)).Reconcile)
 		}
 	}
 

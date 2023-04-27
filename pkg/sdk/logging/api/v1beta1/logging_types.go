@@ -386,123 +386,131 @@ func (l *Logging) SetDefaults() error {
 		}
 	}
 
-	if l.Spec.FluentbitSpec != nil { // nolint:nestif
-		if l.Spec.FluentbitSpec.PosisionDBLegacy != nil {
+	if err := FluentBitDefaults(l.Spec.FluentbitSpec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
+	if fluentbitSpec != nil { // nolint:nestif
+		if fluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
 		}
-		if l.Spec.FluentbitSpec.Parser != "" {
+		if fluentbitSpec.Parser != "" {
 			return errors.New("`parser` field is deprecated, use `inputTail.Parser`")
 		}
-		if l.Spec.FluentbitSpec.Image.Repository == "" {
-			l.Spec.FluentbitSpec.Image.Repository = DefaultFluentbitImageRepository
+		if fluentbitSpec.Image.Repository == "" {
+			fluentbitSpec.Image.Repository = DefaultFluentbitImageRepository
 		}
-		if l.Spec.FluentbitSpec.Image.Tag == "" {
-			l.Spec.FluentbitSpec.Image.Tag = DefaultFluentbitImageTag
+		if fluentbitSpec.Image.Tag == "" {
+			fluentbitSpec.Image.Tag = DefaultFluentbitImageTag
 		}
-		if l.Spec.FluentbitSpec.Image.PullPolicy == "" {
-			l.Spec.FluentbitSpec.Image.PullPolicy = "IfNotPresent"
+		if fluentbitSpec.Image.PullPolicy == "" {
+			fluentbitSpec.Image.PullPolicy = "IfNotPresent"
 		}
-		if l.Spec.FluentbitSpec.Flush == 0 {
-			l.Spec.FluentbitSpec.Flush = 1
+		if fluentbitSpec.Flush == 0 {
+			fluentbitSpec.Flush = 1
 		}
-		if l.Spec.FluentbitSpec.Grace == 0 {
-			l.Spec.FluentbitSpec.Grace = 5
+		if fluentbitSpec.Grace == 0 {
+			fluentbitSpec.Grace = 5
 		}
-		if l.Spec.FluentbitSpec.LogLevel == "" {
-			l.Spec.FluentbitSpec.LogLevel = "info"
+		if fluentbitSpec.LogLevel == "" {
+			fluentbitSpec.LogLevel = "info"
 		}
-		if l.Spec.FluentbitSpec.CoroStackSize == 0 {
-			l.Spec.FluentbitSpec.CoroStackSize = 24576
+		if fluentbitSpec.CoroStackSize == 0 {
+			fluentbitSpec.CoroStackSize = 24576
 		}
-		if l.Spec.FluentbitSpec.Resources.Limits == nil {
-			l.Spec.FluentbitSpec.Resources.Limits = v1.ResourceList{
+		if fluentbitSpec.Resources.Limits == nil {
+			fluentbitSpec.Resources.Limits = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("100M"),
 				v1.ResourceCPU:    resource.MustParse("200m"),
 			}
 		}
-		if l.Spec.FluentbitSpec.Resources.Requests == nil {
-			l.Spec.FluentbitSpec.Resources.Requests = v1.ResourceList{
+		if fluentbitSpec.Resources.Requests == nil {
+			fluentbitSpec.Resources.Requests = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("50M"),
 				v1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
-		if l.Spec.FluentbitSpec.InputTail.Path == "" {
-			l.Spec.FluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
+		if fluentbitSpec.InputTail.Path == "" {
+			fluentbitSpec.InputTail.Path = "/var/log/containers/*.log"
 		}
-		if l.Spec.FluentbitSpec.InputTail.RefreshInterval == "" {
-			l.Spec.FluentbitSpec.InputTail.RefreshInterval = "5"
+		if fluentbitSpec.InputTail.RefreshInterval == "" {
+			fluentbitSpec.InputTail.RefreshInterval = "5"
 		}
-		if l.Spec.FluentbitSpec.InputTail.SkipLongLines == "" {
-			l.Spec.FluentbitSpec.InputTail.SkipLongLines = "On"
+		if fluentbitSpec.InputTail.SkipLongLines == "" {
+			fluentbitSpec.InputTail.SkipLongLines = "On"
 		}
-		if l.Spec.FluentbitSpec.InputTail.DB == nil {
-			l.Spec.FluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
+		if fluentbitSpec.InputTail.DB == nil {
+			fluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
 		}
-		if l.Spec.FluentbitSpec.InputTail.DBLocking == nil {
-			l.Spec.FluentbitSpec.InputTail.DBLocking = util.BoolPointer(true)
+		if fluentbitSpec.InputTail.DBLocking == nil {
+			fluentbitSpec.InputTail.DBLocking = util.BoolPointer(true)
 		}
-		if l.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
-			l.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
+		if fluentbitSpec.InputTail.MemBufLimit == "" {
+			fluentbitSpec.InputTail.MemBufLimit = "5MB"
 		}
-		if l.Spec.FluentbitSpec.InputTail.Tag == "" {
-			l.Spec.FluentbitSpec.InputTail.Tag = "kubernetes.*"
+		if fluentbitSpec.InputTail.Tag == "" {
+			fluentbitSpec.InputTail.Tag = "kubernetes.*"
 		}
-		if l.Spec.FluentbitSpec.Annotations == nil {
-			l.Spec.FluentbitSpec.Annotations = make(map[string]string)
+		if fluentbitSpec.Annotations == nil {
+			fluentbitSpec.Annotations = make(map[string]string)
 		}
-		if l.Spec.FluentbitSpec.Security == nil {
-			l.Spec.FluentbitSpec.Security = &Security{}
+		if fluentbitSpec.Security == nil {
+			fluentbitSpec.Security = &Security{}
 		}
-		if l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
-			l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		if fluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
+			fluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
-		if l.Spec.FluentbitSpec.BufferVolumeImage.Repository == "" {
-			l.Spec.FluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
+		if fluentbitSpec.BufferVolumeImage.Repository == "" {
+			fluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
 		}
-		if l.Spec.FluentbitSpec.BufferVolumeImage.Tag == "" {
-			l.Spec.FluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
+		if fluentbitSpec.BufferVolumeImage.Tag == "" {
+			fluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
 		}
-		if l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy == "" {
-			l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
+		if fluentbitSpec.BufferVolumeImage.PullPolicy == "" {
+			fluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
-		if l.Spec.FluentbitSpec.Security.SecurityContext == nil {
-			l.Spec.FluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
+		if fluentbitSpec.Security.SecurityContext == nil {
+			fluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
 		}
-		if l.Spec.FluentbitSpec.Security.PodSecurityContext == nil {
-			l.Spec.FluentbitSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
+		if fluentbitSpec.Security.PodSecurityContext == nil {
+			fluentbitSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
 		}
-		if l.Spec.FluentbitSpec.Metrics != nil {
-			if l.Spec.FluentbitSpec.Metrics.Path == "" {
-				l.Spec.FluentbitSpec.Metrics.Path = "/api/v1/metrics/prometheus"
+		if fluentbitSpec.Metrics != nil {
+			if fluentbitSpec.Metrics.Path == "" {
+				fluentbitSpec.Metrics.Path = "/api/v1/metrics/prometheus"
 			}
-			if l.Spec.FluentbitSpec.Metrics.Port == 0 {
-				l.Spec.FluentbitSpec.Metrics.Port = 2020
+			if fluentbitSpec.Metrics.Port == 0 {
+				fluentbitSpec.Metrics.Port = 2020
 			}
-			if l.Spec.FluentbitSpec.Metrics.Timeout == "" {
-				l.Spec.FluentbitSpec.Metrics.Timeout = "5s"
+			if fluentbitSpec.Metrics.Timeout == "" {
+				fluentbitSpec.Metrics.Timeout = "5s"
 			}
-			if l.Spec.FluentbitSpec.Metrics.Interval == "" {
-				l.Spec.FluentbitSpec.Metrics.Interval = "15s"
+			if fluentbitSpec.Metrics.Interval == "" {
+				fluentbitSpec.Metrics.Interval = "15s"
 			}
-			if l.Spec.FluentbitSpec.Metrics.PrometheusAnnotations {
-				l.Spec.FluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
-				l.Spec.FluentbitSpec.Annotations["prometheus.io/path"] = l.Spec.FluentbitSpec.Metrics.Path
-				l.Spec.FluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", l.Spec.FluentbitSpec.Metrics.Port)
+			if fluentbitSpec.Metrics.PrometheusAnnotations {
+				fluentbitSpec.Annotations["prometheus.io/scrape"] = "true"
+				fluentbitSpec.Annotations["prometheus.io/path"] = fluentbitSpec.Metrics.Path
+				fluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", fluentbitSpec.Metrics.Port)
 			}
-		} else if l.Spec.FluentbitSpec.LivenessDefaultCheck {
-			l.Spec.FluentbitSpec.Metrics = &Metrics{
+		} else if fluentbitSpec.LivenessDefaultCheck {
+			fluentbitSpec.Metrics = &Metrics{
 				Port: 2020,
 				Path: "/",
 			}
 		}
-		if l.Spec.FluentbitSpec.LivenessProbe == nil {
-			if l.Spec.FluentbitSpec.LivenessDefaultCheck {
-				l.Spec.FluentbitSpec.LivenessProbe = &v1.Probe{
+		if fluentbitSpec.LivenessProbe == nil {
+			if fluentbitSpec.LivenessDefaultCheck {
+				fluentbitSpec.LivenessProbe = &v1.Probe{
 					ProbeHandler: v1.ProbeHandler{
 						HTTPGet: &v1.HTTPGetAction{
-							Path: l.Spec.FluentbitSpec.Metrics.Path,
+							Path: fluentbitSpec.Metrics.Path,
 							Port: intstr.IntOrString{
-								IntVal: l.Spec.FluentbitSpec.Metrics.Port,
+								IntVal: fluentbitSpec.Metrics.Port,
 							},
 						}},
 					InitialDelaySeconds: 10,
@@ -514,62 +522,61 @@ func (l *Logging) SetDefaults() error {
 			}
 		}
 
-		if l.Spec.FluentbitSpec.MountPath == "" {
-			l.Spec.FluentbitSpec.MountPath = "/var/lib/docker/containers"
+		if fluentbitSpec.MountPath == "" {
+			fluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
-		if l.Spec.FluentbitSpec.BufferStorage.StoragePath == "" {
-			l.Spec.FluentbitSpec.BufferStorage.StoragePath = "/buffers"
+		if fluentbitSpec.BufferStorage.StoragePath == "" {
+			fluentbitSpec.BufferStorage.StoragePath = "/buffers"
 		}
-		if l.Spec.FluentbitSpec.FilterAws != nil {
-			if l.Spec.FluentbitSpec.FilterAws.ImdsVersion == "" {
-				l.Spec.FluentbitSpec.FilterAws.ImdsVersion = "v2"
+		if fluentbitSpec.FilterAws != nil {
+			if fluentbitSpec.FilterAws.ImdsVersion == "" {
+				fluentbitSpec.FilterAws.ImdsVersion = "v2"
 			}
-			if l.Spec.FluentbitSpec.FilterAws.AZ == nil {
-				l.Spec.FluentbitSpec.FilterAws.AZ = util.BoolPointer(true)
+			if fluentbitSpec.FilterAws.AZ == nil {
+				fluentbitSpec.FilterAws.AZ = util.BoolPointer(true)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.Ec2InstanceID == nil {
-				l.Spec.FluentbitSpec.FilterAws.Ec2InstanceID = util.BoolPointer(true)
+			if fluentbitSpec.FilterAws.Ec2InstanceID == nil {
+				fluentbitSpec.FilterAws.Ec2InstanceID = util.BoolPointer(true)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.Ec2InstanceType == nil {
-				l.Spec.FluentbitSpec.FilterAws.Ec2InstanceType = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.Ec2InstanceType == nil {
+				fluentbitSpec.FilterAws.Ec2InstanceType = util.BoolPointer(false)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.PrivateIP == nil {
-				l.Spec.FluentbitSpec.FilterAws.PrivateIP = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.PrivateIP == nil {
+				fluentbitSpec.FilterAws.PrivateIP = util.BoolPointer(false)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.AmiID == nil {
-				l.Spec.FluentbitSpec.FilterAws.AmiID = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.AmiID == nil {
+				fluentbitSpec.FilterAws.AmiID = util.BoolPointer(false)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.AccountID == nil {
-				l.Spec.FluentbitSpec.FilterAws.AccountID = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.AccountID == nil {
+				fluentbitSpec.FilterAws.AccountID = util.BoolPointer(false)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.Hostname == nil {
-				l.Spec.FluentbitSpec.FilterAws.Hostname = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.Hostname == nil {
+				fluentbitSpec.FilterAws.Hostname = util.BoolPointer(false)
 			}
-			if l.Spec.FluentbitSpec.FilterAws.VpcID == nil {
-				l.Spec.FluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
+			if fluentbitSpec.FilterAws.VpcID == nil {
+				fluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
 			}
 		}
-		if len(l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet) == 0 {
-			l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet = "Off"
+		if len(fluentbitSpec.FilterKubernetes.UseKubelet) == 0 {
+			fluentbitSpec.FilterKubernetes.UseKubelet = "Off"
 		}
-		if l.Spec.FluentbitSpec.FilterKubernetes.UseKubelet == "On" {
-			l.Spec.FluentbitSpec.DNSPolicy = "ClusterFirstWithHostNet"
-			l.Spec.FluentbitSpec.HostNetwork = true
+		if fluentbitSpec.FilterKubernetes.UseKubelet == "On" {
+			fluentbitSpec.DNSPolicy = "ClusterFirstWithHostNet"
+			fluentbitSpec.HostNetwork = true
 		}
-		if l.Spec.FluentbitSpec.ForwardOptions == nil {
-			l.Spec.FluentbitSpec.ForwardOptions = &ForwardOptions{}
+		if fluentbitSpec.ForwardOptions == nil {
+			fluentbitSpec.ForwardOptions = &ForwardOptions{}
 		}
-		if l.Spec.FluentbitSpec.ForwardOptions.RetryLimit == "" {
-			l.Spec.FluentbitSpec.ForwardOptions.RetryLimit = "False"
+		if fluentbitSpec.ForwardOptions.RetryLimit == "" {
+			fluentbitSpec.ForwardOptions.RetryLimit = "False"
 		}
-		if l.Spec.FluentbitSpec.TLS == nil {
-			l.Spec.FluentbitSpec.TLS = &FluentbitTLS{}
+		if fluentbitSpec.TLS == nil {
+			fluentbitSpec.TLS = &FluentbitTLS{}
 		}
-		if l.Spec.FluentbitSpec.TLS.Enabled == nil {
-			l.Spec.FluentbitSpec.TLS.Enabled = util.BoolPointer(false)
+		if fluentbitSpec.TLS.Enabled == nil {
+			fluentbitSpec.TLS.Enabled = util.BoolPointer(false)
 		}
 	}
-
 	return nil
 }
 
