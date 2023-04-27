@@ -32,6 +32,8 @@ spec:
             properties:
               HostNetwork:
                 type: boolean
+              LoggingRef:
+                type: string
               affinity:
                 properties:
                   nodeAffinity:
