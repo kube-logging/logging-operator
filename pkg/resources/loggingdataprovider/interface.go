@@ -16,10 +16,8 @@ package loggingdataprovider
 
 import (
 	"context"
-
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type LoggingDataProvider interface {
-	GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error)
+	GetReplicaCount(ctx context.Context) (*int32, error)
 }

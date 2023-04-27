@@ -287,7 +287,7 @@ type nodeAgentInstance struct {
 	reconciler          *reconciler.GenericResourceReconciler
 	logging             *v1beta1.Logging
 	configs             map[string][]byte
-	fluentdDataProvider loggingdataprovider.LoggingDataProvider
+	loggingDataProvider loggingdataprovider.LoggingDataProvider
 }
 
 // Reconcile reconciles the InlineNodeAgent resource
@@ -334,7 +334,7 @@ func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgen
 		nodeAgent:           NodeAgentFluentbitDefaults,
 		reconciler:          r.GenericResourceReconciler,
 		logging:             r.Logging,
-		fluentdDataProvider: r.fluentdDataProvider,
+		loggingDataProvider: r.fluentdDataProvider,
 	}
 
 	return instance.Reconcile()

@@ -30,6 +30,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
@@ -157,6 +158,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
 	}
 
+	var loggingDataProvider loggingdataprovider.LoggingDataProvider
+
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
@@ -169,6 +172,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
@@ -183,14 +187,15 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
+		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, logging.Spec.FluentbitSpec, fluentd.NewDataProvider(r.Client)).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, logging.Spec.FluentbitSpec, loggingDataProvider).Reconcile)
 	}
 	if len(loggingResources.Fluentbits) > 0 {
 		for _, f := range loggingResources.Fluentbits {
-			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, &f.Spec, fluentd.NewDataProvider(r.Client)).Reconcile)
+			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, &f.Spec, loggingDataProvider).Reconcile)
 		}
 	}
 
@@ -209,7 +214,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {

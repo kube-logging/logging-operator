@@ -71,7 +71,7 @@ type Reconciler struct {
 	Logging             *v1beta1.Logging
 	configs             map[string][]byte
 	fluentbitSpec       *v1beta1.FluentbitSpec
-	fluentdDataProvider loggingdataprovider.LoggingDataProvider
+	loggingDataProvider loggingdataprovider.LoggingDataProvider
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
@@ -85,7 +85,7 @@ func New(client client.Client,
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
 		fluentbitSpec:             fluentbitSpec,
-		fluentdDataProvider:       fluentdDataProvider,
+		loggingDataProvider:       fluentdDataProvider,
 	}
 }
 

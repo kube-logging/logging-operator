@@ -299,7 +299,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
 		}
 
-		fluentdReplicas, err := r.fluentdDataProvider.GetReplicaCount(context.TODO(), r.Logging)
+		fluentdReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
 		if err != nil {
 			return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 		}
