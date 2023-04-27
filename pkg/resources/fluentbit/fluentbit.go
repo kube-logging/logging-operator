@@ -16,20 +16,22 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
-	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"github.com/kube-logging/logging-operator/pkg/resources"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -91,6 +93,10 @@ func New(client client.Client,
 
 // Reconcile reconciles the fluentBit resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+	if err := v1beta1.FluentBitDefaults(r.fluentbitSpec); err != nil {
+		return nil, err
+	}
+
 	for _, factory := range []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,

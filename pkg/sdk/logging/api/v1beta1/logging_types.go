@@ -386,10 +386,6 @@ func (l *Logging) SetDefaults() error {
 		}
 	}
 
-	if err := FluentBitDefaults(l.Spec.FluentbitSpec); err != nil {
-		return err
-	}
-
 	return nil
 }
 
