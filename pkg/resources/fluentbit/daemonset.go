@@ -22,6 +22,7 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/templates"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
@@ -229,7 +230,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fluentBitSecretConfigName),
+					SecretName: r.nameProvider.ComponentName(fluentBitSecretConfigName),
 					Items: []corev1.KeyToPath{
 						{
 							Key:  BaseConfigName,

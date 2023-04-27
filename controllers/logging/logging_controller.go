@@ -186,11 +186,27 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, logging.Spec.FluentbitSpec, loggingDataProvider).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(
+			r.Client,
+			r.Log,
+			&logging,
+			reconcilerOpts,
+			logging.Spec.FluentbitSpec,
+			loggingDataProvider,
+			loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
+		).Reconcile)
 	}
 	if len(loggingResources.Fluentbits) > 0 {
 		for _, f := range loggingResources.Fluentbits {
-			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, &f.Spec, loggingDataProvider).Reconcile)
+			reconcilers = append(reconcilers, fluentbit.New(
+				r.Client,
+				r.Log,
+				&logging,
+				reconcilerOpts,
+				&f.Spec,
+				loggingDataProvider,
+				loggingv1beta1.NewStandaloneFluentbitNameProvider(f.Name),
+			).Reconcile)
 		}
 	}
 

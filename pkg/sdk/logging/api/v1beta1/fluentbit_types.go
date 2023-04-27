@@ -15,6 +15,7 @@
 package v1beta1
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -80,7 +81,7 @@ type FluentbitSpec struct {
 	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info)
 	LogLevel string `json:"logLevel,omitempty" plugin:"default:info"`
 	// Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer.
-	//Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
+	// Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
 	CoroStackSize int32                       `json:"coroStackSize,omitempty" plugin:"default:24576"`
 	Resources     corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations   []corev1.Toleration         `json:"tolerations,omitempty"`
@@ -247,7 +248,7 @@ type InputTail struct {
 	DockerMode string `json:"Docker_Mode,omitempty"`
 	// Specify an optional parser for the first line of the docker multiline mode.
 	DockerModeParser string `json:"Docker_Mode_Parser,omitempty"`
-	//Wait period time in seconds to flush queued unfinished split lines. (default:4)
+	// Wait period time in seconds to flush queued unfinished split lines. (default:4)
 	DockerModeFlush string `json:"Docker_Mode_Flush,omitempty"`
 	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: "")
 	MultilineParser []string `json:"multiline.parser,omitempty"`
@@ -454,6 +455,30 @@ type ForwardOptions struct {
 	RetryLimit         string `json:"Retry_Limit,omitempty"`
 	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
 	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
+}
+
+type FluentbitNameProvider struct {
+	logging *Logging
+	name    string
+}
+
+func (l FluentbitNameProvider) ComponentName(name string) string {
+	if l.logging != nil {
+		return l.logging.QualifiedName(name)
+	}
+	return fmt.Sprintf("%s-%s", l.name, name)
+}
+
+func NewLegacyFluentbitNameProvider(logging *Logging) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		logging: logging,
+	}
+}
+
+func NewStandaloneFluentbitNameProvider(name string) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		name: name,
+	}
 }
 
 func init() {

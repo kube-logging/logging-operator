@@ -19,9 +19,10 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -120,7 +121,7 @@ func (r *Reconciler) pspClusterRole() (runtime.Object, reconciler.DesiredState, 
 				{
 					APIGroups:     []string{"policy"},
 					Resources:     []string{"podsecuritypolicies"},
-					ResourceNames: []string{r.Logging.QualifiedName(fluentbitPodSecurityPolicyName)},
+					ResourceNames: []string{r.nameProvider.ComponentName(fluentbitPodSecurityPolicyName)},
 					Verbs:         []string{"use"},
 				},
 			},
@@ -138,7 +139,7 @@ func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, reconciler.Desired
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(clusterRoleName + "-psp"),
+				Name:     r.nameProvider.ComponentName(clusterRoleName + "-psp"),
 			},
 			Subjects: []rbacv1.Subject{
 				{

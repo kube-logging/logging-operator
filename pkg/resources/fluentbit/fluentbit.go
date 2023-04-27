@@ -59,7 +59,11 @@ func (r *Reconciler) getServiceAccount() string {
 	if r.fluentbitSpec.Security.ServiceAccount != "" {
 		return r.fluentbitSpec.Security.ServiceAccount
 	}
-	return r.Logging.QualifiedName(defaultServiceAccountName)
+	return r.nameProvider.ComponentName(defaultServiceAccountName)
+}
+
+type NameProvider interface {
+	ComponentName(name string) string
 }
 
 type DesiredObject struct {
@@ -74,6 +78,7 @@ type Reconciler struct {
 	configs             map[string][]byte
 	fluentbitSpec       *v1beta1.FluentbitSpec
 	loggingDataProvider loggingdataprovider.LoggingDataProvider
+	nameProvider        NameProvider
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
@@ -82,12 +87,14 @@ func New(client client.Client,
 	logging *v1beta1.Logging,
 	opts reconciler.ReconcilerOpts,
 	fluentbitSpec *v1beta1.FluentbitSpec,
-	fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
+	loggingDataProvider loggingdataprovider.LoggingDataProvider,
+	nameProvider NameProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
 		fluentbitSpec:             fluentbitSpec,
-		loggingDataProvider:       fluentdDataProvider,
+		loggingDataProvider:       loggingDataProvider,
+		nameProvider:              nameProvider,
 	}
 }
 

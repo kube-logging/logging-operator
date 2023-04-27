@@ -52,7 +52,7 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(clusterRoleName),
+				Name:     r.nameProvider.ComponentName(clusterRoleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{
