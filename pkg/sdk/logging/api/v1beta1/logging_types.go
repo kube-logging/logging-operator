@@ -49,7 +49,7 @@ type LoggingSpec struct {
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
-	// Fluentbit daemonset configuration.
+	// FluentbitAgent daemonset configuration.
 	// Deprecated, will be removed with next major version
 	// Migrate to the standalone NodeAgent resource
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`

@@ -58,6 +58,9 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.NodeAgents, err = r.NodeAgentsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
+	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
 	watchNamespaces := logging.Spec.WatchNamespaces
 	if len(watchNamespaces) == 0 {
 		var nsList corev1.NamespaceList
@@ -255,7 +258,7 @@ func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Con
 
 func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.NodeAgent, error) {
 	if os.Getenv("ENABLE_NODEAGENT_CRD") == "" {
-		r.Logger.Info("processing NodeAgent CRDs is explicitly disabled (can be enabled with ENABLE_NODEAGENT_CRD=1)")
+		r.Logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		return nil, nil
 	}
 
@@ -269,6 +272,30 @@ func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1
 	})
 
 	var res []v1beta1.NodeAgent
+	for _, i := range list.Items {
+		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
+func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.FluentbitAgent, error) {
+	if os.Getenv("ENABLE_FLUENTBIT_CRD") == "" {
+		r.Logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
+		return nil, nil
+	}
+
+	var list v1beta1.FluentbitAgentList
+	if err := r.Client.List(ctx, &list); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.FluentbitAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)

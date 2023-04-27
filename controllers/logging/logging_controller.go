@@ -62,8 +62,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbits;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbits/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -359,7 +359,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.NodeAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-		case *loggingv1beta1.Fluentbit:
+		case *loggingv1beta1.FluentbitAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
@@ -382,7 +382,6 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(&source.Kind{Type: &loggingv1beta1.Fluentbit{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
 		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
@@ -395,8 +394,13 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
-		logger.Info("processing NodeAgent CRDs is explicitly disabled (can be enabled with ENABLE_NODEAGENT_CRD=1)")
+		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
+	}
+	// TODO remove with the next major release
+	if os.Getenv("ENABLE_FLUENTBIT_CRD") != "" {
+		logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_FLUENTBIT_CRD=1)")
+		builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
 	}
 
 	fluentd.RegisterWatches(builder)

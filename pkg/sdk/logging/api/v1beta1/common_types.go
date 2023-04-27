@@ -80,7 +80,7 @@ type ServiceMonitorConfig struct {
 	TLSConfig          *v1.TLSConfig       `json:"tlsConfig,omitempty"`
 }
 
-// Security defines Fluentd, Fluentbit deployment security properties
+// Security defines Fluentd, FluentbitAgent deployment security properties
 type Security struct {
 	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
 	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`

@@ -73,7 +73,7 @@ type Reconciler struct {
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
-// NewReconciler creates a new Fluentbit reconciler
+// NewReconciler creates a new FluentbitAgent reconciler
 func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,

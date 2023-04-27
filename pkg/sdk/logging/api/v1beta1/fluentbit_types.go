@@ -32,7 +32,7 @@ type _hugoFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +name:"FluentbitSpec"
 // +version:"v1beta1"
-// +description:"FluentbitSpec defines the desired state of Fluentbit"
+// +description:"FluentbitSpec defines the desired state of FluentbitAgent"
 type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
@@ -40,8 +40,8 @@ type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 // +kubebuilder:resource:path=fluentbits,scope=Cluster,categories=logging-all
 // +kubebuilder:storageversion
 
-// Fluentbit is the Schema for the loggings API
-type Fluentbit struct {
+// FluentbitAgent is the Schema for the loggings API
+type FluentbitAgent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
@@ -51,16 +51,16 @@ type Fluentbit struct {
 
 // +kubebuilder:object:root=true
 
-// FluentbitList contains a list of Fluentbit
-type FluentbitList struct {
+// FluentbitAgentList contains a list of FluentbitAgent
+type FluentbitAgentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Logging `json:"items"`
+	Items           []FluentbitAgent `json:"items"`
 }
 
 // +kubebuilder:object:generate=true
 
-// FluentbitSpec defines the desired state of Fluentbit
+// FluentbitSpec defines the desired state of FluentbitAgent
 type FluentbitSpec struct {
 	LoggingRef string `json:"LoggingRef,omitempty"`
 
@@ -124,7 +124,7 @@ type FluentbitSpec struct {
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 }
 
-// FluentbitStatus defines the resource status for Fluentbit
+// FluentbitStatus defines the resource status for FluentbitAgent
 type FluentbitStatus struct {
 }
 
@@ -192,7 +192,7 @@ type BufferStorage struct {
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
 }
 
-// InputTail defines Fluentbit tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
+// InputTail defines FluentbitAgent tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
 type InputTail struct {
 	// Specify the buffering mechanism to use. It can be memory or filesystem. (default:memory)
 	StorageType string `json:"storage.type,omitempty"`
@@ -340,9 +340,9 @@ type FilterAws struct {
 
 // FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
 type FilterModify struct {
-	// Fluentbit Filter Modification Rule
+	// FluentbitAgent Filter Modification Rule
 	Rules []FilterModifyRule `json:"rules,omitempty"`
-	// Fluentbit Filter Modification Condition
+	// FluentbitAgent Filter Modification Condition
 	Conditions []FilterModifyCondition `json:"conditions,omitempty"`
 }
 
