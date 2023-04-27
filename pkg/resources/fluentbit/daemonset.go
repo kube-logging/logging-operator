@@ -38,12 +38,12 @@ const (
 
 func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error) {
 
-	labels := util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())
+	labels := util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels())
 	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
-	meta.Annotations = util.MergeLabels(meta.Annotations, r.Logging.Spec.FluentbitSpec.DaemonSetAnnotations)
+	meta.Annotations = util.MergeLabels(meta.Annotations, r.fluentbitSpec.DaemonSetAnnotations)
 	podMeta := metav1.ObjectMeta{
 		Labels:      labels,
-		Annotations: r.Logging.Spec.FluentbitSpec.Annotations,
+		Annotations: r.fluentbitSpec.Annotations,
 	}
 
 	if r.configs != nil {
@@ -64,43 +64,43 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, r.getFluentBitLabels())},
+			Selector: &metav1.LabelSelector{MatchLabels: util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels())},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
 					ServiceAccountName: r.getServiceAccount(),
 					Volumes:            r.generateVolume(),
-					Tolerations:        r.Logging.Spec.FluentbitSpec.Tolerations,
-					NodeSelector:       r.Logging.Spec.FluentbitSpec.NodeSelector,
-					Affinity:           r.Logging.Spec.FluentbitSpec.Affinity,
-					PriorityClassName:  r.Logging.Spec.FluentbitSpec.PodPriorityClassName,
+					Tolerations:        r.fluentbitSpec.Tolerations,
+					NodeSelector:       r.fluentbitSpec.NodeSelector,
+					Affinity:           r.fluentbitSpec.Affinity,
+					PriorityClassName:  r.fluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.FSGroup,
-						RunAsNonRoot: r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
-						RunAsUser:    r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
-						RunAsGroup:   r.Logging.Spec.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						FSGroup:      r.fluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot: r.fluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:    r.fluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:   r.fluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 					},
-					ImagePullSecrets: r.Logging.Spec.FluentbitSpec.Image.ImagePullSecrets,
-					DNSPolicy:        r.Logging.Spec.FluentbitSpec.DNSPolicy,
-					DNSConfig:        r.Logging.Spec.FluentbitSpec.DNSConfig,
-					HostNetwork:      r.Logging.Spec.FluentbitSpec.HostNetwork,
+					ImagePullSecrets: r.fluentbitSpec.Image.ImagePullSecrets,
+					DNSPolicy:        r.fluentbitSpec.DNSPolicy,
+					DNSConfig:        r.fluentbitSpec.DNSConfig,
+					HostNetwork:      r.fluentbitSpec.HostNetwork,
 
 					Containers: containers,
 				},
 			},
-			UpdateStrategy: r.Logging.Spec.FluentbitSpec.UpdateStrategy,
+			UpdateStrategy: r.fluentbitSpec.UpdateStrategy,
 		},
 	}
 
-	r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
+	r.fluentbitSpec.PositionDB.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
-	r.Logging.Spec.FluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
+	r.fluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume))
 
-	if err := r.Logging.Spec.FluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
+	if err := r.fluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err
 	}
-	if err := r.Logging.Spec.FluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
+	if err := r.fluentbitSpec.BufferStorageVolume.ApplyVolumeForPodSpec(BufferStorageVolume, containerName, r.fluentbitSpec.BufferStorage.StoragePath, &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err
 	}
 
@@ -110,30 +110,30 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 func (r *Reconciler) fluentbitContainer() *corev1.Container {
 	return &corev1.Container{
 		Name:            containerName,
-		Image:           r.Logging.Spec.FluentbitSpec.Image.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.Image.PullPolicy),
+		Image:           r.fluentbitSpec.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(r.fluentbitSpec.Image.PullPolicy),
 		Ports:           r.generatePortsMetrics(),
-		Resources:       r.Logging.Spec.FluentbitSpec.Resources,
+		Resources:       r.fluentbitSpec.Resources,
 		VolumeMounts:    r.generateVolumeMounts(),
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsUser,
-			RunAsNonRoot:             r.Logging.Spec.FluentbitSpec.Security.SecurityContext.RunAsNonRoot,
-			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: r.Logging.Spec.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               r.Logging.Spec.FluentbitSpec.Security.SecurityContext.Privileged,
-			SELinuxOptions:           r.Logging.Spec.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
+			RunAsUser:                r.fluentbitSpec.Security.SecurityContext.RunAsUser,
+			RunAsNonRoot:             r.fluentbitSpec.Security.SecurityContext.RunAsNonRoot,
+			ReadOnlyRootFilesystem:   r.fluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: r.fluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               r.fluentbitSpec.Security.SecurityContext.Privileged,
+			SELinuxOptions:           r.fluentbitSpec.Security.SecurityContext.SELinuxOptions,
 		},
-		Env:            r.Logging.Spec.FluentbitSpec.EnvVars,
-		LivenessProbe:  r.Logging.Spec.FluentbitSpec.LivenessProbe,
-		ReadinessProbe: r.Logging.Spec.FluentbitSpec.ReadinessProbe,
+		Env:            r.fluentbitSpec.EnvVars,
+		LivenessProbe:  r.fluentbitSpec.LivenessProbe,
+		ReadinessProbe: r.fluentbitSpec.ReadinessProbe,
 	}
 }
 
 func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPort) {
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+			ContainerPort: r.fluentbitSpec.Metrics.Port,
 			Protocol:      corev1.ProtocolTCP,
 		})
 	}
@@ -154,7 +154,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		},
 	}
 
-	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.VolumeMount{
 			Name:      "extravolumemount" + strconv.Itoa(vCount),
 			ReadOnly:  *vMnt.ReadOnly,
@@ -162,13 +162,13 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
+	if r.fluentbitSpec.CustomConfigSecret == "" {
 		v = append(v, corev1.VolumeMount{
 			Name:      "config",
 			MountPath: "/fluent-bit/etc/fluent-bit.conf",
 			SubPath:   BaseConfigName,
 		})
-		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+		if r.fluentbitSpec.EnableUpstream {
 			v = append(v, corev1.VolumeMount{
 				Name:      "config",
 				MountPath: "/fluent-bit/etc/upstream.conf",
@@ -182,7 +182,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if *r.Logging.Spec.FluentbitSpec.TLS.Enabled {
+	if *r.fluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-bit-tls",
@@ -200,7 +200,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			Name: "varlibcontainers",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
-					Path: r.Logging.Spec.FluentbitSpec.MountPath,
+					Path: r.fluentbitSpec.MountPath,
 				},
 			},
 		},
@@ -214,7 +214,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
-	for vCount, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.Volume{
 			Name: "extravolumemount" + strconv.Itoa(vCount),
 			VolumeSource: corev1.VolumeSource{
@@ -224,7 +224,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			}})
 	}
 
-	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret == "" {
+	if r.fluentbitSpec.CustomConfigSecret == "" {
 		volume := corev1.Volume{
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
@@ -239,7 +239,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		}
-		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+		if r.fluentbitSpec.EnableUpstream {
 			volume.VolumeSource.Secret.Items = append(volume.VolumeSource.Secret.Items, corev1.KeyToPath{
 				Key:  UpstreamConfigName,
 				Path: UpstreamConfigName,
@@ -251,17 +251,17 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.FluentbitSpec.CustomConfigSecret,
+					SecretName: r.fluentbitSpec.CustomConfigSecret,
 				},
 			},
 		})
 	}
-	if *r.Logging.Spec.FluentbitSpec.TLS.Enabled {
+	if *r.fluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluent-bit-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.FluentbitSpec.TLS.SecretName,
+					SecretName: r.fluentbitSpec.TLS.SecretName,
 				},
 			},
 		}
@@ -272,8 +272,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 
 func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
 	port := int32(defaultBufferVolumeMetricsPort)
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
-		port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
+		port = r.fluentbitSpec.BufferVolumeMetrics.Port
 	}
 	return []corev1.ContainerPort{
 		{
@@ -285,15 +285,15 @@ func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
-			port = r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port
+		if r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.fluentbitSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
 		args := []string{portParam}
-		if len(r.Logging.Spec.FluentbitSpec.BufferVolumeArgs) != 0 {
-			args = append(args, r.Logging.Spec.FluentbitSpec.BufferVolumeArgs...)
+		if len(r.fluentbitSpec.BufferVolumeArgs) != 0 {
+			args = append(args, r.fluentbitSpec.BufferVolumeArgs...)
 		} else {
 			args = append(args, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/")
 		}
@@ -303,8 +303,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
-			Image:           r.Logging.Spec.FluentbitSpec.BufferVolumeImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy),
+			Image:           r.fluentbitSpec.BufferVolumeImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.fluentbitSpec.BufferVolumeImage.PullPolicy),
 			Args: []string{
 				"--exec", nodeExporterCmd,
 				"--exec", bufferSizeCmd,
@@ -312,14 +312,14 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Env: []corev1.EnvVar{
 				{
 					Name:  "BUFFER_PATH",
-					Value: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
+					Value: r.fluentbitSpec.BufferStorage.StoragePath,
 				},
 			},
 			Ports: r.generatePortsBufferVolumeMetrics(),
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      BufferStorageVolume,
-					MountPath: r.Logging.Spec.FluentbitSpec.BufferStorage.StoragePath,
+					MountPath: r.fluentbitSpec.BufferStorage.StoragePath,
 				},
 			},
 		}

@@ -29,7 +29,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	}
 	state := reconciler.StateAbsent
 
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.PrometheusRules {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		obj.Spec.Groups = []v1.RuleGroup{{

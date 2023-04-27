@@ -180,7 +180,12 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, *logging.Spec.FluentbitSpec, fluentd.NewDataProvider(r.Client)).Reconcile)
+	}
+	if len(loggingResources.Fluentbits) > 0 {
+		for _, f := range loggingResources.Fluentbits {
+			reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, f.Spec, fluentd.NewDataProvider(r.Client)).Reconcile)
+		}
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {

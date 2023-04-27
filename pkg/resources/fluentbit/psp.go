@@ -27,52 +27,52 @@ import (
 )
 
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+	if r.fluentbitSpec.Security.PodSecurityPolicyCreate {
 		allowedHostPaths := []policyv1beta1.AllowedHostPath{{
-			PathPrefix: r.Logging.Spec.FluentbitSpec.MountPath,
+			PathPrefix: r.fluentbitSpec.MountPath,
 			ReadOnly:   true,
 		}, {
 			PathPrefix: "/var/log",
 			ReadOnly:   true,
 		}}
 
-		if r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath != nil {
+		if r.fluentbitSpec.BufferStorageVolume.HostPath != nil {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-				PathPrefix: r.Logging.Spec.FluentbitSpec.BufferStorageVolume.HostPath.Path,
+				PathPrefix: r.fluentbitSpec.BufferStorageVolume.HostPath.Path,
 				ReadOnly:   false,
 			})
 		}
 
-		for _, vMnt := range r.Logging.Spec.FluentbitSpec.ExtraVolumeMounts {
+		for _, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: vMnt.Source,
 				ReadOnly:   *vMnt.ReadOnly,
 			})
 		}
 
-		if r.Logging.Spec.FluentbitSpec.PositionDB.HostPath != nil {
-			r.Logging.Spec.FluentbitSpec.PositionDB.WithDefaultHostPath(
+		if r.fluentbitSpec.PositionDB.HostPath != nil {
+			r.fluentbitSpec.PositionDB.WithDefaultHostPath(
 				fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
 
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-				PathPrefix: r.Logging.Spec.FluentbitSpec.PositionDB.HostPath.Path,
+				PathPrefix: r.fluentbitSpec.PositionDB.HostPath.Path,
 				ReadOnly:   false,
 			})
 		}
 
 		hostPorts := []policyv1beta1.HostPortRange{}
-		if r.Logging.Spec.FluentbitSpec.HostNetwork {
-			if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
+		if r.fluentbitSpec.HostNetwork {
+			if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.Port != 0 {
 				hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
-					Min: r.Logging.Spec.FluentbitSpec.Metrics.Port,
-					Max: r.Logging.Spec.FluentbitSpec.Metrics.Port,
+					Min: r.fluentbitSpec.Metrics.Port,
+					Max: r.fluentbitSpec.Metrics.Port,
 				})
 			}
 
-			if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port != 0 {
+			if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
 				hostPorts = append(hostPorts, policyv1beta1.HostPortRange{
-					Min: r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port,
-					Max: r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.Port,
+					Min: r.fluentbitSpec.BufferVolumeMetrics.Port,
+					Max: r.fluentbitSpec.BufferVolumeMetrics.Port,
 				})
 			}
 		}
@@ -101,7 +101,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 				ReadOnlyRootFilesystem:   true,
 				AllowPrivilegeEscalation: util.BoolPointer(false),
 				AllowedHostPaths:         allowedHostPaths,
-				HostNetwork:              r.Logging.Spec.FluentbitSpec.HostNetwork,
+				HostNetwork:              r.fluentbitSpec.HostNetwork,
 				HostPorts:                hostPorts,
 			},
 		}, reconciler.StatePresent, nil
@@ -113,7 +113,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 }
 
 func (r *Reconciler) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate && r.fluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName + "-psp"),
 			Rules: []rbacv1.PolicyRule{
@@ -132,7 +132,7 @@ func (r *Reconciler) pspClusterRole() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.PodSecurityPolicyCreate {
+	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate && r.fluentbitSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
 			RoleRef: rbacv1.RoleRef{

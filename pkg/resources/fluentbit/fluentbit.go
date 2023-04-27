@@ -49,13 +49,13 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, map[string]string{
+	return util.MergeLabels(r.fluentbitSpec.Labels, map[string]string{
 		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
 }
 
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
+	if r.fluentbitSpec.Security.ServiceAccount != "" {
+		return r.fluentbitSpec.Security.ServiceAccount
 	}
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
@@ -67,17 +67,19 @@ type DesiredObject struct {
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
+	Logging             *v1beta1.Logging
 	configs             map[string][]byte
+	fluentbitSpec       *v1beta1.FluentbitSpec
 	fluentdDataProvider fluentddataprovider.FluentdDataProvider
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentbitSpec *v1beta1.FluentbitSpec, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
+		fluentbitSpec:             fluentbitSpec,
 		fluentdDataProvider:       fluentdDataProvider,
 	}
 }
