@@ -39,6 +39,11 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 		containers = append(containers, *c)
 	}
 
+	var initContainers []corev1.Container
+	if i := generateInitContainer(r.Logging.Spec.FluentdSpec); i != nil {
+		initContainers = append(initContainers, *i)
+	}
+
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
@@ -49,6 +54,7 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 				Volumes:                   r.generateVolume(),
 				ServiceAccountName:        r.getServiceAccount(),
 				ImagePullSecrets:          r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
+				InitContainers:            initContainers,
 				Containers:                containers,
 				NodeSelector:              r.Logging.Spec.FluentdSpec.NodeSelector,
 				Tolerations:               r.Logging.Spec.FluentdSpec.Tolerations,
