@@ -1,0 +1,4 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGAgent
+metadata:
+  name: syslogng-tailer

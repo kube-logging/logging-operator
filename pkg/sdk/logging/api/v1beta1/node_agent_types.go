@@ -45,7 +45,7 @@ type NodeAgent struct {
 type NodeAgentSpec struct {
 	LoggingRef string `json:"loggingRef,omitempty"`
 
-	//InlineNodeAgent
+	// InlineNodeAgent
 	NodeAgentConfig `json:",inline"`
 }
 
@@ -78,7 +78,7 @@ type NodeAgentList struct {
 // InlineNodeAgent
 // @deprecated, replaced by NodeAgent
 type InlineNodeAgent struct {
-	//InlineNodeAgent unique name.
+	// InlineNodeAgent unique name.
 	Name string `json:"name,omitempty"`
 
 	NodeAgentConfig `json:",inline"`
@@ -100,7 +100,7 @@ type NodeAgentFluentbit struct {
 	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info)
 	LogLevel string `json:"logLevel,omitempty" plugin:"default:info"`
 	// Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer.
-	//Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
+	// Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
 	CoroStackSize  int32                 `json:"coroStackSize,omitempty" plugin:"default:24576"`
 	Metrics        *Metrics              `json:"metrics,omitempty"`
 	MetricsService *typeoverride.Service `json:"metricsService,omitempty"`
@@ -128,6 +128,8 @@ type NodeAgentFluentbit struct {
 // +kubebuilder:object:generate=true
 
 type NodeAgentSyslogNG struct {
+	LoggingRef string `json:"loggingRef,omitempty"`
+
 	Enabled                 *bool                        `json:"enabled,omitempty"`
 	DaemonSetOverrides      *typeoverride.DaemonSet      `json:"daemonSet,omitempty"`
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`

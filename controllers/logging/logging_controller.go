@@ -44,6 +44,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	syslogng_agent "github.com/kube-logging/logging-operator/pkg/resources/syslogng-agent"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 
@@ -64,8 +65,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;syslogngagents;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;syslogngagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -215,6 +216,15 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	default:
 		return ctrl.Result{}, errors.New("cannot handle more than one FluentbitAgent for the same Logging resource")
+	}
+
+	if len(loggingResources.SyslogNGAgents) > 0 {
+		for _, s := range loggingResources.SyslogNGAgents {
+			reconcilers = append(reconcilers, syslogng_agent.NewSyslogNGAgentReconciler(
+				r.Client,
+				r.Log,
+				s).Reconcile)
+		}
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
@@ -395,6 +405,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.FluentbitAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.SyslogNGAgent:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -435,6 +447,11 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	if os.Getenv("ENABLE_FLUENTBIT_CRD") != "" {
 		logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_FLUENTBIT_CRD=1)")
 		builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
+	}
+	// TODO remove with the next major release
+	if os.Getenv("ENABLE_SYSLOGNG_CRD") != "" {
+		logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_SYSLOGNG_CRD=1)")
+		builder.Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGAgent{}}, requestMapper)
 	}
 
 	fluentd.RegisterWatches(builder)

@@ -7877,6 +7877,8 @@ spec:
                     type: integer
                   logMSGSize:
                     type: integer
+                  loggingRef:
+                    type: string
                   maxConnections:
                     type: integer
                   metrics:
