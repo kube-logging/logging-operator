@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
@@ -64,6 +65,7 @@ func (r *Reconciler) getServiceAccount() string {
 
 type NameProvider interface {
 	ComponentName(name string) string
+	OwnerRef() v1.OwnerReference
 }
 
 type DesiredObject struct {

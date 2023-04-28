@@ -205,7 +205,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
-				loggingv1beta1.NewStandaloneFluentbitNameProvider(f.Name),
+				loggingv1beta1.NewStandaloneFluentbitNameProvider(&f),
 			).Reconcile)
 		}
 	}

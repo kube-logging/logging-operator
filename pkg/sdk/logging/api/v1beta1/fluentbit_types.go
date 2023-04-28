@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -458,15 +459,34 @@ type ForwardOptions struct {
 }
 
 type FluentbitNameProvider struct {
-	logging *Logging
-	name    string
+	logging   *Logging
+	fluentbit *FluentbitAgent
 }
 
-func (l FluentbitNameProvider) ComponentName(name string) string {
+func (l *FluentbitNameProvider) ComponentName(name string) string {
 	if l.logging != nil {
 		return l.logging.QualifiedName(name)
 	}
-	return fmt.Sprintf("%s-%s", l.name, name)
+	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
+}
+
+func (l *FluentbitNameProvider) OwnerRef() metav1.OwnerReference {
+	if l.logging != nil {
+		return metav1.OwnerReference{
+			APIVersion: l.logging.APIVersion,
+			Kind:       l.logging.Kind,
+			Name:       l.logging.Name,
+			UID:        l.logging.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
+	return metav1.OwnerReference{
+		APIVersion: l.fluentbit.APIVersion,
+		Kind:       l.fluentbit.Kind,
+		Name:       l.fluentbit.Name,
+		UID:        l.fluentbit.UID,
+		Controller: util.BoolPointer(true),
+	}
 }
 
 func NewLegacyFluentbitNameProvider(logging *Logging) *FluentbitNameProvider {
@@ -475,9 +495,9 @@ func NewLegacyFluentbitNameProvider(logging *Logging) *FluentbitNameProvider {
 	}
 }
 
-func NewStandaloneFluentbitNameProvider(name string) *FluentbitNameProvider {
+func NewStandaloneFluentbitNameProvider(agent *FluentbitAgent) *FluentbitNameProvider {
 	return &FluentbitNameProvider{
-		name: name,
+		fluentbit: agent,
 	}
 }
 

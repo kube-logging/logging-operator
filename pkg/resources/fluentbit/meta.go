@@ -15,7 +15,6 @@
 package fluentbit
 
 import (
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,13 +25,7 @@ func (r *Reconciler) FluentbitObjectMeta(name string) metav1.ObjectMeta {
 		Namespace: r.Logging.Spec.ControlNamespace,
 		Labels:    r.getFluentBitLabels(),
 		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: r.Logging.APIVersion,
-				Kind:       r.Logging.Kind,
-				Name:       r.Logging.Name,
-				UID:        r.Logging.UID,
-				Controller: util.BoolPointer(true),
-			},
+			r.nameProvider.OwnerRef(),
 		},
 	}
 	return *o.DeepCopy()
@@ -44,13 +37,7 @@ func (r *Reconciler) FluentbitObjectMetaClusterScope(name string) metav1.ObjectM
 		Name:   r.nameProvider.ComponentName(name),
 		Labels: r.getFluentBitLabels(),
 		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: r.Logging.APIVersion,
-				Kind:       r.Logging.Kind,
-				Name:       r.Logging.Name,
-				UID:        r.Logging.UID,
-				Controller: util.BoolPointer(true),
-			},
+			r.nameProvider.OwnerRef(),
 		},
 	}
 	return o
