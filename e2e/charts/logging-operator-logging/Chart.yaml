@@ -22,7 +22,7 @@ annotations:
     - name: fluentd
       image: ghcr.io/kube-logging/fluentd:v1.15
     - name: syslog-ng
-      image: ghcr.io/axoflow/syslog-ng:4.1.1
+      image: ghcr.io/axoflow/axosyslog:4.1.1
     - name: logging-operator
       image: ghcr.io/kube-logging/logging-operator:4.0.0
     - name: config-reloader
