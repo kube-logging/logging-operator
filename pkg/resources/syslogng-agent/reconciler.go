@@ -14,11 +14,30 @@
 
 package syslogng_agent
 
-import "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+import (
+	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/merge"
 
-func Reconcile(agent v1beta1.SyslogNGAgent) {
-	// 1. load defaults and merge actual values on top
+	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+)
+
+func Reconcile(agent v1beta1.SyslogNGAgent) error {
+	metricsEnabled := agent.Spec.Metrics != nil
+	prometheusAnnotationsEnabled := metricsEnabled && agent.Spec.Metrics.PrometheusAnnotations
+	if spec, err := nodeagent.NodeAgentSyslogNGDefaults(metricsEnabled, prometheusAnnotationsEnabled); err != nil {
+		agent.Spec = *spec
+		return errors.Wrap(err, "applying syslogNG defaults")
+	} else {
+		err = merge.Merge(&agent.Spec, spec)
+		if err != nil {
+			return err
+		}
+	}
+
 	// 2. generate resources
 	//   2.1 generate most of static resources
 	//   2.2 generate config
+
+	return nil
 }

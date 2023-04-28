@@ -46,7 +46,7 @@ type SyslogNGAgent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SyslogNGAgentSpec   `json:"spec,omitempty"`
+	Spec   NodeAgentSyslogNG   `json:"spec,omitempty"`
 	Status SyslogNGAgentStatus `json:"status,omitempty"`
 }
 

@@ -232,36 +232,34 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 	return programDefault, nil
 }
 
-func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.NodeAgentConfig, error) {
-	programDefault := &v1beta1.NodeAgentConfig{
-		SyslogNGSpec: &v1beta1.NodeAgentSyslogNG{
-			DaemonSetOverrides: &typeoverride.DaemonSet{
-				Spec: typeoverride.DaemonSetSpec{
-					Template: typeoverride.PodTemplateSpec{
-						ObjectMeta: typeoverride.ObjectMeta{
-							Annotations: map[string]string{},
-						},
-						Spec: typeoverride.PodSpec{
-							Containers: []v1.Container{
-								{
-									Name:  containerNameSyslogNG,
-									Image: v1beta1.RepositoryWithTag(imageRepositorySyslogNG, imageTagSyslogNG),
-									Args: []string{
-										"--cfgfile=" + configDirSyslogNG + "/" + configKeySyslogNG,
-										"--control=" + socketPathSyslogNG,
-										"--no-caps",
-										"-Fe",
+func NodeAgentSyslogNGDefaults(metricsEnabled, prometheusAnnotationsEnabled bool) (*v1beta1.NodeAgentSyslogNG, error) {
+	spec := &v1beta1.NodeAgentSyslogNG{
+		DaemonSetOverrides: &typeoverride.DaemonSet{
+			Spec: typeoverride.DaemonSetSpec{
+				Template: typeoverride.PodTemplateSpec{
+					ObjectMeta: typeoverride.ObjectMeta{
+						Annotations: map[string]string{},
+					},
+					Spec: typeoverride.PodSpec{
+						Containers: []v1.Container{
+							{
+								Name:  containerNameSyslogNG,
+								Image: v1beta1.RepositoryWithTag(imageRepositorySyslogNG, imageTagSyslogNG),
+								Args: []string{
+									"--cfgfile=" + configDirSyslogNG + "/" + configKeySyslogNG,
+									"--control=" + socketPathSyslogNG,
+									"--no-caps",
+									"-Fe",
+								},
+								ImagePullPolicy: v1.PullIfNotPresent,
+								Resources: v1.ResourceRequirements{
+									Limits: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("400M"),
+										v1.ResourceCPU:    resource.MustParse("1000m"),
 									},
-									ImagePullPolicy: v1.PullIfNotPresent,
-									Resources: v1.ResourceRequirements{
-										Limits: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("400M"),
-											v1.ResourceCPU:    resource.MustParse("1000m"),
-										},
-										Requests: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("100M"),
-											v1.ResourceCPU:    resource.MustParse("500m"),
-										},
+									Requests: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("100M"),
+										v1.ResourceCPU:    resource.MustParse("500m"),
 									},
 								},
 							},
@@ -269,33 +267,30 @@ func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.No
 					},
 				},
 			},
-			Security: &v1beta1.Security{
-				RoleBasedAccessControlCreate: util.BoolPointer(true),
-				SecurityContext:              &v1.SecurityContext{},
-				PodSecurityContext:           &v1.PodSecurityContext{},
-			},
-			ContainersPath: "/var/lib/docker/containers",
-			VarLogsPath:    "/var/log",
-			BufferStorage: v1beta1.BufferStorage{
-				StoragePath: "/buffers",
-			},
+		},
+		Security: &v1beta1.Security{
+			RoleBasedAccessControlCreate: util.BoolPointer(true),
+			SecurityContext:              &v1.SecurityContext{},
+			PodSecurityContext:           &v1.PodSecurityContext{},
+		},
+		ContainersPath: "/var/lib/docker/containers",
+		VarLogsPath:    "/var/log",
+		BufferStorage: v1beta1.BufferStorage{
+			StoragePath: "/buffers",
 		},
 	}
-	if userDefined.SyslogNGSpec == nil {
-		userDefined.SyslogNGSpec = &v1beta1.NodeAgentSyslogNG{}
-	}
 
-	if userDefined.SyslogNGSpec.Metrics != nil {
+	if metricsEnabled {
 		// TODO implement the same as implemented in the aggregator
-		if userDefined.SyslogNGSpec.Metrics.PrometheusAnnotations {
+		if prometheusAnnotationsEnabled {
 			defaultPrometheusAnnotations := &typeoverride.ObjectMeta{
 				Annotations: map[string]string{
 					"prometheus.io/scrape": "true",
-					"prometheus.io/path":   programDefault.SyslogNGSpec.Metrics.Path,
-					"prometheus.io/port":   fmt.Sprintf("%d", programDefault.SyslogNGSpec.Metrics.Port),
+					"prometheus.io/path":   spec.Metrics.Path,
+					"prometheus.io/port":   fmt.Sprintf("%d", spec.Metrics.Port),
 				},
 			}
-			err := merge.Merge(&(programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
+			err := merge.Merge(&(spec.DaemonSetOverrides.Spec.Template.ObjectMeta), defaultPrometheusAnnotations)
 			if err != nil {
 				return nil, err
 			}
@@ -303,9 +298,9 @@ func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.No
 		defaultLivenessProbe := &v1.Probe{
 			ProbeHandler: v1.ProbeHandler{
 				HTTPGet: &v1.HTTPGetAction{
-					Path: programDefault.SyslogNGSpec.Metrics.Path,
+					Path: spec.Metrics.Path,
 					Port: intstr.IntOrString{
-						IntVal: programDefault.SyslogNGSpec.Metrics.Port,
+						IntVal: spec.Metrics.Port,
 					},
 				}},
 			InitialDelaySeconds: 10,
@@ -314,17 +309,17 @@ func NodeAgentSyslogNGDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.No
 			SuccessThreshold:    0,
 			FailureThreshold:    3,
 		}
-		if programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
-			programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
+		if spec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
+			spec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
 		}
 
-		err := merge.Merge(programDefault.SyslogNGSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
+		err := merge.Merge(spec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return programDefault, nil
+	return spec, nil
 }
 
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentConfig{
@@ -479,7 +474,9 @@ func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgen
 	}
 
 	if userDefinedAgent.SyslogNGSpec != nil {
-		if nodeAgentConfig, err = NodeAgentSyslogNGDefaults(userDefinedAgent); err != nil {
+		metricsEnabled := userDefinedAgent.SyslogNGSpec.Metrics != nil
+		prometheusAnnotationsEnabled := metricsEnabled && userDefinedAgent.SyslogNGSpec.Metrics.PrometheusAnnotations
+		if nodeAgentConfig.SyslogNGSpec, err = NodeAgentSyslogNGDefaults(metricsEnabled, prometheusAnnotationsEnabled); err != nil {
 			return nil, err
 		}
 	}
