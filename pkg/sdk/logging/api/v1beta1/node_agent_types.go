@@ -55,6 +55,7 @@ type NodeAgentConfig struct {
 	Profile       string              `json:"profile,omitempty"`
 	Metadata      types.MetaBase      `json:"metadata,omitempty"`
 	FluentbitSpec *NodeAgentFluentbit `json:"nodeAgentFluentbit,omitempty"`
+	SyslogNGSpec  *NodeAgentSyslogNG  `json:"nodeAgentSyslogNG,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -122,6 +123,39 @@ type NodeAgentFluentbit struct {
 	Network              *FluentbitNetwork       `json:"network,omitempty"`
 	ForwardOptions       *ForwardOptions         `json:"forwardOptions,omitempty"`
 	EnableUpstream       *bool                   `json:"enableUpstream,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+type NodeAgentSyslogNG struct {
+	Enabled                 *bool                        `json:"enabled,omitempty"`
+	DaemonSetOverrides      *typeoverride.DaemonSet      `json:"daemonSet,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
+	TLS                     SyslogNGTLS                  `json:"tls,omitempty"`
+	TargetHost              string                       `json:"targetHost,omitempty"`
+	TargetPort              int32                        `json:"targetPort,omitempty"`
+	Metrics                 *Metrics                     `json:"metrics,omitempty"`
+	MetricsService          *typeoverride.Service        `json:"metricsService,omitempty"`
+	Security                *Security                    `json:"security,omitempty"`
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
+	ContainersPath     string         `json:"containersPath,omitempty"`
+	CustomConfigSecret string         `json:"customConfigSecret,omitempty"`
+	VarLogsPath        string         `json:"varLogsPath,omitempty"`
+	ExtraVolumeMounts  []*VolumeMount `json:"extraVolumeMounts,omitempty"`
+	BufferStorage      BufferStorage  `json:"bufferStorage,omitempty"`
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
+	BufferStorageVolume                 volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
+	BufferVolumeMetrics                 *BufferMetrics          `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeMetricsServiceOverrides *typeoverride.Service   `json:"bufferVolumeMetricsService,omitempty"`
+	GlobalOptions                       *GlobalOptions          `json:"globalOptions,omitempty"`
+	JSONKeyPrefix                       string                  `json:"jsonKeyPrefix,omitempty"`
+	JSONKeyDelimiter                    string                  `json:"jsonKeyDelim,omitempty"`
+	MaxConnections                      int                     `json:"maxConnections,omitempty"`
+	LogIWSize                           int                     `json:"logIWSize,omitempty"`
+	KeepTimestamp                       *bool                   `json:"keepTimestamp,omitempty"`
+	LogFetchLimit                       int                     `json:"logFetchLimit,omitempty"`
+	FollowFreq                          int                     `json:"followFreq,omitempty"`
+	LogMSGSize                          int                     `json:"logMSGSize,omitempty"`
 }
 
 func init() {

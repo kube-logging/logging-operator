@@ -17,8 +17,8 @@ package syslogng_agent
 import "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 func Reconcile(agent v1beta1.SyslogNGAgent) {
-    // 1. load defaults and merge actual values on top
-    // 2. generate resources
-    //   2.1 generate most of static resources
-    //   2.2 generate config
+	// 1. load defaults and merge actual values on top
+	// 2. generate resources
+	//   2.1 generate most of static resources
+	//   2.2 generate config
 }

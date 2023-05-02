@@ -15,7 +15,7 @@
 package v1beta1
 
 import (
-    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // +name:"SyslogNGFlowSpec"
@@ -29,7 +29,7 @@ type _metaSyslogNGAgentSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGAgentSpec is the Kubernetes spec for SyslogNGAgent
 type SyslogNGAgentSpec struct {
-    Disabled bool `json:"disabled,omitempty"`
+	Disabled bool `json:"disabled,omitempty"`
 }
 
 // SyslogNGAgentStatus is the Kubernetes status for SyslogNGAgent
@@ -43,22 +43,22 @@ type SyslogNGAgentStatus struct {
 
 // SyslogNGAgent Kubernetes object
 type SyslogNGAgent struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-    Spec   SyslogNGAgentSpec   `json:"spec,omitempty"`
-    Status SyslogNGAgentStatus `json:"status,omitempty"`
+	Spec   SyslogNGAgentSpec   `json:"spec,omitempty"`
+	Status SyslogNGAgentStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // SyslogNGAgentList contains a list of SyslogNGAgent
 type SyslogNGAgentList struct {
-    metav1.TypeMeta `json:",inline"`
-    metav1.ListMeta `json:"metadata,omitempty"`
-    Items           []SyslogNGAgent `json:"items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []SyslogNGAgent `json:"items"`
 }
 
 func init() {
-    SchemeBuilder.Register(&SyslogNGAgent{}, &SyslogNGAgentList{})
+	SchemeBuilder.Register(&SyslogNGAgent{}, &SyslogNGAgentList{})
 }

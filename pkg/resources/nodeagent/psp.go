@@ -27,102 +27,203 @@ import (
 )
 
 func (n *nodeAgentInstance) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
-	if n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
-		allowedHostPaths := []policyv1beta1.AllowedHostPath{{
-			PathPrefix: n.nodeAgent.FluentbitSpec.ContainersPath,
-			ReadOnly:   true,
-		}, {
-			PathPrefix: n.nodeAgent.FluentbitSpec.VarLogsPath,
-			ReadOnly:   true,
-		}}
+	if n.nodeAgent.FluentbitSpec != nil {
+		if n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
+			allowedHostPaths := []policyv1beta1.AllowedHostPath{{
+				PathPrefix: n.nodeAgent.FluentbitSpec.ContainersPath,
+				ReadOnly:   true,
+			}, {
+				PathPrefix: n.nodeAgent.FluentbitSpec.VarLogsPath,
+				ReadOnly:   true,
+			}}
 
-		for _, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
-			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-				PathPrefix: vMnt.Source,
-				ReadOnly:   *vMnt.ReadOnly,
-			})
+			for _, vMnt := range n.nodeAgent.FluentbitSpec.ExtraVolumeMounts {
+				allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+					PathPrefix: vMnt.Source,
+					ReadOnly:   *vMnt.ReadOnly,
+				})
+			}
+
+			if n.nodeAgent.FluentbitSpec.PositionDB.HostPath != nil {
+				n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
+					fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
+
+				allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+					PathPrefix: n.nodeAgent.FluentbitSpec.PositionDB.HostPath.Path,
+					ReadOnly:   false,
+				})
+			}
+
+			return &policyv1beta1.PodSecurityPolicy{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(PodSecurityPolicyNameFluentbit),
+				Spec: policyv1beta1.PodSecurityPolicySpec{
+					Volumes: []policyv1beta1.FSType{
+						"configMap",
+						"emptyDir",
+						"secret",
+						"hostPath"},
+					SELinux: policyv1beta1.SELinuxStrategyOptions{
+						Rule: policyv1beta1.SELinuxStrategyRunAsAny,
+					},
+					RunAsUser: policyv1beta1.RunAsUserStrategyOptions{
+						Rule: policyv1beta1.RunAsUserStrategyRunAsAny,
+					},
+					SupplementalGroups: policyv1beta1.SupplementalGroupsStrategyOptions{
+						Rule: policyv1beta1.SupplementalGroupsStrategyRunAsAny,
+					},
+					FSGroup: policyv1beta1.FSGroupStrategyOptions{
+						Rule: policyv1beta1.FSGroupStrategyRunAsAny,
+					},
+					ReadOnlyRootFilesystem:   true,
+					AllowPrivilegeEscalation: util.BoolPointer(false),
+					AllowedHostPaths:         allowedHostPaths,
+				},
+			}, reconciler.StatePresent, nil
 		}
-
-		if n.nodeAgent.FluentbitSpec.PositionDB.HostPath != nil {
-			n.nodeAgent.FluentbitSpec.PositionDB.WithDefaultHostPath(
-				fmt.Sprintf(v1beta1.HostPath, n.logging.Name, TailPositionVolume))
-
-			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
-				PathPrefix: n.nodeAgent.FluentbitSpec.PositionDB.HostPath.Path,
-				ReadOnly:   false,
-			})
-		}
-
 		return &policyv1beta1.PodSecurityPolicy{
-			ObjectMeta: n.NodeAgentObjectMetaClusterScope(fluentbitPodSecurityPolicyName),
-			Spec: policyv1beta1.PodSecurityPolicySpec{
-				Volumes: []policyv1beta1.FSType{
-					"configMap",
-					"emptyDir",
-					"secret",
-					"hostPath"},
-				SELinux: policyv1beta1.SELinuxStrategyOptions{
-					Rule: policyv1beta1.SELinuxStrategyRunAsAny,
+			ObjectMeta: n.NodeAgentObjectMeta(PodSecurityPolicyNameFluentbit),
+			Spec:       policyv1beta1.PodSecurityPolicySpec{},
+		}, reconciler.StateAbsent, nil
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		if n.nodeAgent.SyslogNGSpec.Security.PodSecurityPolicyCreate {
+			allowedHostPaths := []policyv1beta1.AllowedHostPath{{
+				PathPrefix: n.nodeAgent.SyslogNGSpec.ContainersPath,
+				ReadOnly:   true,
+			}, {
+				PathPrefix: n.nodeAgent.SyslogNGSpec.VarLogsPath,
+				ReadOnly:   true,
+			}}
+
+			for _, vMnt := range n.nodeAgent.SyslogNGSpec.ExtraVolumeMounts {
+				allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
+					PathPrefix: vMnt.Source,
+					ReadOnly:   *vMnt.ReadOnly,
+				})
+			}
+
+			return &policyv1beta1.PodSecurityPolicy{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(PodSecurityPolicyNameSyslogNG),
+				Spec: policyv1beta1.PodSecurityPolicySpec{
+					Volumes: []policyv1beta1.FSType{
+						"configMap",
+						"emptyDir",
+						"secret",
+						"hostPath"},
+					SELinux: policyv1beta1.SELinuxStrategyOptions{
+						Rule: policyv1beta1.SELinuxStrategyRunAsAny,
+					},
+					RunAsUser: policyv1beta1.RunAsUserStrategyOptions{
+						Rule: policyv1beta1.RunAsUserStrategyRunAsAny,
+					},
+					SupplementalGroups: policyv1beta1.SupplementalGroupsStrategyOptions{
+						Rule: policyv1beta1.SupplementalGroupsStrategyRunAsAny,
+					},
+					FSGroup: policyv1beta1.FSGroupStrategyOptions{
+						Rule: policyv1beta1.FSGroupStrategyRunAsAny,
+					},
+					ReadOnlyRootFilesystem:   true,
+					AllowPrivilegeEscalation: util.BoolPointer(false),
+					AllowedHostPaths:         allowedHostPaths,
 				},
-				RunAsUser: policyv1beta1.RunAsUserStrategyOptions{
-					Rule: policyv1beta1.RunAsUserStrategyRunAsAny,
-				},
-				SupplementalGroups: policyv1beta1.SupplementalGroupsStrategyOptions{
-					Rule: policyv1beta1.SupplementalGroupsStrategyRunAsAny,
-				},
-				FSGroup: policyv1beta1.FSGroupStrategyOptions{
-					Rule: policyv1beta1.FSGroupStrategyRunAsAny,
-				},
-				ReadOnlyRootFilesystem:   true,
-				AllowPrivilegeEscalation: util.BoolPointer(false),
-				AllowedHostPaths:         allowedHostPaths,
-			},
-		}, reconciler.StatePresent, nil
+			}, reconciler.StatePresent, nil
+		}
+		return &policyv1beta1.PodSecurityPolicy{
+			ObjectMeta: n.NodeAgentObjectMeta(PodSecurityPolicyNameSyslogNG),
+			Spec:       policyv1beta1.PodSecurityPolicySpec{},
+		}, reconciler.StateAbsent, nil
+
 	}
-	return &policyv1beta1.PodSecurityPolicy{
-		ObjectMeta: n.NodeAgentObjectMeta(fluentbitPodSecurityPolicyName),
-		Spec:       policyv1beta1.PodSecurityPolicySpec{},
-	}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) pspClusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
-		return &rbacv1.ClusterRole{
-			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
-			Rules: []rbacv1.PolicyRule{
-				{
-					APIGroups:     []string{"policy"},
-					Resources:     []string{"podsecuritypolicies"},
-					ResourceNames: []string{n.QualifiedName(fluentbitPodSecurityPolicyName)},
-					Verbs:         []string{"use"},
+	if n.nodeAgent.FluentbitSpec != nil {
+		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
+			return &rbacv1.ClusterRole{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameFluentbit + "-psp"),
+				Rules: []rbacv1.PolicyRule{
+					{
+						APIGroups:     []string{"policy"},
+						Resources:     []string{"podsecuritypolicies"},
+						ResourceNames: []string{n.QualifiedName(PodSecurityPolicyNameFluentbit)},
+						Verbs:         []string{"use"},
+					},
 				},
-			},
-		}, reconciler.StatePresent, nil
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRole{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameFluentbit + "-psp"),
+			Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+		if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.SyslogNGSpec.Security.PodSecurityPolicyCreate {
+			return &rbacv1.ClusterRole{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameSyslogNG + "-psp"),
+				Rules: []rbacv1.PolicyRule{
+					{
+						APIGroups:     []string{"policy"},
+						Resources:     []string{"podsecuritypolicies"},
+						ResourceNames: []string{n.QualifiedName(PodSecurityPolicyNameSyslogNG)},
+						Verbs:         []string{"use"},
+					},
+				},
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRole{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleNameSyslogNG + "-psp"),
+			Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+
 	}
-	return &rbacv1.ClusterRole{
-		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleName + "-psp"),
-		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
 
 func (n *nodeAgentInstance) pspClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
-		return &rbacv1.ClusterRoleBinding{
-			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
-			RoleRef: rbacv1.RoleRef{
-				Kind:     "ClusterRole",
-				APIGroup: "rbac.authorization.k8s.io",
-				Name:     n.QualifiedName(clusterRoleName + "-psp"),
-			},
-			Subjects: []rbacv1.Subject{
-				{
-					Kind:      "ServiceAccount",
-					Name:      n.getServiceAccount(),
-					Namespace: n.logging.Spec.ControlNamespace,
+
+	if n.nodeAgent.FluentbitSpec != nil {
+		if *n.nodeAgent.FluentbitSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.FluentbitSpec.Security.PodSecurityPolicyCreate {
+			return &rbacv1.ClusterRoleBinding{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameFluentbit + "-psp"),
+				RoleRef: rbacv1.RoleRef{
+					Kind:     "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+					Name:     n.QualifiedName(clusterRoleNameFluentbit + "-psp"),
 				},
-			},
-		}, reconciler.StatePresent, nil
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      n.getServiceAccount(),
+						Namespace: n.logging.Spec.ControlNamespace,
+					},
+				},
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameFluentbit + "-psp"),
+			RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+
+	} else if n.nodeAgent.SyslogNGSpec != nil {
+
+		if *n.nodeAgent.SyslogNGSpec.Security.RoleBasedAccessControlCreate && n.nodeAgent.SyslogNGSpec.Security.PodSecurityPolicyCreate {
+			return &rbacv1.ClusterRoleBinding{
+				ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameSyslogNG + "-psp"),
+				RoleRef: rbacv1.RoleRef{
+					Kind:     "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+					Name:     n.QualifiedName(clusterRoleNameSyslogNG + "-psp"),
+				},
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      n.getServiceAccount(),
+						Namespace: n.logging.Spec.ControlNamespace,
+					},
+				},
+			}, reconciler.StatePresent, nil
+		}
+		return &rbacv1.ClusterRoleBinding{
+			ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingNameSyslogNG + "-psp"),
+			RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+
 	}
-	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: n.NodeAgentObjectMetaClusterScope(clusterRoleBindingName + "-psp"),
-		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+	return nil, reconciler.StateAbsent, nil
 }
