@@ -72,7 +72,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector: v12.LabelSelector{
-					MatchLabels: util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.ObjectMeta.GetName())),
+					MatchLabels: util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.GetName())),
 				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       0,

@@ -185,29 +185,49 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
 	}
 
-	if logging.Spec.FluentbitSpec != nil {
+	switch len(loggingResources.Fluentbits) {
+	case 1:
+		if logging.Spec.FluentbitSpec != nil {
+			if logging.Spec.FluentbitSpec.Disabled {
+				log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
+				reconcilers = append(reconcilers, fluentbit.New(
+					r.Client,
+					r.Log,
+					&logging,
+					reconcilerOpts,
+					logging.Spec.FluentbitSpec,
+					loggingDataProvider,
+					loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
+				).Reconcile)
+			} else {
+				return ctrl.Result{}, errors.New("fluentbit has to be disabled inside the logging resource before the new FluentbitAgent can be reconciled")
+			}
+		}
 		reconcilers = append(reconcilers, fluentbit.New(
 			r.Client,
 			r.Log,
 			&logging,
 			reconcilerOpts,
-			logging.Spec.FluentbitSpec,
+			&loggingResources.Fluentbits[0].Spec,
 			loggingDataProvider,
-			loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
+			loggingv1beta1.NewStandaloneFluentbitNameProvider(&loggingResources.Fluentbits[0]),
 		).Reconcile)
-	}
-	if len(loggingResources.Fluentbits) > 0 {
-		for _, f := range loggingResources.Fluentbits {
+	case 0:
+		// check for legacy definition
+		log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
+		if logging.Spec.FluentbitSpec != nil {
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				r.Log,
 				&logging,
 				reconcilerOpts,
-				&f.Spec,
+				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
-				loggingv1beta1.NewStandaloneFluentbitNameProvider(&f),
+				loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
 			).Reconcile)
 		}
+	default:
+		return ctrl.Result{}, errors.New("cannot handle more than one FluentbitAgent for the same Logging resource")
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
