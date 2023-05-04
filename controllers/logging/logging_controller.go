@@ -29,6 +29,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -155,6 +156,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
+	var aggregatorServiceName string
 
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
@@ -169,6 +171,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
 		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
+		aggregatorServiceName = fluentd.ServiceName
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
@@ -184,6 +187,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
 		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
+		aggregatorServiceName = syslogng.ServiceName
 	}
 
 	switch len(loggingResources.Fluentbits) {
@@ -218,13 +222,34 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, errors.New("cannot handle more than one FluentbitAgent for the same Logging resource")
 	}
 
-	if len(loggingResources.SyslogNGAgents) > 0 {
+	switch len(loggingResources.SyslogNGAgents) {
+	case 1:
 		for _, s := range loggingResources.SyslogNGAgents {
+			agentDataProvider := &nodeagent.GenericDataProvider{
+				Logging:               logging,
+				AggregatorServiceName: aggregatorServiceName,
+				AgentType:             "syslog-ng-agent",
+				AgentConfigFileName:   syslogng_agent.BaseConfigNameSyslogNG,
+				AgentObject:           &s,
+				AgentTypeMeta: metav1.TypeMeta{
+					Kind:       "SyslogNGAgent",
+					APIVersion: loggingv1beta1.GroupVersion.String(),
+				},
+			}
 			reconcilers = append(reconcilers, syslogng_agent.NewSyslogNGAgentReconciler(
-				r.Client,
-				r.Log,
-				s).Reconcile)
+				nodeagent.NewGenericAgentReconciler(
+					reconciler.NewReconcilerWith(r.Client),
+					agentDataProvider,
+					r.Log.WithName("agent-reconciler"),
+				),
+				agentDataProvider,
+				r.Log.WithName("syslog-ng_agent_reconciler"),
+				s,
+			).Reconcile)
 		}
+	case 0:
+	default:
+		return ctrl.Result{}, errors.New("cannot handle more than one SyslogNGAgent for the same Logging resource")
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {

@@ -27,10 +27,6 @@ import (
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	controllers "github.com/kube-logging/logging-operator/controllers/logging"
-	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 	appsv1 "k8s.io/api/apps/v1"
@@ -43,6 +39,11 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	controllers "github.com/kube-logging/logging-operator/controllers/logging"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var (
@@ -1159,6 +1160,42 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	}, timeout).Should(gomega.BeTrue())
 }
 
+func TestSyslogNGAgentResourceGeneratesConfigSecret(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			FlowConfigCheckDisabled: true,
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	agent := &v1beta1.SyslogNGAgent{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-" + uuid.New()[:8],
+			Namespace: controlNamespace,
+		},
+		Spec: v1beta1.NodeAgentSyslogNG{},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, agent)()
+
+	g.Eventually(func() error {
+		configSecret := &corev1.Secret{}
+		err := mgr.GetClient().Get(context.TODO(), client.ObjectKey{
+			Namespace: controlNamespace,
+			Name:      fmt.Sprintf("%s-syslog-ng-agent-config", agent.Name),
+		}, configSecret)
+		return err
+	}, timeout).Should(gomega.Succeed())
+}
+
 func beforeEach(t *testing.T) func() {
 	return beforeEachWithError(t, nil)
 }
@@ -1175,7 +1212,9 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Flow"))
+	flowReconciler := controllers.NewLoggingReconciler(
+		mgr.GetClient(),
+		ctrl.Log.WithName("controllers").WithName("Flow"))
 
 	var stopped bool
 	wrappedReconciler := duplicateRequest(t, flowReconciler, &stopped, errors)

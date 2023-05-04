@@ -28,7 +28,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
-	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -86,15 +85,6 @@ type fluentBitConfig struct {
 	Upstream       struct {
 		Enabled bool
 		Config  upstream
-	}
-}
-
-type syslogNGConfig struct {
-	TargetHost string
-	TargetPort int32
-	TLS        struct {
-		Enabled   bool
-		SharedKey string
 	}
 }
 
@@ -301,23 +291,6 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			ObjectMeta: n.NodeAgentObjectMeta(SecretConfigNameFluentbit),
 			Data:       confs,
 		}, reconciler.StatePresent, nil
-	} else if n.nodeAgent.SyslogNGSpec != nil {
-		input := syslogNGConfig{
-			TargetHost: fmt.Sprintf("%s.%s.svc%s", n.AggregatorQualifiedName(syslogng.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
-		}
-		conf, err := generateSyslogNGConfig(input)
-		if err != nil {
-			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
-		}
-		confs := map[string][]byte{
-			BaseConfigNameSyslogNG: []byte(conf),
-		}
-		n.configs = confs
-
-		return &corev1.Secret{
-			ObjectMeta: n.NodeAgentObjectMeta(secretConfigNameSyslogNG),
-			Data:       confs,
-		}, reconciler.StatePresent, nil
 	}
 
 	return nil, reconciler.StatePresent, errors.New("not implemented")
@@ -326,20 +299,6 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 func generateConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
 	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
-	if err != nil {
-		return "", err
-	}
-	err = tmpl.Execute(output, input)
-	if err != nil {
-		return "", err
-	}
-	outputString := output.String()
-	return outputString, nil
-}
-
-func generateSyslogNGConfig(input syslogNGConfig) (string, error) {
-	output := new(bytes.Buffer)
-	tmpl, err := template.New("test").Parse(syslogNGConfigTemplate)
 	if err != nil {
 		return "", err
 	}

@@ -37,7 +37,7 @@ type SyslogNGAgentStatus struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories=logging-all
+// +kubebuilder:resource:path=syslogngagents,scope=Cluster,categories=logging-all
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 

@@ -17,8 +17,9 @@ package syslogng_agent
 import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
@@ -26,16 +27,23 @@ import (
 )
 
 type SyslogNGAgentReconciler struct {
-	agent  v1beta1.SyslogNGAgent
-	client client.Client
-	log    logr.Logger
+	agent           v1beta1.SyslogNGAgent
+	agentReconciler *nodeagent.GenericAgentReconciler
+	dataProvider    nodeagent.AgentDataProvider
+	log             logr.Logger
 }
 
-func NewSyslogNGAgentReconciler(client client.Client, log logr.Logger, agent v1beta1.SyslogNGAgent) *SyslogNGAgentReconciler {
+func NewSyslogNGAgentReconciler(
+	reconciler *nodeagent.GenericAgentReconciler,
+	dataProvider nodeagent.AgentDataProvider,
+	log logr.Logger,
+	agent v1beta1.SyslogNGAgent,
+) *SyslogNGAgentReconciler {
 	return &SyslogNGAgentReconciler{
-		agent:  agent,
-		client: client,
-		log:    log,
+		agentReconciler: reconciler,
+		agent:           agent,
+		dataProvider:    dataProvider,
+		log:             log,
 	}
 }
 
@@ -54,9 +62,21 @@ func (s *SyslogNGAgentReconciler) Reconcile() (*reconcile.Result, error) {
 
 	s.log.Info("SyslogNGAgent", "syslogng-agent", s.agent)
 
-	// 2. generate resources
-	//   2.1 generate most of static resources
-	//   2.2 generate config
+	resourceBuilders := []reconciler.ResourceBuilder{
+		s.configSecret,
+	}
 
-	return &reconcile.Result{}, nil
+	result, err := s.agentReconciler.Reconcile(resourceBuilders)
+	return &result, err
+}
+
+func (s *SyslogNGAgentReconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
+	input := syslogNGConfig{
+		TargetHost: s.dataProvider.TargetHost(),
+	}
+
+	secret, err := nodeagent.GenerateConfigSecret(input, syslogNGConfigTemplate, s.dataProvider.ConfigFileName())
+	secret.SetName(s.dataProvider.QualifiedName("config"))
+	s.agentReconciler.ChildObjectMeta(&secret)
+	return &secret, reconciler.StatePresent, err
 }

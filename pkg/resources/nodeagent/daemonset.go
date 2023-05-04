@@ -23,12 +23,13 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/templates"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/templates"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -372,8 +373,9 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 						SecretName: n.QualifiedName(secretConfigNameSyslogNG),
 						Items: []corev1.KeyToPath{
 							{
-								Key:  BaseConfigNameSyslogNG,
-								Path: BaseConfigNameSyslogNG,
+								// TODO replace with constants from the syslogng_agent package
+								Key:  "BaseConfigNameSyslogNG",
+								Path: "BaseConfigNameSyslogNG",
 							},
 						},
 					},

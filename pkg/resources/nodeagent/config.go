@@ -15,7 +15,6 @@
 package nodeagent
 
 const BaseConfigNameFluentbit = "fluent-bit.conf"
-const BaseConfigNameSyslogNG = "syslog-ng.conf"
 const UpstreamConfigNameFluentbit = "upstream.conf"
 
 var fluentBitConfigTemplate = `
@@ -120,40 +119,4 @@ var fluentBitUpstreamConfigTemplate = `
     Host {{.Host}}
     Port {{.Port}}
 {{- end}}
-`
-
-var syslogNGConfigTemplate = `
-@version: 4.0
-@include "scl.conf"
-
-# Define the source for log messages
-source s_file {
-  file("/var/log/messages"
-       flags(no-parse)
-       keep-timestamp(yes)
-       log-fetch-limit(10000)
-       log-iw-size(100000)
-       log-msg-size(65535)
-       pad-size(2048)
-       follow-freq(1)
-  );
-};
-
-# Define the destination for log messages with TLS encryption
-destination d_tcp {
-  network("{{ .TargetHost }}" port({{ .TargetPort }}) 
-	{{ if .TLS.Enabled }}
-	transport("tls")
-    tls(ca-dir("/etc/syslog-ng/ca.d") cert-file("/etc/syslog-ng/cert.pem")
-    key-file("/etc/syslog-ng/key.pem") peer-verify(optional-untrusted) 
-	)
-	{{- end }}
-  );
-};
-
-# Define the log path for this configuration
-log {
-  source(s_file);
-  destination(d_tcp);
-};
 `
