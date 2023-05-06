@@ -20,4 +20,5 @@ import (
 
 type LoggingDataProvider interface {
 	GetReplicaCount(ctx context.Context) (*int32, error)
+	TargetHost() string
 }

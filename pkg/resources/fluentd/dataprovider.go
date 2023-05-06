@@ -16,12 +16,14 @@ package fluentd
 
 import (
 	"context"
+	"fmt"
 
 	"emperror.dev/errors"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type DataProvider struct {
@@ -47,4 +49,8 @@ func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
 		return sts.Spec.Replicas, nil
 	}
 	return nil, nil
+}
+
+func (p *DataProvider) TargetHost() string {
+	return fmt.Sprintf("%s.%s.svc%s", p.logging.QualifiedName(ServiceName), p.logging.Spec.ControlNamespace, p.logging.ClusterDomainAsSuffix())
 }

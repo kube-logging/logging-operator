@@ -14,8 +14,6 @@
 
 package syslogng_agent
 
-const BaseConfigNameSyslogNG = "syslog-ng.conf"
-
 type syslogNGConfig struct {
 	TargetHost string
 	TargetPort int32

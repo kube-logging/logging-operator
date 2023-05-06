@@ -15,16 +15,18 @@
 package nodeagent
 
 import (
+	"context"
 	"fmt"
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 )
 
 type AgentDataProvider interface {
+	loggingdataprovider.LoggingDataProvider
 	TargetHost() string
 	ConfigFileName() string
 	QualifiedName(string) string
@@ -32,22 +34,45 @@ type AgentDataProvider interface {
 	ResourceLabels() map[string]string
 	ResourceAnnotations() map[string]string
 	OwnerRefs() []v1.OwnerReference
+	GetConstants() Constants
+}
+
+type Constants struct {
+	LoggingName      string
+	ControlNamespace string
+	Name             string
+	ContainerName    string
+	ConfigFileName   string
+	Kind             string
+	APIVersion       string
+	VolumeName       string
+	StoragePath      string
+	ConfigPath       string
 }
 
 type GenericDataProvider struct {
-	Logging               v1beta1.Logging
-	AggregatorServiceName string
-	AgentType             string
-	AgentConfigFileName   string
-	AgentObject           client.Object
-	AgentTypeMeta         v1.TypeMeta
+	LoggingDataProvider loggingdataprovider.LoggingDataProvider
+	AgentObject         client.Object
+	Constants           Constants
+}
+
+func (f *GenericDataProvider) TargetHost() string {
+	return f.LoggingDataProvider.TargetHost()
+}
+
+func (f *GenericDataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
+	return f.LoggingDataProvider.GetReplicaCount(ctx)
+}
+
+func (f *GenericDataProvider) GetConstants() Constants {
+	return f.Constants
 }
 
 func (f *GenericDataProvider) OwnerRefs() []v1.OwnerReference {
 	return []v1.OwnerReference{
 		{
-			APIVersion: f.AgentTypeMeta.APIVersion,
-			Kind:       f.AgentTypeMeta.Kind,
+			APIVersion: f.Constants.APIVersion,
+			Kind:       f.Constants.Kind,
 			Name:       f.AgentObject.GetName(),
 			UID:        f.AgentObject.GetUID(),
 			Controller: util.BoolPointer(true),
@@ -57,9 +82,9 @@ func (f *GenericDataProvider) OwnerRefs() []v1.OwnerReference {
 
 func (f *GenericDataProvider) ResourceLabels() map[string]string {
 	return util.MergeLabels(f.AgentObject.GetLabels(), map[string]string{
-		"app.kubernetes.io/name":     f.AgentType,
+		"app.kubernetes.io/name":     f.Constants.Name,
 		"app.kubernetes.io/instance": f.AgentObject.GetName(),
-	}, generateLoggingRefLabels(f.Logging.GetName()))
+	}, generateLoggingRefLabels(f.Constants.LoggingName))
 }
 
 func (f *GenericDataProvider) ResourceAnnotations() map[string]string {
@@ -67,17 +92,16 @@ func (f *GenericDataProvider) ResourceAnnotations() map[string]string {
 }
 
 func (f *GenericDataProvider) Namespace() string {
-	return f.Logging.Spec.ControlNamespace
+	return f.Constants.ControlNamespace
 }
 
 func (f *GenericDataProvider) QualifiedName(s string) string {
-	return fmt.Sprintf("%s-%s-%s", f.AgentObject.GetName(), f.AgentType, s)
+	if len(s) > 0 {
+		return fmt.Sprintf("%s-%s-%s", f.AgentObject.GetName(), f.Constants.Name, s)
+	}
+	return fmt.Sprintf("%s-%s", f.AgentObject.GetName(), f.Constants.Name)
 }
 
 func (f *GenericDataProvider) ConfigFileName() string {
-	return f.AgentConfigFileName
-}
-
-func (f *GenericDataProvider) TargetHost() string {
-	return fmt.Sprintf("%s.%s.svc%s", f.Logging.QualifiedName(f.AggregatorServiceName), f.Logging.Spec.ControlNamespace, f.Logging.ClusterDomainAsSuffix())
+	return f.Constants.ConfigFileName
 }

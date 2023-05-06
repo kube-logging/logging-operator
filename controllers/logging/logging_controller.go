@@ -29,7 +29,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -156,7 +155,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
-	var aggregatorServiceName string
 
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
@@ -171,7 +169,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
 		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
-		aggregatorServiceName = fluentd.ServiceName
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
@@ -187,7 +184,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
 		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
-		aggregatorServiceName = syslogng.ServiceName
 	}
 
 	switch len(loggingResources.Fluentbits) {
@@ -226,14 +222,19 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	case 1:
 		for _, s := range loggingResources.SyslogNGAgents {
 			agentDataProvider := &nodeagent.GenericDataProvider{
-				Logging:               logging,
-				AggregatorServiceName: aggregatorServiceName,
-				AgentType:             "syslog-ng-agent",
-				AgentConfigFileName:   syslogng_agent.BaseConfigNameSyslogNG,
-				AgentObject:           &s,
-				AgentTypeMeta: metav1.TypeMeta{
-					Kind:       "SyslogNGAgent",
-					APIVersion: loggingv1beta1.GroupVersion.String(),
+				LoggingDataProvider: loggingDataProvider,
+				AgentObject:         &s,
+				Constants: nodeagent.Constants{
+					LoggingName:      logging.Name,
+					ControlNamespace: logging.Spec.ControlNamespace,
+					Kind:             "SyslogNGAgent",
+					APIVersion:       loggingv1beta1.GroupVersion.String(),
+					Name:             "syslog-ng-agent",
+					ContainerName:    "syslog-ng",
+					ConfigFileName:   "syslog-ng.conf",
+					VolumeName:       "buffers",
+					StoragePath:      "/buffers",
+					ConfigPath:       "/etc/syslog-ng/config/syslog-ng.conf",
 				},
 			}
 			reconcilers = append(reconcilers, syslogng_agent.NewSyslogNGAgentReconciler(

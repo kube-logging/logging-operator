@@ -139,12 +139,10 @@ type NodeAgentSyslogNG struct {
 	Metrics                 *Metrics                     `json:"metrics,omitempty"`
 	MetricsService          *typeoverride.Service        `json:"metricsService,omitempty"`
 	Security                *Security                    `json:"security,omitempty"`
-	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
-	ContainersPath     string         `json:"containersPath,omitempty"`
-	CustomConfigSecret string         `json:"customConfigSecret,omitempty"`
-	VarLogsPath        string         `json:"varLogsPath,omitempty"`
-	ExtraVolumeMounts  []*VolumeMount `json:"extraVolumeMounts,omitempty"`
-	BufferStorage      BufferStorage  `json:"bufferStorage,omitempty"`
+	ContainersPath          string                       `json:"containersPath,omitempty"`
+	CustomConfigSecret      string                       `json:"customConfigSecret,omitempty"`
+	VarLogsPath             string                       `json:"varLogsPath,omitempty"`
+	ExtraVolumeMounts       []*VolumeMount               `json:"extraVolumeMounts,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume                 volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	BufferVolumeMetrics                 *BufferMetrics          `json:"bufferVolumeMetrics,omitempty"`

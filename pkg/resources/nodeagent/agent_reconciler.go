@@ -74,14 +74,15 @@ func (a *GenericAgentReconciler) Reconcile(resources []reconciler.ResourceBuilde
 	return result.Result, result.Err
 }
 
-func (a *GenericAgentReconciler) ChildObjectMeta(resource client.Object) error {
-	resource.SetNamespace(a.dataProvider.Namespace())
-	resource.SetLabels(util.MergeLabels(
+func (a *GenericAgentReconciler) ChildObjectMeta(o client.Object, resourceName string) error {
+	o.SetNamespace(a.dataProvider.Namespace())
+	o.SetName(resourceName)
+	o.SetLabels(util.MergeLabels(
 		// get logging agent specific labels
 		a.dataProvider.ResourceLabels(),
 		// add instance label with the name of the parent
 		map[string]string{},
 	))
-	resource.SetOwnerReferences(a.dataProvider.OwnerRefs())
+	o.SetOwnerReferences(a.dataProvider.OwnerRefs())
 	return nil
 }

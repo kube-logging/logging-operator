@@ -275,9 +275,6 @@ func NodeAgentSyslogNGDefaults(metricsEnabled, prometheusAnnotationsEnabled bool
 		},
 		ContainersPath: "/var/lib/docker/containers",
 		VarLogsPath:    "/var/log",
-		BufferStorage: v1beta1.BufferStorage{
-			StoragePath: "/buffers",
-		},
 	}
 
 	if metricsEnabled {
