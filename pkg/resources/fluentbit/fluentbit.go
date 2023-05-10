@@ -129,9 +129,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
-		if r.fluentbitSpec.Disabled {
-			state = reconciler.StateAbsent
-		}
 		result, err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapWithDetails(err,

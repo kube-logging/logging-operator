@@ -1746,8 +1746,6 @@ spec:
                     type: object
                   disableKubernetesFilter:
                     type: boolean
-                  disabled:
-                    type: boolean
                   dnsConfig:
                     properties:
                       nameservers:
