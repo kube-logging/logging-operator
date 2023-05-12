@@ -1740,6 +1740,8 @@ spec:
                     type: integer
                   customConfigSecret:
                     type: string
+                  customParsers:
+                    type: string
                   daemonsetAnnotations:
                     additionalProperties:
                       type: string

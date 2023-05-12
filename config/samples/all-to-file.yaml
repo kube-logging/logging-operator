@@ -5,7 +5,7 @@ metadata:
 spec:
   fluentd: {}
   controlNamespace: default
-  #fluentbit: {}
+  fluentbit: {}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -25,7 +25,7 @@ metadata:
   name: file
 spec:
   file:
-    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+    path: /tmp/logs/${tag}
     append: true
     buffer:
       timekey: 1m

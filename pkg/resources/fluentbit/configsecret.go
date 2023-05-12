@@ -23,13 +23,14 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type fluentbitInputConfig struct {
@@ -69,6 +70,7 @@ type fluentBitConfig struct {
 	FilterModify            []v1beta1.FilterModify
 	FluentForwardOutput     *fluentForwardOutputConfig
 	SyslogNGOutput          *syslogNGOutputConfig
+	CustomParsers           string
 }
 
 type fluentForwardOutputConfig struct {
@@ -188,6 +190,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Namespace:               r.Logging.Spec.ControlNamespace,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		FilterModify:            r.fluentbitSpec.FilterModify,
+	}
+
+	if r.fluentbitSpec.CustomParsers != "" {
+		input.CustomParsers = fmt.Sprintf("/fluent-bit/etc/%s", CustomParsersConfigName)
 	}
 
 	if r.fluentbitSpec.Metrics != nil {
@@ -356,6 +362,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate upstream config for fluentbit")
 		}
 		confs[UpstreamConfigName] = []byte(upstreamConfig)
+	}
+
+	if r.fluentbitSpec.CustomParsers != "" {
+		confs[CustomParsersConfigName] = []byte(r.fluentbitSpec.CustomParsers)
 	}
 
 	r.configs = confs

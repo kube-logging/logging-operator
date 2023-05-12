@@ -124,6 +124,9 @@ type FluentbitSpec struct {
 	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
 	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+	// Specify a custom parser file to load in addition to the default parsers file.
+	// It must be a valid key in the configmap specified by customConfig
+	CustomParsers string `json:"customParsers,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent
