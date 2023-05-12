@@ -25,19 +25,21 @@ import (
 )
 
 type DataProvider struct {
-	client client.Client
+	client  client.Client
+	logging *v1beta1.Logging
 }
 
-func NewDataProvider(client client.Client) *DataProvider {
+func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvider {
 	return &DataProvider{
-		client: client,
+		client:  client,
+		logging: logging,
 	}
 }
 
-func (p *DataProvider) GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error) {
-	if logging.Spec.FluentdSpec != nil {
+func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
+	if p.logging.Spec.FluentdSpec != nil {
 		sts := &v1.StatefulSet{}
-		om := logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
+		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
 		err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 		if err != nil {
 			return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")

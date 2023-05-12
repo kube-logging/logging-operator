@@ -25,18 +25,20 @@ import (
 )
 
 type DataProvider struct {
-	client client.Client
+	client  client.Client
+	logging *v1beta1.Logging
 }
 
-func NewDataProvider(client client.Client) *DataProvider {
+func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvider {
 	return &DataProvider{
-		client: client,
+		client:  client,
+		logging: logging,
 	}
 }
 
-func (p *DataProvider) GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error) {
+func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
 	sts := &v1.StatefulSet{}
-	om := logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG)
+	om := p.logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG)
 	err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 	if err != nil {
 		return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting syslog-ng statefulset")

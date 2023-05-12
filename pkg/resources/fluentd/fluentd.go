@@ -273,7 +273,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		}
 	}
 
-	replicaCount, err := NewDataProvider(r.Client).GetReplicaCount(ctx, r.Logging)
+	replicaCount, err := NewDataProvider(r.Client, r.Logging).GetReplicaCount(ctx)
 	if err != nil {
 		return nil, errors.WrapIf(err, "get replica count for fluentd")
 	}

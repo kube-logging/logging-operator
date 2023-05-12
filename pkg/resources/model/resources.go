@@ -23,6 +23,7 @@ type LoggingResources struct {
 	Fluentd    FluentdLoggingResources
 	SyslogNG   SyslogNGLoggingResources
 	NodeAgents []v1beta1.NodeAgent
+	Fluentbits []v1beta1.FluentbitAgent
 }
 
 type FluentdLoggingResources struct {

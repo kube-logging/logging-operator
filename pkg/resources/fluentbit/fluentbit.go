@@ -16,20 +16,23 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
-	"github.com/kube-logging/logging-operator/pkg/resources/fluentddataprovider"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"github.com/kube-logging/logging-operator/pkg/resources"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -49,15 +52,20 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+	return util.MergeLabels(r.fluentbitSpec.Labels, map[string]string{
+		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.GetName()))
 }
 
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
+	if r.fluentbitSpec.Security.ServiceAccount != "" {
+		return r.fluentbitSpec.Security.ServiceAccount
 	}
-	return r.Logging.QualifiedName(defaultServiceAccountName)
+	return r.nameProvider.ComponentName(defaultServiceAccountName)
+}
+
+type NameProvider interface {
+	ComponentName(name string) string
+	OwnerRef() v1.OwnerReference
 }
 
 type DesiredObject struct {
@@ -67,23 +75,37 @@ type DesiredObject struct {
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1beta1.Logging
 	*reconciler.GenericResourceReconciler
+	Logging             *v1beta1.Logging
 	configs             map[string][]byte
-	fluentdDataProvider fluentddataprovider.FluentdDataProvider
+	fluentbitSpec       *v1beta1.FluentbitSpec
+	loggingDataProvider loggingdataprovider.LoggingDataProvider
+	nameProvider        NameProvider
 }
 
-// NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+// NewReconciler creates a new FluentbitAgent reconciler
+func New(client client.Client,
+	logger logr.Logger,
+	logging *v1beta1.Logging,
+	opts reconciler.ReconcilerOpts,
+	fluentbitSpec *v1beta1.FluentbitSpec,
+	loggingDataProvider loggingdataprovider.LoggingDataProvider,
+	nameProvider NameProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
-		fluentdDataProvider:       fluentdDataProvider,
+		fluentbitSpec:             fluentbitSpec,
+		loggingDataProvider:       loggingDataProvider,
+		nameProvider:              nameProvider,
 	}
 }
 
 // Reconcile reconciles the fluentBit resource
 func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+	if err := v1beta1.FluentBitDefaults(r.fluentbitSpec); err != nil {
+		return nil, err
+	}
+
 	for _, factory := range []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,

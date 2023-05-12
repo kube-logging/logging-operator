@@ -15,14 +15,17 @@
 package v1beta1
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // +name:"FluentbitSpec"
@@ -31,13 +34,38 @@ type _hugoFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +name:"FluentbitSpec"
 // +version:"v1beta1"
-// +description:"FluentbitSpec defines the desired state of Fluentbit"
+// +description:"FluentbitSpec defines the desired state of FluentbitAgent"
 type _metaFluentbitSpec interface{} //nolint:deadcode,unused
+
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:path=fluentbits,scope=Cluster,categories=logging-all
+// +kubebuilder:storageversion
+
+// FluentbitAgent is the Schema for the loggings API
+type FluentbitAgent struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   FluentbitSpec   `json:"spec,omitempty"`
+	Status FluentbitStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// FluentbitAgentList contains a list of FluentbitAgent
+type FluentbitAgentList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []FluentbitAgent `json:"items"`
+}
 
 // +kubebuilder:object:generate=true
 
-// FluentbitSpec defines the desired state of Fluentbit
+// FluentbitSpec defines the desired state of FluentbitAgent
 type FluentbitSpec struct {
+	LoggingRef string `json:"LoggingRef,omitempty"`
+
 	DaemonSetAnnotations map[string]string `json:"daemonsetAnnotations,omitempty"`
 	Annotations          map[string]string `json:"annotations,omitempty"`
 	Labels               map[string]string `json:"labels,omitempty"`
@@ -53,7 +81,7 @@ type FluentbitSpec struct {
 	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info)
 	LogLevel string `json:"logLevel,omitempty" plugin:"default:info"`
 	// Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer.
-	//Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
+	// Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
 	CoroStackSize int32                       `json:"coroStackSize,omitempty" plugin:"default:24576"`
 	Resources     corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations   []corev1.Toleration         `json:"tolerations,omitempty"`
@@ -96,6 +124,10 @@ type FluentbitSpec struct {
 	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
 	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+}
+
+// FluentbitStatus defines the resource status for FluentbitAgent
+type FluentbitStatus struct {
 }
 
 // +kubebuilder:object:generate=true
@@ -162,7 +194,7 @@ type BufferStorage struct {
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
 }
 
-// InputTail defines Fluentbit tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
+// InputTail defines FluentbitAgent tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
 type InputTail struct {
 	// Specify the buffering mechanism to use. It can be memory or filesystem. (default:memory)
 	StorageType string `json:"storage.type,omitempty"`
@@ -216,7 +248,7 @@ type InputTail struct {
 	DockerMode string `json:"Docker_Mode,omitempty"`
 	// Specify an optional parser for the first line of the docker multiline mode.
 	DockerModeParser string `json:"Docker_Mode_Parser,omitempty"`
-	//Wait period time in seconds to flush queued unfinished split lines. (default:4)
+	// Wait period time in seconds to flush queued unfinished split lines. (default:4)
 	DockerModeFlush string `json:"Docker_Mode_Flush,omitempty"`
 	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: "")
 	MultilineParser []string `json:"multiline.parser,omitempty"`
@@ -310,9 +342,9 @@ type FilterAws struct {
 
 // FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
 type FilterModify struct {
-	// Fluentbit Filter Modification Rule
+	// FluentbitAgent Filter Modification Rule
 	Rules []FilterModifyRule `json:"rules,omitempty"`
-	// Fluentbit Filter Modification Condition
+	// FluentbitAgent Filter Modification Condition
 	Conditions []FilterModifyCondition `json:"conditions,omitempty"`
 }
 
@@ -423,4 +455,51 @@ type ForwardOptions struct {
 	RetryLimit         string `json:"Retry_Limit,omitempty"`
 	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
 	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
+}
+
+type FluentbitNameProvider struct {
+	logging   *Logging
+	fluentbit *FluentbitAgent
+}
+
+func (l *FluentbitNameProvider) ComponentName(name string) string {
+	if l.logging != nil {
+		return l.logging.QualifiedName(name)
+	}
+	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
+}
+
+func (l *FluentbitNameProvider) OwnerRef() metav1.OwnerReference {
+	if l.logging != nil {
+		return metav1.OwnerReference{
+			APIVersion: l.logging.APIVersion,
+			Kind:       l.logging.Kind,
+			Name:       l.logging.Name,
+			UID:        l.logging.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
+	return metav1.OwnerReference{
+		APIVersion: l.fluentbit.APIVersion,
+		Kind:       l.fluentbit.Kind,
+		Name:       l.fluentbit.Name,
+		UID:        l.fluentbit.UID,
+		Controller: util.BoolPointer(true),
+	}
+}
+
+func NewLegacyFluentbitNameProvider(logging *Logging) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		logging: logging,
+	}
+}
+
+func NewStandaloneFluentbitNameProvider(agent *FluentbitAgent) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		fluentbit: agent,
+	}
+}
+
+func init() {
+	SchemeBuilder.Register(&FluentbitAgent{}, &FluentbitAgentList{})
 }

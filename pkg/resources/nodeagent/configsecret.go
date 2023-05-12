@@ -239,11 +239,11 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		}
 	}
 
-	if nil == n.fluentdDataProvider {
+	if nil == n.loggingDataProvider {
 		return nil, nil, errors.WrapIf(err, "nil fluent data provider")
 	}
 
-	fluentdReplicas, err := n.fluentdDataProvider.GetReplicaCount(context.TODO(), n.logging)
+	fluentdReplicas, err := n.loggingDataProvider.GetReplicaCount(context.TODO())
 	if err != nil {
 		return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 	}

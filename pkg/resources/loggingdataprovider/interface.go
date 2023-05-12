@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fluentddataprovider
+package loggingdataprovider
 
 import (
 	"context"
-
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-type FluentdDataProvider interface {
-	GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error)
+type LoggingDataProvider interface {
+	GetReplicaCount(ctx context.Context) (*int32, error)
 }
