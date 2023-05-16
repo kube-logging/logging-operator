@@ -53,7 +53,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 
 		if r.fluentbitSpec.PositionDB.HostPath != nil {
 			r.fluentbitSpec.PositionDB.WithDefaultHostPath(
-				fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+				fmt.Sprintf(v1beta1.HostPath, r.nameProvider.Name(), TailPositionVolume))
 
 			allowedHostPaths = append(allowedHostPaths, policyv1beta1.AllowedHostPath{
 				PathPrefix: r.fluentbitSpec.PositionDB.HostPath.Path,

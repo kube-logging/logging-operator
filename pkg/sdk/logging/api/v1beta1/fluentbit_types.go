@@ -472,6 +472,13 @@ func (l *FluentbitNameProvider) ComponentName(name string) string {
 	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
 }
 
+func (l *FluentbitNameProvider) Name() string {
+	if l.logging != nil {
+		return l.logging.Name
+	}
+	return l.fluentbit.Name
+}
+
 func (l *FluentbitNameProvider) OwnerRef() metav1.OwnerReference {
 	if l.logging != nil {
 		return metav1.OwnerReference{

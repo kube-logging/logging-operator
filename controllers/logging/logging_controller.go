@@ -186,35 +186,38 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	switch len(loggingResources.Fluentbits) {
-	case 1:
-		if logging.Spec.FluentbitSpec != nil {
-			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
-		}
-		reconcilers = append(reconcilers, fluentbit.New(
-			r.Client,
-			r.Log,
-			&logging,
-			reconcilerOpts,
-			&loggingResources.Fluentbits[0].Spec,
-			loggingDataProvider,
-			loggingv1beta1.NewStandaloneFluentbitNameProvider(&loggingResources.Fluentbits[0]),
-		).Reconcile)
 	case 0:
 		// check for legacy definition
 		log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 		if logging.Spec.FluentbitSpec != nil {
+			nameProvider := loggingv1beta1.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
-				r.Log,
+				r.Log.WithName(nameProvider.ComponentName("logging-legacy")),
 				&logging,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
-				loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
+				nameProvider,
 			).Reconcile)
 		}
 	default:
-		return ctrl.Result{}, errors.New("cannot handle more than one FluentbitAgent for the same Logging resource")
+		if logging.Spec.FluentbitSpec != nil {
+			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
+		}
+		for _, f := range loggingResources.Fluentbits {
+			f := f.DeepCopy()
+			nameProvider := loggingv1beta1.NewStandaloneFluentbitNameProvider(f)
+			reconcilers = append(reconcilers, fluentbit.New(
+				r.Client,
+				r.Log.WithName(nameProvider.ComponentName("fluentbit-agent")),
+				&logging,
+				reconcilerOpts,
+				&f.Spec,
+				loggingDataProvider,
+				nameProvider,
+			).Reconcile)
+		}
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
