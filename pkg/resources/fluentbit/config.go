@@ -16,6 +16,7 @@ package fluentbit
 
 const BaseConfigName = "fluent-bit.conf"
 const UpstreamConfigName = "upstream.conf"
+const CustomParsersConfigName = "custom-parsers.conf"
 
 var fluentBitConfigTemplate = `
 [SERVICE]
@@ -24,6 +25,9 @@ var fluentBitConfigTemplate = `
     Daemon       Off
     Log_Level    {{ .LogLevel }}
     Parsers_File parsers.conf
+    {{- if .CustomParsers }}
+    Parsers_File {{ .CustomParsers }}
+    {{- end }}
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
@@ -63,7 +67,6 @@ var fluentBitConfigTemplate = `
 {{- end}}
 
 {{- if .AwsFilter }}
-
 [FILTER]
     Name        aws
     {{- range $key, $value := .AwsFilter }}
