@@ -23,12 +23,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	extensionsconfig "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/crds"
-	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/rbac"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	admissionregistration "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -48,6 +42,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	extensionsconfig "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/crds"
+	"github.com/kube-logging/logging-operator/pkg/sdk/static/gen/rbac"
 )
 
 const (
@@ -150,6 +151,9 @@ func AppendCRDResourceBuilders(rbs []reconciler.ResourceBuilder, modifiers ...CR
 		},
 		func() (runtime.Object, reconciler.DesiredState, error) {
 			return CRD(loggingv1beta1.GroupVersion.Group, "nodeagents", modifiers...)
+		},
+		func() (runtime.Object, reconciler.DesiredState, error) {
+			return CRD(loggingv1beta1.GroupVersion.Group, "fluentbitagents", modifiers...)
 		},
 		func() (runtime.Object, reconciler.DesiredState, error) {
 			return CRD(extensionsv1alpha1.GroupVersion.Group, "hosttailers", modifiers...)

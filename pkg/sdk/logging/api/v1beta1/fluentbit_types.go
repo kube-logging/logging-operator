@@ -39,7 +39,7 @@ type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=fluentbits,scope=Cluster,categories=logging-all
+// +kubebuilder:resource:path=fluentbitagents,scope=Cluster,categories=logging-all
 // +kubebuilder:storageversion
 
 // FluentbitAgent is the Schema for the loggings API
