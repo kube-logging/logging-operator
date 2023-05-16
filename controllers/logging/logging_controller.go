@@ -206,8 +206,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
 		}
 		for _, f := range loggingResources.Fluentbits {
-			f := f.DeepCopy()
-			nameProvider := loggingv1beta1.NewStandaloneFluentbitNameProvider(f)
+			f := f
+			nameProvider := loggingv1beta1.NewStandaloneFluentbitNameProvider(&f)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				r.Log.WithName(nameProvider.ComponentName("fluentbit-agent")),
