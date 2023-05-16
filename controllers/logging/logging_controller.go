@@ -434,11 +434,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
 	}
-	// TODO remove with the next major release
-	if os.Getenv("ENABLE_FLUENTBIT_CRD") != "" {
-		logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_FLUENTBIT_CRD=1)")
-		builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
-	}
+
+	builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
