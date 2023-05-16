@@ -83,7 +83,7 @@ type LoggingReconciler struct {
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("logging", req.NamespacedName)
+	log := r.Log.WithValues("logging", req.Name)
 
 	var logging loggingv1beta1.Logging
 	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
@@ -193,7 +193,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			nameProvider := loggingv1beta1.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
-				r.Log.WithName(nameProvider.ComponentName("logging-legacy")),
+				log.WithName("fluentbit-legacy"),
 				&logging,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
@@ -205,17 +205,17 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if logging.Spec.FluentbitSpec != nil {
 			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
 		}
+		l := log.WithName("fluentbit")
 		for _, f := range loggingResources.Fluentbits {
 			f := f
-			nameProvider := loggingv1beta1.NewStandaloneFluentbitNameProvider(&f)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
-				r.Log.WithName(nameProvider.ComponentName("fluentbit-agent")),
+				l.WithValues("fluentbitagent", f.Name),
 				&logging,
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
-				nameProvider,
+				loggingv1beta1.NewStandaloneFluentbitNameProvider(&f),
 			).Reconcile)
 		}
 	}

@@ -24,14 +24,6 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
-	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
-	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
-	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
@@ -51,6 +43,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
+	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
+	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -158,11 +159,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Logging"))
+	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("logging"))
 
 	if err := (&extensionsControllers.EventTailerReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("EventTailer"),
+		Log:    ctrl.Log.WithName("event-tailer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "EventTailer")
@@ -170,7 +171,7 @@ func main() {
 	}
 	if err := (&extensionsControllers.HostTailerReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("HostTailer"),
+		Log:    ctrl.Log.WithName("host-tailer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HostTailer")
