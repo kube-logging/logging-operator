@@ -16,10 +16,16 @@ package common
 
 import (
 	"context"
+	"os"
+	"os/exec"
+	"strings"
 	"testing"
 
 	"emperror.dev/errors"
+	"github.com/spf13/cast"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
@@ -28,9 +34,13 @@ import (
 
 const defaultClusterName = "e2e-test"
 
+var NamespacesUsed []string
+
 type Cluster interface {
 	cluster.Cluster
 	LoadImages(images ...string) error
+	Cleanup() error
+	PrintLogs(int) error
 }
 
 func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Option) {
@@ -43,6 +53,10 @@ func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Opt
 	}()
 
 	defer func() {
+		t.Log("CLUSTER LOGS START")
+		assert.NoError(t, cluster.PrintLogs(10000))
+		t.Log("CLUSTER LOGS END")
+		assert.NoError(t, cluster.Cleanup())
 		cancel()
 		require.NoError(t, DeleteTestCluster(defaultClusterName))
 	}()
@@ -51,22 +65,38 @@ func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Opt
 }
 
 func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error) {
-	kubeconfig, err := KindClusterKubeconfig(clusterName)
+	var err error
+	var kubeconfig []byte
+	var kubeconfigFile *os.File
+	var clientCfg clientcmd.ClientConfig
+	var restCfg *rest.Config
+	var c cluster.Cluster
+
+	kubeconfig, err = KindClusterKubeconfig(clusterName)
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "getting kubeconfig of kind cluster", "clusterName", clusterName)
 	}
-	clientCfg, err := clientcmd.NewClientConfigFromBytes(kubeconfig)
+	kubeconfigFile, err = os.CreateTemp("", "kind-kind-kubeconfig")
+	if err != nil {
+		return nil, errors.WrapIfWithDetails(err, "unable to create temp file for kubeconfig", "clusterName", clusterName)
+	}
+	err = os.WriteFile(kubeconfigFile.Name(), kubeconfig, os.FileMode(0600))
+	if err != nil {
+		return nil, errors.WrapIfWithDetails(err, "failed to write kubeconfig", "clusterName", clusterName, "path", kubeconfigFile.Name())
+	}
+	clientCfg, err = clientcmd.NewClientConfigFromBytes(kubeconfig)
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "creating client config from kubeconfig bytes", "kubeconfig", kubeconfig)
 	}
-	restCfg, err := clientCfg.ClientConfig()
+	restCfg, err = clientCfg.ClientConfig()
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "creating rest config from client config", "cfg", clientCfg)
 	}
-	c, err := cluster.New(restCfg, opts...)
+	c, err = cluster.New(restCfg, opts...)
 	return &kindCluster{
-		Cluster:     c,
-		clusterName: clusterName,
+		Cluster:            c,
+		kubeconfigFilePath: kubeconfigFile.Name(),
+		clusterName:        clusterName,
 	}, errors.WrapIfWithDetails(err, "creating cluster with rest config", "cfg", restCfg)
 }
 
@@ -78,7 +108,19 @@ func DeleteTestCluster(clusterName string) error {
 
 type kindCluster struct {
 	cluster.Cluster
-	clusterName string
+	kubeconfigFilePath string
+	clusterName        string
+}
+
+func (c kindCluster) PrintLogs(tail int) error {
+	cmd := exec.Command("stern", "-n", strings.Join(NamespacesUsed, ","), ".*", "--no-follow", "--tail", cast.ToString(tail), "--kubeconfig", c.kubeconfigFilePath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (c kindCluster) Cleanup() error {
+	return os.Remove(c.kubeconfigFilePath)
 }
 
 func (c kindCluster) LoadImages(images ...string) error {

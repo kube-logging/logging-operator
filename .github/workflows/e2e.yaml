@@ -58,6 +58,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Stern
+        run: make stern && test -x bin/stern
+
       - name: Build controller image
         run: make docker-build IMG='controller:local'
 
@@ -88,3 +91,6 @@ jobs:
 
       - name: Test
         run: hack/test.sh
+
+      - name: Print last 10k kubernetes logs from default and logging namespaces
+        run: bin/stern -n default,logging ".*" --tail 10000 --no-follow

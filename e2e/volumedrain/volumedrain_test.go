@@ -22,8 +22,6 @@ import (
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -37,15 +35,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
 func TestVolumeDrain_Downscale(t *testing.T) {
+	ns := "testing-1"
+	common.NamespacesUsed = []string{ns, "default"}
 	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
-		ns := "testing-1"
-
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
@@ -196,9 +197,9 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 }
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
+	ns := "testing-2"
+	common.NamespacesUsed = []string{ns, "default"}
 	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
-		ns := "testing-2"
-
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
