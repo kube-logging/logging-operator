@@ -24,10 +24,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"github.com/kube-logging/logging-operator/pkg/resources"
-	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -39,6 +35,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -132,6 +133,12 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Fail when the current config is invalid
+		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
+			return nil, errors.Errorf("current config is invalid")
+		}
+
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
 			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck)
 
