@@ -157,7 +157,7 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 
 .PHONY: test-e2e
 test-e2e: ${KIND} docker-build generate fmt vet manifests stern ## Run E2E tests
-	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
+	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" PROJECT_DIR="$(PWD)" go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

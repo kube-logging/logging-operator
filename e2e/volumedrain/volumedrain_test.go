@@ -16,7 +16,10 @@ package volumedrain
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -43,9 +46,22 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
+var TestTempDir string
+
+func init() {
+	var ok bool
+	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
+	if !ok {
+		TestTempDir = "../.."
+	}
+	TestTempDir = path.Join(TestTempDir, "build/_test")
+	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	if err != nil {
+		panic(err)
+	}
+}
 func TestVolumeDrain_Downscale(t *testing.T) {
 	ns := "testing-1"
-	common.NamespacesUsed = []string{ns, "default"}
 	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
@@ -183,6 +199,14 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
 		require.NoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
 		assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
+	}, func(t *testing.T, c common.Cluster) error {
+		path := fmt.Sprintf("%s/cluster-%s.log", TestTempDir, t.Name())
+		t.Logf("Printing cluster logs to %s", path)
+		return c.PrintLogs(common.PrintLogConfig{
+			Namespaces: []string{ns, "default"},
+			FilePath:   path,
+			Limit:      100 * 1000,
+		})
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
@@ -198,7 +222,6 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 	ns := "testing-2"
-	common.NamespacesUsed = []string{ns, "default"}
 	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
@@ -335,6 +358,14 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
+	}, func(t *testing.T, c common.Cluster) error {
+		path := fmt.Sprintf("%s/cluster-%s.log", TestTempDir, t.Name())
+		t.Logf("Printing cluster logs to %s", path)
+		return c.PrintLogs(common.PrintLogConfig{
+			Namespaces: []string{ns, "default"},
+			FilePath:   path,
+			Limit:      100 * 1000,
+		})
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

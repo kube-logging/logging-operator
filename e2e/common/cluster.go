@@ -34,16 +34,20 @@ import (
 
 const defaultClusterName = "e2e-test"
 
-var NamespacesUsed []string
-
 type Cluster interface {
 	cluster.Cluster
 	LoadImages(images ...string) error
 	Cleanup() error
-	PrintLogs(int) error
+	PrintLogs(config PrintLogConfig) error
 }
 
-func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Option) {
+type PrintLogConfig struct {
+	Namespaces []string
+	FilePath   string
+	Limit      int
+}
+
+func WithCluster(t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
 	cluster, err := GetTestCluster(defaultClusterName, opts...)
 	require.NoError(t, err)
 
@@ -53,9 +57,7 @@ func WithCluster(t *testing.T, fn func(*testing.T, Cluster), opts ...cluster.Opt
 	}()
 
 	defer func() {
-		t.Log("CLUSTER LOGS START")
-		assert.NoError(t, cluster.PrintLogs(10000))
-		t.Log("CLUSTER LOGS END")
+		assert.NoError(t, beforeCleanup(t, cluster))
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
 		require.NoError(t, DeleteTestCluster(defaultClusterName))
@@ -112,10 +114,16 @@ type kindCluster struct {
 	clusterName        string
 }
 
-func (c kindCluster) PrintLogs(tail int) error {
-	cmd := exec.Command("stern", "-n", strings.Join(NamespacesUsed, ","), ".*", "--no-follow", "--tail", cast.ToString(tail), "--kubeconfig", c.kubeconfigFilePath)
-	cmd.Stdout = os.Stdout
+func (c kindCluster) PrintLogs(config PrintLogConfig) error {
+	cmd := exec.Command("stern", "-n", strings.Join(config.Namespaces, ","), ".*", "--no-follow", "--tail", cast.ToString(config.Limit), "--kubeconfig", c.kubeconfigFilePath)
+	f, err := os.Create(config.FilePath)
+	if err != nil {
+		return err
+	}
+	cmd.Stdout = f
 	cmd.Stderr = os.Stderr
+
+	defer f.Close()
 	return cmd.Run()
 }
 
