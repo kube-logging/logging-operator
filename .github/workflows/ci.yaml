@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - release-3.17
+      - "release-[0-9]+.[0-9]+*"
   pull_request:
 
 jobs:
