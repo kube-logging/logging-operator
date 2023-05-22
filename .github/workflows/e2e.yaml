@@ -14,7 +14,7 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: Go end2end tests
     runs-on: ubuntu-latest
 
     steps:
@@ -34,8 +34,16 @@ jobs:
       - name: Run e2e tests
         run: make test-e2e
 
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: go-e2e-test-cluster-logs
+          path: build/_test
+          retention-days: 5
+
   basic_flow:
-    name: Basic flow
+    name: Shell script tests with chart install
     runs-on: ubuntu-latest
 
     steps:
@@ -57,6 +65,9 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Stern
+        run: make stern && test -x bin/stern
 
       - name: Build controller image
         run: make docker-build IMG='controller:local'
@@ -88,3 +99,17 @@ jobs:
 
       - name: Test
         run: hack/test.sh
+
+      - name: Print last 10k kubernetes logs from default and logging namespaces
+        if: always()
+        run: |
+          mkdir -p build/_test
+          bin/stern -n default,logging ".*" --tail 100000 --no-follow > build/_test/cluster.logs
+
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: script-e2e-test-cluster-logs
+          path: build/_test
+          retention-days: 5

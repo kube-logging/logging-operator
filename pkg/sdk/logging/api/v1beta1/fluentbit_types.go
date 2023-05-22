@@ -39,7 +39,7 @@ type _metaFluentbitSpec interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=fluentbits,scope=Cluster,categories=logging-all
+// +kubebuilder:resource:path=fluentbitagents,scope=Cluster,categories=logging-all
 // +kubebuilder:storageversion
 
 // FluentbitAgent is the Schema for the loggings API
@@ -470,6 +470,13 @@ func (l *FluentbitNameProvider) ComponentName(name string) string {
 		return l.logging.QualifiedName(name)
 	}
 	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
+}
+
+func (l *FluentbitNameProvider) Name() string {
+	if l.logging != nil {
+		return l.logging.Name
+	}
+	return l.fluentbit.Name
 }
 
 func (l *FluentbitNameProvider) OwnerRef() metav1.OwnerReference {

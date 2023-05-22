@@ -156,8 +156,8 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
 
 .PHONY: test-e2e
-test-e2e: ${KIND} docker-build generate fmt vet manifests ## Run E2E tests
-	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" go test -timeout ${E2E_TEST_TIMEOUT} ./...
+test-e2e: ${KIND} docker-build generate fmt vet manifests stern ## Run E2E tests
+	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" PROJECT_DIR="$(PWD)" go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
@@ -228,6 +228,9 @@ ${SETUP_ENVTEST}: IMPORT_PATH := sigs.k8s.io/controller-runtime/tools/setup-envt
 ${SETUP_ENVTEST}: VERSION := latest
 ${SETUP_ENVTEST}: | ${BIN}
 	GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
+
+stern: | ${BIN}
+	GOBIN=${BIN} go install github.com/stern/stern@latest
 
 ${ENVTEST_BIN_DIR}: | ${BIN}
 	mkdir -p $@

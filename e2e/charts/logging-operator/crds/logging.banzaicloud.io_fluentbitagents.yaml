@@ -6,7 +6,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.0
   creationTimestamp: null
-  name: fluentbits.logging.banzaicloud.io
+  name: fluentbitagents.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
   names:
@@ -14,7 +14,7 @@ spec:
     - logging-all
     kind: FluentbitAgent
     listKind: FluentbitAgentList
-    plural: fluentbits
+    plural: fluentbitagents
     singular: fluentbitagent
   scope: Cluster
   versions:

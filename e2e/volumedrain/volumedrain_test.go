@@ -16,14 +16,15 @@ package volumedrain
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -37,15 +38,31 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
-func TestVolumeDrain_Downscale(t *testing.T) {
-	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
-		ns := "testing-1"
+var TestTempDir string
 
+func init() {
+	var ok bool
+	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
+	if !ok {
+		TestTempDir = "../.."
+	}
+	TestTempDir = filepath.Join(TestTempDir, "build/_test")
+	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	if err != nil {
+		panic(err)
+	}
+}
+func TestVolumeDrain_Downscale(t *testing.T) {
+	ns := "testing-1"
+	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
@@ -182,6 +199,14 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
 		require.NoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
 		assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
+	}, func(t *testing.T, c common.Cluster) error {
+		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
+		t.Logf("Printing cluster logs to %s", path)
+		return c.PrintLogs(common.PrintLogConfig{
+			Namespaces: []string{ns, "default"},
+			FilePath:   path,
+			Limit:      100 * 1000,
+		})
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
@@ -196,9 +221,8 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 }
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
+	ns := "testing-2"
 	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
-		ns := "testing-2"
-
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
@@ -334,6 +358,14 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
+	}, func(t *testing.T, c common.Cluster) error {
+		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
+		t.Logf("Printing cluster logs to %s", path)
+		return c.PrintLogs(common.PrintLogConfig{
+			Namespaces: []string{ns, "default"},
+			FilePath:   path,
+			Limit:      100 * 1000,
+		})
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

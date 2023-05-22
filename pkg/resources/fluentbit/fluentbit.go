@@ -52,8 +52,13 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(r.fluentbitSpec.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.GetName()))
+	return util.MergeLabels(
+		r.fluentbitSpec.Labels,
+		map[string]string{
+			"app.kubernetes.io/instance": r.nameProvider.Name(),
+			"app.kubernetes.io/name":     "fluentbit",
+		},
+		generateLoggingRefLabels(r.Logging.GetName()))
 }
 
 func (r *Reconciler) getServiceAccount() string {
@@ -64,7 +69,11 @@ func (r *Reconciler) getServiceAccount() string {
 }
 
 type NameProvider interface {
+	// ComponentName provides a qualified name using (Name + "-" + name)
 	ComponentName(name string) string
+	// Name returns the name of the resource, that is owning fluentbit
+	// It is Logging.Name for legacy but the resource's name for FluentbitAgent
+	Name() string
 	OwnerRef() v1.OwnerReference
 }
 
@@ -75,7 +84,8 @@ type DesiredObject struct {
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	*reconciler.GenericResourceReconciler
+	resourceReconciler  *reconciler.GenericResourceReconciler
+	logger              logr.Logger
 	Logging             *v1beta1.Logging
 	configs             map[string][]byte
 	fluentbitSpec       *v1beta1.FluentbitSpec
@@ -92,11 +102,12 @@ func New(client client.Client,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
 	nameProvider NameProvider) *Reconciler {
 	return &Reconciler{
-		Logging:                   logging,
-		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
-		fluentbitSpec:             fluentbitSpec,
-		loggingDataProvider:       loggingDataProvider,
-		nameProvider:              nameProvider,
+		Logging:             logging,
+		logger:              logger,
+		resourceReconciler:  reconciler.NewGenericReconciler(client, logger.WithName("reconciler"), opts),
+		fluentbitSpec:       fluentbitSpec,
+		loggingDataProvider: loggingDataProvider,
+		nameProvider:        nameProvider,
 	}
 }
 
@@ -129,7 +140,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
-		result, err := r.ReconcileResource(o, state)
+		result, err := r.resourceReconciler.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapWithDetails(err,
 				"failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())

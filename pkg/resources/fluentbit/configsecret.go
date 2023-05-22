@@ -25,7 +25,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
@@ -175,10 +174,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 	if !disableKubernetesFilter {
 		if r.fluentbitSpec.FilterKubernetes.BufferSize == "" {
-			log.Log.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+			r.logger.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
 			r.fluentbitSpec.FilterKubernetes.BufferSize = "0"
 		} else if r.fluentbitSpec.FilterKubernetes.BufferSize != "0" {
-			log.Log.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+			r.logger.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
 		}
 	}
 
@@ -246,8 +245,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		// If MultilineParser is set, remove other parser fields
 		// See https://docs.fluentbit.io/manual/pipeline/inputs/tail#multiline-core-v1.8
 
-		log.Log.Info("Notice: MultilineParser is enabled. Disabling other parser options",
-			"logging", r.Logging.Name)
+		r.logger.Info("Notice: MultilineParser is enabled. Disabling other parser options")
 
 		inputTail.Parser = ""
 		inputTail.ParserFirstline = ""
@@ -305,25 +303,25 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
 		}
 
-		fluentdReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
+		aggregatorReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
 		if err != nil {
 			return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 		}
 
-		if r.fluentbitSpec.Network == nil && utils.PointerToInt32(fluentdReplicas) > 1 {
+		if r.fluentbitSpec.Network == nil && utils.PointerToInt32(aggregatorReplicas) > 1 {
 			input.FluentForwardOutput.Network.KeepaliveSet = true
 			input.FluentForwardOutput.Network.Keepalive = true
 			input.FluentForwardOutput.Network.KeepaliveIdleTimeoutSet = true
 			input.FluentForwardOutput.Network.KeepaliveIdleTimeout = 30
 			input.FluentForwardOutput.Network.KeepaliveMaxRecycleSet = true
 			input.FluentForwardOutput.Network.KeepaliveMaxRecycle = 100
-			log.Log.Info("Notice: Because the Fluentd statefulset has been scaled, we've made some changes in the fluentbit network config too. We advice to revise these default configurations.")
+			r.logger.Info("Notice: fluentbit `network` settings have been configured automatically to adapt to multiple aggregator replicas. Configure it manually to avoid this notice.")
 		}
 
 		if r.fluentbitSpec.EnableUpstream {
 			input.FluentForwardOutput.Upstream.Enabled = true
 			input.FluentForwardOutput.Upstream.Config.Name = "fluentd-upstream"
-			for i := int32(0); i < utils.PointerToInt32(fluentdReplicas); i++ {
+			for i := int32(0); i < utils.PointerToInt32(aggregatorReplicas); i++ {
 				input.FluentForwardOutput.Upstream.Config.Nodes = append(input.FluentForwardOutput.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 			}
 		}

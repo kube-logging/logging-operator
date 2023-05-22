@@ -94,9 +94,9 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	}
 
 	r.fluentbitSpec.PositionDB.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, TailPositionVolume))
+		fmt.Sprintf(v1beta1.HostPath, r.nameProvider.Name(), TailPositionVolume))
 	r.fluentbitSpec.BufferStorageVolume.WithDefaultHostPath(
-		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, BufferStorageVolume))
+		fmt.Sprintf(v1beta1.HostPath, r.nameProvider.Name(), BufferStorageVolume))
 
 	if err := r.fluentbitSpec.PositionDB.ApplyVolumeForPodSpec(TailPositionVolume, containerName, "/tail-db", &desired.Spec.Template.Spec); err != nil {
 		return desired, reconciler.StatePresent, err

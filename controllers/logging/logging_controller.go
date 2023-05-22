@@ -83,7 +83,7 @@ type LoggingReconciler struct {
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("logging", req.NamespacedName)
+	log := r.Log.WithValues("logging", req.Name)
 
 	var logging loggingv1beta1.Logging
 	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
@@ -186,35 +186,38 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	switch len(loggingResources.Fluentbits) {
-	case 1:
-		if logging.Spec.FluentbitSpec != nil {
-			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
-		}
-		reconcilers = append(reconcilers, fluentbit.New(
-			r.Client,
-			r.Log,
-			&logging,
-			reconcilerOpts,
-			&loggingResources.Fluentbits[0].Spec,
-			loggingDataProvider,
-			loggingv1beta1.NewStandaloneFluentbitNameProvider(&loggingResources.Fluentbits[0]),
-		).Reconcile)
 	case 0:
 		// check for legacy definition
 		log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 		if logging.Spec.FluentbitSpec != nil {
+			nameProvider := loggingv1beta1.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
-				r.Log,
+				log.WithName("fluentbit-legacy"),
 				&logging,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
-				loggingv1beta1.NewLegacyFluentbitNameProvider(&logging),
+				nameProvider,
 			).Reconcile)
 		}
 	default:
-		return ctrl.Result{}, errors.New("cannot handle more than one FluentbitAgent for the same Logging resource")
+		if logging.Spec.FluentbitSpec != nil {
+			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
+		}
+		l := log.WithName("fluentbit")
+		for _, f := range loggingResources.Fluentbits {
+			f := f
+			reconcilers = append(reconcilers, fluentbit.New(
+				r.Client,
+				l.WithValues("fluentbitagent", f.Name),
+				&logging,
+				reconcilerOpts,
+				&f.Spec,
+				loggingDataProvider,
+				loggingv1beta1.NewStandaloneFluentbitNameProvider(&f),
+			).Reconcile)
+		}
 	}
 
 	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
@@ -431,11 +434,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
 	}
-	// TODO remove with the next major release
-	if os.Getenv("ENABLE_FLUENTBIT_CRD") != "" {
-		logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_FLUENTBIT_CRD=1)")
-		builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
-	}
+
+	builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)

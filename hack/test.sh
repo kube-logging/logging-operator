@@ -16,8 +16,6 @@ function main()
     helm_deploy_logging_operator
     configure_logging
 
-
-
     wait_for_log_files "${mc_pod}" 300
     print_logs "${mc_pod}"
 }
@@ -53,7 +51,7 @@ function helm_add_repo()
 function helm_deploy_logging_operator()
 {
     # TODO: remove version once there is a semver stable version in the repo
-    helm install \
+    helm upgrade --install \
         --debug \
         --wait \
         --set image.tag='local' \
@@ -66,7 +64,7 @@ function helm_deploy_logging_operator()
 function configure_logging()
 {
     # TODO: remove version once there is a semver stable version in the repo
-    helm install \
+    helm upgrade --install \
         --debug \
         --wait \
         --create-namespace \

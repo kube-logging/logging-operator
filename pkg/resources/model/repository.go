@@ -21,9 +21,10 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/go-logr/logr"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func NewLoggingResourceRepository(client client.Reader, logger logr.Logger) *LoggingResourceRepository {
@@ -281,11 +282,6 @@ func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1
 }
 
 func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.FluentbitAgent, error) {
-	if os.Getenv("ENABLE_FLUENTBIT_CRD") == "" {
-		r.Logger.Info("processing FluentbitAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
-		return nil, nil
-	}
-
 	var list v1beta1.FluentbitAgentList
 	if err := r.Client.List(ctx, &list); err != nil {
 		return nil, err
