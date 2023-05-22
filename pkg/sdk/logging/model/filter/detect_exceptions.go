@@ -24,17 +24,18 @@ import (
 type _hugoExceptionDetector interface{} //nolint:deadcode,unused
 
 // +docName:"Exception Detector"
-//This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
-//More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
+// This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
+// More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
 //
 // > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
 //
 // ## Example output configurations
 // ```yaml
-//filters:
-//  - detectExceptions:
-//      languages: java, python
-//      multiline_flush_interval: 0.1
+// filters:
+//   - detectExceptions:
+//     languages: java, python
+//     multiline_flush_interval: 0.1
+//
 // ```
 type _docExceptionDetector interface{} //nolint:deadcode,unused
 
@@ -69,31 +70,37 @@ type DetectExceptions struct {
 
 // ## Example `Exception Detector` filter configurations
 // ```yaml
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: Flow
-//metadata:
-//  name: demo-flow
-//spec:
-//  filters:
-//    - detectExceptions:
-//        multiline_flush_interval: 0.1
-//        languages:
-//          - java
-//          - python
-//  selectors: {}
-//  localOutputRefs:
-//    - demo-output
+// apiVersion: logging.banzaicloud.io/v1beta1
+// kind: Flow
+// metadata:
+//
+//	name: demo-flow
+//
+// spec:
+//
+//	filters:
+//	  - detectExceptions:
+//	      multiline_flush_interval: 0.1
+//	      languages:
+//	        - java
+//	        - python
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
+//
 // ```
 //
 // #### Fluentd Config Result
 // ```yaml
-//<match kubernetes.**>
-//  @type detect_exceptions
-//  @id test_detect_exceptions
-//  languages ["java","python"]
-//  multiline_flush_interval 0.1
-//  remove_tag_prefix kubernetes
-//</match>
+// <match kubernetes.**>
+//
+//	@type detect_exceptions
+//	@id test_detect_exceptions
+//	languages ["java","python"]
+//	multiline_flush_interval 0.1
+//	remove_tag_prefix kubernetes
+//
+// </match>
 // ```
 type _expDetectExceptions interface{} //nolint:deadcode,unused
 
