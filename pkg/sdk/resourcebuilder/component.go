@@ -17,7 +17,7 @@ package resourcebuilder
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	"emperror.dev/errors"
 	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
@@ -218,7 +218,7 @@ func CRD(group string, kind string, modifiers ...CRDModifier) (runtime.Object, r
 	if err != nil {
 		return nil, nil, errors.WrapIff(err, "failed to open %s crd", kind)
 	}
-	bytes, err := ioutil.ReadAll(crdFile)
+	bytes, err := io.ReadAll(crdFile)
 	if err != nil {
 		return nil, nil, errors.WrapIff(err, "failed to read %s crd", kind)
 	}
@@ -377,7 +377,7 @@ func ClusterRole(parent reconciler.ResourceOwner, config ComponentConfig) (runti
 	if err != nil {
 		return nil, nil, errors.WrapIf(err, "failed to open role.yaml")
 	}
-	roleAsByte, err := ioutil.ReadAll(roleFile)
+	roleAsByte, err := io.ReadAll(roleFile)
 	if err != nil {
 		return nil, nil, err
 	}
