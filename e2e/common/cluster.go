@@ -120,10 +120,11 @@ func (c kindCluster) PrintLogs(config PrintLogConfig) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
+
 	cmd.Stdout = f
 	cmd.Stderr = os.Stderr
 
-	defer f.Close()
 	return cmd.Run()
 }
 

@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -54,7 +54,7 @@ func init() {
 	if !ok {
 		TestTempDir = "../.."
 	}
-	TestTempDir = path.Join(TestTempDir, "build/_test")
+	TestTempDir = filepath.Join(TestTempDir, "build/_test")
 	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
 	if err != nil {
 		panic(err)
@@ -200,7 +200,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		require.NoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
 		assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
 	}, func(t *testing.T, c common.Cluster) error {
-		path := fmt.Sprintf("%s/cluster-%s.log", TestTempDir, t.Name())
+		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
 		return c.PrintLogs(common.PrintLogConfig{
 			Namespaces: []string{ns, "default"},
@@ -359,7 +359,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
 	}, func(t *testing.T, c common.Cluster) error {
-		path := fmt.Sprintf("%s/cluster-%s.log", TestTempDir, t.Name())
+		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
 		return c.PrintLogs(common.PrintLogConfig{
 			Namespaces: []string{ns, "default"},
