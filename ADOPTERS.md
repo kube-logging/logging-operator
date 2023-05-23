@@ -13,3 +13,4 @@ This is a list of production adopters of Logging Operator:
 |[Liquid Reply](https://liquidreply.net/monitor-your-multi-cluster-environments)|AWS Premier Consulting Partner for professional cloud computing services|
 |[Carrefour](https://carrefour.com)|Retail|
 |[KubeGems](https://kubegems.io)|KubeGems observability/logging is powerd by Banzai Cloud Logging operator |
+|[PITS Global Data Recovery Services](https://www.pitsdatarecovery.net/)| Data Recovery Services |
