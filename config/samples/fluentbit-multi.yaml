@@ -17,7 +17,7 @@ spec:
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: FluentbitAgent
 metadata:
-  # important to use the same name as the logging agent does
+  # in a migration scenario it is important to use the same name as the logging resource in order to keep the same buffers and position volume names (if the defaults are used as in the example)
   name: multi
 spec:
   positiondb:
