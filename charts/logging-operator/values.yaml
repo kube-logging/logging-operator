@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/banzaicloud/logging-operator
-  tag: 3.17.10
+  repository: ghcr.io/kube-logging/logging-operator
+  tag: 3.17.11
   pullPolicy: IfNotPresent
 
 env: []
