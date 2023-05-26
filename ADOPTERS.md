@@ -16,3 +16,4 @@ This is a list of production adopters of Logging Operator:
 | [Cisco](https://www.cisco.com)                                               | Digital communications technology                                                                                                                                          |
 | [Rancher](https://rancher.com)                                               | Kubernetes management tool. RKE’s default logging solution is based on the Logging Operator   https://ranchermanager.docs.rancher.com/v2.5/pages-for-subheaders/logging    |
 | [D2IQ](https://d2iq.com)                                                     | Kubernetes management tool. D2IQ's logging offering is based on the Logging Operator https://docs.d2iq.com/dkp/2.5/logging                                                 |
+| [Dailymotion](https://dailymotion.com)                                       | Video streaming, Adtech            |
