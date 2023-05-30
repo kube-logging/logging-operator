@@ -59,7 +59,7 @@ const (
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
 	bufferVolumeImageTag              = "v0.6.1"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
-	configReloaderImageTag            = "v1.2.0"
+	configReloaderImageTag            = "v1.3.1"
 	socketVolumeName                  = "socket"
 	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
 	configDir                         = "/etc/syslog-ng/config"
