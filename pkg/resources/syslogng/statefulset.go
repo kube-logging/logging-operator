@@ -23,13 +23,14 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
@@ -45,7 +46,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	}
 
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.Logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG),
+		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
 		Spec: appsv1.StatefulSetSpec{
 			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
 			Selector: &metav1.LabelSelector{
@@ -81,7 +82,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			buffersVolumeName = name
 		}
 	}
-	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, containerName)
+	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, ContainerName)
 	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
 		if !sliceAny(syslogngContainer.Args, func(arg string) bool { return strings.Contains(arg, "--persist-file") }) {
 			syslogngContainer.Args = append(syslogngContainer.Args,
@@ -94,7 +95,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	return corev1.Container{
-		Name:            containerName,
+		Name:            ContainerName,
 		Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{{
@@ -119,7 +120,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 				corev1.ResourceCPU:    resource.MustParse("500m"),
 			},
 		},
-		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: bufferPath}},
+		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: BufferPath}},
 		LivenessProbe: &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
@@ -268,7 +269,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName,
-					MountPath: bufferPath,
+					MountPath: BufferPath,
 				},
 			},
 		}
@@ -335,7 +336,7 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 }
 
 func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
-	//TODO: ADD TLS reload watch
+	// TODO: ADD TLS reload watch
 	container := corev1.Container{
 		Name:            "config-reloader",
 		Image:           v1beta1.RepositoryWithTag(configReloaderImageRepository, configReloaderImageTag),

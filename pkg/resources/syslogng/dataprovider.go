@@ -18,10 +18,11 @@ import (
 	"context"
 
 	"emperror.dev/errors"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type DataProvider struct {
@@ -38,7 +39,7 @@ func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvid
 
 func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
 	sts := &v1.StatefulSet{}
-	om := p.logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG)
+	om := p.logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG)
 	err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 	if err != nil {
 		return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting syslog-ng statefulset")
