@@ -55,7 +55,7 @@ const (
 	syslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
 	syslogngImageTag                  = "4.2.0"
 	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
-	prometheusExporterImageTag        = "v0.0.15"
+	prometheusExporterImageTag        = "v0.0.16"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
 	bufferVolumeImageTag              = "v0.6.1"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
