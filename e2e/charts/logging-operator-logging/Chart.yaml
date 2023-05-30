@@ -28,4 +28,4 @@ annotations:
     - name: config-reloader
       image: ghcr.io/kube-logging/config-reloader:v0.0.4
     - name: node-exporter
-      image: ghcr.io/kube-logging/node-exporter:v0.4.0
+      image: ghcr.io/kube-logging/node-exporter:v0.6.1
