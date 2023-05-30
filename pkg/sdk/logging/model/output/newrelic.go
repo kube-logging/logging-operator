@@ -62,6 +62,8 @@ type NewRelicOutputConfig struct {
 	// New Relic ingestion endpoint
 	// +docLink:"Secret,../secret/"
 	BaseURI string `json:"base_uri,omitempty" plugin:"default:https://log-api.newrelic.com/log/v1"`
+	// +docLink:"Buffer,../buffer/"
+	Buffer *Buffer `json:"buffer,omitempty"`
 }
 
 func (c *NewRelicOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
