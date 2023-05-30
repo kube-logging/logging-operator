@@ -31,3 +31,5 @@ annotations:
       image: ghcr.io/kube-logging/node-exporter:v0.6.1
     - name: syslog-ng-exporter
       image: ghcr.io/kube-logging/syslog-ng-exporter:v0.0.16
+    - name: syslogng-reload
+      image: ghcr.io/kube-logging/syslogng-reload:v1.3.1
