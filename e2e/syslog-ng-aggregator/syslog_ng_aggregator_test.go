@@ -64,7 +64,7 @@ func init() {
 }
 
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
-	ns := "default"
+	ns := "test"
 	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
@@ -165,9 +165,11 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			rawOut, err := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name).Output()
+			cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name)
+			cmd.Stderr = os.Stderr
+			rawOut, err := cmd.Output()
 			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
+				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)
 				return false
 			}
 			t.Logf("log consumer logs: %s", rawOut)
