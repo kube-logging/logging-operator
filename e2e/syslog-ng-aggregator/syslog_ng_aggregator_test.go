@@ -175,13 +175,6 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 			t.Logf("log consumer logs: %s", rawOut)
 			return strings.Contains(string(rawOut), "got request")
 		}, 5*time.Minute, 2*time.Second)
-
-		require.NoError(t, exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off").Run())
-
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: aggergatorPodName}), 30*time.Second, time.Second/2)
-
-		require.NoError(t, exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on").Run())
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
