@@ -9,8 +9,8 @@ on:
 
 env:
   GO_VERSION: '1.20'
-  KIND_VERSION: 'v0.17.0'
-  KIND_NODE_VERSION: 'v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61'
+  KIND_VERSION: 'v0.19.0'
+  KIND_NODE_VERSION: 'kindest/node:v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff'
   KUBECTL_VERSION: 'v1.24.1'
 
 jobs:
@@ -72,9 +72,6 @@ jobs:
 
       - name: Build controller image
         run: make docker-build IMG='controller:local'
-
-      - name: Build e2e fluentd image
-        run: make docker-build-e2e-fluentd IMG='fluentd:local'
 
       - name: Create logging namespace
         run: kubectl create namespace logging

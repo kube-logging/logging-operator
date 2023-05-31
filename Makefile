@@ -11,7 +11,7 @@ DOCKER ?= docker
 GOVERSION = $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
-IMG ?= controller:latest
+IMG ?= controller:local
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
@@ -73,10 +73,6 @@ docker-build: ## Build the docker image
 	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
-
-.PHONY: docker-build-e2e-fluentd
-docker-build-e2e-fluentd: ## Build fluentd docker image
-	${DOCKER} build ./fluentd-image/e2e-test -t ${IMG}
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image

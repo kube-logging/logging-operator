@@ -22,7 +22,7 @@ function main()
 
 function load_images()
 {
-    local images=( "fluentd:local" "controller:local")
+    local images=( "controller:local")
     for image in ${images[@]}; do
         kind load docker-image "${image}"
     done
@@ -63,15 +63,11 @@ function helm_deploy_logging_operator()
 
 function configure_logging()
 {
-    # TODO: remove version once there is a semver stable version in the repo
     helm upgrade --install \
         --debug \
         --wait \
         --create-namespace \
         --namespace logging \
-        --set fluentd.image.tag='local' \
-        --set fluentd.image.repository='fluentd' \
-        --version 4.0.0 \
         'logging-operator-logging-tls' \
         "e2e/charts/logging-operator-logging"
     kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"

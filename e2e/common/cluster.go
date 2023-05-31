@@ -33,8 +33,6 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
 
-const defaultClusterName = "e2e-test"
-
 type Cluster interface {
 	cluster.Cluster
 	LoadImages(images ...string) error
