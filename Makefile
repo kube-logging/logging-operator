@@ -71,7 +71,7 @@ deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	${DOCKER} build . -t ${IMG}
+	docker image inspect ${IMG} && echo "docker image ${IMG} already built" || ${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
