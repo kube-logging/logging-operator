@@ -109,9 +109,7 @@ func DeleteTestCluster(clusterName string) error {
 }
 
 func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {
-	cmd.Env = []string{
-		fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-	}
+	cmd.Env = append(os.Environ(), fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()))
 	cmd.Stderr = os.Stderr
 	return cmd
 }

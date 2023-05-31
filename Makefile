@@ -23,7 +23,6 @@ VERSION := $(shell git describe --abbrev=0 --tags)
 
 E2E_TEST_TIMEOUT ?= 20m
 
-
 CONTROLLER_GEN = ${BIN}/controller-gen
 CONTROLLER_GEN_VERSION = v0.6.0
 
@@ -35,7 +34,8 @@ GOLANGCI_LINT := ${BIN}/golangci-lint
 GOLANGCI_LINT_VERSION := v1.51.2
 
 KIND := ${BIN}/kind
-KIND_VERSION := v0.11.1
+KIND_VERSION := v0.19.0
+KIND_IMAGE := kindest/node:v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff
 
 KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
@@ -99,10 +99,6 @@ generate: ${CONTROLLER_GEN} tidy ## Generate code
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./resourcebuilder/...
 	cd pkg/sdk && go generate ./static
 
-.PHONY: help
-help: ## Show this help message
-	@grep -h -E '^[a-zA-Z0-9%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' | sort
-
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
 	kubectl create -f config/crd/bases || kubectl replace -f config/crd/bases
@@ -153,7 +149,12 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 
 .PHONY: test-e2e
 test-e2e: ${KIND} docker-build generate fmt vet manifests stern ## Run E2E tests
-	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" PROJECT_DIR="$(PWD)" go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
+	cd e2e && \
+		LOGGING_OPERATOR_IMAGE="${IMG}" \
+		KIND_PATH="$(KIND)" \
+		KIND_IMAGE="$(KIND_IMAGE)" \
+		PROJECT_DIR="$(PWD)" \
+		go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
@@ -239,3 +240,9 @@ find ${BIN} -name '$(notdir ${IMPORT_PATH})_*' -exec rm {} +
 GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 mv ${BIN}/$(notdir ${IMPORT_PATH}) $@
 endef
+
+# Self-documenting Makefile
+.DEFAULT_GOAL = help
+.PHONY: help
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)

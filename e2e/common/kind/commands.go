@@ -15,16 +15,31 @@
 package kind
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 )
 
-const CommandName = "kind"
+var KindPath string
+var KindImage string
+
+func init() {
+	KindPath = os.Getenv("KIND_PATH")
+	if KindPath == "" {
+		fmt.Fprintln(os.Stderr, "KIND_PATH need to be set")
+		os.Exit(1)
+	}
+	KindImage = os.Getenv("KIND_IMAGE")
+}
 
 func CreateCluster(options CreateClusterOptions) error {
 	args := []string{"create", "cluster"}
+	if KindImage != "" && options.Image == "" {
+		options.Image = KindImage
+	}
 	args = options.AppendToArgs(args)
-	_, err := exec.Command(CommandName, args...).Output()
+	_, err := exec.Command(KindPath, args...).Output()
 	return err
 }
 
@@ -64,7 +79,7 @@ func (options CreateClusterOptions) AppendToArgs(args []string) []string {
 func DeleteCluster(options DeleteClusterOptions) error {
 	args := []string{"delete", "cluster"}
 	args = options.AppendToArgs(args)
-	return exec.Command(CommandName, args...).Run()
+	return exec.Command(KindPath, args...).Run()
 }
 
 type DeleteClusterOptions struct {
@@ -87,7 +102,7 @@ func (options DeleteClusterOptions) AppendToArgs(args []string) []string {
 func GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {
 	args := []string{"get", "kubeconfig"}
 	args = options.AppendToArgs(args)
-	return exec.Command(CommandName, args...).Output()
+	return exec.Command(KindPath, args...).Output()
 }
 
 type GetKubeconfigOptions struct {
@@ -115,7 +130,7 @@ func LoadDockerImage(images []string, options LoadDockerImageOptions) error {
 	args := []string{"load", "docker-image"}
 	args = options.AppendToArgs(args)
 	args = append(args, images...)
-	_, err := exec.Command(CommandName, args...).Output()
+	_, err := exec.Command(KindPath, args...).Output()
 	return err
 }
 
