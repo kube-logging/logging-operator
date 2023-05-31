@@ -63,7 +63,7 @@ func init() {
 
 func TestVolumeDrain_Downscale(t *testing.T) {
 	ns := "testing-1"
-	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
@@ -223,7 +223,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 	ns := "testing-2"
-	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
