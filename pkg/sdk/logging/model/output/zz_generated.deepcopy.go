@@ -1106,6 +1106,11 @@ func (in *NewRelicOutputConfig) DeepCopyInto(out *NewRelicOutputConfig) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Format != nil {
+		in, out := &in.Format, &out.Format
+		*out = new(Format)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)
