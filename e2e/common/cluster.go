@@ -16,6 +16,7 @@ package common
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -107,6 +108,14 @@ func DeleteTestCluster(clusterName string) error {
 	return errors.WrapIfWithDetails(kind.DeleteCluster(kind.DeleteClusterOptions{
 		Name: clusterName,
 	}), "deleting kind cluster", "clusterName", clusterName)
+}
+
+func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {
+	cmd.Env = []string{
+		fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
+	}
+	cmd.Stderr = os.Stderr
+	return cmd
 }
 
 type kindCluster struct {

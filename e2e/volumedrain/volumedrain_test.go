@@ -158,11 +158,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name)
-			cmd.Env = []string{
-				fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-			}
-			cmd.Stderr = os.Stderr
+			cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
@@ -172,19 +168,11 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			return strings.Contains(string(rawOut), "got request")
 		}, 5*time.Minute, 2*time.Second)
 
-		cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off")
-		cmd.Env = []string{
-			fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-		}
-		cmd.Stderr = os.Stderr
+		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
 		require.NoError(t, cmd.Run())
 
 		require.Eventually(t, func() bool {
-			cmd := exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers")
-			cmd.Env = []string{
-				fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-			}
-			cmd.Stderr = os.Stderr
+			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to list buffer directory: %v", err)
@@ -206,11 +194,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
-		cmd = exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on")
-		cmd.Env = []string{
-			fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-		}
-		cmd.Stderr = os.Stderr
+		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
 		require.NoError(t, cmd.Run())
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
@@ -339,11 +323,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name)
-			cmd.Env = []string{
-				fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-			}
-			cmd.Stderr = os.Stderr
+			cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
@@ -353,19 +333,11 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 			return strings.Contains(string(rawOut), "got request")
 		}, 5*time.Minute, 2*time.Second)
 
-		cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off")
-		cmd.Env = []string{
-			fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-		}
-		cmd.Stderr = os.Stderr
+		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
 		require.NoError(t, cmd.Run())
 
 		require.Eventually(t, func() bool {
-			cmd := exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers")
-			cmd.Env = []string{
-				fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-			}
-			cmd.Stderr = os.Stderr
+			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to list buffer directory: %v", err)
@@ -387,11 +359,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
-		cmd = exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on")
-		cmd.Env = []string{
-			fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
-		}
-		cmd.Stderr = os.Stderr
+		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
 		require.NoError(t, cmd.Run())
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
