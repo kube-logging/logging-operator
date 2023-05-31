@@ -39,6 +39,7 @@ type Cluster interface {
 	LoadImages(images ...string) error
 	Cleanup() error
 	PrintLogs(config PrintLogConfig) error
+	KubeConfigFilePath() string
 }
 
 type PrintLogConfig struct {
@@ -136,4 +137,8 @@ func (c kindCluster) LoadImages(images ...string) error {
 	return kind.LoadDockerImage(images, kind.LoadDockerImageOptions{
 		Name: c.clusterName,
 	})
+}
+
+func (c kindCluster) KubeConfigFilePath() string {
+	return c.kubeconfigFilePath
 }

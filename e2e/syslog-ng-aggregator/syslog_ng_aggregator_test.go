@@ -166,6 +166,9 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 
 		require.Eventually(t, func() bool {
 			cmd := exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name)
+			cmd.Env = []string{
+				fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()),
+			}
 			cmd.Stderr = os.Stderr
 			rawOut, err := cmd.Output()
 			if err != nil {
