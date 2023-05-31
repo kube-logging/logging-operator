@@ -125,7 +125,7 @@ jobs:
         run: |
           kubectl create namespace logging
           
-          kubectl create -f hack/minio.yaml
+          kubectl create -n logging -f hack/minio.yaml
           kubectl wait -n logging --for=condition=available deployment/minio-deployment --timeout=120s
           minio="$(kubectl get pod -n logging -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
           kubectl wait -n logging --for=condition=Ready pod "${minio}" --timeout=120s
