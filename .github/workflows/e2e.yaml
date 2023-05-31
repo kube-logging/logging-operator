@@ -10,7 +10,7 @@ on:
 env:
   GO_VERSION: '1.20'
   KIND_VERSION: 'v0.19.0'
-  KIND_NODE_VERSION: 'kindest/node:v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff'
+  KIND_NODE_VERSION: 'v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff'
   KUBECTL_VERSION: 'v1.24.1'
 
 jobs:
