@@ -117,7 +117,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &logging))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 		output := v1beta1.SyslogNGOutput{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-output",
@@ -134,7 +134,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &output))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
 		flow := v1beta1.SyslogNGFlow{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-flow",
@@ -151,7 +151,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 				LocalOutputRefs: []string{output.Name},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &flow))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		meta := logging.SyslogNGObjectMeta(syslogng.StatefulSetName, syslogng.ComponentSyslogNG)
 		aggergatorPodName := meta.Name + "-0"
@@ -186,11 +186,11 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
 		}
-		require.NoError(t, v1beta1.AddToScheme(o.Scheme))
-		require.NoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		require.NoError(t, appsv1.AddToScheme(o.Scheme))
-		require.NoError(t, batchv1.AddToScheme(o.Scheme))
-		require.NoError(t, corev1.AddToScheme(o.Scheme))
-		require.NoError(t, rbacv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }

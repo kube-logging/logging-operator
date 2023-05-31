@@ -109,7 +109,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &logging))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 		tags := "time"
 		output := v1beta1.Output{
 			ObjectMeta: metav1.ObjectMeta{
@@ -128,7 +128,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &output))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
 		flow := v1beta1.Flow{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-flow",
@@ -147,7 +147,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				LocalOutputRefs: []string{output.Name},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &flow))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		fluentdReplicaName := logging.Name + "-fluentd-1"
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 5*time.Minute, 5*time.Second)
@@ -169,7 +169,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		}, 5*time.Minute, 2*time.Second)
 
 		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
-		require.NoError(t, cmd.Run())
+		common.RequireNoError(t, cmd.Run())
 
 		require.Eventually(t, func() bool {
 			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
@@ -183,7 +183,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 
 		patch := client.MergeFrom(logging.DeepCopy())
 		logging.Spec.FluentdSpec.Scaling.Replicas = 1
-		require.NoError(t, c.GetClient().Patch(ctx, &logging, patch))
+		common.RequireNoError(t, c.GetClient().Patch(ctx, &logging, patch))
 
 		drainerJobName := fluentdReplicaName + "-drainer"
 		require.Eventually(t, func() bool {
@@ -195,14 +195,14 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
 		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
-		require.NoError(t, cmd.Run())
+		common.RequireNoError(t, cmd.Run())
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
-		require.NoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
+		common.RequireNoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
 		assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
@@ -216,12 +216,12 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
 		}
-		require.NoError(t, v1beta1.AddToScheme(o.Scheme))
-		require.NoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		require.NoError(t, appsv1.AddToScheme(o.Scheme))
-		require.NoError(t, batchv1.AddToScheme(o.Scheme))
-		require.NoError(t, corev1.AddToScheme(o.Scheme))
-		require.NoError(t, rbacv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }
 
@@ -274,7 +274,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &logging))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 		tags := "time"
 		output := v1beta1.Output{
 			ObjectMeta: metav1.ObjectMeta{
@@ -293,7 +293,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 				},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &output))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
 		flow := v1beta1.Flow{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-flow",
@@ -312,7 +312,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 				LocalOutputRefs: []string{output.Name},
 			},
 		}
-		require.NoError(t, c.GetClient().Create(ctx, &flow))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		fluentdReplicaName := logging.Name + "-fluentd-1"
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 2*time.Minute, 5*time.Second)
@@ -334,7 +334,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		}, 5*time.Minute, 2*time.Second)
 
 		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
-		require.NoError(t, cmd.Run())
+		common.RequireNoError(t, cmd.Run())
 
 		require.Eventually(t, func() bool {
 			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
@@ -348,7 +348,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 
 		patch := client.MergeFrom(logging.DeepCopy())
 		logging.Spec.FluentdSpec.Scaling.Replicas = 1
-		require.NoError(t, c.GetClient().Patch(ctx, &logging, patch))
+		common.RequireNoError(t, c.GetClient().Patch(ctx, &logging, patch))
 
 		drainerJobName := fluentdReplicaName + "-drainer"
 		require.Eventually(t, func() bool {
@@ -360,7 +360,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
 		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
-		require.NoError(t, cmd.Run())
+		common.RequireNoError(t, cmd.Run())
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
 
@@ -379,11 +379,11 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
 		}
-		require.NoError(t, v1beta1.AddToScheme(o.Scheme))
-		require.NoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		require.NoError(t, appsv1.AddToScheme(o.Scheme))
-		require.NoError(t, batchv1.AddToScheme(o.Scheme))
-		require.NoError(t, corev1.AddToScheme(o.Scheme))
-		require.NoError(t, rbacv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }

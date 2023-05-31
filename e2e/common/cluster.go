@@ -25,7 +25,6 @@ import (
 	"emperror.dev/errors"
 	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
@@ -49,18 +48,18 @@ type PrintLogConfig struct {
 
 func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
 	cluster, err := GetTestCluster(name, opts...)
-	require.NoError(t, err)
+	RequireNoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		require.NoError(t, cluster.Start(ctx))
+		RequireNoError(t, cluster.Start(ctx))
 	}()
 
 	defer func() {
 		assert.NoError(t, beforeCleanup(t, cluster))
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
-		require.NoError(t, DeleteTestCluster(name))
+		RequireNoError(t, DeleteTestCluster(name))
 	}()
 
 	fn(t, cluster)

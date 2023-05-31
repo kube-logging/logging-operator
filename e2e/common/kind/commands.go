@@ -39,7 +39,12 @@ func CreateCluster(options CreateClusterOptions) error {
 		options.Image = KindImage
 	}
 	args = options.AppendToArgs(args)
-	_, err := exec.Command(KindPath, args...).Output()
+	cmd := exec.Command(KindPath, args...)
+	cmd.Stderr = os.Stderr
+	o, err := cmd.Output()
+	if err != nil {
+		fmt.Println(o)
+	}
 	return err
 }
 

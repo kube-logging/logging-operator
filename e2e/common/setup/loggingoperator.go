@@ -25,10 +25,11 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	logrtesting "github.com/go-logr/logr/testing"
-	"github.com/kube-logging/logging-operator/pkg/sdk/resourcebuilder"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/resourcebuilder"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 )
@@ -50,7 +51,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	}
 
 	if img := os.Getenv("LOGGING_OPERATOR_IMAGE"); img != "" {
-		require.NoError(t, c.LoadImages(img))
+		common.RequireNoError(t, c.LoadImages(img))
 
 		if options.Config.ContainerOverrides == nil {
 			options.Config.ContainerOverrides = new(types.ContainerBase)
@@ -69,9 +70,9 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	})
 	for _, rb := range resourceBuilders {
 		obj, ds, err := rb()
-		require.NoError(t, err)
+		common.RequireNoError(t, err)
 		res, err := reconciler.ReconcileResource(obj, ds)
-		require.NoError(t, err)
+		common.RequireNoError(t, err)
 		require.Nil(t, res)
 	}
 
