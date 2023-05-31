@@ -64,8 +64,8 @@ func init() {
 }
 
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
-	ns := "syslog-ng-1"
-	common.WithCluster(t, func(t *testing.T, c common.Cluster) {
+	ns := "default"
+	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns

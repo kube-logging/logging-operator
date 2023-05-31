@@ -47,8 +47,8 @@ type PrintLogConfig struct {
 	Limit      int
 }
 
-func WithCluster(t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
-	cluster, err := GetTestCluster(defaultClusterName, opts...)
+func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
+	cluster, err := GetTestCluster(name, opts...)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -60,7 +60,7 @@ func WithCluster(t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(
 		assert.NoError(t, beforeCleanup(t, cluster))
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
-		require.NoError(t, DeleteTestCluster(defaultClusterName))
+		require.NoError(t, DeleteTestCluster(name))
 	}()
 
 	fn(t, cluster)
