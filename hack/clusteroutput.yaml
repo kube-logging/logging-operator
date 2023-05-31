@@ -2,7 +2,6 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: s3-output
-  namespace: logging
 spec:
   s3:
     aws_key_id:
