@@ -8,7 +8,7 @@ require (
 	github.com/go-logr/logr v1.2.4
 	github.com/kube-logging/logging-operator v0.0.0-20230530115305-fbc338a23756
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
-	github.com/spf13/cast v1.5.0
+	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
 	k8s.io/api v0.26.4
 	k8s.io/apiextensions-apiserver v0.26.4
