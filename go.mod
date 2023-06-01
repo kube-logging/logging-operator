@@ -14,7 +14,7 @@ require (
 	github.com/onsi/gomega v1.27.6
 	github.com/pborman/uuid v1.2.1
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.64.1
-	github.com/prometheus/client_golang v1.15.0
+	github.com/prometheus/client_golang v1.15.1
 	github.com/spf13/cast v1.5.1
 	k8s.io/api v0.26.4
 	k8s.io/apiextensions-apiserver v0.26.4
