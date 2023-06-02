@@ -61,6 +61,15 @@ type SyslogNGTLS struct {
 }
 
 type GlobalOptions struct {
+	// deprecated use stats/level from 4.1+
 	StatsLevel *int `json:"stats_level,omitempty"`
-	StatsFreq  *int `json:"stats_freq,omitempty"`
+	// deprecated use stats/freq from 4.1+
+	StatsFreq *int `json:"stats_freq,omitempty"`
+	// TODO switch to this by default
+	Stats *Stats `json:"stats,omitempty"`
+}
+
+type Stats struct {
+	Level *int `json:"level,omitempty"`
+	Freq  *int `json:"freq,omitempty"`
 }

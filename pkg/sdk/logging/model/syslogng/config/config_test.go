@@ -18,13 +18,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 )
 
 func TestRenderConfigInto(t *testing.T) {
@@ -166,6 +167,78 @@ log {
 options {
     stats_level(3);
     stats_freq(0);
+};
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+`,
+		},
+		"global options default": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{
+							Metrics: &v1beta1.Metrics{
+								Path: "/metrics",
+							},
+							GlobalOptions: &v1beta1.GlobalOptions{},
+						},
+					},
+				},
+				SourcePort:          601,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+			},
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+options {
+    stats(level(2) freq(10));
+};
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+`,
+		},
+		"global options_new_stats": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{
+							GlobalOptions: &v1beta1.GlobalOptions{
+								Stats: &v1beta1.Stats{
+									Level: amp(3),
+									Freq:  amp(0),
+								},
+							},
+						},
+					},
+				},
+				SourcePort:          601,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+			},
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+options {
+    stats(level(3) freq(0));
 };
 
 source "main_input" {
