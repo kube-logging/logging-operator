@@ -107,7 +107,7 @@ func TestRenderConfigInto(t *testing.T) {
 				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
@@ -159,7 +159,7 @@ log {
 				SourcePort:          601,
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
-			wantOut: `@version: 3.37
+			wantOut: `@version: current
 
 @include "scl.conf"
 
@@ -220,7 +220,7 @@ source "main_input" {
 					},
 				},
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
@@ -302,7 +302,7 @@ log {
 				},
 				SourcePort: 601,
 			},
-			wantOut: `@version: 3.37
+			wantOut: `@version: current
 
 @include "scl.conf"
 
@@ -358,7 +358,7 @@ destination "output_default_my-output" {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: `@version: 3.37
+			wantOut: `@version: current
 
 @include "scl.conf"
 
@@ -422,7 +422,7 @@ log {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
@@ -486,7 +486,7 @@ log {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
@@ -550,7 +550,7 @@ log {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
@@ -594,7 +594,7 @@ log {
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
-			wantOut: Untab(`@version: 3.37
+			wantOut: Untab(`@version: current
 
 @include "scl.conf"
 
