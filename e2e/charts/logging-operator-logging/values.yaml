@@ -31,9 +31,13 @@ skipInvalidResources: false
 # -- Override generated config. This is a raw configuration string for troubleshooting purposes.
 flowConfigOverride: ""
 
+# -- Flag to disable fluentbit completely
+fluentbitDisabled: false
 # -- Fluent-bit configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentbit_types/
 fluentbit: {}
 
+# -- Flag to disable fluentd completely
+fluentdDisabled: false
 # -- Fluentd configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentd_types/
 fluentd: {}
 # 20Gi persistent storage is configured for fluentd by default.

@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio-mc-deployment
-  namespace: logging
 spec:
   selector:
     matchLabels:

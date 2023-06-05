@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 )
 
@@ -75,7 +76,7 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 			},
 		},
 	}
-	require.NoError(t, c.Create(context.Background(), &logProducerDeployment))
+	common.RequireNoError(t, c.Create(context.Background(), &logProducerDeployment))
 	require.Eventually(t, cond.AnyPodShouldBeRunning(t, c, client.MatchingLabels(lbls)), 2*time.Minute, 5*time.Second)
 }
 

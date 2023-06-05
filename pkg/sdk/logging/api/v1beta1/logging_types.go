@@ -126,12 +126,12 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                    = "1.9.10"
+	DefaultFluentbitImageTag                    = "2.1.4"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.4.0"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.6.1"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                      = "v1.15"
+	DefaultFluentdImageTag                      = "v1.15-ruby3"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag            = "v0.2.0"
@@ -140,9 +140,9 @@ const (
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag        = "v0.0.4"
+	DefaultFluentdConfigReloaderImageTag        = "v0.0.5"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.4.0"
+	DefaultFluentdBufferVolumeImageTag          = "v0.6.1"
 )
 
 // SetDefaults fills empty attributes

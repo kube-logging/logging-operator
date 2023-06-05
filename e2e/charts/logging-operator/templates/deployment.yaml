@@ -72,6 +72,8 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- if .Values.rbac.enabled }}
+    {{- if .Values.rbac.serviceAccountName }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName }}
+    {{- else if .Values.rbac.enabled }}
       serviceAccountName: {{ include "logging-operator.fullname" . }}
     {{- end }}

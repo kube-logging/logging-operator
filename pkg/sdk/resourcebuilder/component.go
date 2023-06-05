@@ -52,7 +52,7 @@ import (
 )
 
 const (
-	Image            = "ghcr.io/kube-logging/logging-operator:4.0.0"
+	Image            = "ghcr.io/kube-logging/logging-operator:4.2.0"
 	defaultNamespace = "logging-system"
 )
 

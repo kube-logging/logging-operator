@@ -13660,6 +13660,13 @@ spec:
                     type: object
                   globalOptions:
                     properties:
+                      stats:
+                        properties:
+                          freq:
+                            type: integer
+                          level:
+                            type: integer
+                        type: object
                       stats_freq:
                         type: integer
                       stats_level:

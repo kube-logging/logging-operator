@@ -23,9 +23,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"github.com/kube-logging/logging-operator/pkg/resources"
-	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -35,6 +32,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -61,7 +62,7 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 							Containers: []v1.Container{
 								{
 									Name:            containerName,
-									Image:           "fluent/fluent-bit:1.9.10",
+									Image:           v1beta1.DefaultFluentbitImageRepository + ":" + v1beta1.DefaultFluentbitImageTag,
 									Command:         []string{"/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/conf_operator/fluent-bit.conf"},
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{

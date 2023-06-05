@@ -70,6 +70,9 @@ rbac:
     ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
     ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#sysctl
 
+  # specify service account manually
+  # serviceAccountName: custom
+
 monitoring:
   serviceMonitor:
     # -- Create a Prometheus Operator ServiceMonitor object.

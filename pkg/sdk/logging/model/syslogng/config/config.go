@@ -19,10 +19,11 @@ import (
 	"io"
 	"reflect"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
 func RenderConfigInto(in Input, out io.Writer) error {
@@ -53,7 +54,7 @@ type SecretLoaderFactory interface {
 	SecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
-const configVersion = "4.0"
+const configVersion = "current"
 const sourceName = "main_input"
 
 func configRenderer(in Input) (render.Renderer, error) {
@@ -64,8 +65,15 @@ func configRenderer(in Input) (render.Renderer, error) {
 	// TODO: this should happen at the spec level, in something like `SyslogNGSpec.FinalGlobalOptions() GlobalOptions`
 	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
 		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq, amp(10))
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel, amp(2))
+		if in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq != nil ||
+			in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
+			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq, amp(10))
+			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel, amp(2))
+		} else {
+			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats, &v1beta1.Stats{})
+			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Freq, amp(10))
+			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
+		}
 	}
 
 	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))

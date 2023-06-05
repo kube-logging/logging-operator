@@ -16,6 +16,7 @@ package common
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -24,7 +25,6 @@ import (
 	"emperror.dev/errors"
 	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
@@ -32,13 +32,12 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
 
-const defaultClusterName = "e2e-test"
-
 type Cluster interface {
 	cluster.Cluster
 	LoadImages(images ...string) error
 	Cleanup() error
 	PrintLogs(config PrintLogConfig) error
+	KubeConfigFilePath() string
 }
 
 type PrintLogConfig struct {
@@ -47,20 +46,20 @@ type PrintLogConfig struct {
 	Limit      int
 }
 
-func WithCluster(t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
-	cluster, err := GetTestCluster(defaultClusterName, opts...)
-	require.NoError(t, err)
+func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
+	cluster, err := GetTestCluster(name, opts...)
+	RequireNoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		require.NoError(t, cluster.Start(ctx))
+		RequireNoError(t, cluster.Start(ctx))
 	}()
 
 	defer func() {
 		assert.NoError(t, beforeCleanup(t, cluster))
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
-		require.NoError(t, DeleteTestCluster(defaultClusterName))
+		RequireNoError(t, DeleteTestCluster(name))
 	}()
 
 	fn(t, cluster)
@@ -108,6 +107,12 @@ func DeleteTestCluster(clusterName string) error {
 	}), "deleting kind cluster", "clusterName", clusterName)
 }
 
+func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {
+	cmd.Env = append(os.Environ(), fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()))
+	cmd.Stderr = os.Stderr
+	return cmd
+}
+
 type kindCluster struct {
 	cluster.Cluster
 	kubeconfigFilePath string
@@ -136,4 +141,8 @@ func (c kindCluster) LoadImages(images ...string) error {
 	return kind.LoadDockerImage(images, kind.LoadDockerImageOptions{
 		Name: c.clusterName,
 	})
+}
+
+func (c kindCluster) KubeConfigFilePath() string {
+	return c.kubeconfigFilePath
 }

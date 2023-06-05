@@ -67,12 +67,12 @@ func (t TailerWebhookConfig) VersionedFluentBitPathArgs(filePath string) []strin
 var Global = GlobalConfig{
 	FluentBitPosFilePath:   "/var/pos",
 	FluentBitPosVolumeName: "positions",
-	OperatorImage:          "ghcr.io/kube-logging/logging-operator:4.0.0",
+	OperatorImage:          "ghcr.io/kube-logging/logging-operator:4.2.0",
 }
 
 // HostTailer configuration
 var HostTailer = HostTailerConfig{
-	FluentBitImage: "fluent/fluent-bit:1.9.10",
+	FluentBitImage: "fluent/fluent-bit:2.1.4",
 	TailerAffix:    "host-tailer",
 }
 
@@ -85,7 +85,7 @@ var EventTailer = EventTailerConfig{
 
 // TailerWebhook configuration
 var TailerWebhook = TailerWebhookConfig{
-	FluentBitImage:    "fluent/fluent-bit:1.9.10",
+	FluentBitImage:    "fluent/fluent-bit:2.1.4",
 	AnnotationKey:     "sidecar.logging-extensions.banzaicloud.io/tail",
 	ServerPath:        "/tailer-webhook",
 	ServerPort:        9443,

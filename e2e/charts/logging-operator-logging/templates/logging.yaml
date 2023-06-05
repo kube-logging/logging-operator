@@ -17,7 +17,7 @@ spec:
   {{- with .Values.flowConfigOverride }}
   flowConfigOverride: {{ . }}
   {{- end }}
-  {{- if or .Values.tls.enabled .Values.fluentbit }}
+  {{- if and (not .Values.fluentbitDisabled) (or .Values.tls.enabled .Values.fluentbit) }}
   fluentbit:
     {{- if .Values.tls.enabled }}
     tls:
@@ -29,7 +29,7 @@ spec:
     {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- end }}
-  {{- if or .Values.tls.enabled .Values.fluentd }}
+  {{- if and (not .Values.fluentdDisabled) (or .Values.tls.enabled .Values.fluentd) }}
   fluentd:
     {{- if .Values.tls.enabled }}
     tls:
