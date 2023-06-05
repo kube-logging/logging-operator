@@ -100,8 +100,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 											Name: syslogng.ContainerName,
 											Resources: corev1.ResourceRequirements{
 												Limits: corev1.ResourceList{
-													corev1.ResourceCPU:    resource.MustParse("50m"),
-													corev1.ResourceMemory: resource.MustParse("20M"),
+													corev1.ResourceCPU:    resource.MustParse("100m"),
+													corev1.ResourceMemory: resource.MustParse("100M"),
 												},
 												Requests: corev1.ResourceList{
 													corev1.ResourceCPU:    resource.MustParse("25m"),
