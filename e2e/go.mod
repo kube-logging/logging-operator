@@ -84,5 +84,3 @@ require (
 )
 
 replace github.com/kube-logging/logging-operator/pkg/sdk => ../pkg/sdk
-
-replace github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config => ../pkg/sdk/logging/model/syslogng/config
