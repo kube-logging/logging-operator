@@ -168,8 +168,8 @@ github.com/prometheus/procfs v0.9.0/go.mod h1:+pB4zwohETzFnmlpe6yd2lSc+0/46IYZRB
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/sergi/go-diff v1.1.0 h1:we8PVUC3FE2uYfodKH/nBHMSetSfHDR6scGdBi+erh0=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
-github.com/siliconbrain/go-seqs v0.4.0 h1:+WwBqllLgbqYnLv6NK2tKVXmkum0k0TEoFo0LHRS8sU=
-github.com/siliconbrain/go-seqs v0.4.0/go.mod h1:C5Kz1fQpLUN6aSGKh4uFFyRSMJBxZtii/3+iRf5MaAk=
+github.com/siliconbrain/go-seqs v0.5.0 h1:5s1hZrb/RzIUakiFBai89icxEhJngwaJ1/5/M3HrnXw=
+github.com/siliconbrain/go-seqs v0.5.0/go.mod h1:C5Kz1fQpLUN6aSGKh4uFFyRSMJBxZtii/3+iRf5MaAk=
 github.com/spf13/cast v1.5.1 h1:R+kOtfhWQE6TVQzY+4D7wJLBgkdVasCEFxSUBYBYIlA=
 github.com/spf13/cast v1.5.1/go.mod h1:b9PdjNptOpzXr7Rq1q9gJML/2cdGQAo69NKzQ10KN48=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
