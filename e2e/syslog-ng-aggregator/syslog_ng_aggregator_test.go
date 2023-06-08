@@ -64,6 +64,7 @@ func init() {
 }
 
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
+	t.Parallel()
 	ns := "test"
 	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {

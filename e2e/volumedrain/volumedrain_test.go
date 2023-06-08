@@ -62,6 +62,7 @@ func init() {
 }
 
 func TestVolumeDrain_Downscale(t *testing.T) {
+	t.Parallel()
 	ns := "testing-1"
 	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
@@ -226,8 +227,9 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 }
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
+	t.Parallel()
 	ns := "testing-2"
-	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("drain-2", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Config.DisableWebhook = true
 			options.Config.Namespace = ns
