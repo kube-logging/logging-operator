@@ -17,6 +17,9 @@ package fluentbit
 const BaseConfigName = "fluent-bit.conf"
 const UpstreamConfigName = "upstream.conf"
 const CustomParsersConfigName = "custom-parsers.conf"
+const StockConfigPath = "/fluent-bit/etc"
+const StockBinPath = "/fluent-bit/bin/fluent-bit"
+const OperatorConfigPath = "/fluent-bit/etc-operator"
 
 var fluentBitConfigTemplate = `
 [SERVICE]
@@ -24,7 +27,7 @@ var fluentBitConfigTemplate = `
     Grace        {{ .Grace }}
     Daemon       Off
     Log_Level    {{ .LogLevel }}
-    Parsers_File parsers.conf
+    Parsers_File {{ .DefaultParsers }}
     {{- if .CustomParsers }}
     Parsers_File {{ .CustomParsers }}
     {{- end }}

@@ -124,6 +124,9 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 			Privileged:               r.fluentbitSpec.Security.SecurityContext.Privileged,
 			SELinuxOptions:           r.fluentbitSpec.Security.SecurityContext.SELinuxOptions,
 		},
+		Command: []string{
+			StockBinPath, "-c", fmt.Sprintf("%s/%s", OperatorConfigPath, BaseConfigName),
+		},
 		Env:            r.fluentbitSpec.EnvVars,
 		LivenessProbe:  r.fluentbitSpec.LivenessProbe,
 		ReadinessProbe: r.fluentbitSpec.ReadinessProbe,
@@ -155,7 +158,7 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 		},
 		{
 			Name:      "config",
-			MountPath: "/fluent-bit/etc/",
+			MountPath: OperatorConfigPath,
 		},
 	}
 

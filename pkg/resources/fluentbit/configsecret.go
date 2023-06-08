@@ -69,6 +69,7 @@ type fluentBitConfig struct {
 	FilterModify            []v1beta1.FilterModify
 	FluentForwardOutput     *fluentForwardOutputConfig
 	SyslogNGOutput          *syslogNGOutputConfig
+	DefaultParsers          string
 	CustomParsers           string
 }
 
@@ -191,8 +192,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		FilterModify:            r.fluentbitSpec.FilterModify,
 	}
 
+	input.DefaultParsers = fmt.Sprintf("%s/%s", StockConfigPath, "parsers.conf")
+
 	if r.fluentbitSpec.CustomParsers != "" {
-		input.CustomParsers = fmt.Sprintf("/fluent-bit/etc/%s", CustomParsersConfigName)
+		input.CustomParsers = fmt.Sprintf("%s/%s", OperatorConfigPath, CustomParsersConfigName)
 	}
 
 	if r.fluentbitSpec.Metrics != nil {
