@@ -29,18 +29,15 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
@@ -126,10 +123,20 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
-		MapperProvider: func(c *rest.Config) (meta.RESTMapper, error) {
-			return apiutil.NewDynamicRESTMapper(c)
-		},
-		Port: 9443,
+	}
+
+	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
+		webhookServerOptions := webhook.Options{
+			Port: 9443,
+		}
+		if config.TailerWebhook.ServerPort != 0 {
+			webhookServerOptions.Port = config.TailerWebhook.ServerPort
+		}
+		if config.TailerWebhook.CertDir != "" {
+			webhookServerOptions.CertDir = config.TailerWebhook.CertDir
+		}
+		webhookServer := webhook.NewServer(webhookServerOptions)
+		mgrOptions.WebhookServer = webhookServer
 	}
 
 	customMgrOptions, err := setupCustomCache(&mgrOptions, namespace, loggingRef)
@@ -196,12 +203,6 @@ func main() {
 		// Webhook server registration
 		setupLog.Info("Setting up webhook server...")
 		webhookServer := mgr.GetWebhookServer()
-		if config.TailerWebhook.ServerPort != 0 {
-			webhookServer.Port = config.TailerWebhook.ServerPort
-		}
-		if config.TailerWebhook.CertDir != "" {
-			webhookServer.CertDir = config.TailerWebhook.CertDir
-		}
 
 		setupLog.Info("Registering webhooks...")
 		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
@@ -247,30 +248,30 @@ func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef str
 		labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
 	}
 
-	selectorsByObject := cache.SelectorsByObject{
-		&corev1.Pod{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.DaemonSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.StatefulSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.Deployment{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&corev1.PersistentVolumeClaim{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
+	mgrOptions.Cache = cache.Options{
+		ByObject: map[client.Object]cache.ByObject{
+			&corev1.Pod{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.DaemonSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.StatefulSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.Deployment{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&corev1.PersistentVolumeClaim{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
 		},
 	}
-
-	mgrOptions.NewCache = cache.BuilderWithOptions(cache.Options{SelectorsByObject: selectorsByObject})
 
 	return mgrOptions, nil
 }

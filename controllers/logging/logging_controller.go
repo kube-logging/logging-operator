@@ -35,7 +35,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/kube-logging/logging-operator/pkg/resources"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
@@ -369,10 +368,10 @@ func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	requestMapper := handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
 		// get all the logging resources from the cache
 		var loggingList loggingv1beta1.LoggingList
-		if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
 			logger.Error(err, "failed to list logging resources")
 			return nil
 		}
@@ -419,23 +418,23 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
+		Watches(&loggingv1beta1.ClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.ClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.Output{}, requestMapper).
+		Watches(&loggingv1beta1.Flow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
+		Watches(&corev1.Secret{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
 		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
-		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
+		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
 	}
 
-	builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
+	builder.Watches(&loggingv1beta1.FluentbitAgent{}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
