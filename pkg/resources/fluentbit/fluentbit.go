@@ -117,13 +117,10 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		return nil, err
 	}
 
-	for _, factory := range []resources.Resource{
+	objects := []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspClusterRole,
-		r.pspClusterRoleBinding,
 		r.configSecret,
 		r.daemonSet,
 		r.serviceMetrics,
@@ -132,7 +129,11 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.monitorBufferServiceMetrics,
 		r.prometheusRules,
 		r.bufferVolumePrometheusRules,
-	} {
+	}
+	if resources.PSPEnabled {
+		objects = append(objects, r.clusterPodSecurityPolicy, r.pspClusterRole, r.pspClusterRoleBinding)
+	}
+	for _, factory := range objects {
 		o, state, err := factory()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")

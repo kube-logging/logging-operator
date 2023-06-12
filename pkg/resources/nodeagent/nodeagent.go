@@ -343,18 +343,19 @@ func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgen
 
 // Reconcile reconciles the nodeAgentInstance resource
 func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
-	for _, factory := range []resources.Resource{
+	objects := []resources.Resource{
 		n.serviceAccount,
 		n.clusterRole,
 		n.clusterRoleBinding,
-		n.clusterPodSecurityPolicy,
-		n.pspClusterRole,
-		n.pspClusterRoleBinding,
 		n.configSecret,
 		n.daemonSet,
 		n.serviceMetrics,
 		n.monitorServiceMetrics,
-	} {
+	}
+	if resources.PSPEnabled {
+		objects = append(objects, n.clusterPodSecurityPolicy, n.pspClusterRole, n.pspClusterRoleBinding)
+	}
+	for _, factory := range objects {
 		o, state, err := factory()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")

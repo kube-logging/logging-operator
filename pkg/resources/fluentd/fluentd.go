@@ -102,16 +102,19 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	ctx := context.Background()
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
-	for _, res := range []resources.Resource{
+	objects := []resources.Resource{
 		r.serviceAccount,
 		r.role,
 		r.roleBinding,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspRole,
-		r.pspRoleBinding,
-	} {
+	}
+
+	if resources.PSPEnabled {
+		objects = append(objects, r.clusterPodSecurityPolicy, r.pspRole, r.pspRoleBinding)
+	}
+
+	for _, res := range objects {
 		o, state, err := res()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")
