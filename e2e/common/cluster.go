@@ -27,7 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
@@ -47,6 +49,14 @@ type PrintLogConfig struct {
 }
 
 func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
+	zapLogger := zap.New(func(o *zap.Options) {
+		o.Development = true
+		encoder := zap.ConsoleEncoder()
+		encoder(o)
+	})
+
+	ctrl.SetLogger(zapLogger)
+
 	cluster, err := GetTestCluster(name, opts...)
 	RequireNoError(t, err)
 
