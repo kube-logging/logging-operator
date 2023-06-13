@@ -46,6 +46,7 @@ type upstreamNode struct {
 
 type upstream struct {
 	Name  string
+	Path  string
 	Nodes []upstreamNode
 }
 
@@ -323,6 +324,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 		if r.fluentbitSpec.EnableUpstream {
 			input.FluentForwardOutput.Upstream.Enabled = true
+			input.FluentForwardOutput.Upstream.Config.Path = fmt.Sprintf("%s/%s", OperatorConfigPath, UpstreamConfigName)
 			input.FluentForwardOutput.Upstream.Config.Name = "fluentd-upstream"
 			for i := int32(0); i < utils.PointerToInt32(aggregatorReplicas); i++ {
 				input.FluentForwardOutput.Upstream.Config.Nodes = append(input.FluentForwardOutput.Upstream.Config.Nodes, r.generateUpstreamNode(i))

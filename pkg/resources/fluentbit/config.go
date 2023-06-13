@@ -100,7 +100,7 @@ var fluentBitConfigTemplate = `
     Name          forward
     Match         *
     {{- if .Upstream.Enabled }}
-    Upstream      upstream.conf
+    Upstream      {{ .Upstream.Config.Path }}
     {{- else }}
     Host          {{ .TargetHost }}
     Port          {{ .TargetPort }}

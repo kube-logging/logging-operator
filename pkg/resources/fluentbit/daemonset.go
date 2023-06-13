@@ -221,12 +221,6 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		}
-		if r.fluentbitSpec.EnableUpstream {
-			volume.VolumeSource.Secret.Items = append(volume.VolumeSource.Secret.Items, corev1.KeyToPath{
-				Key:  UpstreamConfigName,
-				Path: UpstreamConfigName,
-			})
-		}
 		v = append(v, volume)
 	} else {
 		v = append(v, corev1.Volume{
