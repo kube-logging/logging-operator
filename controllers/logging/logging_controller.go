@@ -27,6 +27,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -90,6 +91,20 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
 		return reconcile.Result{}, client.IgnoreNotFound(err)
+	}
+
+	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
+	} else {
+		log.Info("WARNING ServiceMonitor is not supported in the cluster")
+	}
+
+	if err := r.Client.List(ctx, &v1.PrometheusRuleList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
+	} else {
+		log.Info("WARNING PormetheusRule is not supported in the cluster")
 	}
 
 	if err := logging.SetDefaults(); err != nil {

@@ -126,14 +126,16 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.configSecret,
 		r.daemonSet,
 		r.serviceMetrics,
-		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
-		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
 	}
 	if resources.PSPEnabled {
 		objects = append(objects, r.clusterPodSecurityPolicy, r.pspClusterRole, r.pspClusterRoleBinding)
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		objects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+	}
+	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
+		objects = append(objects, r.prometheusRules, r.bufferVolumePrometheusRules)
 	}
 	for _, factory := range objects {
 		o, state, err := factory()

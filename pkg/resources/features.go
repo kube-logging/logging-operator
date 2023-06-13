@@ -14,4 +14,18 @@
 
 package resources
 
+import (
+	"context"
+
+	"github.com/spf13/cast"
+)
+
 var PSPEnabled bool
+
+const ServiceMonitorKey = "ServiceMonitor"
+const PrometheusRuleKey = "PrometheusRule"
+
+func IsSupported(ctx context.Context, key string) bool {
+	value := ctx.Value(key)
+	return cast.ToBool(value)
+}
