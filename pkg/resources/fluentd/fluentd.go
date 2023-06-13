@@ -98,8 +98,7 @@ func New(client client.Client, log logr.Logger,
 }
 
 // Reconcile reconciles the fluentd resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	ctx := context.Background()
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
 	objects := []resources.Resource{

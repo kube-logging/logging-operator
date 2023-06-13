@@ -144,8 +144,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}()
 
-	reconcilers := []resources.ComponentReconciler{
-		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
+	reconcilers := []resources.ContextAwareComponentReconciler{
+		model.NewValidationReconciler(r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
 	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
@@ -158,7 +158,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -173,7 +173,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -238,7 +238,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	for _, rec := range reconcilers {
-		result, err := rec()
+		result, err := rec(ctx)
 		if err != nil {
 			return reconcile.Result{}, err
 		}

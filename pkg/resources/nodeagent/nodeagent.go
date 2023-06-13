@@ -15,6 +15,7 @@
 package nodeagent
 
 import (
+	"context"
 	"fmt"
 
 	"emperror.dev/errors"
@@ -292,7 +293,7 @@ type nodeAgentInstance struct {
 }
 
 // Reconcile reconciles the InlineNodeAgent resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+func (r *Reconciler) Reconcile(_ context.Context) (*reconcile.Result, error) {
 	combinedResult := reconciler.CombinedResult{}
 	for name, userDefinedAgent := range r.agents {
 		result, err := r.processAgent(name, userDefinedAgent)

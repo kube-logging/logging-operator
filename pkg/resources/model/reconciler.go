@@ -23,20 +23,20 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 	"github.com/kube-logging/logging-operator/pkg/mirror"
 )
 
 func NewValidationReconciler(
-	ctx context.Context,
 	repo client.StatusClient,
 	resources LoggingResources,
 	secrets SecretLoaderFactory,
-) func() (*reconcile.Result, error) {
-	return func() (*reconcile.Result, error) {
+) func(ctx context.Context) (*reconcile.Result, error) {
+	return func(ctx context.Context) (*reconcile.Result, error) {
 		var patchRequests []patchRequest
 		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{

@@ -102,8 +102,7 @@ func New(
 }
 
 // Reconcile reconciles the syslog-ng resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	ctx := context.Background()
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
 	for _, res := range []resources.Resource{

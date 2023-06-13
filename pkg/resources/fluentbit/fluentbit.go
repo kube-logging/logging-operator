@@ -15,6 +15,8 @@
 package fluentbit
 
 import (
+	"context"
+
 	"emperror.dev/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -112,7 +114,7 @@ func New(client client.Client,
 }
 
 // Reconcile reconciles the fluentBit resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	if err := v1beta1.FluentBitDefaults(r.fluentbitSpec); err != nil {
 		return nil, err
 	}
