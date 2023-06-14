@@ -8,7 +8,7 @@ generated_file: true
 ## Overview
 Fluentd output plugin to ship logs to a Loki server.
 More info at https://github.com/kube-logging/fluent-plugin-kubernetes-loki
->Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
+>Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../examples/loki-nginx/)
 
  #### Example output configurations
  ```yaml
