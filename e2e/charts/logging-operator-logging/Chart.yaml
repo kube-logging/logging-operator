@@ -1,8 +1,8 @@
 apiVersion: v2
 type: application
 name: logging-operator-logging
-version: 4.2.0
-kubeVersion: ">=1.22"
+version: 4.2.2
+kubeVersion: ">=1.22.0-0"
 description: A Helm chart to configure logging resource for the Logging operator.
 keywords:
   - logging
@@ -24,7 +24,7 @@ annotations:
     - name: syslog-ng
       image: ghcr.io/axoflow/axosyslog:4.2.0
     - name: logging-operator
-      image: ghcr.io/kube-logging/logging-operator:4.2.0
+      image: ghcr.io/kube-logging/logging-operator:4.2.1
     - name: config-reloader
       image: ghcr.io/kube-logging/config-reloader:v0.0.5
     - name: node-exporter
