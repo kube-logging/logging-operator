@@ -98,20 +98,22 @@ func New(client client.Client, log logr.Logger,
 }
 
 // Reconcile reconciles the fluentd resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	ctx := context.Background()
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
-	for _, res := range []resources.Resource{
+	objects := []resources.Resource{
 		r.serviceAccount,
 		r.role,
 		r.roleBinding,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspRole,
-		r.pspRoleBinding,
-	} {
+	}
+
+	if resources.PSPEnabled {
+		objects = append(objects, r.clusterPodSecurityPolicy, r.pspRole, r.pspRoleBinding)
+	}
+
+	for _, res := range objects {
 		o, state, err := res()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")
@@ -213,19 +215,23 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return result, nil
 		}
 	}
-	for _, res := range []resources.Resource{
+
+	resourceObjects := []resources.Resource{
 		r.secretConfig,
 		r.appConfigSecret,
 		r.statefulset,
 		r.service,
 		r.headlessService,
 		r.serviceMetrics,
-		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
-		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
-	} {
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		resourceObjects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+	}
+	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
+		resourceObjects = append(objects, r.prometheusRules, r.bufferVolumePrometheusRules)
+	}
+	for _, res := range resourceObjects {
 		o, state, err := res()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")

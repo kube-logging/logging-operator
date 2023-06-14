@@ -15,6 +15,7 @@
 package nodeagent
 
 import (
+	"context"
 	"fmt"
 
 	"emperror.dev/errors"
@@ -292,16 +293,16 @@ type nodeAgentInstance struct {
 }
 
 // Reconcile reconciles the InlineNodeAgent resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	combinedResult := reconciler.CombinedResult{}
 	for name, userDefinedAgent := range r.agents {
-		result, err := r.processAgent(name, userDefinedAgent)
+		result, err := r.processAgent(ctx, name, userDefinedAgent)
 		combinedResult.Combine(result, err)
 	}
 	return &combinedResult.Result, combinedResult.Err
 }
 
-func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgentConfig) (*reconcile.Result, error) {
+func (r *Reconciler) processAgent(ctx context.Context, name string, userDefinedAgent v1beta1.NodeAgentConfig) (*reconcile.Result, error) {
 	var instance nodeAgentInstance
 	NodeAgentFluentbitDefaults, err := NodeAgentFluentbitDefaults(userDefinedAgent)
 	if err != nil {
@@ -338,23 +339,26 @@ func (r *Reconciler) processAgent(name string, userDefinedAgent v1beta1.NodeAgen
 		loggingDataProvider: r.fluentdDataProvider,
 	}
 
-	return instance.Reconcile()
+	return instance.Reconcile(ctx)
 }
 
 // Reconcile reconciles the nodeAgentInstance resource
-func (n *nodeAgentInstance) Reconcile() (*reconcile.Result, error) {
-	for _, factory := range []resources.Resource{
+func (n *nodeAgentInstance) Reconcile(ctx context.Context) (*reconcile.Result, error) {
+	objects := []resources.Resource{
 		n.serviceAccount,
 		n.clusterRole,
 		n.clusterRoleBinding,
-		n.clusterPodSecurityPolicy,
-		n.pspClusterRole,
-		n.pspClusterRoleBinding,
 		n.configSecret,
 		n.daemonSet,
 		n.serviceMetrics,
-		n.monitorServiceMetrics,
-	} {
+	}
+	if resources.PSPEnabled {
+		objects = append(objects, n.clusterPodSecurityPolicy, n.pspClusterRole, n.pspClusterRoleBinding)
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		objects = append(objects, n.monitorServiceMetrics)
+	}
+	for _, factory := range objects {
 		o, state, err := factory()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")

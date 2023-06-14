@@ -447,6 +447,31 @@ spec:
                             type: string
                         type: object
                     type: object
+                  secret:
+                    properties:
+                      defaultMode:
+                        format: int32
+                        type: integer
+                      items:
+                        items:
+                          properties:
+                            key:
+                              type: string
+                            mode:
+                              format: int32
+                              type: integer
+                            path:
+                              type: string
+                          required:
+                          - key
+                          - path
+                          type: object
+                        type: array
+                      optional:
+                        type: boolean
+                      secretName:
+                        type: string
+                    type: object
                 type: object
               workloadMetaOverrides:
                 properties:

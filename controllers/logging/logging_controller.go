@@ -27,6 +27,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -35,7 +36,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/kube-logging/logging-operator/pkg/resources"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
@@ -93,6 +93,20 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
+	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
+	} else {
+		log.Info("WARNING ServiceMonitor is not supported in the cluster")
+	}
+
+	if err := r.Client.List(ctx, &v1.PrometheusRuleList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
+	} else {
+		log.Info("WARNING PormetheusRule is not supported in the cluster")
+	}
+
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -145,8 +159,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}()
 
-	reconcilers := []resources.ComponentReconciler{
-		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
+	reconcilers := []resources.ContextAwareComponentReconciler{
+		model.NewValidationReconciler(r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
 	}
 
 	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
@@ -159,7 +173,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -174,7 +188,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -239,7 +253,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	for _, rec := range reconcilers {
-		result, err := rec()
+		result, err := rec(ctx)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -369,10 +383,10 @@ func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	requestMapper := handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
 		// get all the logging resources from the cache
 		var loggingList loggingv1beta1.LoggingList
-		if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
 			logger.Error(err, "failed to list logging resources")
 			return nil
 		}
@@ -419,23 +433,23 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
+		Watches(&loggingv1beta1.ClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.ClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.Output{}, requestMapper).
+		Watches(&loggingv1beta1.Flow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
+		Watches(&corev1.Secret{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
 		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
-		builder.Watches(&source.Kind{Type: &loggingv1beta1.NodeAgent{}}, requestMapper)
+		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
 	}
 
-	builder.Watches(&source.Kind{Type: &loggingv1beta1.FluentbitAgent{}}, requestMapper)
+	builder.Watches(&loggingv1beta1.FluentbitAgent{}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)

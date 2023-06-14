@@ -29,10 +29,10 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
@@ -40,12 +40,12 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
+	"github.com/kube-logging/logging-operator/pkg/resources"
 	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
@@ -126,10 +126,20 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
-		MapperProvider: func(c *rest.Config) (meta.RESTMapper, error) {
-			return apiutil.NewDynamicRESTMapper(c)
-		},
-		Port: 9443,
+	}
+
+	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
+		webhookServerOptions := webhook.Options{
+			Port: 9443,
+		}
+		if config.TailerWebhook.ServerPort != 0 {
+			webhookServerOptions.Port = config.TailerWebhook.ServerPort
+		}
+		if config.TailerWebhook.CertDir != "" {
+			webhookServerOptions.CertDir = config.TailerWebhook.CertDir
+		}
+		webhookServer := webhook.NewServer(webhookServerOptions)
+		mgrOptions.WebhookServer = webhookServer
 	}
 
 	customMgrOptions, err := setupCustomCache(&mgrOptions, namespace, loggingRef)
@@ -157,6 +167,10 @@ func main() {
 	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {
 		setupLog.Error(err, "failed to detect container runtime")
 		os.Exit(1)
+	}
+
+	if !PSPEnabled(mgr.GetConfig()) {
+		setupLog.Info("WARNING PodSecurityPolicies are disabled. Can be enabled manually with PSP_ENABLED=1")
 	}
 
 	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("logging"))
@@ -196,12 +210,6 @@ func main() {
 		// Webhook server registration
 		setupLog.Info("Setting up webhook server...")
 		webhookServer := mgr.GetWebhookServer()
-		if config.TailerWebhook.ServerPort != 0 {
-			webhookServer.Port = config.TailerWebhook.ServerPort
-		}
-		if config.TailerWebhook.CertDir != "" {
-			webhookServer.CertDir = config.TailerWebhook.CertDir
-		}
 
 		setupLog.Info("Registering webhooks...")
 		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
@@ -213,6 +221,27 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func PSPEnabled(cfg *rest.Config) bool {
+	pspenv := os.Getenv("PSP_ENABLED")
+	if pspenv != "" {
+		return cast.ToBool(pspenv)
+	}
+	dsc, err := discovery.NewDiscoveryClientForConfig(cfg)
+	if err != nil {
+		setupLog.Error(err, "discovery client creation")
+		os.Exit(1)
+	}
+	serverVersion, err := dsc.ServerVersion()
+	if err != nil {
+		setupLog.Error(err, "server version")
+		os.Exit(1)
+	}
+	if cast.ToInt(serverVersion.Major) == 1 && cast.ToInt(serverVersion.Minor) < 25 {
+		resources.PSPEnabled = true
+	}
+	return resources.PSPEnabled
 }
 
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {
@@ -247,30 +276,30 @@ func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef str
 		labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
 	}
 
-	selectorsByObject := cache.SelectorsByObject{
-		&corev1.Pod{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.DaemonSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.StatefulSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.Deployment{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&corev1.PersistentVolumeClaim{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
+	mgrOptions.Cache = cache.Options{
+		ByObject: map[client.Object]cache.ByObject{
+			&corev1.Pod{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.DaemonSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.StatefulSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.Deployment{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&corev1.PersistentVolumeClaim{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
 		},
 	}
-
-	mgrOptions.NewCache = cache.BuilderWithOptions(cache.Options{SelectorsByObject: selectorsByObject})
 
 	return mgrOptions, nil
 }

@@ -15,6 +15,8 @@
 package fluentbit
 
 import (
+	"context"
+
 	"emperror.dev/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -112,27 +114,30 @@ func New(client client.Client,
 }
 
 // Reconcile reconciles the fluentBit resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	if err := v1beta1.FluentBitDefaults(r.fluentbitSpec); err != nil {
 		return nil, err
 	}
 
-	for _, factory := range []resources.Resource{
+	objects := []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspClusterRole,
-		r.pspClusterRoleBinding,
 		r.configSecret,
 		r.daemonSet,
 		r.serviceMetrics,
-		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
-		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
-	} {
+	}
+	if resources.PSPEnabled {
+		objects = append(objects, r.clusterPodSecurityPolicy, r.pspClusterRole, r.pspClusterRoleBinding)
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		objects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+	}
+	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
+		objects = append(objects, r.prometheusRules, r.bufferVolumePrometheusRules)
+	}
+	for _, factory := range objects {
 		o, state, err := factory()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")
