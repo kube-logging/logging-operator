@@ -74,6 +74,14 @@ Limit namespaces to watch Flow and Output custom resources.
 
 Default: -
 
+### watchNamespaceSelector (*metav1.LabelSelector, optional) {#loggingspec-watchnamespaceselector}
+
+WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaceses.
+
+Note: This setting is mutually exclusive with watchNamespaces
+
+Default: -
+
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}
 
 Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
