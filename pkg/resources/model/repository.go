@@ -67,13 +67,16 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector
 	if len(watchNamespaces) == 0 {
 		var nsList corev1.NamespaceList
-		selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
-		if err != nil {
-			errs = errors.Append(errs, errors.WrapIf(err, "error in watchNamespaceSelector"))
-			return
-		}
-		nsListOptions := &client.ListOptions{
-			LabelSelector: selector,
+		var nsListOptions = &client.ListOptions{}
+		if nsLabelSelector != nil {
+			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "error in watchNamespaceSelector"))
+				return
+			}
+			nsListOptions = &client.ListOptions{
+				LabelSelector: selector,
+			}
 		}
 		if err := r.Client.List(ctx, &nsList, nsListOptions); err != nil {
 			errs = errors.Append(errs, errors.WrapIf(err, "listing namespaces"))
