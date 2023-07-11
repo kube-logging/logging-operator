@@ -29,6 +29,7 @@ import (
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -1710,6 +1711,11 @@ func (in *LoggingSpec) DeepCopyInto(out *LoggingSpec) {
 		in, out := &in.WatchNamespaces, &out.WatchNamespaces
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.WatchNamespaceSelector != nil {
+		in, out := &in.WatchNamespaceSelector, &out.WatchNamespaceSelector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.ClusterDomain != nil {
 		in, out := &in.ClusterDomain, &out.ClusterDomain

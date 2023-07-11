@@ -22,6 +22,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -63,9 +64,21 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	errs = errors.Append(errs, err)
 
 	watchNamespaces := logging.Spec.WatchNamespaces
+	nsLabelSelector := logging.Spec.WatchNamespaceSelector
 	if len(watchNamespaces) == 0 {
 		var nsList corev1.NamespaceList
-		if err := r.Client.List(ctx, &nsList); err != nil {
+		var nsListOptions = &client.ListOptions{}
+		if nsLabelSelector != nil {
+			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
+			if err != nil {
+				errs = errors.Append(errs, errors.WrapIf(err, "error in watchNamespaceSelector"))
+				return
+			}
+			nsListOptions = &client.ListOptions{
+				LabelSelector: selector,
+			}
+		}
+		if err := r.Client.List(ctx, &nsList, nsListOptions); err != nil {
 			errs = errors.Append(errs, errors.WrapIf(err, "listing namespaces"))
 			return
 		}

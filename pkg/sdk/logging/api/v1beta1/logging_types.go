@@ -65,6 +65,8 @@ type LoggingSpec struct {
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
 	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
+	// WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces
+	WatchNamespaceSelector *metav1.LabelSelector `json:"watchNamespaceSelector,omitempty"`
 	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
 	ClusterDomain *string `json:"clusterDomain,omitempty"`
 	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
