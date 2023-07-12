@@ -26,6 +26,15 @@ on:
       container-image-ref:
         description: Container image ref
         value: ${{ jobs.container-image.outputs.ref }}
+      helm-chart-name:
+        description: Helm chart OCI name
+        value: ${{ jobs.helm-chart.outputs.name }}
+      helm-chart-tag:
+        description: Helm chart tag
+        value: ${{ jobs.helm-chart.outputs.tag }}
+      helm-chart-package:
+        description: Helm chart package name
+        value: ${{ jobs.helm-chart.outputs.package }}
 
 permissions:
   contents: read
@@ -138,6 +147,105 @@ jobs:
         uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54 # 0.11.2
         with:
           input: image
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: "[${{ github.job }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@cdcdbb579706841c47f7063dda365e292e5cad7a # v2.13.4
+        with:
+          sarif_file: trivy-results.sarif
+
+  helm-chart:
+    name: Helm chart
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+    outputs:
+      name: ${{ steps.oci-chart-name.outputs.value }}
+      tag: ${{ steps.version.outputs.value }}
+      package: ${{ steps.build.outputs.package }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
+        with:
+          version: v3.12.0
+
+      - name: Set chart name
+        id: chart-name
+        run: echo "value=${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Set OCI registry name
+        id: oci-registry-name
+        run: echo "value=ghcr.io/${{ github.repository_owner }}/helm-charts" >> "$GITHUB_OUTPUT"
+
+      - name: Set OCI chart name
+        id: oci-chart-name
+        run: echo "value=${{ steps.oci-registry-name.outputs.value }}/${{ steps.chart-name.outputs.value }}" >> "$GITHUB_OUTPUT"
+
+      - name: Helm lint
+        run: helm lint charts/${{ steps.chart-name.outputs.value }}
+
+      - name: Determine raw version
+        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        id: version
+        with:
+          cond: ${{ inputs.release }}
+          if_true: ${{ github.ref_name }}
+          if_false: 0.0.0
+
+      - name: Helm package
+        id: build
+        run: |
+          helm package charts/${{ steps.chart-name.outputs.value }} --version ${{ steps.version.outputs.value }} --app-version ${{ steps.version.outputs.value }}
+          echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
+
+      - name: Upload chart as artifact
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: "[${{ github.job }}] Helm chart"
+          path: ${{ steps.build.outputs.package }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+        if: inputs.publish && inputs.release
+
+      - name: Helm push
+        run: helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }}
+        env:
+          HELM_REGISTRY_CONFIG: ~/.docker/config.json
+        if: inputs.publish && inputs.release
+
+      - name: Upload package as artifact
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: "[${{ github.job }}] package"
+          path: ${{ steps.build.outputs.package }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54 # 0.11.2
+        with:
+          scan-type: config
+          scan-ref: charts/${{ steps.chart-name.outputs.value }}
           format: sarif
           output: trivy-results.sarif
 
