@@ -21,6 +21,8 @@ import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
@@ -38,7 +40,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "FluentbitTooManyErrors",
 					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"service":  "fluentbit",
 						"severity": "warning",
