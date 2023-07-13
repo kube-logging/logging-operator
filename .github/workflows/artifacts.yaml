@@ -122,26 +122,10 @@ jobs:
         run: skopeo --insecure-policy copy docker://${{ steps.image-name.outputs.value }}:${{ steps.meta.outputs.version }} oci-archive:image.tar
         if: inputs.publish
 
-      - name: Upload image as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          name: "[${{ github.job }}] OCI tarball"
-          path: image.tar
-
       - name: Extract OCI tarball
         run: |
           mkdir -p image
           tar -xf image.tar -C image
-
-      # See https://github.com/anchore/syft/issues/1545
-      - name: Extract image from multi-arch image
-        run: skopeo --override-os linux --override-arch amd64 --insecure-policy copy --additional-tag ${{ steps.image-name.outputs.value }}:${{ steps.meta.outputs.version }} oci:image docker-archive:docker.tar
-
-      - name: Upload image as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          name: "[${{ github.job }}] Docker tarball"
-          path: docker.tar
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54 # 0.11.2
@@ -234,12 +218,6 @@ jobs:
         env:
           HELM_REGISTRY_CONFIG: ~/.docker/config.json
         if: inputs.publish && inputs.release
-
-      - name: Upload package as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          name: "[${{ github.job }}] package"
-          path: ${{ steps.build.outputs.package }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54 # 0.11.2
