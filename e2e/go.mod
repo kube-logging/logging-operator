@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/cisco-open/operator-tools v0.30.0
 	github.com/go-logr/logr v1.2.4
-	github.com/kube-logging/logging-operator v0.0.0-20230711113051-b343ee8b5838
+	github.com/kube-logging/logging-operator v0.0.0-20230713145558-c1d44ec0a80a
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
@@ -55,10 +55,10 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0 // indirect
-	github.com/prometheus/client_golang v1.15.1 // indirect
+	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
-	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/wayneashleyberry/terminal-dimensions v1.1.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
