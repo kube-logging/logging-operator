@@ -129,7 +129,7 @@ affinity: {}
 # -- Define which Nodes the Pods are scheduled on.
 podLabels: {}
 
-# -- Logging resources configuration. Previously these were top level configuration of the logging-operator-logging chart.
+# -- Logging resources configuration.
 logging:
 
   # -- Logging resources are disabled by default

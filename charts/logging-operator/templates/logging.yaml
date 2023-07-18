@@ -2,9 +2,9 @@
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
-  name: {{ include "logging-operator-logging.name" . }}
+  name: {{ include "logging-operator.name" . }}
   labels:
-{{ include "logging-operator-logging.labels" . | indent 4 }}
+{{ include "logging-operator.labels" . | indent 4 }}
 spec:
   {{- with .Values.logging.loggingRef }}
   loggingRef: {{ . }}
@@ -23,7 +23,7 @@ spec:
     {{- if .Values.logging.tls.enabled }}
     tls:
       enabled: true
-      secretName: {{ .Values.logging.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentbit-tls" ) }}
+      secretName: {{ .Values.logging.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator.name" . ) "fluentbit-tls" ) }}
       sharedKey: "{{ .Values.logging.tls.sharedKey }}"
     {{- end }}
     {{- with .Values.logging.fluentbit }}
@@ -35,7 +35,7 @@ spec:
     {{- if .Values.logging.tls.enabled }}
     tls:
       enabled: true
-      secretName: {{ .Values.logging.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator-logging.name" . ) "fluentd-tls" ) }}
+      secretName: {{ .Values.logging.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator.name" . ) "fluentd-tls" ) }}
       sharedKey: "{{ .Values.logging.tls.sharedKey }}"
     {{- end }}
     {{- with .Values.logging.fluentd }}
