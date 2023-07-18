@@ -1,10 +1,10 @@
-{{- range $clusteroutput := .Values.clusterOutputs }}
+{{- range $clusteroutput := .Values.logging.clusterOutputs }}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput
 metadata:
   name: {{ $clusteroutput.name }}
-  namespace: {{ $.Values.controlNamespace | default $.Release.Namespace }}
+  namespace: {{ $.Values.logging.controlNamespace | default $.Release.Namespace }}
   labels:
 {{ include "logging-operator-logging.labels" $ | indent 4 }}
 spec:
