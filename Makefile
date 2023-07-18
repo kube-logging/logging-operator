@@ -4,11 +4,11 @@ BIN := ${PWD}/bin
 
 export PATH := $(BIN):$(PATH)
 
-OS = $(shell go env GOOS)
-ARCH = $(shell go env GOARCH)
+OS := $(shell go env GOOS)
+ARCH := $(shell go env GOARCH)
 
 DOCKER ?= docker
-GOVERSION = $(shell go env GOVERSION)
+GOVERSION := $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
 IMG ?= controller:local
@@ -32,6 +32,9 @@ ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
 GOLANGCI_LINT_VERSION := v1.51.2
+
+HELM_DOCS := ${BIN}/helm-docs
+HELM_DOCS_VERSION = 1.11.0
 
 KIND := ${BIN}/kind
 KIND_VERSION := v0.19.0
@@ -57,7 +60,7 @@ all: manager
 check: license-check lint test
 
 .PHONY: check-diff
-check-diff: generate fmt manifests
+check-diff: generate fmt manifests helm-docs
 	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
 
 .PHONY: debug
@@ -171,6 +174,10 @@ vet: ## Run go vet against code
 kind-cluster: ${KIND}
 	kind create cluster --name $(KIND_CLUSTER) --image $(KIND_IMAGE)
 
+.PHONY: helm-docs
+helm-docs: ${HELM_DOCS}
+	${HELM_DOCS} -s file -c charts/ -t ../charts-docs/templates/overrides.gotmpl -t README.md.gotmpl
+
 ## =========================
 ## ==  Tool dependencies  ==
 ## =========================
@@ -237,6 +244,12 @@ stern: | ${BIN}
 
 ${ENVTEST_BIN_DIR}: | ${BIN}
 	mkdir -p $@
+
+${HELM_DOCS}: ${HELM_DOCS}-${HELM_DOCS_VERSION}
+	@ln -sf ${HELM_DOCS}-${HELM_DOCS_VERSION} ${HELM_DOCS}
+${HELM_DOCS}-${HELM_DOCS_VERSION}:
+	@mkdir -p bin
+	curl -L https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_$(shell uname)_x86_64.tar.gz | tar -zOxf - helm-docs > ${HELM_DOCS}-${HELM_DOCS_VERSION} && chmod +x ${HELM_DOCS}-${HELM_DOCS_VERSION}
 
 ${BIN}:
 	mkdir -p bin
