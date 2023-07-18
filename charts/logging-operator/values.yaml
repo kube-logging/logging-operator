@@ -170,7 +170,7 @@ logging:
   # -- Syslog-NG statefulset configuration
   syslogNG: {}
 
-  # -- Default flow for unmatched logs. This Flow configuration collects all logs that didn’t matched any other Flow.
+  # -- Default flow for unmatched logs. This Flow configuration collects all logs that didn’t match any other Flow.
   defaultFlow: {}
 
   # -- GlobalOutput name to flush ERROR events to
@@ -225,10 +225,11 @@ logging:
 
   # Send all pod logs to kafka
   # clusterFlows:
-  #   - name: all-pods
-  #     spec:
-  #       globalOutputRefs:
-  #         - kafka
+  #    - name: all
+  #      spec:
+  #        match:
+  #          - select: {}
+  #        globalOutputRefs: ["kafka"]
   # clusterOutputs:
   #   - name: kafka
   #     spec:

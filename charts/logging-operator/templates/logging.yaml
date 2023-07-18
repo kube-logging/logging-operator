@@ -2,7 +2,7 @@
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
-  name: {{ include "logging-operator.name" . }}
+  name: {{ include "logging-operator.releasename" . }}
   labels:
 {{ include "logging-operator.labels" . | indent 4 }}
 spec:

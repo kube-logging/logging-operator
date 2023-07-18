@@ -25,6 +25,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Expand the name of the release.
+*/}}
+{{- define "logging-operator.releasename" -}}
+{{- default .Release.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Provides the namespace the chart will be installed in using the builtin .Release.Namespace,
 or, if provided, a manually overwritten namespace value.
 */}}
