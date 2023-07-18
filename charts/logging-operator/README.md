@@ -1,6 +1,6 @@
 # logging-operator
 
-![version: 0.0.0](https://img.shields.io/badge/version-0.0.0-informational?style=flat-square) ![type: application](https://img.shields.io/badge/type-application-informational?style=flat-square) ![app version: latest](https://img.shields.io/badge/app%20version-latest-informational?style=flat-square) ![kube version: >=1.22.0-0](https://img.shields.io/badge/kube%20version->=1.22.0--0-informational?style=flat-square) [![artifact hub](https://img.shields.io/badge/artifact%20hub-logging--operator-informational?style=flat-square)](https://artifacthub.io/packages/helm/kube-logging/logging-operator)
+![type: application](https://img.shields.io/badge/type-application-informational?style=flat-square) ![kube version: >=1.22.0-0](https://img.shields.io/badge/kube%20version->=1.22.0--0-informational?style=flat-square) [![artifact hub](https://img.shields.io/badge/artifact%20hub-logging--operator-informational?style=flat-square)](https://artifacthub.io/packages/helm/kube-logging/logging-operator)
 
 Logging operator for Kubernetes based on Fluentd and Fluentbit.
 
@@ -9,7 +9,13 @@ Logging operator for Kubernetes based on Fluentd and Fluentbit.
 ## TL;DR;
 
 ```bash
-helm install --generate-name --wait oci://ghcr.io/kube-logging/helm-charts/logging-operator --version 0.0.0
+helm install --generate-name --wait oci://ghcr.io/kube-logging/helm-charts/logging-operator
+```
+
+or to install with a specific version:
+
+```bash
+helm install --generate-name --wait oci://ghcr.io/kube-logging/helm-charts/logging-operator --version $VERSION
 ```
 
 ## Introduction
