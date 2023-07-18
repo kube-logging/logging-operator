@@ -55,19 +55,15 @@ function helm_deploy_logging_operator()
         --wait \
         --set image.tag='local' \
         --set image.repository='controller' \
+        --set logging.enabled=true \
+        --create-namespace \
+        -n logging \
         logging-operator \
-        "e2e/charts/logging-operator"
+        "charts/logging-operator"
 }
 
 function configure_logging()
 {
-    helm upgrade --install \
-        --debug \
-        --wait \
-        --create-namespace \
-        -n logging \
-        'logging-operator-logging-tls' \
-        "e2e/charts/logging-operator-logging"
     kubectl apply -n logging -f "${SCRIPT_PATH}/clusteroutput.yaml"
     kubectl apply -n logging -f "${SCRIPT_PATH}/clusterflow.yaml"
 }
