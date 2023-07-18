@@ -1517,6 +1517,31 @@ spec:
                                 type: string
                             type: object
                         type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
+                        type: object
                     type: object
                   bufferVolumeArgs:
                     items:
@@ -2621,6 +2646,31 @@ spec:
                                 type: string
                             type: object
                         type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
+                        type: object
                     type: object
                   positiondb:
                     properties:
@@ -2757,6 +2807,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   readinessProbe:
@@ -3598,6 +3673,31 @@ spec:
                                 type: string
                             type: object
                         type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
+                        type: object
                     type: object
                   bufferVolumeArgs:
                     items:
@@ -4133,6 +4233,31 @@ spec:
                                       type: string
                                   type: object
                               type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                              type: object
                           type: object
                         volumeName:
                           type: string
@@ -4288,6 +4413,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   forwardInputConfig:
@@ -6236,6 +6386,31 @@ spec:
                                       type: string
                                   type: object
                               type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                              type: object
                           type: object
                         containersPath:
                           type: string
@@ -7043,6 +7218,19 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
                                                   claims:
@@ -7666,6 +7854,19 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
                                                   claims:
@@ -8293,6 +8494,19 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
                                                   claims:
@@ -10065,6 +10279,31 @@ spec:
                                       type: string
                                   type: object
                               type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                              type: object
                           type: object
                         security:
                           properties:
@@ -11313,6 +11552,19 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
                                 claims:
@@ -11936,6 +12188,19 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
                                 claims:
@@ -12563,6 +12828,19 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
                                 claims:
@@ -14958,6 +15236,19 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
                                             claims:
@@ -15581,6 +15872,19 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
                                             claims:
@@ -16208,6 +16512,19 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
                                             claims:
@@ -17443,6 +17760,29 @@ spec:
                         type: string
                     required:
                     - enabled
+                    type: object
+                type: object
+              watchNamespaceSelector:
+                properties:
+                  matchExpressions:
+                    items:
+                      properties:
+                        key:
+                          type: string
+                        operator:
+                          type: string
+                        values:
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
                     type: object
                 type: object
               watchNamespaces:
