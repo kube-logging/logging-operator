@@ -18,29 +18,12 @@ spec:
   {{- with .Values.logging.flowConfigOverride }}
   flowConfigOverride: {{ . }}
   {{- end }}
-  {{- if and (not .Values.logging.fluentbitDisabled) (or .Values.logging.tls.enabled .Values.logging.fluentbit) }}
-  fluentbit:
-    {{- if .Values.logging.tls.enabled }}
-    tls:
-      enabled: true
-      secretName: {{ .Values.logging.tls.fluentbitSecretName | default (printf "%s-%s" (include "logging-operator.name" . ) "fluentbit-tls" ) }}
-      sharedKey: "{{ .Values.logging.tls.sharedKey }}"
-    {{- end }}
-    {{- with .Values.logging.fluentbit }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- if (not .Values.logging.fluentdDisabled) }}
+  {{- if .Values.logging.fluentd }}
+  fluentd: {{- .Values.logging.fluentd . | nindent 4 }}
+  {{- else }}
+  fluentd: {}
   {{- end }}
-  {{- if and (not .Values.logging.fluentdDisabled) (or .Values.logging.tls.enabled .Values.logging.fluentd) }}
-  fluentd:
-    {{- if .Values.logging.tls.enabled }}
-    tls:
-      enabled: true
-      secretName: {{ .Values.logging.tls.fluentdSecretName | default (printf "%s-%s" (include "logging-operator.name" . ) "fluentd-tls" ) }}
-      sharedKey: "{{ .Values.logging.tls.sharedKey }}"
-    {{- end }}
-    {{- with .Values.logging.fluentd }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
   {{- end }}
   {{- with .Values.logging.syslogNG }}
   syslogNG:

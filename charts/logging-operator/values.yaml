@@ -135,20 +135,6 @@ logging:
   # -- Logging resources are disabled by default
   enabled: false
 
-  tls:
-    # -- Enable secure connection between fluentd and fluent-bit
-    enabled: true
-
-    # -- Specified secret name, which contain tls certs
-    fluentdSecretName: ""
-
-    # -- Specified secret name, which contain tls certs
-    fluentbitSecretName: ""
-
-    # Shared key between nodes (fluentd-fluentbit)
-    sharedKey: ""
-
-
   # -- Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset.
   loggingRef: ""
 
