@@ -1,3 +1,4 @@
+{{ if .Values.logging.enabled -}}
 {{- with $.Values.logging.hostTailer }}
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: HostTailer
@@ -20,5 +21,6 @@ spec:
 {{- with .systemdTailers }}
   systemdTailers:
 {{ toYaml . | indent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{ if .Values.logging.enabled -}}
 {{- range $clusteroutput := .Values.logging.clusterOutputs }}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -10,3 +11,4 @@ metadata:
 spec:
 {{ toYaml $clusteroutput.spec | indent 2 }}
 {{- end -}}
+{{- end }}

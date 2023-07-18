@@ -65,5 +65,5 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 
 ## Installing Fluentd and Fluent-bit via logging
 
-The previous chart does **not** install `logging` resource to deploy Fluentd and Fluent-bit on cluster.
-To install them please use the [Logging Operator Logging](https://github.com/kube-logging/helm-charts/tree/main/charts/logging-operator-logging) chart.
+The chart does **not** install `logging` resource to deploy Fluentd (or Syslog-ng) and Fluent-bit on the cluster by default, but
+it can be enabled by setting the `logging.enabled` value to true.

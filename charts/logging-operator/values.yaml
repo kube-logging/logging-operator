@@ -132,6 +132,9 @@ podLabels: {}
 # -- Logging resources configuration. Previously these were top level configuration of the logging-operator-logging chart.
 logging:
 
+  # -- Logging resources are disabled by default
+  enabled: false
+
   tls:
     # -- Enable secure connection between fluentd and fluent-bit
     enabled: true
