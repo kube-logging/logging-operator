@@ -226,10 +226,10 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.serviceBufferMetrics,
 	}
 	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
-		resourceObjects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+		resourceObjects = append(resourceObjects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
 	}
 	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
-		resourceObjects = append(objects, r.prometheusRules, r.bufferVolumePrometheusRules)
+		resourceObjects = append(resourceObjects, r.prometheusRules, r.bufferVolumePrometheusRules)
 	}
 	for _, res := range resourceObjects {
 		o, state, err := res()
