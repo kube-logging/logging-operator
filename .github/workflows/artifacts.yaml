@@ -93,6 +93,14 @@ jobs:
           if_true: type=image,push=true
           if_false: type=oci,dest=image.tar
 
+      - name: Determine build architectures
+        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        id: build-arch
+        with:
+          cond: ${{ inputs.publish }}
+          if_true: linux/amd64,linux/arm64,linux/arm/v7
+          if_false: local
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
@@ -106,7 +114,7 @@ jobs:
         uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ steps.build-arch.outputs.value }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
