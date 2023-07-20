@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.20.3-alpine3.16@sha256:29c4e6e307eac79e5db29a261b243f27ffe0563fa1767e8d9a6407657c9a5f08 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.20-alpine3.18@sha256:7839c9f01b5502d7cb5198b2c032857023424470b3e31ae46a8261ffca72912a AS builder
 
 RUN apk add --update --no-cache ca-certificates make git curl
 
@@ -31,8 +31,8 @@ COPY pkg/ pkg/
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/manager
 
 
-FROM gcr.io/distroless/static:latest@sha256:a01d47d4036cae5a67a9619e3d06fa14a6811a2247b4da72b4233ece4efebd57
+FROM gcr.io/distroless/static:latest@sha256:7198a357ff3a8ef750b041324873960cf2153c11cc50abb9d8d5f8bb089f6b4e
 
-COPY --from=builder /usr/local/bin/manager /usr/local/bin/
+COPY --from=builder /usr/local/bin/manager /manager
 
-ENTRYPOINT ["manager"]
+ENTRYPOINT ["/manager"]
