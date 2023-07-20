@@ -1,7 +1,15 @@
-# Build the manager binary
-FROM golang:1.20 as builder
+FROM --platform=$BUILDPLATFORM golang:1.20-alpine3.18@sha256:7839c9f01b5502d7cb5198b2c032857023424470b3e31ae46a8261ffca72912a AS builder
 
-WORKDIR /workspace
+RUN apk add --update --no-cache ca-certificates make git curl
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETPLATFORM
+
+WORKDIR /usr/local/src/logging-operator
+
+ARG GOPROXY
+
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
@@ -20,11 +28,11 @@ COPY controllers/ controllers/
 COPY pkg/ pkg/
 
 # Build
-RUN CGO_ENABLED=0 GO111MODULE=on go build -a -o manager main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/manager
 
-# Use distroless as minimal base image to package the manager binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:latest
-WORKDIR /
-COPY --from=builder /workspace/manager .
+
+FROM gcr.io/distroless/static:latest@sha256:7198a357ff3a8ef750b041324873960cf2153c11cc50abb9d8d5f8bb089f6b4e
+
+COPY --from=builder /usr/local/bin/manager /manager
+
 ENTRYPOINT ["/manager"]
