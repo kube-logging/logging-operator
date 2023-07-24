@@ -181,6 +181,9 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		} else if r.fluentbitSpec.FilterKubernetes.BufferSize != "0" {
 			r.logger.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
 		}
+		if r.fluentbitSpec.FilterKubernetes.K8SLoggingExclude == "" {
+			r.fluentbitSpec.FilterKubernetes.K8SLoggingExclude = "On"
+		}
 	}
 
 	input := fluentBitConfig{

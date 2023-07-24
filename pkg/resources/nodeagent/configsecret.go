@@ -23,11 +23,12 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 type fluentbitInputConfig struct {

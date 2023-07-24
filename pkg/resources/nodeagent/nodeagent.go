@@ -114,6 +114,10 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 		userDefined.FluentbitSpec = &v1beta1.NodeAgentFluentbit{}
 	}
 
+	if userDefined.FluentbitSpec.FilterKubernetes.K8SLoggingExclude == "" {
+		userDefined.FluentbitSpec.FilterKubernetes.K8SLoggingExclude = "On"
+	}
+
 	if userDefined.FluentbitSpec.FilterAws != nil {
 		programDefault.FluentbitSpec.FilterAws = &v1beta1.FilterAws{
 			ImdsVersion:     "v2",
