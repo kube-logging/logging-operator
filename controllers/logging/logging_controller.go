@@ -107,10 +107,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		log.Info("WARNING PormetheusRule is not supported in the cluster")
 	}
 
-	if logging.Spec.WatchNamespaces != nil && logging.Spec.WatchNamespaceSelector != nil {
-		log.Info("WARNING watchNamespaceSelector will be omitted if configured along with watchNamespaces")
-	}
-
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}

@@ -42,6 +42,7 @@ import (
 
 	controllers "github.com/kube-logging/logging-operator/controllers/logging"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
@@ -1158,6 +1159,142 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
 	}, timeout).Should(gomega.BeTrue())
+}
+
+func TestWatchNamespaces(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	defer ensureCreated(t, &corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-bylabel-1",
+			Labels: map[string]string{
+				"bylabel": "test1",
+			},
+		},
+	})()
+	defer ensureCreated(t, &corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-bylabel-2",
+			Labels: map[string]string{
+				"bylabel": "test2",
+			},
+		},
+	})()
+
+	cases := []struct {
+		name           string
+		logging        *v1beta1.Logging
+		expectedResult []string
+		expectError    bool
+	}{
+		{
+			name: "empty list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces:        []string{},
+					WatchNamespaceSelector: nil,
+				},
+			},
+			expectedResult: []string{},
+		},
+		{
+			name: "explicit list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces:        []string{"test-explicit-1", "test-explicit-2"},
+					WatchNamespaceSelector: nil,
+				},
+			},
+			expectedResult: []string{"test-explicit-1", "test-explicit-2"},
+		},
+		{
+			name: "bylabel list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchLabels: map[string]string{
+							"bylabel": "test1",
+						},
+					},
+				},
+			},
+			expectedResult: []string{"test-bylabel-1"},
+		},
+		{
+			name: "bylabel negative list (label exists but value should be different)",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchExpressions: []v1.LabelSelectorRequirement{
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpExists,
+							},
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpNotIn,
+								Values:   []string{"test1"},
+							},
+						},
+					},
+				},
+			},
+			expectedResult: []string{"test-bylabel-2"},
+		},
+		{
+			name: "merge two sets uniquely",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{"a", "b", "c", "test-bylabel-1"},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchExpressions: []v1.LabelSelectorRequirement{
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpExists,
+							},
+						},
+					},
+				},
+			},
+			expectedResult: []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"},
+		},
+	}
+
+	repo := model.NewLoggingResourceRepository(mgr.GetClient(), mgr.GetLogger())
+
+	for _, c := range cases {
+		if c.expectError {
+			_, err := repo.UniqueWatchNamespaces(context.TODO(), c.logging)
+			if c.expectError && err == nil {
+				t.Fatalf("expected error for test case %s", c.name)
+			}
+			continue
+		}
+
+		g.Eventually(func() ([]string, error) {
+			return repo.UniqueWatchNamespaces(context.TODO(), c.logging)
+		}, timeout).Should(gomega.ConsistOf(
+			c.expectedResult,
+		))
+	}
 }
 
 func beforeEach(t *testing.T) func() {

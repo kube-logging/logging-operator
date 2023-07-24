@@ -63,33 +63,13 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	watchNamespaces := logging.Spec.WatchNamespaces
-	nsLabelSelector := logging.Spec.WatchNamespaceSelector
-	if len(watchNamespaces) == 0 {
-		var nsList corev1.NamespaceList
-		var nsListOptions = &client.ListOptions{}
-		if nsLabelSelector != nil {
-			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
-			if err != nil {
-				errs = errors.Append(errs, errors.WrapIf(err, "error in watchNamespaceSelector"))
-				return
-			}
-			nsListOptions = &client.ListOptions{
-				LabelSelector: selector,
-			}
-		}
-		if err := r.Client.List(ctx, &nsList, nsListOptions); err != nil {
-			errs = errors.Append(errs, errors.WrapIf(err, "listing namespaces"))
-			return
-		}
-
-		for _, i := range nsList.Items {
-			watchNamespaces = append(watchNamespaces, i.Name)
-		}
+	uniqueWatchNamespaces, err := r.UniqueWatchNamespaces(ctx, &logging)
+	if err != nil {
+		errs = errors.Append(errs, err)
+		return
 	}
-	sort.Strings(watchNamespaces)
 
-	for _, ns := range watchNamespaces {
+	for _, ns := range uniqueWatchNamespaces {
 		{
 			flows, err := r.FlowsInNamespaceFor(ctx, ns, logging)
 			res.Fluentd.Flows = append(res.Fluentd.Flows, flows...)
@@ -116,6 +96,41 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	}
 
 	return
+}
+
+func (r LoggingResourceRepository) UniqueWatchNamespaces(ctx context.Context, logging *v1beta1.Logging) ([]string, error) {
+	watchNamespaces := logging.Spec.WatchNamespaces
+	nsLabelSelector := logging.Spec.WatchNamespaceSelector
+	if nsLabelSelector != nil {
+		var nsList corev1.NamespaceList
+		var nsListOptions = &client.ListOptions{}
+		if nsLabelSelector != nil {
+			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
+			if err != nil {
+				return nil, errors.WrapIf(err, "error in watchNamespaceSelector")
+			}
+			nsListOptions = &client.ListOptions{
+				LabelSelector: selector,
+			}
+		}
+		if err := r.Client.List(ctx, &nsList, nsListOptions); err != nil {
+			return nil, errors.WrapIf(err, "listing namespaces for watchNamespaceSelector")
+		}
+		for _, i := range nsList.Items {
+			watchNamespaces = append(watchNamespaces, i.Name)
+		}
+	}
+	uniqueWatchNamespaces := []string{}
+	var previousNamespace string
+	sort.Strings(watchNamespaces)
+
+	for _, n := range watchNamespaces {
+		if n != previousNamespace {
+			uniqueWatchNamespaces = append(uniqueWatchNamespaces, n)
+		}
+		previousNamespace = n
+	}
+	return uniqueWatchNamespaces, nil
 }
 
 func (r LoggingResourceRepository) ClusterFlowsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.ClusterFlow, error) {
