@@ -1,0 +1,24 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: one
+spec:
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: two
+spec:
+  controlNamespace: default
+# this is invalid, as implicitly this will have the same loggingRef as the first one
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: three
+spec:
+  loggingRef: custom
+  controlNamespace: default
+  fluentd: {}
+# this must be processed regardless of the above as it has a unique loggingRef

@@ -93,6 +93,28 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
+	allLoggings := &loggingv1beta1.LoggingList{}
+	if err := r.Client.List(ctx, allLoggings); err != nil {
+		return reconcile.Result{}, errors.WrapIf(err, "listing logging resources")
+	}
+
+	loggingsForTheSameRef := make([]string, 0)
+	for _, l := range allLoggings.Items {
+		if l.Name == logging.Name {
+			continue
+		}
+		if l.Spec.LoggingRef == logging.Spec.LoggingRef {
+			loggingsForTheSameRef = append(loggingsForTheSameRef, l.Name)
+		}
+	}
+
+	if len(loggingsForTheSameRef) > 0 {
+		problem := fmt.Sprintf("multiple other logging resources exist with the same loggingRef: %s",
+			strings.Join(loggingsForTheSameRef, ","))
+		logging.Status.Problems = []string{problem}
+		return reconcile.Result{}, errors.New(problem)
+	}
+
 	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
