@@ -1,0 +1,14 @@
+{{ if .Values.logging.enabled -}}
+{{- range $clusterflow := .Values.logging.clusterFlows }}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterFlow
+metadata:
+  name: {{ $clusterflow.name }}
+  namespace: {{ $.Values.logging.controlNamespace | default $.Release.Namespace }}
+  labels:
+{{ include "logging-operator.labels" $ | indent 4 }}
+spec:
+{{ toYaml $clusterflow.spec | indent 2 }}
+{{- end -}}
+{{- end }}

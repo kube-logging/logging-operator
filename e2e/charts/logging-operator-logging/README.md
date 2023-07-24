@@ -1,1 +1,0 @@
-This file will be generated in https://github.com/kube-logging/helm-charts/ by running `make docs` there

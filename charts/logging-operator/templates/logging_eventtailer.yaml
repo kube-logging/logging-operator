@@ -1,10 +1,11 @@
-{{- with $.Values.eventTailer }}
+{{ if .Values.logging.enabled -}}
+{{- with $.Values.logging.eventTailer }}
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: EventTailer
 metadata:
   name: {{ .name | default "event-tailer" }}
 spec:
-  controlNamespace: {{ $.Values.controlNamespace | default $.Release.Namespace }}
+  controlNamespace: {{ $.Values.logging.controlNamespace | default $.Release.Namespace }}
   {{- with .pvc }}
   positionVolume:
     pvc:
@@ -30,4 +31,5 @@ spec:
   containerOverrides:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
 {{- end }}

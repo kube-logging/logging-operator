@@ -128,3 +128,149 @@ affinity: {}
 
 # -- Define which Nodes the Pods are scheduled on.
 podLabels: {}
+
+# -- Logging resources configuration.
+logging:
+
+  # -- Logging resources are disabled by default
+  enabled: false
+
+  # -- Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset.
+  loggingRef: ""
+
+  # -- Disable configuration check before applying new fluentd configuration.
+  flowConfigCheckDisabled: false
+
+  # -- Whether to skip invalid Flow and ClusterFlow resources
+  skipInvalidResources: false
+
+  # -- Override generated config. This is a raw configuration string for troubleshooting purposes.
+  flowConfigOverride: ""
+
+  # -- Flag to disable fluentbit completely
+  fluentbitDisabled: false
+  # -- Fluent-bit configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentbit_types/
+  fluentbit: {}
+
+  # -- Flag to disable fluentd completely
+  fluentdDisabled: false
+  # -- Fluentd configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentd_types/
+  fluentd: {}
+  # 20Gi persistent storage is configured for fluentd by default.
+  # Here is an example, on how to override it:
+  #  bufferStorageVolume:
+  #    pvc:
+  #      spec:
+  #        accessModes:
+  #          - ReadWriteOnce
+  #        resources:
+  #          requests:
+  #            storage: 40Gi
+
+  # -- Syslog-NG statefulset configuration
+  syslogNG: {}
+
+  # -- Default flow for unmatched logs. This Flow configuration collects all logs that didn’t match any other Flow.
+  defaultFlow: {}
+
+  # -- GlobalOutput name to flush ERROR events to
+  errorOutputRef: ""
+
+  # -- Global filters to apply on logs before any match or filter mechanism.
+  globalFilters: []
+
+  # -- Limit namespaces to watch Flow and Output custom resources.
+  watchNamespaces: []
+
+  # -- Cluster domain name to be used when templating URLs to services
+  clusterDomain: "cluster.local"
+
+  # -- Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well.
+  controlNamespace: ""
+
+  # -- Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
+  allowClusterResourcesFromAllNamespaces: false
+
+  # -- NodeAgent Configuration
+  nodeAgents: {}
+  #  - name: win-agent
+  #    profile: windows
+  #    nodeAgentFluentbit:
+  #      daemonSet:
+  #        spec:
+  #          template:
+  #            spec:
+  #              containers:
+  #              - image: banzaicloud/fluentbit:1.9.5
+  #                name: fluent-bit
+  #      tls:
+  #        enabled: false
+  #  - name: linux-agent
+  #    profile: linux
+  #    nodeAgentFluentbit:
+  #      metrics:
+  #        prometheusAnnotations: true
+  #        serviceMonitor: false
+  #      tls:
+  #        enabled: false
+
+  # -- EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update.
+  enableRecreateWorkloadOnImmutableFieldChange: false
+
+  # -- ClusterFlows to deploy
+  clusterFlows: []
+
+  # -- ClusterOutputs to deploy
+  clusterOutputs: []
+
+  # Send all pod logs to kafka
+  # clusterFlows:
+  #    - name: all
+  #      spec:
+  #        match:
+  #          - select: {}
+  #        globalOutputRefs: ["kafka"]
+  # clusterOutputs:
+  #   - name: kafka
+  #     spec:
+  #       kafka:
+  #         brokers: kafka-headless.kafka.svc.cluster.local:29092
+  #         format:
+  #           type: json
+  #         default_topic: topic
+
+  # -- EventTailer config
+  eventTailer: {}
+    # name: sample
+    # pvc:
+    #   accessModes:
+    #     - ReadWriteOnce
+    #   volumeMode: Filesystem
+  #   storage: 1Gi
+  #   storageClassName: standard
+
+  # -- HostTailer config
+  hostTailer: {}
+    # name: sample
+    # fileTailers:
+    #   - name: sample-file
+    #     path: /var/log/sample-file
+    #     disabled: false
+    # systemdTailers:
+    #   - name: system-sample
+    #     disabled: false
+  #     maxEntries: 20
+  #     systemdFilter: kubelet.service
+
+testReceiver:
+  enabled: false
+  image: fluent/fluent-bit
+  port: 8080
+  args: ["-i", "http", "-p", "port=8080", "-o", "stdout"]
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 20m
+      memory: 25Mi
