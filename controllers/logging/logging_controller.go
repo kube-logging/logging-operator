@@ -107,10 +107,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		log.Info("WARNING PormetheusRule is not supported in the cluster")
 	}
 
-	if logging.Spec.WatchNamespaces != nil && logging.Spec.WatchNamespaceSelector != nil {
-		log.Info("WARNING watchNamespaceSelector will be omitted if configured along with watchNamespaces")
-	}
-
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -434,9 +430,28 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		return nil
 	})
 
+	// Trigger reconcile for all logging resources on namespace changes that define a watchNamespaceSelector
+	namespaceRequestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
+		var loggingList loggingv1beta1.LoggingList
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
+			logger.Error(err, "failed to list logging resources")
+			return nil
+		}
+		requests := make([]reconcile.Request, 0)
+		for _, l := range loggingList.Items {
+			if l.Spec.WatchNamespaceSelector != nil {
+				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+					Name: l.Name,
+				}})
+			}
+		}
+		return requests
+	})
+
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
+		Watches(&corev1.Namespace{}, namespaceRequestMapper).
 		Watches(&loggingv1beta1.ClusterOutput{}, requestMapper).
 		Watches(&loggingv1beta1.ClusterFlow{}, requestMapper).
 		Watches(&loggingv1beta1.Output{}, requestMapper).
