@@ -101,7 +101,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 func (r LoggingResourceRepository) UniqueWatchNamespaces(ctx context.Context, logging *v1beta1.Logging) ([]string, error) {
 	watchNamespaces := logging.Spec.WatchNamespaces
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector
-	if nsLabelSelector != nil {
+	if len(watchNamespaces) == 0 || nsLabelSelector != nil {
 		var nsList corev1.NamespaceList
 		var nsListOptions = &client.ListOptions{}
 		if nsLabelSelector != nil {

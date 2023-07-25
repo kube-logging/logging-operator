@@ -1185,11 +1185,11 @@ func TestWatchNamespaces(t *testing.T) {
 	cases := []struct {
 		name           string
 		logging        *v1beta1.Logging
-		expectedResult []string
+		expectedResult func() []string
 		expectError    bool
 	}{
 		{
-			name: "empty list",
+			name: "full list",
 			logging: &v1beta1.Logging{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "test-" + uuid.New()[:8],
@@ -1199,7 +1199,18 @@ func TestWatchNamespaces(t *testing.T) {
 					WatchNamespaceSelector: nil,
 				},
 			},
-			expectedResult: []string{},
+			expectedResult: func() []string {
+				allNamespaces := &corev1.NamespaceList{}
+				err := mgr.GetClient().List(context.TODO(), allNamespaces)
+				if err != nil {
+					t.Fatalf("unexpected error when getting namespaces %s", err)
+				}
+				items := []string{}
+				for _, i := range allNamespaces.Items {
+					items = append(items, i.Name)
+				}
+				return items
+			},
 		},
 		{
 			name: "explicit list",
@@ -1212,7 +1223,7 @@ func TestWatchNamespaces(t *testing.T) {
 					WatchNamespaceSelector: nil,
 				},
 			},
-			expectedResult: []string{"test-explicit-1", "test-explicit-2"},
+			expectedResult: func() []string { return []string{"test-explicit-1", "test-explicit-2"} },
 		},
 		{
 			name: "bylabel list",
@@ -1229,7 +1240,7 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: []string{"test-bylabel-1"},
+			expectedResult: func() []string { return []string{"test-bylabel-1"} },
 		},
 		{
 			name: "bylabel negative list (label exists but value should be different)",
@@ -1254,7 +1265,7 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: []string{"test-bylabel-2"},
+			expectedResult: func() []string { return []string{"test-bylabel-2"} },
 		},
 		{
 			name: "merge two sets uniquely",
@@ -1274,7 +1285,7 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"},
+			expectedResult: func() []string { return []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"} },
 		},
 	}
 
@@ -1292,7 +1303,7 @@ func TestWatchNamespaces(t *testing.T) {
 		g.Eventually(func() ([]string, error) {
 			return repo.UniqueWatchNamespaces(context.TODO(), c.logging)
 		}, timeout).Should(gomega.ConsistOf(
-			c.expectedResult,
+			c.expectedResult(),
 		))
 	}
 }
