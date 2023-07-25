@@ -107,56 +107,61 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
-{{- with .FluentForwardOutput }}
+{{ with $out := .FluentForwardOutput }}
+{{- range $target := $out.Targets }}
 [OUTPUT]
     Name          forward
-    Match         *
-    {{- if .Upstream.Enabled }}
-    Upstream      {{ .Upstream.Config.Path }}
+    {{- if eq $target.Namespace "*" }}
+    Match *
     {{- else }}
-    Host          {{ .TargetHost }}
-    Port          {{ .TargetPort }}
+    Match_Regex ^[^_]+_{{ $target.Namespace }}_.*$
     {{- end }}
-    {{ if .TLS.Enabled }}
+    {{- if $out.Upstream.Enabled }}
+    Upstream      {{ $out.Upstream.Config.Path }}
+    {{- else }}
+    Host          {{ $target.Host }}
+    Port          {{ $target.Port }}
+    {{- end }}
+    {{ if $out.TLS.Enabled }}
     tls           On
     tls.verify    Off
     tls.ca_file   /fluent-bit/tls/ca.crt
     tls.crt_file  /fluent-bit/tls/tls.crt
     tls.key_file  /fluent-bit/tls/tls.key
-    {{- if .TLS.SharedKey }}
-    Shared_Key    {{ .TLS.SharedKey }}
+    {{- if $out.TLS.SharedKey }}
+    Shared_Key    {{ $out.TLS.SharedKey }}
     {{- else }}
     Empty_Shared_Key true
     {{- end }}
     {{- end }}
-    {{- if .Network.ConnectTimeoutSet }}
-    net.connect_timeout {{.Network.ConnectTimeout}}
+    {{- if $out.Network.ConnectTimeoutSet }}
+    net.connect_timeout {{ $out.Network.ConnectTimeout }}
     {{- end }}
-    {{- if .Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
+    {{- if $out.Network.ConnectTimeoutLogErrorSet }}
+    net.connect_timeout_log_error {{ $out.Network.ConnectTimeoutLogError }}
     {{- end }}
-    {{- if .Network.DNSMode }}
-    net.dns.mode {{.Network.DNSMode}}
+    {{- if $out.Network.DNSMode }}
+    net.dns.mode {{ $out.Network.DNSMode }}
     {{- end }}
-    {{- if .Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
+    {{- if $out.Network.DNSPreferIPV4Set }}
+    net.dns.prefer_ipv4 {{ $out.Network.DNSPreferIPV4 }}
     {{- end }}
-    {{- if .Network.DNSResolver }}
-    net.dns.resolver {{.Network.DNSResolver}}
+    {{- if $out.Network.DNSResolver }}
+    net.dns.resolver {{ $out.Network.DNSResolver }}
     {{- end }}
-    {{- if .Network.KeepaliveSet}}
-    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- if $out.Network.KeepaliveSet}}
+    net.keepalive {{if $out.Network.Keepalive }}on{{else}}off{{end}}
     {{- end }}
-    {{- if .Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    {{- if $out.Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{ $out.Network.KeepaliveIdleTimeout }}
     {{- end }}
-    {{- if .Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    {{- if $out.Network.KeepaliveMaxRecycleSet }}
+    net.keepalive_max_recycle {{ $out.Network.KeepaliveMaxRecycle }}
     {{- end }}
-    {{- if .Network.SourceAddress }}
-    net.source_address {{.Network.SourceAddress}}
+    {{- if $out.Network.SourceAddress }}
+    net.source_address {{ $out.Network.SourceAddress }}
     {{- end }}
-    {{- with .Options }}
+    {{- with $out.Options }}
     {{- range $key, $value := . }}
     {{- if $value }}
     {{ $key }}  {{$value}}
@@ -164,50 +169,57 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 {{- end }}
+{{- end }}
 
-{{- with .SyslogNGOutput }}
+{{- with $out := .SyslogNGOutput }}
+{{- range $target := $out.Targets }}
 [OUTPUT]
     Name tcp
+    {{- if eq $target.Namespace "*" }}
     Match *
-    Host {{ .Host }}
-    Port {{ .Port }}
+    {{- else }}
+    Match_Regex ^[^_]+_{{ $target.Namespace }}_.*$
+    {{- end }}
+    Host {{ $target.Host }}
+    Port {{ $target.Port }}
     Format json_lines
-    {{- with .JSONDateKey }}
+    {{- with $out.JSONDateKey }}
     json_date_key {{ . }}
     {{- end }}
-    {{- with .JSONDateFormat }}
+    {{- with $out.JSONDateFormat }}
     json_date_format {{ . }}
     {{- end }}
-    {{- with .Workers }}
+    {{- with $out.Workers }}
     Workers {{ . }}
     {{- end }}
-    {{- if .Network.ConnectTimeoutSet }}
-    net.connect_timeout {{.Network.ConnectTimeout}}
+    {{- if $out.Network.ConnectTimeoutSet }}
+    net.connect_timeout {{ $out.Network.ConnectTimeout }}
     {{- end }}
-    {{- if .Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
+    {{- if $out.Network.ConnectTimeoutLogErrorSet }}
+    net.connect_timeout_log_error {{ $out.Network.ConnectTimeoutLogError }}
     {{- end }}
-    {{- if .Network.DNSMode }}
-    net.dns.mode {{.Network.DNSMode}}
+    {{- if $out.Network.DNSMode }}
+    net.dns.mode {{ $out.Network.DNSMode }}
     {{- end }}
-    {{- if .Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
+    {{- if $out.Network.DNSPreferIPV4Set }}
+    net.dns.prefer_ipv4 {{ $out.Network.DNSPreferIPV4 }}
     {{- end }}
-    {{- if .Network.DNSResolver }}
-    net.dns.resolver {{.Network.DNSResolver}}
+    {{- if $out.Network.DNSResolver }}
+    net.dns.resolver {{ $out.Network.DNSResolver }}
     {{- end }}
-    {{- if .Network.KeepaliveSet}}
-    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- if $out.Network.KeepaliveSet}}
+    net.keepalive {{if $out.Network.Keepalive }}on{{else}}off{{end}}
     {{- end }}
-    {{- if .Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    {{- if $out.Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{ $out.Network.KeepaliveIdleTimeout }}
     {{- end }}
-    {{- if .Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    {{- if $out.Network.KeepaliveMaxRecycleSet }}
+    net.keepalive_max_recycle {{ $out.Network.KeepaliveMaxRecycle }}
     {{- end }}
-    {{- if .Network.SourceAddress }}
-    net.source_address {{.Network.SourceAddress}}
+    {{- if $out.Network.SourceAddress }}
+    net.source_address {{ $out.Network.SourceAddress }}
     {{- end }}
+{{- end }}
 {{- end }}
 `
 

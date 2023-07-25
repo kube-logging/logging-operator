@@ -2192,6 +2192,19 @@ spec:
                 type: object
               targetHost:
                 type: string
+              targetLoggings:
+                items:
+                  properties:
+                    loggingName:
+                      type: string
+                    namespaces:
+                      items:
+                        type: string
+                      type: array
+                  required:
+                  - loggingName
+                  type: object
+                type: array
               targetPort:
                 format: int32
                 type: integer

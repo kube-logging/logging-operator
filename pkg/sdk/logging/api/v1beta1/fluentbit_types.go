@@ -72,6 +72,8 @@ type FluentbitSpec struct {
 	TLS                  *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost           string            `json:"targetHost,omitempty"`
 	TargetPort           int32             `json:"targetPort,omitempty"`
+	// Specify target logging resources and namespaces
+	TargetLoggings []TargetLogging `json:"targetLoggings,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
@@ -127,6 +129,11 @@ type FluentbitSpec struct {
 	// It must be a valid key in the configmap specified by customConfig
 	CustomParsers string       `json:"customParsers,omitempty"`
 	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
+}
+
+type TargetLogging struct {
+	LoggingName string   `json:"loggingName"`
+	Namespaces  []string `json:"namespaces,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

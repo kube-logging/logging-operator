@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: b
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: b
+spec:
+  loggingRef: b
+  syslogNG: {}
+  controlNamespace: b
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all
+  namespace: b
+spec:
+  loggingRef: b
+  localOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http
+  namespace: b
+spec:
+  loggingRef: b
+  http:
+    url: http://example-test-receiver.infra:8080/tenant-b
+    headers:
+      - "Content-type: application/json"

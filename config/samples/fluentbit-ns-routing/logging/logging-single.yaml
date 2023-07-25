@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: single
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: single
+spec:
+  loggingRef: single
+  controlNamespace: single
+  fluentd: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: single
+spec:
+  loggingRef: single
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+  namespace: single
+spec:
+  loggingRef: single
+  match:
+    - select: {}
+  globalOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: http
+  namespace: single
+spec:
+  loggingRef: single
+  http:
+    endpoint: http://example-test-receiver.infra:8080/tenant-single
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s
