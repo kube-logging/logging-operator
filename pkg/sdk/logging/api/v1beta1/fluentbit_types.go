@@ -64,7 +64,7 @@ type FluentbitAgentList struct {
 
 // FluentbitSpec defines the desired state of FluentbitAgent
 type FluentbitSpec struct {
-	LoggingRef string `json:"LoggingRef,omitempty"`
+	LoggingRef string `json:"loggingRef,omitempty"`
 
 	DaemonSetAnnotations map[string]string `json:"daemonsetAnnotations,omitempty"`
 	Annotations          map[string]string `json:"annotations,omitempty"`

@@ -32,8 +32,6 @@ spec:
             properties:
               HostNetwork:
                 type: boolean
-              LoggingRef:
-                type: string
               affinity:
                 properties:
                   nodeAffinity:
@@ -1300,6 +1298,8 @@ spec:
                     type: integer
                 type: object
               logLevel:
+                type: string
+              loggingRef:
                 type: string
               metrics:
                 properties:
