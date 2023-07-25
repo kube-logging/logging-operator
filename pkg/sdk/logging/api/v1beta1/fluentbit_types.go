@@ -297,7 +297,7 @@ type FilterKubernetes struct {
 	RegexParser string `json:"Regex_Parser,omitempty"`
 	// Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) (default:Off)
 	K8SLoggingParser string `json:"K8S-Logging.Parser,omitempty"`
-	// Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). (default:Off)
+	// Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). (default:On)
 	K8SLoggingExclude string `json:"K8S-Logging.Exclude,omitempty"`
 	// Include Kubernetes resource labels in the extra metadata. (default:On)
 	Labels string `json:"Labels,omitempty"`
