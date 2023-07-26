@@ -216,7 +216,7 @@ func NewValidationReconciler(
 		}
 
 		if len(loggingsForTheSameRef) > 0 {
-			problem := fmt.Sprintf("Deprecated behaviour! Other logging resources exist with the same loggingRef: %s",
+			problem := fmt.Sprintf("Deprecated behaviour! Other logging resources exist with the same loggingRef: %s. This is going to be an error with the next major release.",
 				strings.Join(loggingsForTheSameRef, ","))
 			logger.Info(fmt.Sprintf("WARNING %s", problem))
 			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
