@@ -206,7 +206,7 @@ func NewValidationReconciler(
 		resources.Logging.Status.Problems = nil
 
 		loggingsForTheSameRef := make([]string, 0)
-		for _, l := range resources.AllLoggings.Items {
+		for _, l := range resources.AllLoggings {
 			if l.Name == resources.Logging.Name {
 				continue
 			}

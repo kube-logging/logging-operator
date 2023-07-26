@@ -305,8 +305,14 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 	g.Eventually(getLoggingProblems(logging2)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
 	g.Eventually(getLoggingProblems(logging3)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
 
-	logging1.Spec.ClusterDomain = utils.StringPointer("change something to trigger new reconciliation")
-	g.Expect(mgr.GetClient().Update(context.TODO(), logging1)).Should(gomega.Succeed())
+	g.Eventually(func() error {
+		l := &v1beta1.Logging{}
+		if err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(logging1), l); err != nil {
+			return err
+		}
+		l.Spec.ErrorOutputRef = "trigger reconcile"
+		return mgr.GetClient().Update(context.TODO(), l)
+	}).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.Succeed())
 	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
 }
 

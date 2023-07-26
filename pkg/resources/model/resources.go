@@ -19,7 +19,7 @@ import (
 )
 
 type LoggingResources struct {
-	AllLoggings v1beta1.LoggingList
+	AllLoggings []v1beta1.Logging
 	Logging     v1beta1.Logging
 	Fluentd     FluentdLoggingResources
 	SyslogNG    SyslogNGLoggingResources
