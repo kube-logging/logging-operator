@@ -395,6 +395,137 @@ destination "output_default_my-output" {
 };
 `,
 		},
+		"clusteroutput with flow ref": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
+						ControlNamespace: "logging",
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs: []v1beta1.SyslogNGClusterOutput{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "clusterout",
+							Namespace: "logging",
+						},
+						Spec: v1beta1.SyslogNGClusterOutputSpec{
+							SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
+								Syslog: &output.SyslogOutput{
+									Host: "127.0.0.1",
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+
+destination "clusteroutput_logging_clusterout" {
+    syslog("127.0.0.1" persist_name("clusteroutput_logging_clusterout"));
+};
+
+filter "flow_default_test-flow_ns_filter" {
+    match("default" value("json.kubernetes.namespace_name") type("string"));
+};
+log {
+    source("main_input");
+    filter("flow_default_test-flow_ns_filter");
+    destination("clusteroutput_logging_clusterout");
+};
+`,
+		},
+		"flow referencing non-existent cluster output": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
+						ControlNamespace: "logging",
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs:      nil,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantErr: true,
+		},
+		"clusterFlow referencing non-existent cluster output": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
+						ControlNamespace: "logging",
+					},
+				},
+				ClusterFlows: []v1beta1.SyslogNGClusterFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGClusterFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs:      nil,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantErr: true,
+		},
 		"parser": {
 			input: Input{
 				Logging: v1beta1.Logging{

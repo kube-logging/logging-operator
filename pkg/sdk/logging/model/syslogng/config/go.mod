@@ -3,6 +3,7 @@ module github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/c
 go 1.20
 
 require (
+	emperror.dev/errors v0.8.1
 	github.com/cisco-open/operator-tools v0.30.0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
 	github.com/siliconbrain/go-seqs v0.5.0
@@ -14,7 +15,6 @@ require (
 )
 
 require (
-	emperror.dev/errors v0.8.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

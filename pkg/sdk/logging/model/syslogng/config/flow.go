@@ -20,16 +20,28 @@ import (
 	"strconv"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/siliconbrain/go-seqs/seqs"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/siliconbrain/go-seqs/seqs"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func validateClusterOutputs(clusterOutputRefs map[string]types.NamespacedName, flow string, globalOutputRefs []string) error {
+	return seqs.Reduce(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
+		if _, ok := clusterOutputRefs[ref]; !ok {
+			return errors.Append(err, errors.Errorf("cluster output reference %s for flow %s cannot be found", ref, flow))
+		}
+		return err
+	})
+}
+
+func renderClusterFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	filterDefs := seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
@@ -48,12 +60,14 @@ func renderClusterFlow(sourceName string, f v1beta1.SyslogNGClusterFlow, secretL
 					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
 				}),
 			)),
-			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) })),
+			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string {
+				return clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref)
+			})),
 		),
 	)
 }
 
-func renderFlow(controlNS string, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	nsFilterName := fmt.Sprintf("%s_ns_filter", baseName)
@@ -80,7 +94,9 @@ func renderFlow(controlNS string, sourceName string, keyDelim string, f v1beta1.
 				}),
 			)),
 			seqs.ToSlice(seqs.Concat(
-				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string { return clusterOutputDestName(f.Namespace, ref) }),
+				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) string {
+					return clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref)
+				}),
 				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) string { return outputDestName(f.Namespace, ref) }),
 			)),
 		),
