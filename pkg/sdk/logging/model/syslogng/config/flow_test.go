@@ -18,11 +18,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 )
 
 func TestRenderClusterFlow(t *testing.T) {
@@ -65,7 +66,7 @@ source("test_input");
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			out := strings.Builder{}
-			require.NoError(t, renderClusterFlow("test_input", testCase.clusterFlow, nil)(render.RenderContext{
+			require.NoError(t, renderClusterFlow(nil, "test_input", testCase.clusterFlow, nil)(render.RenderContext{
 				Out: &out,
 			}))
 			assert.Equal(t, testCase.expected, out.String())
