@@ -45,6 +45,12 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 
 	var err error
 
+	allLoggings := &v1beta1.LoggingList{}
+	if err := r.Client.List(ctx, allLoggings); err != nil {
+		errs = errors.Append(errs, err)
+	}
+	res.AllLoggings = allLoggings.Items
+
 	res.Fluentd.ClusterFlows, err = r.ClusterFlowsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 

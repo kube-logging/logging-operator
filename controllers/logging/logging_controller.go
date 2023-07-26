@@ -160,7 +160,12 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}()
 
 	reconcilers := []resources.ContextAwareComponentReconciler{
-		model.NewValidationReconciler(r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
+		model.NewValidationReconciler(
+			r.Client,
+			loggingResources,
+			&secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath},
+			log.WithName("validation"),
+		),
 	}
 
 	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
@@ -262,6 +267,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return *result, err
 		}
 	}
+
 	return ctrl.Result{}, nil
 }
 
