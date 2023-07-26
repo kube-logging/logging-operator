@@ -19,11 +19,12 @@ import (
 )
 
 type LoggingResources struct {
-	Logging    v1beta1.Logging
-	Fluentd    FluentdLoggingResources
-	SyslogNG   SyslogNGLoggingResources
-	NodeAgents []v1beta1.NodeAgent
-	Fluentbits []v1beta1.FluentbitAgent
+	AllLoggings v1beta1.LoggingList
+	Logging     v1beta1.Logging
+	Fluentd     FluentdLoggingResources
+	SyslogNG    SyslogNGLoggingResources
+	NodeAgents  []v1beta1.NodeAgent
+	Fluentbits  []v1beta1.FluentbitAgent
 }
 
 type FluentdLoggingResources struct {

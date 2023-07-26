@@ -23,6 +23,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -35,6 +36,7 @@ func NewValidationReconciler(
 	repo client.StatusClient,
 	resources LoggingResources,
 	secrets SecretLoaderFactory,
+	logger logr.Logger,
 ) func(ctx context.Context) (*reconcile.Result, error) {
 	return func(ctx context.Context) (*reconcile.Result, error) {
 		var patchRequests []patchRequest
@@ -202,6 +204,23 @@ func NewValidationReconciler(
 		registerForPatching(&resources.Logging)
 
 		resources.Logging.Status.Problems = nil
+
+		loggingsForTheSameRef := make([]string, 0)
+		for _, l := range resources.AllLoggings.Items {
+			if l.Name == resources.Logging.Name {
+				continue
+			}
+			if l.Spec.LoggingRef == resources.Logging.Spec.LoggingRef {
+				loggingsForTheSameRef = append(loggingsForTheSameRef, l.Name)
+			}
+		}
+
+		if len(loggingsForTheSameRef) > 0 {
+			problem := fmt.Sprintf("Deprecated behaviour! Other logging resources exist with the same loggingRef: %s",
+				strings.Join(loggingsForTheSameRef, ","))
+			logger.Info(fmt.Sprintf("WARNING %s", problem))
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+		}
 
 		if len(resources.Logging.Spec.NodeAgents) > 0 || len(resources.NodeAgents) > 0 {
 			// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
