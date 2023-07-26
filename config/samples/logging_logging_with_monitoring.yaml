@@ -1,0 +1,32 @@
+# example config to activate monitoring,
+# required to use logging dashboard
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: logging-example
+spec:
+  controlNamespace: kube-logging
+  enableRecreateWorkloadOnImmutableFieldChange: true
+  fluentd:
+    bufferVolumeImage:
+      repository: ghcr.io/kube-logging/node-exporter
+    bufferVolumeMetrics: 
+      prometheusRules: true
+      serviceMonitor: true
+    metrics: 
+      prometheusRules: true
+      serviceMonitor: true
+#  fluentbit:
+#    metrics: 
+#      prometheusRules: true
+#      serviceMonitor: true
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: logging-example
+spec:
+  metrics: 
+    prometheusRules: true
+    serviceMonitor: true
