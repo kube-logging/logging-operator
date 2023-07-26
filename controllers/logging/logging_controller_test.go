@@ -266,6 +266,58 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
 }
 
+func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging1 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-1",
+		},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: controlNamespace,
+		},
+	}
+	logging2 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-2",
+		},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: controlNamespace,
+		},
+	}
+	logging3 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-3",
+		},
+		Spec: v1beta1.LoggingSpec{
+			LoggingRef:       "test",
+			ControlNamespace: controlNamespace,
+		},
+	}
+
+	defer ensureCreated(t, logging1)()
+	defer ensureCreated(t, logging2)()
+	defer ensureCreated(t, logging3)()
+
+	// The first logging resource won't be populated with a warning initially since at the time of creation it is unique
+	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
+	g.Eventually(getLoggingProblems(logging2)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+	g.Eventually(getLoggingProblems(logging3)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
+
+	logging1.Spec.ClusterDomain = utils.StringPointer("change something to trigger new reconciliation")
+	g.Expect(mgr.GetClient().Update(context.TODO(), logging1)).Should(gomega.Succeed())
+	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+}
+
+func getLoggingProblems(logging *v1beta1.Logging) func() ([]string, error) {
+	return func() ([]string, error) {
+		l := &v1beta1.Logging{}
+		err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(logging), l)
+		return l.Status.Problems, err
+	}
+}
+
 func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
