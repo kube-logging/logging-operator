@@ -20,29 +20,25 @@ spec:
   {{- end }}
   {{- if (not .Values.logging.fluentdDisabled) }}
   {{- if .Values.logging.fluentd }}
-  fluentd: {{- .Values.logging.fluentd . | nindent 4 }}
+  fluentd: {{- toYaml .Values.logging.fluentd | nindent 4 }}
   {{- else }}
   fluentd: {}
   {{- end }}
   {{- end }}
   {{- with .Values.logging.syslogNG }}
-  syslogNG:
-    {{- toYaml . | nindent 4 }}
+  syslogNG: {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .Values.logging.defaultFlow }}
-  defaultFlow:
-    {{- toYaml . | nindent 4 }}
+  defaultFlow: {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .Values.logging.errorOutputRef }}
   errorOutputRef: {{ . }}
   {{- end }}
   {{- with .Values.logging.globalFilters }}
-  globalFilters:
-    {{- toYaml . | nindent 4 }}
+  globalFilters: {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .Values.logging.watchNamespaces }}
-  watchNamespaces:
-    {{- toYaml . | nindent 4 }}
+  watchNamespaces: {{- toYaml . | nindent 4 }}
   {{- end }}
   clusterDomain: {{ .Values.logging.clusterDomain }}
   controlNamespace: {{ .Values.logging.controlNamespace | default .Release.Namespace }}
@@ -50,8 +46,7 @@ spec:
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}
   {{- with .Values.logging.nodeAgents }}
-  nodeAgents:
-    {{ toYaml . | nindent 4 }}
+  nodeAgents: {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
