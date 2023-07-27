@@ -26,8 +26,6 @@ rules:
   - eventtailers/status
   verbs:
   - get
-  - patch
-  - update
 - apiGroups:
   - logging.banzaicloud.io
   resources:
@@ -49,8 +47,6 @@ rules:
   - outputs/status
   verbs:
   - get
-  - patch
-  - update
 - apiGroups:
   - logging.banzaicloud.io
   resources:
@@ -72,6 +68,4 @@ rules:
   - syslogngoutputs/status
   verbs:
   - get
-  - patch
-  - update
 {{- end }}
