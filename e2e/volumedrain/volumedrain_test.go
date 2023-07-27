@@ -64,14 +64,12 @@ func init() {
 func TestVolumeDrain_Downscale(t *testing.T) {
 	t.Parallel()
 	ns := "testing-1"
+	releaseNameOverride := "volumedrain"
+	testTag := "test.volumedrain"
 	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Config.DisableWebhook = true
-			options.Config.Namespace = ns
-		}))
-
-		consumer := setup.LogConsumer(t, c.GetClient(), setup.LogConsumerOptionFunc(func(options *setup.LogConsumerOptions) {
 			options.Namespace = ns
+			options.NameOverride = releaseNameOverride
 		}))
 
 		ctx := context.Background()
@@ -119,16 +117,22 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			},
 			Spec: v1beta1.OutputSpec{
 				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint: consumer.InputURL(),
+					Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+					ContentType: "application/json",
 					Buffer: &output.Buffer{
 						Type:        "file",
 						Tags:        &tags,
-						Timekey:     "10s",
+						Timekey:     "1s",
 						TimekeyWait: "0s",
 					},
 				},
 			},
 		}
+
+		producerLabels := map[string]string{
+			"my-unique-label": "log-producer",
+		}
+
 		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
 		flow := v1beta1.Flow{
 			ObjectMeta: metav1.ObjectMeta{
@@ -139,9 +143,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				Match: []v1beta1.Match{
 					{
 						Select: &v1beta1.Select{
-							Labels: map[string]string{
-								"my-unique-label": "log-producer",
-							},
+							Labels: producerLabels,
 						},
 					},
 				},
@@ -150,37 +152,67 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
-		fluentdReplicaName := logging.Name + "-fluentd-1"
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 5*time.Minute, 5*time.Second)
+		aggergatorLabels := map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": "fluentd",
+		}
+		operatorLabels := map[string]string{
+			"app.kubernetes.io/name": releaseNameOverride,
+		}
 
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
-			options.Labels = flow.Spec.Match[0].Select.Labels
+			options.Labels = producerLabels
 		}))
 
 		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name), c)
+			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+				t.Log("waiting for the operator")
+				return false
+			}
+			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+				t.Log("waiting for the producer")
+				return false
+			}
+			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+				t.Log("waiting for the aggregator")
+				return false
+			}
+
+			cmd := common.CmdEnv(exec.Command("kubectl",
+				"logs",
+				"-n", ns,
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
 				return false
 			}
 			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), "got request")
-		}, 5*time.Minute, 2*time.Second)
+			return strings.Contains(string(rawOut), testTag)
+		}, 5*time.Minute, 3*time.Second)
 
-		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
+		cmd := common.CmdEnv(exec.Command("kubectl", "scale",
+			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
+			"-n", ns,
+			"--replicas", "0"), c)
 		common.RequireNoError(t, cmd.Run())
 
+		fluentdReplicaName := logging.Name + "-fluentd-1"
+
 		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
+			cmd := common.CmdEnv(exec.Command("kubectl",
+				"exec",
+				"-n", ns, fluentdReplicaName,
+				"-c", "fluentd",
+				"--", "ls", "-1", "/buffers"), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to list buffer directory: %v", err)
 				return false
 			}
 			return strings.Count(string(rawOut), "\n") > 2
-		}, 3*time.Minute, 10*time.Second)
+		}, 1*time.Minute, 3*time.Second)
 
 		patch := client.MergeFrom(logging.DeepCopy())
 		logging.Spec.FluentdSpec.Scaling.Replicas = 1
@@ -191,16 +223,19 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			var job batchv1.Job
 			present := cond.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
 			return present && job.Status.Active > 0
-		}, 2*time.Minute, 1*time.Second)
+		}, 1*time.Minute, 3*time.Second)
 
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
-		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
+		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
+			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
+			"-n", ns,
+			"--replicas", "1"), c)
 		common.RequireNoError(t, cmd.Run())
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
+		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
+		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second)
 
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
 		common.RequireNoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
@@ -229,17 +264,22 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 	t.Parallel()
 	ns := "testing-2"
+	releaseNameOverride := "volumedrain"
+	testTag := "test.volumedrain"
 	common.WithCluster("drain-2", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Config.DisableWebhook = true
-			options.Config.Namespace = ns
-		}))
-
-		consumer := setup.LogConsumer(t, c.GetClient(), setup.LogConsumerOptionFunc(func(options *setup.LogConsumerOptions) {
 			options.Namespace = ns
+			options.NameOverride = releaseNameOverride
 		}))
 
 		ctx := context.Background()
+		aggergatorLabels := map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": "fluentd",
+		}
+		operatorLabels := map[string]string{
+			"app.kubernetes.io/name": releaseNameOverride,
+		}
 
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
@@ -285,7 +325,8 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 			},
 			Spec: v1beta1.OutputSpec{
 				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint: consumer.InputURL(),
+					Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+					ContentType: "application/json",
 					Buffer: &output.Buffer{
 						Type:        "file",
 						Tags:        &tags,
@@ -296,6 +337,10 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
+
+		producerLabels := map[string]string{
+			"my-unique-label": "log-producer",
+		}
 		flow := v1beta1.Flow{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "test-flow",
@@ -305,9 +350,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 				Match: []v1beta1.Match{
 					{
 						Select: &v1beta1.Select{
-							Labels: map[string]string{
-								"my-unique-label": "log-producer",
-							},
+							Labels: producerLabels,
 						},
 					},
 				},
@@ -317,25 +360,43 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		fluentdReplicaName := logging.Name + "-fluentd-1"
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 2*time.Minute, 5*time.Second)
 
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
-			options.Labels = flow.Spec.Match[0].Select.Labels
+			options.Labels = producerLabels
 		}))
 
 		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name), c)
+			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+				t.Log("waiting for the operator")
+				return false
+			}
+			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+				t.Log("waiting for the producer")
+				return false
+			}
+			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+				t.Log("waiting for the aggregator")
+				return false
+			}
+
+			cmd := common.CmdEnv(exec.Command("kubectl",
+				"logs",
+				"-n", ns,
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
 				return false
 			}
 			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), "got request")
+			return strings.Contains(string(rawOut), testTag)
 		}, 5*time.Minute, 2*time.Second)
 
-		cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/off"), c)
+		cmd := common.CmdEnv(exec.Command("kubectl", "scale",
+			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
+			"-n", ns,
+			"--replicas", "0"), c)
 		common.RequireNoError(t, cmd.Run())
 
 		require.Eventually(t, func() bool {
@@ -361,10 +422,13 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 
 		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
-		cmd = common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "exec", consumer.PodKey.Name, "--", "curl", "-sS", "http://localhost:8082/on"), c)
+		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
+			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
+			"-n", ns,
+			"--replicas", "1"), c)
 		common.RequireNoError(t, cmd.Run())
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 5*time.Minute, 30*time.Second)
+		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
 
 		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 

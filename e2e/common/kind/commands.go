@@ -15,7 +15,10 @@
 package kind
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -27,8 +30,8 @@ var KindImage string
 func init() {
 	KindPath = os.Getenv("KIND_PATH")
 	if KindPath == "" {
-		fmt.Fprintln(os.Stderr, "KIND_PATH need to be set")
-		os.Exit(1)
+		KindPath = "../../bin/kind"
+		fmt.Println("KIND_PATH is not set, defaulting to ../../bin/kind")
 	}
 	KindImage = os.Getenv("KIND_IMAGE")
 }
@@ -40,12 +43,13 @@ func CreateCluster(options CreateClusterOptions) error {
 	}
 	args = options.AppendToArgs(args)
 	cmd := exec.Command(KindPath, args...)
-	cmd.Stderr = os.Stderr
-	o, err := cmd.Output()
-	if err != nil {
-		fmt.Println(o)
+	cmderr := &bytes.Buffer{}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
+	if err := cmd.Run(); err != nil {
+		return errors.New(cmderr.String())
 	}
-	return err
+	return nil
 }
 
 type CreateClusterOptions struct {

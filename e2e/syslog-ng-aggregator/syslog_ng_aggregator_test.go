@@ -66,14 +66,11 @@ func init() {
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	t.Parallel()
 	ns := "test"
+	releaseNameOverride := "e2e"
 	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Config.DisableWebhook = true
-			options.Config.Namespace = ns
-		}))
-
-		consumer := setup.LogConsumer(t, c.GetClient(), setup.LogConsumerOptionFunc(func(options *setup.LogConsumerOptions) {
 			options.Namespace = ns
+			options.NameOverride = releaseNameOverride
 		}))
 
 		ctx := context.Background()
@@ -118,6 +115,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 				},
 			},
 		}
+		testTag := "test.tag"
+
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 		output := v1beta1.SyslogNGOutput{
 			ObjectMeta: metav1.ObjectMeta{
@@ -126,7 +125,11 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 			},
 			Spec: v1beta1.SyslogNGOutputSpec{
 				HTTP: &syslogngoutput.HTTPOutput{
-					URL: consumer.InputURL(),
+					URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+					Headers: []string{
+						"Content-type: application/json",
+					},
+					Method: "POST",
 					DiskBuffer: &syslogngoutput.DiskBuffer{
 						DiskBufSize: 100 * 1024 * 1024,
 						Reliable:    true,
@@ -154,27 +157,49 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
-		meta := logging.SyslogNGObjectMeta(syslogng.StatefulSetName, syslogng.ComponentSyslogNG)
-		aggergatorPodName := meta.Name + "-0"
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: aggergatorPodName}), 5*time.Minute, 5*time.Second)
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		aggergatorLabels := map[string]string{
+			"app.kubernetes.io/name":      "syslog-ng",
+			"app.kubernetes.io/component": "syslog-ng",
+		}
+		operatorLabels := map[string]string{
+			"app.kubernetes.io/name": releaseNameOverride,
+		}
+		producerLabels := map[string]string{
+			"my-unique-label": "log-producer",
+		}
+		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
-			options.Labels = map[string]string{
-				"my-unique-label": "log-producer",
-			}
+			options.Labels = producerLabels
 		}))
 
 		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "-n", consumer.PodKey.Namespace, "logs", consumer.PodKey.Name), c)
+			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+				t.Log("waiting for the operator")
+				return false
+			}
+			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+				t.Log("waiting for the producer")
+				return false
+			}
+			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+				t.Log("waiting for the aggregator")
+				return false
+			}
+
+			cmd := common.CmdEnv(exec.Command("kubectl",
+				"logs",
+				"-n", ns,
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride,
+				)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)
 				return false
 			}
 			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), "got request")
+			return strings.Contains(string(rawOut), testTag)
 		}, 5*time.Minute, 2*time.Second)
+
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)

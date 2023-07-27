@@ -15,85 +15,89 @@
 package setup
 
 import (
-	"context"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/go-logr/logr"
-	logrtesting "github.com/go-logr/logr/testing"
-	"github.com/stretchr/testify/require"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/cli"
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/kube-logging/logging-operator/pkg/sdk/resourcebuilder"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
-	options := LoggingOperatorOptions{
-		Config: resourcebuilder.ComponentConfig{
-			EnabledComponent: types.EnabledComponent{
-				Enabled: utils.BoolPointer(true),
-			},
-			Namespace: "default",
-		},
-		Logger: logrtesting.NewTestLogger(t),
-		Parent: &parentObject{
-			Name: "test",
-		},
-		PollInterval: 5 * time.Second,
-		Timeout:      2 * time.Minute,
+
+	opt := &LoggingOperatorOptions{
+		Namespace:    "default",
+		NameOverride: "logging-operator",
+		PollInterval: time.Second * 3,
+		Timeout:      time.Minute,
 	}
 
-	if img := os.Getenv("LOGGING_OPERATOR_IMAGE"); img != "" {
-		common.RequireNoError(t, c.LoadImages(img))
-
-		if options.Config.ContainerOverrides == nil {
-			options.Config.ContainerOverrides = new(types.ContainerBase)
-		}
-		options.Config.ContainerOverrides.Image = img
-		options.Config.ContainerOverrides.PullPolicy = corev1.PullNever
+	for _, o := range opts {
+		o.ApplyToLoggingOperatorOptions(opt)
 	}
 
-	for _, opt := range opts {
-		opt.ApplyToLoggingOperatorOptions(&options)
+	restClientGetter, err := NewRESTClientGetter(c.KubeConfigFilePath(), opt.Namespace)
+	if err != nil {
+		t.Fatalf("helm rest client getter: %s", err)
 	}
+	actionConfig := new(action.Configuration)
 
-	resourceBuilders := resourcebuilder.ResourceBuildersWithReader(c.GetClient())(options.Parent, &options.Config)
-	reconciler := reconciler.NewGenericReconciler(c.GetClient(), options.Logger, reconciler.ReconcilerOpts{
-		Scheme: c.GetScheme(),
+	err = actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...interface{}) {
+		t.Logf(format, v...)
 	})
-	for _, rb := range resourceBuilders {
-		obj, ds, err := rb()
-		common.RequireNoError(t, err)
-		res, err := reconciler.ReconcileResource(obj, ds)
-		common.RequireNoError(t, err)
-		require.Nil(t, res)
+
+	installer := action.NewInstall(actionConfig)
+
+	installer.Namespace = opt.Namespace
+	installer.CreateNamespace = true
+	installer.ReleaseName = "logging-operator"
+
+	projectDir := os.Getenv("PROJECT_DIR")
+	if projectDir == "" {
+		projectDir = "../.."
 	}
 
-	require.Eventually(t, func() bool {
-		var ps corev1.PodList
-		if err := c.GetClient().List(context.Background(), &ps, client.MatchingLabels{
-			"banzaicloud.io/operator": options.Parent.GetName() + "-logging-operator",
-		}); err != nil {
-			t.Logf("failed to list logging operator pods: %v", err)
-			return false
+	cp, err := installer.ChartPathOptions.LocateChart(fmt.Sprintf("%s/charts/logging-operator", projectDir), cli.New())
+	if err != nil {
+		t.Fatalf("helm locate chart: %s", err)
+	}
+	chartReq, err := loader.Load(cp)
+	if err != nil {
+		t.Fatalf("helm load chart: %s", err)
+	}
+
+	image := strings.Split(os.Getenv("LOGGING_OPERATOR_IMAGE"), ":")
+	if len(image) < 2 {
+		t.Log("LOGGING_OPERATOR_IMAGE (<repository>:<tag>) is undefined. Defaulting to controller:local")
+		image = []string{
+			"controller", "local",
 		}
-		for _, p := range ps.Items {
-			if p.Status.Phase == corev1.PodRunning {
-				return true
-			}
-		}
-		if len(ps.Items) > 0 {
-			t.Log("logging operator is not running")
-		}
-		return false
-	}, options.Timeout, options.PollInterval)
+	}
+	err = c.LoadImages(strings.Join(image, ":"))
+	if err != nil {
+		t.Fatalf("kind load image: %s", err)
+	}
+
+	_, err = installer.Run(chartReq, map[string]interface{}{
+		"nameOverride": opt.NameOverride,
+		"image": map[string]interface{}{
+			"repository": image[0],
+			"tag":        image[1],
+			"pullPolicy": corev1.PullNever,
+		},
+		"testReceiver": map[string]interface{}{
+			"enabled": true,
+		},
+	})
+	if err != nil {
+		t.Fatalf("helm chart install: %s", err)
+	}
 }
 
 type LoggingOperatorOption interface {
@@ -107,18 +111,8 @@ func (fn LoggingOperatorOptionFunc) ApplyToLoggingOperatorOptions(options *Loggi
 }
 
 type LoggingOperatorOptions struct {
-	Config       resourcebuilder.ComponentConfig
-	Logger       logr.Logger
-	Parent       reconciler.ResourceOwner
+	Namespace    string
+	NameOverride string
 	PollInterval time.Duration
 	Timeout      time.Duration
-}
-
-type parentObject struct {
-	common.PanicObject
-	Name string
-}
-
-func (o *parentObject) GetName() string {
-	return o.Name
 }
