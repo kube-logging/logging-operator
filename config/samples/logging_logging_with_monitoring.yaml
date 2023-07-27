@@ -1,5 +1,6 @@
 # example config to activate monitoring,
 # required to use logging dashboard
+# depends on https://github.com/prometheus-operator/prometheus-operator
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
