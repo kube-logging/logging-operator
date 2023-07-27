@@ -62,7 +62,7 @@ func init() {
 }
 
 func TestVolumeDrain_Downscale(t *testing.T) {
-	t.Parallel()
+	common.Initialize(t)
 	ns := "testing-1"
 	releaseNameOverride := "volumedrain"
 	testTag := "test.volumedrain"
@@ -262,7 +262,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 }
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
-	t.Parallel()
+	common.Initialize(t)
 	ns := "testing-2"
 	releaseNameOverride := "volumedrain"
 	testTag := "test.volumedrain"

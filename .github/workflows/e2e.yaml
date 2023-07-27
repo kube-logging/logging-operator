@@ -41,6 +41,11 @@ jobs:
     name: Go end2end tests
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        SHARD: [0, 1]
+        SHARDS: [2]
 
     steps:
       - name: Set up Docker Buildx
@@ -75,6 +80,9 @@ jobs:
 
       - name: Run e2e tests
         run: make test-e2e
+        env:
+          SHARD: ${{ matrix.SHARD }}
+          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Archive Test Results
         if: always()
@@ -84,7 +92,7 @@ jobs:
           path: build/_test
           retention-days: 5
 
-  chart-minio:
+  chart:
     name: Shell script tests with chart install
     runs-on: ubuntu-latest
     needs: build

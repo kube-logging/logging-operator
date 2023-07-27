@@ -64,7 +64,7 @@ func init() {
 }
 
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
-	t.Parallel()
+	common.Initialize(t)
 	ns := "test"
 	releaseNameOverride := "e2e"
 	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
