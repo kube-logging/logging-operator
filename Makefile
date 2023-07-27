@@ -37,7 +37,7 @@ HELM_DOCS := ${BIN}/helm-docs
 HELM_DOCS_VERSION = 1.11.0
 
 KIND := ${BIN}/kind
-KIND_VERSION := v0.19.0
+KIND_VERSION := v0.20.0
 KIND_IMAGE := kindest/node:v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff
 KIND_CLUSTER := kind
 

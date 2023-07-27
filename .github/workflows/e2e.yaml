@@ -86,6 +86,10 @@ jobs:
     name: Shell script tests with chart install
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        kube: ["1.22", "1.23", "1.24", "1.25", "1.26", "1.27"]
 
     steps:
       - name: Set up Docker Buildx
@@ -102,11 +106,6 @@ jobs:
           docker load --input /tmp/controller.tar
           docker image ls -a
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -115,31 +114,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Make docker-build
-        run: make docker-build
+      # See https://github.com/kubernetes-sigs/kind/releases/tag/v0.20.0
+      - name: Determine KinD node image version
+        id: node_image
+        run: |
+          case ${{ matrix.kube }} in
+            1.22)
+              NODE_IMAGE=kindest/node:v1.22.17@sha256:f5b2e5698c6c9d6d0adc419c0deae21a425c07d81bbf3b6a6834042f25d4fba2 ;;
+            1.23)
+              NODE_IMAGE=kindest/node:v1.23.17@sha256:59c989ff8a517a93127d4a536e7014d28e235fb3529d9fba91b3951d461edfdb ;;
+            1.24)
+              NODE_IMAGE=kindest/node:v1.24.15@sha256:7db4f8bea3e14b82d12e044e25e34bd53754b7f2b0e9d56df21774e6f66a70ab ;;
+            1.25)
+              NODE_IMAGE=kindest/node:v1.25.11@sha256:227fa11ce74ea76a0474eeefb84cb75d8dad1b08638371ecf0e86259b35be0c8 ;;
+            1.26)
+              NODE_IMAGE=kindest/node:v1.26.6@sha256:6e2d8b28a5b601defe327b98bd1c2d1930b49e5d8c512e1895099e4504007adb ;;
+            1.27)
+              NODE_IMAGE=kindest/node:v1.27.3@sha256:3966ac761ae0136263ffdb6cfd4db23ef8a83cba8a463690e98317add2c9ba72 ;;
+            esac
+
+            echo "image=$NODE_IMAGE" >> $GITHUB_OUTPUT
 
       - name: Make setup
         run: make kind-cluster stern
-
-      - name: Kubernetes setup
-        run: |
-          kubectl create namespace logging
-          
-          kubectl create -n logging -f hack/minio.yaml
-          kubectl wait -n logging --for=condition=available deployment/minio-deployment --timeout=120s
-          minio="$(kubectl get pod -n logging -l app=minio -o 'jsonpath={.items[0].metadata.name}')"
-          kubectl wait -n logging --for=condition=Ready pod "${minio}" --timeout=120s
-          
-          kubectl create -n logging -f hack/minio-mc.yaml
-          kubectl wait -n logging --for=condition=available deployment/minio-mc-deployment --timeout=120s
-          mc_pod="$(kubectl get pod -n logging -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}')"
-          kubectl wait -n logging --for=condition=Ready pod "${mc_pod}" --timeout=120s
-          
-          kubectl exec -n logging "${mc_pod}" -- \
-            mc config host add minio \
-            'http://minio-service.logging.svc.cluster.local:9000' \
-            'minio_access_key' \
-            'minio_secret_key'
+        env:
+          KIND_IMAGE: ${{ steps.node_image.outputs.image }}
 
       - name: Test
         run: hack/test.sh
