@@ -23,8 +23,8 @@ VERSION := $(shell git describe --abbrev=0 --tags)
 
 E2E_TEST_TIMEOUT ?= 20m
 
-CONTROLLER_GEN = ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION = v0.6.0
+CONTROLLER_GEN := ${BIN}/controller-gen
+CONTROLLER_GEN_VERSION := v0.6.0
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
 ENVTEST_K8S_VERSION := 1.24.1
@@ -46,6 +46,8 @@ KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
 LICENSEI_VERSION = v0.8.0
+
+STERN_VERSION := 1.25.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
@@ -155,7 +157,15 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
 
 .PHONY: test-e2e
-test-e2e: ${KIND} docker-build generate fmt vet manifests stern ## Run E2E tests
+test-e2e: ${KIND} generate manifests docker-build stern ## Run E2E tests
+	$(MAKE) test-e2e-nodeps
+
+.PHONY: test-e2e-ci
+test-e2e-ci: ${BIN}
+	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64
+	chmod +x ./bin/kind
+	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
+	chmod +x ./bin/stern
 	cd e2e && \
 		LOGGING_OPERATOR_IMAGE="${IMG}" \
 		KIND_PATH="$(KIND)" \

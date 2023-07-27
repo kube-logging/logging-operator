@@ -75,11 +75,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Make docker-build
-        run: make docker-build
-
       - name: Run e2e tests
-        run: make test-e2e
+        run: make test-e2e-ci
         env:
           SHARD: ${{ matrix.SHARD }}
           SHARDS: ${{ matrix.SHARDS }}
