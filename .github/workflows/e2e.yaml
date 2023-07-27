@@ -27,6 +27,8 @@ jobs:
         with:
           context: .
           tags: controller:local
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/controller.tar
 
       - name: Upload artifact
