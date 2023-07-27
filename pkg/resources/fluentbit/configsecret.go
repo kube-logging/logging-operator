@@ -337,7 +337,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 	if r.Logging.Spec.SyslogNGSpec != nil {
 		input.SyslogNGOutput = &syslogNGOutputConfig{}
-		input.SyslogNGOutput.Host = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(syslogng.ServiceName), r.Logging.Spec.ControlNamespace)
+		input.SyslogNGOutput.Host = fmt.Sprintf("%s.%s.svc%s", r.Logging.QualifiedName(syslogng.ServiceName), r.Logging.Spec.ControlNamespace, r.Logging.ClusterDomainAsSuffix())
 		input.SyslogNGOutput.Port = syslogng.ServicePort
 		input.SyslogNGOutput.JSONDateKey = "ts"
 		input.SyslogNGOutput.JSONDateFormat = "iso8601"
