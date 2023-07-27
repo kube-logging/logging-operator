@@ -8,25 +8,6 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
 rules:
 - apiGroups:
-  - logging-extensions.banzaicloud.io
-  resources:
-  - eventtailers
-  verbs:
-  - create
-  - delete
-  - deletecollection
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - logging-extensions.banzaicloud.io
-  resources:
-  - eventtailers/status
-  verbs:
-  - get
-- apiGroups:
   - logging.banzaicloud.io
   resources:
   - flows
