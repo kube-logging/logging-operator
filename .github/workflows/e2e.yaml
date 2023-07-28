@@ -44,8 +44,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        SHARD: [0, 1]
-        SHARDS: [2]
+        SHARD: [0]
+        SHARDS: [1]
 
     steps:
       - name: Set up Docker Buildx
