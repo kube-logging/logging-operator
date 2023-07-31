@@ -25,13 +25,6 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
-  - flows/status
-  - outputs/status
-  verbs:
-  - get
-- apiGroups:
-  - logging.banzaicloud.io
-  resources:
   - syslogngflows
   - syslogngoutputs
   verbs:
@@ -43,11 +36,4 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - logging.banzaicloud.io
-  resources:
-  - syslogngflows/status
-  - syslogngoutputs/status
-  verbs:
-  - get
 {{- end }}
