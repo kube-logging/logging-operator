@@ -312,9 +312,9 @@ func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
 
 func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 	containerArgs := []string{
+		"timeout", "10",
 		"fluentd", "-c",
 		fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
-		"--dry-run",
 	}
 	containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
 
