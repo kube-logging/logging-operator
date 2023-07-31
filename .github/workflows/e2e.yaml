@@ -43,9 +43,9 @@ jobs:
     needs: build
     strategy:
       fail-fast: false
-      matrix:
-        SHARD: [0]
-        SHARDS: [1]
+#      matrix:
+#        SHARD: [0]
+#        SHARDS: [1]
 
     steps:
       - name: Set up Docker Buildx
@@ -77,9 +77,9 @@ jobs:
 
       - name: Run e2e tests
         run: make test-e2e-ci
-        env:
-          SHARD: ${{ matrix.SHARD }}
-          SHARDS: ${{ matrix.SHARDS }}
+#        env:
+#          SHARD: ${{ matrix.SHARD }}
+#          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Archive Test Results
         if: always()
