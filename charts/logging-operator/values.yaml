@@ -265,6 +265,7 @@ logging:
 testReceiver:
   enabled: false
   image: fluent/fluent-bit
+  pullPolicy: IfNotPresent
   port: 8080
   args: ["-i", "http", "-p", "port=8080", "-o", "stdout"]
   resources:

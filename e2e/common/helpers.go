@@ -16,15 +16,32 @@ package common
 
 import (
 	"fmt"
+	"os"
+	"sync/atomic"
 	"testing"
 
 	"emperror.dev/errors"
+	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
 )
+
+var sequence uint32
 
 func RequireNoError(t *testing.T, err error) {
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("Received unexpected error:\n%#v %+v", err, errors.GetDetails(err)))
 		t.FailNow()
 	}
+}
+
+func Initialize(t *testing.T) {
+	localSeq := atomic.AddUint32(&sequence, 1)
+	shards := cast.ToUint32(os.Getenv("SHARDS"))
+	shard := cast.ToUint32(os.Getenv("SHARD"))
+	if shards > 0 {
+		if localSeq%shards != shard {
+			t.Skipf("skipping %s as sequence %d not in shard %d", t.Name(), localSeq, shard)
+		}
+	}
+	t.Parallel()
 }

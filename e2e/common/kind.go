@@ -15,8 +15,7 @@
 package common
 
 import (
-	"bytes"
-	"os/exec"
+	"strings"
 
 	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
@@ -37,6 +36,5 @@ func KindClusterKubeconfig(name string) ([]byte, error) {
 }
 
 func isClusterAlreadyExistsError(err error) bool {
-	exitErr, _ := err.(*exec.ExitError)
-	return exitErr != nil && bytes.Contains(exitErr.Stderr, []byte("failed to create cluster: node(s) already exist for a cluster with the name"))
+	return strings.Contains(err.Error(), "failed to create cluster: node(s) already exist for a cluster with the name")
 }
