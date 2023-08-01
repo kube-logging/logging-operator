@@ -84,7 +84,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		fluentContainer(r.Logging.Spec.FluentdSpec),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
 	}
-	if c := r.bufferMetricsSidecarContainer(); c != nil {
+	if c := r.bufferMetricsSidecarContainer(r.Logging.Spec.FluentdSpec); c != nil {
 		containers = append(containers, *c)
 	}
 
@@ -364,7 +364,7 @@ func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
 	return nil
 }
 
-func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
+func (r *Reconciler) bufferMetricsSidecarContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
 	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
@@ -381,6 +381,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
+			Resources:       spec.BufferVolumeResources,
 			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
 			Args:            []string{"--startup", customRunner},
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),

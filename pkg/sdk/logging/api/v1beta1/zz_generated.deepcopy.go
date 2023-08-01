@@ -1387,6 +1387,7 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	in.Resources.DeepCopyInto(&out.Resources)
 	in.ConfigCheckResources.DeepCopyInto(&out.ConfigCheckResources)
 	in.ConfigReloaderResources.DeepCopyInto(&out.ConfigReloaderResources)
+	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)

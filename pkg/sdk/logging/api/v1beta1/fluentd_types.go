@@ -54,6 +54,7 @@ type FluentdSpec struct {
 	Resources                 corev1.ResourceRequirements       `json:"resources,omitempty"`
 	ConfigCheckResources      corev1.ResourceRequirements       `json:"configCheckResources,omitempty"`
 	ConfigReloaderResources   corev1.ResourceRequirements       `json:"configReloaderResources,omitempty"`
+	BufferVolumeResources     corev1.ResourceRequirements       `json:"bufferVolumeResources,omitempty"`
 	LivenessProbe             *corev1.Probe                     `json:"livenessProbe,omitempty"`
 	LivenessDefaultCheck      bool                              `json:"livenessDefaultCheck,omitempty"`
 	ReadinessProbe            *corev1.Probe                     `json:"readinessProbe,omitempty"`
