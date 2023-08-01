@@ -242,9 +242,9 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
 		}
 
-		fluentbitTargetPort := r.fluentbitSpec.TargetPort
-		if fluentbitTargetPort == 0 {
-			fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
+		fluentbitTargetPort := int32(fluentd.ServicePort)
+		if r.fluentbitSpec.TargetPort != 0 {
+			fluentbitTargetPort = r.fluentbitSpec.TargetPort
 		}
 
 		input.FluentForwardOutput = &fluentForwardOutputConfig{
@@ -392,7 +392,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 							input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
 								Namespace: ns,
 								Host:      aggregatorEndpoint(&l, fluentd.ServiceName),
-								Port:      24240,
+								Port:      fluentd.ServicePort,
 							})
 						} else if l.Spec.SyslogNGSpec != nil {
 							if input.SyslogNGOutput == nil {
@@ -496,6 +496,6 @@ func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
 			r.Logging.Spec.ControlNamespace,
 			r.Logging.ClusterDomainAsSuffix()),
-		Port: 24240,
+		Port: fluentd.ServicePort,
 	}
 }
