@@ -11,6 +11,8 @@ metadata:
 spec:
   loggingRef: a
   match:
-    - select: {}
+    - select:
+        labels:
+          app.kubernetes.io/name: log-generator
   globalOutputRefs:
     - http
