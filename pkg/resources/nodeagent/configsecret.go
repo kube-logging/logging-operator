@@ -40,7 +40,7 @@ type fluentbitInputConfig struct {
 type upstreamNode struct {
 	Name string
 	Host string
-	Port int
+	Port int32
 }
 
 type upstream struct {
@@ -179,6 +179,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		Namespace:               n.logging.Spec.ControlNamespace,
 		Monitor:                 monitor,
 		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
+		TargetPort:              fluentd.ServicePort,
 		Input:                   fluentbitInput,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		KubernetesFilter:        fluentbitKubernetesFilter,
@@ -193,9 +194,6 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 			Enabled:   *n.nodeAgent.FluentbitSpec.TLS.Enabled,
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
 		}
-	}
-	if n.logging.Spec.FluentdSpec != nil {
-		input.TargetPort = n.logging.Spec.FluentdSpec.Port
 	}
 	if n.nodeAgent.FluentbitSpec.FilterAws != nil {
 		awsFilter, err := mapper.StringsMap(n.nodeAgent.FluentbitSpec.FilterAws)
@@ -328,6 +326,6 @@ func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
 			n.logging.Spec.ControlNamespace,
 			n.logging.ClusterDomainAsSuffix()),
-		Port: 24240,
+		Port: n.logging.Spec.FluentdSpec.Port,
 	}
 }

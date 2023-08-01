@@ -48,17 +48,20 @@ type FluentdSpec struct {
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
 	// Deprecated, use bufferStorageVolume
-	FluentdPvcSpec            *volume.KubernetesVolume          `json:"fluentdPvcSpec,omitempty"`
-	VolumeMountChmod          bool                              `json:"volumeMountChmod,omitempty"`
-	VolumeModImage            ImageSpec                         `json:"volumeModImage,omitempty"`
-	ConfigReloaderImage       ImageSpec                         `json:"configReloaderImage,omitempty"`
-	Resources                 corev1.ResourceRequirements       `json:"resources,omitempty"`
-	ConfigCheckResources      corev1.ResourceRequirements       `json:"configCheckResources,omitempty"`
-	ConfigReloaderResources   corev1.ResourceRequirements       `json:"configReloaderResources,omitempty"`
-	LivenessProbe             *corev1.Probe                     `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck      bool                              `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe            *corev1.Probe                     `json:"readinessProbe,omitempty"`
-	ReadinessDefaultCheck     ReadinessDefaultCheck             `json:"readinessDefaultCheck,omitempty"`
+	FluentdPvcSpec          *volume.KubernetesVolume    `json:"fluentdPvcSpec,omitempty"`
+	VolumeMountChmod        bool                        `json:"volumeMountChmod,omitempty"`
+	VolumeModImage          ImageSpec                   `json:"volumeModImage,omitempty"`
+	ConfigReloaderImage     ImageSpec                   `json:"configReloaderImage,omitempty"`
+	Resources               corev1.ResourceRequirements `json:"resources,omitempty"`
+	ConfigCheckResources    corev1.ResourceRequirements `json:"configCheckResources,omitempty"`
+	ConfigReloaderResources corev1.ResourceRequirements `json:"configReloaderResources,omitempty"`
+	LivenessProbe           *corev1.Probe               `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck    bool                        `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe          *corev1.Probe               `json:"readinessProbe,omitempty"`
+	ReadinessDefaultCheck   ReadinessDefaultCheck       `json:"readinessDefaultCheck,omitempty"`
+	// Fluentd port inside the container (24240 by default)
+	// The headless service port is controlled by this field as well
+	// Note, that the default ClusterIP service port is always 24240 regardless of this field
 	Port                      int32                             `json:"port,omitempty"`
 	Tolerations               []corev1.Toleration               `json:"tolerations,omitempty"`
 	NodeSelector              map[string]string                 `json:"nodeSelector,omitempty"`

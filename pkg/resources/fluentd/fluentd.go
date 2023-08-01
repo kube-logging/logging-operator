@@ -51,6 +51,7 @@ const (
 	StatefulSetName       = "fluentd"
 	PodSecurityPolicyName = "fluentd"
 	ServiceName           = "fluentd"
+	ServicePort           = 24240
 	OutputSecretName      = "fluentd-output"
 	OutputSecretPath      = "/fluentd/secret"
 

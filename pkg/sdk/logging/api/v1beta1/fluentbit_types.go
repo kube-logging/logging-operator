@@ -72,7 +72,7 @@ type FluentbitSpec struct {
 	TLS                  *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost           string            `json:"targetHost,omitempty"`
 	TargetPort           int32             `json:"targetPort,omitempty"`
-	// Specify target logging resources and namespaces
+	// Specify target logging resources and namespaces (experimental)
 	TargetLoggings []TargetLogging `json:"targetLoggings,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
