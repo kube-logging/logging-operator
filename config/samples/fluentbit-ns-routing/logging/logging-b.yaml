@@ -9,7 +9,8 @@ metadata:
   name: b
 spec:
   loggingRef: b
-  syslogNG: {}
+  syslogNG:
+    jsonKeyDelim: '#'
   controlNamespace: b
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -19,6 +20,11 @@ metadata:
   namespace: b
 spec:
   loggingRef: b
+  match:
+    regexp:
+      pattern: log-generator
+      type: string
+      value: json#kubernetes#labels#app.kubernetes.io/name
   localOutputRefs:
     - http
 ---

@@ -102,7 +102,7 @@ var fluentBitConfigTemplate = `
     {{- if eq $target.Namespace "*" }}
     Match *
     {{- else }}
-    Match_Regex ^[^_]+_{{ $target.Namespace }}_.*$
+    Match *_{{ $target.Namespace }}_*
     {{- end }}
     {{- if $out.Upstream.Enabled }}
     Upstream      {{ $out.Upstream.Config.Path }}
@@ -166,7 +166,7 @@ var fluentBitConfigTemplate = `
     {{- if eq $target.Namespace "*" }}
     Match *
     {{- else }}
-    Match_Regex ^[^_]+_{{ $target.Namespace }}_.*$
+    Match *_{{ $target.Namespace }}_*
     {{- end }}
     Host {{ $target.Host }}
     Port {{ $target.Port }}
