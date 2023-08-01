@@ -44,7 +44,7 @@ spec:
           {{- range .Values.testReceiver.args }}
             - {{ . }}
           {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.testReceiver.pullPolicy }}
           resources:
             {{- toYaml .Values.testReceiver.resources | nindent 12 }}
           ports:

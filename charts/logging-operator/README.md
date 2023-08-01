@@ -93,6 +93,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.hostTailer | object | `{}` | HostTailer config |
 | testReceiver.enabled | bool | `false` |  |
 | testReceiver.image | string | `"fluent/fluent-bit"` |  |
+| testReceiver.pullPolicy | string | `"IfNotPresent"` |  |
 | testReceiver.port | int | `8080` |  |
 | testReceiver.args[0] | string | `"-i"` |  |
 | testReceiver.args[1] | string | `"http"` |  |
