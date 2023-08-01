@@ -461,8 +461,8 @@ type ForwardOptions struct {
 }
 
 type FluentbitNameProvider struct {
-	logging   *Logging
-	fluentbit *FluentbitAgent
+	logging   *Logging		`json:"logging,omitempty"`
+	fluentbit *FluentbitAgent	`json:"fluentbit,omitempty"`
 }
 
 func (l *FluentbitNameProvider) ComponentName(name string) string {
