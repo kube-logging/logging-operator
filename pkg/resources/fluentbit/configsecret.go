@@ -325,9 +325,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			}
 			input.FluentForwardOutput.Options = forwardOptions
 		}
-		if r.fluentbitSpec.Network != nil {
-			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
-		}
+		r.applyNetworkSettings(input)
 
 		aggregatorReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
 		if err != nil {
@@ -366,9 +364,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	if input.SyslogNGOutput != nil {
-		if r.fluentbitSpec.Network != nil {
-			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
-		}
+		r.applyNetworkSettings(input)
 	}
 
 	if r.fluentbitSpec.TargetLoggings != nil {
@@ -428,6 +424,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
+	r.applyNetworkSettings(input)
+
 	conf, err := generateConfig(input)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to generate config for fluentbit")
@@ -456,19 +454,35 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}, reconciler.StatePresent, nil
 }
 
+func (r *Reconciler) applyNetworkSettings(input fluentBitConfig) {
+	if r.fluentbitSpec.Network != nil {
+		if input.FluentForwardOutput != nil {
+			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+		if input.SyslogNGOutput != nil {
+			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+	}
+}
+
 func aggregatorEndpoint(l *v1beta1.Logging, svc string) string {
 	return fmt.Sprintf("%s.%s.svc%s", l.QualifiedName(svc), l.Spec.ControlNamespace, l.ClusterDomainAsSuffix())
 }
 
 func generateConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
-	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
+	tmpl := template.New("fluentbit")
+	tmpl, err := tmpl.Parse(fluentBitConfigTemplate)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "parsing fluentbit template")
+	}
+	tmpl, err = tmpl.Parse(fluentbitNetworkTemplate)
+	if err != nil {
+		return "", errors.WrapIf(err, "parsing fluentbit network nested template")
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "executing fluentbit config template")
 	}
 	outputString := output.String()
 	return outputString, nil

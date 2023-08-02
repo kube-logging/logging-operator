@@ -17,6 +17,8 @@ metadata:
   name: infra
 spec:
   loggingRef: infra
+  network:
+    connectTimeout: 2
   targetLoggings:
     - loggingName: a
       namespaces:

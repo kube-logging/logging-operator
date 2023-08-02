@@ -122,7 +122,7 @@ var fluentBitConfigTemplate = `
     Host          {{ $target.Host }}
     Port          {{ $target.Port }}
     {{- end }}
-    {{ if $out.TLS.Enabled }}
+    {{- if $out.TLS.Enabled }}
     tls           On
     tls.verify    Off
     tls.ca_file   /fluent-bit/tls/ca.crt
@@ -134,33 +134,7 @@ var fluentBitConfigTemplate = `
     Empty_Shared_Key true
     {{- end }}
     {{- end }}
-    {{- if $out.Network.ConnectTimeoutSet }}
-    net.connect_timeout {{ $out.Network.ConnectTimeout }}
-    {{- end }}
-    {{- if $out.Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{ $out.Network.ConnectTimeoutLogError }}
-    {{- end }}
-    {{- if $out.Network.DNSMode }}
-    net.dns.mode {{ $out.Network.DNSMode }}
-    {{- end }}
-    {{- if $out.Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{ $out.Network.DNSPreferIPV4 }}
-    {{- end }}
-    {{- if $out.Network.DNSResolver }}
-    net.dns.resolver {{ $out.Network.DNSResolver }}
-    {{- end }}
-    {{- if $out.Network.KeepaliveSet}}
-    net.keepalive {{if $out.Network.Keepalive }}on{{else}}off{{end}}
-    {{- end }}
-    {{- if $out.Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{ $out.Network.KeepaliveIdleTimeout }}
-    {{- end }}
-    {{- if $out.Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{ $out.Network.KeepaliveMaxRecycle }}
-    {{- end }}
-    {{- if $out.Network.SourceAddress }}
-    net.source_address {{ $out.Network.SourceAddress }}
-    {{- end }}
+    {{- template "network" $out }}
     {{- with $out.Options }}
     {{- range $key, $value := . }}
     {{- if $value }}
@@ -192,35 +166,41 @@ var fluentBitConfigTemplate = `
     {{- with $out.Workers }}
     Workers {{ . }}
     {{- end }}
-    {{- if $out.Network.ConnectTimeoutSet }}
-    net.connect_timeout {{ $out.Network.ConnectTimeout }}
-    {{- end }}
-    {{- if $out.Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{ $out.Network.ConnectTimeoutLogError }}
-    {{- end }}
-    {{- if $out.Network.DNSMode }}
-    net.dns.mode {{ $out.Network.DNSMode }}
-    {{- end }}
-    {{- if $out.Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{ $out.Network.DNSPreferIPV4 }}
-    {{- end }}
-    {{- if $out.Network.DNSResolver }}
-    net.dns.resolver {{ $out.Network.DNSResolver }}
-    {{- end }}
-    {{- if $out.Network.KeepaliveSet}}
-    net.keepalive {{if $out.Network.Keepalive }}on{{else}}off{{end}}
-    {{- end }}
-    {{- if $out.Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{ $out.Network.KeepaliveIdleTimeout }}
-    {{- end }}
-    {{- if $out.Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{ $out.Network.KeepaliveMaxRecycle }}
-    {{- end }}
-    {{- if $out.Network.SourceAddress }}
-    net.source_address {{ $out.Network.SourceAddress }}
-    {{- end }}
+    {{- template "network" $out }}
 {{- end }}
 {{- end }}
+`
+
+var fluentbitNetworkTemplate = `
+    {{- define "network" }}
+    {{- if .Network.ConnectTimeoutSet }}
+    net.connect_timeout {{ .Network.ConnectTimeout }}
+    {{- end }}
+    {{- if .Network.ConnectTimeoutLogErrorSet }}
+    net.connect_timeout_log_error {{ .Network.ConnectTimeoutLogError }}
+    {{- end }}
+    {{- if .Network.DNSMode }}
+    net.dns.mode {{ .Network.DNSMode }}
+    {{- end }}
+    {{- if .Network.DNSPreferIPV4Set }}
+    net.dns.prefer_ipv4 {{ .Network.DNSPreferIPV4 }}
+    {{- end }}
+    {{- if .Network.DNSResolver }}
+    net.dns.resolver {{ .Network.DNSResolver }}
+    {{- end }}
+    {{- if .Network.KeepaliveSet}}
+    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
+    {{- end }}
+    {{- if .Network.KeepaliveIdleTimeoutSet }}
+    net.keepalive_idle_timeout {{ .Network.KeepaliveIdleTimeout }}
+    {{- end }}
+    {{- if .Network.KeepaliveMaxRecycleSet }}
+    net.keepalive_max_recycle {{ .Network.KeepaliveMaxRecycle }}
+    {{- end }}
+    {{- if .Network.SourceAddress }}
+    net.source_address {{ .Network.SourceAddress }}
+    {{- end }}
+    {{- end }}
 `
 
 var upstreamConfigTemplate = `
