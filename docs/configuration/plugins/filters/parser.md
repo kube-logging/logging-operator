@@ -399,51 +399,57 @@ Use specified timezone. one can parse/format the time value in the specified tim
 Default: -
 
 
- #### Example `Parser` filter configurations
+ ## Example `Parser` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - parser:
-        remove_key_name_field: true
-        reserve_data: true
-        parse:
-          type: multi_format
-          patterns:
-          - format: nginx
-          - format: regexp
-            expression: /foo/
-          - format: none
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - parser:
+	      remove_key_name_field: true
+	      reserve_data: true
+	      parse:
+	        type: multi_format
+	        patterns:
+	        - format: nginx
+	        - format: regexp
+	          expression: /foo/
+	        - format: none
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type parser
-  @id test_parser
-  key_name message
-  remove_key_name_field true
-  reserve_data true
-  <parse>
-    @type multi_format
-    <pattern>
-      format nginx
-    </pattern>
-    <pattern>
-      expression /foo/
-      format regexp
-    </pattern>
-    <pattern>
-      format none
-    </pattern>
-  </parse>
-</filter>
+ <filter **>
+
+	@type parser
+	@id test_parser
+	key_name message
+	remove_key_name_field true
+	reserve_data true
+	<parse>
+	  @type multi_format
+	  <pattern>
+	    format nginx
+	  </pattern>
+	  <pattern>
+	    expression /foo/
+	    format regexp
+	  </pattern>
+	  <pattern>
+	    format none
+	  </pattern>
+	</parse>
+
+ </filter>
  ```
 
 ---

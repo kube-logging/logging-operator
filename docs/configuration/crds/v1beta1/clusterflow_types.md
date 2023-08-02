@@ -40,11 +40,7 @@ Default: -
 
 ## ClusterSelect
 
-### namespaces ([]string, optional) {#clusterselect-namespaces}
-
-Default: -
-
-### labels (map[string]string, optional) {#clusterselect-labels}
+### container_names ([]string, optional) {#clusterselect-container_names}
 
 Default: -
 
@@ -52,18 +48,18 @@ Default: -
 
 Default: -
 
-### container_names ([]string, optional) {#clusterselect-container_names}
+### labels (map[string]string, optional) {#clusterselect-labels}
+
+Default: -
+
+### namespaces ([]string, optional) {#clusterselect-namespaces}
 
 Default: -
 
 
 ## ClusterExclude
 
-### namespaces ([]string, optional) {#clusterexclude-namespaces}
-
-Default: -
-
-### labels (map[string]string, optional) {#clusterexclude-labels}
+### container_names ([]string, optional) {#clusterexclude-container_names}
 
 Default: -
 
@@ -71,7 +67,11 @@ Default: -
 
 Default: -
 
-### container_names ([]string, optional) {#clusterexclude-container_names}
+### labels (map[string]string, optional) {#clusterexclude-labels}
+
+Default: -
+
+### namespaces ([]string, optional) {#clusterexclude-namespaces}
 
 Default: -
 
@@ -80,21 +80,27 @@ Default: -
 
 ClusterFlowSpec is the Kubernetes spec for ClusterFlows
 
-### selectors (map[string]string, optional) {#clusterflowspec-selectors}
-
-Deprecated 
-
-Default: -
-
-### match ([]ClusterMatch, optional) {#clusterflowspec-match}
-
-Default: -
-
 ### filters ([]Filter, optional) {#clusterflowspec-filters}
 
 Default: -
 
+### flowLabel (string, optional) {#clusterflowspec-flowlabel}
+
+Default: -
+
+### globalOutputRefs ([]string, optional) {#clusterflowspec-globaloutputrefs}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#clusterflowspec-includelabelinrouter}
+
+Default: -
+
 ### loggingRef (string, optional) {#clusterflowspec-loggingref}
+
+Default: -
+
+### match ([]ClusterMatch, optional) {#clusterflowspec-match}
 
 Default: -
 
@@ -104,7 +110,9 @@ Deprecated
 
 Default: -
 
-### globalOutputRefs ([]string, optional) {#clusterflowspec-globaloutputrefs}
+### selectors (map[string]string, optional) {#clusterflowspec-selectors}
+
+Deprecated 
 
 Default: -
 
@@ -113,15 +121,15 @@ Default: -
 
 ClusterFlowList contains a list of ClusterFlow
 
+### items ([]ClusterFlow, required) {#clusterflowlist-items}
+
+Default: -
+
 ###  (metav1.TypeMeta, required) {#clusterflowlist-}
 
 Default: -
 
 ### metadata (metav1.ListMeta, optional) {#clusterflowlist-metadata}
-
-Default: -
-
-### items ([]ClusterFlow, required) {#clusterflowlist-items}
 
 Default: -
 

@@ -29,11 +29,11 @@ Default: -
 
 SyslogNGClusterOutputSpec contains Kubernetes spec for SyslogNGClusterOutput
 
-###  (SyslogNGOutputSpec, required) {#syslogngclusteroutputspec-}
+### enabledNamespaces ([]string, optional) {#syslogngclusteroutputspec-enablednamespaces}
 
 Default: -
 
-### enabledNamespaces ([]string, optional) {#syslogngclusteroutputspec-enablednamespaces}
+###  (SyslogNGOutputSpec, required) {#syslogngclusteroutputspec-}
 
 Default: -
 
@@ -42,15 +42,15 @@ Default: -
 
 SyslogNGClusterOutputList contains a list of SyslogNGClusterOutput
 
+### items ([]SyslogNGClusterOutput, required) {#syslogngclusteroutputlist-items}
+
+Default: -
+
 ###  (metav1.TypeMeta, required) {#syslogngclusteroutputlist-}
 
 Default: -
 
 ### metadata (metav1.ListMeta, optional) {#syslogngclusteroutputlist-metadata}
-
-Default: -
-
-### items ([]SyslogNGClusterOutput, required) {#syslogngclusteroutputlist-items}
 
 Default: -
 

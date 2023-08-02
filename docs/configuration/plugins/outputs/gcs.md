@@ -4,6 +4,22 @@ weight: 200
 generated_file: true
 ---
 
+# Google Cloud Storage
+## Overview
+ Store logs in Google Cloud Storage. For details, see [https://github.com/kube-logging/fluent-plugin-gcs](https://github.com/kube-logging/fluent-plugin-gcs).
+
+ ## Example
+ ```yaml
+ spec:
+
+	gcs:
+	  project: logging-example
+	  bucket: banzai-log-test
+	  path: logs/${tag}/%Y/%m/%d/
+
+ ```
+
+## Configuration
 ## GCSOutput
 
 ### project (string, required) {#gcsoutput-project}
@@ -117,6 +133,12 @@ Default: -
 ### buffer (*Buffer, optional) {#gcsoutput-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#gcsoutput-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

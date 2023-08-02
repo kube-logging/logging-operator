@@ -48,31 +48,37 @@ Add records docs at: https://github.com/repeatedly/fluent-plugin-record-modifier
 Default: -
 
 
- #### Example `Record Modifier` filter configurations
+ ## Example `Record Modifier` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - record_modifier:
-        records:
-        - foo: "bar"
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - record_modifier:
+	      records:
+	      - foo: "bar"
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type record_modifier
-  @id test_record_modifier
-  <record>
-    foo bar
-  </record>
-</filter>
+ <filter **>
+
+	@type record_modifier
+	@id test_record_modifier
+	<record>
+	  foo bar
+	</record>
+
+ </filter>
  ```
 
 ---

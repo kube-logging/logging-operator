@@ -8,7 +8,43 @@ generated_file: true
 
 SyslogNGSpec defines the desired state of SyslogNG
 
-### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
+### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
+
+Default: -
+
+### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
+
+Default: -
+
+### configCheckPod (*typeoverride.PodSpec, optional) {#syslogngspec-configcheckpod}
+
+Default: -
+
+### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
+
+Default: -
+
+### jsonKeyPrefix (string, optional) {#syslogngspec-jsonkeyprefix}
+
+Default: -
+
+### jsonKeyDelim (string, optional) {#syslogngspec-jsonkeydelim}
+
+Default: -
+
+### logIWSize (int, optional) {#syslogngspec-logiwsize}
+
+Default: -
+
+### maxConnections (int, optional) {#syslogngspec-maxconnections}
+
+Default: -
+
+### metrics (*Metrics, optional) {#syslogngspec-metrics}
+
+Default: -
+
+### metricsService (*typeoverride.Service, optional) {#syslogngspec-metricsservice}
 
 Default: -
 
@@ -32,27 +68,7 @@ Default: -
 
 Default: -
 
-### configCheckPod (*typeoverride.PodSpec, optional) {#syslogngspec-configcheckpod}
-
-Default: -
-
-### metrics (*Metrics, optional) {#syslogngspec-metrics}
-
-Default: -
-
-### metricsService (*typeoverride.Service, optional) {#syslogngspec-metricsservice}
-
-Default: -
-
-### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
-
-Default: -
-
-### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
-
-Default: -
-
-### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
+### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
 
 Default: -
 
@@ -76,11 +92,32 @@ Default: -
 
 ## GlobalOptions
 
-### stats_level (*int, optional) {#globaloptions-stats_level}
+### stats (*Stats, optional) {#globaloptions-stats}
+
+TODO switch to this by default 
 
 Default: -
 
 ### stats_freq (*int, optional) {#globaloptions-stats_freq}
+
+deprecated use stats/freq from 4.1+ 
+
+Default: -
+
+### stats_level (*int, optional) {#globaloptions-stats_level}
+
+deprecated use stats/level from 4.1+ 
+
+Default: -
+
+
+## Stats
+
+### freq (*int, optional) {#stats-freq}
+
+Default: -
+
+### level (*int, optional) {#stats-level}
 
 Default: -
 

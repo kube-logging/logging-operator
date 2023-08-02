@@ -6,23 +6,27 @@ generated_file: true
 
 # Kafka output plugin for Fluentd
 ## Overview
-  More info at https://github.com/fluent/fluent-plugin-kafka
->Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
 
- #### Example output configurations
+	More info at https://github.com/fluent/fluent-plugin-kafka
+
+ >Example Deployment: [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/)
+
+ ## Example output configurations
  ```yaml
  spec:
-   kafka:
-     brokers: kafka-headless.kafka.svc.cluster.local:29092
-     default_topic: topic
-     sasl_over_ssl: false
-     format:
-       type: json
-     buffer:
-       tags: topic
-       timekey: 1m
-       timekey_wait: 30s
-       timekey_use_utc: true
+
+	kafka:
+	  brokers: kafka-headless.kafka.svc.cluster.local:29092
+	  default_topic: topic
+	  sasl_over_ssl: false
+	  format:
+	    type: json
+	  buffer:
+	    tags: topic
+	    timekey: 1m
+	    timekey_wait: 30s
+	    timekey_use_utc: true
+
  ```
 
 ## Configuration
@@ -245,6 +249,12 @@ Default: -
 ### buffer (*Buffer, optional) {#kafka-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#kafka-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

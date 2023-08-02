@@ -29,11 +29,11 @@ Default: -
 
 ClusterOutputSpec contains Kubernetes spec for ClusterOutput
 
-###  (OutputSpec, required) {#clusteroutputspec-}
+### enabledNamespaces ([]string, optional) {#clusteroutputspec-enablednamespaces}
 
 Default: -
 
-### enabledNamespaces ([]string, optional) {#clusteroutputspec-enablednamespaces}
+###  (OutputSpec, required) {#clusteroutputspec-}
 
 Default: -
 
@@ -42,15 +42,15 @@ Default: -
 
 ClusterOutputList contains a list of ClusterOutput
 
+### items ([]ClusterOutput, required) {#clusteroutputlist-items}
+
+Default: -
+
 ###  (metav1.TypeMeta, required) {#clusteroutputlist-}
 
 Default: -
 
 ### metadata (metav1.ListMeta, optional) {#clusteroutputlist-metadata}
-
-Default: -
-
-### items ([]ClusterOutput, required) {#clusteroutputlist-items}
 
 Default: -
 

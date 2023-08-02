@@ -24,30 +24,36 @@ Separator
 Default: _
 
 
- #### Example `Dedot` filter configurations
+ ## Example `Dedot` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - dedot:
-        de_dot_separator: "-"
-        de_dot_nested: true
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - dedot:
+	      de_dot_separator: "-"
+	      de_dot_nested: true
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type dedot
-  @id test_dedot
-  de_dot_nested true
-  de_dot_separator -
-</filter>
+ <filter **>
+
+	@type dedot
+	@id test_dedot
+	de_dot_nested true
+	de_dot_separator -
+
+ </filter>
  ```
 
 ---

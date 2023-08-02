@@ -9,14 +9,16 @@ generated_file: true
  Sends logs to Redis endpoints.
  More info at https://github.com/fluent-plugins-nursery/fluent-plugin-redis
 
- #### Example output configurations
+ ## Example output configurations
  ```yaml
  spec:
-   redis:
-     host: redis-master.prod.svc.cluster.local
-     buffer:
-       tags: "[]"
-       flush_interval: 10s
+
+	redis:
+	  host: redis-master.prod.svc.cluster.local
+	  buffer:
+	    tags: "[]"
+	    flush_interval: 10s
+
  ```
 
 ## Configuration
@@ -79,6 +81,12 @@ Default: -
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

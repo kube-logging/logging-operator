@@ -8,11 +8,7 @@ generated_file: true
 
 OutputSpec defines the desired state of Output
 
-### loggingRef (string, optional) {#outputspec-loggingref}
-
-Default: -
-
-### s3 (*output.S3OutputConfig, optional) {#outputspec-s3}
+### awsElasticsearch (*output.AwsElasticsearchOutputConfig, optional) {#outputspec-awselasticsearch}
 
 Default: -
 
@@ -20,31 +16,7 @@ Default: -
 
 Default: -
 
-### gcs (*output.GCSOutput, optional) {#outputspec-gcs}
-
-Default: -
-
-### oss (*output.OSSOutput, optional) {#outputspec-oss}
-
-Default: -
-
-### elasticsearch (*output.ElasticsearchOutput, optional) {#outputspec-elasticsearch}
-
-Default: -
-
-### opensearch (*output.OpenSearchOutput, optional) {#outputspec-opensearch}
-
-Default: -
-
-### logz (*output.LogZOutput, optional) {#outputspec-logz}
-
-Default: -
-
-### loki (*output.LokiOutput, optional) {#outputspec-loki}
-
-Default: -
-
-### sumologic (*output.SumologicOutput, optional) {#outputspec-sumologic}
+### cloudwatch (*output.CloudWatchOutput, optional) {#outputspec-cloudwatch}
 
 Default: -
 
@@ -52,7 +24,7 @@ Default: -
 
 Default: -
 
-### forward (*output.ForwardOutput, optional) {#outputspec-forward}
+### elasticsearch (*output.ElasticsearchOutput, optional) {#outputspec-elasticsearch}
 
 Default: -
 
@@ -60,15 +32,23 @@ Default: -
 
 Default: -
 
-### nullout (*output.NullOutputConfig, optional) {#outputspec-nullout}
+### forward (*output.ForwardOutput, optional) {#outputspec-forward}
+
+Default: -
+
+### gelf (*output.GELFOutputConfig, optional) {#outputspec-gelf}
+
+Default: -
+
+### gcs (*output.GCSOutput, optional) {#outputspec-gcs}
+
+Default: -
+
+### http (*output.HTTPOutputConfig, optional) {#outputspec-http}
 
 Default: -
 
 ### kafka (*output.KafkaOutputConfig, optional) {#outputspec-kafka}
-
-Default: -
-
-### cloudwatch (*output.CloudWatchOutput, optional) {#outputspec-cloudwatch}
 
 Default: -
 
@@ -80,19 +60,35 @@ Default: -
 
 Default: -
 
+### loggingRef (string, optional) {#outputspec-loggingref}
+
+Default: -
+
+### logz (*output.LogZOutput, optional) {#outputspec-logz}
+
+Default: -
+
+### loki (*output.LokiOutput, optional) {#outputspec-loki}
+
+Default: -
+
+### mattermost (*output.MattermostOutputConfig, optional) {#outputspec-mattermost}
+
+Default: -
+
 ### newrelic (*output.NewRelicOutputConfig, optional) {#outputspec-newrelic}
 
 Default: -
 
-### splunkHec (*output.SplunkHecOutput, optional) {#outputspec-splunkhec}
+### nullout (*output.NullOutputConfig, optional) {#outputspec-nullout}
 
 Default: -
 
-### http (*output.HTTPOutputConfig, optional) {#outputspec-http}
+### oss (*output.OSSOutput, optional) {#outputspec-oss}
 
 Default: -
 
-### awsElasticsearch (*output.AwsElasticsearchOutputConfig, optional) {#outputspec-awselasticsearch}
+### opensearch (*output.OpenSearchOutput, optional) {#outputspec-opensearch}
 
 Default: -
 
@@ -100,11 +96,15 @@ Default: -
 
 Default: -
 
-### syslog (*output.SyslogOutputConfig, optional) {#outputspec-syslog}
+### relabel (*output.RelabelOutputConfig, optional) {#outputspec-relabel}
 
 Default: -
 
-### gelf (*output.GELFOutputConfig, optional) {#outputspec-gelf}
+### s3 (*output.S3OutputConfig, optional) {#outputspec-s3}
+
+Default: -
+
+### splunkHec (*output.SplunkHecOutput, optional) {#outputspec-splunkhec}
 
 Default: -
 
@@ -112,7 +112,11 @@ Default: -
 
 Default: -
 
-### mattermost (*output.MattermostOutputConfig, optional) {#outputspec-mattermost}
+### sumologic (*output.SumologicOutput, optional) {#outputspec-sumologic}
+
+Default: -
+
+### syslog (*output.SyslogOutputConfig, optional) {#outputspec-syslog}
 
 Default: -
 
@@ -159,15 +163,15 @@ Default: -
 
 OutputList contains a list of Output
 
+### items ([]Output, required) {#outputlist-items}
+
+Default: -
+
 ###  (metav1.TypeMeta, required) {#outputlist-}
 
 Default: -
 
 ### metadata (metav1.ListMeta, optional) {#outputlist-metadata}
-
-Default: -
-
-### items ([]Output, required) {#outputlist-items}
 
 Default: -
 

@@ -8,15 +8,7 @@ generated_file: true
 
 SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 
-### match (*SyslogNGMatch, optional) {#syslogngflowspec-match}
-
-Default: -
-
 ### filters ([]SyslogNGFilter, optional) {#syslogngflowspec-filters}
-
-Default: -
-
-### loggingRef (string, optional) {#syslogngflowspec-loggingref}
 
 Default: -
 
@@ -25,6 +17,14 @@ Default: -
 Default: -
 
 ### localOutputRefs ([]string, optional) {#syslogngflowspec-localoutputrefs}
+
+Default: -
+
+### loggingRef (string, optional) {#syslogngflowspec-loggingref}
+
+Default: -
+
+### match (*SyslogNGMatch, optional) {#syslogngflowspec-match}
 
 Default: -
 
@@ -75,15 +75,15 @@ Default: -
 
 FlowList contains a list of Flow
 
+### items ([]SyslogNGFlow, required) {#syslogngflowlist-items}
+
+Default: -
+
 ###  (metav1.TypeMeta, required) {#syslogngflowlist-}
 
 Default: -
 
 ### metadata (metav1.ListMeta, optional) {#syslogngflowlist-metadata}
-
-Default: -
-
-### items ([]SyslogNGFlow, required) {#syslogngflowlist-items}
 
 Default: -
 

@@ -33,7 +33,7 @@ Metrics defines the service monitor endpoints
 
 Default: -
 
-### timeout (string, optional) {#metrics-timeout}
+### path (string, optional) {#metrics-path}
 
 Default: -
 
@@ -41,7 +41,11 @@ Default: -
 
 Default: -
 
-### path (string, optional) {#metrics-path}
+### prometheusAnnotations (bool, optional) {#metrics-prometheusannotations}
+
+Default: -
+
+### prometheusRules (bool, optional) {#metrics-prometheusrules}
 
 Default: -
 
@@ -53,11 +57,7 @@ Default: -
 
 Default: -
 
-### prometheusAnnotations (bool, optional) {#metrics-prometheusannotations}
-
-Default: -
-
-### prometheusRules (bool, optional) {#metrics-prometheusrules}
+### timeout (string, optional) {#metrics-timeout}
 
 Default: -
 
@@ -87,11 +87,11 @@ Default: -
 
 Default: -
 
-### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
+### metricRelabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-metricrelabelings}
 
 Default: -
 
-### metricRelabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-metricrelabelings}
+### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
 
 Default: -
 
@@ -106,13 +106,9 @@ Default: -
 
 ## Security
 
-Security defines Fluentd, Fluentbit deployment security properties
+Security defines Fluentd, FluentbitAgent deployment security properties
 
-### serviceAccount (string, optional) {#security-serviceaccount}
-
-Default: -
-
-### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
+### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
 
 Default: -
 
@@ -120,11 +116,15 @@ Default: -
 
 Default: -
 
+### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
+
+Default: -
+
 ### securityContext (*corev1.SecurityContext, optional) {#security-securitycontext}
 
 Default: -
 
-### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
+### serviceAccount (string, optional) {#security-serviceaccount}
 
 Default: -
 
@@ -151,11 +151,11 @@ Default: -
 
 Default: -
 
-### initialDelaySeconds (int32, optional) {#readinessdefaultcheck-initialdelayseconds}
+### failureThreshold (int32, optional) {#readinessdefaultcheck-failurethreshold}
 
 Default: -
 
-### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
+### initialDelaySeconds (int32, optional) {#readinessdefaultcheck-initialdelayseconds}
 
 Default: -
 
@@ -167,7 +167,7 @@ Default: -
 
 Default: -
 
-### failureThreshold (int32, optional) {#readinessdefaultcheck-failurethreshold}
+### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
 
 Default: -
 

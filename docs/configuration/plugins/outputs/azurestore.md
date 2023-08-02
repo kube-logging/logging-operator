@@ -6,8 +6,8 @@ generated_file: true
 
 # Azure Storage output plugin for Fluentd
 ## Overview
-Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
-More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
+ Azure Storage output plugin buffers logs in local file and upload them to Azure Storage periodically.
+ More info at https://github.com/microsoft/fluent-plugin-azure-storage-append-blob
 
 ## Configuration
 ## Output Config
@@ -69,6 +69,12 @@ Default: json
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 
