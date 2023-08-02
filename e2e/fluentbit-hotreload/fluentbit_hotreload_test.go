@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fluentbit_multitenant
+package fluentbit_hotreload
 
 import (
 	"context"
@@ -69,14 +69,14 @@ var producerLabels = map[string]string{
 	"my-unique-label": "log-producer",
 }
 
-func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
+func TestFluentbitHotReload(t *testing.T) {
 	common.Initialize(t)
 	nsInfra := "infra"
 	nsTenant := "tenant"
 	tagInfra := "tag_infra"
 	tagTenant := "tag_tenant"
 
-	release := "fluentbit-multitenant"
+	release := "fluentbit-hotreload"
 	common.WithCluster(release, t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = nsInfra
@@ -125,7 +125,12 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 				t.Log("waiting for the tenant aggregator")
 				return false
 			}
+			return true
+		}, 5*time.Minute, 3*time.Second)
 
+		loggingRoute(ctx, t, c.GetClient())
+
+		require.Eventually(t, func() bool {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", nsInfra,
@@ -204,29 +209,10 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 			Name: "infra",
 		},
 		Spec: v1beta1.FluentbitSpec{
-			LoggingRef:      "infra",
-			ConfigHotReload: &v1beta1.HotReload{},
+			LoggingRef: "infra",
 		},
 	}
 	common.RequireNoError(t, c.Create(ctx, &agent))
-
-	ap := v1beta1.LoggingRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "tenants",
-		},
-		Spec: v1beta1.LoggingRouteSpec{
-			Source: "infra",
-			Targets: metav1.LabelSelector{
-				MatchExpressions: []metav1.LabelSelectorRequirement{
-					{
-						Key:      "tenant",
-						Operator: metav1.LabelSelectorOpExists,
-					},
-				},
-			},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &ap))
 
 	logging := v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{
@@ -253,6 +239,26 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 		},
 	}
 	common.RequireNoError(t, c.Create(ctx, &logging))
+}
+
+func loggingRoute(ctx context.Context, t *testing.T, c client.Client) {
+	ap := v1beta1.LoggingRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "tenants",
+		},
+		Spec: v1beta1.LoggingRouteSpec{
+			Source: "infra",
+			Targets: metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					{
+						Key:      "tenant",
+						Operator: metav1.LabelSelectorOpExists,
+					},
+				},
+			},
+		},
+	}
+	common.RequireNoError(t, c.Create(ctx, &ap))
 }
 
 func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant, nsInfra, release, tag string) {
