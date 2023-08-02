@@ -58,6 +58,7 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
 		RootDir:                   r.Logging.Spec.FluentdSpec.RootDir,
 		EnableMsgpackTimeSupport:  r.Logging.Spec.FluentdSpec.EnableMsgpackTimeSupport,
+		Workers:                   r.Logging.Spec.FluentdSpec.Workers,
 	}
 
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
@@ -69,11 +70,6 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 	input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
 	if input.LogLevel == "" {
 		input.LogLevel = "info"
-	}
-
-	input.Workers = r.Logging.Spec.FluentdSpec.Workers
-	if input.Workers <= 0 {
-		input.Workers = 1
 	}
 
 	inputConfig, err := generateConfig(input)

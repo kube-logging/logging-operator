@@ -54,7 +54,9 @@ var fluentdInputTemplate = `
 <source>
     @type prometheus
     port {{ .Monitor.Port }}
+{{- if .Monitor.Path }}
     metrics_path {{ .Monitor.Path }}
+{{- end }}
 </source>
 <source>
     @type prometheus_monitor
