@@ -67,7 +67,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Formats the cluster domain as a suffix, e.g.:
 .Values.clusterDomain == "", returns ""
-.Values.clusterDomain == "cluster.local", returns ".cluster.local"
+.Values.clusterDomain == "cluster.local.", returns ".cluster.local."
 */}}
 {{- define "logging-operator.clusterDomainAsSuffix" -}}
 {{- if .Values.clusterDomain -}}

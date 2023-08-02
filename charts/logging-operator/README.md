@@ -67,7 +67,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | tolerations | list | `[]` | Node Tolerations |
 | affinity | object | `{}` | Node Affinity |
 | podLabels | object | `{}` | Define which Nodes the Pods are scheduled on. |
-| logging | object | `{"allowClusterResourcesFromAllNamespaces":false,"clusterDomain":"cluster.local","clusterFlows":[],"clusterOutputs":[],"controlNamespace":"","defaultFlow":{},"enableRecreateWorkloadOnImmutableFieldChange":false,"enabled":false,"errorOutputRef":"","eventTailer":{},"flowConfigCheckDisabled":false,"flowConfigOverride":"","fluentbit":{},"fluentbitDisabled":false,"fluentd":{},"fluentdDisabled":false,"globalFilters":[],"hostTailer":{},"loggingRef":"","nodeAgents":{},"skipInvalidResources":false,"syslogNG":{},"watchNamespaces":[]}` | Logging resources configuration. |
+| logging | object | `{"allowClusterResourcesFromAllNamespaces":false,"clusterDomain":"cluster.local.","clusterFlows":[],"clusterOutputs":[],"controlNamespace":"","defaultFlow":{},"enableRecreateWorkloadOnImmutableFieldChange":false,"enabled":false,"errorOutputRef":"","eventTailer":{},"flowConfigCheckDisabled":false,"flowConfigOverride":"","fluentbit":{},"fluentbitDisabled":false,"fluentd":{},"fluentdDisabled":false,"globalFilters":[],"hostTailer":{},"loggingRef":"","nodeAgents":{},"skipInvalidResources":false,"syslogNG":{},"watchNamespaces":[]}` | Logging resources configuration. |
 | logging.enabled | bool | `false` | Logging resources are disabled by default |
 | logging.loggingRef | string | `""` | Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset. |
 | logging.flowConfigCheckDisabled | bool | `false` | Disable configuration check before applying new fluentd configuration. |
@@ -82,7 +82,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.errorOutputRef | string | `""` | GlobalOutput name to flush ERROR events to |
 | logging.globalFilters | list | `[]` | Global filters to apply on logs before any match or filter mechanism. |
 | logging.watchNamespaces | list | `[]` | Limit namespaces to watch Flow and Output custom resources. |
-| logging.clusterDomain | string | `"cluster.local"` | Cluster domain name to be used when templating URLs to services |
+| logging.clusterDomain | string | `"cluster.local."` | Cluster domain name to be used when templating URLs to services |
 | logging.controlNamespace | string | `""` | Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. |
 | logging.allowClusterResourcesFromAllNamespaces | bool | `false` | Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources |
 | logging.nodeAgents | object | `{}` | NodeAgent Configuration |
