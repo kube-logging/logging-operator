@@ -55,13 +55,13 @@ func RepositoryWithTag(repository, tag string) string {
 // Metrics defines the service monitor endpoints
 type Metrics struct {
 	Interval              string               `json:"interval,omitempty"`
-	Timeout               string               `json:"timeout,omitempty"`
-	Port                  int32                `json:"port,omitempty"`
 	Path                  string               `json:"path,omitempty"`
-	ServiceMonitor        bool                 `json:"serviceMonitor,omitempty"`
-	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
+	Port                  int32                `json:"port,omitempty"`
 	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
+	ServiceMonitor        bool                 `json:"serviceMonitor,omitempty"`
+	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
+	Timeout               string               `json:"timeout,omitempty"`
 }
 
 // BufferMetrics defines the service monitor endpoints
@@ -74,19 +74,19 @@ type BufferMetrics struct {
 type ServiceMonitorConfig struct {
 	AdditionalLabels   map[string]string   `json:"additionalLabels,omitempty"`
 	HonorLabels        bool                `json:"honorLabels,omitempty"`
-	Relabelings        []*v1.RelabelConfig `json:"relabelings,omitempty"`
 	MetricsRelabelings []*v1.RelabelConfig `json:"metricRelabelings,omitempty"`
+	Relabelings        []*v1.RelabelConfig `json:"relabelings,omitempty"`
 	Scheme             string              `json:"scheme,omitempty"`
 	TLSConfig          *v1.TLSConfig       `json:"tlsConfig,omitempty"`
 }
 
 // Security defines Fluentd, FluentbitAgent deployment security properties
 type Security struct {
-	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
-	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`
-	PodSecurityPolicyCreate      bool                       `json:"podSecurityPolicyCreate,omitempty"`
-	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`
 	PodSecurityContext           *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
+	PodSecurityPolicyCreate      bool                       `json:"podSecurityPolicyCreate,omitempty"`
+	RoleBasedAccessControlCreate *bool                      `json:"roleBasedAccessControlCreate,omitempty"`
+	SecurityContext              *corev1.SecurityContext    `json:"securityContext,omitempty"`
+	ServiceAccount               string                     `json:"serviceAccount,omitempty"`
 }
 
 // ReadinessDefaultCheck Enable default readiness checks
@@ -96,9 +96,9 @@ type ReadinessDefaultCheck struct {
 	BufferFreeSpaceThreshold int32 `json:"bufferFreeSpaceThreshold,omitempty"`
 	BufferFileNumber         bool  `json:"bufferFileNumber,omitempty"`
 	BufferFileNumberMax      int32 `json:"bufferFileNumberMax,omitempty"`
+	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
 	InitialDelaySeconds      int32 `json:"initialDelaySeconds,omitempty"`
-	TimeoutSeconds           int32 `json:"timeoutSeconds,omitempty"`
 	PeriodSeconds            int32 `json:"periodSeconds,omitempty"`
 	SuccessThreshold         int32 `json:"successThreshold,omitempty"`
-	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
+	TimeoutSeconds           int32 `json:"timeoutSeconds,omitempty"`
 }

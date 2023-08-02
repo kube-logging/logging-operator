@@ -30,54 +30,54 @@ type _metaFlowSpec interface{} //nolint:deadcode,unused
 
 // FlowSpec is the Kubernetes spec for Flows
 type FlowSpec struct {
-	// Deprecated
-	Selectors  map[string]string `json:"selectors,omitempty"`
-	Match      []Match           `json:"match,omitempty"`
-	Filters    []Filter          `json:"filters,omitempty"`
-	LoggingRef string            `json:"loggingRef,omitempty"`
-	// Deprecated
-	OutputRefs           []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
-	LocalOutputRefs      []string `json:"localOutputRefs,omitempty"`
+	Filters              []Filter `json:"filters,omitempty"`
 	FlowLabel            string   `json:"flowLabel,omitempty"`
+	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
 	IncludeLabelInRouter *bool    `json:"includeLabelInRouter,omitempty"`
+	LocalOutputRefs      []string `json:"localOutputRefs,omitempty"`
+	LoggingRef           string   `json:"loggingRef,omitempty"`
+	Match                []Match  `json:"match,omitempty"`
+	// Deprecated
+	OutputRefs []string `json:"outputRefs,omitempty"`
+	// Deprecated
+	Selectors map[string]string `json:"selectors,omitempty"`
 }
 
 type Match struct {
-	*Select  `json:"select,omitempty"`
 	*Exclude `json:"exclude,omitempty"`
+	*Select  `json:"select,omitempty"`
 }
 
 type Select struct {
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
 	ContainerNames []string          `json:"container_names,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
 }
 
 type Exclude struct {
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
 	ContainerNames []string          `json:"container_names,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
 }
 
 // Filter definition for FlowSpec
 type Filter struct {
-	StdOut              *filter.StdOutFilterConfig        `json:"stdout,omitempty"`
-	Parser              *filter.ParserConfig              `json:"parser,omitempty"`
-	TagNormaliser       *filter.TagNormaliser             `json:"tag_normaliser,omitempty"`
-	Dedot               *filter.DedotFilterConfig         `json:"dedot,omitempty"`
-	ElasticGenId        *filter.ElasticsearchGenId        `json:"elasticsearch_genid,omitempty"`
-	RecordTransformer   *filter.RecordTransformer         `json:"record_transformer,omitempty"`
-	RecordModifier      *filter.RecordModifier            `json:"record_modifier,omitempty"`
-	GeoIP               *filter.GeoIP                     `json:"geoip,omitempty"`
 	Concat              *filter.Concat                    `json:"concat,omitempty"`
+	Dedot               *filter.DedotFilterConfig         `json:"dedot,omitempty"`
 	DetectExceptions    *filter.DetectExceptions          `json:"detectExceptions,omitempty"`
-	Grep                *filter.GrepConfig                `json:"grep,omitempty"`
-	Prometheus          *filter.PrometheusConfig          `json:"prometheus,omitempty"`
-	Throttle            *filter.Throttle                  `json:"throttle,omitempty"`
-	SumoLogic           *filter.SumoLogic                 `json:"sumologic,omitempty"`
+	ElasticGenId        *filter.ElasticsearchGenId        `json:"elasticsearch_genid,omitempty"`
 	EnhanceK8s          *filter.EnhanceK8s                `json:"enhanceK8s,omitempty"`
+	GeoIP               *filter.GeoIP                     `json:"geoip,omitempty"`
+	Grep                *filter.GrepConfig                `json:"grep,omitempty"`
 	KubeEventsTimestamp *filter.KubeEventsTimestampConfig `json:"kube_events_timestamp,omitempty"`
+	Parser              *filter.ParserConfig              `json:"parser,omitempty"`
+	Prometheus          *filter.PrometheusConfig          `json:"prometheus,omitempty"`
+	RecordModifier      *filter.RecordModifier            `json:"record_modifier,omitempty"`
+	RecordTransformer   *filter.RecordTransformer         `json:"record_transformer,omitempty"`
+	SumoLogic           *filter.SumoLogic                 `json:"sumologic,omitempty"`
+	StdOut              *filter.StdOutFilterConfig        `json:"stdout,omitempty"`
+	TagNormaliser       *filter.TagNormaliser             `json:"tag_normaliser,omitempty"`
+	Throttle            *filter.Throttle                  `json:"throttle,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow
@@ -98,18 +98,17 @@ type FlowStatus struct {
 type Flow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   FlowSpec   `json:"spec,omitempty"`
-	Status FlowStatus `json:"status,omitempty"`
+	Spec              FlowSpec   `json:"spec,omitempty"`
+	Status            FlowStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // FlowList contains a list of Flow
 type FlowList struct {
+	Items           []Flow `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Flow `json:"items"`
 }
 
 func init() {

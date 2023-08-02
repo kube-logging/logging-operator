@@ -41,12 +41,26 @@ type _metaLoggingSpec interface{} //nolint:deadcode,unused
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
+	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
+	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
+	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
+	ClusterDomain *string `json:"clusterDomain,omitempty"`
+	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
+	// This should be a protected namespace from regular users.
+	// Resources like fluentbit and fluentd will run in this namespace as well.
+	ControlNamespace string `json:"controlNamespace"`
+	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
+	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
 	// Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset.
-	LoggingRef string `json:"loggingRef,omitempty"`
+	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
+	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
+	// in case there is a change in an immutable field
+	// that otherwise couldn't be managed with a simple update.
+	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
+	// GlobalOutput name to flush ERROR events to
+	ErrorOutputRef string `json:"errorOutputRef,omitempty"`
 	// Disable configuration check before applying new fluentd configuration.
 	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
-	// Whether to skip invalid Flow and ClusterFlow resources
-	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
 	// FluentbitAgent daemonset configuration.
@@ -55,34 +69,20 @@ type LoggingSpec struct {
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
-	// Syslog-NG statefulset configuration
-	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
-	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
-	DefaultFlowSpec *DefaultFlowSpec `json:"defaultFlow,omitempty"`
-	// GlobalOutput name to flush ERROR events to
-	ErrorOutputRef string `json:"errorOutputRef,omitempty"`
 	// Global filters to apply on logs before any match or filter mechanism.
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
+	LoggingRef    string   `json:"loggingRef,omitempty"`
+	// InlineNodeAgent Configuration
+	// Deprecated, will be removed with next major version
+	NodeAgents []*InlineNodeAgent `json:"nodeAgents,omitempty"`
+	// Whether to skip invalid Flow and ClusterFlow resources
+	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
+	// Syslog-NG statefulset configuration
+	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
 	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
 	// WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces
 	WatchNamespaceSelector *metav1.LabelSelector `json:"watchNamespaceSelector,omitempty"`
-	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
-	ClusterDomain *string `json:"clusterDomain,omitempty"`
-	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
-	// This should be a protected namespace from regular users.
-	// Resources like fluentbit and fluentd will run in this namespace as well.
-	ControlNamespace string `json:"controlNamespace"`
-	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
-	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
-	// InlineNodeAgent Configuration
-	// Deprecated, will be removed with next major version
-	NodeAgents []*InlineNodeAgent `json:"nodeAgents,omitempty"`
-	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
-	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
-	// in case there is a change in an immutable field
-	// that otherwise couldn't be managed with a simple update.
-	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging
@@ -100,30 +100,29 @@ type LoggingStatus struct {
 type Logging struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   LoggingSpec   `json:"spec,omitempty"`
-	Status LoggingStatus `json:"status,omitempty"`
+	Spec              LoggingSpec   `json:"spec,omitempty"`
+	Status            LoggingStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // LoggingList contains a list of Logging
 type LoggingList struct {
+	Items           []Logging `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Logging `json:"items"`
 }
 
 // +kubebuilder:object:generate=true
 
 // DefaultFlowSpec is a Flow for logs that did not match any other Flow
 type DefaultFlowSpec struct {
-	Filters []Filter `json:"filters,omitempty"`
-	// Deprecated
-	OutputRefs           []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
+	Filters              []Filter `json:"filters,omitempty"`
 	FlowLabel            string   `json:"flowLabel,omitempty"`
+	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
 	IncludeLabelInRouter *bool    `json:"includeLabelInRouter,omitempty"`
+	// Deprecated
+	OutputRefs []string `json:"outputRefs,omitempty"`
 }
 
 const (

@@ -50,40 +50,40 @@ type ClusterMatch struct {
 }
 
 type ClusterSelect struct {
-	Namespaces     []string          `json:"namespaces,omitempty"`
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
 	ContainerNames []string          `json:"container_names,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Namespaces     []string          `json:"namespaces,omitempty"`
 }
 
 type ClusterExclude struct {
-	Namespaces     []string          `json:"namespaces,omitempty"`
-	Labels         map[string]string `json:"labels,omitempty"`
-	Hosts          []string          `json:"hosts,omitempty"`
 	ContainerNames []string          `json:"container_names,omitempty"`
+	Hosts          []string          `json:"hosts,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	Namespaces     []string          `json:"namespaces,omitempty"`
 }
 
 // ClusterFlowSpec is the Kubernetes spec for ClusterFlows
 type ClusterFlowSpec struct {
+	Filters              []Filter       `json:"filters,omitempty"`
+	FlowLabel            string         `json:"flowLabel,omitempty"`
+	GlobalOutputRefs     []string       `json:"globalOutputRefs,omitempty"`
+	IncludeLabelInRouter *bool          `json:"includeLabelInRouter,omitempty"`
+	LoggingRef           string         `json:"loggingRef,omitempty"`
+	Match                []ClusterMatch `json:"match,omitempty"`
 	// Deprecated
-	Selectors  map[string]string `json:"selectors,omitempty"`
-	Match      []ClusterMatch    `json:"match,omitempty"`
-	Filters    []Filter          `json:"filters,omitempty"`
-	LoggingRef string            `json:"loggingRef,omitempty"`
+	OutputRefs []string `json:"outputRefs,omitempty"`
 	// Deprecated
-	OutputRefs           []string `json:"outputRefs,omitempty"`
-	GlobalOutputRefs     []string `json:"globalOutputRefs,omitempty"`
-	FlowLabel            string   `json:"flowLabel,omitempty"`
-	IncludeLabelInRouter *bool    `json:"includeLabelInRouter,omitempty"`
+	Selectors map[string]string `json:"selectors,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // ClusterFlowList contains a list of ClusterFlow
 type ClusterFlowList struct {
+	Items           []ClusterFlow `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClusterFlow `json:"items"`
 }
 
 func init() {

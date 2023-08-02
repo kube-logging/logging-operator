@@ -30,11 +30,11 @@ type _metaSyslogNGFlowSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 type SyslogNGFlowSpec struct {
-	Match            *SyslogNGMatch   `json:"match,omitempty"`
 	Filters          []SyslogNGFilter `json:"filters,omitempty"`
-	LoggingRef       string           `json:"loggingRef,omitempty"`
 	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
 	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
+	LoggingRef       string           `json:"loggingRef,omitempty"`
+	Match            *SyslogNGMatch   `json:"match,omitempty"`
 }
 
 type SyslogNGMatch filter.MatchExpr
@@ -65,18 +65,17 @@ type SyslogNGFlowStatus FlowStatus
 type SyslogNGFlow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   SyslogNGFlowSpec   `json:"spec,omitempty"`
-	Status SyslogNGFlowStatus `json:"status,omitempty"`
+	Spec              SyslogNGFlowSpec   `json:"spec,omitempty"`
+	Status            SyslogNGFlowStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // FlowList contains a list of Flow
 type SyslogNGFlowList struct {
+	Items           []SyslogNGFlow `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SyslogNGFlow `json:"items"`
 }
 
 func init() {

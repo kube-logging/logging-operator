@@ -47,17 +47,17 @@ type ClusterOutput struct {
 
 // ClusterOutputSpec contains Kubernetes spec for ClusterOutput
 type ClusterOutputSpec struct {
-	OutputSpec        `json:",inline"`
 	EnabledNamespaces []string `json:"enabledNamespaces,omitempty"`
+	OutputSpec        `json:",inline"`
 }
 
 // +kubebuilder:object:root=true
 
 // ClusterOutputList contains a list of ClusterOutput
 type ClusterOutputList struct {
+	Items           []ClusterOutput `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClusterOutput `json:"items"`
 }
 
 func init() {

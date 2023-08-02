@@ -38,26 +38,25 @@ type _metaSyslogNGClusterOutput interface{} //nolint:deadcode,unused
 type SyslogNGClusterOutput struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   SyslogNGClusterOutputSpec `json:"spec"`
-	Status SyslogNGOutputStatus      `json:"status,omitempty"`
+	Spec              SyslogNGClusterOutputSpec `json:"spec"`
+	Status            SyslogNGOutputStatus      `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
 
 // SyslogNGClusterOutputSpec contains Kubernetes spec for SyslogNGClusterOutput
 type SyslogNGClusterOutputSpec struct {
-	SyslogNGOutputSpec `json:",inline"`
 	EnabledNamespaces  []string `json:"enabledNamespaces,omitempty"`
+	SyslogNGOutputSpec `json:",inline"`
 }
 
 // +kubebuilder:object:root=true
 
 // SyslogNGClusterOutputList contains a list of SyslogNGClusterOutput
 type SyslogNGClusterOutputList struct {
+	Items           []SyslogNGClusterOutput `json:"items"`
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SyslogNGClusterOutput `json:"items"`
 }
 
 func init() {

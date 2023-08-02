@@ -31,22 +31,22 @@ type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGSpec defines the desired state of SyslogNG
 type SyslogNGSpec struct {
-	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
+	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
+	ConfigCheckPodOverrides             *typeoverride.PodSpec        `json:"configCheckPod,omitempty"`
+	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
+	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
+	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
+	LogIWSize                           int                          `json:"logIWSize,omitempty"`
+	MaxConnections                      int                          `json:"maxConnections,omitempty"`
+	Metrics                             *Metrics                     `json:"metrics,omitempty"`
+	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	ReadinessDefaultCheck               ReadinessDefaultCheck        `json:"readinessDefaultCheck,omitempty"`
 	SkipRBACCreate                      bool                         `json:"skipRBACCreate,omitempty"`
 	StatefulSetOverrides                *typeoverride.StatefulSet    `json:"statefulSet,omitempty"`
 	ServiceOverrides                    *typeoverride.Service        `json:"service,omitempty"`
 	ServiceAccountOverrides             *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	ConfigCheckPodOverrides             *typeoverride.PodSpec        `json:"configCheckPod,omitempty"`
-	Metrics                             *Metrics                     `json:"metrics,omitempty"`
-	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
-	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
-	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
-	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
-	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
-	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
-	MaxConnections                      int                          `json:"maxConnections,omitempty"`
-	LogIWSize                           int                          `json:"logIWSize,omitempty"`
+	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
 
 	// TODO: option to turn on/off buffer volume PVC
 }
@@ -61,15 +61,15 @@ type SyslogNGTLS struct {
 }
 
 type GlobalOptions struct {
-	// deprecated use stats/level from 4.1+
-	StatsLevel *int `json:"stats_level,omitempty"`
-	// deprecated use stats/freq from 4.1+
-	StatsFreq *int `json:"stats_freq,omitempty"`
 	// TODO switch to this by default
 	Stats *Stats `json:"stats,omitempty"`
+	// deprecated use stats/freq from 4.1+
+	StatsFreq *int `json:"stats_freq,omitempty"`
+	// deprecated use stats/level from 4.1+
+	StatsLevel *int `json:"stats_level,omitempty"`
 }
 
 type Stats struct {
-	Level *int `json:"level,omitempty"`
 	Freq  *int `json:"freq,omitempty"`
+	Level *int `json:"level,omitempty"`
 }
