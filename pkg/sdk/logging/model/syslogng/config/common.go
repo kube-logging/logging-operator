@@ -21,9 +21,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/slices"
 )
@@ -52,6 +52,9 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),
 		}
+	} else if value.CanConvert(arrowMapType) {
+		arrowMap := value.Convert(arrowMapType).Interface().(filter.ArrowMap)
+		return []render.Renderer{render.ArrowMap(arrowMap)}
 	}
 
 	switch value.Kind() {
@@ -194,6 +197,7 @@ func goNameToSyslogName(s string) string {
 }
 
 var matchExprType = reflect.TypeOf(filter.MatchExpr{})
+var arrowMapType = reflect.TypeOf(filter.ArrowMap{})
 
 func derefAll[T Derefable[T]](v T) T {
 	for v.Kind() == reflect.Pointer {
