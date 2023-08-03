@@ -108,6 +108,14 @@ Default: -
 
 Default: -
 
+### flowLabel (string, optional) {#clusterflowspec-flowlabel}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#clusterflowspec-includelabelinrouter}
+
+Default: -
+
 
 ## ClusterFlowList
 

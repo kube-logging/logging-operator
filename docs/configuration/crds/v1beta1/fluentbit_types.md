@@ -4,9 +4,51 @@ weight: 200
 generated_file: true
 ---
 
+## FluentbitAgent
+
+FluentbitAgent is the Schema for the loggings API
+
+###  (metav1.TypeMeta, required) {#fluentbitagent-}
+
+Default: -
+
+### metadata (metav1.ObjectMeta, optional) {#fluentbitagent-metadata}
+
+Default: -
+
+### spec (FluentbitSpec, optional) {#fluentbitagent-spec}
+
+Default: -
+
+### status (FluentbitStatus, optional) {#fluentbitagent-status}
+
+Default: -
+
+
+## FluentbitAgentList
+
+FluentbitAgentList contains a list of FluentbitAgent
+
+###  (metav1.TypeMeta, required) {#fluentbitagentlist-}
+
+Default: -
+
+### metadata (metav1.ListMeta, optional) {#fluentbitagentlist-metadata}
+
+Default: -
+
+### items ([]FluentbitAgent, required) {#fluentbitagentlist-items}
+
+Default: -
+
+
 ## FluentbitSpec
 
-FluentbitSpec defines the desired state of Fluentbit
+FluentbitSpec defines the desired state of FluentbitAgent
+
+### loggingRef (string, optional) {#fluentbitspec-loggingref}
+
+Default: -
 
 ### daemonsetAnnotations (map[string]string, optional) {#fluentbitspec-daemonsetannotations}
 
@@ -212,6 +254,21 @@ Default: -
 
 Default: -
 
+### updateStrategy (appsv1.DaemonSetUpdateStrategy, optional) {#fluentbitspec-updatestrategy}
+
+Default: -
+
+### customParsers (string, optional) {#fluentbitspec-customparsers}
+
+Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
+
+Default: -
+
+
+## FluentbitStatus
+
+FluentbitStatus defines the resource status for FluentbitAgent
+
 
 ## FluentbitTLS
 
@@ -333,7 +390,7 @@ Default: 5M
 
 ## InputTail
 
-InputTail defines Fluentbit tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
+InputTail defines FluentbitAgent tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
 
 ### storage.type (string, optional) {#inputtail-storage.type}
 
@@ -544,6 +601,12 @@ Token file  (default:/var/run/secrets/kubernetes.io/serviceaccount/token)
 
 Default: /var/run/secrets/kubernetes.io/serviceaccount/token
 
+### Kube_Token_TTL (string, optional) {#filterkubernetes-kube_token_ttl}
+
+Token TTL configurable 'time to live' for the K8s token. By default, it is set to 600 seconds. After this time, the token is reloaded from Kube_Token_File or the Kube_Token_Command.  (default:"600") 
+
+Default: 600
+
 ### Kube_Tag_Prefix (string, optional) {#filterkubernetes-kube_tag_prefix}
 
 When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.) 
@@ -620,7 +683,7 @@ Default: Off
 
 Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section).  
 
-Default: Off
+Default: On
 
 ### Labels (string, optional) {#filterkubernetes-labels}
 
@@ -669,6 +732,12 @@ Default: Off
 kubelet port using for HTTP request, this only works when Use_Kubelet  set to On  
 
 Default: 10250
+
+### Kube_Meta_Cache_TTL (string, optional) {#filterkubernetes-kube_meta_cache_ttl}
+
+Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted.  
+
+Default: 0
 
 
 ## FilterAws
@@ -742,13 +811,13 @@ FilterModify The Modify Filter plugin allows you to change records using rules a
 
 ### rules ([]FilterModifyRule, optional) {#filtermodify-rules}
 
-Fluentbit Filter Modification Rule 
+FluentbitAgent Filter Modification Rule 
 
 Default: -
 
 ### conditions ([]FilterModifyCondition, optional) {#filtermodify-conditions}
 
-Fluentbit Filter Modification Condition 
+FluentbitAgent Filter Modification Condition 
 
 Default: -
 
@@ -962,6 +1031,19 @@ Default: -
 ### storage.total_limit_size (string, optional) {#forwardoptions-storage.total_limit_size}
 
 `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination. 
+
+Default: -
+
+
+## FluentbitNameProvider
+
+Allow using multiple FluentbitAgents
+
+### Logging (*Logging, optional) {#fluentbitnameprovider-logging}
+
+Default: -
+
+### FluentbitAgent (*FluentbitAgent, optional) {#fluentbitnameprovider-fluentbitagent}
 
 Default: -
 

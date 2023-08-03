@@ -10,13 +10,13 @@ HostTailerSpec defines the desired state of HostTailer
 
 ### fileTailers ([]FileTailer, optional) {#hosttailerspec-filetailers}
 
-List of file tailers 
+List of [file tailers](#filetailer). 
 
 Default: -
 
 ### systemdTailers ([]SystemdTailer, optional) {#hosttailerspec-systemdtailers}
 
-List of systemd tailers 
+List of [systemd tailers](#systemdtailer). 
 
 Default: -
 
@@ -41,7 +41,7 @@ Default: -
 
 ## HostTailerStatus
 
-HostTailerStatus defines the observed state of HostTailer
+HostTailerStatus defines the observed state of [HostTailer](#hosttailer).
 
 
 ## HostTailer
@@ -67,7 +67,7 @@ Default: -
 
 ## HostTailerList
 
-HostTailerList contains a list of HostTailer
+HostTailerList contains a list of [HostTailers](#hosttailer).
 
 ###  (metav1.TypeMeta, required) {#hosttailerlist-}
 

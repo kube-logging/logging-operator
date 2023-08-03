@@ -34,7 +34,7 @@ Default: -
 
 ### fluentbit (*FluentbitSpec, optional) {#loggingspec-fluentbit}
 
-Fluentbit daemonset configuration. 
+FluentbitAgent daemonset configuration. Deprecated, will be removed with next major version Migrate to the standalone NodeAgent resource 
 
 Default: -
 
@@ -76,15 +76,19 @@ Default: -
 
 ### watchNamespaceSelector (*metav1.LabelSelector, optional) {#loggingspec-watchnamespaceselector}
 
-WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaceses.
-
-Note: This setting is mutually exclusive with watchNamespaces
+WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces 
 
 Default: -
 
+### clusterDomain (*string, optional) {#loggingspec-clusterdomain}
+
+Cluster domain name to be used when templating URLs to services . 
+
+Default:  "cluster.local"
+
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}
 
-Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
+Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
 
 Default: -
 
@@ -94,9 +98,9 @@ Allow configuration of cluster resources from any namespace. Mutually exclusive 
 
 Default: -
 
-### nodeAgents ([]*NodeAgent, optional) {#loggingspec-nodeagents}
+### nodeAgents ([]*InlineNodeAgent, optional) {#loggingspec-nodeagents}
 
-NodeAgent Configuration 
+InlineNodeAgent Configuration Deprecated, will be removed with next major version 
 
 Default: -
 
@@ -112,6 +116,10 @@ Default: -
 LoggingStatus defines the observed state of Logging
 
 ### configCheckResults (map[string]bool, optional) {#loggingstatus-configcheckresults}
+
+Default: -
+
+### problems ([]string, optional) {#loggingstatus-problems}
 
 Default: -
 
@@ -169,6 +177,14 @@ Deprecated
 Default: -
 
 ### globalOutputRefs ([]string, optional) {#defaultflowspec-globaloutputrefs}
+
+Default: -
+
+### flowLabel (string, optional) {#defaultflowspec-flowlabel}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#defaultflowspec-includelabelinrouter}
 
 Default: -
 

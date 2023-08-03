@@ -17,11 +17,11 @@ Specify field name in the record to parse. If you leave empty the Container Runt
 
 Default: -
 
-### separator (string, optional) {#concat-separator}
+### separator (*string, optional) {#concat-separator}
 
-The separator of lines.  
+The separator of lines. (default: "\n") 
 
-Default:  "\n"
+Default: \"\\n\"
 
 ### n_lines (int, optional) {#concat-n_lines}
 
@@ -101,33 +101,63 @@ If true, keep partial metadata
 
 Default: -
 
+### partial_metadata_format (string, optional) {#concat-partial_metadata_format}
 
- #### Example `Concat` filter configurations
+Input format of the partial metadata (fluentd or journald docker log driver)( docker-fluentd, docker-journald, docker-journald-lowercase) 
+
+Default: -
+
+### use_partial_cri_logtag (bool, optional) {#concat-use_partial_cri_logtag}
+
+Use cri log tag to concatenate multiple records 
+
+Default: -
+
+### partial_cri_logtag_key (string, optional) {#concat-partial_cri_logtag_key}
+
+The key name that is referred to concatenate records on cri log 
+
+Default: -
+
+### partial_cri_stream_key (string, optional) {#concat-partial_cri_stream_key}
+
+The key name that is referred to detect stream name on cri log 
+
+Default: -
+
+
+ ## Example `Concat` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - concat:
-        partial_key: "partial_message"
-        separator: ""
-        n_lines: 10
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - concat:
+	      partial_key: "partial_message"
+	      separator: ""
+	      n_lines: 10
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type concat
-  @id test_concat
-  key message
-  n_lines 10
-  partial_key partial_message
-</filter>
+ <filter **>
+
+	@type concat
+	@id test_concat
+	key message
+	n_lines 10
+	partial_key partial_message
+
+ </filter>
  ```
 
 ---

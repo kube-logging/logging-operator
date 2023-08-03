@@ -6,7 +6,7 @@ generated_file: true
 
 # Sumo Logic collection solution for Kubernetes
 ## Overview
-More info at https://github.com/SumoLogic/sumologic-kubernetes-collection
+ More info at https://github.com/SumoLogic/sumologic-kubernetes-collection
 
 ## Configuration
 ## SumoLogic
@@ -168,28 +168,34 @@ Collector Value
 Default:  "undefined"
 
 
- #### Example `Parser` filter configurations
+ ## Example `Parser` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - sumologic:
-        source_name: "elso"
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - sumologic:
+	      source_name: "elso"
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type kubernetes_sumologic
-  @id test_sumologic
-  source_name elso
-</filter>
+ <filter **>
+
+	@type kubernetes_sumologic
+	@id test_sumologic
+	source_name elso
+
+ </filter>
  ```
 
 ---

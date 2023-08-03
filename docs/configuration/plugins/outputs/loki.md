@@ -6,19 +6,21 @@ generated_file: true
 
 # Loki output plugin 
 ## Overview
-Fluentd output plugin to ship logs to a Loki server.
-More info at https://github.com/kube-logging/fluent-plugin-kubernetes-loki
->Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
+ Fluentd output plugin to ship logs to a Loki server.
+ More info at https://grafana.com/docs/loki/latest/clients/fluentd/
+ >Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
 
- #### Example output configurations
+ ## Example output configurations
  ```yaml
  spec:
-   loki:
-     url: http://loki:3100
-     buffer:
-       timekey: 1m
-       timekey_wait: 30s
-       timekey_use_utc: true
+
+	loki:
+	  url: http://loki:3100
+	  buffer:
+	    timekey: 1m
+	    timekey_wait: 30s
+	    timekey_use_utc: true
+
  ```
 
 ## Configuration
@@ -114,9 +116,21 @@ Configure Kubernetes metadata in a Prometheus like format
 
 Default:  false
 
+### include_thread_label (*bool, optional) {#output config-include_thread_label}
+
+whether to include the fluentd_thread label when multiple threads are used for flushing.  
+
+Default:  true
+
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

@@ -6,35 +6,40 @@ generated_file: true
 
 # SumoLogic output plugin for Fluentd
 ## Overview
-This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
-More info at https://github.com/SumoLogic/fluentd-output-sumologic
+ This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
+ More info at https://github.com/SumoLogic/fluentd-output-sumologic
 
  Example secret for HTTP input URL
  ```
+ kubectl create secret generic sumo-output --from-literal "endpoint=$URL"
+ ```
+
+ # Example ClusterOutput
+
+ ```yaml
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: ClusterOutput
+ metadata:
+
+	name: sumo-output
+
+ spec:
+
+	sumologic:
+	  buffer:
+	    flush_interval: 10s
+	    flush_mode: interval
+	  compress: true
+	  endpoint:
+	    valueFrom:
+	      secretKeyRef:
+	        key: endpoint
+	        name: sumo-output
+	  source_name: test1
+
+ ```
+
 export URL='https://endpoint1.collection.eu.sumologic.com/receiver/v1/http/.......'
-kubectl create secret generic sumo-output --from-literal "endpoint=$URL"
-```
-
- Example ClusterOutput
-
-```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: ClusterOutput
-metadata:
-  name: sumo-output
-spec:
-  sumologic:
-    buffer:
-      flush_interval: 10s
-      flush_mode: interval
-    compress: true
-    endpoint:
-      valueFrom:
-        secretKeyRef:
-          key: endpoint
-          name: sumo-output
-    source_name: test1
-```
 
 ## Configuration
 ## Output Config
@@ -168,6 +173,12 @@ Default: -
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

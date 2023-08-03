@@ -24,11 +24,23 @@ Default: -
 
 Default: -
 
+### mqtt (*output.MQTT, optional) {#syslogngoutputspec-mqtt}
+
+Default: -
+
 ### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
 
 Default: -
 
 ### sumologic-syslog (*output.SumologicSyslogOutput, optional) {#syslogngoutputspec-sumologic-syslog}
+
+Default: -
+
+### http (*output.HTTPOutput, optional) {#syslogngoutputspec-http}
+
+Default: -
+
+### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
 
 Default: -
 

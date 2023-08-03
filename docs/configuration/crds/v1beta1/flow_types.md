@@ -40,6 +40,14 @@ Default: -
 
 Default: -
 
+### flowLabel (string, optional) {#flowspec-flowlabel}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#flowspec-includelabelinrouter}
+
+Default: -
+
 
 ## Match
 
