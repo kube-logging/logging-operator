@@ -46,7 +46,6 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | nameOverride | string | `""` | A name in place of the chart name for `app:` labels. |
 | fullnameOverride | string | `""` | A name to substitute for the full names of resources. |
 | namespaceOverride | string | `""` | A namespace override for the app. |
-| watchNamespace | string | `""` | Namespace to watch for LoggingOperator Custom Resources. |
 | annotations | object | `{}` | Define annotations for logging-operator pods. |
 | createCustomResource | bool | `false` | Deploy CRDs used by Logging Operator. |
 | http.port | int | `8080` | HTTP listen port number. |
