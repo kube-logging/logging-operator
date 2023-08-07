@@ -20,12 +20,13 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
@@ -390,6 +391,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: bufferPath,
 				},
 			},
+			Resources: r.Logging.Spec.FluentdSpec.BufferVolumeResources,
 		}
 	}
 	return nil

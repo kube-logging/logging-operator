@@ -1415,6 +1415,7 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(Security)
