@@ -272,6 +272,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: BufferPath,
 				},
 			},
+			Resources: r.Logging.Spec.SyslogNGSpec.BufferVolumeResources,
 		}
 	}
 	return nil
