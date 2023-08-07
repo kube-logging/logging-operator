@@ -56,9 +56,13 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 	input := fluentdConfig{
 		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
 		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
-		RootDir:                   r.Logging.Spec.FluentdSpec.RootDir,
 		EnableMsgpackTimeSupport:  r.Logging.Spec.FluentdSpec.EnableMsgpackTimeSupport,
 		Workers:                   r.Logging.Spec.FluentdSpec.Workers,
+	}
+
+	input.RootDir = r.Logging.Spec.FluentdSpec.RootDir
+	if input.RootDir == "" {
+		input.RootDir = bufferPath
 	}
 
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
