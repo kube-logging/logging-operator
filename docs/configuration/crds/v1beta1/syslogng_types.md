@@ -52,6 +52,10 @@ Default: -
 
 Default: -
 
+### bufferVolumeResources (corev1.ResourceRequirements, optional) {#syslogngspec-buffervolumeresources}
+
+Default: -
+
 ### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
 
 Default: -

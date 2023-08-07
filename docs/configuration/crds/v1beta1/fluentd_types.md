@@ -132,6 +132,10 @@ Default: -
 
 Default: -
 
+### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentdspec-buffervolumeresources}
+
+Default: -
+
 ### security (*Security, optional) {#fluentdspec-security}
 
 Default: -
