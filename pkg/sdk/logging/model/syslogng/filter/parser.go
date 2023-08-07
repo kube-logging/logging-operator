@@ -68,6 +68,7 @@ type _metaParser interface{} //nolint:deadcode,unused
 type ParserConfig struct {
 	Regexp       *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
 	SyslogParser *SyslogParser `json:"syslog-parser,omitempty," syslog-ng:"parser-drv,name=syslog-parser"`
+	MetricsProbe *MetricsProbe `json:"metrics-probe,omitempty," syslog-ng:"parser-drv,name=metrics-probe"`
 }
 
 // +kubebuilder:object:generate=true
@@ -89,3 +90,16 @@ type SyslogParser struct {
 	// Pattern flags
 	Flags []string `json:"flags,omitempty"`
 }
+
+// +kubebuilder:object:generate=true
+// +docName:"[Metrics Probe] https://axoflow.com/docs/axosyslog-core/chapter-parsers/metrics-probe/
+type MetricsProbe struct {
+	// The name of the counter to create. Note that the value of this option is always prefixed with syslogng_, so for example key("my-custom-key") becomes syslogng_my-custom-key.
+	Key string `json:"key,omitempty"`
+	// The labels used to create separate counters, based on the fields of the messages processed by metrics-probe(). The keys of the map are the name of the label, and the values are syslog-ng templates.
+	Labels ArrowMap `json:"labels,omitempty"`
+	// Sets the stats level of the generated metrics (default 0).
+	Level int `json:"level,omitempty"`
+}
+
+type ArrowMap map[string]string

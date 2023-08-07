@@ -204,6 +204,10 @@ Default: -
 
 Default: -
 
+### compressConfigFile (bool, optional) {#fluentdspec-compressconfigfile}
+
+Default: -
+
 
 ## FluentOutLogrotate
 
@@ -292,6 +296,12 @@ Default: -
 ### annotations (map[string]string, optional) {#fluentddrainconfig-annotations}
 
 Container image to use for the drain watch sidecar 
+
+Default: -
+
+### deleteVolume (bool, optional) {#fluentddrainconfig-deletevolume}
+
+Should persistent volume claims be deleted after draining is done 
 
 Default: -
 

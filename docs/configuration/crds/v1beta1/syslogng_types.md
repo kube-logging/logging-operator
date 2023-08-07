@@ -56,6 +56,22 @@ Default: -
 
 Default: -
 
+### jsonKeyPrefix (string, optional) {#syslogngspec-jsonkeyprefix}
+
+Default: -
+
+### jsonKeyDelim (string, optional) {#syslogngspec-jsonkeydelim}
+
+Default: -
+
+### maxConnections (int, optional) {#syslogngspec-maxconnections}
+
+Default: -
+
+### logIWSize (int, optional) {#syslogngspec-logiwsize}
+
+Default: -
+
 
 ## SyslogNGTLS
 
@@ -78,9 +94,30 @@ Default: -
 
 ### stats_level (*int, optional) {#globaloptions-stats_level}
 
+deprecated use stats/level from 4.1+ 
+
 Default: -
 
 ### stats_freq (*int, optional) {#globaloptions-stats_freq}
+
+deprecated use stats/freq from 4.1+ 
+
+Default: -
+
+### stats (*Stats, optional) {#globaloptions-stats}
+
+TODO switch to this by default 
+
+Default: -
+
+
+## Stats
+
+### level (*int, optional) {#stats-level}
+
+Default: -
+
+### freq (*int, optional) {#stats-freq}
 
 Default: -
 

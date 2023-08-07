@@ -6,8 +6,20 @@ generated_file: true
 
 # Datadog output plugin for Fluentd
 ## Overview
-It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
-More info at https://github.com/DataDog/fluent-plugin-datadog
+ It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
+ More info at [https://github.com/DataDog/fluent-plugin-datadog](https://github.com/DataDog/fluent-plugin-datadog).
+
+ ## Example
+ ```yaml
+ spec:
+
+	datadog:
+	  api_key '<YOUR_API_KEY>'
+	  dd_source: '<INTEGRATION_NAME>'
+	  dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
+	  dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
+
+ ```
 
 ## Configuration
 ## Output Config
@@ -135,6 +147,12 @@ Default:  "http-intake.logs.datadoghq.com"
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

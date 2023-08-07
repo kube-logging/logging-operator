@@ -42,28 +42,34 @@ When a group reaches its limit and as long as it is not reset, a warning message
 Default:  10 seconds
 
 
- #### Example `Throttle` filter configurations
+ ## Example `Throttle` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - throttle:
-        group_key: "$.kubernetes.container_name"
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - throttle:
+	      group_key: "$.kubernetes.container_name"
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type throttle
-  @id test_throttle
-  group_key $.kubernetes.container_name
-</filter>
+ <filter **>
+
+	@type throttle
+	@id test_throttle
+	group_key $.kubernetes.container_name
+
+ </filter>
  ```
 
 ---
