@@ -209,7 +209,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// check for legacy definition
 		log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 		if logging.Spec.FluentbitSpec != nil {
-			nameProvider := loggingv1beta1.NewLegacyFluentbitNameProvider(&logging)
+			nameProvider := fluentbit.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				log.WithName("fluentbit-legacy"),
@@ -234,7 +234,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
-				loggingv1beta1.NewStandaloneFluentbitNameProvider(&f),
+				fluentbit.NewStandaloneFluentbitNameProvider(&f),
 			).Reconcile)
 		}
 	}

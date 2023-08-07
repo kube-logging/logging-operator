@@ -1035,16 +1035,3 @@ Default: -
 Default: -
 
 
-## FluentbitNameProvider
-
-Allow using multiple FluentbitAgents
-
-### Logging (*Logging, optional) {#fluentbitnameprovider-logging}
-
-Default: -
-
-### FluentbitAgent (*FluentbitAgent, optional) {#fluentbitnameprovider-fluentbitagent}
-
-Default: -
-
-

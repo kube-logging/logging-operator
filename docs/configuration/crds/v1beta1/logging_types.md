@@ -84,7 +84,7 @@ Default: -
 
 Cluster domain name to be used when templating URLs to services . 
 
-Default:  "cluster.local"
+Default:  "cluster.local."
 
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}
 
