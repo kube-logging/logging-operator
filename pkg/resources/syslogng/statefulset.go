@@ -55,6 +55,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+					Annotations: map[string]string{
+						"fluentbit.io/exclude": "true",
+					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: containers,
