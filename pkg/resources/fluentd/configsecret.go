@@ -58,6 +58,7 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
 		EnableMsgpackTimeSupport:  r.Logging.Spec.FluentdSpec.EnableMsgpackTimeSupport,
 		Workers:                   r.Logging.Spec.FluentdSpec.Workers,
+		LogLevel:                  r.Logging.Spec.FluentdSpec.LogLevel,
 	}
 
 	input.RootDir = r.Logging.Spec.FluentdSpec.RootDir
@@ -69,11 +70,6 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 		input.Monitor.Enabled = true
 		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
 		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
-	}
-
-	input.LogLevel = r.Logging.Spec.FluentdSpec.LogLevel
-	if input.LogLevel == "" {
-		input.LogLevel = "info"
 	}
 
 	inputConfig, err := generateConfig(input)

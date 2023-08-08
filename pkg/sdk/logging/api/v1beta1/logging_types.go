@@ -205,6 +205,9 @@ func (l *Logging) SetDefaults() error {
 				l.Spec.FluentdSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", l.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
+		if l.Spec.FluentdSpec.LogLevel == "" {
+			l.Spec.FluentdSpec.LogLevel = "info"
+		}
 		if !l.Spec.FluentdSpec.DisablePvc {
 			if l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 				l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
