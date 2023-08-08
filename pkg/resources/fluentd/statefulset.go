@@ -356,7 +356,7 @@ func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
 			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName),
+					Name:      r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName),
 					MountPath: bufferPath,
 				},
 			},
@@ -387,7 +387,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName),
+					Name:      r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName),
 					MountPath: bufferPath,
 				},
 			},
