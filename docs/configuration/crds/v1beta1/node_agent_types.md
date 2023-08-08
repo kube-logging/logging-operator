@@ -1,22 +1,94 @@
+---
+title: NodeAgent
+weight: 200
+generated_file: true
+---
+
 ## NodeAgent
 
-### name (string, optional) {#nodeagent-name}
+NodeAgent
 
-NodeAgent unique name. 
-
-Default: -
-
-### profile (string, optional) {#nodeagent-profile}
-
-Specify the Logging-Operator nodeAgents profile. It can be linux or windows .  
-
-Default: linux
-
-### metadata (types.MetaBase, optional) {#nodeagent-metadata}
+###  (metav1.TypeMeta, required) {#nodeagent-}
 
 Default: -
 
-### nodeAgentFluentbit (*NodeAgentFluentbit, optional) {#nodeagent-nodeagentfluentbit}
+### metadata (metav1.ObjectMeta, optional) {#nodeagent-metadata}
+
+Default: -
+
+### spec (NodeAgentSpec, optional) {#nodeagent-spec}
+
+Default: -
+
+### status (NodeAgentStatus, optional) {#nodeagent-status}
+
+Default: -
+
+
+## NodeAgentSpec
+
+NodeAgentSpec
+
+### loggingRef (string, optional) {#nodeagentspec-loggingref}
+
+Default: -
+
+###  (NodeAgentConfig, required) {#nodeagentspec-}
+
+InlineNodeAgent 
+
+Default: -
+
+
+## NodeAgentConfig
+
+### profile (string, optional) {#nodeagentconfig-profile}
+
+Default: -
+
+### metadata (types.MetaBase, optional) {#nodeagentconfig-metadata}
+
+Default: -
+
+### nodeAgentFluentbit (*NodeAgentFluentbit, optional) {#nodeagentconfig-nodeagentfluentbit}
+
+Default: -
+
+
+## NodeAgentStatus
+
+NodeAgentStatus
+
+
+## NodeAgentList
+
+NodeAgentList
+
+###  (metav1.TypeMeta, required) {#nodeagentlist-}
+
+Default: -
+
+### metadata (metav1.ListMeta, optional) {#nodeagentlist-metadata}
+
+Default: -
+
+### items ([]NodeAgent, required) {#nodeagentlist-items}
+
+Default: -
+
+
+## InlineNodeAgent
+
+InlineNodeAgent
+@deprecated, replaced by NodeAgent
+
+### name (string, optional) {#inlinenodeagent-name}
+
+InlineNodeAgent unique name. 
+
+Default: -
+
+###  (NodeAgentConfig, required) {#inlinenodeagent-}
 
 Default: -
 

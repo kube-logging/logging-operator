@@ -116,6 +116,10 @@ Default: -
 
 Default: -
 
+### relabel (*output.RelabelOutputConfig, optional) {#outputspec-relabel}
+
+Default: -
+
 
 ## OutputStatus
 

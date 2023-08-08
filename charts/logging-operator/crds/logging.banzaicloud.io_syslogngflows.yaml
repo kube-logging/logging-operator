@@ -72,6 +72,17 @@ spec:
                       type: object
                     parser:
                       properties:
+                        metrics-probe:
+                          properties:
+                            key:
+                              type: string
+                            labels:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            level:
+                              type: integer
+                          type: object
                         regexp:
                           properties:
                             flags:

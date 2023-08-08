@@ -62,7 +62,7 @@ all: manager
 check: license-check lint test
 
 .PHONY: check-diff
-check-diff: generate fmt manifests helm-docs
+check-diff: generate fmt manifests docs helm-docs
 	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
 
 .PHONY: debug

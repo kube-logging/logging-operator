@@ -24,6 +24,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 func TestRenderClusterFlow(t *testing.T) {
@@ -61,12 +62,46 @@ source("test_input");
 };
 `),
 		},
+		"metrics-probe": {
+			clusterFlow: v1beta1.SyslogNGClusterFlow{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "test_clusterflow",
+					Namespace: "test_ns",
+				},
+				Spec: v1beta1.SyslogNGClusterFlowSpec{
+					Match: &v1beta1.SyslogNGMatch{},
+					Filters: []v1beta1.SyslogNGFilter{
+						{
+							Parser: &filter.ParserConfig{
+								MetricsProbe: &filter.MetricsProbe{
+									Key:    "key",
+									Labels: filter.ArrowMap{"z": "zzz", "asd": "foo", `b"sd`: "${HOST}"},
+									Level:  1,
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: Untab(`parser "clusterflow_test_ns_test_clusterflow_filters_0" {
+metrics-probe(key("key") labels(
+"asd" => "foo"
+"b\"sd" => "${HOST}"
+"z" => "zzz"
+) level(1));
+};
+log {
+source("test_input");
+parser("clusterflow_test_ns_test_clusterflow_filters_0");
+};
+`),
+		},
 	}
 	for name, testCase := range testCases {
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			out := strings.Builder{}
-			require.NoError(t, renderClusterFlow(nil, "test_input", testCase.clusterFlow, nil)(render.RenderContext{
+			require.NoError(t, renderClusterFlow(nil, "test_input", testCase.clusterFlow, &TestSecretLoaderFactory{})(render.RenderContext{
 				Out: &out,
 			}))
 			assert.Equal(t, testCase.expected, out.String())

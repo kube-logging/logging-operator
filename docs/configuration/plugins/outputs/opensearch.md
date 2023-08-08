@@ -6,22 +6,24 @@ generated_file: true
 
 # OpenSearch output plugin for Fluentd
 ## Overview
-More info at https://github.com/fluent/fluent-plugin-opensearch
->Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
+ More info at https://github.com/fluent/fluent-plugin-opensearch
+ >Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
 
- #### Example output configurations
+ ## Example output configurations
  ```yaml
  spec:
-   opensearch:
-     host: opensearch-cluster.default.svc.cluster.local
-     port: 9200
-     scheme: https
-     ssl_verify: false
-     ssl_version: TLSv1_2
-     buffer:
-       timekey: 1m
-       timekey_wait: 30s
-       timekey_use_utc: true
+
+	opensearch:
+	  host: opensearch-cluster.default.svc.cluster.local
+	  port: 9200
+	  scheme: https
+	  ssl_verify: false
+	  ssl_version: TLSv1_2
+	  buffer:
+	    timekey: 1m
+	    timekey_wait: 30s
+	    timekey_use_utc: true
+
  ```
 
 ## Configuration
@@ -233,9 +235,15 @@ CA certificate
 
 Default: -
 
+### ssl_version (string, optional) {#opensearch-ssl_version}
+
+If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2] 
+
+Default: -
+
 ### remove_keys_on_update (string, optional) {#opensearch-remove_keys_on_update}
 
-If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2] Remove keys on update will not update the configured keys in OpenSearch when a record is being updated. This setting only has any effect if the write operation is update or upsert. 
+Remove keys on update will not update the configured keys in OpenSearch when a record is being updated. This setting only has any effect if the write operation is update or upsert. 
 
 Default: -
 
@@ -518,5 +526,29 @@ Default:  false
 ### buffer (*Buffer, optional) {#opensearch-buffer}
 
 Default: -
+
+### slow_flush_log_threshold (string, optional) {#opensearch-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+
+Default: -
+
+### data_stream_enable (*bool, optional) {#opensearch-data_stream_enable}
+
+Use @type opensearch_data_stream 
+
+Default: -
+
+### data_stream_name (string, optional) {#opensearch-data_stream_name}
+
+You can specify Opensearch data stream name by this parameter. This parameter is mandatory for opensearch_data_stream. 
+
+Default: -
+
+### data_stream_template_name (string, optional) {#opensearch-data_stream_template_name}
+
+Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream.  
+
+Default:  data_stream_name
 
 

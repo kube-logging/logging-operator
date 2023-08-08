@@ -183,7 +183,7 @@ logging:
   watchNamespaces: []
 
   # -- Cluster domain name to be used when templating URLs to services
-  clusterDomain: "cluster.local"
+  clusterDomain: "cluster.local."
 
   # -- Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well.
   controlNamespace: ""

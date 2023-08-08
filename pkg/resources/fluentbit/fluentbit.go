@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"context"
+	"fmt"
 
 	"emperror.dev/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -156,6 +157,56 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+type FluentbitNameProvider struct {
+	logging   *v1beta1.Logging
+	fluentbit *v1beta1.FluentbitAgent
+}
+
+func (l *FluentbitNameProvider) ComponentName(name string) string {
+	if l.logging != nil {
+		return l.logging.QualifiedName(name)
+	}
+	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
+}
+
+func (l *FluentbitNameProvider) Name() string {
+	if l.logging != nil {
+		return l.logging.Name
+	}
+	return l.fluentbit.Name
+}
+
+func (l *FluentbitNameProvider) OwnerRef() v1.OwnerReference {
+	if l.logging != nil {
+		return v1.OwnerReference{
+			APIVersion: l.logging.APIVersion,
+			Kind:       l.logging.Kind,
+			Name:       l.logging.Name,
+			UID:        l.logging.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
+	return v1.OwnerReference{
+		APIVersion: l.fluentbit.APIVersion,
+		Kind:       l.fluentbit.Kind,
+		Name:       l.fluentbit.Name,
+		UID:        l.fluentbit.UID,
+		Controller: util.BoolPointer(true),
+	}
+}
+
+func NewLegacyFluentbitNameProvider(logging *v1beta1.Logging) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		logging: logging,
+	}
+}
+
+func NewStandaloneFluentbitNameProvider(agent *v1beta1.FluentbitAgent) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		fluentbit: agent,
+	}
 }
 
 func RegisterWatches(builder *builder.Builder) *builder.Builder {

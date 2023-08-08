@@ -106,7 +106,7 @@ Default: -
 
 ## Security
 
-Security defines Fluentd, Fluentbit deployment security properties
+Security defines Fluentd, FluentbitAgent deployment security properties
 
 ### serviceAccount (string, optional) {#security-serviceaccount}
 

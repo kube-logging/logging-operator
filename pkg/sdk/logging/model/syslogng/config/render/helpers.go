@@ -17,10 +17,12 @@ package render
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/constraints"
+	"golang.org/x/exp/maps"
 )
 
 type Renderer func(ctx RenderContext) error
@@ -130,6 +132,17 @@ func Literal[T LiteralTypes](v T) Renderer {
 	default:
 		return Formatted("%v", v)
 	}
+}
+
+// ArrowMap renders a map as a key=>value style map used at various places of the config grammar
+func ArrowMap(v map[string]string) Renderer {
+	keys := maps.Keys(v)
+	sort.Strings(keys)
+	lines := []Renderer{NewLine}
+	for _, key := range keys {
+		lines = append(lines, Line(SpaceSeparated(Literal(key), String("=>"), Literal(v[key]))))
+	}
+	return AllOf(Indented(AllOf(lines...)), Indentation)
 }
 
 type LiteralTypes interface {

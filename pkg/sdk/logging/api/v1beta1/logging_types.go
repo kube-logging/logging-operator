@@ -67,7 +67,7 @@ type LoggingSpec struct {
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
 	// WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces
 	WatchNamespaceSelector *metav1.LabelSelector `json:"watchNamespaceSelector,omitempty"`
-	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
+	// Cluster domain name to be used when templating URLs to services (default: "cluster.local.").
 	ClusterDomain *string `json:"clusterDomain,omitempty"`
 	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
@@ -150,7 +150,7 @@ const (
 // SetDefaults fills empty attributes
 func (l *Logging) SetDefaults() error {
 	if l.Spec.ClusterDomain == nil {
-		l.Spec.ClusterDomain = util.StringPointer("cluster.local")
+		l.Spec.ClusterDomain = util.StringPointer("cluster.local.")
 	}
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
@@ -598,7 +598,7 @@ func (l *Logging) QualifiedName(name string) string {
 
 // ClusterDomainAsSuffix formats the cluster domain as a suffix, e.g.:
 // .Spec.ClusterDomain == "", returns ""
-// .Spec.ClusterDomain == "cluster.local", returns ".cluster.local"
+// .Spec.ClusterDomain == "cluster.local.", returns ".cluster.local."
 func (l *Logging) ClusterDomainAsSuffix() string {
 	if l.Spec.ClusterDomain == nil || *l.Spec.ClusterDomain == "" {
 		return ""

@@ -42,27 +42,32 @@ TLS Options  - for options see https://github.com/graylog-labs/gelf-rb/blob/7291
 Default:  {}
 
 
-
- #### Example `GELF` output configurations
+ ## Example `GELF` output configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Output
-metadata:
-  name: gelf-output-sample
-spec:
-  gelf:
-    host: gelf-host
-    port: 12201
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Output
+ metadata:
+
+	name: gelf-output-sample
+
+ spec:
+
+	gelf:
+	  host: gelf-host
+	  port: 12201
+
  ```
 
- #### Fluentd Config Result
+ ## Fluentd Config Result
  ```
-  <match **>
-	@type gelf
-	@id test_gelf
-	host gelf-host
-	port 12201
-  </match>
+
+	 <match **>
+		@type gelf
+		@id test_gelf
+		host gelf-host
+		port 12201
+	 </match>
+
  ```
 
 ---

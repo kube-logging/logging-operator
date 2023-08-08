@@ -54,7 +54,7 @@ message The message you want to send, can be a static message, which you add at 
 
 Default: -
 
-### enable_tls (bool, optional) {#output config-enable_tls}
+### enable_tls (*bool, optional) {#output config-enable_tls}
 
 enable_tls you can set the communication channel if it uses tls.  
 
