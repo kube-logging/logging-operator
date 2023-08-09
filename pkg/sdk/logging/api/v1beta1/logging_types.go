@@ -130,7 +130,7 @@ const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "2.1.4"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.6.1"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.7.1"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
 	DefaultFluentdImageTag                      = "v1.15-ruby3"
@@ -144,7 +144,7 @@ const (
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "v0.0.5"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.6.1"
+	DefaultFluentdBufferVolumeImageTag          = "v0.7.1"
 )
 
 // SetDefaults fills empty attributes
