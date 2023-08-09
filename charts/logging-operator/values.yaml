@@ -31,9 +31,6 @@ fullnameOverride: ""
 # -- A namespace override for the app.
 namespaceOverride: ""
 
-# -- Namespace to watch for LoggingOperator Custom Resources.
-watchNamespace: ""
-
 # -- Define annotations for logging-operator pods.
 annotations: {}
 
