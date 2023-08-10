@@ -84,7 +84,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 		fluentContainer(r.Logging.Spec.FluentdSpec),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
 	}
-	if c := r.bufferMetricsSidecarContainer(r.Logging.Spec.FluentdSpec); c != nil {
+	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
 
