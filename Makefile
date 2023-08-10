@@ -156,7 +156,7 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 
 .PHONY: test-e2e
 test-e2e: ${KIND} generate manifests docker-build stern ## Run E2E tests
-	$(MAKE) test-e2e-nodeps
+	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
 test-e2e-ci: ${BIN}
@@ -164,12 +164,16 @@ test-e2e-ci: ${BIN}
 	chmod +x ./bin/kind
 	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
 	chmod +x ./bin/stern
+	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
+
+.PHONY: test-e2e-nodeps
+test-e2e-nodeps:
 	cd e2e && \
 		LOGGING_OPERATOR_IMAGE="${IMG}" \
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
-		go test -v -timeout ${E2E_TEST_TIMEOUT} ./...
+		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
