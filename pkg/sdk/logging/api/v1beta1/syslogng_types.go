@@ -16,7 +16,6 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
-	corev1 "k8s.io/api/core/v1"
 )
 
 // +name:"SyslogNGSpec"
@@ -43,7 +42,6 @@ type SyslogNGSpec struct {
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
-	BufferVolumeResources               corev1.ResourceRequirements  `json:"bufferVolumeResources,omitempty"`
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
