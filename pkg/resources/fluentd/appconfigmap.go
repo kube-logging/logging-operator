@@ -61,6 +61,18 @@ func (r *Reconciler) configHash() (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
 }
 
+func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string) (bool, error) {
+	var err error
+	pod := r.newCheckPod(hashKey)
+
+	p := &corev1.Pod{}
+	err = r.Client.Get(ctx, client.ObjectKeyFromObject(pod), p)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
 	hashKey, err := r.configHash()
 	if err != nil {
