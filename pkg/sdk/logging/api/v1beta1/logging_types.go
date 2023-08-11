@@ -130,7 +130,7 @@ const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "2.1.4"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.6.1"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.7.1"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
 	DefaultFluentdImageTag                      = "v1.15-ruby3"
@@ -144,7 +144,7 @@ const (
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "v0.0.5"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.6.1"
+	DefaultFluentdBufferVolumeImageTag          = "v0.7.1"
 )
 
 // SetDefaults fills empty attributes
@@ -186,10 +186,10 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup == nil {
 			l.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
 		}
+		if l.Spec.FluentdSpec.Workers <= 0 {
+			l.Spec.FluentdSpec.Workers = 1
+		}
 		if l.Spec.FluentdSpec.Metrics != nil {
-			if l.Spec.FluentdSpec.Metrics.Path == "" {
-				l.Spec.FluentdSpec.Metrics.Path = "/metrics"
-			}
 			if l.Spec.FluentdSpec.Metrics.Port == 0 {
 				l.Spec.FluentdSpec.Metrics.Port = 24231
 			}
@@ -199,15 +199,15 @@ func (l *Logging) SetDefaults() error {
 			if l.Spec.FluentdSpec.Metrics.Interval == "" {
 				l.Spec.FluentdSpec.Metrics.Interval = "15s"
 			}
-
 			if l.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
 				l.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
-
-				l.Spec.FluentdSpec.Annotations["prometheus.io/path"] = l.Spec.FluentdSpec.Metrics.Path
+				l.Spec.FluentdSpec.Annotations["prometheus.io/path"] = l.GetFluentdMetricsPath()
 				l.Spec.FluentdSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", l.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
-
+		if l.Spec.FluentdSpec.LogLevel == "" {
+			l.Spec.FluentdSpec.LogLevel = "info"
+		}
 		if !l.Spec.FluentdSpec.DisablePvc {
 			if l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 				l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
@@ -699,4 +699,16 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
+
+// GetFluentdMetricsPath returns the right Fluentd metrics endpoint
+// depending on the number of workers and the user configuration
+func (l *Logging) GetFluentdMetricsPath() string {
+	if l.Spec.FluentdSpec.Metrics.Path == "" {
+		if l.Spec.FluentdSpec.Workers > 1 {
+			return "/aggregated_metrics"
+		}
+		return "/metrics"
+	}
+	return l.Spec.FluentdSpec.Metrics.Path
 }
