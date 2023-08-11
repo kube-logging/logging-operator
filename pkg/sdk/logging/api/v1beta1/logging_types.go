@@ -49,6 +49,8 @@ type LoggingSpec struct {
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
+	// ConfigCheck settings that apply to both fluentd and syslog-ng
+	ConfigCheck ConfigCheck `json:"configCheck,omitempty"`
 	// FluentbitAgent daemonset configuration.
 	// Deprecated, will be removed with next major version
 	// Migrate to the standalone NodeAgent resource
@@ -83,6 +85,24 @@ type LoggingSpec struct {
 	// in case there is a change in an immutable field
 	// that otherwise couldn't be managed with a simple update.
 	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
+}
+
+type ConfigCheckStrategy string
+
+const (
+	ConfigCheckStrategyDryRun  ConfigCheckStrategy = "DryRun"
+	ConfigCheckStrategyTimeout ConfigCheckStrategy = "StartWithTimeout"
+)
+
+type ConfigCheck struct {
+	// Select the config check strategy to use.
+	// `DryRun`: parse and validate configuration
+	// `StartWithTimeout`: start with given configuration and exit after specified timeout
+	// Default: `DryRun`
+	Strategy ConfigCheckStrategy `json:"strategy,omitempty"`
+
+	// Configure timeout in seconds if strategy is StartWithTimeout
+	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging
@@ -383,6 +403,9 @@ func (l *Logging) SetDefaults() error {
 			if e.Volume == nil {
 				e.Volume = &volume.KubernetesVolume{}
 			}
+		}
+		if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
+			l.Spec.ConfigCheck.TimeoutSeconds = 10
 		}
 	}
 

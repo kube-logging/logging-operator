@@ -21,13 +21,16 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	"github.com/kube-logging/logging-operator/pkg/compression"
-	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/compression"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type ConfigCheckResult struct {
@@ -323,11 +326,25 @@ func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
 }
 
 func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
-	containerArgs := []string{
-		"fluentd", "-c",
-		fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
-		"--dry-run",
+	var containerArgs []string
+
+	switch r.Logging.Spec.ConfigCheck.Strategy {
+	case v1beta1.ConfigCheckStrategyTimeout:
+		containerArgs = []string{
+			"timeout", cast.ToString(r.Logging.Spec.ConfigCheck.TimeoutSeconds),
+			"fluentd", "-c",
+			fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
+		}
+	case v1beta1.ConfigCheckStrategyDryRun:
+		fallthrough
+	default:
+		containerArgs = []string{
+			"fluentd", "-c",
+			fmt.Sprintf("/fluentd/etc/%s", ConfigKey),
+			"--dry-run",
+		}
 	}
+
 	containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
 
 	container := []corev1.Container{
