@@ -258,6 +258,18 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
+		if l.Spec.FluentdSpec.BufferVolumeResources.Limits == nil {
+			l.Spec.FluentdSpec.BufferVolumeResources.Limits = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
+		}
+		if l.Spec.FluentdSpec.BufferVolumeResources.Requests == nil {
+			l.Spec.FluentdSpec.BufferVolumeResources.Requests = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("5M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
+		}
 		if l.Spec.FluentdSpec.Resources.Limits == nil {
 			l.Spec.FluentdSpec.Resources.Limits = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("400M"),
@@ -470,6 +482,18 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 		if fluentbitSpec.BufferVolumeImage.PullPolicy == "" {
 			fluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
+		}
+		if fluentbitSpec.BufferVolumeResources.Limits == nil {
+			fluentbitSpec.BufferVolumeResources.Limits = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
+		}
+		if fluentbitSpec.BufferVolumeResources.Requests == nil {
+			fluentbitSpec.BufferVolumeResources.Requests = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("5M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
 		}
 		if fluentbitSpec.Security.SecurityContext == nil {
 			fluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
