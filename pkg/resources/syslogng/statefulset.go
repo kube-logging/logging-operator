@@ -275,10 +275,10 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Resources: corev1.ResourceRequirements{
 				Limits: corev1.ResourceList{
 					corev1.ResourceMemory: resource.MustParse("10M"),
-					corev1.ResourceCPU:    resource.MustParse("1m"),
+					corev1.ResourceCPU:    resource.MustParse("50m"),
 				},
 				Requests: corev1.ResourceList{
-					corev1.ResourceMemory: resource.MustParse("5M"),
+					corev1.ResourceMemory: resource.MustParse("10M"),
 					corev1.ResourceCPU:    resource.MustParse("1m"),
 				},
 			},
