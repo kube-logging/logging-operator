@@ -202,6 +202,10 @@ Default: -
 
 Default: -
 
+### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentbitspec-buffervolumeresources}
+
+Default: -
+
 ### customConfigSecret (string, optional) {#fluentbitspec-customconfigsecret}
 
 Default: -

@@ -17,8 +17,9 @@ package v1beta1
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/cisco-open/operator-tools/pkg/volume"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
 
 // +name:"FluentdSpec"
@@ -67,6 +68,7 @@ type FluentdSpec struct {
 	BufferVolumeMetrics       *Metrics                          `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeImage         ImageSpec                         `json:"bufferVolumeImage,omitempty"`
 	BufferVolumeArgs          []string                          `json:"bufferVolumeArgs,omitempty"`
+	BufferVolumeResources     corev1.ResourceRequirements       `json:"bufferVolumeResources,omitempty"`
 	Security                  *Security                         `json:"security,omitempty"`
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`

@@ -1166,6 +1166,7 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)
@@ -1415,6 +1416,7 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(Security)
