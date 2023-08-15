@@ -314,8 +314,11 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentdSpec.FluentOutLogrotate == nil {
 			l.Spec.FluentdSpec.FluentOutLogrotate = &FluentOutLogrotate{
-				Enabled: true,
+				Enabled: false,
 			}
+		}
+		if _, ok := l.Spec.FluentdSpec.Annotations["fluentbit.io/exclude"]; !ok {
+			l.Spec.FluentdSpec.Annotations["fluentbit.io/exclude"] = "true"
 		}
 		if l.Spec.FluentdSpec.FluentOutLogrotate.Path == "" {
 			l.Spec.FluentdSpec.FluentOutLogrotate.Path = "/fluentd/log/out"
