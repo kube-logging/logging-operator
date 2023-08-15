@@ -62,6 +62,7 @@ const (
 	clusterRoleName                = "fluentd"
 	containerName                  = "fluentd"
 	defaultBufferVolumeMetricsPort = 9200
+	drainerCheckInterval           = "10"
 )
 
 // Reconciler holds info what resource to reconcile

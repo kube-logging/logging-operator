@@ -17,10 +17,11 @@ package fluentd
 import (
 	"strings"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
@@ -97,6 +98,10 @@ func drainWatchContainer(cfg *v1beta1.FluentdDrainConfig, bufferVolumeName strin
 			{
 				Name:  "BUFFER_PATH",
 				Value: bufferPath,
+			},
+			{
+				Name:  "CHECK_INTERVAL",
+				Value: drainerCheckInterval,
 			},
 		},
 		Image:           cfg.Image.RepositoryWithTag(),
