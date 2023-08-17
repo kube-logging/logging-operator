@@ -17,33 +17,38 @@ package test
 import (
 	"testing"
 
-	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestLogglyOutput(t *testing.T) {
+func TestElasticsearchOutput(t *testing.T) {
+	var emptyString string
 	config.CheckConfigForOutput(t,
 		v1beta1.SyslogNGOutput{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: "default",
-				Name:      "test-loggly-out",
+				Name:      "test-elasticsearch-out",
 			},
 			Spec: v1beta1.SyslogNGOutputSpec{
-				Loggly: &output.Loggly{
-					SyslogOutput: output.SyslogOutput{Host: "localhost"},
-					Token: &secret.Secret{
-						Value: "asd",
+				Elasticsearch: &output.ElasticsearchOutput{
+					HTTPOutput: output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
 					},
-					Tag: "test-tag",
+					LogstashPrefix: "xxx",
+					Type:           &emptyString,
 				},
 			},
 		},
 		`
-destination "output_default_test-loggly-out" {
-	loggly("localhost" tag("test-tag") token("asd") persist_name("output_default_test-loggly-out"));
+destination "output_default_test-elasticsearch-out" {
+	elasticsearch-http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-elasticsearch-out") index("xxx-${YEAR}.${MONTH}.${DAY}") type(""));
 };
 `,
 	)

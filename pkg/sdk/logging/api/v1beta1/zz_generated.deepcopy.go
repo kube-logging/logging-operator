@@ -2912,6 +2912,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.HTTPOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Elasticsearch != nil {
+		in, out := &in.Elasticsearch, &out.Elasticsearch
+		*out = new(syslogngoutput.ElasticsearchOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LogScale != nil {
 		in, out := &in.LogScale, &out.LogScale
 		*out = new(syslogngoutput.LogScaleOutput)
