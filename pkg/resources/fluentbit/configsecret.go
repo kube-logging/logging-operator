@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
@@ -182,6 +183,8 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
+	ctx := context.TODO()
+
 	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
@@ -367,17 +370,31 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		r.applyNetworkSettings(input)
 	}
 
-	if r.fluentbitSpec.TargetLoggings != nil {
+	if r.fluentbitSpec.LogRouting.Enabled {
 		loggings := &v1beta1.LoggingList{}
-		if err := r.resourceReconciler.Client.List(context.TODO(), loggings); err != nil {
+		if err := r.resourceReconciler.Client.List(ctx, loggings); err != nil {
 			return nil, reconciler.StatePresent, errors.WrapIf(err, "getting logging list")
 		}
-		for _, t := range r.fluentbitSpec.TargetLoggings {
+		var logRoutingErrors error
+		for _, t := range r.fluentbitSpec.LogRouting.Targets {
 		TargetLogging:
 			for _, l := range loggings.Items {
 				if l.Name == t.LoggingName {
-					targetNamespaces := t.Namespaces
-					if targetNamespaces == nil {
+					targetNamespaces, allNamespaces, err := model.UniqueWatchNamespaces(ctx, r.resourceReconciler.Client, &l)
+					if err != nil {
+						logRoutingErrors = errors.Append(logRoutingErrors, errors.WrapIff(err, "getting target namespaces for logging %s", l.Name))
+						continue
+					}
+					if len(targetNamespaces) == 0 {
+						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("cannot find any valid namespaces for logging %s", l.Name))
+						continue
+					}
+					if allNamespaces && !t.AllNamespace {
+						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("refused sending all namespaces logs to "+
+							"logging %s without explicitly asking through the `allNamespaces` option for the target", l.Name))
+						continue
+					}
+					if t.AllNamespace {
 						targetNamespaces = []string{"*"}
 					}
 					for _, ns := range targetNamespaces {
@@ -400,12 +417,15 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 								Port:      syslogng.ServicePort,
 							})
 						} else {
-							r.logger.Info("ERROR logging %s does not provide any aggregator configured", "logging", l.Name)
+							logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("logging %s does not provide any aggregator configured", l.Name))
 							break TargetLogging
 						}
 					}
 				}
 			}
+		}
+		if logRoutingErrors != nil {
+			return nil, nil, logRoutingErrors
 		}
 	} else {
 		// compatibility with existing configuration

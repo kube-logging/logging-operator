@@ -9,6 +9,7 @@ metadata:
   name: infra
 spec:
   loggingRef: infra
+  fluentd: {}
   controlNamespace: infra
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -25,11 +26,10 @@ spec:
       path: ""
   network:
     connectTimeout: 2
-  targetLoggings:
-    - loggingName: a
-      namespaces:
-        - a
-    - loggingName: b
-      namespaces:
-        - b1
-        - b2
+  logRouting:
+    enabled: true
+    targets:
+    - logging: infra
+      allNamespaces: true
+    - logging: a
+    - logging: b

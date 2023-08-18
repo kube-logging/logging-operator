@@ -9,11 +9,10 @@ metadata:
   name: a
 spec:
   loggingRef: a
-  fluentd:
-    fluentLogDestination: stdout
-    fluentOutLogrotate:
-      enabled: false
+  fluentd: {}
   controlNamespace: a-control
+  watchNamespaces:
+  - a
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: ClusterOutput

@@ -72,8 +72,9 @@ type FluentbitSpec struct {
 	TLS                  *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost           string            `json:"targetHost,omitempty"`
 	TargetPort           int32             `json:"targetPort,omitempty"`
-	// Specify target logging resources and namespaces (experimental)
-	TargetLoggings []TargetLogging `json:"targetLoggings,omitempty"`
+	// Enable log routing to other logging resources based on namespace information queried from the target logging's watchNamespaces or watchNamespaceSelector
+	// Experimental feature
+	LogRouting LogRouting `json:"logRouting,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
@@ -131,9 +132,18 @@ type FluentbitSpec struct {
 	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
 }
 
-type TargetLogging struct {
-	LoggingName string   `json:"loggingName"`
-	Namespaces  []string `json:"namespaces,omitempty"`
+type LogRouting struct {
+	Enabled bool      `json:"enabled,omitempty"`
+	Targets []Targets `json:"targets,omitempty"`
+}
+
+type Targets struct {
+	// Name of the remote logging resource to use as an output
+	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` if set
+	// When none of those are set, then routing is only enabled if `allNamespaces` flag is enabled
+	LoggingName string `json:"logging"`
+	// Send all namespace logs to this
+	AllNamespace bool `json:"allNamespaces,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

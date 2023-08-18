@@ -29,6 +29,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
 	"github.com/pborman/uuid"
+	"golang.org/x/exp/slices"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -1240,10 +1241,16 @@ func TestWatchNamespaces(t *testing.T) {
 		},
 	})()
 
+	type ReturnVal struct {
+		namespaces   []string
+		allNamespace bool
+		err          error
+	}
+
 	cases := []struct {
 		name           string
 		logging        *v1beta1.Logging
-		expectedResult func() []string
+		expectedResult func() ReturnVal
 		expectError    bool
 	}{
 		{
@@ -1257,7 +1264,7 @@ func TestWatchNamespaces(t *testing.T) {
 					WatchNamespaceSelector: nil,
 				},
 			},
-			expectedResult: func() []string {
+			expectedResult: func() ReturnVal {
 				allNamespaces := &corev1.NamespaceList{}
 				err := mgr.GetClient().List(context.TODO(), allNamespaces)
 				if err != nil {
@@ -1267,7 +1274,11 @@ func TestWatchNamespaces(t *testing.T) {
 				for _, i := range allNamespaces.Items {
 					items = append(items, i.Name)
 				}
-				return items
+				slices.Sort(items)
+				return ReturnVal{
+					namespaces:   items,
+					allNamespace: true,
+				}
 			},
 		},
 		{
@@ -1281,7 +1292,11 @@ func TestWatchNamespaces(t *testing.T) {
 					WatchNamespaceSelector: nil,
 				},
 			},
-			expectedResult: func() []string { return []string{"test-explicit-1", "test-explicit-2"} },
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-explicit-1", "test-explicit-2"},
+				}
+			},
 		},
 		{
 			name: "bylabel list",
@@ -1298,7 +1313,11 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: func() []string { return []string{"test-bylabel-1"} },
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-bylabel-1"},
+				}
+			},
 		},
 		{
 			name: "bylabel negative list (label exists but value should be different)",
@@ -1323,7 +1342,11 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: func() []string { return []string{"test-bylabel-2"} },
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-bylabel-2"},
+				}
+			},
 		},
 		{
 			name: "merge two sets uniquely",
@@ -1343,22 +1366,31 @@ func TestWatchNamespaces(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: func() []string { return []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"} },
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"},
+				}
+			},
 		},
 	}
 
 	for _, c := range cases {
 		if c.expectError {
-			_, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			_, _, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
 			if c.expectError && err == nil {
 				t.Fatalf("expected error for test case %s", c.name)
 			}
 			continue
 		}
 
-		g.Eventually(func() ([]string, error) {
-			return model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
-		}, timeout).Should(gomega.ConsistOf(
+		g.Eventually(func() ReturnVal {
+			n, b, e := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			return ReturnVal{
+				namespaces:   n,
+				allNamespace: b,
+				err:          e,
+			}
+		}, timeout).Should(gomega.Equal(
 			c.expectedResult(),
 		))
 	}

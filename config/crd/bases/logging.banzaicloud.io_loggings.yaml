@@ -2330,6 +2330,22 @@ spec:
                     type: object
                   logLevel:
                     type: string
+                  logRouting:
+                    properties:
+                      enabled:
+                        type: boolean
+                      targets:
+                        items:
+                          properties:
+                            allNamespaces:
+                              type: boolean
+                            logging:
+                              type: string
+                          required:
+                          - logging
+                          type: object
+                        type: array
+                    type: object
                   loggingRef:
                     type: string
                   metrics:
@@ -3181,19 +3197,6 @@ spec:
                     type: object
                   targetHost:
                     type: string
-                  targetLoggings:
-                    items:
-                      properties:
-                        loggingName:
-                          type: string
-                        namespaces:
-                          items:
-                            type: string
-                          type: array
-                      required:
-                      - loggingName
-                      type: object
-                    type: array
                   targetPort:
                     format: int32
                     type: integer

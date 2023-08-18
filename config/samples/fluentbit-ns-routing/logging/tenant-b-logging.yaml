@@ -17,3 +17,6 @@ spec:
         freq: 0
       #log_level: trace
   controlNamespace: b-control
+  watchNamespaces:
+    - b1
+    - b2
