@@ -53,6 +53,17 @@ func (f FileTailer) Command(Name string) []string {
 		"-p", "format=template",
 		"-p", "template={log}",
 	}
+	if f.Tag != "" {
+		command = append(command, "-p", fmt.Sprintf("tag=%s", f.Tag))
+	}
+	if f.TagRegex != "" {
+		command = append(command, "-p", fmt.Sprintf("tag_regex=%s", f.TagRegex))
+	}
+	if len(f.MultilineParser) > 0 {
+		for _, parser := range f.MultilineParser {
+			command = append(command, "-p", fmt.Sprintf("multiline.parser=%s", parser))
+		}
+	}
 	command = append(command, config.HostTailer.VersionedFluentBitPathArgs("/dev/stdout")...)
 	return command
 }

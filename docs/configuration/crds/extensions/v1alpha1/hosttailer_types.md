@@ -128,6 +128,24 @@ Start reading from the head of new log files
 
 Default: -
 
+### tag (string, optional) {#filetailer-tag}
+
+Set a tag (with regex-extract fields) that will be placed on lines read. 
+
+Default: -
+
+### tag_regex (string, optional) {#filetailer-tag_regex}
+
+Set a regex to extract fields from the file. 
+
+Default: -
+
+### multiline.parser ([]string, optional) {#filetailer-multiline.parser}
+
+Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8  
+
+Default:  []
+
 ### containerOverrides (*types.ContainerBase, optional) {#filetailer-containeroverrides}
 
 Override container fields for the given tailer 

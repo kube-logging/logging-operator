@@ -252,7 +252,7 @@ type InputTail struct {
 	DockerModeParser string `json:"Docker_Mode_Parser,omitempty"`
 	// Wait period time in seconds to flush queued unfinished split lines. (default:4)
 	DockerModeFlush string `json:"Docker_Mode_Flush,omitempty"`
-	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: "")
+	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: [])
 	MultilineParser []string `json:"multiline.parser,omitempty"`
 }
 

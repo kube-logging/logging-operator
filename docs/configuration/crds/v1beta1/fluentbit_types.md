@@ -562,7 +562,7 @@ Default: 4
 
 Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8  
 
-Default:  ""
+Default:  []
 
 
 ## FilterKubernetes

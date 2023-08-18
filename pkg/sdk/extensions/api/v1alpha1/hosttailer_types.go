@@ -88,6 +88,12 @@ type FileTailer struct {
 	SkipLongLines string `json:"skip_long_lines,omitempty"`
 	// Start reading from the head of new log files
 	ReadFromHead bool `json:"read_from_head,omitempty"`
+	// Set a tag (with regex-extract fields) that will be placed on lines read.
+	Tag string `json:"tag,omitempty"`
+	// Set a regex to extract fields from the file.
+	TagRegex string `json:"tag_regex,omitempty"`
+	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: [])
+	MultilineParser []string `json:"multiline.parser,omitempty"`
 	// Override container fields for the given tailer
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
 }
