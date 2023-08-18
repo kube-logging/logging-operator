@@ -1347,11 +1347,9 @@ func TestWatchNamespaces(t *testing.T) {
 		},
 	}
 
-	repo := model.NewLoggingResourceRepository(mgr.GetClient(), mgr.GetLogger())
-
 	for _, c := range cases {
 		if c.expectError {
-			_, err := repo.UniqueWatchNamespaces(context.TODO(), c.logging)
+			_, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
 			if c.expectError && err == nil {
 				t.Fatalf("expected error for test case %s", c.name)
 			}
@@ -1359,7 +1357,7 @@ func TestWatchNamespaces(t *testing.T) {
 		}
 
 		g.Eventually(func() ([]string, error) {
-			return repo.UniqueWatchNamespaces(context.TODO(), c.logging)
+			return model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
 		}, timeout).Should(gomega.ConsistOf(
 			c.expectedResult(),
 		))
