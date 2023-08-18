@@ -69,7 +69,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	uniqueWatchNamespaces, err := r.UniqueWatchNamespaces(ctx, &logging)
+	uniqueWatchNamespaces, err := UniqueWatchNamespaces(ctx, r.Client, &logging)
 	if err != nil {
 		errs = errors.Append(errs, err)
 		return
@@ -104,7 +104,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	return
 }
 
-func (r LoggingResourceRepository) UniqueWatchNamespaces(ctx context.Context, logging *v1beta1.Logging) ([]string, error) {
+func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v1beta1.Logging) ([]string, error) {
 	watchNamespaces := logging.Spec.WatchNamespaces
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector
 	if len(watchNamespaces) == 0 || nsLabelSelector != nil {
@@ -119,7 +119,7 @@ func (r LoggingResourceRepository) UniqueWatchNamespaces(ctx context.Context, lo
 				LabelSelector: selector,
 			}
 		}
-		if err := r.Client.List(ctx, &nsList, nsListOptions); err != nil {
+		if err := reader.List(ctx, &nsList, nsListOptions); err != nil {
 			return nil, errors.WrapIf(err, "listing namespaces for watchNamespaceSelector")
 		}
 		for _, i := range nsList.Items {
