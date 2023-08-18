@@ -17,13 +17,19 @@ metadata:
   name: infra
 spec:
   loggingRef: infra
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
   network:
     connectTimeout: 2
   targetLoggings:
     - loggingName: a
       namespaces:
         - a
-        - a-user
     - loggingName: b
       namespaces:
-        - b
+        - b1
+        - b2

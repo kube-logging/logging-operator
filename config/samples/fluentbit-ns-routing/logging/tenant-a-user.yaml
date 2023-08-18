@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: a-user
+  name: a
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
   name: all
-  namespace: a-user
+  namespace: a
 spec:
   loggingRef: a
   match:
