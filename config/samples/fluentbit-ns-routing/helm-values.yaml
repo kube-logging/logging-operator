@@ -1,4 +1,0 @@
-nameOverride: example
-
-testReceiver:
-  enabled: true

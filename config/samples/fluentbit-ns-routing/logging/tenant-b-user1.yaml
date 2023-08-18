@@ -1,23 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: b
----
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Logging
-metadata:
-  name: b
-spec:
-  loggingRef: b
-  syslogNG:
-    jsonKeyDelim: '#'
-  controlNamespace: b
+  name: b1
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGFlow
 metadata:
-  name: all
-  namespace: b
+  name: log-generator
+  namespace: b1
 spec:
   loggingRef: b
   match:
@@ -32,10 +22,10 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
 metadata:
   name: http
-  namespace: b
+  namespace: b1
 spec:
   loggingRef: b
   http:
-    url: http://example-test-receiver.infra:8080/tenant-b
+    url: http://test-receiver.infra:8080/tenant-b-namespace-b1
     headers:
       - "Content-type: application/json"
