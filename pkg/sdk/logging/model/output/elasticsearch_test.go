@@ -48,6 +48,7 @@ buffer:
 	scheme https
 	ssl_verify false
 	ssl_version TLSv1_2
+	use_legacy_template true
 	utc_index true
 	verify_es_version_at_startup true
     <buffer tag,time>
@@ -96,6 +97,7 @@ buffer:
     scheme https
     ssl_verify false
     ssl_version TLSv1_2
+    use_legacy_template true
     utc_index true
     verify_es_version_at_startup true
     <buffer tag,time>

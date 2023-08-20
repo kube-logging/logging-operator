@@ -54,6 +54,7 @@ buffer:
 	reload_connections true
 	ssl_verify true
 	tag_key @log_name
+	use_legacy_template true
 	utc_index true
 	verify_es_version_at_startup true
 	<endpoint>

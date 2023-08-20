@@ -507,9 +507,9 @@ Default: -
 
 ### use_legacy_template (*bool, optional) {#opensearch-use_legacy_template}
 
-use_legacy_template (default: true) 
+Specify wether to use legacy template or not.  
 
-Default: true
+Default:  true
 
 ### catch_transport_exception_on_retry (*bool, optional) {#opensearch-catch_transport_exception_on_retry}
 
