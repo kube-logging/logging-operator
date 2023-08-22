@@ -38,12 +38,15 @@ func TestHTTPOutput(t *testing.T) {
 						BatchLines: 2000,
 					},
 					Workers: 3,
+					TLS: &output.TLS{
+						PeerVerify: true,
+					},
 				},
 			},
 		},
 		`
 destination "output_default_test-http-out" {
-	http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
+	http(url("test.local") headers("a:b" "c:d") tls(peer-verify(yes)) batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
 };
 `,
 	)

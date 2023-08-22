@@ -308,7 +308,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -510,7 +510,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -894,7 +894,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -1103,7 +1103,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -1295,7 +1295,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
