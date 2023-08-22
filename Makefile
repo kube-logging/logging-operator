@@ -69,11 +69,6 @@ check-diff: generate fmt manifests docs helm-docs
 debug: manager ## Remote debug
 	dlv --listen=:40000 --log --headless=true --api-version=2 exec bin/manager -- $(ARGS)
 
-.PHONY: deploy
-deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-	kubectl apply -f config/crd/bases
-	kustomize build config/default | kubectl apply -f -
-
 .PHONY: docker-build
 docker-build: ## Build the docker image
 	docker image inspect ${IMG} && echo "docker image ${IMG} already built" || ${DOCKER} build . -t ${IMG}

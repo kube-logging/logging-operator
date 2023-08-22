@@ -22,13 +22,15 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
-	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type ConfigCheckResult struct {
@@ -160,6 +162,31 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
+	var containerArgs, containerCommand []string
+
+	switch r.Logging.Spec.ConfigCheck.Strategy {
+	case v1beta1.ConfigCheckStrategyTimeout:
+		containerCommand = []string{
+			"timeout", cast.ToString(r.Logging.Spec.ConfigCheck.TimeoutSeconds),
+			"/usr/sbin/syslog-ng",
+		}
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-Fe",
+			"--no-caps",
+		}
+	case v1beta1.ConfigCheckStrategyDryRun:
+		fallthrough
+	default:
+		// use the default entrypoint
+		containerCommand = nil
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-s",
+			"--no-caps",
+		}
+	}
+
 	pod := &corev1.Pod{
 		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
@@ -188,11 +215,8 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Name:            "syslog-ng",
 					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 					ImagePullPolicy: corev1.PullIfNotPresent,
-					Args: []string{
-						"--cfgfile=" + configDir + "/" + configKey,
-						"-s",
-						"--no-caps",
-					},
+					Command:         containerCommand,
+					Args:            containerArgs,
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceMemory: resource.MustParse("400M"),
