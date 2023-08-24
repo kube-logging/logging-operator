@@ -135,12 +135,12 @@ func Literal[T LiteralTypes](v T) Renderer {
 }
 
 // ArrowMap renders a map as a key=>value style map used at various places of the config grammar
-func ArrowMap(v map[string]string) Renderer {
+func ArrowMap(v map[string]string, keyRenderer func(string) Renderer, valueRenderer func(string) Renderer) Renderer {
 	keys := maps.Keys(v)
 	sort.Strings(keys)
 	lines := []Renderer{NewLine}
 	for _, key := range keys {
-		lines = append(lines, Line(SpaceSeparated(Literal(key), String("=>"), Literal(v[key]))))
+		lines = append(lines, Line(SpaceSeparated(keyRenderer(key), String("=>"), valueRenderer(v[key]))))
 	}
 	return AllOf(Indented(AllOf(lines...)), Indentation)
 }
