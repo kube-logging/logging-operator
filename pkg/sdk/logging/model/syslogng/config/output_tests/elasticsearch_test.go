@@ -53,3 +53,36 @@ destination "output_default_test-elasticsearch-out" {
 `,
 	)
 }
+
+func TestElasticsearchOutputWithCustomLogstashFormat(t *testing.T) {
+	var emptyString string
+	config.CheckConfigForOutput(t,
+		v1beta1.SyslogNGOutput{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      "test-elasticsearch-out",
+			},
+			Spec: v1beta1.SyslogNGOutputSpec{
+				Elasticsearch: &output.ElasticsearchOutput{
+					HTTPOutput: output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+					},
+					LogstashPrefix:          "my-prefix",
+					LogstashPrefixSeparator: "+",
+					LogStashSuffix:          "my-suffix",
+					Type:                    &emptyString,
+				},
+			},
+		},
+		`
+destination "output_default_test-elasticsearch-out" {
+    elasticsearch-http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-elasticsearch-out") index("my-prefix+my-suffix") type(""));
+};
+`,
+	)
+}

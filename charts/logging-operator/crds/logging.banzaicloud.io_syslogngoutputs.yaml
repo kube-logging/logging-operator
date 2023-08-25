@@ -91,6 +91,10 @@ spec:
                     type: integer
                   logstash_prefix:
                     type: string
+                  logstash_prefix_separator:
+                    type: string
+                  logstash_suffix:
+                    type: string
                   method:
                     type: string
                   password:

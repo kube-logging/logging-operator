@@ -38,12 +38,25 @@ type ElasticsearchOutput struct {
 	// The document type associated with the operation. Elasticsearch indices now support a single document type: _doc
 	Type *string `json:"type,omitempty"`
 	// The document ID. If no ID is specified, a document ID is automatically generated.
-	CustomID       string `json:"custom_id,omitempty"`
+	CustomID string `json:"custom_id,omitempty"`
+	// Set the prefix for logs in logstash format. If set, then Index field will be ignored.
 	LogstashPrefix string `json:"logstash_prefix,omitempty" syslog-ng:"ignore"`
+	// Set the separator between LogstashPrefix and LogStashDateformat. Default: "-"
+	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty" syslog-ng:"ignore"`
+	// Set the suffix for logs in logstash format. Default: "${YEAR}.${MONTH}.${DAY}"
+	LogStashSuffix string `json:"logstash_suffix,omitempty" syslog-ng:"ignore"`
 }
 
 func (o *ElasticsearchOutput) BeforeRender() {
+	if o.LogstashPrefixSeparator == "" {
+		o.LogstashPrefixSeparator = "-"
+	}
+
+	if o.LogStashSuffix == "" {
+		o.LogStashSuffix = "${YEAR}.${MONTH}.${DAY}"
+	}
+
 	if o.LogstashPrefix != "" {
-		o.Index = fmt.Sprintf("%s-${YEAR}.${MONTH}.${DAY}", o.LogstashPrefix)
+		o.Index = fmt.Sprintf("%s%s%s", o.LogstashPrefix, o.LogstashPrefixSeparator, o.LogStashSuffix)
 	}
 }
