@@ -121,7 +121,7 @@ func TestHTTPOutputTable(t *testing.T) {
 							BatchLines: 2000,
 						},
 						Workers:     3,
-						LogFifoSize: 1000,
+						LogFIFOSize: 1000,
 					},
 				},
 			},
