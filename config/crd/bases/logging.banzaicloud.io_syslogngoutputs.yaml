@@ -126,6 +126,8 @@ spec:
                     items:
                       type: string
                     type: array
+                  log-fifo-size:
+                    type: integer
                   method:
                     type: string
                   password:
@@ -163,9 +165,15 @@ spec:
                     type: object
                   persist_name:
                     type: string
+                  response-action:
+                    additionalProperties:
+                      type: string
+                    type: object
                   retries:
                     type: integer
                   time_reopen:
+                    type: integer
+                  timeout:
                     type: integer
                   tls:
                     properties:
@@ -304,7 +312,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -506,7 +514,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -890,7 +898,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -1099,7 +1107,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object
@@ -1291,7 +1299,7 @@ spec:
                             type: object
                         type: object
                       peer_verify:
-                        type: string
+                        type: boolean
                       use-system-cert-store:
                         type: boolean
                     type: object

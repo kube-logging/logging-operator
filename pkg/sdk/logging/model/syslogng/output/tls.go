@@ -41,7 +41,7 @@ type TLS struct {
 	// Name of a file, that contains an X.509 certificate (or a certificate chain) in PEM format, suitable as a TLS certificate, matching the private key set in the key-file() option. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3146)
 	CertFile *secret.Secret `json:"cert_file,omitempty"`
 	// Verification method of the peer. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#tls-options-peer-verify)
-	PeerVerify string `json:"peer_verify,omitempty"`
+	PeerVerify *bool `json:"peer_verify,omitempty"`
 	// Use the certificate store of the system for verifying HTTPS certificates. [more information](https://curl.se/docs/sslcerts.html)
 	UseSystemCertStore *bool `json:"use-system-cert-store,omitempty"`
 	// Description: Specifies the cipher, hash, and key-exchange algorithms used for the encryption, for example, ECDHE-ECDSA-AES256-SHA384. The list of available algorithms depends on the version of OpenSSL used to compile syslog-ng OSE

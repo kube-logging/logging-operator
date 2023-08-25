@@ -52,12 +52,12 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),
 		}
-	} else if value.CanConvert(arrowMapType) {
-		arrowMap := value.Convert(arrowMapType).Interface().(filter.ArrowMap)
+	} else if value.Type() == arrowMapType {
+		arrowMap := value.Interface().(filter.ArrowMap)
 		return []render.Renderer{render.ArrowMap(arrowMap, render.Literal[string], render.Literal[string])}
-	} else if value.CanConvert(rawArrowMapType) {
-		arrowMap := value.Convert(rawArrowMapType).Interface().(filter.RawArrowMap)
-		return []render.Renderer{render.ArrowMap(arrowMap, render.String, render.String)}
+	} else if value.Type() == rawArrowMapType {
+		rawArrowMap := value.Interface().(filter.RawArrowMap)
+		return []render.Renderer{render.ArrowMap(rawArrowMap, render.String, render.String)}
 	}
 
 	switch value.Kind() {
