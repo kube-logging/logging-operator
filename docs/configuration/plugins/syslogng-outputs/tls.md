@@ -13,31 +13,31 @@ generated_file: true
 
 ### ca_dir (*secret.Secret, optional) {#tls-ca_dir}
 
-The name of a directory that contains a set of trusted CA certificates in PEM format. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3142) 
+The name of a directory that contains a set of trusted CA certificates in PEM format. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-dir) 
 
 Default: -
 
 ### ca_file (*secret.Secret, optional) {#tls-ca_file}
 
-The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3144) 
+The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-file) 
 
 Default: -
 
 ### key_file (*secret.Secret, optional) {#tls-key_file}
 
-The name of a file that contains an unencrypted private key in PEM format, suitable as a TLS key. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3163) 
+The name of a file that contains an unencrypted private key in PEM format, suitable as a TLS key. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#key-file) 
 
 Default: -
 
 ### cert_file (*secret.Secret, optional) {#tls-cert_file}
 
-Name of a file, that contains an X.509 certificate (or a certificate chain) in PEM format, suitable as a TLS certificate, matching the private key set in the key-file() option. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#kanchor3146) 
+Name of a file, that contains an X.509 certificate (or a certificate chain) in PEM format, suitable as a TLS certificate, matching the private key set in the key-file() option. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#cert-file) 
 
 Default: -
 
-### peer_verify (string, optional) {#tls-peer_verify}
+### peer_verify (*bool, optional) {#tls-peer_verify}
 
-Verification method of the peer. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#tls-options-peer-verify) 
+Verification method of the peer. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#tls-options-peer-verify) 
 
 Default: -
 

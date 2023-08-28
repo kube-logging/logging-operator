@@ -20,9 +20,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
-	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -144,3 +144,13 @@ func (r secretReader) List(ctx context.Context, list client.ObjectList, opts ...
 }
 
 var _ client.Reader = (*secretReader)(nil)
+
+func NewTrue() *bool {
+	b := true
+	return &b
+}
+
+func NewFalse() *bool {
+	b := false
+	return &b
+}
