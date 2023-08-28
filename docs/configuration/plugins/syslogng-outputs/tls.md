@@ -35,7 +35,7 @@ Name of a file, that contains an X.509 certificate (or a certificate chain) in P
 
 Default: -
 
-### peer_verify (string, optional) {#tls-peer_verify}
+### peer_verify (*bool, optional) {#tls-peer_verify}
 
 Verification method of the peer. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#tls-options-peer-verify) 
 
