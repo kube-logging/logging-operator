@@ -6,16 +6,16 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.30.0
-	github.com/kube-logging/logging-operator v0.0.0-20230724074909-5e36c5087c5d
+	github.com/kube-logging/logging-operator f0a916b260dc
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
-	helm.sh/helm/v3 v3.12.2
-	k8s.io/api v0.27.4
-	k8s.io/apiextensions-apiserver v0.27.4
-	k8s.io/apimachinery v0.27.4
-	k8s.io/client-go v0.27.4
-	sigs.k8s.io/controller-runtime v0.15.0
+	helm.sh/helm/v3 v3.12.3
+	k8s.io/api v0.27.5
+	k8s.io/apiextensions-apiserver v0.27.5
+	k8s.io/apimachinery v0.27.5
+	k8s.io/client-go v0.27.5
+	sigs.k8s.io/controller-runtime v0.16.0
 )
 
 require (
