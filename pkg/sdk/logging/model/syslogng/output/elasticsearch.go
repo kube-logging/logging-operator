@@ -21,11 +21,11 @@ import "fmt"
 type _hugoElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/destination-forward-send-and-store-log-messages/elasticsearch-http-sending-messages-to-elasticsearch-http-bulk-api/
+// More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
 type _docSElasticsearch interface{} //nolint:deadcode,unused
 
 // +name:"Elasticsearch"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/destination-forward-send-and-store-log-messages/elasticsearch-http-sending-messages-to-elasticsearch-http-bulk-api/"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/"
 // +description:"Sending messages over Elasticsearch"
 // +status:"Testing"
 type _metaElasticsearch interface{} //nolint:deadcode,unused
