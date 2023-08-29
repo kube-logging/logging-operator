@@ -39,6 +39,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	controllers "github.com/kube-logging/logging-operator/controllers/logging"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
@@ -1377,7 +1378,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                  scheme.Scheme,
-		MetricsBindAddress:      "0",
+		Metrics:                 metricsserver.Options{BindAddress: "0"},
 		GracefulShutdownTimeout: &timeout,
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
