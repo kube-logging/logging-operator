@@ -18,11 +18,10 @@ import (
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestLogglyOutput(t *testing.T) {

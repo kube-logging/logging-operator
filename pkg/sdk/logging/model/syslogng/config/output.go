@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
-	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -58,6 +58,9 @@ func renderOutputSpec(spec v1beta1.SyslogNGOutputSpec, destName string, output m
 	case 1:
 		driverField := driverFields[0]
 		defaultPersistName(driverField.Value, destName) // HACK: defaulting should be done properly
+		if br, _ := driverField.Value.Interface().(interface{ BeforeRender() }); br != nil {
+			br.BeforeRender()
+		}
 		return renderDriver(driverField, secretLoader)
 	default:
 		return render.Error(fmt.Errorf(
