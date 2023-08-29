@@ -52,9 +52,12 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),
 		}
-	} else if value.CanConvert(arrowMapType) {
-		arrowMap := value.Convert(arrowMapType).Interface().(filter.ArrowMap)
-		return []render.Renderer{render.ArrowMap(arrowMap)}
+	} else if value.Type() == arrowMapType {
+		arrowMap := value.Interface().(filter.ArrowMap)
+		return []render.Renderer{render.ArrowMap(arrowMap, render.Literal[string], render.Literal[string])}
+	} else if value.Type() == rawArrowMapType {
+		rawArrowMap := value.Interface().(filter.RawArrowMap)
+		return []render.Renderer{render.ArrowMap(rawArrowMap, render.String, render.String)}
 	}
 
 	switch value.Kind() {
@@ -198,6 +201,7 @@ func goNameToSyslogName(s string) string {
 
 var matchExprType = reflect.TypeOf(filter.MatchExpr{})
 var arrowMapType = reflect.TypeOf(filter.ArrowMap{})
+var rawArrowMapType = reflect.TypeOf(filter.RawArrowMap{})
 
 func derefAll[T Derefable[T]](v T) T {
 	for v.Kind() == reflect.Pointer {

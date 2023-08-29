@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"HTTP"
@@ -64,9 +65,18 @@ type HTTPOutput struct {
 	Password secret.Secret `json:"password,omitempty"`
 	// The value of the USER-AGENT header in the messages sent to the server.
 	UserAgent string `json:"user-agent,omitempty"`
-	// Description: Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.
-	Workers     int    `json:"workers,omitempty"`
+	// Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.
+	Workers int `json:"workers,omitempty"`
+	// If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers:
+	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.`
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
 	PersistName string `json:"persist_name,omitempty"`
+	// The number of messages that the output queue can store.
+	LogFIFOSize int `json:"log-fifo-size,omitempty"`
+	// Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited.
+	Timeout int `json:"timeout,omitempty"`
+	// Specifies what AxoSyslog does with the log message, based on the response code received from the HTTP server. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information.
+	ResponseAction filter.RawArrowMap `json:"response-action,omitempty"`
 }
 
 type Batch struct {
