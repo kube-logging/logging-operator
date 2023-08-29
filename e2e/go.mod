@@ -162,4 +162,4 @@ require (
 
 replace github.com/kube-logging/logging-operator/pkg/sdk => ../pkg/sdk
 
-replace sigs.k8s.io/controller-runtime v0.16.0 => /home/orion/axoflow/logging-operator/e2e/controller-runtime
+replace sigs.k8s.io/controller-runtime v0.16.0 => github.com/OverOrion/controller-runtime v0.0.0-20230829075300-1ebb9990072a
