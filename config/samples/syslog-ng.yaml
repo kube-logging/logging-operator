@@ -6,6 +6,7 @@ spec:
   syslogNG:
     bufferVolumeMetrics:
       mount_name: buffers
+      # prometheus chart or the operator should be installed for this to work
       serviceMonitor: true
     statefulSet:
       spec:
