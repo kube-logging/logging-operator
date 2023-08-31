@@ -69,10 +69,17 @@ type RedisOutput struct {
 	CommandAndArguments []string `json:"command_and_arguments,omitempty" syslog-ng:"ignore"`
 	// Internal rendered form of the CommandAndArguments field
 	RenderedCommand StringList `json:"command,omitempty"`
+	// Batching parameters
+	Batch `json:",inline"`
+	// The number of messages that the output queue can store.
+	LogFIFOSize int `json:"log-fifo-size,omitempty"`
+	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
+	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 }
 
+// +kubebuilder:object:generate=true
 type StringList struct {
-	List []string
+	List []string `json:"string-list,omitempty"`
 }
 
 func (o *RedisOutput) BeforeRender() {

@@ -45,3 +45,28 @@ destination "output_default_test-redis-out" {
 `,
 	)
 }
+
+func TestRedisOutputWithBatching(t *testing.T) {
+	config.CheckConfigForOutput(t,
+		v1beta1.SyslogNGOutput{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      "test-redis-out",
+			},
+			Spec: v1beta1.SyslogNGOutputSpec{
+				Redis: &output.RedisOutput{
+					Host:                "127.0.0.1",
+					Port:                6379,
+					CommandAndArguments: []string{"HINCRBY", "hosts", "$HOST", "1"},
+					Batch:               output.Batch{BatchLines: 100, BatchTimeout: 10000},
+					LogFIFOSize:         100000,
+				},
+			},
+		},
+		`
+destination "output_default_test-redis-out" {
+	redis(host("127.0.0.1") port(6379) command("HINCRBY", "hosts", "$HOST", "1") batch-lines(100) batch-timeout(10000) log-fifo-size(100000));
+};
+`,
+	)
+}
