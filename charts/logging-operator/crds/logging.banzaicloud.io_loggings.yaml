@@ -5058,6 +5058,10 @@ spec:
                               tag:
                                 type: string
                             type: object
+                          labels:
+                            additionalProperties:
+                              type: string
+                            type: object
                           pauseImage:
                             properties:
                               imagePullSecrets:
