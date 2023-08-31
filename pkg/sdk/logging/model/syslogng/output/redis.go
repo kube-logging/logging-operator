@@ -52,7 +52,7 @@ type _docRedis interface{} //nolint:deadcode,unused
 type _metaRedis interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-type Redis struct {
+type RedisOutput struct {
 	// The hostname or IP address of the Redis server. (default: 127.0.0.1)
 	Host string `json:"host,omitempty"`
 	// The port number of the Redis server. (default: 6379)
@@ -66,5 +66,10 @@ type Redis struct {
 	// Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination. (default: 1)
 	Workers int `json:"workers,omitempty"`
 	// The Redis command to execute, for example, LPUSH, INCR, or HINCRBY. Using the HINCRBY command with an increment value of 1 allows you to create various statistics. For example, the command("HINCRBY" "${HOST}/programs" "${PROGRAM}" "1") command counts the number of log messages on each host for each program. (default: "")
-	Command int `json:"command,omitempty"`
+	Command string `json:"command,omitempty"`
 }
+
+func (o *RedisOutput) BeforeRender() {
+	
+}
+
