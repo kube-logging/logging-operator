@@ -305,7 +305,7 @@ Default: -
 
 ### labels (map[string]string, optional) {#fluentddrainconfig-labels}
 
-Labels to use for the drain watch sidecar 
+Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten. 
 
 Default: -
 

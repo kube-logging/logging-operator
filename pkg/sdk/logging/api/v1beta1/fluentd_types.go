@@ -150,7 +150,7 @@ type FluentdDrainConfig struct {
 	Enabled bool `json:"enabled,omitempty"`
 	// Annotations to use for the drain watch sidecar
 	Annotations map[string]string `json:"annotations,omitempty"`
-	// Labels to use for the drain watch sidecar
+	// Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten.
 	Labels map[string]string `json:"labels,omitempty"`
 	// Should persistent volume claims be deleted after draining is done
 	DeleteVolume bool      `json:"deleteVolume,omitempty"`
