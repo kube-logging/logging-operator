@@ -48,7 +48,7 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels:      r.Logging.GetFluentdLabels(ComponentDrainer),
+				Labels:      r.getDrainerLabels(),
 				Annotations: r.Logging.Spec.FluentdSpec.Scaling.Drain.Annotations,
 			},
 			Spec: corev1.PodSpec{
@@ -121,4 +121,17 @@ func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
 	res := spec.DeepCopy()
 	res.FluentOutLogrotate = nil
 	return res
+}
+
+func (r *Reconciler) getDrainerLabels() map[string]string {
+	labels := r.Logging.GetFluentdLabels(ComponentDrainer)
+
+	// Ensure that no istio sidecar is injected by default. See: https://github.com/istio/istio/issues/6324
+	labels["sidecar.istio.io/inject"] = "false"
+
+	for key, value := range r.Logging.Spec.FluentdSpec.Scaling.Drain.Labels {
+		labels[key] = value
+	}
+
+	return labels
 }
