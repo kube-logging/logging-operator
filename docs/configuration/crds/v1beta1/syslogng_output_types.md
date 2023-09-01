@@ -40,6 +40,10 @@ Default: -
 
 Default: -
 
+### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
+
+Default: -
+
 ### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
 
 Default: -
