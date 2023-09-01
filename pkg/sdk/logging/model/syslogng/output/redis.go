@@ -46,7 +46,7 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 type _docRedis interface{} //nolint:deadcode,unused
 
 // +name:"Redis Server Destination"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/49"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/"
 // +description:"Sending messages from local network to the Redis server"
 // +status:"Testing"
 type _metaRedis interface{} //nolint:deadcode,unused
