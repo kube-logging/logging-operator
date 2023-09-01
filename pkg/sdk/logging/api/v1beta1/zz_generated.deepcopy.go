@@ -2921,6 +2921,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.RedisOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MongoDB != nil {
+		in, out := &in.MongoDB, &out.MongoDB
+		*out = new(syslogngoutput.MongoDB)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.SumologicHTTP != nil {
 		in, out := &in.SumologicHTTP, &out.SumologicHTTP
 		*out = new(syslogngoutput.SumologicHTTPOutput)
