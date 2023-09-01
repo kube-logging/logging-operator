@@ -66,17 +66,53 @@ type MongoDB struct {
 	Batch `json:",inline"`
 	// Bulk operation related options
 	Bulk `json:",inline"`
+	// The number of messages that the output queue can store.
+	LogFIFOSize int `json:"log-fifo-size,omitempty"`
+	// If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers:
+	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.`
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
+	PersistName string `json:"persist_name,omitempty"`
+	// The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches retries, then drops the message.
+	Retries int `json:"retries,omitempty"`
+	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
+	TimeReopen int `json:"time_reopen,omitempty"`
+	//
+	WriteConcern RawString `json:"write_concern,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
 // Bulk operation related options
+// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk
 type Bulk struct {
 	// Enables bulk insert mode. If disabled, each messages is inserted individually. (default: yes)
-	// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk
 	Bulk *bool `json:"bulk,omitempty"`
-	// If set to yes, it disables MongoDB bulk operations validation mode.
+	// If set to yes, it disables MongoDB bulk operations validation mode. (default: no)
 	BulkByPassValidation *bool `json:"bulk_bypass_validation,omitempty"`
+	// Description: Enables unordered bulk operations mode. (default: no)
+	BulkUnordered *bool `json:"bulk_unordered,omitempty"`
 }
+
+// +kubebuilder:object:generate=true
+type WriteConcern int
+
+// {
+// Unacked  RawString `json:"unacked,omitempty"`
+// Acked    RawString `json:"acked,omitempty"`
+// Majority RawString `json:"majority,omitempty"`
+// }
+
+// const (
+//
+//	Unacked  = "unacked" `json:"unacked,omitempty"`
+//	Acked    = "acked" `json:"acked,omitempty"`
+//	Majority = "majority"	`json:"majority,omitempty"`
+//
+// )
+const (
+	Unacked  = "unacked"
+	Acked    = "acked"
+	Majority = "majority"
+)
 
 // +kubebuilder:object:generate=true
 // TODO move this to a common module once it is used in more places
