@@ -299,7 +299,13 @@ Default: -
 
 ### annotations (map[string]string, optional) {#fluentddrainconfig-annotations}
 
-Container image to use for the drain watch sidecar 
+Annotations to use for the drain watch sidecar 
+
+Default: -
+
+### labels (map[string]string, optional) {#fluentddrainconfig-labels}
+
+Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten. 
 
 Default: -
 

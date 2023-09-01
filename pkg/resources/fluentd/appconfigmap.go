@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -228,7 +229,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 	initContainer := r.initContainerCheckPod()
 
 	pod := &corev1.Pod{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
+		ObjectMeta: r.configCheckPodObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccount(),
@@ -416,4 +417,14 @@ func (r *Reconciler) initContainerCheckPod() []corev1.Container {
 	}
 
 	return initContainer
+}
+
+func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
+	objectMeta := r.FluentdObjectMeta(name, component)
+
+	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
+		objectMeta.Labels[key] = value
+	}
+
+	return objectMeta
 }

@@ -148,8 +148,10 @@ type FluentdTLS struct {
 type FluentdDrainConfig struct {
 	// Should buffers on persistent volumes left after scaling down the statefulset be drained
 	Enabled bool `json:"enabled,omitempty"`
-	// Container image to use for the drain watch sidecar
+	// Annotations to use for the drain watch sidecar
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten.
+	Labels map[string]string `json:"labels,omitempty"`
 	// Should persistent volume claims be deleted after draining is done
 	DeleteVolume bool      `json:"deleteVolume,omitempty"`
 	Image        ImageSpec `json:"image,omitempty"`
