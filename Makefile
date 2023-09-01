@@ -63,7 +63,7 @@ check: license-check lint test
 
 .PHONY: check-diff
 check-diff: generate fmt manifests docs helm-docs
-	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
+	git diff --exit-code ':(exclude)./ADOPTERS.md'
 
 .PHONY: debug
 debug: manager ## Remote debug
