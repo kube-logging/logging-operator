@@ -62,6 +62,20 @@ type MongoDB struct {
 	Uri string `json:"uri,omitempty"`
 	// Creates structured name-value pairs from the data and metadata of the log message. (default: "scope("selected-macros" "nv-pairs")")
 	ValuePairs ValuePairs `json:"value_pairs,omitempty"`
+	// Batching parameters
+	Batch `json:",inline"`
+	// Bulk operation related options
+	Bulk `json:",inline"`
+}
+
+// +kubebuilder:object:generate=true
+// Bulk operation related options
+type Bulk struct {
+	// Enables bulk insert mode. If disabled, each messages is inserted individually. (default: yes)
+	// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk
+	Bulk *bool `json:"bulk,omitempty"`
+	// If set to yes, it disables MongoDB bulk operations validation mode.
+	BulkByPassValidation *bool `json:"bulk_bypass_validation,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
