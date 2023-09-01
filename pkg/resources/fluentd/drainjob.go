@@ -126,9 +126,6 @@ func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
 func (r *Reconciler) getDrainerLabels() map[string]string {
 	labels := r.Logging.GetFluentdLabels(ComponentDrainer)
 
-	// Ensure that no istio sidecar is injected by default. See: https://github.com/istio/istio/issues/6324
-	labels["sidecar.istio.io/inject"] = "false"
-
 	for key, value := range r.Logging.Spec.FluentdSpec.Scaling.Drain.Labels {
 		labels[key] = value
 	}

@@ -103,6 +103,8 @@ type ConfigCheck struct {
 
 	// Configure timeout in seconds if strategy is StartWithTimeout
 	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
+	// Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten.
+	Labels map[string]string `json:"labels,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging

@@ -131,6 +131,12 @@ Configure timeout in seconds if strategy is StartWithTimeout
 
 Default: -
 
+### labels (map[string]string, optional) {#configcheck-labels}
+
+Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten. 
+
+Default: -
+
 
 ## LoggingStatus
 

@@ -422,8 +422,9 @@ func (r *Reconciler) initContainerCheckPod() []corev1.Container {
 func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
 	objectMeta := r.FluentdObjectMeta(name, component)
 
-	// Ensure that no istio sidecar is injected by default. See: https://github.com/istio/istio/issues/6324
-	objectMeta.Labels["sidecar.istio.io/inject"] = "false"
+	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
+		objectMeta.Labels[key] = value
+	}
 
 	return objectMeta
 }
