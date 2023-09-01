@@ -34,13 +34,13 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 //
 // spec:
 //
-//		redis:
-//		  host: 127.0.0.1
-//		  port: 6379
-//	   retries: 3
-//	   throttle: 0
-//	   time-reopen: 60
-//	   workers: 1
+//	redis:
+//	  host: 127.0.0.1
+//	  port: 6379
+//	  retries: 3
+//	  throttle: 0
+//	  time-reopen: 60
+//	  workers: 1
 //
 // {{</ highlight >}}
 type _docRedis interface{} //nolint:deadcode,unused

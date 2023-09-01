@@ -21,13 +21,13 @@ generated_file: true
 
  spec:
 
-		redis:
-		  host: 127.0.0.1
-		  port: 6379
-	   retries: 3
-	   throttle: 0
-	   time-reopen: 60
-	   workers: 1
+	redis:
+	  host: 127.0.0.1
+	  port: 6379
+	  retries: 3
+	  throttle: 0
+	  time-reopen: 60
+	  workers: 1
 
  {{</ highlight >}}
 
