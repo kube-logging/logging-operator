@@ -24,6 +24,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/slices"
 )
@@ -58,6 +59,9 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 	} else if value.Type() == rawArrowMapType {
 		rawArrowMap := value.Interface().(filter.RawArrowMap)
 		return []render.Renderer{render.ArrowMap(rawArrowMap, render.String, render.String)}
+	} else if value.Type() == rawStringType {
+		rawString := value.Interface().(output.RawString)
+		return []render.Renderer{render.RawString(rawString.String)}
 	}
 
 	switch value.Kind() {
@@ -202,6 +206,7 @@ func goNameToSyslogName(s string) string {
 var matchExprType = reflect.TypeOf(filter.MatchExpr{})
 var arrowMapType = reflect.TypeOf(filter.ArrowMap{})
 var rawArrowMapType = reflect.TypeOf(filter.RawArrowMap{})
+var rawStringType = reflect.TypeOf(output.RawString{})
 
 func derefAll[T Derefable[T]](v T) T {
 	for v.Kind() == reflect.Pointer {

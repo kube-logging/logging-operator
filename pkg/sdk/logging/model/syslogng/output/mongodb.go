@@ -61,5 +61,19 @@ type MongoDB struct {
 	// Defines the folder where the disk-buffer files are stored. (default: "mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000")
 	Uri string `json:"uri,omitempty"`
 	// Creates structured name-value pairs from the data and metadata of the log message. (default: "scope("selected-macros" "nv-pairs")")
-	ValuePairs string `json:"value_pairs,omitempty"`
+	ValuePairs ValuePairs `json:"value_pairs,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+// TODO move this to a common module once it is used in more places
+type ValuePairs struct {
+	Scope   RawString `json:"scope,omitempty"`
+	Exclude RawString `json:"exclude,omitempty"`
+	Key     RawString `json:"key,omitempty"`
+	Pair    RawString `json:"pair,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type RawString struct {
+	String string `json:"raw_string,omitempty"`
 }

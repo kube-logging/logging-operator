@@ -35,13 +35,17 @@ func TestMongoDBOutput(t *testing.T) {
 					Uri:        "mongodb://127.0.0.1:27017/syslog",
 					Collection: "messages",
 					Compaction: *config.NewFalse(),
-					ValuePairs: `scope("selected-macros" "nv-pairs" "sdata")`,
+					ValuePairs: output.ValuePairs{
+						Scope: output.RawString{
+							String: `"selected-macros" "nv-pairs" "sdata"`,
+						},
+					},
 				},
 			},
 		},
 		`
 destination "output_default_test-mongodb-out" {
-	mongodb(collection("messages") compaction(no) uri("mongodb://127.0.0.1:27017/syslog") value-pairs(scope("selected-macros" "nv-pairs" "sdata")));
+	mongodb(collection("messages") compaction(no) uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")));
 };
 `,
 	)
