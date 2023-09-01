@@ -965,7 +965,28 @@ spec:
                   uri:
                     type: string
                   value_pairs:
-                    type: string
+                    properties:
+                      exclude:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      key:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      pair:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      scope:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                    type: object
                 required:
                 - collection
                 - compaction
