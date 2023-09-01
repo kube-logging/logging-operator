@@ -28,6 +28,10 @@ Default: -
 
 Default: -
 
+### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
+
+Default: -
+
 ### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
 
 Default: -
