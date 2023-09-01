@@ -32,6 +32,10 @@ Default: -
 
 Default: -
 
+### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+
+Default: -
+
 ### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
 
 Default: -

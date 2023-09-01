@@ -932,6 +932,18 @@ spec:
                 type: object
               mongodb:
                 properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  bulk:
+                    type: boolean
+                  bulk_bypass_validation:
+                    type: boolean
+                  bulk_unordered:
+                    type: boolean
                   collection:
                     type: string
                   compaction:
@@ -962,10 +974,44 @@ spec:
                     - disk_buf_size
                     - reliable
                     type: object
+                  log-fifo-size:
+                    type: integer
+                  persist_name:
+                    type: string
+                  retries:
+                    type: integer
+                  time_reopen:
+                    type: integer
                   uri:
                     type: string
                   value_pairs:
-                    type: string
+                    properties:
+                      exclude:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      key:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      pair:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                      scope:
+                        properties:
+                          raw_string:
+                            type: string
+                        type: object
+                    type: object
+                  write_concern:
+                    properties:
+                      raw_string:
+                        type: string
+                    type: object
                 required:
                 - collection
                 - compaction

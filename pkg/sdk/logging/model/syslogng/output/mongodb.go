@@ -61,5 +61,57 @@ type MongoDB struct {
 	// Defines the folder where the disk-buffer files are stored. (default: "mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000")
 	Uri string `json:"uri,omitempty"`
 	// Creates structured name-value pairs from the data and metadata of the log message. (default: "scope("selected-macros" "nv-pairs")")
-	ValuePairs string `json:"value_pairs,omitempty"`
+	ValuePairs ValuePairs `json:"value_pairs,omitempty"`
+	// Batching parameters
+	Batch `json:",inline"`
+	// Bulk operation related options
+	Bulk `json:",inline"`
+	// The number of messages that the output queue can store.
+	LogFIFOSize int `json:"log-fifo-size,omitempty"`
+	// If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers:
+	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.`
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
+	PersistName string `json:"persist_name,omitempty"`
+	// The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches retries, then drops the message.
+	Retries int `json:"retries,omitempty"`
+	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
+	TimeReopen int `json:"time_reopen,omitempty"`
+	// 	Description: Sets the write concern mode of the MongoDB operations, for both bulk and single mode.
+	// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-write-concern
+	WriteConcern RawString `json:"write_concern,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+// Bulk operation related options
+// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk
+type Bulk struct {
+	// Enables bulk insert mode. If disabled, each messages is inserted individually. (default: yes)
+	Bulk *bool `json:"bulk,omitempty"`
+	// If set to yes, it disables MongoDB bulk operations validation mode. (default: no)
+	BulkByPassValidation *bool `json:"bulk_bypass_validation,omitempty"`
+	// Description: Enables unordered bulk operations mode. (default: no)
+	BulkUnordered *bool `json:"bulk_unordered,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type WriteConcern int
+
+const (
+	Unacked  = "unacked"
+	Acked    = "acked"
+	Majority = "majority"
+)
+
+// +kubebuilder:object:generate=true
+// TODO move this to a common module once it is used in more places
+type ValuePairs struct {
+	Scope   RawString `json:"scope,omitempty"`
+	Exclude RawString `json:"exclude,omitempty"`
+	Key     RawString `json:"key,omitempty"`
+	Pair    RawString `json:"pair,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type RawString struct {
+	String string `json:"raw_string,omitempty"`
 }
