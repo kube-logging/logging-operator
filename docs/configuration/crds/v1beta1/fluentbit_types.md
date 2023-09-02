@@ -82,6 +82,12 @@ Default: -
 
 Default: -
 
+### logRouting (LogRouting, optional) {#fluentbitspec-logrouting}
+
+Enable log routing to other logging resources based on namespace information queried from the target logging's watchNamespaces or watchNamespaceSelector Experimental feature 
+
+Default: -
+
 ### flush (int32, optional) {#fluentbitspec-flush}
 
 Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1) 
@@ -269,6 +275,32 @@ Specify a custom parser file to load in addition to the default parsers file. It
 Default: -
 
 ### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
+
+Default: -
+
+
+## LogRouting
+
+### enabled (bool, optional) {#logrouting-enabled}
+
+Default: -
+
+### targets ([]Targets, optional) {#logrouting-targets}
+
+Default: -
+
+
+## Targets
+
+### logging (string, required) {#targets-logging}
+
+Name of the remote logging resource to use as an output The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` if set When none of those are set, then routing is only enabled if `allNamespaces` flag is enabled 
+
+Default: -
+
+### allNamespaces (bool, optional) {#targets-allnamespaces}
+
+Send all namespace logs to this 
 
 Default: -
 
