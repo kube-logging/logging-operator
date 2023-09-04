@@ -943,6 +943,64 @@ spec:
                   topic:
                     type: string
                 type: object
+              redis:
+                properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  command:
+                    properties:
+                      string-list:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  command_and_arguments:
+                    items:
+                      type: string
+                    type: array
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  host:
+                    type: string
+                  log-fifo-size:
+                    type: integer
+                  port:
+                    type: integer
+                  retries:
+                    type: integer
+                  throttle:
+                    type: integer
+                  time-reopen:
+                    type: integer
+                  workers:
+                    type: integer
+                type: object
               sumologic-http:
                 properties:
                   batch-bytes:

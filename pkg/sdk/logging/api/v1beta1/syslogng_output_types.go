@@ -35,6 +35,7 @@ type SyslogNGOutputSpec struct {
 	Syslog          *output.SyslogOutput          `json:"syslog,omitempty" syslog-ng:"dest-drv"`
 	File            *output.FileOutput            `json:"file,omitempty" syslog-ng:"dest-drv"`
 	MQTT            *output.MQTT                  `json:"mqtt,omitempty" syslog-ng:"dest-drv"`
+	Redis           *output.RedisOutput           `json:"redis,omitempty" syslog-ng:"dest-drv"`
 	SumologicHTTP   *output.SumologicHTTPOutput   `json:"sumologic-http,omitempty" syslog-ng:"dest-drv"`
 	SumologicSyslog *output.SumologicSyslogOutput `json:"sumologic-syslog,omitempty" syslog-ng:"dest-drv"`
 	HTTP            *output.HTTPOutput            `json:"http,omitempty" syslog-ng:"dest-drv"`
