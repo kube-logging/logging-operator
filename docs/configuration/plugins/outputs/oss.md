@@ -40,7 +40,7 @@ Your access key id [Secret](../secret/)
 
 Default: -
 
-### aaccess_key_secret (*secret.Secret, required) {#output config-aaccess_key_secret}
+### access_key_secret (*secret.Secret, required) {#output config-access_key_secret}
 
 Your access secret key [Secret](../secret/) 
 

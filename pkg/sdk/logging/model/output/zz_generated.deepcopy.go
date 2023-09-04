@@ -1151,8 +1151,8 @@ func (in *OSSOutput) DeepCopyInto(out *OSSOutput) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.AaccessKeySecret != nil {
-		in, out := &in.AaccessKeySecret, &out.AaccessKeySecret
+	if in.AccessKeySecret != nil {
+		in, out := &in.AccessKeySecret, &out.AccessKeySecret
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
