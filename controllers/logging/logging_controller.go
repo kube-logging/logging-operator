@@ -110,6 +110,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
+	r.dynamicDefaults(ctx, log, logging)
 
 	reconcilerOpts := reconciler.ReconcilerOpts{
 		RecreateErrorMessageCondition:                reconciler.MatchImmutableErrorMessages,
@@ -269,6 +270,16 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, logging loggingv1beta1.Logging) {
+	nodes := corev1.NodeList{}
+	if err := r.Client.List(ctx, &nodes); err != nil {
+		log.Error(err, "listing nodes")
+	}
+	if logging.Spec.SyslogNGSpec != nil && len(nodes.Items) > 0 {
+		logging.Spec.SyslogNGSpec.MaxConnections = len(nodes.Items) * 100
+	}
 }
 
 func updateResourceStateMetrics(obj client.Object, active bool, problemsCount int, statusMetric *prometheus.GaugeVec, problemsMetric *prometheus.GaugeVec) {

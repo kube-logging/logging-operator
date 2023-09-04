@@ -14015,6 +14015,8 @@ spec:
                     type: object
                   globalOptions:
                     properties:
+                      log_level:
+                        type: string
                       stats:
                         properties:
                           freq:

@@ -54,8 +54,8 @@ const (
 	defaultBufferVolumeMetricsPort    = 9200
 	syslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
 	syslogngImageTag                  = "4.3.1"
-	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
-	prometheusExporterImageTag        = "v0.0.16"
+	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	prometheusExporterImageTag        = "0.0.2"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
 	bufferVolumeImageTag              = "v0.7.1"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"

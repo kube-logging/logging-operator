@@ -201,7 +201,7 @@ source "main_input" {
 @include "scl.conf"
 
 options {
-    stats(level(2) freq(10));
+    stats(level(2) freq(0));
 };
 
 source "main_input" {

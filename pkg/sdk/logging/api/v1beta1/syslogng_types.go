@@ -65,8 +65,10 @@ type GlobalOptions struct {
 	StatsLevel *int `json:"stats_level,omitempty"`
 	// deprecated use stats/freq from 4.1+
 	StatsFreq *int `json:"stats_freq,omitempty"`
-	// TODO switch to this by default
+	// Stats https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats
 	Stats *Stats `json:"stats,omitempty"`
+	// Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level
+	LogLevel *string `json:"log_level,omitempty"`
 }
 
 type Stats struct {
