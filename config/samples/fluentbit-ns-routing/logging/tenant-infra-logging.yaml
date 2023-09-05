@@ -18,6 +18,12 @@ metadata:
   name: infra
 spec:
   loggingRef: infra
+  inputTail:
+    storage.type: filesystem
+  forwardOptions:
+    Workers: 0
+  syslogng_output:
+    Workers: 0
   positiondb:
     hostPath:
       path: ""
@@ -33,3 +39,4 @@ spec:
       allNamespaces: true
     - logging: a
     - logging: b
+    - logging: c
