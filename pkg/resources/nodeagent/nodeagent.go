@@ -26,7 +26,6 @@ import (
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -60,20 +59,20 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 							Annotations: map[string]string{},
 						},
 						Spec: typeoverride.PodSpec{
-							Containers: []v1.Container{
+							Containers: []corev1.Container{
 								{
 									Name:            containerName,
 									Image:           v1beta1.DefaultFluentbitImageRepository + ":" + v1beta1.DefaultFluentbitImageTag,
 									Command:         []string{"/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/conf_operator/fluent-bit.conf"},
-									ImagePullPolicy: v1.PullIfNotPresent,
-									Resources: v1.ResourceRequirements{
-										Limits: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("100M"),
-											v1.ResourceCPU:    resource.MustParse("200m"),
+									ImagePullPolicy: corev1.PullIfNotPresent,
+									Resources: corev1.ResourceRequirements{
+										Limits: corev1.ResourceList{
+											corev1.ResourceMemory: resource.MustParse("100M"),
+											corev1.ResourceCPU:    resource.MustParse("200m"),
 										},
-										Requests: v1.ResourceList{
-											v1.ResourceMemory: resource.MustParse("50M"),
-											v1.ResourceCPU:    resource.MustParse("100m"),
+										Requests: corev1.ResourceList{
+											corev1.ResourceMemory: resource.MustParse("50M"),
+											corev1.ResourceCPU:    resource.MustParse("100m"),
 										},
 									},
 								},
@@ -96,8 +95,8 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 			},
 			Security: &v1beta1.Security{
 				RoleBasedAccessControlCreate: util.BoolPointer(true),
-				SecurityContext:              &v1.SecurityContext{},
-				PodSecurityContext:           &v1.PodSecurityContext{},
+				SecurityContext:              &corev1.SecurityContext{},
+				PodSecurityContext:           &corev1.PodSecurityContext{},
 			},
 			ContainersPath: "/var/lib/docker/containers",
 			VarLogsPath:    "/var/log",
@@ -174,9 +173,9 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 		}
 	}
 	if programDefault.FluentbitSpec.Metrics != nil {
-		defaultLivenessProbe := &v1.Probe{
-			ProbeHandler: v1.ProbeHandler{
-				HTTPGet: &v1.HTTPGetAction{
+		defaultLivenessProbe := &corev1.Probe{
+			ProbeHandler: corev1.ProbeHandler{
+				HTTPGet: &corev1.HTTPGetAction{
 					Path: programDefault.FluentbitSpec.Metrics.Path,
 					Port: intstr.IntOrString{
 						IntVal: programDefault.FluentbitSpec.Metrics.Port,
@@ -189,7 +188,7 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 			FailureThreshold:    3,
 		}
 		if programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe == nil {
-			programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &v1.Probe{}
+			programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe = &corev1.Probe{}
 		}
 
 		err := merge.Merge(programDefault.FluentbitSpec.DaemonSetOverrides.Spec.Template.Spec.Containers[0].LivenessProbe, defaultLivenessProbe)
@@ -218,19 +217,19 @@ var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgentConfig{
 			Spec: typeoverride.DaemonSetSpec{
 				Template: typeoverride.PodTemplateSpec{
 					Spec: typeoverride.PodSpec{
-						Containers: []v1.Container{
+						Containers: []corev1.Container{
 							{
 								Name:    containerName,
 								Image:   "rancher/fluent-bit:1.6.10-rc7",
 								Command: []string{"fluent-bit", "-c", "fluent-bit\\conf_operator\\fluent-bit.conf"},
-								Resources: v1.ResourceRequirements{
-									Limits: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("200M"),
-										v1.ResourceCPU:    resource.MustParse("200m"),
+								Resources: corev1.ResourceRequirements{
+									Limits: corev1.ResourceList{
+										corev1.ResourceMemory: resource.MustParse("200M"),
+										corev1.ResourceCPU:    resource.MustParse("200m"),
 									},
-									Requests: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("100M"),
-										v1.ResourceCPU:    resource.MustParse("100m"),
+									Requests: corev1.ResourceList{
+										corev1.ResourceMemory: resource.MustParse("100M"),
+										corev1.ResourceCPU:    resource.MustParse("100m"),
 									},
 								},
 							}},
