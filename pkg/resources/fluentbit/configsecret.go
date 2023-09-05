@@ -359,15 +359,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput = newSyslogNGOutputConfig()
 		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort
-
-		if r.fluentbitSpec.SyslogNGOutput != nil {
-			input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
-			input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
-		}
-	}
-
-	if input.SyslogNGOutput != nil {
-		r.applyNetworkSettings(input)
 	}
 
 	if r.fluentbitSpec.LogRouting.Enabled {
@@ -442,6 +433,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 				Port:      input.SyslogNGOutput.Port,
 			})
 		}
+	}
+
+	if input.SyslogNGOutput != nil && r.fluentbitSpec.SyslogNGOutput != nil {
+		input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
+		input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
+		input.SyslogNGOutput.Workers = r.fluentbitSpec.SyslogNGOutput.Workers
 	}
 
 	r.applyNetworkSettings(input)
