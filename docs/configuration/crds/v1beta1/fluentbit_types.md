@@ -335,6 +335,10 @@ Default: ts
 
 Default: iso8601
 
+### Workers (*int, optional) {#fluentbittcpoutput-workers}
+
+Default: -
+
 
 ## FluentbitNetwork
 
