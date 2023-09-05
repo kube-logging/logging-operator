@@ -2148,6 +2148,8 @@ spec:
                         type: string
                       Time_as_Integer:
                         type: boolean
+                      Workers:
+                        type: integer
                       storage.total_limit_size:
                         type: string
                     type: object
@@ -3179,6 +3181,8 @@ spec:
                     type: object
                   syslogng_output:
                     properties:
+                      Workers:
+                        type: integer
                       json_date_format:
                         type: string
                       json_date_key:
@@ -9837,6 +9841,8 @@ spec:
                               type: string
                             Time_as_Integer:
                               type: boolean
+                            Workers:
+                              type: integer
                             storage.total_limit_size:
                               type: string
                           type: object

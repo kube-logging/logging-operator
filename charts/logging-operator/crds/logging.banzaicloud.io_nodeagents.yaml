@@ -3550,6 +3550,8 @@ spec:
                         type: string
                       Time_as_Integer:
                         type: boolean
+                      Workers:
+                        type: integer
                       storage.total_limit_size:
                         type: string
                     type: object
