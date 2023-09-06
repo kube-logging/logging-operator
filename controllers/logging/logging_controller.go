@@ -278,7 +278,10 @@ func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger
 		log.Error(err, "listing nodes")
 	}
 	if logging.Spec.SyslogNGSpec != nil && len(nodes.Items) > 0 {
-		logging.Spec.SyslogNGSpec.MaxConnections = len(nodes.Items) * 100
+		logging.Spec.SyslogNGSpec.MaxConnections = len(nodes.Items) * 10
+		if logging.Spec.SyslogNGSpec.MaxConnections > 512 {
+			logging.Spec.SyslogNGSpec.MaxConnections = 512
+		}
 	}
 }
 
