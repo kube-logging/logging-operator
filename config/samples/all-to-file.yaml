@@ -5,7 +5,18 @@ metadata:
 spec:
   fluentd: {}
   controlNamespace: default
-  fluentbit: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: all-to-file
+spec:
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
