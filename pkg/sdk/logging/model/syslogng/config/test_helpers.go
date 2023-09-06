@@ -107,25 +107,25 @@ func Untab(s string) string {
 }
 
 type TestSecretLoaderFactory struct {
-	reader    client.Reader
-	mountPath string
-	secrets   secret.MountSecrets
+	Reader    client.Reader
+	MountPath string
+	Secrets   secret.MountSecrets
 }
 
 func (f *TestSecretLoaderFactory) SecretLoaderForNamespace(ns string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.reader, ns, f.mountPath, &f.secrets)
+	return secret.NewSecretLoader(f.Reader, ns, f.MountPath, &f.Secrets)
 }
 
-type secretReader struct {
-	secrets []corev1.Secret
+type SecretReader struct {
+	Secrets []corev1.Secret
 }
 
-func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+func (r SecretReader) Get(_ context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	if secret, ok := obj.(*corev1.Secret); ok {
 		if secret == nil {
 			return nil
 		}
-		for _, s := range r.secrets {
+		for _, s := range r.Secrets {
 			if s.Namespace == key.Namespace && s.Name == key.Name {
 				*secret = s
 				return nil
@@ -139,11 +139,11 @@ func (r secretReader) Get(_ context.Context, key client.ObjectKey, obj client.Ob
 	}, key.String())
 }
 
-func (r secretReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+func (r SecretReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	panic("not implemented")
 }
 
-var _ client.Reader = (*secretReader)(nil)
+var _ client.Reader = (*SecretReader)(nil)
 
 func NewTrue() *bool {
 	b := true
