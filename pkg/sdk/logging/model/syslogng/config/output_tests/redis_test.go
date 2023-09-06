@@ -40,7 +40,7 @@ func TestRedisOutput(t *testing.T) {
 		},
 		`
 destination "output_default_test-redis-out" {
-	redis(host("127.0.0.1") port(6379) command("HINCRBY", "hosts", "$HOST", "1"));
+	redis(host("127.0.0.1") port(6379) command("HINCRBY", "hosts", "$HOST", "1") persist_name("output_default_test-redis-out"));
 };
 `,
 	)
@@ -65,7 +65,7 @@ func TestRedisOutputWithBatching(t *testing.T) {
 		},
 		`
 destination "output_default_test-redis-out" {
-	redis(host("127.0.0.1") port(6379) command("HINCRBY", "hosts", "$HOST", "1") batch-lines(100) batch-timeout(10000) log-fifo-size(100000));
+	redis(host("127.0.0.1") port(6379) command("HINCRBY", "hosts", "$HOST", "1") batch-lines(100) batch-timeout(10000) log-fifo-size(100000) persist_name("output_default_test-redis-out"));
 };
 `,
 	)

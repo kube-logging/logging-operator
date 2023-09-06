@@ -100,6 +100,12 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default:  false
 
+### persist_name (string, optional) {#redisoutput-persist_name}
+
+Persistname 
+
+Default: -
+
 
 ## StringList
 

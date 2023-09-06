@@ -990,6 +990,8 @@ spec:
                     type: string
                   log-fifo-size:
                     type: integer
+                  persist_name:
+                    type: string
                   port:
                     type: integer
                   retries:

@@ -75,6 +75,8 @@ type RedisOutput struct {
 	LogFIFOSize int `json:"log-fifo-size,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
+	// Persistname
+	PersistName string `json:"persist_name,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
