@@ -40,6 +40,12 @@ The hostname or IP address of the Redis server.
 
 Default:  127.0.0.1
 
+### auth (*secret.Secret, optional) {#redisoutput-auth}
+
+The password used for authentication on a password-protected Redis server. 
+
+Default: -
+
 ### port (int, optional) {#redisoutput-port}
 
 The port number of the Redis server.  
