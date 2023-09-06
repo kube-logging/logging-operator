@@ -43,6 +43,7 @@ type SyslogNGOutputSpec struct {
 	Elasticsearch   *output.ElasticsearchOutput   `json:"elasticsearch,omitempty" syslog-ng:"dest-drv,name=elasticsearch-http"`
 	LogScale        *output.LogScaleOutput        `json:"logscale,omitempty" syslog-ng:"dest-drv"`
 	SplunkHEC       *output.SplunkHECOutput       `json:"splunk_hec_event,omitempty" syslog-ng:"dest-drv"`
+	Loki            *output.LokiOutput            `json:"loki,omitempty" syslog-ng:"dest-drv"`
 }
 
 type SyslogNGOutputStatus OutputStatus

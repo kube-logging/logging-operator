@@ -930,6 +930,64 @@ spec:
                         type: object
                     type: object
                 type: object
+              loki:
+                properties:
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  log-fifo-size:
+                    type: integer
+                  persist_name:
+                    type: string
+                  retries:
+                    type: integer
+                  template:
+                    type: string
+                  time_reopen:
+                    type: integer
+                  timestamp:
+                    default: current
+                    enum:
+                    - current
+                    - received
+                    - msg
+                    type: string
+                  url:
+                    type: string
+                  workers:
+                    type: integer
+                type: object
               mongodb:
                 properties:
                   batch-bytes:
