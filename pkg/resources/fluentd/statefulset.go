@@ -110,10 +110,12 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				DNSPolicy:                 r.Logging.Spec.FluentdSpec.DNSPolicy,
 				DNSConfig:                 r.Logging.Spec.FluentdSpec.DNSConfig,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:    r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup},
+					RunAsNonRoot:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+					FSGroup:        r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
+					RunAsUser:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
+					RunAsGroup:     r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
+					SeccompProfile: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.SeccompProfile,
+				},
 			},
 		},
 		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
@@ -146,6 +148,8 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 			Privileged:               spec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
 			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
+			Capabilities:             spec.Security.SecurityContext.Capabilities,
 		},
 		Env:            envVars,
 		LivenessProbe:  spec.LivenessProbe,
@@ -225,6 +229,8 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 			Privileged:               spec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
 			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
+			Capabilities:             spec.Security.SecurityContext.Capabilities,
 		}
 	}
 

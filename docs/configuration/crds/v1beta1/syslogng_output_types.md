@@ -52,6 +52,10 @@ Default: -
 
 Default: -
 
+### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
+
+Default: -
+
 
 ## SyslogNGOutput
 

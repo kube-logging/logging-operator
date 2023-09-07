@@ -70,10 +70,11 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 					ServiceAccountName: n.getServiceAccount(),
 					Volumes:            n.generateVolume(),
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
-						RunAsNonRoot: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
-						RunAsUser:    n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
-						RunAsGroup:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						FSGroup:        n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:     n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						SeccompProfile: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.SeccompProfile,
 					},
 					Containers: []corev1.Container{
 						{
@@ -87,6 +88,8 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 								AllowPrivilegeEscalation: n.nodeAgent.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 								Privileged:               n.nodeAgent.FluentbitSpec.Security.SecurityContext.Privileged,
 								SELinuxOptions:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
+								SeccompProfile:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SeccompProfile,
+								Capabilities:             n.nodeAgent.FluentbitSpec.Security.SecurityContext.Capabilities,
 							},
 						},
 					},
