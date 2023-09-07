@@ -21,7 +21,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -48,11 +47,11 @@ func (e *EventTailer) StatefulSet() (runtime.Object, reconciler.DesiredState, er
 func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 	spec := appsv1.StatefulSetSpec{
 		Replicas: utils.IntPointer(1),
-		Selector: &v1.LabelSelector{
+		Selector: &metav1.LabelSelector{
 			MatchLabels: e.selectorLabels(),
 		},
 		Template: corev1.PodTemplateSpec{
-			ObjectMeta: e.customResource.Spec.WorkloadMetaBase.Merge(v1.ObjectMeta{
+			ObjectMeta: e.customResource.Spec.WorkloadMetaBase.Merge(metav1.ObjectMeta{
 				Labels: e.selectorLabels(),
 			}),
 			Spec: e.customResource.Spec.WorkloadBase.Override(
