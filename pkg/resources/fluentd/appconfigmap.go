@@ -77,6 +77,21 @@ func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string) (boo
 	return true, nil
 }
 
+func (r *Reconciler) CheckForObjectExistence(ctx context.Context, object client.Object) (*ConfigCheckResult, error) {
+	if err := r.Client.Get(ctx, client.ObjectKeyFromObject(object), object); err != nil {
+		if apierrors.IsNotFound(err) {
+			objNotFoundMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s not found", object.GetName(), object.GetNamespace())
+			r.Log.Info(objNotFoundMsg)
+			err = nil
+		}
+		errMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s is not available", object.GetName(), object.GetNamespace())
+		return &ConfigCheckResult{
+			Ready: false, Valid: false, Message: errMsg,
+		}, err
+	}
+	return nil, nil
+}
+
 func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
 	hashKey, err := r.configHash()
 	if err != nil {
@@ -98,9 +113,16 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create secret for fluentd configcheck")
 	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find secret for fluentd configcheck")
+	}
+
 	err = r.Client.Create(ctx, checkSecretAppConfig)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create secret with Generated for fluentd configcheck")
+	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecretAppConfig); res != nil {
+		return res, errors.WrapIf(err, "failed to find secret with Generated for fluentd configcheck")
 	}
 
 	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
@@ -111,6 +133,9 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	err = r.Client.Create(ctx, checkOutputSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create output secret for fluentd configcheck")
+	}
+	if res, err := r.CheckForObjectExistence(ctx, checkOutputSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find output secret for fluentd configcheck")
 	}
 
 	pod := r.newCheckPod(hashKey)
