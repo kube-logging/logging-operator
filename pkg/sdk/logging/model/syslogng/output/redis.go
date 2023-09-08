@@ -14,6 +14,8 @@
 
 package output
 
+import "github.com/cisco-open/operator-tools/pkg/secret"
+
 // +name:"Redis"
 // +weight:"200"
 type _hugoRedis interface{} //nolint:deadcode,unused
@@ -55,6 +57,8 @@ type _metaRedis interface{} //nolint:deadcode,unused
 type RedisOutput struct {
 	// The hostname or IP address of the Redis server. (default: 127.0.0.1)
 	Host string `json:"host,omitempty"`
+	// The password used for authentication on a password-protected Redis server.
+	Auth *secret.Secret `json:"auth,omitempty"`
 	// The port number of the Redis server. (default: 6379)
 	Port int `json:"port,omitempty"`
 	// If syslog-ng OSE cannot send a message, it will try again until the number of attempts reaches retries(). (default: 3)
@@ -75,6 +79,8 @@ type RedisOutput struct {
 	LogFIFOSize int `json:"log-fifo-size,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
+	// Persistname
+	PersistName string `json:"persist_name,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

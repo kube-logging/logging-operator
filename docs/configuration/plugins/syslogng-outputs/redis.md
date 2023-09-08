@@ -40,6 +40,12 @@ The hostname or IP address of the Redis server.
 
 Default:  127.0.0.1
 
+### auth (*secret.Secret, optional) {#redisoutput-auth}
+
+The password used for authentication on a password-protected Redis server. 
+
+Default: -
+
 ### port (int, optional) {#redisoutput-port}
 
 The port number of the Redis server.  
@@ -99,6 +105,12 @@ Default: -
 This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).  
 
 Default:  false
+
+### persist_name (string, optional) {#redisoutput-persist_name}
+
+Persistname 
+
+Default: -
 
 
 ## StringList

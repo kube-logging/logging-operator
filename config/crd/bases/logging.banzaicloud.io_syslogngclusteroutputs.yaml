@@ -945,6 +945,39 @@ spec:
                 type: object
               redis:
                 properties:
+                  auth:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
                   batch-bytes:
                     type: integer
                   batch-lines:
@@ -990,6 +1023,8 @@ spec:
                     type: string
                   log-fifo-size:
                     type: integer
+                  persist_name:
+                    type: string
                   port:
                     type: integer
                   retries:
