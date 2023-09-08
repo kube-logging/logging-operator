@@ -62,6 +62,9 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 	} else if value.Type() == stringListType {
 		stringList := value.Interface().(output.StringList)
 		return []render.Renderer{render.StringList(stringList.List)}
+	} else if value.Type() == rawStringType {
+		rawString := value.Interface().(output.RawString)
+		return []render.Renderer{render.RawString(rawString.String)}
 	}
 
 	switch value.Kind() {
@@ -206,6 +209,7 @@ func goNameToSyslogName(s string) string {
 var matchExprType = reflect.TypeOf(filter.MatchExpr{})
 var arrowMapType = reflect.TypeOf(filter.ArrowMap{})
 var rawArrowMapType = reflect.TypeOf(filter.RawArrowMap{})
+var rawStringType = reflect.TypeOf(output.RawString{})
 
 var stringListType = reflect.TypeOf(output.StringList{})
 
