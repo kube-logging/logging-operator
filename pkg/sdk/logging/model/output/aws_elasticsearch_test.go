@@ -18,9 +18,10 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAwsElasticsearch(t *testing.T) {
@@ -54,7 +55,6 @@ buffer:
 	reload_connections true
 	ssl_verify true
 	tag_key @log_name
-	use_legacy_template true
 	utc_index true
 	verify_es_version_at_startup true
 	<endpoint>
