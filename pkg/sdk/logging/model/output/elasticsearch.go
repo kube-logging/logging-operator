@@ -259,6 +259,9 @@ type ElasticsearchOutput struct {
 	DataStreamIlmPolicy string `json:"data_stream_ilm_policy,omitempty"`
 	// Specify whether overwriting data stream ilm policy or not.
 	DataStreamIlmPolicyOverwrite bool `json:"data_stream_ilm_policy_overwrite,omitempty"`
+	// Specify wether to use legacy template or not. (default: true)
+	// +kubebuilder:validation:Optional
+	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty"`
 }
 
 func (e *ElasticsearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

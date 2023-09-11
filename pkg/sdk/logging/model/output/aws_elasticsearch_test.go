@@ -18,9 +18,10 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAwsElasticsearch(t *testing.T) {

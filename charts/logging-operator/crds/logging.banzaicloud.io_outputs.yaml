@@ -752,6 +752,8 @@ spec:
                     type: string
                   unrecoverable_error_types:
                     type: string
+                  use_legacy_template:
+                    type: boolean
                   user:
                     type: string
                   utc_index:
@@ -1781,6 +1783,8 @@ spec:
                     type: string
                   unrecoverable_error_types:
                     type: string
+                  use_legacy_template:
+                    type: boolean
                   user:
                     type: string
                   utc_index:
@@ -6746,6 +6750,8 @@ spec:
                     type: string
                   unrecoverable_error_types:
                     type: string
+                  use_legacy_template:
+                    type: boolean
                   user:
                     type: string
                   utc_index:
@@ -7775,6 +7781,8 @@ spec:
                     type: string
                   unrecoverable_error_types:
                     type: string
+                  use_legacy_template:
+                    type: boolean
                   user:
                     type: string
                   utc_index:
