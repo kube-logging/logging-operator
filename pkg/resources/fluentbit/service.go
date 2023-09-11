@@ -134,6 +134,8 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+					Scheme:               r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.getFluentBitLabels()},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
