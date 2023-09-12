@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: a
+  labels:
+    tenant: tenant-a
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+  namespace: a
+spec:
+  loggingRef: a
+  match:
+    - select:
+        labels:
+          app.kubernetes.io/name: log-generator
+  localOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: http
+  namespace: a
+spec:
+  loggingRef: a
+  http:
+    endpoint: http://test-receiver.infra:8080/tenant-a
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s
