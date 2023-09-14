@@ -285,20 +285,20 @@ Default: -
 
 Default: -
 
-### targets ([]Targets, optional) {#logrouting-targets}
+### targets ([]Target, optional) {#logrouting-targets}
 
 Default: -
 
 
-## Targets
+## Target
 
-### logging (string, required) {#targets-logging}
+### logging (string, required) {#target-logging}
 
 Name of the remote logging resource to use as an output The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields. An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to. 
 
 Default: -
 
-### targetSelector (*metav1.LabelSelector, optional) {#targets-targetselector}
+### targetSelector (*metav1.LabelSelector, optional) {#target-targetselector}
 
 LabelSelector to identify the remote logging resource to use as an output The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields. An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to. 
 

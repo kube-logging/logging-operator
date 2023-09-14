@@ -1448,6 +1448,22 @@ func ensureCreated(t *testing.T, obj runtime.Object) func() {
 	}
 }
 
+func ensureCreatedAll[O client.Object](t *testing.T, objs []O) func() {
+	for _, object := range objs {
+		if err := mgr.GetClient().Create(context.TODO(), object); err != nil {
+			t.Fatalf("%+v", err)
+		}
+	}
+	return func() {
+		for _, object := range objs {
+			err := mgr.GetClient().Delete(context.TODO(), object)
+			if err != nil {
+				t.Fatalf("%+v", errors.WithStack(err))
+			}
+		}
+	}
+}
+
 func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) func() {
 	object, ok := obj.(client.Object)
 	if !ok {

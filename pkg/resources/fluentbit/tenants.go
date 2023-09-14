@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
+	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -29,23 +30,23 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-type tenant struct {
-	l            *v1beta1.Logging
-	allNamespace bool
-	namespaces   []string
+type Tenant struct {
+	Logging      *v1beta1.Logging
+	AllNamespace bool
+	Namespaces   []string
 }
 
-func (r *Reconciler) tenants(ctx context.Context) ([]tenant, error) {
-	var tenantCandidates []tenant
+func FindTenants(ctx context.Context, targets []v1beta1.Target, currentLogging string, reader client.Reader, logger logr.Logger) ([]Tenant, error) {
+	var tenantCandidates []Tenant
 
-	for _, t := range r.fluentbitSpec.LogRouting.Targets {
+	for _, t := range targets {
 		if t.LoggingName != "" {
 			l := &v1beta1.Logging{}
-			if err := r.resourceReconciler.Client.Get(ctx, client.ObjectKey{Name: t.LoggingName}, l); err != nil {
+			if err := reader.Get(ctx, client.ObjectKey{Name: t.LoggingName}, l); err != nil {
 				return nil, errors.WrapIff(err, "logrouting target %", t.LoggingName)
 			}
-			tenantCandidates = append(tenantCandidates, tenant{
-				l: l,
+			tenantCandidates = append(tenantCandidates, Tenant{
+				Logging: l,
 			})
 		}
 		if t.LoggingSelector != nil {
@@ -57,67 +58,68 @@ func (r *Reconciler) tenants(ctx context.Context) ([]tenant, error) {
 				LabelSelector: selector,
 			}
 			loggingList := &v1beta1.LoggingList{}
-			if err := r.resourceReconciler.Client.List(ctx, loggingList, listOptions); err != nil {
+			if err := reader.List(ctx, loggingList, listOptions); err != nil {
 				return nil, errors.WrapIf(err, "listing loggings for targetSelector")
 			}
 			for _, l := range loggingList.Items {
-				tenantCandidates = append(tenantCandidates, tenant{
-					l: &l,
+				l := l
+				tenantCandidates = append(tenantCandidates, Tenant{
+					Logging: &l,
 				})
 			}
 		}
 	}
 
-	var validTenants []tenant
+	var validTenants []Tenant
 	for _, t := range tenantCandidates {
-		targetNamespaces, allNamespaces, err := model.UniqueWatchNamespaces(ctx, r.resourceReconciler.Client, t.l)
+		targetNamespaces, allNamespaces, err := model.UniqueWatchNamespaces(ctx, reader, t.Logging)
 		if err != nil {
-			r.logger.Error(err, "getting target namespaces for logging %s", t.l.Name)
+			logger.Error(err, "getting target namespaces for logging %s", t.Logging.Name)
 			continue
 		}
 		if len(targetNamespaces) == 0 {
-			r.logger.Info(fmt.Sprintf("WARNING unable to use logging %s as a valid target as no watch namespaces have been found", t.l.Name))
+			logger.Info(fmt.Sprintf("WARNING unable to use logging %s as a valid target as no watch namespaces have been found", t.Logging.Name))
 			continue
 		}
-		if allNamespaces && t.l.Name != r.Logging.Name {
-			r.logger.Info(fmt.Sprintf("WARNING refusing to send logs from all namespaces to logging %s", t.l.Name))
+		if allNamespaces && t.Logging.Name != currentLogging {
+			logger.Info(fmt.Sprintf("WARNING refusing to send logs from all namespaces to logging %s", t.Logging.Name))
 			continue
 		}
-		validTenants = append(validTenants, tenant{
-			l:            t.l,
-			allNamespace: allNamespaces,
-			namespaces:   targetNamespaces,
+		validTenants = append(validTenants, Tenant{
+			Logging:      t.Logging,
+			AllNamespace: allNamespaces,
+			Namespaces:   targetNamespaces,
 		})
 	}
 	return validTenants, nil
 }
 
-func (r *Reconciler) configureOutputsForTenants(tenants []tenant, input *fluentBitConfig) error {
+func (r *Reconciler) configureOutputsForTenants(tenants []Tenant, input *fluentBitConfig) error {
 	var errs error
 	for _, t := range tenants {
-		namespaceRegex := fmt.Sprintf("^[^_]+_(%s)_", strings.Join(t.namespaces, "|"))
-		if t.l.Spec.FluentdSpec != nil {
+		namespaceRegex := fmt.Sprintf("^[^_]+_(%s)_", strings.Join(t.Namespaces, "|"))
+		if t.Logging.Spec.FluentdSpec != nil {
 			if input.FluentForwardOutput == nil {
 				input.FluentForwardOutput = &fluentForwardOutputConfig{}
 			}
 			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-				AllNamespaces:  t.allNamespace,
+				AllNamespaces:  t.AllNamespace,
 				NamespaceRegex: namespaceRegex,
-				Host:           aggregatorEndpoint(t.l, fluentd.ServiceName),
+				Host:           aggregatorEndpoint(t.Logging, fluentd.ServiceName),
 				Port:           fluentd.ServicePort,
 			})
-		} else if t.l.Spec.SyslogNGSpec != nil {
+		} else if t.Logging.Spec.SyslogNGSpec != nil {
 			if input.SyslogNGOutput == nil {
 				input.SyslogNGOutput = newSyslogNGOutputConfig()
 			}
 			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-				AllNamespaces:  t.allNamespace,
+				AllNamespaces:  t.AllNamespace,
 				NamespaceRegex: namespaceRegex,
-				Host:           aggregatorEndpoint(t.l, syslogng.ServiceName),
+				Host:           aggregatorEndpoint(t.Logging, syslogng.ServiceName),
 				Port:           syslogng.ServicePort,
 			})
 		} else {
-			errs = errors.Append(errs, errors.Errorf("logging %s does not provide any aggregator configured", t.l.Name))
+			errs = errors.Append(errs, errors.Errorf("logging %s does not provide any aggregator configured", t.Logging.Name))
 		}
 	}
 	return errs

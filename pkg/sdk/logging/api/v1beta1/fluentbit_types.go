@@ -133,11 +133,11 @@ type FluentbitSpec struct {
 }
 
 type LogRouting struct {
-	Enabled bool      `json:"enabled,omitempty"`
-	Targets []Targets `json:"targets,omitempty"`
+	Enabled bool     `json:"enabled,omitempty"`
+	Targets []Target `json:"targets,omitempty"`
 }
 
-type Targets struct {
+type Target struct {
 	// Name of the remote logging resource to use as an output
 	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields.
 	// An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to.
