@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"emperror.dev/errors"
@@ -87,9 +88,10 @@ type fluentForwardOutputConfig struct {
 }
 
 type forwardTargetConfig struct {
-	Namespace string
-	Host      string
-	Port      int32
+	AllNamespaces  bool
+	NamespaceRegex string
+	Host           string
+	Port           int32
 }
 
 type fluentForwardOutputTLSConfig struct {
@@ -385,33 +387,32 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 							"logging %s without explicitly asking through the `allNamespaces` option for the target", l.Name))
 						continue
 					}
-					if t.AllNamespace {
-						targetNamespaces = []string{"*"}
-					}
-					for _, ns := range targetNamespaces {
-						if l.Spec.FluentdSpec != nil {
-							if input.FluentForwardOutput == nil {
-								input.FluentForwardOutput = &fluentForwardOutputConfig{}
-							}
-							input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-								Namespace: ns,
-								Host:      aggregatorEndpoint(&l, fluentd.ServiceName),
-								Port:      fluentd.ServicePort,
-							})
-						} else if l.Spec.SyslogNGSpec != nil {
-							if input.SyslogNGOutput == nil {
-								input.SyslogNGOutput = newSyslogNGOutputConfig()
-							}
-							input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-								Namespace: ns,
-								Host:      aggregatorEndpoint(&l, syslogng.ServiceName),
-								Port:      syslogng.ServicePort,
-							})
-						} else {
-							logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("logging %s does not provide any aggregator configured", l.Name))
-							break TargetLogging
+					namespaceRegex := fmt.Sprintf("^[^_]+_(%s)_", strings.Join(targetNamespaces, "|"))
+					if l.Spec.FluentdSpec != nil {
+						if input.FluentForwardOutput == nil {
+							input.FluentForwardOutput = &fluentForwardOutputConfig{}
 						}
+						input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
+							AllNamespaces:  allNamespaces,
+							NamespaceRegex: namespaceRegex,
+							Host:           aggregatorEndpoint(&l, fluentd.ServiceName),
+							Port:           fluentd.ServicePort,
+						})
+					} else if l.Spec.SyslogNGSpec != nil {
+						if input.SyslogNGOutput == nil {
+							input.SyslogNGOutput = newSyslogNGOutputConfig()
+						}
+						input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
+							AllNamespaces:  allNamespaces,
+							NamespaceRegex: namespaceRegex,
+							Host:           aggregatorEndpoint(&l, syslogng.ServiceName),
+							Port:           syslogng.ServicePort,
+						})
+					} else {
+						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("logging %s does not provide any aggregator configured", l.Name))
+						break TargetLogging
 					}
+
 				}
 			}
 		}
@@ -422,15 +423,15 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		// compatibility with existing configuration
 		if input.FluentForwardOutput != nil {
 			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-				Namespace: "*",
-				Host:      input.FluentForwardOutput.TargetHost,
-				Port:      input.FluentForwardOutput.TargetPort,
+				AllNamespaces: true,
+				Host:          input.FluentForwardOutput.TargetHost,
+				Port:          input.FluentForwardOutput.TargetPort,
 			})
 		} else if input.SyslogNGOutput != nil {
 			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-				Namespace: "*",
-				Host:      input.SyslogNGOutput.Host,
-				Port:      input.SyslogNGOutput.Port,
+				AllNamespaces: true,
+				Host:          input.SyslogNGOutput.Host,
+				Port:          input.SyslogNGOutput.Port,
 			})
 		}
 	}

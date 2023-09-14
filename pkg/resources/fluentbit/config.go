@@ -111,10 +111,10 @@ var fluentBitConfigTemplate = `
 {{- range $target := $out.Targets }}
 [OUTPUT]
     Name          forward
-    {{- if eq $target.Namespace "*" }}
+    {{- if $target.AllNamespaces }}
     Match *
     {{- else }}
-    Match *_{{ $target.Namespace }}_*
+    Match_Regex {{ $target.NamespaceRegex }}
     {{- end }}
     {{- if $out.Upstream.Enabled }}
     Upstream      {{ $out.Upstream.Config.Path }}
@@ -149,10 +149,10 @@ var fluentBitConfigTemplate = `
 {{- range $target := $out.Targets }}
 [OUTPUT]
     Name tcp
-    {{- if eq $target.Namespace "*" }}
+    {{- if $target.AllNamespaces }}
     Match *
     {{- else }}
-    Match *_{{ $target.Namespace }}_*
+    Match_Regex {{ $target.NamespaceRegex }}
     {{- end }}
     Host {{ $target.Host }}
     Port {{ $target.Port }}
