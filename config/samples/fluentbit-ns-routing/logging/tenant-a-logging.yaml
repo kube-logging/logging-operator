@@ -7,6 +7,8 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: a
+  labels:
+    tenant: a
 spec:
   loggingRef: a
   fluentd: {}

@@ -7,6 +7,8 @@ apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
   name: b
+  labels:
+    tenant: b
 spec:
   loggingRef: b
   syslogNG:

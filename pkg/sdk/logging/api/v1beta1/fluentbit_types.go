@@ -139,11 +139,14 @@ type LogRouting struct {
 
 type Targets struct {
 	// Name of the remote logging resource to use as an output
-	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` if set
-	// When none of those are set, then routing is only enabled if `allNamespaces` flag is enabled
+	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields.
+	// An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to.
 	LoggingName string `json:"logging"`
-	// Send all namespace logs to this
-	AllNamespace bool `json:"allNamespaces,omitempty"`
+
+	// LabelSelector to identify the remote logging resource to use as an output
+	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields.
+	// An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to.
+	LoggingSelector *metav1.LabelSelector `json:"targetSelector,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

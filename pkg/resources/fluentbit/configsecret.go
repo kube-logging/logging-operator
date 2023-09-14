@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
 	"text/template"
 
 	"emperror.dev/errors"
@@ -28,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
@@ -363,61 +361,17 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.Port = syslogng.ServicePort
 	}
 
+	// TODO well defined and articulated failure scenarios
 	if r.fluentbitSpec.LogRouting.Enabled {
-		loggings := &v1beta1.LoggingList{}
-		if err := r.resourceReconciler.Client.List(ctx, loggings); err != nil {
-			return nil, reconciler.StatePresent, errors.WrapIf(err, "getting logging list")
+		tenants, err := r.tenants(ctx)
+		if err != nil {
+			return nil, nil, errors.WrapIf(err, "collecting tenants to identify targets")
 		}
-		var logRoutingErrors error
-		for _, t := range r.fluentbitSpec.LogRouting.Targets {
-		TargetLogging:
-			for _, l := range loggings.Items {
-				if l.Name == t.LoggingName {
-					targetNamespaces, allNamespaces, err := model.UniqueWatchNamespaces(ctx, r.resourceReconciler.Client, &l)
-					if err != nil {
-						logRoutingErrors = errors.Append(logRoutingErrors, errors.WrapIff(err, "getting target namespaces for logging %s", l.Name))
-						continue
-					}
-					if len(targetNamespaces) == 0 {
-						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("cannot find any valid namespaces for logging %s", l.Name))
-						continue
-					}
-					if allNamespaces && !t.AllNamespace {
-						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("refused sending all namespaces logs to "+
-							"logging %s without explicitly asking through the `allNamespaces` option for the target", l.Name))
-						continue
-					}
-					namespaceRegex := fmt.Sprintf("^[^_]+_(%s)_", strings.Join(targetNamespaces, "|"))
-					if l.Spec.FluentdSpec != nil {
-						if input.FluentForwardOutput == nil {
-							input.FluentForwardOutput = &fluentForwardOutputConfig{}
-						}
-						input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-							AllNamespaces:  allNamespaces,
-							NamespaceRegex: namespaceRegex,
-							Host:           aggregatorEndpoint(&l, fluentd.ServiceName),
-							Port:           fluentd.ServicePort,
-						})
-					} else if l.Spec.SyslogNGSpec != nil {
-						if input.SyslogNGOutput == nil {
-							input.SyslogNGOutput = newSyslogNGOutputConfig()
-						}
-						input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-							AllNamespaces:  allNamespaces,
-							NamespaceRegex: namespaceRegex,
-							Host:           aggregatorEndpoint(&l, syslogng.ServiceName),
-							Port:           syslogng.ServicePort,
-						})
-					} else {
-						logRoutingErrors = errors.Append(logRoutingErrors, errors.Errorf("logging %s does not provide any aggregator configured", l.Name))
-						break TargetLogging
-					}
-
-				}
-			}
+		if len(tenants) == 0 {
+			return nil, nil, errors.New("log routing is enabled but no target has been configured")
 		}
-		if logRoutingErrors != nil {
-			return nil, nil, logRoutingErrors
+		if err := r.configureOutputsForTenants(tenants, &input); err != nil {
+			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
 	} else {
 		// compatibility with existing configuration

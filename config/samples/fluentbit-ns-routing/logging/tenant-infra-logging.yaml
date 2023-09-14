@@ -11,6 +11,20 @@ spec:
   loggingRef: infra
   fluentd: {}
   controlNamespace: infra
+  watchNamespaces:
+  - infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+  namespace: infra
+spec:
+  loggingRef: a
+  match:
+    - select: {}
+  filters:
+    - stdout: {}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: FluentbitAgent
@@ -36,7 +50,7 @@ spec:
     enabled: true
     targets:
     - logging: infra
-      allNamespaces: true
-    - logging: a
-    - logging: b
-    - logging: c
+    - loggingSelector:
+        matchExpressions:
+        - key: tenant
+          operator: Exists
