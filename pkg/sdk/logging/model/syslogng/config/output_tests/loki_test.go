@@ -113,6 +113,32 @@ func TestLokiOutputTable(t *testing.T) {
 };
 `,
 		},
+		{
+			name: "template",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-loki-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					Loki: &output.LokiOutput{
+						URL: "test.local",
+						Batch: output.Batch{
+							BatchLines:   2000,
+							BatchBytes:   1500,
+							BatchTimeout: 10,
+						},
+						Workers:     3,
+						LogFIFOSize: 1000,
+						Template:    "$ISODATE $HOST $MSGHDR$MSG",
+					},
+				},
+			},
+			config: `destination "output_default_test-loki-out" {
+	loki(url("test.local") batch-lines(2000) batch-bytes(1500) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) template("$ISODATE $HOST $MSGHDR$MSG"));
+};
+`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
