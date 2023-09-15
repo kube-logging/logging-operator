@@ -25,7 +25,6 @@ import (
 )
 
 func TestHTTPOutputTable(t *testing.T) {
-	// Defining the columns of the table
 	var tests = []struct {
 		name   string
 		output v1beta1.SyslogNGOutput
@@ -188,8 +187,4 @@ func TestHTTPOutputTable(t *testing.T) {
 			config.CheckConfigForOutput(t, tt.output, tt.config)
 		})
 	}
-}
-
-func newTrue() {
-	panic("unimplemented")
 }
