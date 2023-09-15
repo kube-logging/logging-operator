@@ -33,7 +33,7 @@ type _hugoDatadog interface{} //nolint:deadcode,unused
 //
 //	datadog:
 //	  api_key:
-//	    value: '<YOUR_API_KEY>'
+//	    value: '<YOUR_API_KEY>' # for referencing a secret see https://kube-logging.dev/docs/configuration/plugins/outputs/secret/
 //	  dd_source: '<INTEGRATION_NAME>'
 //	  dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
 //	  dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
