@@ -43,7 +43,7 @@ func FindTenants(ctx context.Context, targets []v1beta1.Target, currentLogging s
 		if t.LoggingName != "" {
 			l := &v1beta1.Logging{}
 			if err := reader.Get(ctx, client.ObjectKey{Name: t.LoggingName}, l); err != nil {
-				return nil, errors.WrapIff(err, "logrouting target %", t.LoggingName)
+				return nil, errors.WrapIff(err, "logrouting target %s", t.LoggingName)
 			}
 			tenantCandidates = append(tenantCandidates, Tenant{
 				Logging: l,
