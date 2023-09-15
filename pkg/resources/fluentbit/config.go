@@ -107,12 +107,12 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
-{{ with $out := .FluentForwardOutput }}
+{{- with $out := .FluentForwardOutput }}
 {{- range $target := $out.Targets }}
 [OUTPUT]
     Name          forward
     {{- if $target.AllNamespaces }}
-    Match *
+    Match         *
     {{- else }}
     Match_Regex {{ $target.NamespaceRegex }}
     {{- end }}
