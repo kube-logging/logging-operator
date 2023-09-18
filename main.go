@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
+	"regexp"
 	"strings"
 
 	"emperror.dev/errors"
@@ -238,7 +239,16 @@ func PSPEnabled(cfg *rest.Config) bool {
 		setupLog.Error(err, "server version")
 		os.Exit(1)
 	}
-	if cast.ToInt(serverVersion.Major) == 1 && cast.ToInt(serverVersion.Minor) < 25 {
+	compiledVersion := regexp.MustCompile(`\d+`)
+	minorCompiled := compiledVersion.Find([]byte(serverVersion.Minor))
+	minor := cast.ToInt(string(minorCompiled))
+
+	if minor == 0 {
+		setupLog.Info("minor server detection failed, PSPs will be disabled")
+		return resources.PSPEnabled
+	}
+
+	if cast.ToInt(serverVersion.Major) == 1 && minor < 25 {
 		resources.PSPEnabled = true
 	}
 	return resources.PSPEnabled
