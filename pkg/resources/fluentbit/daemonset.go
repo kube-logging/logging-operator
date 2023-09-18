@@ -76,10 +76,11 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 					Affinity:           r.fluentbitSpec.Affinity,
 					PriorityClassName:  r.fluentbitSpec.PodPriorityClassName,
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      r.fluentbitSpec.Security.PodSecurityContext.FSGroup,
-						RunAsNonRoot: r.fluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
-						RunAsUser:    r.fluentbitSpec.Security.PodSecurityContext.RunAsUser,
-						RunAsGroup:   r.fluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						FSGroup:        r.fluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot:   r.fluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:      r.fluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:     r.fluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						SeccompProfile: r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
 					},
 					ImagePullSecrets: r.fluentbitSpec.Image.ImagePullSecrets,
 					DNSPolicy:        r.fluentbitSpec.DNSPolicy,
@@ -123,6 +124,8 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 			AllowPrivilegeEscalation: r.fluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 			Privileged:               r.fluentbitSpec.Security.SecurityContext.Privileged,
 			SELinuxOptions:           r.fluentbitSpec.Security.SecurityContext.SELinuxOptions,
+			SeccompProfile:           r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
+			Capabilities:             r.fluentbitSpec.Security.SecurityContext.Capabilities,
 		},
 		Command: []string{
 			StockBinPath, "-c", fmt.Sprintf("%s/%s", OperatorConfigPath, BaseConfigName),
@@ -298,6 +301,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: r.fluentbitSpec.BufferStorage.StoragePath,
 				},
 			},
+			Resources: r.fluentbitSpec.BufferVolumeResources,
 		}
 	}
 	return nil

@@ -17,10 +17,11 @@ package fluentd
 import (
 	"strings"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
@@ -47,7 +48,7 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels:      r.Logging.GetFluentdLabels(ComponentDrainer),
+				Labels:      r.getDrainerLabels(),
 				Annotations: r.Logging.Spec.FluentdSpec.Scaling.Drain.Annotations,
 			},
 			Spec: corev1.PodSpec{
@@ -62,10 +63,11 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 				TopologySpreadConstraints: r.Logging.Spec.FluentdSpec.TopologySpreadConstraints,
 				PriorityClassName:         r.Logging.Spec.FluentdSpec.PodPriorityClassName,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:    r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
+					RunAsNonRoot:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+					FSGroup:        r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
+					RunAsUser:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
+					RunAsGroup:     r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
+					SeccompProfile: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.SeccompProfile,
 				},
 				RestartPolicy: corev1.RestartPolicyNever,
 			},
@@ -98,6 +100,10 @@ func drainWatchContainer(cfg *v1beta1.FluentdDrainConfig, bufferVolumeName strin
 				Name:  "BUFFER_PATH",
 				Value: bufferPath,
 			},
+			{
+				Name:  "CHECK_INTERVAL",
+				Value: drainerCheckInterval,
+			},
 		},
 		Image:           cfg.Image.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullPolicy(cfg.Image.PullPolicy),
@@ -116,4 +122,14 @@ func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
 	res := spec.DeepCopy()
 	res.FluentOutLogrotate = nil
 	return res
+}
+
+func (r *Reconciler) getDrainerLabels() map[string]string {
+	labels := r.Logging.GetFluentdLabels(ComponentDrainer)
+
+	for key, value := range r.Logging.Spec.FluentdSpec.Scaling.Drain.Labels {
+		labels[key] = value
+	}
+
+	return labels
 }

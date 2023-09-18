@@ -108,6 +108,7 @@ type FluentbitSpec struct {
 	BufferVolumeMetrics     *Metrics                       `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeImage       ImageSpec                      `json:"bufferVolumeImage,omitempty"`
 	BufferVolumeArgs        []string                       `json:"bufferVolumeArgs,omitempty"`
+	BufferVolumeResources   corev1.ResourceRequirements    `json:"bufferVolumeResources,omitempty"`
 	CustomConfigSecret      string                         `json:"customConfigSecret,omitempty"`
 	PodPriorityClassName    string                         `json:"podPriorityClassName,omitempty"`
 	LivenessProbe           *corev1.Probe                  `json:"livenessProbe,omitempty"`

@@ -35,10 +35,14 @@ type SyslogNGOutputSpec struct {
 	Syslog          *output.SyslogOutput          `json:"syslog,omitempty" syslog-ng:"dest-drv"`
 	File            *output.FileOutput            `json:"file,omitempty" syslog-ng:"dest-drv"`
 	MQTT            *output.MQTT                  `json:"mqtt,omitempty" syslog-ng:"dest-drv"`
+	Redis           *output.RedisOutput           `json:"redis,omitempty" syslog-ng:"dest-drv"`
+	MongoDB         *output.MongoDB               `json:"mongodb,omitempty" syslog-ng:"dest-drv"`
 	SumologicHTTP   *output.SumologicHTTPOutput   `json:"sumologic-http,omitempty" syslog-ng:"dest-drv"`
 	SumologicSyslog *output.SumologicSyslogOutput `json:"sumologic-syslog,omitempty" syslog-ng:"dest-drv"`
 	HTTP            *output.HTTPOutput            `json:"http,omitempty" syslog-ng:"dest-drv"`
+	Elasticsearch   *output.ElasticsearchOutput   `json:"elasticsearch,omitempty" syslog-ng:"dest-drv,name=elasticsearch-http"`
 	LogScale        *output.LogScaleOutput        `json:"logscale,omitempty" syslog-ng:"dest-drv"`
+	SplunkHEC       *output.SplunkHECOutput       `json:"splunk_hec_event,omitempty" syslog-ng:"dest-drv"`
 }
 
 type SyslogNGOutputStatus OutputStatus

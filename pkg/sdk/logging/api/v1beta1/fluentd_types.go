@@ -17,8 +17,9 @@ package v1beta1
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/cisco-open/operator-tools/pkg/volume"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
 
 // +name:"FluentdSpec"
@@ -67,6 +68,7 @@ type FluentdSpec struct {
 	BufferVolumeMetrics       *Metrics                          `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeImage         ImageSpec                         `json:"bufferVolumeImage,omitempty"`
 	BufferVolumeArgs          []string                          `json:"bufferVolumeArgs,omitempty"`
+	BufferVolumeResources     corev1.ResourceRequirements       `json:"bufferVolumeResources,omitempty"`
 	Security                  *Security                         `json:"security,omitempty"`
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`
@@ -146,8 +148,10 @@ type FluentdTLS struct {
 type FluentdDrainConfig struct {
 	// Should buffers on persistent volumes left after scaling down the statefulset be drained
 	Enabled bool `json:"enabled,omitempty"`
-	// Container image to use for the drain watch sidecar
+	// Annotations to use for the drain watch sidecar
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten.
+	Labels map[string]string `json:"labels,omitempty"`
 	// Should persistent volume claims be deleted after draining is done
 	DeleteVolume bool      `json:"deleteVolume,omitempty"`
 	Image        ImageSpec `json:"image,omitempty"`

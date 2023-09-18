@@ -31,9 +31,6 @@ fullnameOverride: ""
 # -- A namespace override for the app.
 namespaceOverride: ""
 
-# -- Namespace to watch for LoggingOperator Custom Resources.
-watchNamespace: ""
-
 # -- Define annotations for logging-operator pods.
 annotations: {}
 
@@ -181,6 +178,9 @@ logging:
 
   # -- Limit namespaces to watch Flow and Output custom resources.
   watchNamespaces: []
+
+  # -- Limit namespaces to watch Flow and Output custom resources.
+  watchNamespaceSelector: {}
 
   # -- Cluster domain name to be used when templating URLs to services
   clusterDomain: "cluster.local."

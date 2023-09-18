@@ -62,6 +62,7 @@ const (
 	clusterRoleName                = "fluentd"
 	containerName                  = "fluentd"
 	defaultBufferVolumeMetricsPort = 9200
+	drainerCheckInterval           = "10"
 )
 
 // Reconciler holds info what resource to reconcile
@@ -138,7 +139,11 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 
 		// Fail when the current config is invalid
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
-			return nil, errors.Errorf("current config is invalid")
+			if hasPod, err := r.hasConfigCheckPod(ctx, hash); hasPod {
+				return nil, errors.WrapIf(err, "current config is invalid")
+			}
+			// clean the status so that we can rerun the check
+			return r.statusUpdate(ctx, patchBase, nil)
 		}
 
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
@@ -152,16 +157,9 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 				// Errors with the cleanup should not block the reconciliation, we just note it
 				r.Log.Error(err, "issues during configcheck cleanup, moving on")
 			} else if len(r.Logging.Status.ConfigCheckResults) > 1 {
-				//
-				r.Logging.Status.ConfigCheckResults = map[string]bool{
+				return r.statusUpdate(ctx, patchBase, map[string]bool{
 					hash: result,
-				}
-				if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
-					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
-				} else {
-					// explicitly ask for a requeue to short circuit the controller loop after the status update
-					return &reconcile.Result{Requeue: true}, nil
-				}
+				})
 			}
 		} else {
 			// We don't have an existing result
@@ -253,6 +251,16 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, result map[string]bool) (*reconcile.Result, error) {
+	r.Logging.Status.ConfigCheckResults = result
+	if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+		return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
+	} else {
+		// explicitly ask for a requeue to short circuit the controller loop after the status update
+		return &reconcile.Result{Requeue: true}, nil
+	}
 }
 
 func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, error) {

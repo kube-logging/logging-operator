@@ -106,11 +106,31 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 													corev1.ResourceMemory: resource.MustParse("10M"),
 												},
 											},
+											VolumeMounts: []corev1.VolumeMount{
+												{
+													Name: "buffers",
+													MountPath: "/buffers",
+												},
+											},
+										},
+									},
+									Volumes: []corev1.Volume{
+										{
+											Name: "buffers",
+											VolumeSource: corev1.VolumeSource{
+												EmptyDir: &corev1.EmptyDirVolumeSource{},
+											},
 										},
 									},
 								},
 							},
 						},
+					},
+					BufferVolumeMetrics: &v1beta1.BufferMetrics{
+						Metrics: v1beta1.Metrics{
+							Interval: "1s",
+						},
+						MountName: "buffers",
 					},
 				},
 			},

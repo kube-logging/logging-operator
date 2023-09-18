@@ -38,9 +38,6 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
 		configReloadContainer(r.Logging.Spec.SyslogNGSpec),
 	}
-	if c := r.bufferMetricsSidecarContainer(); c != nil {
-		containers = append(containers, *c)
-	}
 	if c := r.syslogNGMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
@@ -55,6 +52,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+					Annotations: map[string]string{
+						"fluentbit.io/exclude": "true",
+					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: containers,
@@ -82,11 +82,16 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			buffersVolumeName = name
 		}
 	}
+
 	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, ContainerName)
 	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
 		if !sliceAny(syslogngContainer.Args, func(arg string) bool { return strings.Contains(arg, "--persist-file") }) {
 			syslogngContainer.Args = append(syslogngContainer.Args,
 				"--persist-file", filepath.Join(mnt.MountPath, "/syslog-ng.persist"))
+		}
+
+		if c := r.bufferMetricsSidecarContainer(); c != nil {
+			desired.Spec.Template.Spec.Containers = append(desired.Spec.Template.Spec.Containers, *c)
 		}
 	}
 
@@ -257,19 +262,41 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			port = r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
-		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem"}
+		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/"}
 
-		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
+		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))
+		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
+
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           v1beta1.RepositoryWithTag(bufferVolumeImageRepository, bufferVolumeImageTag),
 			ImagePullPolicy: corev1.PullIfNotPresent,
-			Args:            []string{"--port", "7358", "--startup", customRunner},
-			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
+			Args: []string{
+				"--port", "7358",
+				"--exec", nodeExporterCmd,
+				"--exec", bufferSizeCmd,
+			},
+			Env: []corev1.EnvVar{
+				{
+					Name:  "BUFFER_PATH",
+					Value: BufferPath,
+				},
+			},
+			Ports: generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName,
 					MountPath: BufferPath,
+				},
+			},
+			Resources: corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("10M"),
+					corev1.ResourceCPU:    resource.MustParse("50m"),
+				},
+				Requests: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("10M"),
+					corev1.ResourceCPU:    resource.MustParse("1m"),
 				},
 			},
 		}

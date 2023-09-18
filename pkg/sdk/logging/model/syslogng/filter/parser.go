@@ -103,3 +103,4 @@ type MetricsProbe struct {
 }
 
 type ArrowMap map[string]string
+type RawArrowMap map[string]string

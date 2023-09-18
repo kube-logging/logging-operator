@@ -53,6 +53,17 @@ spec:
                 type: boolean
               clusterDomain:
                 type: string
+              configCheck:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  strategy:
+                    type: string
+                  timeoutSeconds:
+                    type: integer
+                type: object
               controlNamespace:
                 type: string
               defaultFlow:
@@ -1759,6 +1770,37 @@ spec:
                         type: object
                       timeout:
                         type: string
+                    type: object
+                  bufferVolumeResources:
+                    properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
                     type: object
                   coroStackSize:
                     format: int32
@@ -3929,6 +3971,37 @@ spec:
                       timeout:
                         type: string
                     type: object
+                  bufferVolumeResources:
+                    properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                    type: object
                   compressConfigFile:
                     type: boolean
                   configCheckAnnotations:
@@ -5001,6 +5074,10 @@ spec:
                                 type: string
                               tag:
                                 type: string
+                            type: object
+                          labels:
+                            additionalProperties:
+                              type: string
                             type: object
                           pauseImage:
                             properties:
@@ -13953,6 +14030,8 @@ spec:
                     type: object
                   globalOptions:
                     properties:
+                      log_level:
+                        type: string
                       stats:
                         properties:
                           freq:

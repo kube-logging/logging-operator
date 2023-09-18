@@ -100,7 +100,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "http-metrics",
-					Path:                 r.Logging.Spec.FluentdSpec.Metrics.Path,
+					Path:                 r.Logging.GetFluentdMetricsPath(),
 					Interval:             v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Interval),
 					ScrapeTimeout:        v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Timeout),
 					HonorLabels:          r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
@@ -172,6 +172,8 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+					Scheme:               r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},

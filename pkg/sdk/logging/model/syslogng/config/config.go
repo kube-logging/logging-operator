@@ -71,13 +71,12 @@ func configRenderer(in Input) (render.Renderer, error) {
 		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
 		if in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq != nil ||
 			in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
-			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq, amp(10))
-			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel, amp(2))
-		} else {
-			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats, &v1beta1.Stats{})
-			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Freq, amp(10))
-			setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
+			return nil, errors.New("stats_freq and stats_level are not supported anymore, please use stats.level and stats.freq")
 		}
+
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats, &v1beta1.Stats{})
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Freq, amp(0))
+		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
 	}
 
 	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))

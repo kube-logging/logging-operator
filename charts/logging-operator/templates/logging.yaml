@@ -40,6 +40,9 @@ spec:
   {{- with .Values.logging.watchNamespaces }}
   watchNamespaces: {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- with .Values.logging.watchNamespaceSelector }}
+  watchNamespaceSelector: {{- toYaml . | nindent 4 }}
+  {{- end }}
   clusterDomain: {{ .Values.logging.clusterDomain }}
   controlNamespace: {{ .Values.logging.controlNamespace | default .Release.Namespace }}
   {{- with .Values.logging.allowClusterResourcesFromAllNamespaces }}

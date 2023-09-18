@@ -49,6 +49,8 @@ type LoggingSpec struct {
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
+	// ConfigCheck settings that apply to both fluentd and syslog-ng
+	ConfigCheck ConfigCheck `json:"configCheck,omitempty"`
 	// FluentbitAgent daemonset configuration.
 	// Deprecated, will be removed with next major version
 	// Migrate to the standalone NodeAgent resource
@@ -83,6 +85,26 @@ type LoggingSpec struct {
 	// in case there is a change in an immutable field
 	// that otherwise couldn't be managed with a simple update.
 	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
+}
+
+type ConfigCheckStrategy string
+
+const (
+	ConfigCheckStrategyDryRun  ConfigCheckStrategy = "DryRun"
+	ConfigCheckStrategyTimeout ConfigCheckStrategy = "StartWithTimeout"
+)
+
+type ConfigCheck struct {
+	// Select the config check strategy to use.
+	// `DryRun`: parse and validate configuration
+	// `StartWithTimeout`: start with given configuration and exit after specified timeout
+	// Default: `DryRun`
+	Strategy ConfigCheckStrategy `json:"strategy,omitempty"`
+
+	// Configure timeout in seconds if strategy is StartWithTimeout
+	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
+	// Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten.
+	Labels map[string]string `json:"labels,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging
@@ -128,9 +150,9 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                    = "2.1.4"
+	DefaultFluentbitImageTag                    = "2.1.8"
 	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.6.1"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.7.1"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
 	DefaultFluentdImageTag                      = "v1.15-ruby3"
@@ -144,7 +166,7 @@ const (
 	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag        = "v0.0.5"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.6.1"
+	DefaultFluentdBufferVolumeImageTag          = "v0.7.1"
 )
 
 // SetDefaults fills empty attributes
@@ -186,10 +208,10 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup == nil {
 			l.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
 		}
+		if l.Spec.FluentdSpec.Workers <= 0 {
+			l.Spec.FluentdSpec.Workers = 1
+		}
 		if l.Spec.FluentdSpec.Metrics != nil {
-			if l.Spec.FluentdSpec.Metrics.Path == "" {
-				l.Spec.FluentdSpec.Metrics.Path = "/metrics"
-			}
 			if l.Spec.FluentdSpec.Metrics.Port == 0 {
 				l.Spec.FluentdSpec.Metrics.Port = 24231
 			}
@@ -199,15 +221,15 @@ func (l *Logging) SetDefaults() error {
 			if l.Spec.FluentdSpec.Metrics.Interval == "" {
 				l.Spec.FluentdSpec.Metrics.Interval = "15s"
 			}
-
 			if l.Spec.FluentdSpec.Metrics.PrometheusAnnotations {
 				l.Spec.FluentdSpec.Annotations["prometheus.io/scrape"] = "true"
-
-				l.Spec.FluentdSpec.Annotations["prometheus.io/path"] = l.Spec.FluentdSpec.Metrics.Path
+				l.Spec.FluentdSpec.Annotations["prometheus.io/path"] = l.GetFluentdMetricsPath()
 				l.Spec.FluentdSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", l.Spec.FluentdSpec.Metrics.Port)
 			}
 		}
-
+		if l.Spec.FluentdSpec.LogLevel == "" {
+			l.Spec.FluentdSpec.LogLevel = "info"
+		}
 		if !l.Spec.FluentdSpec.DisablePvc {
 			if l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim == nil {
 				l.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
@@ -258,6 +280,18 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
+		if l.Spec.FluentdSpec.BufferVolumeResources.Limits == nil {
+			l.Spec.FluentdSpec.BufferVolumeResources.Limits = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("50m"),
+			}
+		}
+		if l.Spec.FluentdSpec.BufferVolumeResources.Requests == nil {
+			l.Spec.FluentdSpec.BufferVolumeResources.Requests = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
+		}
 		if l.Spec.FluentdSpec.Resources.Limits == nil {
 			l.Spec.FluentdSpec.Resources.Limits = v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("400M"),
@@ -302,8 +336,11 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentdSpec.FluentOutLogrotate == nil {
 			l.Spec.FluentdSpec.FluentOutLogrotate = &FluentOutLogrotate{
-				Enabled: true,
+				Enabled: false,
 			}
+		}
+		if _, ok := l.Spec.FluentdSpec.Annotations["fluentbit.io/exclude"]; !ok {
+			l.Spec.FluentdSpec.Annotations["fluentbit.io/exclude"] = "true"
 		}
 		if l.Spec.FluentdSpec.FluentOutLogrotate.Path == "" {
 			l.Spec.FluentdSpec.FluentOutLogrotate.Path = "/fluentd/log/out"
@@ -369,9 +406,15 @@ func (l *Logging) SetDefaults() error {
 				e.Volume = &volume.KubernetesVolume{}
 			}
 		}
+		if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
+			l.Spec.ConfigCheck.TimeoutSeconds = 10
+		}
 	}
 
 	if l.Spec.SyslogNGSpec != nil {
+		if l.Spec.SyslogNGSpec.MaxConnections == 0 {
+			l.Spec.SyslogNGSpec.MaxConnections = 100
+		}
 		if l.Spec.SyslogNGSpec.Metrics != nil {
 			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
 				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
@@ -470,6 +513,18 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 		if fluentbitSpec.BufferVolumeImage.PullPolicy == "" {
 			fluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
+		}
+		if fluentbitSpec.BufferVolumeResources.Limits == nil {
+			fluentbitSpec.BufferVolumeResources.Limits = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("50m"),
+			}
+		}
+		if fluentbitSpec.BufferVolumeResources.Requests == nil {
+			fluentbitSpec.BufferVolumeResources.Requests = v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("10M"),
+				v1.ResourceCPU:    resource.MustParse("1m"),
+			}
 		}
 		if fluentbitSpec.Security.SecurityContext == nil {
 			fluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
@@ -675,4 +730,16 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
+
+// GetFluentdMetricsPath returns the right Fluentd metrics endpoint
+// depending on the number of workers and the user configuration
+func (l *Logging) GetFluentdMetricsPath() string {
+	if l.Spec.FluentdSpec.Metrics.Path == "" {
+		if l.Spec.FluentdSpec.Workers > 1 {
+			return "/aggregated_metrics"
+		}
+		return "/metrics"
+	}
+	return l.Spec.FluentdSpec.Metrics.Path
 }

@@ -54,10 +54,10 @@ const (
 	defaultBufferVolumeMetricsPort    = 9200
 	syslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
 	syslogngImageTag                  = "4.3.1"
-	prometheusExporterImageRepository = "ghcr.io/kube-logging/syslog-ng-exporter"
-	prometheusExporterImageTag        = "v0.0.16"
+	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	prometheusExporterImageTag        = "0.0.2"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.6.1"
+	bufferVolumeImageTag              = "v0.7.1"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
 	configReloaderImageTag            = "v1.3.1"
 	socketVolumeName                  = "socket"
@@ -136,7 +136,11 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 
 		// Fail when the current config is invalid
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
-			return nil, errors.Errorf("current config is invalid")
+			if hasPod, err := r.hasConfigCheckPod(ctx, hash); hasPod {
+				return nil, errors.WrapIf(err, "current config is invalid")
+			}
+			// clean the status so that we can rerun the check
+			return r.statusUpdate(ctx, patchBase, nil)
 		}
 
 		// Cleanup previous configcheck results
@@ -151,16 +155,9 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 				// Errors with the cleanup should not block the reconciliation, we just note it
 				r.Log.Error(err, "issues during configcheck cleanup, moving on")
 			} else if len(r.Logging.Status.ConfigCheckResults) > 1 {
-				//
-				r.Logging.Status.ConfigCheckResults = map[string]bool{
+				return r.statusUpdate(ctx, patchBase, map[string]bool{
 					hash: result,
-				}
-				if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
-					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
-				} else {
-					// explicitly ask for a requeue to short circuit the controller loop after the status update
-					return &reconcile.Result{Requeue: true}, nil
-				}
+				})
 			}
 		} else {
 			// We don't have an existing result
@@ -246,6 +243,31 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string) (bool, error) {
+	var err error
+	pod, err := r.newCheckPod(hashKey)
+	if err != nil {
+		return false, err
+	}
+
+	p := &corev1.Pod{}
+	err = r.Client.Get(ctx, client.ObjectKeyFromObject(pod), p)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, result map[string]bool) (*reconcile.Result, error) {
+	r.Logging.Status.ConfigCheckResults = result
+	if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+		return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
+	} else {
+		// explicitly ask for a requeue to short circuit the controller loop after the status update
+		return &reconcile.Result{Requeue: true}, nil
+	}
 }
 
 func (r *Reconciler) getServiceAccountName() string {

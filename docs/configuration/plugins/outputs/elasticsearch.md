@@ -575,4 +575,10 @@ Specify whether overwriting data stream ilm policy or not.
 
 Default: -
 
+### use_legacy_template (*bool, optional) {#elasticsearch-use_legacy_template}
+
+Specify wether to use legacy template or not.  
+
+Default:  true
+
 

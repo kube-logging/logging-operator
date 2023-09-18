@@ -28,6 +28,14 @@ Default: -
 
 Default: -
 
+### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
+
+Default: -
+
+### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+
+Default: -
+
 ### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
 
 Default: -
@@ -40,7 +48,15 @@ Default: -
 
 Default: -
 
+### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
+
+Default: -
+
 ### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
+
+Default: -
+
+### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
 
 Default: -
 

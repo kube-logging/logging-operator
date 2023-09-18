@@ -201,7 +201,7 @@ source "main_input" {
 @include "scl.conf"
 
 options {
-    stats(level(2) freq(10));
+    stats(level(2) freq(0));
 };
 
 source "main_input" {
@@ -358,8 +358,8 @@ log {
 					},
 				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{
-					reader: secretReader{
-						secrets: []corev1.Secret{
+					Reader: SecretReader{
+						Secrets: []corev1.Secret{
 							{
 								ObjectMeta: metav1.ObjectMeta{
 									Namespace: "default",
@@ -371,7 +371,7 @@ log {
 							},
 						},
 					},
-					mountPath: "/etc/syslog-ng/secret",
+					MountPath: "/etc/syslog-ng/secret",
 				},
 				SourcePort: 601,
 			},

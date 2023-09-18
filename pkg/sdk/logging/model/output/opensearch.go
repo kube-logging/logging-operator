@@ -227,9 +227,9 @@ type OpenSearchOutput struct {
 	CompressionLevel string `json:"compression_level,omitempty"`
 	// truncate_caches_interval
 	TruncateCachesInterval string `json:"truncate_caches_interval,omitempty"`
-	// use_legacy_template (default: true)
+	// Specify wether to use legacy template or not. (default: true)
 	// +kubebuilder:validation:Optional
-	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty" plugin:"default:true"`
+	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty"`
 	// catch_transport_exception_on_retry (default: true)
 	// +kubebuilder:validation:Optional
 	CatchTransportExceptionOnRetry *bool `json:"catch_transport_exception_on_retry,omitempty" plugin:"default:true"`

@@ -103,11 +103,31 @@ Default: -
 
 ### workers (int, optional) {#httpoutput-workers}
 
-Description: Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination. 
+Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination. 
 
 Default: -
 
 ### persist_name (string, optional) {#httpoutput-persist_name}
+
+If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+
+Default: -
+
+### log-fifo-size (int, optional) {#httpoutput-log-fifo-size}
+
+The number of messages that the output queue can store. 
+
+Default: -
+
+### timeout (int, optional) {#httpoutput-timeout}
+
+Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. 
+
+Default: -
+
+### response-action (filter.RawArrowMap, optional) {#httpoutput-response-action}
+
+Specifies what AxoSyslog does with the log message, based on the response code received from the HTTP server. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information. 
 
 Default: -
 

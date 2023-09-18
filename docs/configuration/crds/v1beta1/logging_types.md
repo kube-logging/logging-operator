@@ -32,6 +32,12 @@ Override generated config. This is a *raw* configuration string for troubleshoot
 
 Default: -
 
+### configCheck (ConfigCheck, optional) {#loggingspec-configcheck}
+
+ConfigCheck settings that apply to both fluentd and syslog-ng 
+
+Default: -
+
 ### fluentbit (*FluentbitSpec, optional) {#loggingspec-fluentbit}
 
 FluentbitAgent daemonset configuration. Deprecated, will be removed with next major version Migrate to the standalone NodeAgent resource 
@@ -107,6 +113,27 @@ Default: -
 ### enableRecreateWorkloadOnImmutableFieldChange (bool, optional) {#loggingspec-enablerecreateworkloadonimmutablefieldchange}
 
 EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 
+
+Default: -
+
+
+## ConfigCheck
+
+### strategy (ConfigCheckStrategy, optional) {#configcheck-strategy}
+
+Select the config check strategy to use. `DryRun`: parse and validate configuration `StartWithTimeout`: start with given configuration and exit after specified timeout Default: `DryRun` 
+
+Default: -
+
+### timeoutSeconds (int, optional) {#configcheck-timeoutseconds}
+
+Configure timeout in seconds if strategy is StartWithTimeout 
+
+Default: -
+
+### labels (map[string]string, optional) {#configcheck-labels}
+
+Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten. 
 
 Default: -
 

@@ -18,9 +18,10 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
-	"github.com/stretchr/testify/require"
 )
 
 func TestOpenSearch(t *testing.T) {
@@ -51,7 +52,6 @@ buffer:
   scheme https
   ssl_verify false
   ssl_version TLSv1_2
-  use_legacy_template true
   utc_index true
     verify_os_version_at_startup true
     <buffer tag,time>
@@ -102,7 +102,6 @@ buffer:
     scheme https
     ssl_verify false
     ssl_version TLSv1_2
-    use_legacy_template true
     utc_index true
     verify_os_version_at_startup true
     <buffer tag,time>

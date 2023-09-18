@@ -22,13 +22,16 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
-	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type ConfigCheckResult struct {
@@ -43,6 +46,21 @@ func (r *Reconciler) configHash() (string, error) {
 		return "", errors.WrapIf(err, "failed to calculate hash for the configmap data")
 	}
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
+}
+
+func (r *Reconciler) CheckForObjectExistence(ctx context.Context, object client.Object) (*ConfigCheckResult, error) {
+	if err := r.Client.Get(ctx, client.ObjectKeyFromObject(object), object); err != nil {
+		if apierrors.IsNotFound(err) {
+			objNotFoundMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s not found", object.GetName(), object.GetNamespace())
+			r.Log.Info(objNotFoundMsg)
+			err = nil
+		}
+		errMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s is not available", object.GetName(), object.GetNamespace())
+		return &ConfigCheckResult{
+			Ready: false, Valid: false, Message: errMsg,
+		}, err
+	}
+	return nil, nil
 }
 
 func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
@@ -60,6 +78,9 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create secret for syslog-ng configcheck")
 	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find secret for syslog-ng configcheck")
+	}
 
 	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
 	if err != nil {
@@ -69,6 +90,9 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	err = r.Client.Create(ctx, checkOutputSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create output secret for syslog-ng configcheck")
+	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find output secret for syslog-ng configcheck")
 	}
 
 	pod, err := r.newCheckPod(hashKey)
@@ -160,8 +184,33 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
+	var containerArgs, containerCommand []string
+
+	switch r.Logging.Spec.ConfigCheck.Strategy {
+	case v1beta1.ConfigCheckStrategyTimeout:
+		containerCommand = []string{
+			"timeout", cast.ToString(r.Logging.Spec.ConfigCheck.TimeoutSeconds),
+			"/usr/sbin/syslog-ng",
+		}
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-Fe",
+			"--no-caps",
+		}
+	case v1beta1.ConfigCheckStrategyDryRun:
+		fallthrough
+	default:
+		// use the default entrypoint
+		containerCommand = nil
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-s",
+			"--no-caps",
+		}
+	}
+
 	pod := &corev1.Pod{
-		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
+		ObjectMeta: r.configCheckPodObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccountName(),
@@ -188,11 +237,8 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Name:            "syslog-ng",
 					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 					ImagePullPolicy: corev1.PullIfNotPresent,
-					Args: []string{
-						"--cfgfile=" + configDir + "/" + configKey,
-						"-s",
-						"--no-caps",
-					},
+					Command:         containerCommand,
+					Args:            containerArgs,
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceMemory: resource.MustParse("400M"),
@@ -241,4 +287,14 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 
 func configCheckResourceName(hash string) string {
 	return fmt.Sprintf("syslog-ng-configcheck-%s", hash)
+}
+
+func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
+	objectMeta := r.SyslogNGObjectMeta(name, component)
+
+	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
+		objectMeta.Labels[key] = value
+	}
+
+	return objectMeta
 }
