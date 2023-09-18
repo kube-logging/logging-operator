@@ -104,7 +104,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
 	} else {
-		log.Info("WARNING PormetheusRule is not supported in the cluster")
+		log.Info("WARNING PrometheusRule is not supported in the cluster")
 	}
 
 	if err := logging.SetDefaults(); err != nil {
