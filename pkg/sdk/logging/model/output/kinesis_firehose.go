@@ -48,8 +48,8 @@ type _docKinesisFirehose interface{} //nolint:deadcode,unused
 type _metaKinesisFirehose interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"KinesisStream"
-// Send your logs to a Kinesis Stream
+// +docName:"KinesisFirehose"
+// Send your logs to a Kinesis Firehose
 type KinesisFirehoseOutputConfig struct {
 	// Name of the delivery stream to put data.
 	DeliveryStreamName string `json:"delivery_stream_name"`

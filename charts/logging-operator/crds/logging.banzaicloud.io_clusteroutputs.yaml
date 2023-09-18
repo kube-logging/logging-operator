@@ -3198,6 +3198,237 @@ spec:
                 - brokers
                 - format
                 type: object
+              kinesisFirehose:
+                properties:
+                  append_new_line:
+                    type: boolean
+                  assume_role_credentials:
+                    properties:
+                      duration_seconds:
+                        type: string
+                      external_id:
+                        type: string
+                      policy:
+                        type: string
+                      role_arn:
+                        type: string
+                      role_session_name:
+                        type: string
+                    required:
+                    - role_arn
+                    - role_session_name
+                    type: object
+                  aws_iam_retries:
+                    type: integer
+                  aws_key_id:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  aws_sec_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  aws_ses_token:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  batch_request_max_count:
+                    type: integer
+                  batch_request_max_size:
+                    type: integer
+                  buffer:
+                    properties:
+                      chunk_full_threshold:
+                        type: string
+                      chunk_limit_records:
+                        type: integer
+                      chunk_limit_size:
+                        type: string
+                      compress:
+                        type: string
+                      delayed_commit_timeout:
+                        type: string
+                      disable_chunk_backup:
+                        type: boolean
+                      disabled:
+                        type: boolean
+                      flush_at_shutdown:
+                        type: boolean
+                      flush_interval:
+                        type: string
+                      flush_mode:
+                        type: string
+                      flush_thread_burst_interval:
+                        type: string
+                      flush_thread_count:
+                        type: integer
+                      flush_thread_interval:
+                        type: string
+                      overflow_action:
+                        type: string
+                      path:
+                        type: string
+                      queue_limit_length:
+                        type: integer
+                      queued_chunks_limit_size:
+                        type: integer
+                      retry_exponential_backoff_base:
+                        type: string
+                      retry_forever:
+                        type: boolean
+                      retry_max_interval:
+                        type: string
+                      retry_max_times:
+                        type: integer
+                      retry_randomize:
+                        type: boolean
+                      retry_secondary_threshold:
+                        type: string
+                      retry_timeout:
+                        type: string
+                      retry_type:
+                        type: string
+                      retry_wait:
+                        type: string
+                      tags:
+                        type: string
+                      timekey:
+                        type: string
+                      timekey_use_utc:
+                        type: boolean
+                      timekey_wait:
+                        type: string
+                      timekey_zone:
+                        type: string
+                      total_limit_size:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  delivery_stream_name:
+                    type: string
+                  format:
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
+                  process_credentials:
+                    properties:
+                      process:
+                        type: string
+                    required:
+                    - process
+                    type: object
+                  region:
+                    type: string
+                  reset_backoff_if_success:
+                    type: boolean
+                  retries_on_batch_request:
+                    type: integer
+                  slow_flush_log_threshold:
+                    type: string
+                required:
+                - delivery_stream_name
+                type: object
               kinesisStream:
                 properties:
                   assume_role_credentials:
@@ -9282,6 +9513,237 @@ spec:
                 required:
                 - brokers
                 - format
+                type: object
+              kinesisFirehose:
+                properties:
+                  append_new_line:
+                    type: boolean
+                  assume_role_credentials:
+                    properties:
+                      duration_seconds:
+                        type: string
+                      external_id:
+                        type: string
+                      policy:
+                        type: string
+                      role_arn:
+                        type: string
+                      role_session_name:
+                        type: string
+                    required:
+                    - role_arn
+                    - role_session_name
+                    type: object
+                  aws_iam_retries:
+                    type: integer
+                  aws_key_id:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  aws_sec_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  aws_ses_token:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  batch_request_max_count:
+                    type: integer
+                  batch_request_max_size:
+                    type: integer
+                  buffer:
+                    properties:
+                      chunk_full_threshold:
+                        type: string
+                      chunk_limit_records:
+                        type: integer
+                      chunk_limit_size:
+                        type: string
+                      compress:
+                        type: string
+                      delayed_commit_timeout:
+                        type: string
+                      disable_chunk_backup:
+                        type: boolean
+                      disabled:
+                        type: boolean
+                      flush_at_shutdown:
+                        type: boolean
+                      flush_interval:
+                        type: string
+                      flush_mode:
+                        type: string
+                      flush_thread_burst_interval:
+                        type: string
+                      flush_thread_count:
+                        type: integer
+                      flush_thread_interval:
+                        type: string
+                      overflow_action:
+                        type: string
+                      path:
+                        type: string
+                      queue_limit_length:
+                        type: integer
+                      queued_chunks_limit_size:
+                        type: integer
+                      retry_exponential_backoff_base:
+                        type: string
+                      retry_forever:
+                        type: boolean
+                      retry_max_interval:
+                        type: string
+                      retry_max_times:
+                        type: integer
+                      retry_randomize:
+                        type: boolean
+                      retry_secondary_threshold:
+                        type: string
+                      retry_timeout:
+                        type: string
+                      retry_type:
+                        type: string
+                      retry_wait:
+                        type: string
+                      tags:
+                        type: string
+                      timekey:
+                        type: string
+                      timekey_use_utc:
+                        type: boolean
+                      timekey_wait:
+                        type: string
+                      timekey_zone:
+                        type: string
+                      total_limit_size:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  delivery_stream_name:
+                    type: string
+                  format:
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
+                  process_credentials:
+                    properties:
+                      process:
+                        type: string
+                    required:
+                    - process
+                    type: object
+                  region:
+                    type: string
+                  reset_backoff_if_success:
+                    type: boolean
+                  retries_on_batch_request:
+                    type: integer
+                  slow_flush_log_threshold:
+                    type: string
+                required:
+                - delivery_stream_name
                 type: object
               kinesisStream:
                 properties:
