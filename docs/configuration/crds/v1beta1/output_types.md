@@ -72,6 +72,10 @@ Default: -
 
 Default: -
 
+### kinesisFirehose (*output.KinesisFirehoseOutputConfig, optional) {#outputspec-kinesisfirehose}
+
+Default: -
+
 ### kinesisStream (*output.KinesisStreamOutputConfig, optional) {#outputspec-kinesisstream}
 
 Default: -

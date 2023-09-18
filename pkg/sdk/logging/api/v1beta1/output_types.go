@@ -46,6 +46,7 @@ type OutputSpec struct {
 	NullOutputConfig             *output.NullOutputConfig             `json:"nullout,omitempty"`
 	KafkaOutputConfig            *output.KafkaOutputConfig            `json:"kafka,omitempty"`
 	CloudWatchOutput             *output.CloudWatchOutput             `json:"cloudwatch,omitempty"`
+	KinesisFirehoseOutputConfig  *output.KinesisFirehoseOutputConfig  `json:"kinesisFirehose,omitempty"`
 	KinesisStreamOutputConfig    *output.KinesisStreamOutputConfig    `json:"kinesisStream,omitempty"`
 	LogDNAOutput                 *output.LogDNAOutput                 `json:"logdna,omitempty"`
 	NewRelicOutputConfig         *output.NewRelicOutputConfig         `json:"newrelic,omitempty"`

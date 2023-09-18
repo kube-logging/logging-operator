@@ -2184,6 +2184,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.CloudWatchOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.KinesisFirehoseOutputConfig != nil {
+		in, out := &in.KinesisFirehoseOutputConfig, &out.KinesisFirehoseOutputConfig
+		*out = new(output.KinesisFirehoseOutputConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.KinesisStreamOutputConfig != nil {
 		in, out := &in.KinesisStreamOutputConfig, &out.KinesisStreamOutputConfig
 		*out = new(output.KinesisStreamOutputConfig)
