@@ -69,6 +69,7 @@ For more information please click on the plugin name
 | **[MongoDB Destination](syslogng-outputs/mongodb/)** | syslogng-outputs | Sending messages into MongoDB Server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/) |
 | **[MQTT Destination](syslogng-outputs/mqtt/)** | syslogng-outputs | Sending messages over MQTT Protocol | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/45#TOPIC-1829079) |
 | **[Redis Server Destination](syslogng-outputs/redis/)** | syslogng-outputs | Sending messages from local network to the Redis server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/) |
+| **[S3 Destination](syslogng-outputs/s3/)** | syslogng-outputs | Sending messages from a local network to a S3 (compatible) server | Testing | [](FIXME) |
 | **[SplunkHEC](syslogng-outputs/splunk_hec/)** | syslogng-outputs | Sending messages over Splunk HEC | Testing | []() |
 | **[Sumo Logic HTTP](syslogng-outputs/sumologic_http/)** | syslogng-outputs | Storing messages in Sumo Logic over http | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55) |
 | **[Sumo Logic Syslog](syslogng-outputs/sumologic_syslog/)** | syslogng-outputs | Storing messages in Sumo Logic over syslog | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122) |

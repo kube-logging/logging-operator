@@ -1178,6 +1178,150 @@ spec:
                   workers:
                     type: integer
                 type: object
+              s3:
+                properties:
+                  access_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  bucket:
+                    type: string
+                  canned_acl:
+                    type: string
+                  chunk_size:
+                    type: integer
+                  compression:
+                    type: boolean
+                  compresslevel:
+                    type: integer
+                  flush_grace_period:
+                    type: integer
+                  log-fifo-size:
+                    type: integer
+                  max_object_size:
+                    type: integer
+                  max_pending_uploads:
+                    type: integer
+                  object_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  object_key_timestamp:
+                    properties:
+                      raw_string:
+                        type: string
+                    type: object
+                  persist_name:
+                    type: string
+                  region:
+                    type: string
+                  retries:
+                    type: integer
+                  secret_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
+                  storage_class:
+                    type: string
+                  template:
+                    properties:
+                      raw_string:
+                        type: string
+                    type: object
+                  throttle:
+                    type: integer
+                  upload_threads:
+                    type: integer
+                  url:
+                    type: string
+                type: object
               splunk_hec_event:
                 properties:
                   batch-bytes:
