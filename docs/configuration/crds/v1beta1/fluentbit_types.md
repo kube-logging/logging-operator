@@ -387,6 +387,41 @@ If storage.path is set, Fluent Bit will look for data chunks that were not deliv
 
 Default: 5M
 
+### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
+
+This option registers a new endpoint where internal metrics of the storage layer can be consumed.
+
+Default: Off
+
+
+## HealthCheck
+
+Health check subsection that is defined under the Service Section.
+
+### enabled (bool, optional) {#healthcheck-enabled}
+
+Enables Health check feature.
+
+Default: false
+
+### hcErrorsCount (int, optional) {#healthcheck-hcErrorsCount}
+
+The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.
+
+Default: 5
+
+### hcRetryFailureCount (int, optional) {#healthcheck-hcRetryFailureCount}
+
+The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.
+
+Default: 5
+
+### hcPeriod (int, optional) {#healthcheck-hcPeriod}
+
+The time period by second to count the error and retry failure data point.
+
+Default: 60
+
 
 ## InputTail
 

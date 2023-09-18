@@ -72,6 +72,7 @@ type fluentBitConfig struct {
 	SyslogNGOutput          *syslogNGOutputConfig
 	DefaultParsers          string
 	CustomParsers           string
+	HealthCheck             *v1beta1.HealthCheck
 }
 
 type fluentForwardOutputConfig struct {
@@ -194,6 +195,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Namespace:               r.Logging.Spec.ControlNamespace,
 		DisableKubernetesFilter: disableKubernetesFilter,
 		FilterModify:            r.fluentbitSpec.FilterModify,
+		HealthCheck:             r.fluentbitSpec.HealthCheck,
 	}
 
 	input.DefaultParsers = fmt.Sprintf("%s/%s", StockConfigPath, "parsers.conf")

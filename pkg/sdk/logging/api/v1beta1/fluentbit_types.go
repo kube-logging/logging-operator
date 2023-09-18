@@ -124,7 +124,8 @@ type FluentbitSpec struct {
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 	// Specify a custom parser file to load in addition to the default parsers file.
 	// It must be a valid key in the configmap specified by customConfig
-	CustomParsers string `json:"customParsers,omitempty"`
+	CustomParsers string       `json:"customParsers,omitempty"`
+	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent
@@ -193,6 +194,19 @@ type BufferStorage struct {
 	StorageChecksum string `json:"storage.checksum,omitempty"`
 	// If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records. (default:5M)
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
+	StorageMetrics         string `json:"storage.metrics,omitempty"`
+}
+
+// HealthCheck configuration
+type HealthCheck struct {
+	// Enables Health check feature. (default: false)
+	Enabled bool `json:"enabled,omitempty"`
+	// The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period. (default: 5)
+	HCErrorsCount int `json:"hcErrorsCount,omitempty"`
+	// The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period (default: 5)
+	HCRetryFailureCount int `json:"hcRetryFailureCount,omitempty"`
+	// The time period by second to count the error and retry failure data point (default: 60)
+	HCPeriod int `json:"hcPeriod,omitempty"`
 }
 
 // InputTail defines FluentbitAgent tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.

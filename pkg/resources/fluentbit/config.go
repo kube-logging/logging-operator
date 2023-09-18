@@ -42,6 +42,22 @@ var fluentBitConfigTemplate = `
     {{ $key }}  {{$value}}
     {{- end }}
     {{- end }}
+    {{- if .HealthCheck }}
+    {{- if .HealthCheck.Enabled }}
+    Health_Check On
+    {{- else }}
+    Health_Check Off
+    {{- end }}
+    {{- if.HealthCheck.HCErrorsCount }}
+    HC_Errors_Count {{ .HealthCheck.HCErrorsCount }}
+    {{- end }}
+    {{- if.HealthCheck.HCRetryFailureCount }}
+    HC_Retry_Failure_Count {{ .HealthCheck.HCRetryFailureCount }}
+    {{- end }}
+    {{- if.HealthCheck.HCPeriod }}
+    HC_Period {{ .HealthCheck.HCPeriod }}
+    {{- end }}
+    {{- end }}
 
 [INPUT]
     Name         tail

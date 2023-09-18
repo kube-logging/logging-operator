@@ -18,10 +18,17 @@ spec:
     metrics: 
       prometheusRules: true
       serviceMonitor: true
-#  fluentbit:
-#    metrics: 
-#      prometheusRules: true
-#      serviceMonitor: true
+  fluentbit:
+    metrics: 
+      prometheusRules: true
+      serviceMonitor: true
+    bufferStorage:
+      storage.metrics: "On"
+    healthCheck:
+      enabled: true
+      hcErrorsCount: 15
+      hcPeriod: 60
+      hcRetryFailureCount: 5
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: FluentbitAgent

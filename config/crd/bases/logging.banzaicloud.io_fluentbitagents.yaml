@@ -396,6 +396,8 @@ spec:
                     type: string
                   storage.checksum:
                     type: string
+                  storage.metrics:
+                    type: string
                   storage.path:
                     type: string
                   storage.sync:
@@ -1134,6 +1136,17 @@ spec:
               grace:
                 format: int32
                 type: integer
+              healthCheck:
+                properties:
+                  enabled:
+                    type: boolean
+                  hcErrorsCount:
+                    type: integer
+                  hcPeriod:
+                    type: integer
+                  hcRetryFailureCount:
+                    type: integer
+                type: object
               image:
                 properties:
                   imagePullSecrets:
