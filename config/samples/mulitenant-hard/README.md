@@ -6,7 +6,7 @@ minikube start --nodes=2
 kubectl label node minikube tenant=tenant-a
 kubectl label node minikube-m02 tenant=tenant-b
 
-make generate manifests install
+make codegen manifests install
 kubectl apply -f config/samples/multitenant-hard/logging
 
 helm upgrade --install --namespace a --create-namespace --set "nodeSelector.tenant=tenant-a" log-generator oci://ghcr.io/kube-logging/helm-charts/log-generator
