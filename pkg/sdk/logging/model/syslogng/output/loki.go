@@ -22,19 +22,19 @@ import (
 // +weight:"200"
 type _hugoLoki interface{} //nolint:deadcode,unused
 
-// +docName:"Sending messages to Loki over HTTP"
+// +docName:"Sending messages to Loki over gRPC"
 // More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
 type _docLoki interface{} //nolint:deadcode,unused
 
 // +name:"Loki"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
-// +description:"Sending messages to Loki over HTTP"
+// +description:"Sending messages to Loki over gRPC"
 // +status:"Testing"
 type _metaLoki interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type LokiOutput struct {
-	// Label mapping from kubernetes labels to Loki labels.
+	// Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: {"app" : "$PROGRAM"}
 	Labels filter.ArrowMap `json:"labels,omitempty"`
 	// Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: http://127.0.0.1:8000
 	URL string `json:"url,omitempty"`

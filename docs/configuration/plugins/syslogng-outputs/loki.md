@@ -4,7 +4,7 @@ weight: 200
 generated_file: true
 ---
 
-# Sending messages to Loki over HTTP
+# Sending messages to Loki over gRPC
 ## Overview
  More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
 
@@ -13,7 +13,7 @@ generated_file: true
 
 ### labels (filter.ArrowMap, optional) {#lokioutput-labels}
 
-Label mapping from kubernetes labels to Loki labels. 
+Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: {"app" : "$PROGRAM"} 
 
 Default: -
 
