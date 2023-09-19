@@ -268,6 +268,10 @@ Specify a custom parser file to load in addition to the default parsers file. It
 
 Default: -
 
+### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
+
+Default: -
+
 
 ## FluentbitStatus
 
@@ -393,36 +397,36 @@ Default: 5M
 
 ### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
 
-This option registers a new endpoint where internal metrics of the storage layer can be consumed.
+If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.  
 
 Default: Off
 
 
 ## HealthCheck
 
-Health check subsection that is defined under the Service Section.
+HealthCheck configuration
 
 ### enabled (bool, optional) {#healthcheck-enabled}
 
-Enables Health check feature.
+Enables Health check feature.  
 
 Default: false
 
-### hcErrorsCount (int, optional) {#healthcheck-hcErrorsCount}
+### hcErrorsCount (int, optional) {#healthcheck-hcerrorscount}
 
-The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.
-
-Default: 5
-
-### hcRetryFailureCount (int, optional) {#healthcheck-hcRetryFailureCount}
-
-The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.
+The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.  
 
 Default: 5
 
-### hcPeriod (int, optional) {#healthcheck-hcPeriod}
+### hcRetryFailureCount (int, optional) {#healthcheck-hcretryfailurecount}
 
-The time period by second to count the error and retry failure data point.
+The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period  
+
+Default: 5
+
+### hcPeriod (int, optional) {#healthcheck-hcperiod}
+
+The time period by second to count the error and retry failure data point  
 
 Default: 60
 
