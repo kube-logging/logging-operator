@@ -36,37 +36,27 @@ type Tenant struct {
 	Namespaces   []string
 }
 
-func FindTenants(ctx context.Context, targets []v1beta1.Target, currentLogging string, reader client.Reader, logger logr.Logger) ([]Tenant, error) {
+func FindTenants(ctx context.Context, targets []metav1.LabelSelector, currentLogging string, reader client.Reader, logger logr.Logger) ([]Tenant, error) {
 	var tenantCandidates []Tenant
 
 	for _, t := range targets {
-		if t.LoggingName != "" {
-			l := &v1beta1.Logging{}
-			if err := reader.Get(ctx, client.ObjectKey{Name: t.LoggingName}, l); err != nil {
-				return nil, errors.WrapIff(err, "logrouting target %s", t.LoggingName)
-			}
-			tenantCandidates = append(tenantCandidates, Tenant{
-				Logging: l,
-			})
+		t := t
+		selector, err := metav1.LabelSelectorAsSelector(&t)
+		if err != nil {
+			return nil, errors.WrapIf(err, "logrouting targetSelector")
 		}
-		if t.LoggingSelector != nil {
-			selector, err := metav1.LabelSelectorAsSelector(t.LoggingSelector)
-			if err != nil {
-				return nil, errors.WrapIf(err, "logrouting targetSelector")
-			}
-			listOptions := &client.ListOptions{
-				LabelSelector: selector,
-			}
-			loggingList := &v1beta1.LoggingList{}
-			if err := reader.List(ctx, loggingList, listOptions); err != nil {
-				return nil, errors.WrapIf(err, "listing loggings for targetSelector")
-			}
-			for _, l := range loggingList.Items {
-				l := l
-				tenantCandidates = append(tenantCandidates, Tenant{
-					Logging: &l,
-				})
-			}
+		listOptions := &client.ListOptions{
+			LabelSelector: selector,
+		}
+		loggingList := &v1beta1.LoggingList{}
+		if err := reader.List(ctx, loggingList, listOptions); err != nil {
+			return nil, errors.WrapIf(err, "listing loggings for targetSelector")
+		}
+		for _, l := range loggingList.Items {
+			l := l
+			tenantCandidates = append(tenantCandidates, Tenant{
+				Logging: &l,
+			})
 		}
 	}
 
@@ -74,16 +64,7 @@ func FindTenants(ctx context.Context, targets []v1beta1.Target, currentLogging s
 	for _, t := range tenantCandidates {
 		targetNamespaces, allNamespaces, err := model.UniqueWatchNamespaces(ctx, reader, t.Logging)
 		if err != nil {
-			logger.Error(err, "getting target namespaces for logging %s", t.Logging.Name)
-			continue
-		}
-		if len(targetNamespaces) == 0 {
-			logger.Info(fmt.Sprintf("WARNING unable to use logging %s as a valid target as no watch namespaces have been found", t.Logging.Name))
-			continue
-		}
-		if allNamespaces && t.Logging.Name != currentLogging {
-			logger.Info(fmt.Sprintf("WARNING refusing to send logs from all namespaces to logging %s", t.Logging.Name))
-			continue
+			return nil, err
 		}
 		validTenants = append(validTenants, Tenant{
 			Logging:      t.Logging,
@@ -97,6 +78,9 @@ func FindTenants(ctx context.Context, targets []v1beta1.Target, currentLogging s
 func (r *Reconciler) configureOutputsForTenants(tenants []Tenant, input *fluentBitConfig) error {
 	var errs error
 	for _, t := range tenants {
+		if len(t.Namespaces) == 0 {
+			errs = errors.Append(errs, errors.Errorf("logging %s does not have valid watchNamespaces defined", t.Logging.Name))
+		}
 		namespaceRegex := fmt.Sprintf("^[^_]+_(%s)_", strings.Join(t.Namespaces, "|"))
 		if t.Logging.Spec.FluentdSpec != nil {
 			if input.FluentForwardOutput == nil {

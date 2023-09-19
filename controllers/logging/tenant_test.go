@@ -33,25 +33,32 @@ func TestFindTenants(t *testing.T) {
 
 	testData := []struct {
 		name     string
-		targets  []v1beta1.Target
+		targets  []v1.LabelSelector
 		loggings []*v1beta1.Logging
 		wantErr  bool
 		satisfy  func([]fluentbit.Tenant) bool
 	}{
 		{
 			name: "static logging target with a static watch namespace list",
-			targets: []v1beta1.Target{
+			targets: []v1.LabelSelector{
 				{
-					LoggingName: "a",
+					MatchLabels: map[string]string{
+						"name": "a",
+					},
 				},
 				{
-					LoggingName: "b",
+					MatchLabels: map[string]string{
+						"name": "b",
+					},
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
 					ObjectMeta: v1.ObjectMeta{
 						Name: "a",
+						Labels: map[string]string{
+							"name": "a",
+						},
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces: []string{"asd"},
@@ -60,6 +67,9 @@ func TestFindTenants(t *testing.T) {
 				{
 					ObjectMeta: v1.ObjectMeta{
 						Name: "b",
+						Labels: map[string]string{
+							"name": "b",
+						},
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces: []string{"bsd"},
@@ -78,15 +88,20 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "static logging target with an empty watch namespace will be omitted",
-			targets: []v1beta1.Target{
+			targets: []v1.LabelSelector{
 				{
-					LoggingName: "a",
+					MatchLabels: map[string]string{
+						"name": currentLoggingName,
+					},
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
 					ObjectMeta: v1.ObjectMeta{
 						Name: "a",
+						Labels: map[string]string{
+							"name": "a",
+						},
 					},
 				},
 			},
@@ -96,14 +111,12 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "dynamic logging targets with a static watch namespace list",
-			targets: []v1beta1.Target{
+			targets: []v1.LabelSelector{
 				{
-					LoggingSelector: &v1.LabelSelector{
-						MatchExpressions: []v1.LabelSelectorRequirement{
-							{
-								Key:      "tenant",
-								Operator: v1.LabelSelectorOpExists,
-							},
+					MatchExpressions: []v1.LabelSelectorRequirement{
+						{
+							Key:      "tenant",
+							Operator: v1.LabelSelectorOpExists,
 						},
 					},
 				},
@@ -144,15 +157,20 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "allNamespace allowed for self referencing target",
-			targets: []v1beta1.Target{
+			targets: []v1.LabelSelector{
 				{
-					LoggingName: currentLoggingName,
+					MatchLabels: map[string]string{
+						"name": currentLoggingName,
+					},
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
 					ObjectMeta: v1.ObjectMeta{
 						Name: currentLoggingName,
+						Labels: map[string]string{
+							"name": currentLoggingName,
+						},
 					},
 				},
 			},

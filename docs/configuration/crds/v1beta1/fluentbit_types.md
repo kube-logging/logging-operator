@@ -281,26 +281,11 @@ Default: -
 
 ## LogRouting
 
-### enabled (bool, optional) {#logrouting-enabled}
+LogRouting defines alternative log destinations
 
-Default: -
+### targets ([]metav1.LabelSelector, optional) {#logrouting-targets}
 
-### targets ([]Target, optional) {#logrouting-targets}
-
-Default: -
-
-
-## Target
-
-### logging (string, required) {#target-logging}
-
-Name of the remote logging resource to use as an output The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields. An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to. 
-
-Default: -
-
-### targetSelector (*metav1.LabelSelector, optional) {#target-targetselector}
-
-LabelSelector to identify the remote logging resource to use as an output The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields. An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to. 
+Targets define the selectors to identify Logging resources where logs should be sent Logs are filtered based on the target Logging's watchNamespaces and watchNamespaceSelector 
 
 Default: -
 

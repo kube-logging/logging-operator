@@ -2334,38 +2334,29 @@ spec:
                     type: string
                   logRouting:
                     properties:
-                      enabled:
-                        type: boolean
                       targets:
                         items:
                           properties:
-                            logging:
-                              type: string
-                            targetSelector:
-                              properties:
-                                matchExpressions:
-                                  items:
-                                    properties:
-                                      key:
-                                        type: string
-                                      operator:
-                                        type: string
-                                      values:
-                                        items:
-                                          type: string
-                                        type: array
-                                    required:
-                                    - key
-                                    - operator
-                                    type: object
-                                  type: array
-                                matchLabels:
-                                  additionalProperties:
+                            matchExpressions:
+                              items:
+                                properties:
+                                  key:
                                     type: string
-                                  type: object
+                                  operator:
+                                    type: string
+                                  values:
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
                               type: object
-                          required:
-                          - logging
                           type: object
                         type: array
                     type: object

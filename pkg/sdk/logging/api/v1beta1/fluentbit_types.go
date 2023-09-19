@@ -132,21 +132,11 @@ type FluentbitSpec struct {
 	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
 }
 
+// LogRouting defines alternative log destinations
 type LogRouting struct {
-	Enabled bool     `json:"enabled,omitempty"`
-	Targets []Target `json:"targets,omitempty"`
-}
-
-type Target struct {
-	// Name of the remote logging resource to use as an output
-	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields.
-	// An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to.
-	LoggingName string `json:"logging"`
-
-	// LabelSelector to identify the remote logging resource to use as an output
-	// The namespaces will be selected based on the remote logging's `watchNamespaces` and `watchNamespaceSelector` fields.
-	// An empty set means all namespaces, but that is only allowed if the logging target matches the actual logging this agent belongs to.
-	LoggingSelector *metav1.LabelSelector `json:"targetSelector,omitempty"`
+	// Targets define the selectors to identify Logging resources where logs should be sent
+	// Logs are filtered based on the target Logging's watchNamespaces and watchNamespaceSelector
+	Targets []metav1.LabelSelector `json:"targets,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

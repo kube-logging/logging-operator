@@ -206,13 +206,14 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef: "infra",
 			LogRouting: v1beta1.LogRouting{
-				Enabled: true,
-				Targets: []v1beta1.Target{
+				Targets: []metav1.LabelSelector{
 					{
-						LoggingName: "infra",
-					},
-					{
-						LoggingName: "tenant",
+						MatchExpressions: []metav1.LabelSelectorRequirement{
+							{
+								Key:      "tenant",
+								Operator: metav1.LabelSelectorOpExists,
+							},
+						},
 					},
 				},
 			},
@@ -223,6 +224,9 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 	logging := v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "infra",
+			Labels: map[string]string{
+				"tenant": "infra",
+			},
 		},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       "infra",
@@ -280,6 +284,9 @@ func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant,
 	logging := v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "tenant",
+			Labels: map[string]string{
+				"tenant": "tenant",
+			},
 		},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       "tenant",

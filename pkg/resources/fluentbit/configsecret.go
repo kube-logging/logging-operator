@@ -362,7 +362,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	// TODO well defined and articulated failure scenarios
-	if r.fluentbitSpec.LogRouting.Enabled {
+	if len(r.fluentbitSpec.LogRouting.Targets) > 0 {
 		tenants, err := FindTenants(ctx, r.fluentbitSpec.LogRouting.Targets, r.Logging.Name, r.resourceReconciler.Client, r.logger)
 		if err != nil {
 			return nil, nil, errors.WrapIf(err, "collecting tenants to identify targets")
