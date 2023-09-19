@@ -54,7 +54,7 @@ type LokiOutput struct {
 	PersistName string `json:"persist_name,omitempty"`
 	// The number of messages that the output queue can store.
 	LogFIFOSize int `json:"log-fifo-size,omitempty"`
-	// The timestamp that will be applied to the outgoing messages (default: current). Loki does not accept events, in which the timestamp is not monotonically increasing.
+	// The timestamp that will be applied to the outgoing messages (possible values: current|received|msg default: current). Loki does not accept events, in which the timestamp is not monotonically increasing.
 	// +kubebuilder:default=current
 	// +kubebuilder:validation:Enum=current;received;msg
 	Timestamp string `json:"timestamp,omitempty"`
