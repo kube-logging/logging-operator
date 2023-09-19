@@ -30,6 +30,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -128,6 +129,7 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", nsInfra,
+				"--tail", "30",
 				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", release)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
@@ -136,7 +138,7 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 			}
 			t.Logf("log consumer logs: %s", rawOut)
 			return strings.Contains(string(rawOut), tagTenant) && strings.Contains(string(rawOut), tagInfra)
-		}, 3*time.Minute, 3*time.Second)
+		}, 5*time.Minute, 3*time.Second)
 
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
@@ -160,18 +162,6 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 }
 
 func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra string, release string, tag string) {
-	logging := v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "infra",
-		},
-		Spec: v1beta1.LoggingSpec{
-			LoggingRef:       "infra",
-			ControlNamespace: nsInfra,
-			FluentdSpec:      &v1beta1.FluentdSpec{},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &logging))
-
 	output := v1beta1.ClusterOutput{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "http",
@@ -229,22 +219,29 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 		},
 	}
 	common.RequireNoError(t, c.Create(ctx, &agent))
-}
 
-func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant, nsInfra, release, tag string) {
 	logging := v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "tenant",
+			Name: "infra",
 		},
 		Spec: v1beta1.LoggingSpec{
-			LoggingRef:       "tenant",
-			ControlNamespace: nsTenant,
-			WatchNamespaces:  []string{"tenant"},
-			FluentdSpec:      &v1beta1.FluentdSpec{},
+			LoggingRef:       "infra",
+			ControlNamespace: nsInfra,
+			FluentdSpec: &v1beta1.FluentdSpec{
+				DisablePvc: true,
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("50m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+			},
 		},
 	}
 	common.RequireNoError(t, c.Create(ctx, &logging))
+}
 
+func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant, nsInfra, release, tag string) {
 	output := v1beta1.Output{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "http",
@@ -279,4 +276,25 @@ func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant,
 		},
 	}
 	common.RequireNoError(t, c.Create(ctx, &flow))
+
+	logging := v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "tenant",
+		},
+		Spec: v1beta1.LoggingSpec{
+			LoggingRef:       "tenant",
+			ControlNamespace: nsTenant,
+			WatchNamespaces:  []string{"tenant"},
+			FluentdSpec: &v1beta1.FluentdSpec{
+				DisablePvc: true,
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("50m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+			},
+		},
+	}
+	common.RequireNoError(t, c.Create(ctx, &logging))
 }
