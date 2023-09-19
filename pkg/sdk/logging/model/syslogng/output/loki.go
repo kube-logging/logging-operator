@@ -42,8 +42,11 @@ type LokiOutput struct {
 	TimeReopen int `json:"time_reopen,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
-	// Batching parameters
-	Batch `json:",inline"`
+	// Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency.
+	// For example, if you set batch-lines() to 100, syslog-ng OSE waits for 100 messages.
+	BatchLines int `json:"batch-lines,omitempty"`
+	// Description: Specifies the time syslog-ng OSE waits for lines to accumulate in the output buffer. The syslog-ng OSE application sends batches to the destinations evenly. The timer starts when the first message arrives to the buffer, so if only few messages arrive, syslog-ng OSE sends messages to the destination at most once every batch-timeout() milliseconds.
+	BatchTimeout int `json:"batch-timeout,omitempty"`
 	// The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches retries, then drops the message.
 	Retries int `json:"retries,omitempty"`
 	// Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.

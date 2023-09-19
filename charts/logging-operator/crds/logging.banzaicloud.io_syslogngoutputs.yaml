@@ -928,8 +928,6 @@ spec:
                 type: object
               loki:
                 properties:
-                  batch-bytes:
-                    type: integer
                   batch-lines:
                     type: integer
                   batch-timeout:

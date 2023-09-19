@@ -39,19 +39,16 @@ func TestLokiOutputTable(t *testing.T) {
 				},
 				Spec: v1beta1.SyslogNGOutputSpec{
 					Loki: &output.LokiOutput{
-						URL: "test.local",
-						Batch: output.Batch{
-							BatchLines:   2000,
-							BatchBytes:   1500,
-							BatchTimeout: 10,
-						},
-						Workers:     3,
-						LogFIFOSize: 1000,
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
 					},
 				},
 			},
 			config: `destination "output_default_test-loki-out" {
-	loki(url("test.local") batch-lines(2000) batch-bytes(1500) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
+	loki(url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
 };
 `,
 		},
@@ -64,14 +61,11 @@ func TestLokiOutputTable(t *testing.T) {
 				},
 				Spec: v1beta1.SyslogNGOutputSpec{
 					Loki: &output.LokiOutput{
-						URL: "test.local",
-						Batch: output.Batch{
-							BatchLines:   2000,
-							BatchBytes:   1500,
-							BatchTimeout: 10,
-						},
-						Workers:     3,
-						LogFIFOSize: 1000,
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
 						Labels: filter.ArrowMap{
 							"app":  "$PROGRAM",
 							"host": "$HOST",
@@ -83,7 +77,7 @@ func TestLokiOutputTable(t *testing.T) {
 	loki(labels(
 		"app" => "$PROGRAM"
 		"host" => "$HOST"
-	) url("test.local") batch-lines(2000) batch-bytes(1500) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
+	) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
 };
 `,
 		},
@@ -96,20 +90,17 @@ func TestLokiOutputTable(t *testing.T) {
 				},
 				Spec: v1beta1.SyslogNGOutputSpec{
 					Loki: &output.LokiOutput{
-						URL: "test.local",
-						Batch: output.Batch{
-							BatchLines:   2000,
-							BatchBytes:   1500,
-							BatchTimeout: 10,
-						},
-						Workers:     3,
-						LogFIFOSize: 1000,
-						Timestamp:   "msg",
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
+						Timestamp:    "msg",
 					},
 				},
 			},
 			config: `destination "output_default_test-loki-out" {
-	loki(url("test.local") batch-lines(2000) batch-bytes(1500) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) timestamp("msg"));
+	loki(url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) timestamp("msg"));
 };
 `,
 		},
@@ -122,20 +113,17 @@ func TestLokiOutputTable(t *testing.T) {
 				},
 				Spec: v1beta1.SyslogNGOutputSpec{
 					Loki: &output.LokiOutput{
-						URL: "test.local",
-						Batch: output.Batch{
-							BatchLines:   2000,
-							BatchBytes:   1500,
-							BatchTimeout: 10,
-						},
-						Workers:     3,
-						LogFIFOSize: 1000,
-						Template:    "$ISODATE $HOST $MSGHDR$MSG",
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
+						Template:     "$ISODATE $HOST $MSGHDR$MSG",
 					},
 				},
 			},
 			config: `destination "output_default_test-loki-out" {
-	loki(url("test.local") batch-lines(2000) batch-bytes(1500) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) template("$ISODATE $HOST $MSGHDR$MSG"));
+	loki(url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) template("$ISODATE $HOST $MSGHDR$MSG"));
 };
 `,
 		},

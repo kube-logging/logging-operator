@@ -35,9 +35,15 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default:  false
 
-###  (Batch, required) {#lokioutput-}
+### batch-lines (int, optional) {#lokioutput-batch-lines}
 
-Batching parameters 
+Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set batch-lines() to 100, syslog-ng OSE waits for 100 messages. 
+
+Default: -
+
+### batch-timeout (int, optional) {#lokioutput-batch-timeout}
+
+Description: Specifies the time syslog-ng OSE waits for lines to accumulate in the output buffer. The syslog-ng OSE application sends batches to the destinations evenly. The timer starts when the first message arrives to the buffer, so if only few messages arrive, syslog-ng OSE sends messages to the destination at most once every batch-timeout() milliseconds. 
 
 Default: -
 
@@ -67,9 +73,9 @@ Default: -
 
 ### timestamp (string, optional) {#lokioutput-timestamp}
 
-The timestamp that will be applied to the outgoing messages . Loki does not accept events, in which the timestamp is not monotonically increasing. 
+The timestamp that will be applied to the outgoing messages (possible values: current|received|msg default: current). Loki does not accept events, in which the timestamp is not monotonically increasing. 
 
-Default:  current
+Default: -
 
 ### template (string, optional) {#lokioutput-template}
 
