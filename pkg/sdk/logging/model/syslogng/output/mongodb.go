@@ -28,17 +28,13 @@ type _hugoMongoDB interface{} //nolint:deadcode,unused
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: SyslogNGOutput
 // metadata:
-//
-//	name: mongodb
-//	namespace: default
-//
+//   name: mongodb
+//   namespace: default
 // spec:
-//
-//	mongodb:
-//	  collection: syslog
-//	  uri: mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000
-//	  value_pairs: scope("selected-macros" "nv-pairs")
-//
+//   mongodb:
+//     collection: syslog
+//     uri: mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000
+//     value_pairs: scope("selected-macros" "nv-pairs")
 // {{</ highlight >}}
 type _docMongoDB interface{} //nolint:deadcode,unused
 
