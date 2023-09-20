@@ -21,26 +21,25 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 type _hugoRedis interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to the Redis server"
-//
-// ## Prerequisites
-//
-// ## Example
-//
-// {{< highlight yaml >}}
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: SyslogNGOutput
-// metadata:
-//	name: redis
-//	namespace: default
-// spec:
-//	redis:
-//	  host: 127.0.0.1
-//	  port: 6379
-//	  retries: 3
-//	  throttle: 0
-//	  time-reopen: 60
-//	  workers: 1
-// {{</ highlight >}}
+/*
+## Example
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: redis
+  namespace: default
+spec:
+  redis:
+    host: 127.0.0.1
+	port: 6379
+	retries: 3
+	throttle: 0
+	time-reopen: 60
+	workers: 1
+{{</ highlight >}}
+*/
 type _docRedis interface{} //nolint:deadcode,unused
 
 // +name:"Redis Server Destination"
