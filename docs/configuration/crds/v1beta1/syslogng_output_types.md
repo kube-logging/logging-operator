@@ -60,6 +60,10 @@ Default: -
 
 Default: -
 
+### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
+
+Default: -
+
 
 ## SyslogNGOutput
 
