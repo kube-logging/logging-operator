@@ -30,12 +30,9 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 // apiVersion: logging.banzaicloud.io/v1beta1
 // kind: SyslogNGOutput
 // metadata:
-//
 //	name: redis
 //	namespace: default
-//
 // spec:
-//
 //	redis:
 //	  host: 127.0.0.1
 //	  port: 6379
@@ -43,7 +40,6 @@ type _hugoRedis interface{} //nolint:deadcode,unused
 //	  throttle: 0
 //	  time-reopen: 60
 //	  workers: 1
-//
 // {{</ highlight >}}
 type _docRedis interface{} //nolint:deadcode,unused
 
