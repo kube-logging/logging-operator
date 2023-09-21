@@ -158,7 +158,7 @@ const (
 	DefaultFluentdImageTag                      = "v1.15-ruby3"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/kube-logging/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.2.0"
+	DefaultFluentdDrainWatchImageTag            = "v0.2.1"
 	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag            = "3.2"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
