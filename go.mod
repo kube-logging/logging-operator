@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/cisco-open/operator-tools v0.30.1-0.20230920173043-e5436b622336
+	github.com/cisco-open/operator-tools v0.31.0
 	github.com/go-logr/logr v1.2.4
 	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0

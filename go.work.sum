@@ -1804,6 +1804,7 @@ go.etcd.io/etcd/server/v3 v3.5.5/go.mod h1:rZ95vDw/jrvsbj9XpTqPrTAB9/kzchVdhRiry
 go.etcd.io/etcd/server/v3 v3.5.7 h1:BTBD8IJUV7YFgsczZMHhMTS67XuA4KpRquL0MFOJGRk=
 go.etcd.io/etcd/server/v3 v3.5.7/go.mod h1:gxBgT84issUVBRpZ3XkW1T55NjOb4vZZRI4wVvNhf4A=
 go.etcd.io/etcd/server/v3 v3.5.9/go.mod h1:GgI1fQClQCFIzuVjlvdbMxNbnISt90gdfYyqiAIt65g=
+go.etcd.io/gofail v0.1.0 h1:XItAMIhOojXFQMgrxjnd2EIIHun/d5qL0Pf7FzVTkFg=
 go.etcd.io/gofail v0.1.0/go.mod h1:VZBCXYGZhHAinaBiiqYvuDynvahNsAyLFwB3kEHKz1M=
 go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1 h1:A/5uWzF44DlIgdm/PQFwfMkW0JX+cIcQi/SwLAmZP5M=
 go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1/go.mod h1:SNgMg+EgDFwmvSmLRTNKC5fegJjB7v23qTQ0XLGUNHk=
