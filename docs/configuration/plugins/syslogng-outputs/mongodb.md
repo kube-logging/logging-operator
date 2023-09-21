@@ -7,26 +7,21 @@ generated_file: true
 # Sending messages from a local network to an MongoDB database
 ## Overview
 
- ## Prerequisites
+## Example
 
- ## Example
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: mongodb
+  namespace: default
+spec:
+  mongodb:
+    collection: syslog
+    uri: mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000
+    value_pairs: scope("selected-macros" "nv-pairs")
+{{</ highlight >}}
 
- {{< highlight yaml >}}
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: SyslogNGOutput
- metadata:
-
-	name: mongodb
-	namespace: default
-
- spec:
-
-	mongodb:
-	  collection: syslog
-	  uri: mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000
-	  value_pairs: scope("selected-macros" "nv-pairs")
-
- {{</ highlight >}}
 
 ## Configuration
 ## MongoDB
