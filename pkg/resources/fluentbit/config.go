@@ -43,11 +43,7 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
     {{- if .HealthCheck }}
-    {{- if .HealthCheck.Enabled }}
     Health_Check On
-    {{- else }}
-    Health_Check Off
-    {{- end }}
     {{- if.HealthCheck.HCErrorsCount }}
     HC_Errors_Count {{ .HealthCheck.HCErrorsCount }}
     {{- end }}

@@ -19,13 +19,12 @@ spec:
       prometheusRules: true
       serviceMonitor: true
   fluentbit:
-    metrics: 
+    metrics:
       prometheusRules: true
       serviceMonitor: true
     bufferStorage:
       storage.metrics: "On"
     healthCheck:
-      enabled: true
       hcErrorsCount: 15
       hcPeriod: 60
       hcRetryFailureCount: 5

@@ -201,8 +201,6 @@ type BufferStorage struct {
 
 // HealthCheck configuration
 type HealthCheck struct {
-	// Enables Health check feature. (default:false)
-	Enabled bool `json:"enabled,omitempty"`
 	// The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period. (default:5)
 	HCErrorsCount int `json:"hcErrorsCount,omitempty"`
 	// The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period (default:5)

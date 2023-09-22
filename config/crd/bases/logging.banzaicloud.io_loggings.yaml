@@ -2158,8 +2158,6 @@ spec:
                     type: integer
                   healthCheck:
                     properties:
-                      enabled:
-                        type: boolean
                       hcErrorsCount:
                         type: integer
                       hcPeriod:

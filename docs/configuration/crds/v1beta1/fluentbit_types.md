@@ -406,12 +406,6 @@ Default: Off
 
 HealthCheck configuration
 
-### enabled (bool, optional) {#healthcheck-enabled}
-
-Enables Health check feature.  
-
-Default: false
-
 ### hcErrorsCount (int, optional) {#healthcheck-hcerrorscount}
 
 The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.  
