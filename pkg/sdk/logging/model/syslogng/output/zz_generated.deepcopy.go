@@ -270,6 +270,11 @@ func (in *MongoDB) DeepCopyInto(out *MongoDB) {
 		*out = new(DiskBuffer)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Uri != nil {
+		in, out := &in.Uri, &out.Uri
+		*out = new(secret.Secret)
+		(*in).DeepCopyInto(*out)
+	}
 	out.ValuePairs = in.ValuePairs
 	out.Batch = in.Batch
 	in.Bulk.DeepCopyInto(&out.Bulk)

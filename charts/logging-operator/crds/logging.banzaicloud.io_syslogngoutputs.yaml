@@ -998,8 +998,6 @@ spec:
                     type: boolean
                   collection:
                     type: string
-                  compaction:
-                    type: boolean
                   dir:
                     type: string
                   disk_buffer:
@@ -1035,7 +1033,38 @@ spec:
                   time_reopen:
                     type: integer
                   uri:
-                    type: string
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    type: object
                   value_pairs:
                     properties:
                       exclude:
@@ -1066,7 +1095,6 @@ spec:
                     type: object
                 required:
                 - collection
-                - compaction
                 type: object
               mqtt:
                 properties:

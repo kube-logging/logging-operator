@@ -32,12 +32,6 @@ The name of the MongoDB collection where the log messages are stored (collection
 
 Default: -
 
-### compaction (bool, required) {#mongodb-compaction}
-
-If set to yes, syslog-ng OSE cannot lose logs in case of reload/restart, unreachable destination or syslog-ng OSE crash. This solution provides a slower, but reliable disk-buffer option. 
-
-Default: -
-
 ### dir (string, optional) {#mongodb-dir}
 
 Defines the folder where the disk-buffer files are stored. 
@@ -50,11 +44,11 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default:  false
 
-### uri (string, optional) {#mongodb-uri}
+### uri (*secret.Secret, optional) {#mongodb-uri}
 
-Defines the folder where the disk-buffer files are stored.  
+Connection string used for authentication. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri) 
 
-Default:  "mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000"
+Default: -
 
 ### value_pairs (ValuePairs, optional) {#mongodb-value_pairs}
 
