@@ -7,29 +7,24 @@ generated_file: true
 # Sending messages from a local network to the Redis server
 ## Overview
 
- ## Prerequisites
+## Example
 
- ## Example
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: redis
+  namespace: default
+spec:
+  redis:
+    host: 127.0.0.1
+	port: 6379
+	retries: 3
+	throttle: 0
+	time-reopen: 60
+	workers: 1
+{{</ highlight >}}
 
- {{< highlight yaml >}}
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: SyslogNGOutput
- metadata:
-
-	name: redis
-	namespace: default
-
- spec:
-
-	redis:
-	  host: 127.0.0.1
-	  port: 6379
-	  retries: 3
-	  throttle: 0
-	  time-reopen: 60
-	  workers: 1
-
- {{</ highlight >}}
 
 ## Configuration
 ## RedisOutput

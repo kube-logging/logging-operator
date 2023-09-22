@@ -65,6 +65,7 @@ For more information please click on the plugin name
 | **[HTTP](syslogng-outputs/http/)** | syslogng-outputs | Sending messages over HTTP | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058) |
 | **[Loggly](syslogng-outputs/loggly/)** | syslogng-outputs | Send your logs to loggly | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072) |
 | **[Falcon LogScale](syslogng-outputs/logscale/)** | syslogng-outputs | Storing messages in Falcon's LogScale over http | Testing | [](https://library.humio.com/falcon-logscale/api-ingest.html#api-ingest-structured-data) |
+| **[Loki](syslogng-outputs/loki/)** | syslogng-outputs | Sending messages to Loki over gRPC | Testing | []() |
 | **[MongoDB Destination](syslogng-outputs/mongodb/)** | syslogng-outputs | Sending messages into MongoDB Server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/) |
 | **[MQTT Destination](syslogng-outputs/mqtt/)** | syslogng-outputs | Sending messages over MQTT Protocol | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/45#TOPIC-1829079) |
 | **[Redis Server Destination](syslogng-outputs/redis/)** | syslogng-outputs | Sending messages from local network to the Redis server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/) |

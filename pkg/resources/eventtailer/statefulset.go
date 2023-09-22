@@ -17,11 +17,12 @@ package eventtailer
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
 // StatefulSet resource for reconciler
@@ -59,7 +60,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 					Containers: []corev1.Container{
 						e.customResource.Spec.ContainerBase.Override(corev1.Container{
 							Name:            config.EventTailer.TailerAffix,
-							Image:           "banzaicloud/eventrouter:v0.1.0",
+							Image:           "ghcr.io/kube-logging/eventrouter:0.4.0",
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							VolumeMounts: []corev1.VolumeMount{
 								{
