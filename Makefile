@@ -61,8 +61,11 @@ all: manager
 .PHONY: check
 check: license-check lint test
 
+.PHONY: generate
+generate: codegen fmt manifests docs helm-docs
+
 .PHONY: check-diff
-check-diff: generate fmt manifests docs helm-docs
+check-diff: generate
 	git diff --exit-code ':(exclude)./ADOPTERS.md'
 
 .PHONY: debug
@@ -92,8 +95,8 @@ fmt: ## Run go fmt against code
 	go fmt ./...
 	cd pkg/sdk && go fmt ./...
 
-.PHONY: generate
-generate: ${CONTROLLER_GEN} tidy ## Generate code
+.PHONY: codegen
+codegen: ${CONTROLLER_GEN} tidy ## Generate code
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/model/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./extensions/api/...
@@ -126,7 +129,7 @@ list: ## List all make targets
 	@${MAKE} -pRrn : -f $(MAKEFILE_LIST) 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | sort
 
 .PHONY: manager
-manager: generate fmt vet ## Build manager binary
+manager: codegen fmt vet ## Build manager binary
 	go build -o bin/manager main.go
 
 .PHONY: manifests
@@ -139,10 +142,10 @@ manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
 
 .PHONY: run
-run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
+run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
-test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
+test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
 	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./...
 	cd pkg/sdk/extensions && go test ./...
 	cd pkg/sdk/logging/model/syslogng/config && go test ./...
@@ -150,7 +153,7 @@ test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run 
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
 
 .PHONY: test-e2e
-test-e2e: ${KIND} generate manifests docker-build stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
