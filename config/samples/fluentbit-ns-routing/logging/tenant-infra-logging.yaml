@@ -46,9 +46,14 @@ spec:
       path: ""
   network:
     connectTimeout: 2
-  logRouting:
-    enabled: true
-    targets:
-    - matchExpressions:
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: AggregationPolicy
+metadata:
+  name: tenants
+spec:
+  loggingRef: infra
+  watchNamespaceTargets:
+    matchExpressions:
       - key: tenant
         operator: Exists

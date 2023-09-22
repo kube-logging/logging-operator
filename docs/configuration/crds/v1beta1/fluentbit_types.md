@@ -82,12 +82,6 @@ Default: -
 
 Default: -
 
-### logRouting (LogRouting, optional) {#fluentbitspec-logrouting}
-
-Enable log routing to other logging resources based on namespace information queried from the target logging's watchNamespaces or watchNamespaceSelector Experimental feature 
-
-Default: -
-
 ### flush (int32, optional) {#fluentbitspec-flush}
 
 Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1) 
@@ -275,17 +269,6 @@ Specify a custom parser file to load in addition to the default parsers file. It
 Default: -
 
 ### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
-
-Default: -
-
-
-## LogRouting
-
-LogRouting defines alternative log destinations
-
-### targets ([]metav1.LabelSelector, optional) {#logrouting-targets}
-
-Targets define the selectors to identify Logging resources where logs should be sent Logs are filtered based on the target Logging's watchNamespaces and watchNamespaceSelector 
 
 Default: -
 

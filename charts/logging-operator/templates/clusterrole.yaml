@@ -237,6 +237,26 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
+  - aggregationpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - aggregationpolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
   - clusterflows
   - clusteroutputs
   - flows

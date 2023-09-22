@@ -1242,9 +1242,8 @@ func TestWatchNamespaces(t *testing.T) {
 	})()
 
 	type ReturnVal struct {
-		namespaces   []string
-		allNamespace bool
-		err          error
+		namespaces []string
+		err        error
 	}
 
 	cases := []struct {
@@ -1276,8 +1275,7 @@ func TestWatchNamespaces(t *testing.T) {
 				}
 				slices.Sort(items)
 				return ReturnVal{
-					namespaces:   items,
-					allNamespace: true,
+					namespaces: items,
 				}
 			},
 		},
@@ -1376,7 +1374,7 @@ func TestWatchNamespaces(t *testing.T) {
 
 	for _, c := range cases {
 		if c.expectError {
-			_, _, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			_, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
 			if c.expectError && err == nil {
 				t.Fatalf("expected error for test case %s", c.name)
 			}
@@ -1384,11 +1382,10 @@ func TestWatchNamespaces(t *testing.T) {
 		}
 
 		g.Eventually(func() ReturnVal {
-			n, b, e := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			n, e := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
 			return ReturnVal{
-				namespaces:   n,
-				allNamespace: b,
-				err:          e,
+				namespaces: n,
+				err:        e,
 			}
 		}, timeout).Should(gomega.Equal(
 			c.expectedResult(),

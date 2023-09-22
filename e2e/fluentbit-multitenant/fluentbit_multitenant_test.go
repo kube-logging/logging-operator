@@ -205,21 +205,27 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 		},
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef: "infra",
-			LogRouting: v1beta1.LogRouting{
-				Targets: []metav1.LabelSelector{
+		},
+	}
+	common.RequireNoError(t, c.Create(ctx, &agent))
+
+	ap := v1beta1.AggregationPolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "tenants",
+		},
+		Spec: v1beta1.AggregationPolicySpec{
+			LoggingRef: "infra",
+			WatchNamespaceTargets: metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
 					{
-						MatchExpressions: []metav1.LabelSelectorRequirement{
-							{
-								Key:      "tenant",
-								Operator: metav1.LabelSelectorOpExists,
-							},
-						},
+						Key:      "tenant",
+						Operator: metav1.LabelSelectorOpExists,
 					},
 				},
 			},
 		},
 	}
-	common.RequireNoError(t, c.Create(ctx, &agent))
+	common.RequireNoError(t, c.Create(ctx, &ap))
 
 	logging := v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{

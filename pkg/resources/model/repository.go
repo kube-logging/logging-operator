@@ -69,7 +69,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	uniqueWatchNamespaces, _, err := UniqueWatchNamespaces(ctx, r.Client, &logging)
+	uniqueWatchNamespaces, err := UniqueWatchNamespaces(ctx, r.Client, &logging)
 	if err != nil {
 		errs = errors.Append(errs, err)
 		return
@@ -104,24 +104,23 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	return
 }
 
-func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v1beta1.Logging) ([]string, bool, error) {
+func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v1beta1.Logging) ([]string, error) {
 	watchNamespaces := logging.Spec.WatchNamespaces
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector
-	allNamespaces := len(watchNamespaces) == 0 && nsLabelSelector == nil
 	if len(watchNamespaces) == 0 || nsLabelSelector != nil {
 		var nsList corev1.NamespaceList
 		var nsListOptions = &client.ListOptions{}
 		if nsLabelSelector != nil {
 			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
 			if err != nil {
-				return nil, allNamespaces, errors.WrapIf(err, "error in watchNamespaceSelector")
+				return nil, errors.WrapIf(err, "error in watchNamespaceSelector")
 			}
 			nsListOptions = &client.ListOptions{
 				LabelSelector: selector,
 			}
 		}
 		if err := reader.List(ctx, &nsList, nsListOptions); err != nil {
-			return nil, allNamespaces, errors.WrapIf(err, "listing namespaces for watchNamespaceSelector")
+			return nil, errors.WrapIf(err, "listing namespaces for watchNamespaceSelector")
 		}
 		for _, i := range nsList.Items {
 			watchNamespaces = append(watchNamespaces, i.Name)
@@ -137,7 +136,7 @@ func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v
 		}
 		previousNamespace = n
 	}
-	return uniqueWatchNamespaces, allNamespaces, nil
+	return uniqueWatchNamespaces, nil
 }
 
 func (r LoggingResourceRepository) ClusterFlowsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.ClusterFlow, error) {

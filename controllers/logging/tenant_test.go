@@ -33,23 +33,16 @@ func TestFindTenants(t *testing.T) {
 
 	testData := []struct {
 		name     string
-		targets  []v1.LabelSelector
+		target   v1.LabelSelector
 		loggings []*v1beta1.Logging
 		wantErr  bool
 		satisfy  func([]fluentbit.Tenant) bool
 	}{
 		{
 			name: "static logging target with a static watch namespace list",
-			targets: []v1.LabelSelector{
-				{
-					MatchLabels: map[string]string{
-						"name": "a",
-					},
-				},
-				{
-					MatchLabels: map[string]string{
-						"name": "b",
-					},
+			target: v1.LabelSelector{
+				MatchLabels: map[string]string{
+					"name": "a",
 				},
 			},
 			loggings: []*v1beta1.Logging{
@@ -64,35 +57,47 @@ func TestFindTenants(t *testing.T) {
 						WatchNamespaces: []string{"asd"},
 					},
 				},
+			},
+			satisfy: func(tenants []fluentbit.Tenant) bool {
+				return assert.Len(t, tenants, 1) &&
+					assert.Equal(t, "a", tenants[0].Name) &&
+					assert.Equal(t, []string{"asd"}, tenants[0].Namespaces) &&
+					assert.False(t, tenants[0].AllNamespace)
+			},
+		},
+		{
+			name: "watching all namespaces will result in an empty namespace list, with the allNamespaces flag set to true",
+			target: v1.LabelSelector{
+				MatchLabels: map[string]string{
+					"name": "a",
+				},
+			},
+			loggings: []*v1beta1.Logging{
 				{
 					ObjectMeta: v1.ObjectMeta{
-						Name: "b",
+						Name: "a",
 						Labels: map[string]string{
-							"name": "b",
+							"name": "a",
 						},
 					},
 					Spec: v1beta1.LoggingSpec{
-						WatchNamespaces: []string{"bsd"},
+						WatchNamespaces:        nil,
+						WatchNamespaceSelector: nil,
 					},
 				},
 			},
 			satisfy: func(tenants []fluentbit.Tenant) bool {
-				return assert.Len(t, tenants, 2) &&
-					assert.Equal(t, "a", tenants[0].Logging.Name) &&
-					assert.Equal(t, "b", tenants[1].Logging.Name) &&
-					assert.Equal(t, []string{"asd"}, tenants[0].Namespaces) &&
-					assert.Equal(t, []string{"bsd"}, tenants[1].Namespaces) &&
-					assert.False(t, tenants[0].AllNamespace) &&
-					assert.False(t, tenants[1].AllNamespace)
+				return assert.Len(t, tenants, 1) &&
+					assert.Equal(t, "a", tenants[0].Name) &&
+					assert.Empty(t, tenants[0].Namespaces) &&
+					assert.True(t, tenants[0].AllNamespace)
 			},
 		},
 		{
 			name: "static logging target with an empty watch namespace will be omitted",
-			targets: []v1.LabelSelector{
-				{
-					MatchLabels: map[string]string{
-						"name": currentLoggingName,
-					},
+			target: v1.LabelSelector{
+				MatchLabels: map[string]string{
+					"name": currentLoggingName,
 				},
 			},
 			loggings: []*v1beta1.Logging{
@@ -111,13 +116,11 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "dynamic logging targets with a static watch namespace list",
-			targets: []v1.LabelSelector{
-				{
-					MatchExpressions: []v1.LabelSelectorRequirement{
-						{
-							Key:      "tenant",
-							Operator: v1.LabelSelectorOpExists,
-						},
+			target: v1.LabelSelector{
+				MatchExpressions: []v1.LabelSelectorRequirement{
+					{
+						Key:      "tenant",
+						Operator: v1.LabelSelectorOpExists,
 					},
 				},
 			},
@@ -147,8 +150,8 @@ func TestFindTenants(t *testing.T) {
 			},
 			satisfy: func(tenants []fluentbit.Tenant) bool {
 				return assert.Len(t, tenants, 2) &&
-					assert.Equal(t, "b", tenants[0].Logging.Name) &&
-					assert.Equal(t, "c", tenants[1].Logging.Name) &&
+					assert.Equal(t, "b", tenants[0].Name) &&
+					assert.Equal(t, "c", tenants[1].Name) &&
 					assert.Equal(t, []string{"bsd"}, tenants[0].Namespaces) &&
 					assert.Equal(t, []string{"csd"}, tenants[1].Namespaces) &&
 					assert.False(t, tenants[0].AllNamespace) &&
@@ -157,11 +160,9 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "allNamespace allowed for self referencing target",
-			targets: []v1.LabelSelector{
-				{
-					MatchLabels: map[string]string{
-						"name": currentLoggingName,
-					},
+			target: v1.LabelSelector{
+				MatchLabels: map[string]string{
+					"name": currentLoggingName,
 				},
 			},
 			loggings: []*v1beta1.Logging{
@@ -185,7 +186,7 @@ func TestFindTenants(t *testing.T) {
 		td := td
 		deferred := ensureCreatedAll(t, td.loggings)
 		assert.Eventually(t, func() bool {
-			tenants, err := fluentbit.FindTenants(context.TODO(), td.targets, currentLoggingName, mgr.GetClient(), mgr.GetLogger())
+			tenants, err := fluentbit.FindTenants(context.TODO(), td.target, mgr.GetClient())
 			if td.wantErr {
 				assert.NoError(t, err)
 			}

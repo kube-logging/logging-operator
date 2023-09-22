@@ -219,6 +219,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
 				nameProvider,
+				nil,
 			).Reconcile)
 		}
 	default:
@@ -228,6 +229,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		l := log.WithName("fluentbit")
 		for _, f := range loggingResources.Fluentbits {
 			f := f
+			aps, err := r.aggregationPoliciesForAgent(ctx, logging.Name, f.Name)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
@@ -236,6 +241,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				&f.Spec,
 				loggingDataProvider,
 				fluentbit.NewStandaloneFluentbitNameProvider(&f),
+				aps,
 			).Reconcile)
 		}
 	}
@@ -270,6 +276,21 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) aggregationPoliciesForAgent(ctx context.Context, logging, agent string) (aps []loggingv1beta1.AggregationPolicy, err error) {
+	apList := &loggingv1beta1.AggregationPolicyList{}
+	err = r.Client.List(ctx, apList)
+	if err != nil {
+		err = errors.WrapIf(err, "listing aggregation policies")
+		return
+	}
+	for _, ap := range apList.Items {
+		if ap.Spec.LoggingRef == logging && (ap.Spec.Agent == "" || ap.Spec.Agent == agent) {
+			aps = append(aps, ap)
+		}
+	}
+	return
 }
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, logging loggingv1beta1.Logging) {
@@ -480,7 +501,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGClusterFlow{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
-		Watches(&corev1.Secret{}, requestMapper)
+		Watches(&corev1.Secret{}, requestMapper).
+		Watches(&loggingv1beta1.AggregationPolicy{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {

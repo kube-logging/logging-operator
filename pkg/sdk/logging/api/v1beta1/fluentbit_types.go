@@ -72,9 +72,6 @@ type FluentbitSpec struct {
 	TLS                  *FluentbitTLS     `json:"tls,omitempty"`
 	TargetHost           string            `json:"targetHost,omitempty"`
 	TargetPort           int32             `json:"targetPort,omitempty"`
-	// Enable log routing to other logging resources based on namespace information queried from the target logging's watchNamespaces or watchNamespaceSelector
-	// Experimental feature
-	LogRouting LogRouting `json:"logRouting,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
@@ -130,13 +127,6 @@ type FluentbitSpec struct {
 	// It must be a valid key in the configmap specified by customConfig
 	CustomParsers string       `json:"customParsers,omitempty"`
 	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
-}
-
-// LogRouting defines alternative log destinations
-type LogRouting struct {
-	// Targets define the selectors to identify Logging resources where logs should be sent
-	// Logs are filtered based on the target Logging's watchNamespaces and watchNamespaceSelector
-	Targets []metav1.LabelSelector `json:"targets,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

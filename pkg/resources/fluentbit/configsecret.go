@@ -361,16 +361,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.Port = syslogng.ServicePort
 	}
 
-	// TODO well defined and articulated failure scenarios
-	if len(r.fluentbitSpec.LogRouting.Targets) > 0 {
-		tenants, err := FindTenants(ctx, r.fluentbitSpec.LogRouting.Targets, r.Logging.Name, r.resourceReconciler.Client, r.logger)
-		if err != nil {
-			return nil, nil, errors.WrapIf(err, "collecting tenants to identify targets")
+	if len(r.aggregationPolicies) > 0 {
+		var tenants []v1beta1.Tenant
+		for _, a := range r.aggregationPolicies {
+			tenants = append(tenants, a.Status.Tenants...)
 		}
-		if len(tenants) == 0 {
-			return nil, nil, errors.New("log routing is enabled but no target has been configured")
-		}
-		if err := r.configureOutputsForTenants(tenants, &input); err != nil {
+		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
 			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
 	} else {
