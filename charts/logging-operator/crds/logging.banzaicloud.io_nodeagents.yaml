@@ -51,6 +51,8 @@ spec:
                         type: string
                       storage.checksum:
                         type: string
+                      storage.metrics:
+                        type: string
                       storage.path:
                         type: string
                       storage.sync:

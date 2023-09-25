@@ -268,6 +268,10 @@ Specify a custom parser file to load in addition to the default parsers file. It
 
 Default: -
 
+### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
+
+Default: -
+
 
 ## FluentbitStatus
 
@@ -390,6 +394,35 @@ Default: Off
 If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records.  
 
 Default: 5M
+
+### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
+
+If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.  
+
+Default: Off
+
+
+## HealthCheck
+
+HealthCheck configuration
+
+### hcErrorsCount (int, optional) {#healthcheck-hcerrorscount}
+
+The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period.  
+
+Default: 5
+
+### hcRetryFailureCount (int, optional) {#healthcheck-hcretryfailurecount}
+
+The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period  
+
+Default: 5
+
+### hcPeriod (int, optional) {#healthcheck-hcperiod}
+
+The time period by second to count the error and retry failure data point  
+
+Default: 60
 
 
 ## InputTail
