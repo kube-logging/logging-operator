@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: infra
+  labels:
+    tenant: infra
+spec:
+  loggingRef: infra
+  fluentd: {}
+  controlNamespace: infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+  namespace: infra
+spec:
+  loggingRef: a
+  match:
+    - select: {}
+  filters:
+    - stdout: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: infra
+spec:
+  loggingRef: infra
+  inputTail:
+    storage.type: filesystem
+  forwardOptions:
+    Workers: 0
+  syslogng_output:
+    Workers: 0
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
+  network:
+    connectTimeout: 2
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: LoggingRoute
+metadata:
+  name: tenants
+spec:
+  source: infra
+  targets:
+    matchExpressions:
+      - key: tenant
+        operator: Exists

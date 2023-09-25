@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: customer-a
+  labels:
+    tenant: customer-a
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: customer-a-infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: customer-a
+  labels:
+    tenant: customer-a
+spec:
+  fluentd: {}
+  controlNamespace: customer-a-infra
+  watchNamespaceSelector:
+    matchLabels:
+      tenant: customer-a
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: http
+  namespace: customer-a
+spec:
+  http:
+    endpoint: http://test-receiver.infra:8080/customer-a
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: log-generator
+  namespace: customer-a
+spec:
+  match:
+    - select:
+        labels:
+          app.kubernetes.io/name: log-generator
+  localOutputRefs:
+    - http
