@@ -52,7 +52,7 @@ s3:
 type _docS3 interface{} //nolint:deadcode,unused
 
 // +name:"S3 Destination"
-// +url:"FIXME"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/"
 // +description:"Sending messages from a local network to a S3 (compatible) server"
 // +status:"Testing"
 type _metaS3 interface{} //nolint:deadcode,unused
