@@ -199,9 +199,9 @@ func main() {
 	}
 
 	if err := (ctrl.NewControllerManagedBy(mgr).
-		For(&loggingv1beta1.AggregationPolicy{}).
-		Complete(loggingControllers.NewAggregationPolicyReconciler(mgr.GetClient(), mgr.GetLogger()))); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AggregationPolicy")
+		For(&loggingv1beta1.LoggingRoute{}).
+		Complete(loggingControllers.NewLoggingRouteReconciler(mgr.GetClient(), mgr.GetLogger()))); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
 		os.Exit(1)
 	}
 

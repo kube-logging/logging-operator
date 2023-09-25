@@ -227,12 +227,12 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
 		}
 		l := log.WithName("fluentbit")
+		aps, err := r.loggingRoutes(ctx, logging.Name)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		for _, f := range loggingResources.Fluentbits {
 			f := f
-			aps, err := r.aggregationPoliciesForAgent(ctx, logging.Name, f.Name)
-			if err != nil {
-				return ctrl.Result{}, err
-			}
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
@@ -278,15 +278,15 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) aggregationPoliciesForAgent(ctx context.Context, logging, agent string) (aps []loggingv1beta1.AggregationPolicy, err error) {
-	apList := &loggingv1beta1.AggregationPolicyList{}
+func (r *LoggingReconciler) loggingRoutes(ctx context.Context, logging string) (aps []loggingv1beta1.LoggingRoute, err error) {
+	apList := &loggingv1beta1.LoggingRouteList{}
 	err = r.Client.List(ctx, apList)
 	if err != nil {
-		err = errors.WrapIf(err, "listing aggregation policies")
+		err = errors.WrapIf(err, "listing logging routes")
 		return
 	}
 	for _, ap := range apList.Items {
-		if ap.Spec.LoggingRef == logging && (ap.Spec.Agent == "" || ap.Spec.Agent == agent) {
+		if ap.Spec.Source == logging {
 			aps = append(aps, ap)
 		}
 	}
@@ -453,6 +453,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.FluentbitAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.LoggingRoute:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -502,7 +504,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
 		Watches(&corev1.Secret{}, requestMapper).
-		Watches(&loggingv1beta1.AggregationPolicy{}, requestMapper)
+		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {

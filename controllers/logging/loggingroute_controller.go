@@ -28,36 +28,36 @@ import (
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-func NewAggregationPolicyReconciler(client client.Client, log logr.Logger) *AggregationPolicyReconciler {
-	return &AggregationPolicyReconciler{
+func NewLoggingRouteReconciler(client client.Client, log logr.Logger) *LoggingRouteReconciler {
+	return &LoggingRouteReconciler{
 		Client: client,
 		Log:    log,
 	}
 }
 
-// AggregationPolicyReconciler reconciles an AggregationPolicy object
-type AggregationPolicyReconciler struct {
+// LoggingRouteReconciler reconciles an LoggingRoute object
+type LoggingRouteReconciler struct {
 	client.Client
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=aggregationpolicies,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=aggregationpolicies/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggingroutes,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggingroutes/status,verbs=get;update;patch
 
-// Reconcile aggregation policies
-func (r *AggregationPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	var agrPol loggingv1beta1.AggregationPolicy
-	if err := r.Client.Get(ctx, req.NamespacedName, &agrPol); err != nil {
+// Reconcile routes between logging domains
+func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	var loggingRoute loggingv1beta1.LoggingRoute
+	if err := r.Client.Get(ctx, req.NamespacedName, &loggingRoute); err != nil {
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
-	tenants, err := fluentbit.FindTenants(ctx, agrPol.Spec.WatchNamespaceTargets, r.Client)
+	tenants, err := fluentbit.FindTenants(ctx, loggingRoute.Spec.Targets, r.Client)
 	if err != nil {
 		return ctrl.Result{}, errors.WrapIf(err, "listing tenants")
 	}
 
 	var problems []string
-	agrPol.Status.Tenants = make([]loggingv1beta1.Tenant, 0)
+	loggingRoute.Status.Tenants = make([]loggingv1beta1.Tenant, 0)
 
 	for _, t := range tenants {
 		valid := true
@@ -74,13 +74,13 @@ func (r *AggregationPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Re
 			Namespaces: t.Namespaces,
 		}
 		if valid {
-			agrPol.Status.Tenants = append(agrPol.Status.Tenants, tenantStatus)
+			loggingRoute.Status.Tenants = append(loggingRoute.Status.Tenants, tenantStatus)
 		}
 	}
 
-	agrPol.Status.Problems = problems
+	loggingRoute.Status.Problems = problems
 
-	err = r.Status().Update(ctx, &agrPol)
+	err = r.Status().Update(ctx, &loggingRoute)
 	if err != nil {
 		return ctrl.Result{}, err
 	}

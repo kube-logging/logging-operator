@@ -6,18 +6,18 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.0
   creationTimestamp: null
-  name: aggregationpolicies.logging.banzaicloud.io
+  name: loggingroutes.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
   names:
     categories:
     - logging-all
-    kind: AggregationPolicy
-    listKind: AggregationPolicyList
-    plural: aggregationpolicies
+    kind: LoggingRoute
+    listKind: LoggingRouteList
+    plural: loggingroutes
     shortNames:
-    - agp
-    singular: aggregationpolicy
+    - lr
+    singular: loggingroute
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -37,11 +37,9 @@ spec:
             type: object
           spec:
             properties:
-              agent:
+              source:
                 type: string
-              loggingRef:
-                type: string
-              watchNamespaceTargets:
+              targets:
                 properties:
                   matchExpressions:
                     items:
@@ -65,8 +63,8 @@ spec:
                     type: object
                 type: object
             required:
-            - loggingRef
-            - watchNamespaceTargets
+            - source
+            - targets
             type: object
           status:
             properties:

@@ -361,9 +361,9 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.Port = syslogng.ServicePort
 	}
 
-	if len(r.aggregationPolicies) > 0 {
+	if len(r.loggingRoutes) > 0 {
 		var tenants []v1beta1.Tenant
-		for _, a := range r.aggregationPolicies {
+		for _, a := range r.loggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
 		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {

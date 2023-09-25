@@ -209,13 +209,13 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 	}
 	common.RequireNoError(t, c.Create(ctx, &agent))
 
-	ap := v1beta1.AggregationPolicy{
+	ap := v1beta1.LoggingRoute{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "tenants",
 		},
-		Spec: v1beta1.AggregationPolicySpec{
-			LoggingRef: "infra",
-			WatchNamespaceTargets: metav1.LabelSelector{
+		Spec: v1beta1.LoggingRouteSpec{
+			Source: "infra",
+			Targets: metav1.LabelSelector{
 				MatchExpressions: []metav1.LabelSelectorRequirement{
 					{
 						Key:      "tenant",

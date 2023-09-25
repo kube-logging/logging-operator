@@ -48,12 +48,12 @@ spec:
     connectTimeout: 2
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
-kind: AggregationPolicy
+kind: LoggingRoute
 metadata:
   name: tenants
 spec:
-  loggingRef: infra
-  watchNamespaceTargets:
+  source: infra
+  targets:
     matchExpressions:
       - key: tenant
         operator: Exists
