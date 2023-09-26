@@ -565,8 +565,9 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 							Port: intstr.IntOrString{
 								IntVal: fluentbitSpec.Metrics.Port,
 							},
-						}},
-					InitialDelaySeconds: 10,
+						}
+					},
+					InitialDelaySeconds: 120,
 					TimeoutSeconds:      0,
 					PeriodSeconds:       10,
 					SuccessThreshold:    0,
@@ -574,7 +575,6 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 				}
 			}
 		}
-
 		if fluentbitSpec.MountPath == "" {
 			fluentbitSpec.MountPath = "/var/lib/docker/containers"
 		}
