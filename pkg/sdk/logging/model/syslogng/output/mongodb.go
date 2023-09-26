@@ -14,6 +14,8 @@
 
 package output
 
+import "github.com/cisco-open/operator-tools/pkg/secret"
+
 // +name:"MongoDB"
 // +weight:"200"
 type _hugoMongoDB interface{} //nolint:deadcode,unused
@@ -47,14 +49,13 @@ type _metaMongoDB interface{} //nolint:deadcode,unused
 type MongoDB struct {
 	//  The name of the MongoDB collection where the log messages are stored (collections are similar to SQL tables). Note that the name of the collection must not start with a dollar sign ($), and that it may contain dot (.) characters.
 	Collection string `json:"collection"`
-	//  If set to yes, syslog-ng OSE cannot lose logs in case of reload/restart, unreachable destination or syslog-ng OSE crash. This solution provides a slower, but reliable disk-buffer option.
-	Compaction bool `json:"compaction"`
 	// Defines the folder where the disk-buffer files are stored.
 	Dir string `json:"dir,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
-	// Defines the folder where the disk-buffer files are stored. (default: "mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000")
-	Uri string `json:"uri,omitempty"`
+	// Connection string used for authentication.
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri)
+	Uri *secret.Secret `json:"uri,omitempty"`
 	// Creates structured name-value pairs from the data and metadata of the log message. (default: "scope("selected-macros" "nv-pairs")")
 	ValuePairs ValuePairs `json:"value_pairs,omitempty"`
 	// Batching parameters
