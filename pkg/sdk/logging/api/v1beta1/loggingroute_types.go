@@ -29,8 +29,11 @@ type LoggingRouteStatus struct {
 	// Enumerate all loggings with all the destination namespaces expanded
 	Tenants []Tenant `json:"tenants,omitempty"`
 
-	// Enumerate problems that prohibits this policy to take effect
+	// Enumerate problems that prohibits this route to take effect and populate the tenants field
 	Problems []string `json:"problems,omitempty"`
+
+	// Notices highlights non-blocker issues the user should pay attention to
+	Notices []string `json:"notices,omitempty"`
 }
 
 type Tenant struct {

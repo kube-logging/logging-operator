@@ -35,7 +35,7 @@ func NewLoggingRouteReconciler(client client.Client, log logr.Logger) *LoggingRo
 	}
 }
 
-// LoggingRouteReconciler reconciles an LoggingRoute object
+// LoggingRouteReconciler reconciles a LoggingRoute object
 type LoggingRouteReconciler struct {
 	client.Client
 	Log logr.Logger
@@ -57,17 +57,16 @@ func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	var problems []string
+	var notices []string
 	loggingRoute.Status.Tenants = make([]loggingv1beta1.Tenant, 0)
 
 	for _, t := range tenants {
 		valid := true
 		if t.AllNamespace {
-			problems = append(problems, fmt.Sprintf("tenant %s receives logs from ALL namespaces", t.Name))
-		} else {
-			if len(t.Namespaces) == 0 {
-				problems = append(problems, fmt.Sprintf("tenant %s will be skipped as it does not provide valid target namespaces", t.Name))
-				valid = false
-			}
+			notices = append(notices, fmt.Sprintf("tenant %s receives logs from ALL namespaces", t.Name))
+		} else if len(t.Namespaces) == 0 {
+			problems = append(problems, fmt.Sprintf("tenant %s will be skipped as it does not provide valid target namespaces", t.Name))
+			valid = false
 		}
 		tenantStatus := loggingv1beta1.Tenant{
 			Name:       t.Name,
@@ -79,6 +78,7 @@ func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	loggingRoute.Status.Problems = problems
+	loggingRoute.Status.Notices = notices
 
 	err = r.Status().Update(ctx, &loggingRoute)
 	if err != nil {

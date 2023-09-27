@@ -23,7 +23,13 @@ Default: -
 
 ### problems ([]string, optional) {#loggingroutestatus-problems}
 
-Enumerate problems that prohibits this policy to take effect 
+Enumerate problems that prohibits this route to take effect and populate the tenants field 
+
+Default: -
+
+### notices ([]string, optional) {#loggingroutestatus-notices}
+
+Notices highlights non-blocker issues the user should pay attention to 
 
 Default: -
 

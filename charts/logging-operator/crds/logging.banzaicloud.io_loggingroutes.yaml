@@ -68,6 +68,10 @@ spec:
             type: object
           status:
             properties:
+              notices:
+                items:
+                  type: string
+                type: array
               problems:
                 items:
                   type: string
