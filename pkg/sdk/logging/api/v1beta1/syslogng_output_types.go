@@ -44,6 +44,7 @@ type SyslogNGOutputSpec struct {
 	LogScale        *output.LogScaleOutput        `json:"logscale,omitempty" syslog-ng:"dest-drv"`
 	SplunkHEC       *output.SplunkHECOutput       `json:"splunk_hec_event,omitempty" syslog-ng:"dest-drv"`
 	Loki            *output.LokiOutput            `json:"loki,omitempty" syslog-ng:"dest-drv"`
+	S3              *output.S3Output              `json:"s3,omitempty" syslog-ng:"dest-drv"`
 }
 
 type SyslogNGOutputStatus OutputStatus
