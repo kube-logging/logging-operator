@@ -105,7 +105,7 @@ func TestLokiOutputTable(t *testing.T) {
 `,
 		},
 		{
-			name: "template",
+			name: "test_template",
 			output: v1beta1.SyslogNGOutput{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
@@ -124,6 +124,42 @@ func TestLokiOutputTable(t *testing.T) {
 			},
 			config: `destination "output_default_test-loki-out" {
 	loki(url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000) template("$ISODATE $HOST $MSGHDR$MSG"));
+};
+`,
+		},
+		{
+			name: "test_auth",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-loki-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					Loki: &output.LokiOutput{
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
+						Auth: &output.Auth{
+							ALTS: struct {
+								TargetServiceAccounts string "json:\"target-service-accounts,omitempty\""
+							}{
+								TargetServiceAccounts: "test_sa",
+							},
+							ADC:      &struct{}{},
+							Insecure: &struct{}{},
+							TLS: &output.TLS{
+								PeerVerify:         config.NewTrue(),
+								UseSystemCertStore: config.NewFalse(),
+								CipherSuite:        "ASD-256",
+							},
+						},
+					},
+				},
+			},
+			config: `destination "output_default_test-loki-out" {
+				loki(auth(alts(target-service-accounts("test_sa")) adc() insecure() tls(peer_verify(yes) use-system-cert-store(no) cipher-suite("ASD-256"))) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
 };
 `,
 		},
