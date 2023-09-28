@@ -70,7 +70,7 @@ fluentd:
       memory: 2G
 ```
 
-The fluentd-Pods should receive their input and buffer them on their filesystem. After that the workers can pick the logs up, process and forward them to their final destination. For this we will have to configure a PVC and as a buffer volume:
+The fluentd-Pods should receive their input and buffer them on their filesystem. After that, the workers can pick the logs up, process and forward them to their final destination. For this, we will have to configure a PVC and a buffer volume:
 
 ```yaml
 fluentd:
