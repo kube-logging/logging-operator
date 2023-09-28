@@ -43,6 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
@@ -213,7 +214,9 @@ func main() {
 		webhookServer := mgr.GetWebhookServer()
 
 		setupLog.Info("Registering webhooks...")
-		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
+		webhookHandler := podhandler.NewPodHandler(ctrl.Log.WithName("webhook-tailer"))
+		webhookHandler.Decoder = admission.NewDecoder(mgr.GetScheme())
+		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: webhookHandler})
 	}
 
 	// +kubebuilder:scaffold:builder
