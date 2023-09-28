@@ -9,6 +9,7 @@ In specific scenarios, a fluentd with a single worker instance cannot process an
 When enabling the multi-worker setup, it is recommended to ensure the following things:
 - Place the fluentds on separate Nodes
 - Increase the compute and memory resources 
+- Configure a buffer volume for fluentd
 - Do not use specific filter plugins
   - detectExceptions [is not working](https://github.com/kube-logging/logging-operator/issues/1490)
 - Also scale [horizontally](https://kube-logging.dev/docs/logging-infrastructure/fluentd/#autoscaling)
@@ -69,6 +70,37 @@ fluentd:
       memory: 2G
 ```
 
+The fluentd-Pods should receive their input and buffer them on their filesystem. After that the workers can pick the logs up, process and forward them to their final destination. For this we will have to configure a PVC and as a buffer volume:
+
+```yaml
+fluentd:
+  nodeSelector:
+    type: cpu
+  tolerations:
+  - effect: NoSchedule
+    key: type
+    operator: Equal
+    value: cpu
+  resources:
+    limits:
+      cpu: 5
+      memory: 2G
+    requests:
+      cpu: 5
+      memory: 2G
+  rootDir: /buffers
+  bufferStorageVolume:
+    pvc:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 40Gi
+        storageClassName: default
+        volumeMode: Filesystem
+```
+
 Lastly we can increase the number of fluentd-workers that are used per Pod:
 ```yaml
 fluentd:
@@ -86,5 +118,16 @@ fluentd:
     requests:
       cpu: 5
       memory: 2G
+  rootDir: /buffers
+  bufferStorageVolume:
+    pvc:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 40Gi
+        storageClassName: default
+        volumeMode: Filesystem
   workers: 5
 ```
