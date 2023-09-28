@@ -25,6 +25,10 @@ spec:
       jsonPath: .status.problemsCount
       name: Problems
       type: integer
+    - description: Number of notices
+      jsonPath: .status.noticesCount
+      name: Notices
+      type: integer
     name: v1beta1
     schema:
       openAPIV3Schema:
@@ -72,10 +76,14 @@ spec:
                 items:
                   type: string
                 type: array
+              noticesCount:
+                type: integer
               problems:
                 items:
                   type: string
                 type: array
+              problemsCount:
+                type: integer
               tenants:
                 items:
                   properties:

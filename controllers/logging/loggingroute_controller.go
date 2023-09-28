@@ -78,7 +78,9 @@ func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	loggingRoute.Status.Problems = problems
+	loggingRoute.Status.ProblemsCount = len(problems)
 	loggingRoute.Status.Notices = notices
+	loggingRoute.Status.NoticesCount = len(notices)
 
 	err = r.Status().Update(ctx, &loggingRoute)
 	if err != nil {

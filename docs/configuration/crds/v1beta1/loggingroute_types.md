@@ -27,9 +27,21 @@ Enumerate problems that prohibits this route to take effect and populate the ten
 
 Default: -
 
+### problemsCount (int, optional) {#loggingroutestatus-problemscount}
+
+Summarize the number of problems for the CLI output 
+
+Default: -
+
 ### notices ([]string, optional) {#loggingroutestatus-notices}
 
 Notices highlights non-blocker issues the user should pay attention to 
+
+Default: -
+
+### noticesCount (int, optional) {#loggingroutestatus-noticescount}
+
+Summarize the number of notices for the CLI output 
 
 Default: -
 
