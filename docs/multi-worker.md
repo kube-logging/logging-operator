@@ -51,7 +51,7 @@ Additionaly we will have to increase the resources that are requested by the flu
   - memory:  100M
 ```
 
-In this short walkthrough, we will increase the fluentd workers from `1` to `5`. Therefore, we will multiply the requests and limits with factor 5 to ensure enough resources are reserved. Additionally, we will set requests and limits to the same values to ensure that the fluentd Pods are not affected by other workloads on the Node. This is, in general, a good practice. We do this by changing the Logging-CRD like follows:
+In this short walkthrough, we will increase the fluentd workers from `1` to `5`. Therefore, we will multiply the requests and limits with factor 5 to ensure enough resources are reserved. Additionally, we will set requests and limits to the same values to ensure that the fluentd Pods are not affected by other workloads on the Node. This is, in general, a good practice. We do this by changing the Logging resource as follows:
 ```yaml
 fluentd:
   nodeSelector:
