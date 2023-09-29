@@ -29,16 +29,15 @@ spec:
     value: cpu
 ```
 
-The corresponding setting in the Logging resource looks like follows:
+The corresponding setting in the FluentdSpec looks like follows:
 ```yaml
-fluentd:
-  nodeSelector:
-    type: cpu
-  tolerations:
-  - effect: NoSchedule
-    key: type
-    operator: Equal
-    value: cpu
+nodeSelector:
+  type: cpu
+tolerations:
+- effect: NoSchedule
+  key: type
+  operator: Equal
+  value: cpu
 ```
 
 Additionaly we will have to increase the resources that are requested by the fluentd Pods. In the default setting they use following requests and limits:
@@ -51,56 +50,39 @@ Additionaly we will have to increase the resources that are requested by the flu
   - memory:  100M
 ```
 
-In this short walkthrough, we will increase the fluentd workers from `1` to `5`. Therefore, we will multiply the requests and limits with factor 5 to ensure enough resources are reserved. Additionally, we will set requests and limits to the same values to ensure that the fluentd Pods are not affected by other workloads on the Node. This is, in general, a good practice. We do this by changing the Logging resource as follows:
+In this short walkthrough, we will increase the fluentd workers from `1` to `5`. Therefore, we will multiply the requests and limits with factor 5 to ensure enough resources are reserved. Additionally, we will set requests and limits to the same values to ensure that the fluentd Pods are not affected by other workloads on the Node. This is, in general, a good practice. It is necessary to set the following settings in the FluentdSpec:
 ```yaml
-fluentd:
-  nodeSelector:
-    type: cpu
-  tolerations:
-  - effect: NoSchedule
-    key: type
-    operator: Equal
-    value: cpu
-  resources:
-    limits:
-      cpu: 5
-      memory: 2G
-    requests:
-      cpu: 5
-      memory: 2G
+resources:
+  limits:
+    cpu: 5
+    memory: 2G
+  requests:
+    cpu: 5
+    memory: 2G
 ```
 
-The fluentd-Pods should receive their input and buffer them on their filesystem. After that, the workers can pick the logs up, process and forward them to their final destination. For this, we will have to configure a PVC and a buffer volume:
+The fluentd-Pods should receive their input and buffer them on their filesystem. After that, the workers can pick the logs up, process and forward them to their final destination. For this, we will have to configure a PVC and a buffer volume in the FluentdSpec:
 
 ```yaml
-fluentd:
-  nodeSelector:
-    type: cpu
-  tolerations:
-  - effect: NoSchedule
-    key: type
-    operator: Equal
-    value: cpu
-  resources:
-    limits:
-      cpu: 5
-      memory: 2G
-    requests:
-      cpu: 5
-      memory: 2G
-  bufferStorageVolume:
-    pvc:
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 40Gi
-        storageClassName: default
-        volumeMode: Filesystem
+bufferStorageVolume:
+  pvc:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 40Gi
+      storageClassName: default
+      volumeMode: Filesystem
 ```
 
 Lastly we can increase the number of fluentd-workers that are used per Pod and set the rootDir field. It is important that those two settings are changed together otherwise the fluentd process will not work correctly:
+```yaml
+workers: 5
+rootDir: /buffers
+```
+
+The full configuration of the Logging resource looks like follows:
 ```yaml
 fluentd:
   nodeSelector:
