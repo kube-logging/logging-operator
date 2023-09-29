@@ -23,7 +23,7 @@ type _hugoAuth interface{} //nolint:deadcode,unused
 type _docAuth interface{} //nolint:deadcode,unused
 
 // +name:"Authentication config for syslog-ng outputs"
-// +url:"TODO"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/#auth"
 // +description:"Authentication config for syslog-ng outputs"
 // +status:"Testing"
 type _metaAuth interface{} //nolint:deadcode,unused
