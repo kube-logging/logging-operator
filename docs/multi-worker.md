@@ -88,7 +88,6 @@ fluentd:
     requests:
       cpu: 5
       memory: 2G
-  rootDir: /buffers
   bufferStorageVolume:
     pvc:
       spec:
@@ -101,7 +100,7 @@ fluentd:
         volumeMode: Filesystem
 ```
 
-Lastly we can increase the number of fluentd-workers that are used per Pod:
+Lastly we can increase the number of fluentd-workers that are used per Pod and set the rootDir field. It is important that those two settings are changed together otherwise the fluentd process will not work correctly:
 ```yaml
 fluentd:
   nodeSelector:
@@ -118,7 +117,6 @@ fluentd:
     requests:
       cpu: 5
       memory: 2G
-  rootDir: /buffers
   bufferStorageVolume:
     pvc:
       spec:
@@ -130,4 +128,5 @@ fluentd:
         storageClassName: default
         volumeMode: Filesystem
   workers: 5
+  rootDir: /buffers
 ```
