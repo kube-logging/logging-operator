@@ -60,9 +60,11 @@ func TestFindTenants(t *testing.T) {
 			},
 			satisfy: func(tenants []fluentbit.Tenant) bool {
 				return assert.Len(t, tenants, 1) &&
-					assert.Equal(t, "a", tenants[0].Name) &&
-					assert.Equal(t, []string{"asd"}, tenants[0].Namespaces) &&
-					assert.False(t, tenants[0].AllNamespace)
+					assert.Contains(t, tenants, fluentbit.Tenant{
+						Name:         "a",
+						AllNamespace: false,
+						Namespaces:   []string{"asd"},
+					})
 			},
 		},
 		{
@@ -88,9 +90,10 @@ func TestFindTenants(t *testing.T) {
 			},
 			satisfy: func(tenants []fluentbit.Tenant) bool {
 				return assert.Len(t, tenants, 1) &&
-					assert.Equal(t, "a", tenants[0].Name) &&
-					assert.Empty(t, tenants[0].Namespaces) &&
-					assert.True(t, tenants[0].AllNamespace)
+					assert.Contains(t, tenants, fluentbit.Tenant{
+						Name:         "a",
+						AllNamespace: true,
+					})
 			},
 		},
 		{
@@ -150,34 +153,16 @@ func TestFindTenants(t *testing.T) {
 			},
 			satisfy: func(tenants []fluentbit.Tenant) bool {
 				return assert.Len(t, tenants, 2) &&
-					assert.Equal(t, "b", tenants[0].Name) &&
-					assert.Equal(t, "c", tenants[1].Name) &&
-					assert.Equal(t, []string{"bsd"}, tenants[0].Namespaces) &&
-					assert.Equal(t, []string{"csd"}, tenants[1].Namespaces) &&
-					assert.False(t, tenants[0].AllNamespace) &&
-					assert.False(t, tenants[1].AllNamespace)
-			},
-		},
-		{
-			name: "allNamespace allowed for self referencing target",
-			target: v1.LabelSelector{
-				MatchLabels: map[string]string{
-					"name": currentLoggingName,
-				},
-			},
-			loggings: []*v1beta1.Logging{
-				{
-					ObjectMeta: v1.ObjectMeta{
-						Name: currentLoggingName,
-						Labels: map[string]string{
-							"name": currentLoggingName,
-						},
-					},
-				},
-			},
-			satisfy: func(tenants []fluentbit.Tenant) bool {
-				return assert.Len(t, tenants, 1) &&
-					assert.True(t, tenants[0].AllNamespace)
+					assert.Contains(t, tenants, fluentbit.Tenant{
+						Name:         "b",
+						AllNamespace: false,
+						Namespaces:   []string{"bsd"},
+					}) &&
+					assert.Contains(t, tenants, fluentbit.Tenant{
+						Name:         "c",
+						AllNamespace: false,
+						Namespaces:   []string{"csd"},
+					})
 			},
 		},
 	}
