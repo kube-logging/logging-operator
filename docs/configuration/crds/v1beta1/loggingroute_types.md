@@ -17,6 +17,8 @@ Default: -
 
 ## LoggingRouteStatus
 
+LoggingRouteStatus defines the actual state of the LoggingRoute
+
 ### tenants ([]Tenant, optional) {#loggingroutestatus-tenants}
 
 Enumerate all loggings with all the destination namespaces expanded 
@@ -37,7 +39,7 @@ Default: -
 
 ### notices ([]string, optional) {#loggingroutestatus-notices}
 
-Notices highlights non-blocker issues the user should pay attention to 
+Enumerate non-blocker issues the user should pay attention to 
 
 Default: -
 
@@ -61,7 +63,8 @@ Default: -
 
 ## LoggingRoute
 
-LoggingRoute defines
+LoggingRoute (experimental)
+Connects a log collector with log aggregators from other logging domains and routes relevant logs based on watch namespaces
 
 ###  (metav1.TypeMeta, required) {#loggingroute-}
 

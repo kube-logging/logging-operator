@@ -26,6 +26,7 @@ type LoggingRouteSpec struct {
 	Targets metav1.LabelSelector `json:"targets"`
 }
 
+// LoggingRouteStatus defines the actual state of the LoggingRoute
 type LoggingRouteStatus struct {
 	// Enumerate all loggings with all the destination namespaces expanded
 	Tenants []Tenant `json:"tenants,omitempty"`
@@ -36,7 +37,7 @@ type LoggingRouteStatus struct {
 	// Summarize the number of problems for the CLI output
 	ProblemsCount int `json:"problemsCount,omitempty"`
 
-	// Notices highlights non-blocker issues the user should pay attention to
+	// Enumerate non-blocker issues the user should pay attention to
 	Notices []string `json:"notices,omitempty"`
 
 	// Summarize the number of notices for the CLI output
@@ -55,7 +56,8 @@ type Tenant struct {
 // +kubebuilder:printcolumn:name="Notices",type="integer",JSONPath=".status.noticesCount",description="Number of notices"
 // +kubebuilder:storageversion
 
-// LoggingRoute defines
+// LoggingRoute (experimental)
+// Connects a log collector with log aggregators from other logging domains and routes relevant logs based on watch namespaces
 type LoggingRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
