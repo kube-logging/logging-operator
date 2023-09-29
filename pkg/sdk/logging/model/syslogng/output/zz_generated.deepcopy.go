@@ -411,11 +411,6 @@ func (in *S3Output) DeepCopyInto(out *S3Output) {
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.ObjectKey != nil {
-		in, out := &in.ObjectKey, &out.ObjectKey
-		*out = new(secret.Secret)
-		(*in).DeepCopyInto(*out)
-	}
 	out.ObjectKeyTimestamp = in.ObjectKeyTimestamp
 	out.Template = in.Template
 	if in.Compression != nil {
