@@ -40,8 +40,6 @@ type LokiOutput struct {
 	Labels filter.ArrowMap `json:"labels,omitempty"`
 	// Specifies the hostname or IP address and optionally the port number of the  service that can receive log data via gRPC. Use a colon (:) after the address to specify the port number of the server. For example: grpc://127.0.0.1:8000
 	URL string `json:"url,omitempty"`
-	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193).
-	TLS *TLS `json:"tls,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)

@@ -29,12 +29,6 @@ Specifies the hostname or IP address and optionally the port number of the  serv
 
 Default: -
 
-### tls (*TLS, optional) {#lokioutput-tls}
-
-This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193). 
-
-Default: -
-
 ### time_reopen (int, optional) {#lokioutput-time_reopen}
 
 The time to wait in seconds before a dead connection is reestablished.  
