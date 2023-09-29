@@ -1,3 +1,9 @@
+---
+title: LoggingRouteSpec
+weight: 200
+generated_file: true
+---
+
 ## LoggingRouteSpec
 
 LoggingRouteSpec defines the desired state of LoggingRoute

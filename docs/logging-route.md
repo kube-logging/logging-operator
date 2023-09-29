@@ -69,7 +69,7 @@ spec:
       tenant: team-b
 ```
 > Note: 
-> - these logging resources do not have a corresponding `FluentbitAgent` resource defined as log collection 
+> - these logging resources do not have a corresponding `FluentbitAgent` resource defined as log collection
 will be handled by the ops tenant. 
 > - the usage of `loggingRef` is not required here.
 
@@ -99,7 +99,7 @@ spec:
 ```
 > Note: 
 > - `loggingRef`s are required here
-> - `Workers: 0` is a workaround so that the processing of all tenants (outputs) don't block if one or more tenant is unavailable 
+> - `Workers: 0` is a workaround so that the processing of all tenants (outputs) don't block if one or more tenant is unavailable
 
 And finally the logging route with a populated status:
 ```
