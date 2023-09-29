@@ -24,21 +24,15 @@ metadata:
   name: all
 spec:
   filters:
-    - tag_normaliser: {}
+    - stdout: {}
   match:
     - select: {}
   localOutputRefs:
-    - file
+    - nullout
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
-  name: file
+  name: nullout
 spec:
-  file:
-    path: /tmp/logs/${tag}
-    append: true
-    buffer:
-      timekey: 1m
-      timekey_wait: 10s
-      timekey_use_utc: true
+  nullout: {}

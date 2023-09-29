@@ -78,10 +78,18 @@ type fluentBitConfig struct {
 type fluentForwardOutputConfig struct {
 	Network    FluentbitNetwork
 	Options    map[string]string
+	Targets    []forwardTargetConfig
 	TargetHost string
 	TargetPort int32
 	TLS        fluentForwardOutputTLSConfig
 	Upstream   fluentForwardOutputUpstreamConfig
+}
+
+type forwardTargetConfig struct {
+	AllNamespaces  bool
+	NamespaceRegex string
+	Host           string
+	Port           int32
 }
 
 type fluentForwardOutputTLSConfig struct {
@@ -114,11 +122,19 @@ type FluentbitNetwork struct {
 // https://docs.fluentbit.io/manual/pipeline/outputs/tcp-and-tls
 type syslogNGOutputConfig struct {
 	Host           string
-	Port           int
+	Port           int32
+	Targets        []forwardTargetConfig
 	JSONDateKey    string
 	JSONDateFormat string
 	Workers        *int
 	Network        FluentbitNetwork
+}
+
+func newSyslogNGOutputConfig() *syslogNGOutputConfig {
+	return &syslogNGOutputConfig{
+		JSONDateKey:    "ts",
+		JSONDateFormat: "iso8601",
+	}
 }
 
 func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetwork) {
@@ -167,6 +183,8 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
+	ctx := context.TODO()
+
 	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
@@ -224,12 +242,12 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if r.Logging.Spec.FluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost
 		if fluentbitTargetHost == "" {
-			fluentbitTargetHost = fmt.Sprintf("%s.%s.svc%s", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace, r.Logging.ClusterDomainAsSuffix())
+			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
 		}
 
-		fluentbitTargetPort := r.fluentbitSpec.TargetPort
-		if fluentbitTargetPort == 0 {
-			fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
+		fluentbitTargetPort := int32(fluentd.ServicePort)
+		if r.fluentbitSpec.TargetPort != 0 {
+			fluentbitTargetPort = r.fluentbitSpec.TargetPort
 		}
 
 		input.FluentForwardOutput = &fluentForwardOutputConfig{
@@ -294,6 +312,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.AwsFilter = awsFilter
 	}
 
+	// Fluentd aggregator path
 	if input.FluentForwardOutput != nil {
 		if r.fluentbitSpec.TargetHost != "" {
 			input.FluentForwardOutput.TargetHost = r.fluentbitSpec.TargetHost
@@ -301,6 +320,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		if r.fluentbitSpec.TargetPort != 0 {
 			input.FluentForwardOutput.TargetPort = r.fluentbitSpec.TargetPort
 		}
+
 		if r.fluentbitSpec.ForwardOptions != nil {
 			forwardOptions, err := mapper.StringsMap(r.fluentbitSpec.ForwardOptions)
 			if err != nil {
@@ -308,9 +328,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			}
 			input.FluentForwardOutput.Options = forwardOptions
 		}
-		if r.fluentbitSpec.Network != nil {
-			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
-		}
+		r.applyNetworkSettings(input)
 
 		aggregatorReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
 		if err != nil {
@@ -338,23 +356,43 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	if r.Logging.Spec.SyslogNGSpec != nil {
-		input.SyslogNGOutput = &syslogNGOutputConfig{}
-		input.SyslogNGOutput.Host = fmt.Sprintf("%s.%s.svc%s", r.Logging.QualifiedName(syslogng.ServiceName), r.Logging.Spec.ControlNamespace, r.Logging.ClusterDomainAsSuffix())
+		input.SyslogNGOutput = newSyslogNGOutputConfig()
+		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort
-		input.SyslogNGOutput.JSONDateKey = "ts"
-		input.SyslogNGOutput.JSONDateFormat = "iso8601"
+	}
 
-		if r.fluentbitSpec.SyslogNGOutput != nil {
-			input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
-			input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
+	if len(r.loggingRoutes) > 0 {
+		var tenants []v1beta1.Tenant
+		for _, a := range r.loggingRoutes {
+			tenants = append(tenants, a.Status.Tenants...)
+		}
+		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
+			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
+		}
+	} else {
+		// compatibility with existing configuration
+		if input.FluentForwardOutput != nil {
+			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
+				AllNamespaces: true,
+				Host:          input.FluentForwardOutput.TargetHost,
+				Port:          input.FluentForwardOutput.TargetPort,
+			})
+		} else if input.SyslogNGOutput != nil {
+			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
+				AllNamespaces: true,
+				Host:          input.SyslogNGOutput.Host,
+				Port:          input.SyslogNGOutput.Port,
+			})
 		}
 	}
 
-	if input.SyslogNGOutput != nil {
-		if r.fluentbitSpec.Network != nil {
-			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
-		}
+	if input.SyslogNGOutput != nil && r.fluentbitSpec.SyslogNGOutput != nil {
+		input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
+		input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
+		input.SyslogNGOutput.Workers = r.fluentbitSpec.SyslogNGOutput.Workers
 	}
+
+	r.applyNetworkSettings(input)
 
 	conf, err := generateConfig(input)
 	if err != nil {
@@ -384,15 +422,35 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}, reconciler.StatePresent, nil
 }
 
+func (r *Reconciler) applyNetworkSettings(input fluentBitConfig) {
+	if r.fluentbitSpec.Network != nil {
+		if input.FluentForwardOutput != nil {
+			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+		if input.SyslogNGOutput != nil {
+			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+	}
+}
+
+func aggregatorEndpoint(l *v1beta1.Logging, svc string) string {
+	return fmt.Sprintf("%s.%s.svc%s", l.QualifiedName(svc), l.Spec.ControlNamespace, l.ClusterDomainAsSuffix())
+}
+
 func generateConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
-	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
+	tmpl := template.New("fluentbit")
+	tmpl, err := tmpl.Parse(fluentBitConfigTemplate)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "parsing fluentbit template")
+	}
+	tmpl, err = tmpl.Parse(fluentbitNetworkTemplate)
+	if err != nil {
+		return "", errors.WrapIf(err, "parsing fluentbit network nested template")
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "executing fluentbit config template")
 	}
 	outputString := output.String()
 	return outputString, nil
@@ -420,6 +478,6 @@ func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
 			r.Logging.Spec.ControlNamespace,
 			r.Logging.ClusterDomainAsSuffix()),
-		Port: 24240,
+		Port: fluentd.ServicePort,
 	}
 }

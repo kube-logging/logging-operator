@@ -434,6 +434,12 @@ func (l *Logging) SetDefaults() error {
 	return nil
 }
 
+func (logging *Logging) WatchAllNamespaces() bool {
+	watchNamespaces := logging.Spec.WatchNamespaces
+	nsLabelSelector := logging.Spec.WatchNamespaceSelector
+	return len(watchNamespaces) == 0 && nsLabelSelector == nil
+}
+
 func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 	if fluentbitSpec != nil { // nolint:nestif
 		if fluentbitSpec.PosisionDBLegacy != nil {
