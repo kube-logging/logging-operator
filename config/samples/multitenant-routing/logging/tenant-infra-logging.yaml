@@ -15,16 +15,33 @@ spec:
   controlNamespace: infra
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
+kind: ClusterFlow
 metadata:
   name: all
   namespace: infra
 spec:
-  loggingRef: a
+  loggingRef: infra
   match:
-    - select: {}
-  filters:
-    - stdout: {}
+  - select:
+      labels:
+        app.kubernetes.io/name: log-generator
+  globalOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: http
+  namespace: infra
+spec:
+  loggingRef: infra
+  http:
+    endpoint: http://test-receiver.infra:8080/infra
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: FluentbitAgent
