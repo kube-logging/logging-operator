@@ -16,6 +16,7 @@ package v1beta1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+// LoggingRouteSpec defines the desired state of LoggingRoute
 type LoggingRouteSpec struct {
 	// Source identifies the logging that this policy applies to
 	Source string `json:"source"`

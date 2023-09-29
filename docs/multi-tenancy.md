@@ -20,10 +20,10 @@ All container logs are aggregated into fluentd/syslogng (statefulset) by fluentb
 
 ### Isolation options with **logging ref** and **watch namespaces**
 
-The `loggingRef` field in each resource makes it possible to create multiple logging "domains" with different configuration. 
+The `loggingRef` field in each resource makes it possible to create multiple logging "domains" with different configuration.
 
 By default, resources with an empty `loggingRef` are processed by all `logging` resources, except if the `logging` defines a
-`watchNamespaces` field. In that case _flow_ and _output_ resources are only combined into a logging configuration if 
+`watchNamespaces` field. In that case _flow_ and _output_ resources are only combined into a logging configuration if
 they are all in the defined list of watched namespaces.
 
 _Clusterflow_ and _clusteroutput_ resources (which are actually namespaced resources with multi-namespace capabilities) are by default
@@ -34,9 +34,9 @@ Additionally there is an option to process these from all namespaces.
 
 1. The collector (fluentbit) collects all logs and sends them to the aggregator (fluentd/syslog-ng). There is no option to filter or route log records based on any criteria there. 
 
-    In case someone defines multiple tenants, they have to either 
-    - set up a routing logging that collects and forwards all logs to separate standalone logging aggregators 
-      (a logging resource that has no fluentbit collector defined). 
+    In case someone defines multiple tenants, they have to either
+    - set up a routing logging that collects and forwards all logs to separate standalone logging aggregators
+      (a logging resource that has no fluentbit collector defined).
     - set up multiple logging resources, that all have collectors, thus processing all log messages on their own.
 
 2. WatchNamespaces is a static list.
@@ -114,9 +114,9 @@ Cons:
 
 With the introduction of a `LoggingRoute` resource, it is now possible to route logs based on namespaces to different aggregators.
 
-A _logging route_ connects a collector (fluentbit) of one logging resource with the aggregators of other logging resources. 
+A _logging route_ connects a collector (fluentbit) of one logging resource with the aggregators of other logging resources.
 
-The collector uses the _watch namespaces_ configuration in the target logging resources to send only the logs relevant to them. 
+The collector uses the _watch namespaces_ configuration in the target logging resources to send only the logs relevant to them.
 This way, target loggings can effectively work in isolation on their own logs and nothing more.
 
 > Note: This method can be combined with a _logging ref_ as well, similar to how the [Soft multi-tenancy with logging ref](#soft-multi-tenancy-with-logging-ref) 
