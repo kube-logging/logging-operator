@@ -42,11 +42,7 @@ s3:
       secretKeyRef:
         name: s3
         key: secret-key
-  object_key:
-    valueFrom:
-      secretKeyRef:
-        name: s3
-        key: object-key
+  object_key: "${HOST}/my-logs"
 {{</ highlight >}}
 */
 type _docS3 interface{} //nolint:deadcode,unused
@@ -68,7 +64,7 @@ type S3Output struct {
 	// The secret_key for the S3 server.
 	SecretKey *secret.Secret `json:"secret_key,omitempty"`
 	// The object_key for the S3 server.
-	ObjectKey *secret.Secret `json:"object_key,omitempty"`
+	ObjectKey string `json:"object_key,omitempty"`
 	// Set object_key_timestamp
 	ObjectKeyTimestamp RawString `json:"object_key_timestamp,omitempty"`
 	// Template

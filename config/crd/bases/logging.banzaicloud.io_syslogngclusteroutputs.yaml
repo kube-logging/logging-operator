@@ -1415,38 +1415,7 @@ spec:
                   max_pending_uploads:
                     type: integer
                   object_key:
-                    properties:
-                      mountFrom:
-                        properties:
-                          secretKeyRef:
-                            properties:
-                              key:
-                                type: string
-                              name:
-                                type: string
-                              optional:
-                                type: boolean
-                            required:
-                            - key
-                            type: object
-                        type: object
-                      value:
-                        type: string
-                      valueFrom:
-                        properties:
-                          secretKeyRef:
-                            properties:
-                              key:
-                                type: string
-                              name:
-                                type: string
-                              optional:
-                                type: boolean
-                            required:
-                            - key
-                            type: object
-                        type: object
-                    type: object
+                    type: string
                   object_key_timestamp:
                     properties:
                       raw_string:

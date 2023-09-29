@@ -44,7 +44,7 @@ source "main_input" {
 };
 
 destination "output_default_test-s3-out" {
-	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") object_key("object-secret-value") persist_name("output_default_test-s3-out"));
+	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") object_key("${HOST}/my-logs") persist_name("output_default_test-s3-out"));
 };
 `)
 
@@ -72,7 +72,7 @@ destination "output_default_test-s3-out" {
 						},
 						Data: map[string][]byte{
 							"secret_key": []byte("secret-key-value"),
-							"object_key": []byte("object-secret-value"),
+							"object_key": []byte("${HOST}/my-logs"),
 							"access_key": []byte("access-key-secret-value"),
 						},
 					},
@@ -110,16 +110,7 @@ destination "output_default_test-s3-out" {
 								},
 							},
 						},
-						ObjectKey: &secret.Secret{
-							ValueFrom: &secret.ValueFrom{
-								SecretKeyRef: &corev1.SecretKeySelector{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "s3-secrets",
-									},
-									Key: "object_key",
-								},
-							},
-						},
+						ObjectKey: "${HOST}/my-logs",
 					},
 				},
 			},
@@ -148,7 +139,7 @@ source "main_input" {
 };
 
 destination "output_default_test-s3-out" {
-	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") object_key("object-secret-value") object_key_timestamp("timestamp") template("${MESSAGE}\n") compression(no) compresslevel(9) chunk_size(5) max_object_size(5000) upload_threads(8) max_pending_uploads(32) flush_grace_period(60) region("s3region") storage_class("STANDARD") canned_acl("s3-canned-acl") persist_name("output_default_test-s3-out"));
+	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") object_key("${HOST}/my-logs") object_key_timestamp("timestamp") template("${MESSAGE}\n") compression(no) compresslevel(9) chunk_size(5) max_object_size(5000) upload_threads(8) max_pending_uploads(32) flush_grace_period(60) region("s3region") storage_class("STANDARD") canned_acl("s3-canned-acl") persist_name("output_default_test-s3-out"));
 };
 `)
 
@@ -176,7 +167,7 @@ destination "output_default_test-s3-out" {
 						},
 						Data: map[string][]byte{
 							"secret_key": []byte("secret-key-value"),
-							"object_key": []byte("object-secret-value"),
+							"object_key": []byte("${HOST}/my-logs"),
 							"access_key": []byte("access-key-secret-value"),
 						},
 					},
@@ -213,16 +204,7 @@ destination "output_default_test-s3-out" {
 							},
 						},
 					},
-					ObjectKey: &secret.Secret{
-						ValueFrom: &secret.ValueFrom{
-							SecretKeyRef: &corev1.SecretKeySelector{
-								LocalObjectReference: corev1.LocalObjectReference{
-									Name: "s3-secrets",
-								},
-								Key: "object_key",
-							},
-						},
-					},
+					ObjectKey:          "${HOST}/my-logs",
 					ObjectKeyTimestamp: output.RawString{String: `"timestamp"`},
 					Template:           output.RawString{String: `"${MESSAGE}\n"`},
 					Compression:        config.NewFalse(),
