@@ -1,5 +1,7 @@
 ## LoggingRouteSpec
 
+LoggingRouteSpec defines the desired state of LoggingRoute
+
 ### source (string, required) {#loggingroutespec-source}
 
 Source identifies the logging that this policy applies to 

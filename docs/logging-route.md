@@ -1,7 +1,7 @@
 ## Logging Route
 
 A _Logging Route_ is responsible to define a global rule that instructs `FluentbitAgent` resources that belongs to the same
-`Logging` resource to route logs to different target `Logging` aggregators (fluentd or syslog-ng). 
+`Logging` resource to route logs to different target `Logging` aggregators (fluentd or syslog-ng).
 
 The routed logs are filtered based on the `watchNamespaces` and `watchNamespaceSelector` fields of the target `Logging` resources,
 which were originally used to limit which _flow_ and _output_ resources are process by the `Logging` resource.
@@ -10,6 +10,7 @@ This also means, that the logs routed by _clusterflows_ will be limited to the a
 will not have any other log in its possession.
 
 ### Spec
+
 
 Example:
 ```
