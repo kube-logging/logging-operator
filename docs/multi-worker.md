@@ -42,12 +42,13 @@ tolerations:
 
 Additionaly we will have to increase the resources that are requested by the fluentd Pods. In the default setting they use following requests and limits:
 ```yaml
-- Limits:
-  - cpu: 1000m
-  - memory: 400M
-- Requests:
-  - cpu: 500m
-  - memory:  100M
+resources:
+  limits:
+    cpu: 1
+    memory: 400M
+  requests:
+    cpu: 500m
+    memory: 100M
 ```
 
 In this short walkthrough, we will increase the fluentd workers from `1` to `5`. Therefore, we will multiply the requests and limits with factor 5 to ensure enough resources are reserved. Additionally, we will set requests and limits to the same values to ensure that the fluentd Pods are not affected by other workloads on the Node. This is, in general, a good practice. It is necessary to set the following settings in the FluentdSpec:
