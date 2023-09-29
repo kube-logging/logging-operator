@@ -142,24 +142,19 @@ func TestLokiOutputTable(t *testing.T) {
 						Workers:      3,
 						LogFIFOSize:  1000,
 						Auth: &output.Auth{
-							ALTS: struct {
-								TargetServiceAccounts string "json:\"target-service-accounts,omitempty\""
-							}{
-								TargetServiceAccounts: "test_sa",
-							},
-							ADC:      &struct{}{},
-							Insecure: &struct{}{},
+							ALTS:     &output.ALTS{},
+							ADC:      &output.ADC{},
+							Insecure: &output.Insecure{},
 							TLS: &output.TLS{
 								PeerVerify:         config.NewTrue(),
 								UseSystemCertStore: config.NewFalse(),
-								CipherSuite:        "ASD-256",
 							},
 						},
 					},
 				},
 			},
 			config: `destination "output_default_test-loki-out" {
-				loki(auth(alts(target-service-accounts("test_sa")) adc() insecure() tls(peer_verify(yes) use-system-cert-store(no) cipher-suite("ASD-256"))) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
+	loki(auth(alts() adc() insecure() tls(peer_verify(yes) use-system-cert-store(no))) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
 };
 `,
 		},
