@@ -29,7 +29,7 @@ spec:
     value: cpu
 ```
 
-The corresponding setting in the Logging-CRD is looking like follows:
+The corresponding setting in the Logging resource looks like follows:
 ```yaml
 fluentd:
   nodeSelector:
