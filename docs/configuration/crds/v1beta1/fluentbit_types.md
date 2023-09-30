@@ -307,6 +307,10 @@ Default: ts
 
 Default: iso8601
 
+### Workers (*int, optional) {#fluentbittcpoutput-workers}
+
+Default: -
+
 
 ## FluentbitNetwork
 
@@ -1068,6 +1072,12 @@ Default: -
 ### storage.total_limit_size (string, optional) {#forwardoptions-storage.total_limit_size}
 
 `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination. 
+
+Default: -
+
+### Workers (*int, optional) {#forwardoptions-workers}
+
+Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0. 
 
 Default: -
 

@@ -64,6 +64,10 @@ Default: -
 
 Default: -
 
+### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+
+Default: -
+
 
 ## SyslogNGOutput
 

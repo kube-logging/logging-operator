@@ -98,6 +98,8 @@ Default: -
 
 ### port (int32, optional) {#fluentdspec-port}
 
+Fluentd port inside the container (24240 by default) The headless service port is controlled by this field as well Note, that the default ClusterIP service port is always 24240 regardless of this field 
+
 Default: -
 
 ### tolerations ([]corev1.Toleration, optional) {#fluentdspec-tolerations}

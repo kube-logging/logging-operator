@@ -94,6 +94,7 @@ type Reconciler struct {
 	fluentbitSpec       *v1beta1.FluentbitSpec
 	loggingDataProvider loggingdataprovider.LoggingDataProvider
 	nameProvider        NameProvider
+	loggingRoutes       []v1beta1.LoggingRoute
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
@@ -103,7 +104,8 @@ func New(client client.Client,
 	opts reconciler.ReconcilerOpts,
 	fluentbitSpec *v1beta1.FluentbitSpec,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
-	nameProvider NameProvider) *Reconciler {
+	nameProvider NameProvider,
+	loggingRoutes []v1beta1.LoggingRoute) *Reconciler {
 	return &Reconciler{
 		Logging:             logging,
 		logger:              logger,
@@ -111,6 +113,7 @@ func New(client client.Client,
 		fluentbitSpec:       fluentbitSpec,
 		loggingDataProvider: loggingDataProvider,
 		nameProvider:        nameProvider,
+		loggingRoutes:       loggingRoutes,
 	}
 }
 

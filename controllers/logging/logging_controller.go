@@ -208,8 +208,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	switch len(loggingResources.Fluentbits) {
 	case 0:
 		// check for legacy definition
-		log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 		if logging.Spec.FluentbitSpec != nil {
+			log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 			nameProvider := fluentbit.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
@@ -219,6 +219,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
 				nameProvider,
+				nil,
 			).Reconcile)
 		}
 	default:
@@ -226,6 +227,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
 		}
 		l := log.WithName("fluentbit")
+		aps, err := r.loggingRoutes(ctx, logging.Name)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		for _, f := range loggingResources.Fluentbits {
 			f := f
 			reconcilers = append(reconcilers, fluentbit.New(
@@ -236,6 +241,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				&f.Spec,
 				loggingDataProvider,
 				fluentbit.NewStandaloneFluentbitNameProvider(&f),
+				aps,
 			).Reconcile)
 		}
 	}
@@ -270,6 +276,21 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) loggingRoutes(ctx context.Context, logging string) (aps []loggingv1beta1.LoggingRoute, err error) {
+	apList := &loggingv1beta1.LoggingRouteList{}
+	err = r.Client.List(ctx, apList)
+	if err != nil {
+		err = errors.WrapIf(err, "listing logging routes")
+		return
+	}
+	for _, ap := range apList.Items {
+		if ap.Spec.Source == logging {
+			aps = append(aps, ap)
+		}
+	}
+	return
 }
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, logging loggingv1beta1.Logging) {
@@ -432,6 +453,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.FluentbitAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.LoggingRoute:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -480,7 +503,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGClusterFlow{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
-		Watches(&corev1.Secret{}, requestMapper)
+		Watches(&corev1.Secret{}, requestMapper).
+		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
