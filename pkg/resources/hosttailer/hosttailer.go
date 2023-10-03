@@ -151,7 +151,7 @@ func (h *HostTailer) Containers(tailers []tailer.Tailer, volumePaths []string) [
 			WithName(volumepath.ConvertFilePath(*path)).
 			VolumeMount
 		command := t.Command(h.Name(generalDescriptor.Name))
-		containers = append(containers, h.Container(generalDescriptor.Name, volumeMount, command, generalDescriptor.ContainerBase))
+		containers = append(containers, h.Container(generalDescriptor.Name, volumeMount, command, generalDescriptor.ContainerBase, generalDescriptor.Image))
 	}
 	return containers
 }
