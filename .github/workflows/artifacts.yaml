@@ -82,6 +82,12 @@ jobs:
             type=ref,event=pr,prefix=pr-
             type=semver,pattern={{raw}}
             type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.description=The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline.
+            org.opencontainers.image.title=Logging operator
+            org.opencontainers.image.authors=Kube logging authors
+            org.opencontainers.image.documentation=https://kube-logging.dev/docs/
+
 
       # Multiple exporters are not supported yet
       # See https://github.com/moby/buildkit/pull/2760
@@ -111,7 +117,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: ${{ steps.build-output.outputs.value }}
+          outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
           # push: ${{ inputs.publish }}
 
       - name: Set image ref
