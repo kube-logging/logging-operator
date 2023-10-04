@@ -82,7 +82,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 					Containers: []corev1.Container{
 						e.customResource.Spec.ContainerBase.Override(corev1.Container{
 							Name:            config.EventTailer.TailerAffix,
-							Image:           "ghcr.io/kube-logging/eventrouter:0.4.0",
+							Image:           config.EventTailer.ImageWithTag,
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							VolumeMounts: []corev1.VolumeMount{
 								{
