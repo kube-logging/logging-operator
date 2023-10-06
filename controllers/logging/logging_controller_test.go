@@ -46,6 +46,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var (
@@ -1404,7 +1405,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                  scheme.Scheme,
-		MetricsBindAddress:      "0",
+		Metrics:                 metricsserver.Options{BindAddress: "0"},
 		GracefulShutdownTimeout: &timeout,
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
