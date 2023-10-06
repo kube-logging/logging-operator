@@ -6,10 +6,39 @@ generated_file: true
 
 # Sending messages to Loki over gRPC
 ## Overview
- More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+
+## Example
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: loki-output
+spec:
+  loki:
+    url: 	"loki.loki:8000"
+    batch-lines: 2000
+    batch-timeout: 10
+    workers: 3
+    log-fifo-size: 1000
+    labels:
+      "app": "$PROGRAM"
+      "host": "$HOST"
+    timestamp: "msg"
+    template: "$ISODATE $HOST $MSGHDR$MSG"
+    auth:
+      insecure: {}
+{{</ highlight >}}
+More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+
 
 ## Configuration
 ## LokiOutput
+
+### auth (*Auth, optional) {#lokioutput-auth}
+
+Auth TODO 
+
+Default: -
 
 ### labels (filter.ArrowMap, optional) {#lokioutput-labels}
 
@@ -19,7 +48,7 @@ Default: -
 
 ### url (string, optional) {#lokioutput-url}
 
-Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: http://127.0.0.1:8000 
+Specifies the hostname or IP address and optionally the port number of the  service that can receive log data via gRPC. Use a colon (:) after the address to specify the port number of the server. For example: grpc://127.0.0.1:8000 
 
 Default: -
 

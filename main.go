@@ -199,6 +199,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := (ctrl.NewControllerManagedBy(mgr).
+		For(&loggingv1beta1.LoggingRoute{}).
+		Complete(loggingControllers.NewLoggingRouteReconciler(mgr.GetClient(), mgr.GetLogger()))); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
+		os.Exit(1)
+	}
+
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
 		if err := loggingv1beta1.SetupWebhookWithManager(mgr, loggingv1beta1.APITypes()...); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "v1beta1.logging")

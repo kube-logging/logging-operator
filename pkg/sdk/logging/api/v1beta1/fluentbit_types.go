@@ -148,6 +148,7 @@ type FluentbitTLS struct {
 type FluentbitTCPOutput struct {
 	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
 	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
+	Workers        *int   `json:"Workers,omitempty"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit
@@ -470,6 +471,8 @@ type ForwardOptions struct {
 	RetryLimit         string `json:"Retry_Limit,omitempty"`
 	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
 	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
+	// Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0.
+	Workers *int `json:"Workers,omitempty"`
 }
 
 func init() {

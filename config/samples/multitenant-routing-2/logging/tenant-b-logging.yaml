@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: b-control
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: b
+  labels:
+    tenant: b
+spec:
+  loggingRef: b
+  syslogNG:
+    jsonKeyDelim: '#'
+    globalOptions:
+      stats:
+        level: 2
+        freq: 0
+      #log_level: trace
+  controlNamespace: b-control
+  watchNamespaces:
+    - b1
+    - b2

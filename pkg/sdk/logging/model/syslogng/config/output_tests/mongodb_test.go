@@ -15,96 +15,279 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestMongoDBOutput(t *testing.T) {
-	config.CheckConfigForOutput(t,
-		v1beta1.SyslogNGOutput{
+	expectedConfig := config.Untab(`@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+	channel {
+		source {
+			network(flags("no-parse") port(601) transport("tcp"));
+		};
+		parser {
+			json-parser(prefix("json."));
+		};
+	};
+};
+
+destination "output_default_test-mongodb-out" {
+	mongodb(collection("messages") uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out"));
+};
+`)
+
+	testCaseInput := config.Input{
+		Logging: v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "default",
-				Name:      "test-mongodb-out",
+				Namespace: "config-test",
+				Name:      "test",
 			},
-			Spec: v1beta1.SyslogNGOutputSpec{
-				MongoDB: &output.MongoDB{
-					Uri:        "mongodb://127.0.0.1:27017/syslog",
-					Collection: "messages",
-					Compaction: *config.NewFalse(),
-					ValuePairs: output.ValuePairs{
-						Scope: output.RawString{
-							String: `"selected-macros" "nv-pairs" "sdata"`,
+			Spec: v1beta1.LoggingSpec{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+			},
+		},
+		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
+		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
+		Flows:          []v1beta1.SyslogNGFlow{},
+		SourcePort:     601,
+		SecretLoaderFactory: &config.TestSecretLoaderFactory{
+			Reader: config.SecretReader{
+				Secrets: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "mongodb-connectionstring",
+						},
+						Data: map[string][]byte{
+							"connectionstring": []byte("mongodb://127.0.0.1:27017/syslog"),
+						},
+					},
+				},
+			},
+			MountPath: "/etc/syslog-ng/secret",
+		},
+		Outputs: []v1beta1.SyslogNGOutput{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-mongodb-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					MongoDB: &output.MongoDB{
+						Uri: &secret.Secret{
+							ValueFrom: &secret.ValueFrom{
+								SecretKeyRef: &corev1.SecretKeySelector{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "mongodb-connectionstring",
+									},
+									Key: "connectionstring",
+								},
+							},
+						},
+						Collection: "messages",
+						ValuePairs: output.ValuePairs{
+							Scope: output.RawString{
+								String: `"selected-macros" "nv-pairs" "sdata"`,
+							},
 						},
 					},
 				},
 			},
 		},
-		`
-destination "output_default_test-mongodb-out" {
-	mongodb(collection("messages") compaction(no) uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out"));
-};
-`,
-	)
+	}
+
+	var buf strings.Builder
+	err := config.RenderConfigInto(testCaseInput, &buf)
+	config.CheckError(t, false, err)
+	require.Equal(t, expectedConfig, buf.String())
+
 }
 
 func TestMongoDBOutputWithWriteConcernKeyword(t *testing.T) {
-	config.CheckConfigForOutput(t,
-		v1beta1.SyslogNGOutput{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "default",
-				Name:      "test-mongodb-out",
-			},
-			Spec: v1beta1.SyslogNGOutputSpec{
-				MongoDB: &output.MongoDB{
-					Uri:        "mongodb://127.0.0.1:27017/syslog",
-					Collection: "messages",
-					Compaction: *config.NewFalse(),
-					ValuePairs: output.ValuePairs{
-						Scope: output.RawString{
-							String: `"selected-macros" "nv-pairs" "sdata"`,
-						},
-					},
-					WriteConcern: output.RawString{String: output.Unacked},
-				},
-			},
-		},
-		`
-destination "output_default_test-mongodb-out" {
-	mongodb(collection("messages") compaction(no) uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out") write_concern(unacked));
-};
-`,
-	)
-}
+	expectedConfig := config.Untab(`@version: current
 
-func TestMongoDBOutputWithWriteConcernNonNegativeInteger(t *testing.T) {
-	config.CheckConfigForOutput(t,
-		v1beta1.SyslogNGOutput{
+@include "scl.conf"
+
+source "main_input" {
+	channel {
+		source {
+			network(flags("no-parse") port(601) transport("tcp"));
+		};
+		parser {
+			json-parser(prefix("json."));
+		};
+	};
+};
+
+destination "output_default_test-mongodb-out" {
+	mongodb(collection("messages") uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out") write_concern(unacked));
+};
+`)
+
+	testCaseInput := config.Input{
+		Logging: v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "default",
-				Name:      "test-mongodb-out",
+				Namespace: "config-test",
+				Name:      "test",
 			},
-			Spec: v1beta1.SyslogNGOutputSpec{
-				MongoDB: &output.MongoDB{
-					Uri:        "mongodb://127.0.0.1:27017/syslog",
-					Collection: "messages",
-					Compaction: *config.NewFalse(),
-					ValuePairs: output.ValuePairs{
-						Scope: output.RawString{
-							String: `"selected-macros" "nv-pairs" "sdata"`,
+			Spec: v1beta1.LoggingSpec{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+			},
+		},
+		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
+		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
+		Flows:          []v1beta1.SyslogNGFlow{},
+		SourcePort:     601,
+		SecretLoaderFactory: &config.TestSecretLoaderFactory{
+			Reader: config.SecretReader{
+				Secrets: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "mongodb-connectionstring",
+						},
+						Data: map[string][]byte{
+							"connectionstring": []byte("mongodb://127.0.0.1:27017/syslog"),
 						},
 					},
-					WriteConcern: output.RawString{String: `5`},
+				},
+			},
+			MountPath: "/etc/syslog-ng/secret",
+		},
+		Outputs: []v1beta1.SyslogNGOutput{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-mongodb-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					MongoDB: &output.MongoDB{
+						Uri: &secret.Secret{
+							ValueFrom: &secret.ValueFrom{
+								SecretKeyRef: &corev1.SecretKeySelector{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "mongodb-connectionstring",
+									},
+									Key: "connectionstring",
+								},
+							},
+						},
+						Collection: "messages",
+						ValuePairs: output.ValuePairs{
+							Scope: output.RawString{
+								String: `"selected-macros" "nv-pairs" "sdata"`,
+							},
+						},
+						WriteConcern: output.RawString{String: output.Unacked},
+					},
 				},
 			},
 		},
-		`
-destination "output_default_test-mongodb-out" {
-	mongodb(collection("messages") compaction(no) uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out") write_concern(5));
+	}
+
+	var buf strings.Builder
+	err := config.RenderConfigInto(testCaseInput, &buf)
+	config.CheckError(t, false, err)
+	require.Equal(t, expectedConfig, buf.String())
+
+}
+func TestMongoDBOutputWithWriteConcernNonNegativeInteger(t *testing.T) {
+	expectedConfig := config.Untab(`@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+	channel {
+		source {
+			network(flags("no-parse") port(601) transport("tcp"));
+		};
+		parser {
+			json-parser(prefix("json."));
+		};
+	};
 };
-`,
-	)
+
+destination "output_default_test-mongodb-out" {
+	mongodb(collection("messages") uri("mongodb://127.0.0.1:27017/syslog") value_pairs(scope("selected-macros" "nv-pairs" "sdata")) persist_name("output_default_test-mongodb-out") write_concern(5));
+};
+`)
+
+	testCaseInput := config.Input{
+		Logging: v1beta1.Logging{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "config-test",
+				Name:      "test",
+			},
+			Spec: v1beta1.LoggingSpec{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+			},
+		},
+		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
+		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
+		Flows:          []v1beta1.SyslogNGFlow{},
+		SourcePort:     601,
+		SecretLoaderFactory: &config.TestSecretLoaderFactory{
+			Reader: config.SecretReader{
+				Secrets: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "mongodb-connectionstring",
+						},
+						Data: map[string][]byte{
+							"connectionstring": []byte("mongodb://127.0.0.1:27017/syslog"),
+						},
+					},
+				},
+			},
+			MountPath: "/etc/syslog-ng/secret",
+		},
+		Outputs: []v1beta1.SyslogNGOutput{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-mongodb-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					MongoDB: &output.MongoDB{
+						Uri: &secret.Secret{
+							ValueFrom: &secret.ValueFrom{
+								SecretKeyRef: &corev1.SecretKeySelector{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "mongodb-connectionstring",
+									},
+									Key: "connectionstring",
+								},
+							},
+						},
+						Collection: "messages",
+						ValuePairs: output.ValuePairs{
+							Scope: output.RawString{
+								String: `"selected-macros" "nv-pairs" "sdata"`,
+							},
+						},
+						WriteConcern: output.RawString{String: `5`},
+					},
+				},
+			},
+		},
+	}
+
+	var buf strings.Builder
+	err := config.RenderConfigInto(testCaseInput, &buf)
+	config.CheckError(t, false, err)
+	require.Equal(t, expectedConfig, buf.String())
+
 }

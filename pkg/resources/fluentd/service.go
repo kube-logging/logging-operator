@@ -32,14 +32,14 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 				{
 					Name:       "tcp-fluentd",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       24240,
-					TargetPort: intstr.IntOrString{IntVal: 24240},
+					Port:       ServicePort,
+					TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Port},
 				},
 				{
 					Name:       "udp-fluentd",
 					Protocol:   corev1.ProtocolUDP,
-					Port:       24240,
-					TargetPort: intstr.IntOrString{IntVal: 24240},
+					Port:       ServicePort,
+					TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Port},
 				},
 			},
 			Selector: r.Logging.GetFluentdLabels(ComponentFluentd),
@@ -193,16 +193,18 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
-					Name:       "tcp-fluentd",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       24240,
-					TargetPort: intstr.IntOrString{IntVal: 24240},
+					Name:     "tcp-fluentd",
+					Protocol: corev1.ProtocolTCP,
+					// This port should match the containerport and targetPort will be automatically set to the same
+					// https://github.com/kubernetes/kubernetes/issues/20488
+					Port: r.Logging.Spec.FluentdSpec.Port,
 				},
 				{
-					Name:       "udp-fluentd",
-					Protocol:   corev1.ProtocolUDP,
-					Port:       24240,
-					TargetPort: intstr.IntOrString{IntVal: 24240},
+					Name:     "udp-fluentd",
+					Protocol: corev1.ProtocolUDP,
+					// This port should match the containerport and targetPort will be automatically set to the same
+					// https://github.com/kubernetes/kubernetes/issues/20488
+					Port: r.Logging.Spec.FluentdSpec.Port,
 				},
 			},
 			Selector:  r.Logging.GetFluentdLabels(ComponentFluentd),
