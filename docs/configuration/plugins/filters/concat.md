@@ -67,9 +67,9 @@ Default: -
 
 ### use_first_timestamp (bool, optional) {#concat-use_first_timestamp}
 
-Use timestamp of first record when buffer is flushed.  
+Use timestamp of first record when buffer is flushed.
 
-Default:  False
+Default: False
 
 ### partial_key (string, optional) {#concat-partial_key}
 
@@ -85,7 +85,7 @@ Default: -
 
 ### keep_partial_key (bool, optional) {#concat-keep_partial_key}
 
-If true, keep partial_key in concatenated records  
+If true, keep partial_key in concatenated records
 
 Default: False
 

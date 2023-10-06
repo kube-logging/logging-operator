@@ -26,15 +26,15 @@ generated_file: true
 
 ### type (string, optional) {#format-type}
 
-Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value  
+Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
 
-Default:  json
+Default: json
 
 ### add_newline (*bool, optional) {#format-add_newline}
 
-When type is single_value add '\n' to the end of the message  
+When type is single_value add '\n' to the end of the message
 
-Default:  true
+Default: true
 
 ### message_key (string, optional) {#format-message_key}
 

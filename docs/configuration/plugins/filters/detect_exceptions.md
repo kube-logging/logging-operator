@@ -25,57 +25,57 @@ generated_file: true
 
 ### message (string, optional) {#detectexceptions-message}
 
-The field which contains the raw message text in the input JSON data.  
+The field which contains the raw message text in the input JSON data.
 
-Default:  ""
+Default: ""
 
 ### remove_tag_prefix (string, optional) {#detectexceptions-remove_tag_prefix}
 
-The prefix to be removed from the input tag when outputting a record.  
+The prefix to be removed from the input tag when outputting a record.
 
-Default:  kubernetes
+Default: kubernetes
 
 ### multiline_flush_interval (string, optional) {#detectexceptions-multiline_flush_interval}
 
-The interval of flushing the buffer for multiline format.  
+The interval of flushing the buffer for multiline format.
 
-Default:  nil
+Default: nil
 
 ### languages ([]string, optional) {#detectexceptions-languages}
 
-Programming languages for which to detect exceptions.  
+Programming languages for which to detect exceptions.
 
-Default:  []
+Default: []
 
 ### max_lines (int, optional) {#detectexceptions-max_lines}
 
-Maximum number of lines to flush (0 means no limit)  
+Maximum number of lines to flush (0 means no limit)
 
-Default:  1000
+Default: 1000
 
 ### max_bytes (int, optional) {#detectexceptions-max_bytes}
 
-Maximum number of bytes to flush (0 means no limit)  
+Maximum number of bytes to flush (0 means no limit)
 
-Default:  0
+Default: 0
 
 ### stream (string, optional) {#detectexceptions-stream}
 
-Separate log streams by this field in the input JSON data.  
+Separate log streams by this field in the input JSON data.
 
-Default:  ""
+Default: ""
 
 ### force_line_breaks (bool, optional) {#detectexceptions-force_line_breaks}
 
-Force line breaks between each lines when comibining exception stacks.  
+Force line breaks between each lines when comibining exception stacks.
 
-Default:  false
+Default: false
 
 ### match_tag (string, optional) {#detectexceptions-match_tag}
 
-Tag used in match directive.  
+Tag used in match directive.
 
-Default:  kubernetes.**
+Default: kubernetes.**
 
 
  ## Example `Exception Detector` filter configurations

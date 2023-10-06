@@ -50,15 +50,15 @@ Default: -
 
 ### azure_object_key_format (string, optional) {#output config-azure_object_key_format}
 
-Object key format  
+Object key format
 
-Default:  %{path}%{time_slice}_%{index}.%{file_extension}
+Default: %{path}%{time_slice}_%{index}.%{file_extension}
 
 ### auto_create_container (bool, optional) {#output config-auto_create_container}
 
-Automatically create container if not exists 
+Automatically create container if not exists
 
-Default:  true
+Default: true
 
 ### format (string, optional) {#output config-format}
 

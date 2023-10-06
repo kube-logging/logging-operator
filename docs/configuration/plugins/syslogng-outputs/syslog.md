@@ -133,9 +133,9 @@ Default: -
 
 ### template (string, optional) {#syslogoutput-template}
 
-Specifies a template defining the logformat to be used in the destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor905)  
+Specifies a template defining the logformat to be used in the destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor905)
 
-Default:  0
+Default: 0
 
 ### template_escape (*bool, optional) {#syslogoutput-template_escape}
 

@@ -136,27 +136,27 @@ Default: -
 
 ### time_type (string, optional) {#parse section-time_type}
 
-Parse/format value according to this type available values: float, unixtime, string  
+Parse/format value according to this type available values: float, unixtime, string
 
-Default:  string
+Default: string
 
 ### local_time (bool, optional) {#parse section-local_time}
 
-Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.  
+Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.
 
-Default:  true
+Default: true
 
 ### utc (bool, optional) {#parse section-utc}
 
-If true, use UTC. Otherwise, local time is used. This is exclusive with localtime  
+If true, use UTC. Otherwise, local time is used. This is exclusive with localtime
 
-Default:  false
+Default: false
 
 ### timezone (string, optional) {#parse section-timezone}
 
-Use specified timezone. one can parse/format the time value in the specified timezone.  
+Use specified timezone. one can parse/format the time value in the specified timezone.
 
-Default:  nil
+Default: nil
 
 ### format (string, optional) {#parse section-format}
 
@@ -172,9 +172,9 @@ Default: -
 
 ### delimiter (string, optional) {#parse section-delimiter}
 
-Only available when using type: ltsv  
+Only available when using type: ltsv
 
-Default:  "\t"
+Default: "\t"
 
 ### delimiter_pattern (string, optional) {#parse section-delimiter_pattern}
 
@@ -184,9 +184,9 @@ Default: -
 
 ### label_delimiter (string, optional) {#parse section-label_delimiter}
 
-Only available when using type: ltsv  
+Only available when using type: ltsv
 
-Default:  ":"
+Default: ":"
 
 ### multiline ([]string, optional) {#parse section-multiline}
 
@@ -295,27 +295,27 @@ Default: -
 
 ### time_type (string, optional) {#parse section (single)-time_type}
 
-Parse/format value according to this type available values: float, unixtime, string  
+Parse/format value according to this type available values: float, unixtime, string
 
-Default:  string
+Default: string
 
 ### local_time (bool, optional) {#parse section (single)-local_time}
 
-Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.  
+Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.
 
-Default:  true
+Default: true
 
 ### utc (bool, optional) {#parse section (single)-utc}
 
-If true, use UTC. Otherwise, local time is used. This is exclusive with localtime  
+If true, use UTC. Otherwise, local time is used. This is exclusive with localtime
 
-Default:  false
+Default: false
 
 ### timezone (string, optional) {#parse section (single)-timezone}
 
-Use specified timezone. one can parse/format the time value in the specified timezone.  
+Use specified timezone. one can parse/format the time value in the specified timezone.
 
-Default:  nil
+Default: nil
 
 ### format (string, optional) {#parse section (single)-format}
 

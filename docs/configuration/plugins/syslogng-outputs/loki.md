@@ -54,15 +54,15 @@ Default: -
 
 ### time_reopen (int, optional) {#lokioutput-time_reopen}
 
-The time to wait in seconds before a dead connection is reestablished.  
+The time to wait in seconds before a dead connection is reestablished.
 
-Default:  60
+Default: 60
 
 ### disk_buffer (*DiskBuffer, optional) {#lokioutput-disk_buffer}
 
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).  
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 
-Default:  false
+Default: false
 
 ### batch-lines (int, optional) {#lokioutput-batch-lines}
 

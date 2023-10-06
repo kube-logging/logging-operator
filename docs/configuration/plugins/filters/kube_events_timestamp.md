@@ -13,15 +13,15 @@ generated_file: true
 
 ### timestamp_fields ([]string, optional) {#kubeeventstimestampconfig-timestamp_fields}
 
-Time field names in order of relevance  
+Time field names in order of relevance
 
-Default:  event.eventTime, event.lastTimestamp, event.firstTimestamp
+Default: event.eventTime, event.lastTimestamp, event.firstTimestamp
 
 ### mapped_time_key (string, optional) {#kubeeventstimestampconfig-mapped_time_key}
 
-Added time field name  
+Added time field name
 
-Default:  triggerts
+Default: triggerts
 
 
  ## Example `Kubernetes Events Timestamp` filter configurations

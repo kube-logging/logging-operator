@@ -60,9 +60,9 @@ Default: -
 
 ### object_key_format (string, optional) {#gcsoutput-object_key_format}
 
-Format of GCS object keys  
+Format of GCS object keys
 
-Default:  %{path}%{time_slice}_%{index}.%{file_extension}
+Default: %{path}%{time_slice}_%{index}.%{file_extension}
 
 ### path (string, optional) {#gcsoutput-path}
 
@@ -72,9 +72,9 @@ Default: -
 
 ### store_as (string, optional) {#gcsoutput-store_as}
 
-Archive format on GCS: gzip json text  
+Archive format on GCS: gzip json text
 
-Default:  gzip
+Default: gzip
 
 ### transcoding (bool, optional) {#gcsoutput-transcoding}
 
@@ -84,21 +84,21 @@ Default: -
 
 ### auto_create_bucket (bool, optional) {#gcsoutput-auto_create_bucket}
 
-Create GCS bucket if it does not exists  
+Create GCS bucket if it does not exists
 
-Default:  true
+Default: true
 
 ### hex_random_length (int, optional) {#gcsoutput-hex_random_length}
 
-Max length of `%{hex_random}` placeholder(4-16)  
+Max length of `%{hex_random}` placeholder(4-16)
 
-Default:  4
+Default: 4
 
 ### overwrite (bool, optional) {#gcsoutput-overwrite}
 
-Overwrite already existing path  
+Overwrite already existing path
 
-Default:  false
+Default: false
 
 ### acl (string, optional) {#gcsoutput-acl}
 

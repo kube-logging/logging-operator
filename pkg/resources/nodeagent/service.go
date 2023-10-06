@@ -56,6 +56,7 @@ func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitor {
 		objectMetadata := n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics")
 		if n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -84,7 +85,7 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
 				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
