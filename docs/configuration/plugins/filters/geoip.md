@@ -14,9 +14,9 @@ generated_file: true
 
 ### geoip_lookup_keys (string, optional) {#geoip-geoip_lookup_keys}
 
-Specify one or more geoip lookup field which has ip address  
+Specify one or more geoip lookup field which has ip address
 
-Default:  host
+Default: host
 
 ### geoip_database (string, optional) {#geoip-geoip_database}
 

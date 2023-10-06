@@ -37,15 +37,15 @@ Default: -
 
 ### create_queue (*bool, optional) {#output config-create_queue}
 
-Create SQS queue  
+Create SQS queue
 
-Default:  true
+Default: true
 
 ### region (string, optional) {#output config-region}
 
-AWS region  
+AWS region
 
-Default:  ap-northeast-1
+Default: ap-northeast-1
 
 ### message_group_id (string, optional) {#output config-message_group_id}
 
@@ -55,21 +55,21 @@ Default: -
 
 ### delay_seconds (int, optional) {#output config-delay_seconds}
 
-Delivery delay seconds  
+Delivery delay seconds
 
-Default:  0
+Default: 0
 
 ### include_tag (*bool, optional) {#output config-include_tag}
 
-Include tag  
+Include tag
 
-Default:  true
+Default: true
 
 ### tag_property_name (string, optional) {#output config-tag_property_name}
 
-Tags property name in json  
+Tags property name in json
 
-Default:  '__tag'
+Default: '__tag'
 
 ### buffer (*Buffer, optional) {#output config-buffer}
 

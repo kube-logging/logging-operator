@@ -20,15 +20,15 @@ Default: -
 
 ### tags (*string, optional) {#buffer-tags}
 
-When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags.  
+When tag is specified as buffer chunk key, output plugin writes events into chunks separately per tags.
 
-Default:  tag,time
+Default: tag,time
 
 ### path (string, optional) {#buffer-path}
 
-The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default.  
+The path where buffer chunks are stored. The '*' is replaced with random characters. It's highly recommended to leave this default.
 
-Default:  operator generated
+Default: operator generated
 
 ### chunk_limit_size (string, optional) {#buffer-chunk_limit_size}
 
