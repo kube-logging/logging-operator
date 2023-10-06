@@ -74,6 +74,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
+	if c := r.tmpDirHackContainer(); c != nil {
+		initContainers = append(initContainers, *c)
+	}
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
@@ -131,6 +134,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 	envVars := append(spec.EnvVars,
 		corev1.EnvVar{Name: "BUFFER_PATH", Value: bufferPath},
+		corev1.EnvVar{Name: "TMPDIR", Value: "/tmp/fluent"},
 	)
 
 	container := corev1.Container{
@@ -283,6 +287,10 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			Name:      "output-secret",
 			MountPath: OutputSecretPath,
 		},
+		{
+			Name:      "tmp",
+			MountPath: "/tmp",
+		},
 	}
 	if spec != nil && spec.TLS.Enabled {
 		res = append(res, corev1.VolumeMount{
@@ -309,6 +317,12 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.Logging.QualifiedName(OutputSecretName),
 				},
+			},
+		},
+		{
+			Name: "tmp",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
 			},
 		},
 	}
@@ -351,6 +365,29 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		v = append(v, tlsRelatedVolume)
 	}
 	return
+}
+
+func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
+	return &corev1.Container{
+		Command:         []string{"sh", "-c", "mkdir /tmp/fluent;chmod +t /tmp/fluent"},
+		Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
+		Name:            "tmp-dir-hack",
+		Resources:       r.Logging.Spec.FluentdSpec.Resources,
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
+			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
+			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
+			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
+			SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
+			SeccompProfile:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SeccompProfile,
+			Capabilities:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.Capabilities,
+		},
+		VolumeMounts:    generateVolumeMounts(r.Logging.Spec.FluentdSpec),
+	}
+	return nil
 }
 
 func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
