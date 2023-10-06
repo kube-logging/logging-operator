@@ -137,7 +137,7 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1
 			return c.Name == sideCar.Name
 		}) {
 			p.Log.Info(duplicateValuesMsg)
-			rv := admission.Allowed(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
 
 		} else {
@@ -153,7 +153,7 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1
 			return v.Name == volume.Name
 		}) {
 			p.Log.Info(duplicateValuesMsg)
-			rv := admission.Allowed(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
 		} else {
 			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
