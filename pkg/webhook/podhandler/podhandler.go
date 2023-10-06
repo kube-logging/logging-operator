@@ -26,6 +26,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/siliconbrain/go-seqs/seqs"
 	corev1 "k8s.io/api/core/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -108,15 +109,15 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	annotationHandler := annotation.NewHandler(containerNames)
 	annotationHandler.AddTailerAnnotation(tailAnnotation)
 
-	for idx, container := range pod.Spec.Containers {
+	for _, container := range pod.Spec.Containers {
 		filePaths := annotationHandler.FilePathsForContainer(container.Name)
 
 		sideCars, volumes, volumeMounts := p.sideCarsForContainer(container.Name, filePaths)
 
 		// Append the new data to the podspec
-		pod.Spec.Containers = append(pod.Spec.Containers, sideCars...)
-		pod.Spec.Volumes = append(pod.Spec.Volumes, volumes...)
-		pod.Spec.Containers[idx].VolumeMounts = append(pod.Spec.Containers[idx].VolumeMounts, volumeMounts...)
+		if resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); resp != nil {
+			return *resp
+		}
 	}
 
 	marshaledPod, err := json.Marshal(pod)
@@ -126,4 +127,38 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
+}
+
+func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
+	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
+	for idx, sideCar := range sideCars {
+		sideCar := sideCar
+		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
+			return c.Name == sideCar.Name
+		}) {
+			p.Log.Info(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
+			return &rv
+
+		} else {
+			podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
+			podToModify.Spec.Containers[idx].VolumeMounts = append(podToModify.Spec.Containers[idx].VolumeMounts, volumeMounts...)
+
+		}
+	}
+
+	for _, volume := range volumes {
+		volume := volume
+		if seqs.Any(seqs.FromSlice(podToModify.Spec.Volumes), func(v corev1.Volume) bool {
+			return v.Name == volume.Name
+		}) {
+			p.Log.Info(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
+			return &rv
+		} else {
+			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
+
+		}
+	}
+	return nil
 }
