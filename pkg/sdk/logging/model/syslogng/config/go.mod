@@ -4,14 +4,14 @@ go 1.20
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/cisco-open/operator-tools v0.30.0
-	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
-	github.com/siliconbrain/go-seqs v0.5.0
+	github.com/cisco-open/operator-tools v0.31.0
+	github.com/kube-logging/logging-operator/pkg/sdk v0.10.0
+	github.com/siliconbrain/go-seqs v0.6.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
-	k8s.io/api v0.27.4
-	k8s.io/apimachinery v0.27.4
-	sigs.k8s.io/controller-runtime v0.15.0
+	k8s.io/api v0.27.6
+	k8s.io/apimachinery v0.27.6
+	sigs.k8s.io/controller-runtime v0.16.2
 )
 
 require (

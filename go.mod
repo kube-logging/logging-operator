@@ -8,22 +8,22 @@ require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/cisco-open/operator-tools v0.31.0
 	github.com/go-logr/logr v1.2.4
-	github.com/kube-logging/logging-operator/pkg/sdk v0.9.1
+	github.com/kube-logging/logging-operator/pkg/sdk v0.10.0
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.27.9
+	github.com/onsi/gomega v1.28.0
 	github.com/pborman/uuid v1.2.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
-	github.com/prometheus/client_golang v1.16.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.68.0
+	github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
-	k8s.io/api v0.27.4
-	k8s.io/apiextensions-apiserver v0.27.4
-	k8s.io/apimachinery v0.27.4
-	k8s.io/client-go v0.27.4
+	k8s.io/api v0.27.6
+	k8s.io/apiextensions-apiserver v0.27.6
+	k8s.io/apimachinery v0.27.6
+	k8s.io/client-go v0.27.6
 	k8s.io/klog/v2 v2.100.1
-	sigs.k8s.io/controller-runtime v0.15.0
+	sigs.k8s.io/controller-runtime v0.16.2
 )
 
 require (
