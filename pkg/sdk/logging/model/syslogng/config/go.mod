@@ -1,6 +1,6 @@
 module github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config
 
-go 1.20
+go 1.21
 
 require (
 	emperror.dev/errors v0.8.1
@@ -76,5 +76,3 @@ require (
 )
 
 replace github.com/kube-logging/logging-operator/pkg/sdk => ../../../../../../pkg/sdk
-
-replace github.com/siliconbrain/go-seqs v0.6.0 => github.com/siliconbrain/go-seqs v0.5.0
