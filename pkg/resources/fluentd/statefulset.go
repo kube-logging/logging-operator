@@ -208,10 +208,7 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Resources:       spec.ConfigReloaderResources,
 		Args:            args,
 		VolumeMounts:    vm,
-	}
-
-	if spec.Security != nil && spec.Security.SecurityContext != nil {
-		c.SecurityContext = spec.Security.SecurityContext
+		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
@@ -464,6 +461,7 @@ func generateInitContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
 					MountPath: "/tmp/archive",
 				},
 			},
+			SecurityContext: spec.Security.SecurityContext,
 		}
 	}
 	return nil
