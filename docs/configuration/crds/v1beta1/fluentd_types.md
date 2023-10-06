@@ -327,4 +327,16 @@ Container image to use for the fluentd placeholder pod
 
 Default: -
 
+### resources (*corev1.ResourceRequirements, optional) {#fluentddrainconfig-resources}
+
+Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit 
+
+Default: -
+
+### securityContext (*corev1.SecurityContext, optional) {#fluentddrainconfig-securitycontext}
+
+Configurable security context, uses fluentd pods' security context by default 
+
+Default: -
+
 
