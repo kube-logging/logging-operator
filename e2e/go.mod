@@ -5,7 +5,7 @@ go 1.21
 require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/cisco-open/operator-tools v0.31.0
+	github.com/cisco-open/operator-tools v0.32.0
 	github.com/kube-logging/logging-operator v0.0.0-20231004170743-a36ee535ef24
 	github.com/kube-logging/logging-operator/pkg/sdk v0.10.0
 	github.com/spf13/cast v1.5.1
@@ -74,7 +74,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
-	github.com/iancoleman/orderedmap v0.2.0 // indirect
+	github.com/iancoleman/orderedmap v0.3.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
