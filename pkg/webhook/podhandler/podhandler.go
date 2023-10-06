@@ -115,8 +115,8 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 		sideCars, volumes, volumeMounts := p.sideCarsForContainer(container.Name, filePaths)
 
 		// Append the new data to the podspec
-		if err := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); err != nil {
-			return *err
+		if resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); resp != nil {
+			return *resp
 		}
 	}
 
