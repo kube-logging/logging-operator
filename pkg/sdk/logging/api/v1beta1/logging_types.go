@@ -331,6 +331,19 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy == "" {
 			l.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy = "IfNotPresent"
 		}
+		if l.Spec.FluentdSpec.Scaling.Drain.Resources == nil {
+			l.Spec.FluentdSpec.Scaling.Drain.Resources = &v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					v1.ResourceMemory: resource.MustParse("50M"),
+				},
+				Requests: v1.ResourceList{
+					v1.ResourceCPU: resource.MustParse("20m"),
+				},
+			}
+		}
+		if l.Spec.FluentdSpec.Scaling.Drain.SecurityContext == nil {
+			l.Spec.FluentdSpec.Scaling.Drain.SecurityContext = l.Spec.FluentdSpec.Security.SecurityContext.DeepCopy()
+		}
 		if l.Spec.FluentdSpec.FluentLogDestination == "" {
 			l.Spec.FluentdSpec.FluentLogDestination = "null"
 		}

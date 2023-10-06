@@ -74,7 +74,7 @@ debug: manager ## Remote debug
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	docker image inspect ${IMG} && echo "docker image ${IMG} already built" || ${DOCKER} build . -t ${IMG}
+	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 

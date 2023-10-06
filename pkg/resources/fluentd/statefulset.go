@@ -140,20 +140,10 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		Ports:           generatePorts(spec),
 		VolumeMounts:    generateVolumeMounts(spec),
 		Resources:       spec.Resources,
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             spec.Security.SecurityContext.Capabilities,
-		},
-		Env:            envVars,
-		LivenessProbe:  spec.LivenessProbe,
-		ReadinessProbe: generateReadinessCheck(spec),
+		SecurityContext: spec.Security.SecurityContext,
+		Env:             envVars,
+		LivenessProbe:   spec.LivenessProbe,
+		ReadinessProbe:  generateReadinessCheck(spec),
 	}
 
 	if spec.FluentOutLogrotate != nil && spec.FluentOutLogrotate.Enabled {
@@ -218,20 +208,7 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Resources:       spec.ConfigReloaderResources,
 		Args:            args,
 		VolumeMounts:    vm,
-	}
-
-	if spec.Security != nil && spec.Security.SecurityContext != nil {
-		c.SecurityContext = &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             spec.Security.SecurityContext.Capabilities,
-		}
+		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
@@ -409,7 +386,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: bufferPath,
 				},
 			},
-			Resources: r.Logging.Spec.FluentdSpec.BufferVolumeResources,
+			Resources:       r.Logging.Spec.FluentdSpec.BufferVolumeResources,
+			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
 		}
 	}
 	return nil
@@ -483,6 +461,7 @@ func generateInitContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
 					MountPath: "/tmp/archive",
 				},
 			},
+			SecurityContext: spec.Security.SecurityContext,
 		}
 	}
 	return nil

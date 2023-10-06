@@ -160,4 +160,8 @@ type FluentdDrainConfig struct {
 	Image        ImageSpec `json:"image,omitempty"`
 	// Container image to use for the fluentd placeholder pod
 	PauseImage ImageSpec `json:"pauseImage,omitempty"`
+	// Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+	// Configurable security context, uses fluentd pods' security context by default
+	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 }
