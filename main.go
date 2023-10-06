@@ -42,6 +42,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
@@ -123,10 +124,10 @@ func main() {
 	klog.SetLogger(zapLogger)
 
 	mgrOptions := ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
+		Scheme:           scheme,
+		Metrics:          metricsserver.Options{BindAddress: metricsAddr},
+		LeaderElection:   enableLeaderElection,
+		LeaderElectionID: "logging-operator." + loggingv1beta1.GroupVersion.Group,
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
@@ -149,20 +150,26 @@ func main() {
 		os.Exit(1)
 	}
 
+	if enableprofile {
+		setupLog.Info("enabling pprof")
+		pprofxIndexPath := "/debug/pprof"
+		//err = mgr.AddMetricsExtraHandler("/debug/pprof/", http.HandlerFunc(pprof.Index))
+		customMgrOptions.Metrics.ExtraHandlers = map[string]http.Handler{
+			pprofxIndexPath: http.HandlerFunc(pprof.Index),
+		}
+		pprofIndexEndpoint := fmt.Sprintf("http://127.0.0.1:%s%s", metricsAddr, pprofxIndexPath)
+		_, err := http.Get(pprofIndexEndpoint)
+		if err != nil {
+			setupLog.Error(err, "unable to attach pprof to webserver")
+			os.Exit(1)
+		}
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), *customMgrOptions)
 
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
-	}
-
-	if enableprofile {
-		setupLog.Info("enabling pprof")
-		err = mgr.AddMetricsExtraHandler("/debug/pprof/", http.HandlerFunc(pprof.Index))
-		if err != nil {
-			setupLog.Error(err, "unable to attach pprof to webserver")
-			os.Exit(1)
-		}
 	}
 
 	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {

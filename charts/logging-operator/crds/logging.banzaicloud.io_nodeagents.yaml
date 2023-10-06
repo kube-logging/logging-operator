@@ -1070,6 +1070,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:
@@ -1706,6 +1708,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:
@@ -2346,6 +2350,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:

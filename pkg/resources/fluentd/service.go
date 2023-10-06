@@ -84,6 +84,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.FluentdSpec.Metrics != nil && r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
 		if r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -111,7 +112,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
@@ -151,6 +152,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -177,7 +179,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}

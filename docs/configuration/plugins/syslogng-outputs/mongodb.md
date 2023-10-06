@@ -40,9 +40,9 @@ Default: -
 
 ### disk_buffer (*DiskBuffer, optional) {#mongodb-disk_buffer}
 
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).  
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 
-Default:  false
+Default: false
 
 ### uri (*secret.Secret, optional) {#mongodb-uri}
 
@@ -52,9 +52,9 @@ Default: -
 
 ### value_pairs (ValuePairs, optional) {#mongodb-value_pairs}
 
-Creates structured name-value pairs from the data and metadata of the log message.  
+Creates structured name-value pairs from the data and metadata of the log message.
 
-Default:  "scope("selected-macros" "nv-pairs")"
+Default: "scope("selected-macros" "nv-pairs")"
 
 ###  (Batch, required) {#mongodb-}
 
@@ -88,9 +88,9 @@ Default: -
 
 ### time_reopen (int, optional) {#mongodb-time_reopen}
 
-The time to wait in seconds before a dead connection is reestablished.  
+The time to wait in seconds before a dead connection is reestablished.
 
-Default:  60
+Default: 60
 
 ### write_concern (RawString, optional) {#mongodb-write_concern}
 
@@ -106,21 +106,21 @@ See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destination
 
 ### bulk (*bool, optional) {#bulk-bulk}
 
-Enables bulk insert mode. If disabled, each messages is inserted individually.  
+Enables bulk insert mode. If disabled, each messages is inserted individually.
 
-Default:  yes
+Default: yes
 
 ### bulk_bypass_validation (*bool, optional) {#bulk-bulk_bypass_validation}
 
-If set to yes, it disables MongoDB bulk operations validation mode.  
+If set to yes, it disables MongoDB bulk operations validation mode.
 
-Default:  no
+Default: no
 
 ### bulk_unordered (*bool, optional) {#bulk-bulk_unordered}
 
-Description: Enables unordered bulk operations mode.  
+Description: Enables unordered bulk operations mode.
 
-Default:  no
+Default: no
 
 
 ## ValuePairs

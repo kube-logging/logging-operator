@@ -19,15 +19,15 @@ Default: -
 
 ### headers ([]string, optional) {#httpoutput-headers}
 
-Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").   
+Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").
 
-Default:  empty
+Default: empty
 
 ### time_reopen (int, optional) {#httpoutput-time_reopen}
 
-The time to wait in seconds before a dead connection is reestablished.  
+The time to wait in seconds before a dead connection is reestablished.
 
-Default:  60
+Default: 60
 
 ### tls (*TLS, optional) {#httpoutput-tls}
 
@@ -37,9 +37,9 @@ Default: -
 
 ### disk_buffer (*DiskBuffer, optional) {#httpoutput-disk_buffer}
 
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).  
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 
-Default:  false
+Default: false
 
 ###  (Batch, required) {#httpoutput-}
 

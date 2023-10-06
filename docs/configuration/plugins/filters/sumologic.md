@@ -13,159 +13,159 @@ generated_file: true
 
 ### source_category (string, optional) {#sumologic-source_category}
 
-Source Category  
+Source Category
 
-Default:  "%{namespace}/%{pod_name}"
+Default: "%{namespace}/%{pod_name}"
 
 ### source_category_replace_dash (string, optional) {#sumologic-source_category_replace_dash}
 
-Source Category Replace Dash  
+Source Category Replace Dash
 
-Default:  "/"
+Default: "/"
 
 ### source_category_prefix (string, optional) {#sumologic-source_category_prefix}
 
-Source Category Prefix  
+Source Category Prefix
 
-Default:  kubernetes/
+Default: kubernetes/
 
 ### source_name (string, optional) {#sumologic-source_name}
 
-Source Name  
+Source Name
 
-Default:  "%{namespace}.%{pod}.%{container}"
+Default: "%{namespace}.%{pod}.%{container}"
 
 ### log_format (string, optional) {#sumologic-log_format}
 
-Log Format  
+Log Format
 
-Default:  json
+Default: json
 
 ### source_host (string, optional) {#sumologic-source_host}
 
-Source Host  
+Source Host
 
-Default:  ""
+Default: ""
 
 ### exclude_container_regex (string, optional) {#sumologic-exclude_container_regex}
 
-Exclude Container Regex  
+Exclude Container Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_facility_regex (string, optional) {#sumologic-exclude_facility_regex}
 
-Exclude Facility Regex  
+Exclude Facility Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_host_regex (string, optional) {#sumologic-exclude_host_regex}
 
-Exclude Host Regex  
+Exclude Host Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_namespace_regex (string, optional) {#sumologic-exclude_namespace_regex}
 
-Exclude Namespace Regex  
+Exclude Namespace Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_pod_regex (string, optional) {#sumologic-exclude_pod_regex}
 
-Exclude Pod Regex  
+Exclude Pod Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_priority_regex (string, optional) {#sumologic-exclude_priority_regex}
 
-Exclude Priority Regex  
+Exclude Priority Regex
 
-Default:  ""
+Default: ""
 
 ### exclude_unit_regex (string, optional) {#sumologic-exclude_unit_regex}
 
-Exclude Unit Regex  
+Exclude Unit Regex
 
-Default:  ""
+Default: ""
 
 ### tracing_format (*bool, optional) {#sumologic-tracing_format}
 
-Tracing Format  
+Tracing Format
 
-Default:  false
+Default: false
 
 ### tracing_namespace (string, optional) {#sumologic-tracing_namespace}
 
-Tracing Namespace  
+Tracing Namespace
 
-Default:  "namespace"
+Default: "namespace"
 
 ### tracing_pod (string, optional) {#sumologic-tracing_pod}
 
-Tracing Pod  
+Tracing Pod
 
-Default:  "pod"
+Default: "pod"
 
 ### tracing_pod_id (string, optional) {#sumologic-tracing_pod_id}
 
-Tracing Pod ID  
+Tracing Pod ID
 
-Default:  "pod_id"
+Default: "pod_id"
 
 ### tracing_container_name (string, optional) {#sumologic-tracing_container_name}
 
-Tracing Container Name  
+Tracing Container Name
 
-Default:  "container_name"
+Default: "container_name"
 
 ### tracing_host (string, optional) {#sumologic-tracing_host}
 
-Tracing Host  
+Tracing Host
 
-Default:  "hostname"
+Default: "hostname"
 
 ### tracing_label_prefix (string, optional) {#sumologic-tracing_label_prefix}
 
-Tracing Label Prefix  
+Tracing Label Prefix
 
-Default:  "pod_label_"
+Default: "pod_label_"
 
 ### tracing_annotation_prefix (string, optional) {#sumologic-tracing_annotation_prefix}
 
-Tracing Annotation Prefix  
+Tracing Annotation Prefix
 
-Default:  "pod_annotation_"
+Default: "pod_annotation_"
 
 ### source_host_key_name (string, optional) {#sumologic-source_host_key_name}
 
-Source HostKey Name  
+Source HostKey Name
 
-Default:  "_sourceHost"
+Default: "_sourceHost"
 
 ### source_category_key_name (string, optional) {#sumologic-source_category_key_name}
 
-Source CategoryKey Name  
+Source CategoryKey Name
 
-Default:  "_sourceCategory"
+Default: "_sourceCategory"
 
 ### source_name_key_name (string, optional) {#sumologic-source_name_key_name}
 
-Source NameKey Name  
+Source NameKey Name
 
-Default:  "_sourceName"
+Default: "_sourceName"
 
 ### collector_key_name (string, optional) {#sumologic-collector_key_name}
 
-CollectorKey Name  
+CollectorKey Name
 
-Default:  "_collector"
+Default: "_collector"
 
 ### collector_value (string, optional) {#sumologic-collector_value}
 
-Collector Value  
+Collector Value
 
-Default:  "undefined"
+Default: "undefined"
 
 
  ## Example `Parser` filter configurations

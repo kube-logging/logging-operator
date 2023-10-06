@@ -26,15 +26,15 @@ Default: -
 
 ### ack_response_timeout (int, optional) {#forwardoutput-ack_response_timeout}
 
-This option is used when require_ack_response is true. This default value is based on popular tcp_syn_retries.  
+This option is used when require_ack_response is true. This default value is based on popular tcp_syn_retries.
 
-Default:  190
+Default: 190
 
 ### send_timeout (int, optional) {#forwardoutput-send_timeout}
 
-The timeout time when sending event logs.  
+The timeout time when sending event logs.
 
-Default:  60
+Default: 60
 
 ### connect_timeout (int, optional) {#forwardoutput-connect_timeout}
 
@@ -44,9 +44,9 @@ Default: -
 
 ### recover_wait (int, optional) {#forwardoutput-recover_wait}
 
-The wait time before accepting a server fault recovery.  
+The wait time before accepting a server fault recovery.
 
-Default:  10
+Default: 10
 
 ### heartbeat_type (string, optional) {#forwardoutput-heartbeat_type}
 
@@ -56,33 +56,33 @@ Default: -
 
 ### heartbeat_interval (int, optional) {#forwardoutput-heartbeat_interval}
 
-The interval of the heartbeat packer.  
+The interval of the heartbeat packer.
 
-Default:  1
+Default: 1
 
 ### phi_failure_detector (bool, optional) {#forwardoutput-phi_failure_detector}
 
-Use the "Phi accrual failure detector" to detect server failure.  
+Use the "Phi accrual failure detector" to detect server failure.
 
-Default:  true
+Default: true
 
 ### phi_threshold (int, optional) {#forwardoutput-phi_threshold}
 
-The threshold parameter used to detect server faults.  `phi_threshold` is deeply related to `heartbeat_interval`. If you are using longer `heartbeat_interval`, please use the larger `phi_threshold`. Otherwise you will see frequent detachments of destination servers. The default value 16 is tuned for `heartbeat_interval` 1s. 
+The threshold parameter used to detect server faults.  `phi_threshold` is deeply related to `heartbeat_interval`. If you are using longer `heartbeat_interval`, please use the larger `phi_threshold`. Otherwise you will see frequent detachments of destination servers. The default value 16 is tuned for `heartbeat_interval` 1s.
 
-Default:  16
+Default: 16
 
 ### hard_timeout (int, optional) {#forwardoutput-hard_timeout}
 
-The hard timeout used to detect server failure. The default value is equal to the send_timeout parameter.  
+The hard timeout used to detect server failure. The default value is equal to the send_timeout parameter.
 
-Default:  60
+Default: 60
 
 ### expire_dns_cache (int, optional) {#forwardoutput-expire_dns_cache}
 
-Set TTL to expire DNS cache in seconds. Set 0 not to use DNS Cache.  
+Set TTL to expire DNS cache in seconds. Set 0 not to use DNS Cache.
 
-Default:  0
+Default: 0
 
 ### dns_round_robin (bool, optional) {#forwardoutput-dns_round_robin}
 
@@ -98,33 +98,33 @@ Default: -
 
 ### tls_version (string, optional) {#forwardoutput-tls_version}
 
-The default version of TLS transport. [TLSv1_1, TLSv1_2]  
+The default version of TLS transport. [TLSv1_1, TLSv1_2]
 
-Default:  TLSv1_2
+Default: TLSv1_2
 
 ### tls_ciphers (string, optional) {#forwardoutput-tls_ciphers}
 
-The cipher configuration of TLS transport.  
+The cipher configuration of TLS transport.
 
-Default:  ALL:!aNULL:!eNULL:!SSLv2
+Default: ALL:!aNULL:!eNULL:!SSLv2
 
 ### tls_insecure_mode (bool, optional) {#forwardoutput-tls_insecure_mode}
 
-Skip all verification of certificates or not.  
+Skip all verification of certificates or not.
 
-Default:  false
+Default: false
 
 ### tls_allow_self_signed_cert (bool, optional) {#forwardoutput-tls_allow_self_signed_cert}
 
-Allow self signed certificates or not.  
+Allow self signed certificates or not.
 
-Default:  false
+Default: false
 
 ### tls_verify_hostname (bool, optional) {#forwardoutput-tls_verify_hostname}
 
-Verify hostname of servers and certificates or not in TLS transport.  
+Verify hostname of servers and certificates or not in TLS transport.
 
-Default:  true
+Default: true
 
 ### tls_cert_path (*secret.Secret, optional) {#forwardoutput-tls_cert_path}
 
@@ -170,15 +170,15 @@ Default: -
 
 ### keepalive (bool, optional) {#forwardoutput-keepalive}
 
-Enable keepalive connection.  
+Enable keepalive connection.
 
-Default:  false
+Default: false
 
 ### keepalive_timeout (int, optional) {#forwardoutput-keepalive_timeout}
 
-Expired time of keepalive. Default value is nil, which means to keep connection as long as possible.  
+Expired time of keepalive. Default value is nil, which means to keep connection as long as possible.
 
-Default:  0
+Default: 0
 
 ### security (*common.Security, optional) {#forwardoutput-security}
 
@@ -188,9 +188,9 @@ Default: -
 
 ### verify_connection_at_startup (bool, optional) {#forwardoutput-verify_connection_at_startup}
 
-Verify that a connection can be made with one of out_forward nodes at the time of startup.  
+Verify that a connection can be made with one of out_forward nodes at the time of startup.
 
-Default:  false
+Default: false
 
 ### buffer (*Buffer, optional) {#forwardoutput-buffer}
 
@@ -223,9 +223,9 @@ Default: -
 
 ### port (int, optional) {#fluentd server-port}
 
-The port number of the host. Note that both TCP packets (event stream) and UDP packets (heartbeat message) are sent to this port.  
+The port number of the host. Note that both TCP packets (event stream) and UDP packets (heartbeat message) are sent to this port.
 
-Default:  24224
+Default: 24224
 
 ### shared_key (*secret.Secret, optional) {#fluentd server-shared_key}
 
@@ -253,8 +253,8 @@ Default: -
 
 ### weight (int, optional) {#fluentd server-weight}
 
-The load balancing weight. If the weight of one server is 20 and the weight of the other server is 30, events are sent in a 2:3 ratio. . 
+The load balancing weight. If the weight of one server is 20 and the weight of the other server is 30, events are sent in a 2:3 ratio. .
 
-Default:  60
+Default: 60
 
 

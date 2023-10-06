@@ -26,9 +26,9 @@ SplunkHecOutput sends your logs to Splunk via Hec
 
 ### data_type (string, optional) {#splunkhecoutput-data_type}
 
-The type of data that will be sent to Sumo Logic, either event or metric  
+The type of data that will be sent to Sumo Logic, either event or metric
 
-Default:  event
+Default: event
 
 ### hec_host (string, required) {#splunkhecoutput-hec_host}
 
@@ -38,15 +38,15 @@ Default: -
 
 ### hec_port (int, optional) {#splunkhecoutput-hec_port}
 
-The port number for the Hec token or the Hec load balancer.  
+The port number for the Hec token or the Hec load balancer.
 
-Default:  8088
+Default: 8088
 
 ### protocol (string, optional) {#splunkhecoutput-protocol}
 
-This is the protocol to use for calling the Hec API. Available values are: http, https.  
+This is the protocol to use for calling the Hec API. Available values are: http, https.
 
-Default:  https
+Default: https
 
 ### hec_token (*secret.Secret, required) {#splunkhecoutput-hec_token}
 
@@ -62,9 +62,9 @@ Default: -
 
 ### metric_name_key (string, optional) {#splunkhecoutput-metric_name_key}
 
-Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false.  
+Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false.
 
-Default:  true
+Default: true
 
 ### metric_value_key (string, optional) {#splunkhecoutput-metric_value_key}
 
@@ -74,15 +74,15 @@ Default: -
 
 ### coerce_to_utf8 (*bool, optional) {#splunkhecoutput-coerce_to_utf8}
 
-Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. . 
+Indicates whether to allow non-UTF-8 characters in user logs. If set to true, any non-UTF-8 character is replaced by the string specified in non_utf8_replacement_string. If set to false, the Ingest API errors out any non-UTF-8 characters. .
 
-Default:  true
+Default: true
 
 ### non_utf8_replacement_string (string, optional) {#splunkhecoutput-non_utf8_replacement_string}
 
-If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. . 
+If coerce_to_utf8 is set to true, any non-UTF-8 character is replaced by the string you specify in this parameter. .
 
-Default:  ' '
+Default: ' '
 
 ### index (string, optional) {#splunkhecoutput-index}
 
@@ -188,7 +188,7 @@ Default: -
 
 ### insecure_ssl (*bool, optional) {#splunkhecoutput-insecure_ssl}
 
-Indicates if insecure SSL connection is allowed  
+Indicates if insecure SSL connection is allowed
 
 Default: false
 

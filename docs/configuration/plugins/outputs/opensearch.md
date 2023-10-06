@@ -33,15 +33,15 @@ Send your logs to OpenSearch
 
 ### host (string, optional) {#opensearch-host}
 
-You can specify OpenSearch host by this parameter.  
+You can specify OpenSearch host by this parameter.
 
 Default: localhost
 
 ### port (int, optional) {#opensearch-port}
 
-You can specify OpenSearch port by this parameter. 
+You can specify OpenSearch port by this parameter.
 
-Default:  9200
+Default: 9200
 
 ### user (string, optional) {#opensearch-user}
 
@@ -63,9 +63,9 @@ Default: -
 
 ### scheme (string, optional) {#opensearch-scheme}
 
-Connection scheme  
+Connection scheme
 
-Default:  http
+Default: http
 
 ### hosts (string, optional) {#opensearch-hosts}
 
@@ -93,33 +93,33 @@ Default: -
 
 ### include_timestamp (bool, optional) {#opensearch-include_timestamp}
 
-Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in OpenSearch and utilize the rollover API. 
+Adds a @timestamp field to the log, following all settings logstash_format does, except without the restrictions on index_name. This allows one to log to an alias in OpenSearch and utilize the rollover API.
 
-Default:  false
+Default: false
 
 ### logstash_format (bool, optional) {#opensearch-logstash_format}
 
-Enable Logstash log format. 
+Enable Logstash log format.
 
-Default:  false
+Default: false
 
 ### logstash_prefix (string, optional) {#opensearch-logstash_prefix}
 
-Set the Logstash prefix. 
+Set the Logstash prefix.
 
-Default:  logstash
+Default: logstash
 
 ### logstash_prefix_separator (string, optional) {#opensearch-logstash_prefix_separator}
 
-Set the Logstash prefix separator. 
+Set the Logstash prefix separator.
 
-Default:  -
+Default: -
 
 ### logstash_dateformat (string, optional) {#opensearch-logstash_dateformat}
 
-Set the Logstash date format. 
+Set the Logstash date format.
 
-Default:  %Y.%m.%d
+Default: %Y.%m.%d
 
 ### utc_index (*bool, optional) {#opensearch-utc_index}
 
@@ -135,9 +135,9 @@ Default: -
 
 ### index_name (string, optional) {#opensearch-index_name}
 
-The index name to write events to  
+The index name to write events to
 
-Default:  fluentd
+Default: fluentd
 
 ### id_key (string, optional) {#opensearch-id_key}
 
@@ -147,9 +147,9 @@ Default: -
 
 ### write_operation (string, optional) {#opensearch-write_operation}
 
-The write_operation can be any of: (index,create,update,upsert) 
+The write_operation can be any of: (index,create,update,upsert)
 
-Default:  index
+Default: index
 
 ### parent_key (string, optional) {#opensearch-parent_key}
 
@@ -165,9 +165,9 @@ Default: -
 
 ### request_timeout (string, optional) {#opensearch-request_timeout}
 
-You can specify HTTP request timeout. 
+You can specify HTTP request timeout.
 
-Default:  5s
+Default: 5s
 
 ### reload_connections (*bool, optional) {#opensearch-reload_connections}
 
@@ -177,9 +177,9 @@ Default: true
 
 ### reload_on_failure (bool, optional) {#opensearch-reload_on_failure}
 
-Indicates that the OpenSearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses. 
+Indicates that the OpenSearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.
 
-Default:  false
+Default: false
 
 ### retry_tag (string, optional) {#opensearch-retry_tag}
 
@@ -189,9 +189,9 @@ Default: -
 
 ### resurrect_after (string, optional) {#opensearch-resurrect_after}
 
-You can set in the OpenSearch-transport how often dead connections from the OpenSearch-transport's pool will be resurrected. 
+You can set in the OpenSearch-transport how often dead connections from the OpenSearch-transport's pool will be resurrected.
 
-Default:  60s
+Default: 60s
 
 ### time_key (string, optional) {#opensearch-time_key}
 
@@ -201,9 +201,9 @@ Default: -
 
 ### time_key_exclude_timestamp (bool, optional) {#opensearch-time_key_exclude_timestamp}
 
-time_key_exclude_timestamp  
+time_key_exclude_timestamp
 
-Default:  false
+Default: false
 
 ### ssl_verify (*bool, optional) {#opensearch-ssl_verify}
 
@@ -279,9 +279,9 @@ Default: -
 
 ### template_overwrite (bool, optional) {#opensearch-template_overwrite}
 
-Always update the template, even if it already exists. 
+Always update the template, even if it already exists.
 
-Default:  false
+Default: false
 
 ### customize_template (string, optional) {#opensearch-customize_template}
 
@@ -291,21 +291,21 @@ Default: -
 
 ### index_date_pattern (*string, optional) {#opensearch-index_date_pattern}
 
-Specify this to override the index date pattern for creating a rollover index. 
+Specify this to override the index date pattern for creating a rollover index.
 
-Default:  now/d
+Default: now/d
 
 ### index_separator (string, optional) {#opensearch-index_separator}
 
-index_separator  
+index_separator
 
-Default:  -
+Default: -
 
 ### application_name (*string, optional) {#opensearch-application_name}
 
-Specify the application name for the rollover index to be created. 
+Specify the application name for the rollover index to be created.
 
-Default:  default
+Default: default
 
 ### templates (string, optional) {#opensearch-templates}
 
@@ -315,9 +315,9 @@ Default: -
 
 ### max_retry_putting_template (string, optional) {#opensearch-max_retry_putting_template}
 
-You can specify times of retry putting template. 
+You can specify times of retry putting template.
 
-Default:  10
+Default: 10
 
 ### fail_on_putting_template_retry_exceed (*bool, optional) {#opensearch-fail_on_putting_template_retry_exceed}
 
@@ -333,21 +333,21 @@ Default: true
 
 ### max_retry_get_os_version (int, optional) {#opensearch-max_retry_get_os_version}
 
-max_retry_get_os_version  
+max_retry_get_os_version
 
-Default:  15
+Default: 15
 
 ### include_tag_key (bool, optional) {#opensearch-include_tag_key}
 
-This will add the Fluentd tag in the JSON record. 
+This will add the Fluentd tag in the JSON record.
 
-Default:  false
+Default: false
 
 ### tag_key (string, optional) {#opensearch-tag_key}
 
-This will add the Fluentd tag in the JSON record. 
+This will add the Fluentd tag in the JSON record.
 
-Default:  tag
+Default: tag
 
 ### time_parse_error_tag (string, optional) {#opensearch-time_parse_error_tag}
 
@@ -357,9 +357,9 @@ Default: -
 
 ### reconnect_on_error (bool, optional) {#opensearch-reconnect_on_error}
 
-Indicates that the plugin should reset connection on any error (reconnect on next send). By default it will reconnect only on "host unreachable exceptions". We recommended to set this true in the presence of OpenSearch shield. 
+Indicates that the plugin should reset connection on any error (reconnect on next send). By default it will reconnect only on "host unreachable exceptions". We recommended to set this true in the presence of OpenSearch shield.
 
-Default:  false
+Default: false
 
 ### pipeline (string, optional) {#opensearch-pipeline}
 
@@ -369,15 +369,15 @@ Default: -
 
 ### with_transporter_log (bool, optional) {#opensearch-with_transporter_log}
 
-This is debugging purpose option to enable to obtain transporter layer log.  
+This is debugging purpose option to enable to obtain transporter layer log.
 
-Default:  false
+Default: false
 
 ### emit_error_for_missing_id (bool, optional) {#opensearch-emit_error_for_missing_id}
 
-emit_error_for_missing_id  
+emit_error_for_missing_id
 
-Default:  false
+Default: false
 
 ### sniffer_class_name (string, optional) {#opensearch-sniffer_class_name}
 
@@ -405,9 +405,9 @@ Default: -
 
 ### http_backend (string, optional) {#opensearch-http_backend}
 
-With http_backend typhoeus, opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive.  
+With http_backend typhoeus, opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive.
 
-Default:  excon
+Default: excon
 
 ### http_backend_excon_nonblock (*bool, optional) {#opensearch-http_backend_excon_nonblock}
 
@@ -417,15 +417,15 @@ Default: true
 
 ### validate_client_version (bool, optional) {#opensearch-validate_client_version}
 
-When you use mismatched OpenSearch server and client libraries, fluent-plugin-opensearch cannot send data into OpenSearch.   
+When you use mismatched OpenSearch server and client libraries, fluent-plugin-opensearch cannot send data into OpenSearch.
 
-Default:  false
+Default: false
 
 ### prefer_oj_serializer (bool, optional) {#opensearch-prefer_oj_serializer}
 
-With default behavior, OpenSearch client uses Yajl as JSON encoder/decoder. Oj is the alternative high performance JSON encoder/decoder. When this parameter sets as true, OpenSearch client uses Oj as JSON encoder/decoder.  
+With default behavior, OpenSearch client uses Yajl as JSON encoder/decoder. Oj is the alternative high performance JSON encoder/decoder. When this parameter sets as true, OpenSearch client uses Oj as JSON encoder/decoder.
 
-Default:  false
+Default: false
 
 ### unrecoverable_error_types (string, optional) {#opensearch-unrecoverable_error_types}
 
@@ -453,27 +453,27 @@ Default: true
 
 ### default_opensearch_version (int, optional) {#opensearch-default_opensearch_version}
 
-max_retry_get_os_version  
+max_retry_get_os_version
 
-Default:  1
+Default: 1
 
 ### log_os_400_reason (bool, optional) {#opensearch-log_os_400_reason}
 
-log_os_400_reason  
+log_os_400_reason
 
-Default:  false
+Default: false
 
 ### custom_headers (string, optional) {#opensearch-custom_headers}
 
-This parameter adds additional headers to request. Example: {"token":"secret"}  
+This parameter adds additional headers to request. Example: {"token":"secret"}
 
-Default:  {}
+Default: {}
 
 ### suppress_doc_wrap (bool, optional) {#opensearch-suppress_doc_wrap}
 
-By default, record body is wrapped by 'doc'. This behavior can not handle update script requests. You can set this to suppress doc wrapping and allow record body to be untouched.  
+By default, record body is wrapped by 'doc'. This behavior can not handle update script requests. You can set this to suppress doc wrapping and allow record body to be untouched.
 
-Default:  false
+Default: false
 
 ### ignore_exceptions (string, optional) {#opensearch-ignore_exceptions}
 
@@ -489,9 +489,9 @@ Default: true
 
 ### bulk_message_request_threshold (string, optional) {#opensearch-bulk_message_request_threshold}
 
-Configure bulk_message request splitting threshold size. Default value is 20MB. (20 * 1024 * 1024) If you specify this size as negative number, bulk_message request splitting feature will be disabled.  
+Configure bulk_message request splitting threshold size. Default value is 20MB. (20 * 1024 * 1024) If you specify this size as negative number, bulk_message request splitting feature will be disabled.
 
-Default:  20MB
+Default: 20MB
 
 ### compression_level (string, optional) {#opensearch-compression_level}
 
@@ -507,9 +507,9 @@ Default: -
 
 ### use_legacy_template (*bool, optional) {#opensearch-use_legacy_template}
 
-Specify wether to use legacy template or not.  
+Specify wether to use legacy template or not.
 
-Default:  true
+Default: true
 
 ### catch_transport_exception_on_retry (*bool, optional) {#opensearch-catch_transport_exception_on_retry}
 
@@ -519,9 +519,9 @@ Default: true
 
 ### target_index_affinity (bool, optional) {#opensearch-target_index_affinity}
 
-target_index_affinity  
+target_index_affinity
 
-Default:  false
+Default: false
 
 ### buffer (*Buffer, optional) {#opensearch-buffer}
 
@@ -547,8 +547,8 @@ Default: -
 
 ### data_stream_template_name (string, optional) {#opensearch-data_stream_template_name}
 
-Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream.  
+Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream.
 
-Default:  data_stream_name
+Default: data_stream_name
 
 
