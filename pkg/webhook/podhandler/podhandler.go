@@ -126,8 +126,7 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	rv := admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
-	return rv
+	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
 }
 
 func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
