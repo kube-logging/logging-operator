@@ -21,27 +21,27 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/go-logr/logr"
 	"github.com/kube-logging/logging-operator/pkg/resources/annotation"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	corev1 "k8s.io/api/core/v1"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 // PodHandler .
 type PodHandler struct {
-	Client  client.Client
-	decoder *admission.Decoder
+	Decoder *admission.Decoder
+	Log     logr.Logger
 }
 
 var _ admission.Handler = &PodHandler{}
 
 // NewPodHandler constructor
-func NewPodHandler(client client.Client) *PodHandler {
-	return &PodHandler{Client: client}
+func NewPodHandler(log logr.Logger) *PodHandler {
+	return &PodHandler{Log: log}
 }
 
 func (p *PodHandler) sideCarsForContainer(containerName string, filesToTail []string) (sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) {
@@ -83,10 +83,15 @@ func (p *PodHandler) sideCarsForContainer(containerName string, filesToTail []st
 
 // Handle .
 func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admission.Response {
+	log := p.Log.WithValues("namespace", req.Namespace, "name", req.Name)
+
+	log.Info("webhook handler called")
+
 	pod := &corev1.Pod{}
 
-	err := p.decoder.Decode(req, pod)
+	err := p.Decoder.Decode(req, pod)
 	if err != nil {
+		log.Error(err, "unable to decode pod")
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
@@ -116,14 +121,9 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 
 	marshaledPod, err := json.Marshal(pod)
 	if err != nil {
+		log.Error(err, "pod marshaling failed")
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
-}
-
-// InjectDecoder injects the decoder.
-func (p *PodHandler) InjectDecoder(d *admission.Decoder) error {
-	p.decoder = d
-	return nil
 }
