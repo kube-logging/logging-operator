@@ -385,9 +385,8 @@ func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
 			SeccompProfile:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SeccompProfile,
 			Capabilities:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.Capabilities,
 		},
-		VolumeMounts:    generateVolumeMounts(r.Logging.Spec.FluentdSpec),
+		VolumeMounts: generateVolumeMounts(r.Logging.Spec.FluentdSpec),
 	}
-	return nil
 }
 
 func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
