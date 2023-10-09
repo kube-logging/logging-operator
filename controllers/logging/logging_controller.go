@@ -298,11 +298,8 @@ func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger
 	if err := r.Client.List(ctx, &nodes); err != nil {
 		log.Error(err, "listing nodes")
 	}
-	if logging.Spec.SyslogNGSpec != nil && len(nodes.Items) > 0 {
-		logging.Spec.SyslogNGSpec.MaxConnections = len(nodes.Items) * 10
-		if logging.Spec.SyslogNGSpec.MaxConnections > 512 {
-			logging.Spec.SyslogNGSpec.MaxConnections = 512
-		}
+	if logging.Spec.SyslogNGSpec != nil && logging.Spec.SyslogNGSpec.MaxConnections == 0 {
+		logging.Spec.SyslogNGSpec.MaxConnections = max(100, min(1000, len(nodes.Items)*10))
 	}
 }
 
@@ -534,4 +531,18 @@ func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRe
 		}
 	}
 	return
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

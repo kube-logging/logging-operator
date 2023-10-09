@@ -425,9 +425,9 @@ func (l *Logging) SetDefaults() error {
 	}
 
 	if l.Spec.SyslogNGSpec != nil {
-		if l.Spec.SyslogNGSpec.MaxConnections == 0 {
-			l.Spec.SyslogNGSpec.MaxConnections = 100
-		}
+		// if l.Spec.SyslogNGSpec.MaxConnections == 0 {
+		// 	max connections is now configured dynamically if not set
+		// }
 		if l.Spec.SyslogNGSpec.Metrics != nil {
 			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
 				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
