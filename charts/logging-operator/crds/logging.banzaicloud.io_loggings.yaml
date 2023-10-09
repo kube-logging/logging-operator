@@ -37,7 +37,24 @@ spec:
     storage: false
     subresources:
       status: {}
-  - name: v1beta1
+  - additionalPrinterColumns:
+    - description: Logging reference
+      jsonPath: .spec.loggingRef
+      name: LoggingRef
+      type: string
+    - description: Control namespace
+      jsonPath: .spec.controlNamespace
+      name: ControlNamespace
+      type: string
+    - description: Watched namespaces
+      jsonPath: .status.watchNamespaces
+      name: WatchNamespaces
+      type: string
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
     schema:
       openAPIV3Schema:
         properties:
@@ -17989,6 +18006,12 @@ spec:
                   type: boolean
                 type: object
               problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
+              watchNamespaces:
                 items:
                   type: string
                 type: array

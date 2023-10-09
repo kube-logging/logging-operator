@@ -109,14 +109,26 @@ type ConfigCheck struct {
 
 // LoggingStatus defines the observed state of Logging
 type LoggingStatus struct {
+	// Result of the config check. Under normal conditions there is a single item in the map with a bool value.
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
-	Problems           []string        `json:"problems,omitempty"`
+
+	// Problems with the logging resource
+	Problems []string `json:"problems,omitempty"`
+	// Count of problems for printcolumn
+	ProblemsCount int `json:"problemsCount,omitempty"`
+	// List of namespaces that watchNamespaces + watchNamespaceSelector is resolving to.
+	// Not set means all namespaces.
+	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=loggings,scope=Cluster,categories=logging-all
 // +kubebuilder:storageversion
+// +kubebuilder:printcolumn:name="LoggingRef",type="string",JSONPath=".spec.loggingRef",description="Logging reference"
+// +kubebuilder:printcolumn:name="ControlNamespace",type="string",JSONPath=".spec.controlNamespace",description="Control namespace"
+// +kubebuilder:printcolumn:name="WatchNamespaces",type="string",JSONPath=".status.watchNamespaces",description="Watched namespaces"
+// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 
 // Logging is the Schema for the loggings API
 type Logging struct {
