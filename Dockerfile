@@ -1,14 +1,5 @@
 FROM --platform=$BUILDPLATFORM golang:1.21alpine3.18@sha256:a76f153cff6a59112777c071b0cde1b6e4691ddc7f172be424228da1bfb7bbda AS builder
 
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md
-LABEL org.opencontainers.image.title="Logging operator"
-LABEL org.opencontainers.image.description="The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline."
-LABEL org.opencontainers.image.authors="Kube logging authors"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
-LABEL org.opencontainers.image.source="https://github.com/kube-logging/logging-operator"
-LABEL org.opencontainers.image.documentation="https://kube-logging.dev/docs/"
-LABEL org.opencontainers.image.url="https://kube-logging.dev/"
-
 RUN apk add --update --no-cache ca-certificates make git curl
 
 ARG TARGETOS
