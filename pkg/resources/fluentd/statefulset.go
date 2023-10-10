@@ -75,8 +75,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
 
-	initContainers = append(initContainers, *r.tmpDirHackContainer())
-
+	if c := r.tmpDirHackContainer(); c != nil {
+		initContainers = append(initContainers, *c)
+	}
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
@@ -134,7 +135,6 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 	envVars := append(spec.EnvVars,
 		corev1.EnvVar{Name: "BUFFER_PATH", Value: bufferPath},
-		corev1.EnvVar{Name: "TMPDIR", Value: "/tmp/fluent"},
 	)
 
 	container := corev1.Container{
@@ -287,15 +287,21 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			Name:      "output-secret",
 			MountPath: OutputSecretPath,
 		},
-		{
-			Name:      "tmp",
-			MountPath: "/tmp",
-		},
 	}
 	if spec != nil && spec.TLS.Enabled {
 		res = append(res, corev1.VolumeMount{
 			Name:      "fluentd-tls",
 			MountPath: "/fluentd/tls/",
+		})
+	}
+	if spec != nil && spec.Security != nil &&
+		spec.Security.SecurityContext != nil &&
+		spec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
+		*spec.Security.SecurityContext.ReadOnlyRootFilesystem {
+		res = append(res, corev1.VolumeMount{
+			Name:      "tmp",
+			SubPath:   "fluentd",
+			MountPath: "/tmp",
 		})
 	}
 	return res
@@ -319,12 +325,16 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		},
-		{
-			Name: "tmp",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		},
+	}
+
+	if r.Logging.Spec.FluentdSpec.Security != nil &&
+		r.Logging.Spec.FluentdSpec.Security.SecurityContext != nil &&
+		r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
+		*r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem {
+		v = append(v, corev1.Volume{
+			Name:         "tmp",
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		})
 	}
 
 	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
@@ -368,15 +378,25 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
-	return &corev1.Container{
-		Command:         []string{"sh", "-c", "mkdir /tmp/fluent;chmod +t /tmp/fluent"},
-		Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
-		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
-		Name:            "tmp-dir-hack",
-		Resources:       r.Logging.Spec.FluentdSpec.Resources,
-		SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
-		VolumeMounts:    generateVolumeMounts(r.Logging.Spec.FluentdSpec),
+	if r.Logging.Spec.FluentdSpec.Security != nil &&
+		r.Logging.Spec.FluentdSpec.Security.SecurityContext != nil &&
+		r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
+		*r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem {
+		return &corev1.Container{
+			Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
+			Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
+			Name:            "tmp-dir-hack",
+			Resources:       r.Logging.Spec.FluentdSpec.Resources,
+			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "tmp",
+					MountPath: "/mnt/tmp"},
+			},
+		}
 	}
+	return nil
 }
 
 func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
