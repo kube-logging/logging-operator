@@ -11,10 +11,9 @@
 
 </p>
 
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_large)
-
 # Logging operator
+
+The Logging Operator is now a [CNCF Sandbox](https://www.cncf.io/sandbox-projects/) project.
 
 The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline.
 
@@ -73,7 +72,6 @@ See the [detailed CRDs documentation](https://kube-logging.github.io/docs/config
 ## Quickstart
 
 [![asciicast](https://asciinema.org/a/315998.svg)](https://asciinema.org/a/315998)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_shield)
 
 Follow these [quickstart guides](https://kube-logging.github.io/docs/quickstarts/) to try out the Logging operator!
 
@@ -100,11 +98,11 @@ If you find this project useful, help us:
 - Help new users with issues they may encounter :muscle:
 - Send a pull request with your new features and bug fixes :rocket: 
 
+Please read the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)!
+
 *For more information, read the [developer documentation](https://kube-logging.github.io/docs/developers)*.
 
 ## License
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkube-logging%2Flogging-operator?ref=badge_large)
 
 Copyright (c) 2021-2023 [Cisco Systems, Inc. and its affiliates](https://cisco.com)
 Copyright (c) 2017-2020 [Banzai Cloud, Inc.](https://banzaicloud.com)
