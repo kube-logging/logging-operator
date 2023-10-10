@@ -102,6 +102,8 @@ Please read the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/m
 
 *For more information, read the [developer documentation](https://kube-logging.github.io/docs/developers)*.
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7941/badge)](https://www.bestpractices.dev/projects/7941)
+
 ## License
 
 Copyright (c) 2021-2023 [Cisco Systems, Inc. and its affiliates](https://cisco.com)
