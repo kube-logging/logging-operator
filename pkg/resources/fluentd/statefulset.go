@@ -74,9 +74,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
-	if c := r.tmpDirHackContainer(); c != nil {
-		initContainers = append(initContainers, *c)
-	}
+
+	initContainers = append(initContainers)
+
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
