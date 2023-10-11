@@ -75,7 +75,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
 
-	initContainers = append(initContainers)
+	initContainers = append(initContainers, *r.tmpDirHackContainer())
 
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
@@ -375,7 +375,7 @@ func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
 		Name:            "tmp-dir-hack",
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
 		SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
-		VolumeMounts: generateVolumeMounts(r.Logging.Spec.FluentdSpec),
+		VolumeMounts:    generateVolumeMounts(r.Logging.Spec.FluentdSpec),
 	}
 }
 
