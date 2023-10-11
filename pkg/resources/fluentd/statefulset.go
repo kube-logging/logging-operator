@@ -374,17 +374,7 @@ func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
 		ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
 		Name:            "tmp-dir-hack",
 		Resources:       r.Logging.Spec.FluentdSpec.Resources,
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.Capabilities,
-		},
+		SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
 		VolumeMounts: generateVolumeMounts(r.Logging.Spec.FluentdSpec),
 	}
 }
