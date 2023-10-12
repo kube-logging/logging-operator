@@ -21,11 +21,11 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 type _hugoTLS interface{} //nolint:deadcode,unused
 
 // +docName:"TLS config for syslog-ng outputs"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+// More info at https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/
 type _docTLS interface{} //nolint:deadcode,unused
 
 // +name:"TLS config for syslog-ng outputs"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/"
 // +description:"TLS config for syslog-ng outputs"
 // +status:"Testing"
 type _metaTLS interface{} //nolint:deadcode,unused

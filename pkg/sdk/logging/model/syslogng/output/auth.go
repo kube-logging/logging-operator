@@ -19,11 +19,10 @@ package output
 type _hugoAuth interface{} //nolint:deadcode,unused
 
 // +docName:"Authentication config for syslog-ng outputs"
-// More info at TODO
+// GRPC based outputs use this configuration instead of the simple tls field found at most HTTP based destinations
 type _docAuth interface{} //nolint:deadcode,unused
 
 // +name:"Authentication config for syslog-ng outputs"
-// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/#auth"
 // +description:"Authentication config for syslog-ng outputs"
 // +status:"Testing"
 type _metaAuth interface{} //nolint:deadcode,unused

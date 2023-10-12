@@ -6,7 +6,56 @@ generated_file: true
 
 # Sending messages over HTTP
 ## Overview
- More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058
+
+A simple example sending logs over HTTP to a fluentbit HTTP endpoint:
+{{< highlight yaml >}}
+kind: SyslogNGOutput
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: http
+spec:
+  http:
+    #URL of the ingest endpoint
+    url: http://fluentbit-endpoint:8080/tag
+    method: POST
+    headers:
+      - "Content-type: application/json"
+{{</ highlight >}}
+
+A more complex example to demonstrate sending logs to OpenObserve
+{{< highlight yaml >}}
+kind: SyslogNGOutput
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: openobserve
+spec:
+  http:
+    #URL of the ingest endpoint
+    url: https://openobserve-endpoint/api/default/log-generator/_json
+    user: "username"
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: openobserve
+          key: password
+    method: POST
+    # Parameters for sending logs in batches
+    batch-lines: 5000
+    batch-bytes: 4096
+    batch-timeout: 300
+    headers:
+      - "Connection: keep-alive"
+    # Disable TLS peer verification for demo
+    tls:
+      peer_verify: "no"
+    body-prefix: "["
+    body-suffix: "]"
+    delimiter: ","
+    body: "${MESSAGE}"
+{{</ highlight >}}
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/
+
 
 ## Configuration
 ## HTTPOutput

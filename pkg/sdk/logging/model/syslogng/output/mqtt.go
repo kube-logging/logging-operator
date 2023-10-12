@@ -21,30 +21,27 @@ type _hugoMQTT interface{} //nolint:deadcode,unused
 // +docName:"Sending messages from a local network to an MQTT broker"
 //
 // ## Prerequisites
-//
-// ## Example
-//
-// {{< highlight yaml >}}
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: SyslogNGOutput
-// metadata:
-//
-//	name: mqtt
-//	namespace: default
-//
-// spec:
-//
-//	mqtt:
-//	  address: tcp://mosquitto:1883
-//	  template: |
-//	    $(format-json --subkeys json~ --key-delimiter ~)
-//	  topic: test/demo
-//
-// {{</ highlight >}}
+/*
+# Example
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: mqtt
+  namespace: default
+spec:
+  mqtt:
+    address: tcp://mosquitto:1883
+    topic: test/demo
+{{</ highlight >}}
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/
+*/
 type _docMQTT interface{} //nolint:deadcode,unused
 
 // +name:"MQTT Destination"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/45#TOPIC-1829079"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/"
 // +description:"Sending messages over MQTT Protocol"
 // +status:"Testing"
 type _metaMQTT interface{} //nolint:deadcode,unused

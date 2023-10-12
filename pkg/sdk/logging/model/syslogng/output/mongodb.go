@@ -33,9 +33,11 @@ metadata:
 spec:
   mongodb:
     collection: syslog
-    uri: mongodb://127.0.0.1:27017/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000
+    uri: "mongodb://mongodb-endpoint/syslog?wtimeoutMS=60000&socketTimeoutMS=60000&connectTimeoutMS=60000"
     value_pairs: scope("selected-macros" "nv-pairs")
 {{</ highlight >}}
+
+More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/
 */
 type _docMongoDB interface{} //nolint:deadcode,unused
 

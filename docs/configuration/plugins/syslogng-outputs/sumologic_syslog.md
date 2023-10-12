@@ -6,7 +6,7 @@ generated_file: true
 
 # Storing messages in Sumo Logic over syslog
 ## Overview
- More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
+ More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/
 
 ## Configuration
 ## SumologicSyslogOutput

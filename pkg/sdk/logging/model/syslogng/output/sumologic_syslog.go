@@ -19,11 +19,11 @@ package output
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over syslog"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
+// More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/
 type _docSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic Syslog"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/"
 // +description:"Storing messages in Sumo Logic over syslog"
 // +status:"Testing"
 type _metaSumologicSyslog interface{} //nolint:deadcode,unused

@@ -25,6 +25,8 @@ spec:
 	workers: 1
 {{</ highlight >}}
 
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/
+
 
 ## Configuration
 ## RedisOutput

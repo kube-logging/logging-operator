@@ -8,47 +8,46 @@ generated_file: true
 ## Overview
  The `sumologic-http` output sends log records over HTTP to Sumo Logic.
 
- ## Prerequisites
+## Prerequisites
 
- You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55#TOPIC-1829118).
+You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55#TOPIC-1829118).
 
- ## Example
+## Example
 
- {{< highlight yaml >}}
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: SyslogNGOutput
- metadata:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: test-sumo
+  namespace: default
+spec:
+  sumologic-http:
+    batch-lines: 1000
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffers
+      reliable: true
+    body: "$(format-json
+                --subkeys json.
+                --exclude json.kubernetes.annotations.*
+                json.kubernetes.annotations=literal($(format-flat-json --subkeys json.kubernetes.annotations.))
+                --exclude json.kubernetes.labels.*
+                json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))"
+    collector:
+      valueFrom:
+        secretKeyRef:
+          key: token
+          name: sumo-collector
+    deployment: us2
+    headers:
+    - 'X-Sumo-Name: source-name'
+    - 'X-Sumo-Category: source-category'
+    tls:
+      use-system-cert-store: true
+{{</ highlight >}}
 
-	name: test-sumo
-	namespace: default
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-http/
 
- spec:
-
-	sumologic-http:
-	  batch-lines: 1000
-	  disk_buffer:
-	    disk_buf_size: 512000000
-	    dir: /buffers
-	    reliable: true
-	  body: "$(format-json
-	              --subkeys json.
-	              --exclude json.kubernetes.annotations.*
-	              json.kubernetes.annotations=literal($(format-flat-json --subkeys json.kubernetes.annotations.))
-	              --exclude json.kubernetes.labels.*
-	              json.kubernetes.labels=literal($(format-flat-json --subkeys json.kubernetes.labels.)))"
-	  collector:
-	    valueFrom:
-	      secretKeyRef:
-	        key: token
-	        name: sumo-collector
-	  deployment: us2
-	  headers:
-	  - 'X-Sumo-Name: source-name'
-	  - 'X-Sumo-Category: source-category'
-	  tls:
-	    use-system-cert-store: true
-
- {{</ highlight >}}
 
 ## Configuration
 ## SumologicHTTPOutput

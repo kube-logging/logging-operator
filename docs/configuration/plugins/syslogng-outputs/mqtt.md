@@ -9,25 +9,22 @@ generated_file: true
 
  ## Prerequisites
 
- ## Example
+# Example
 
- {{< highlight yaml >}}
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: SyslogNGOutput
- metadata:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: mqtt
+  namespace: default
+spec:
+  mqtt:
+    address: tcp://mosquitto:1883
+    topic: test/demo
+{{</ highlight >}}
 
-	name: mqtt
-	namespace: default
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/
 
- spec:
-
-	mqtt:
-	  address: tcp://mosquitto:1883
-	  template: |
-	    $(format-json --subkeys json~ --key-delimiter ~)
-	  topic: test/demo
-
- {{</ highlight >}}
 
 ## Configuration
 ## MQTT

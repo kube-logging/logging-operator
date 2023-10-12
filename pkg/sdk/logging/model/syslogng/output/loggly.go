@@ -29,7 +29,7 @@ type _hugoLoggly interface{} //nolint:deadcode,unused
 type _docLoggly interface{} //nolint:deadcode,unused
 
 // +name:"Loggly"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/"
 // +description:"Send your logs to loggly"
 // +status:"Testing"
 type _metaLoggly interface{} //nolint:deadcode,unused
@@ -42,7 +42,7 @@ type Loggly struct {
 	Host string `json:"host,omitempty"`
 	// Event tag [more information](https://documentation.solarwinds.com/en/success_center/loggly/content/admin/tags.htm)
 	Tag string `json:"tag,omitempty"`
-	// Your Customer Token that you received from Loggly [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#loggly-option-token)
+	// Your Customer Token that you received from Loggly [more information](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/)
 	Token *secret.Secret `json:"token"`
 	// syslog output configuration
 	SyslogOutput `json:",inline"`

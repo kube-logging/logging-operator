@@ -29,7 +29,7 @@ Default: -
 
 ### token (*secret.Secret, required) {#loggly-token}
 
-Your Customer Token that you received from Loggly [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#loggly-option-token) 
+Your Customer Token that you received from Loggly [more information](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/) 
 
 Default: -
 
