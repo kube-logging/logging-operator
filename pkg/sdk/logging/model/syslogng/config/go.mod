@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/cisco-open/operator-tools v0.32.0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.10.0
-	github.com/siliconbrain/go-seqs v0.6.0
+	github.com/siliconbrain/go-seqs v0.7.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
 	k8s.io/api v0.28.2
@@ -52,7 +52,7 @@ require (
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.16.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
