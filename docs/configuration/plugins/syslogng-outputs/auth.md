@@ -6,7 +6,7 @@ generated_file: true
 
 # Authentication config for syslog-ng outputs
 ## Overview
- GRPC based outputs use this configuration instead of the simple tls field found at most HTTP based destinations
+ GRPC based outputs use this configuration instead of the simple `tls` field found at most HTTP based destinations
 
 ## Configuration
 ## Auth

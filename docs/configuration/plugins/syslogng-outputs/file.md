@@ -23,7 +23,7 @@ For available macros like `${YEAR}/${MONTH}/${DAY}` see https://axoflow.com/docs
 ## Configuration
 ## FileOutput
 
-Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044
+Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/
 
 ### path (string, required) {#fileoutput-path}
 

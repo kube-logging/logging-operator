@@ -35,13 +35,13 @@ For available macros like `${YEAR}/${MONTH}/${DAY}` see https://axoflow.com/docs
 type _docFile interface{} //nolint:deadcode,unused
 
 // +name:"File"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.17/administration-guide/32"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/"
 // +description:"SStoring messages in plain-text files"
 // +status:"Testing"
 type _metaFile interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044
+// Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/
 type FileOutput struct {
 	// Store file path
 	Path string `json:"path" syslog-ng:"pos=0"`

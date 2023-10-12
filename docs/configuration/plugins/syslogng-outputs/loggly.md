@@ -6,7 +6,8 @@ generated_file: true
 
 # Loggly output plugin for syslog-ng
 ## Overview
- The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider. You can send log messages over TCP, or encrypted with TLS. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072).
+ The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider.
+ You can send log messages over TCP, or encrypted with [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
 
  ## Prerequisites
 
@@ -14,6 +15,8 @@ generated_file: true
 
 ## Configuration
 ## Loggly
+
+Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 
 ### host (string, optional) {#loggly-host}
 

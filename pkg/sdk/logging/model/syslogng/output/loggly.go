@@ -21,7 +21,8 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 type _hugoLoggly interface{} //nolint:deadcode,unused
 
 // +docName:"Loggly output plugin for syslog-ng"
-// The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider. You can send log messages over TCP, or encrypted with TLS. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/43#TOPIC-1829072).
+// The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider.
+// You can send log messages over TCP, or encrypted with [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
 //
 // ## Prerequisites
 //
@@ -36,7 +37,6 @@ type _metaLoggly interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
-
 type Loggly struct {
 	// Address of the destination host
 	Host string `json:"host,omitempty"`

@@ -91,7 +91,7 @@ type HTTPOutput struct {
 	Headers []string `json:"headers,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`
-	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193).
+	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
 	TLS *TLS `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
