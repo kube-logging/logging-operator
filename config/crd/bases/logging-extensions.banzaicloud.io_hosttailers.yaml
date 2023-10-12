@@ -320,6 +320,22 @@ spec:
                       type: object
                     disabled:
                       type: boolean
+                    image:
+                      properties:
+                        imagePullSecrets:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                          type: array
+                        pullPolicy:
+                          type: string
+                        repository:
+                          type: string
+                        tag:
+                          type: string
+                      type: object
                     name:
                       type: string
                     path:
@@ -332,6 +348,22 @@ spec:
                   - name
                   type: object
                 type: array
+              image:
+                properties:
+                  imagePullSecrets:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                      type: object
+                    type: array
+                  pullPolicy:
+                    type: string
+                  repository:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               systemdTailers:
                 items:
                   properties:
@@ -618,6 +650,22 @@ spec:
                       type: object
                     disabled:
                       type: boolean
+                    image:
+                      properties:
+                        imagePullSecrets:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                          type: array
+                        pullPolicy:
+                          type: string
+                        repository:
+                          type: string
+                        tag:
+                          type: string
+                      type: object
                     maxEntries:
                       type: integer
                     name:

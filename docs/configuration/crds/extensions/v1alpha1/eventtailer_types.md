@@ -38,6 +38,12 @@ Override container fields for the given statefulset
 
 Default: -
 
+### image (*tailer.ImageSpec, optional) {#eventtailerspec-image}
+
+Override image related fields for the given statefulset, highest precedence 
+
+Default: -
+
 
 ## EventTailerStatus
 

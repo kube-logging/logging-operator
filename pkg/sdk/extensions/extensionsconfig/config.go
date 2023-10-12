@@ -42,6 +42,7 @@ func (t HostTailerConfig) VersionedFluentBitPathArgs(filePath string) []string {
 
 // EventTailerConfig is a configuration type for EventTailer
 type EventTailerConfig struct {
+	ImageWithTag          string
 	TailerAffix           string
 	ConfigurationFileName string
 	PositionVolumeName    string
@@ -76,6 +77,7 @@ var HostTailer = HostTailerConfig{
 
 // EventTailer configuration
 var EventTailer = EventTailerConfig{
+	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:0.4.0",
 	TailerAffix:           "event-tailer",
 	ConfigurationFileName: "config.json",
 	PositionVolumeName:    "event-tailer-position",

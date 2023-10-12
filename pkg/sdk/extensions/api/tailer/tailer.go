@@ -14,7 +14,10 @@
 
 package tailer
 
-import "github.com/cisco-open/operator-tools/pkg/types"
+import (
+	"github.com/cisco-open/operator-tools/pkg/types"
+	corev1 "k8s.io/api/core/v1"
+)
 
 // Tailer .
 type Tailer interface {
@@ -30,4 +33,25 @@ type General struct {
 	Path          string               `json:"path,omitempty"`
 	Disabled      bool                 `json:"disabled,omitempty"`
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
+	Image         *ImageSpec           `json:"image,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type ImageSpec struct {
+	Repository       string                        `json:"repository,omitempty"`
+	Tag              string                        `json:"tag,omitempty"`
+	PullPolicy       string                        `json:"pullPolicy,omitempty"`
+	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
+}
+
+func (s ImageSpec) RepositoryWithTag() string {
+	return RepositoryWithTag(s.Repository, s.Tag)
+}
+
+func RepositoryWithTag(repository, tag string) string {
+	res := repository
+	if tag != "" {
+		res += ":" + tag
+	}
+	return res
 }

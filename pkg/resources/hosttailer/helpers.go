@@ -19,6 +19,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,11 +62,18 @@ func (h *HostTailer) objectMeta() v1.ObjectMeta {
 }
 
 // Container returns the assembled container for the current tailer
-func (h *HostTailer) Container(name string, volumeMount corev1.VolumeMount, command []string, overrides *types.ContainerBase) corev1.Container {
+func (h *HostTailer) Container(name string, volumeMount corev1.VolumeMount, command []string, overrides *types.ContainerBase, imageSpec *tailer.ImageSpec) corev1.Container {
+	imageWithTag := config.HostTailer.FluentBitImage
+	imagePullPolicy := corev1.PullIfNotPresent
+
+	if imageSpec != nil {
+		imageWithTag = imageSpec.RepositoryWithTag()
+		imagePullPolicy = corev1.PullPolicy(imageSpec.PullPolicy)
+	}
 	container := corev1.Container{
 		Name:            name,
-		Image:           config.HostTailer.FluentBitImage,
-		ImagePullPolicy: corev1.PullIfNotPresent,
+		Image:           imageWithTag,
+		ImagePullPolicy: imagePullPolicy,
 		Command:         command,
 		VolumeMounts: []corev1.VolumeMount{
 			kubetool.NewVolumeMountBuilder().

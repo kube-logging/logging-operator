@@ -38,6 +38,10 @@ Override podSpec fields for the given daemonset
 
 Default: -
 
+### image (tailer.ImageSpec, optional) {#hosttailerspec-image}
+
+Default: -
+
 
 ## HostTailerStatus
 
@@ -134,6 +138,12 @@ Override container fields for the given tailer
 
 Default: -
 
+### image (*tailer.ImageSpec, optional) {#filetailer-image}
+
+Override image field for the given trailer 
+
+Default: -
+
 
 ## SystemdTailer
 
@@ -172,6 +182,12 @@ Default: -
 ### containerOverrides (*types.ContainerBase, optional) {#systemdtailer-containeroverrides}
 
 Override container fields for the given tailer 
+
+Default: -
+
+### image (*tailer.ImageSpec, optional) {#systemdtailer-image}
+
+Override image field for the given trailer 
 
 Default: -
 
