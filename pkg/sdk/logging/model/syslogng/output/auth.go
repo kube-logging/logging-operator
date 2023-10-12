@@ -19,7 +19,7 @@ package output
 type _hugoAuth interface{} //nolint:deadcode,unused
 
 // +docName:"Authentication config for syslog-ng outputs"
-// GRPC based outputs use this configuration instead of the simple tls field found at most HTTP based destinations
+// GRPC based outputs use this configuration instead of the simple `tls` field found at most HTTP based destinations
 type _docAuth interface{} //nolint:deadcode,unused
 
 // +name:"Authentication config for syslog-ng outputs"

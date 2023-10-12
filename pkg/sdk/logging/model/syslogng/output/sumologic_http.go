@@ -25,7 +25,7 @@ type _hugoSumologicHTTP interface{} //nolint:deadcode,unused
 /*
 ## Prerequisites
 
-You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/55#TOPIC-1829118).
+You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/).
 
 ## Example
 
