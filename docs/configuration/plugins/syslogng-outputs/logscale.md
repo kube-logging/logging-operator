@@ -4,9 +4,34 @@ weight: 200
 generated_file: true
 ---
 
-# logscale
+# Storing messages in Falcon LogScale
 ## Overview
- {{</ highlight >}}
+ The `LogScale` output sends log records over HTTP to Falcon's LogScale.
+
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: test-logscale
+  namespace: logging
+spec:
+  logscale:
+    token:
+      valueFrom:
+        secretKeyRef:
+          key: token
+          name: logscale-token
+    timezone: "UTC"
+    batch_lines: 1000
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffers
+      reliable: true
+{{</ highlight >}}
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/
+
 
 ## Configuration
 ## LogScaleOutput

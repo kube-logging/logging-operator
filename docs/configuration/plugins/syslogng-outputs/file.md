@@ -8,21 +8,22 @@ generated_file: true
 ## Overview
  The `file` output stores log records in a plain text file.
 
- {{< highlight yaml >}}
+{{< highlight yaml >}}
+spec:
+  file:
+    path: /mnt/archive/logs/${YEAR}/${MONTH}/${DAY}/app.log
+    create_dirs: true
+{{</ highlight >}}
 
-	spec:
-	  file:
-	    path: /mnt/archive/logs/${YEAR}/${MONTH}/${DAY}/app.log
-	    create_dirs: true
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/
 
- {{</ highlight >}}
+For available macros like `${YEAR}/${MONTH}/${DAY}` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 
- For details on the available options of the output, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044).
 
 ## Configuration
 ## FileOutput
 
-Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/36#TOPIC-1829044
+Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/
 
 ### path (string, required) {#fileoutput-path}
 

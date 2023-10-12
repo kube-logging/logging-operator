@@ -32,32 +32,26 @@ metadata:
   name: loki-output
 spec:
   loki:
-    url: 	"loki.loki:8000"
-    batch-lines: 2000
-    batch-timeout: 10
-    workers: 3
-    log-fifo-size: 1000
+    url: "loki-endpoint"
     labels:
       "app": "$PROGRAM"
       "host": "$HOST"
-    timestamp: "msg"
-    template: "$ISODATE $HOST $MSGHDR$MSG"
-    auth:
-      insecure: {}
 {{</ highlight >}}
-More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
+For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 */
 type _docLoki interface{} //nolint:deadcode,unused
 
 // +name:"Loki"
-// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/"
 // +description:"Sending messages to Loki over gRPC"
 // +status:"Testing"
 type _metaLoki interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type LokiOutput struct {
-	// Auth TODO
+	// Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth
 	Auth *Auth `json:"auth,omitempty"`
 	// Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: {"app" : "$PROGRAM"}
 	Labels filter.ArrowMap `json:"labels,omitempty"`

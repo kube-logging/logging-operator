@@ -23,33 +23,34 @@ type _hugoLogScale interface{} //nolint:deadcode,unused
 // +docName:"Storing messages in Falcon LogScale"
 // The `LogScale` output sends log records over HTTP to Falcon's LogScale.
 //
-// ## Example
-//
-// {{< highlight yaml >}}
-//apiVersion: logging.banzaicloud.io/v1beta1
-//kind: SyslogNGOutput
-//metadata:
-//  name: test-logscale
-//  namespace: logging
-//spec:
-//  logscale:
-//    token:
-//      valueFrom:
-//        secretKeyRef:
-//          key: token
-//          name: logscale-token
-//    timezone: "UTC"
-//    batch_lines: 1000
-//    disk_buffer:
-//      disk_buf_size: 512000000
-//      dir: /buffers
-//      reliable: true
+/*
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: test-logscale
+  namespace: logging
+spec:
+  logscale:
+    token:
+      valueFrom:
+        secretKeyRef:
+          key: token
+          name: logscale-token
+    timezone: "UTC"
+    batch_lines: 1000
+    disk_buffer:
+      disk_buf_size: 512000000
+      dir: /buffers
+      reliable: true
+{{</ highlight >}}
 
-// {{</ highlight >}}
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/
+*/
 type _docLogScale interface{} //nolint:deadcode,unused
 
 // +name:"Falcon LogScale"
-// +url:"https://library.humio.com/falcon-logscale/api-ingest.html#api-ingest-structured-data"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/"
 // +description:"Storing messages in Falcon's LogScale over http"
 // +status:"Testing"
 type _metaLogScale interface{} //nolint:deadcode,unused

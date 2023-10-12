@@ -15,20 +15,14 @@ metadata:
   name: loki-output
 spec:
   loki:
-    url: 	"loki.loki:8000"
-    batch-lines: 2000
-    batch-timeout: 10
-    workers: 3
-    log-fifo-size: 1000
+    url: "loki-endpoint"
     labels:
       "app": "$PROGRAM"
       "host": "$HOST"
-    timestamp: "msg"
-    template: "$ISODATE $HOST $MSGHDR$MSG"
-    auth:
-      insecure: {}
 {{</ highlight >}}
-More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
+For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 
 
 ## Configuration
@@ -36,7 +30,7 @@ More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog
 
 ### auth (*Auth, optional) {#lokioutput-auth}
 
-Auth TODO 
+Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth 
 
 Default: -
 
