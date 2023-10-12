@@ -144,20 +144,10 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		Ports:           generatePorts(spec),
 		VolumeMounts:    generateVolumeMounts(spec),
 		Resources:       spec.Resources,
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             spec.Security.SecurityContext.Capabilities,
-		},
-		Env:            envVars,
-		LivenessProbe:  spec.LivenessProbe,
-		ReadinessProbe: generateReadinessCheck(spec),
+		SecurityContext: spec.Security.SecurityContext,
+		Env:             envVars,
+		LivenessProbe:   spec.LivenessProbe,
+		ReadinessProbe:  generateReadinessCheck(spec),
 	}
 
 	if spec.FluentOutLogrotate != nil && spec.FluentOutLogrotate.Enabled {
