@@ -93,19 +93,20 @@ func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
-	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
-		var lrList loggingv1beta1.LoggingRouteList
-		if err := mgr.GetCache().List(ctx, &lrList); err != nil {
-			logger.Error(err, "failed to list logging route resources")
-			return nil
-		}
+	// In case we receive an update about a logging resource
+	// we better notify all the logging routes to check if their target list has changed
+	// rather than complicate the watch logic here.
+	// The number and processing time of logging routes is not expected to cause issues.
+	loggingRequestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
 		var requests []reconcile.Request
-		switch o := obj.(type) {
-		case *loggingv1beta1.Logging:
+		if _, ok := obj.(*loggingv1beta1.Logging); ok {
+			var lrList loggingv1beta1.LoggingRouteList
+			if err := mgr.GetClient().List(ctx, &lrList); err != nil {
+				logger.Error(err, "failed to list logging route resources")
+				return nil
+			}
 			for _, lr := range lrList.Items {
-				if lr.Spec.Source == o.Name {
-					requests = append(requests, reconcile.Request{NamespacedName: apitypes.NamespacedName{Name: lr.Name}})
-				}
+				requests = append(requests, reconcile.Request{NamespacedName: apitypes.NamespacedName{Name: lr.Name}})
 			}
 		}
 		return requests
@@ -113,5 +114,5 @@ func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.LoggingRoute{}).
-		Watches(&loggingv1beta1.Logging{}, requestMapper).Complete(NewLoggingRouteReconciler(mgr.GetClient(), logger))
+		Watches(&loggingv1beta1.Logging{}, loggingRequestMapper).Complete(NewLoggingRouteReconciler(mgr.GetClient(), logger))
 }
