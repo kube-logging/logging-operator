@@ -284,10 +284,7 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			MountPath: "/fluentd/tls/",
 		})
 	}
-	if spec != nil && spec.Security != nil &&
-		spec.Security.SecurityContext != nil &&
-		spec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
-		*spec.Security.SecurityContext.ReadOnlyRootFilesystem {
+	if isFluentdReadOnlyRootFilesystem(spec) {
 		res = append(res, corev1.VolumeMount{
 			Name:      "tmp",
 			SubPath:   "fluentd",
@@ -317,10 +314,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
-	if r.Logging.Spec.FluentdSpec.Security != nil &&
-		r.Logging.Spec.FluentdSpec.Security.SecurityContext != nil &&
-		r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
-		*r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem {
+	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
 		v = append(v, corev1.Volume{
 			Name:         "tmp",
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
@@ -368,10 +362,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
-	if r.Logging.Spec.FluentdSpec.Security != nil &&
-		r.Logging.Spec.FluentdSpec.Security.SecurityContext != nil &&
-		r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem != nil &&
-		*r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem {
+	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
 		return &corev1.Container{
 			Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
 			Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
@@ -522,4 +513,12 @@ func generateInitContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
 		}
 	}
 	return nil
+}
+
+func isFluentdReadOnlyRootFilesystem(spec *v1beta1.FluentdSpec) bool {
+	if spec.Security.SecurityContext.ReadOnlyRootFilesystem != nil {
+		return *spec.Security.SecurityContext.ReadOnlyRootFilesystem
+	}
+
+	return false
 }
