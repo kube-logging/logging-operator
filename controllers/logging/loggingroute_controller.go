@@ -96,7 +96,7 @@ func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
 	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
 		var lrList loggingv1beta1.LoggingRouteList
 		if err := mgr.GetCache().List(ctx, &lrList); err != nil {
-			logger.Error(err, "failed to list logging resources")
+			logger.Error(err, "failed to list logging route resources")
 			return nil
 		}
 		var requests []reconcile.Request
