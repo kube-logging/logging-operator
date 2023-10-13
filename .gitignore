@@ -1,6 +1,7 @@
 # Temporary Build Files
 build/_output
 build/_test
+build/_test_coverage
 # Ignore vscode devcontainer
 .devcontainer/
 # Created by https://www.gitignore.io/api/go,vim,emacs,visualstudiocode
