@@ -5,6 +5,7 @@ RUN apk add --update --no-cache ca-certificates make git curl
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETPLATFORM
+ARG GO_BUILD_FLAGS=""
 
 WORKDIR /usr/local/src/logging-operator
 
@@ -28,9 +29,10 @@ COPY controllers/ controllers/
 COPY pkg/ pkg/
 
 # Build
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/manager
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build $GO_BUILD_FLAGS -o /usr/local/bin/manager
 
 
+#use debug to have tar (kubectl cp needs it)
 FROM gcr.io/distroless/static:latest@sha256:6706c73aae2afaa8201d63cc3dda48753c09bcd6c300762251065c0f7e602b25
 
 COPY --from=builder /usr/local/bin/manager /manager

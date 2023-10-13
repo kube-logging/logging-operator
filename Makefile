@@ -78,6 +78,12 @@ docker-build: ## Build the docker image
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
+.PHONY: docker-build-with-coverage
+docker-build-docker-build-with-coverage: ## Build the docker image with coverage
+	docker image inspect ${IMG} && echo "docker image ${IMG} already built" || ${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover". -t ${IMG}
+	@echo "updating kustomize image patch file for manager resource"
+	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
 	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
@@ -168,7 +174,7 @@ check-coverage: install-go-test-coverage generate-test-coverage
 	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
-test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build-with-coverage stern ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
