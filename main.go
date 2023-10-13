@@ -199,10 +199,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (ctrl.NewControllerManagedBy(mgr).
-		For(&loggingv1beta1.LoggingRoute{}).
-		Complete(loggingControllers.NewLoggingRouteReconciler(mgr.GetClient(), mgr.GetLogger()))); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
+	if err := loggingControllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Logging")
 		os.Exit(1)
 	}
 

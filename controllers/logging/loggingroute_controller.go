@@ -20,8 +20,10 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/go-logr/logr"
+	apitypes "k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
@@ -88,4 +90,28 @@ func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
+	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
+		var lrList loggingv1beta1.LoggingRouteList
+		if err := mgr.GetCache().List(ctx, &lrList); err != nil {
+			logger.Error(err, "failed to list logging resources")
+			return nil
+		}
+		var requests []reconcile.Request
+		switch o := obj.(type) {
+		case *loggingv1beta1.Logging:
+			for _, lr := range lrList.Items {
+				if lr.Spec.Source == o.Name {
+					requests = append(requests, reconcile.Request{NamespacedName: apitypes.NamespacedName{Name: lr.Name}})
+				}
+			}
+		}
+		return requests
+	})
+
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&loggingv1beta1.LoggingRoute{}).
+		Watches(&loggingv1beta1.Logging{}, requestMapper).Complete(NewLoggingRouteReconciler(mgr.GetClient(), logger))
 }
