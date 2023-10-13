@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
+	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -68,6 +69,11 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 			})
 		}
 	}
+
+	// Make sure our tenant list is stable
+	slices.SortStableFunc(tenants, func(a, b Tenant) bool {
+		return a.Name < b.Name
+	})
 
 	return tenants, nil
 }
