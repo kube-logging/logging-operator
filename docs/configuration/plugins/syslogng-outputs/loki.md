@@ -15,10 +15,18 @@ metadata:
   name: loki-output
 spec:
   loki:
-    url: "loki-endpoint"
+    url: "loki.loki:8000"
+    batch-lines: 2000
+    batch-timeout: 10
+    workers: 3
+    log-fifo-size: 1000
     labels:
       "app": "$PROGRAM"
       "host": "$HOST"
+    timestamp: "msg"
+    template: "$ISODATE $HOST $MSGHDR$MSG"
+    auth:
+      insecure: {}
 {{</ highlight >}}
 
 More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
