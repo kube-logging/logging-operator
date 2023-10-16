@@ -203,6 +203,9 @@ func NewValidationReconciler(
 
 		registerForPatching(&resources.Logging)
 
+		if !resources.Logging.WatchAllNamespaces() {
+			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
+		}
 		resources.Logging.Status.Problems = nil
 
 		loggingsForTheSameRef := make([]string, 0)
@@ -240,6 +243,7 @@ func NewValidationReconciler(
 				}
 			}
 		}
+		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 
 		var errs error
 		for _, req := range patchRequests {

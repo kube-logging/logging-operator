@@ -118,6 +118,8 @@ func drainWatchContainer(cfg *v1beta1.FluentdDrainConfig, bufferVolumeName strin
 				ReadOnly:  true,
 			},
 		},
+		Resources:       *cfg.Resources,
+		SecurityContext: cfg.SecurityContext,
 	}
 }
 

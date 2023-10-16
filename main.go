@@ -44,6 +44,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
@@ -205,9 +206,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (ctrl.NewControllerManagedBy(mgr).
-		For(&loggingv1beta1.LoggingRoute{}).
-		Complete(loggingControllers.NewLoggingRouteReconciler(mgr.GetClient(), mgr.GetLogger()))); err != nil {
+	if err := loggingControllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
 		os.Exit(1)
 	}
@@ -227,7 +226,9 @@ func main() {
 		webhookServer := mgr.GetWebhookServer()
 
 		setupLog.Info("Registering webhooks...")
-		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
+		webhookHandler := podhandler.NewPodHandler(ctrl.Log.WithName("webhook-tailer"))
+		webhookHandler.Decoder = admission.NewDecoder(mgr.GetScheme())
+		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: webhookHandler})
 	}
 
 	// +kubebuilder:scaffold:builder
