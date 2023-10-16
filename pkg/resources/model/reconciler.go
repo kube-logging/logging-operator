@@ -204,11 +204,17 @@ func NewValidationReconciler(
 		}
 
 		registerForPatching(&resources.Logging)
+		resources.Logging.Status.Problems = nil
+		resources.Logging.Status.WatchNamespaces = nil
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
 		}
-		resources.Logging.Status.Problems = nil
+
+		if resources.Logging.Spec.WatchNamespaceSelector != nil &&
+			len(resources.Logging.Status.WatchNamespaces) == 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Defined watchNamespaceSelector did not match any namespaces")
+		}
 
 		loggingsForTheSameRef := make([]string, 0)
 		for _, l := range resources.AllLoggings {
