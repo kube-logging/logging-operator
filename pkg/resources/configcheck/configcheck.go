@@ -23,21 +23,21 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const hashLabel = "logging.banzaicloud.io/config-hash"
+const HashLabel = "logging.banzaicloud.io/config-hash"
 
 func WithHashLabel(accessor v1.Object, hash string) {
 	l := accessor.GetLabels()
 	if l == nil {
 		l = map[string]string{}
 	}
-	l[hashLabel] = hash
+	l[HashLabel] = hash
 	accessor.SetLabels(l)
 }
 
 func hasHashLabel(accessor v1.Object, hash string) (has bool, match bool) {
 	l := accessor.GetLabels()
 	var val string
-	val, has = l[hashLabel]
+	val, has = l[HashLabel]
 	return has, val == hash
 }
 

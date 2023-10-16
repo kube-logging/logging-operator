@@ -24,9 +24,11 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 	"github.com/kube-logging/logging-operator/pkg/mirror"
@@ -225,6 +227,21 @@ func NewValidationReconciler(
 			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
 		}
 
+		checkResults := resources.Logging.Status.ConfigCheckResults
+		if len(checkResults) > 0 {
+			for hash, r := range checkResults {
+				if !r {
+					problem := fmt.Sprintf("Configuration with checksum %s has failed. "+
+						"Config secrets: `kubectl get secret -n %s -l %s=%s`. "+
+						"Configcheck pod log: `kubectl logs -n %s -l %s=%s --tail -1`",
+						hash,
+						resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
+						resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
+					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+				}
+			}
+		}
+
 		if len(resources.Logging.Spec.NodeAgents) > 0 || len(resources.NodeAgents) > 0 {
 			// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
 			// for compatibility reasons
@@ -243,6 +260,7 @@ func NewValidationReconciler(
 				}
 			}
 		}
+		slices.Sort(resources.Logging.Status.Problems)
 		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 
 		var errs error
