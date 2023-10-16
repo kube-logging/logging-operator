@@ -395,18 +395,8 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 					MountPath: OutputSecretPath,
 				},
 			},
-			SecurityContext: &corev1.SecurityContext{
-				RunAsUser:                r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsUser,
-				RunAsGroup:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsGroup,
-				ReadOnlyRootFilesystem:   r.Logging.Spec.FluentdSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-				AllowPrivilegeEscalation: r.Logging.Spec.FluentdSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-				Privileged:               r.Logging.Spec.FluentdSpec.Security.SecurityContext.Privileged,
-				RunAsNonRoot:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.RunAsNonRoot,
-				SELinuxOptions:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SELinuxOptions,
-				SeccompProfile:           r.Logging.Spec.FluentdSpec.Security.SecurityContext.SeccompProfile,
-				Capabilities:             r.Logging.Spec.FluentdSpec.Security.SecurityContext.Capabilities,
-			},
-			Resources: r.Logging.Spec.FluentdSpec.ConfigCheckResources,
+			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
+			Resources:       r.Logging.Spec.FluentdSpec.ConfigCheckResources,
 		},
 	}
 

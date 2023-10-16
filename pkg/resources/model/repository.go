@@ -69,13 +69,13 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	uniqueWatchNamespaces, err := UniqueWatchNamespaces(ctx, r.Client, &logging)
+	res.WatchNamespaces, err = UniqueWatchNamespaces(ctx, r.Client, &logging)
 	if err != nil {
 		errs = errors.Append(errs, err)
 		return
 	}
 
-	for _, ns := range uniqueWatchNamespaces {
+	for _, ns := range res.WatchNamespaces {
 		{
 			flows, err := r.FlowsInNamespaceFor(ctx, ns, logging)
 			res.Fluentd.Flows = append(res.Fluentd.Flows, flows...)
