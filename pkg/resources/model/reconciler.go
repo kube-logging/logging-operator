@@ -257,6 +257,11 @@ func NewValidationReconciler(
 				}
 			}
 		}
+
+		if resources.Logging.Spec.FluentbitSpec != nil && len(resources.LoggingRoutes) > 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Logging routes are not supported for embedded fluentbit configs, please use a separate FluentbitAgent resource!")
+		}
+
 		slices.Sort(resources.Logging.Status.Problems)
 		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 

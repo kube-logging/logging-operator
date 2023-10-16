@@ -69,6 +69,9 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
+	res.LoggingRoutes, err = r.LoggingRoutesFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
 	res.WatchNamespaces, err = UniqueWatchNamespaces(ctx, r.Client, &logging)
 	if err != nil {
 		errs = errors.Append(errs, err)
@@ -328,6 +331,25 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	var res []v1beta1.FluentbitAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	return res, nil
+}
+
+func (r LoggingResourceRepository) LoggingRoutesFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.LoggingRoute, error) {
+	var list v1beta1.LoggingRouteList
+	if err := r.Client.List(ctx, &list); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(list.Items, func(i, j int) bool {
+		return lessByNamespacedName(&list.Items[i], &list.Items[j])
+	})
+
+	var res []v1beta1.LoggingRoute
+	for _, i := range list.Items {
+		if i.Spec.Source == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
