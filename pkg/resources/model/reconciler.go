@@ -227,18 +227,15 @@ func NewValidationReconciler(
 			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
 		}
 
-		checkResults := resources.Logging.Status.ConfigCheckResults
-		if len(checkResults) > 0 {
-			for hash, r := range checkResults {
-				if !r {
-					problem := fmt.Sprintf("Configuration with checksum %s has failed. "+
-						"Config secrets: `kubectl get secret -n %s -l %s=%s`. "+
-						"Configcheck pod log: `kubectl logs -n %s -l %s=%s --tail -1`",
-						hash,
-						resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
-						resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
-					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
-				}
+		for hash, r := range resources.Logging.Status.ConfigCheckResults {
+			if !r {
+				problem := fmt.Sprintf("Configuration with checksum %s has failed. "+
+					"Config secrets: `kubectl get secret -n %s -l %s=%s`. "+
+					"Configcheck pod log: `kubectl logs -n %s -l %s=%s --tail -1`",
+					hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
 			}
 		}
 
