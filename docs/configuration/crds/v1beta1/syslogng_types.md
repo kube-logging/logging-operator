@@ -8,31 +8,35 @@ generated_file: true
 
 SyslogNGSpec defines the desired state of SyslogNG
 
-### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
+### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
 
 Default: -
 
-### readinessDefaultCheck (ReadinessDefaultCheck, optional) {#syslogngspec-readinessdefaultcheck}
-
-Default: -
-
-### skipRBACCreate (bool, optional) {#syslogngspec-skiprbaccreate}
-
-Default: -
-
-### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}
-
-Default: -
-
-### service (*typeoverride.Service, optional) {#syslogngspec-service}
-
-Default: -
-
-### serviceAccount (*typeoverride.ServiceAccount, optional) {#syslogngspec-serviceaccount}
+### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
 
 Default: -
 
 ### configCheckPod (*typeoverride.PodSpec, optional) {#syslogngspec-configcheckpod}
+
+Default: -
+
+### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
+
+Default: -
+
+### jsonKeyDelim (string, optional) {#syslogngspec-jsonkeydelim}
+
+Default: -
+
+### jsonKeyPrefix (string, optional) {#syslogngspec-jsonkeyprefix}
+
+Default: -
+
+### logIWSize (int, optional) {#syslogngspec-logiwsize}
+
+Default: -
+
+### maxConnections (int, optional) {#syslogngspec-maxconnections}
 
 Default: -
 
@@ -44,31 +48,27 @@ Default: -
 
 Default: -
 
-### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
+### readinessDefaultCheck (ReadinessDefaultCheck, optional) {#syslogngspec-readinessdefaultcheck}
 
 Default: -
 
-### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
+### serviceAccount (*typeoverride.ServiceAccount, optional) {#syslogngspec-serviceaccount}
 
 Default: -
 
-### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
+### service (*typeoverride.Service, optional) {#syslogngspec-service}
 
 Default: -
 
-### jsonKeyPrefix (string, optional) {#syslogngspec-jsonkeyprefix}
+### skipRBACCreate (bool, optional) {#syslogngspec-skiprbaccreate}
 
 Default: -
 
-### jsonKeyDelim (string, optional) {#syslogngspec-jsonkeydelim}
+### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}
 
 Default: -
 
-### maxConnections (int, optional) {#syslogngspec-maxconnections}
-
-Default: -
-
-### logIWSize (int, optional) {#syslogngspec-logiwsize}
+### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
 
 Default: -
 
@@ -92,15 +92,9 @@ Default: -
 
 ## GlobalOptions
 
-### stats_level (*int, optional) {#globaloptions-stats_level}
+### log_level (*string, optional) {#globaloptions-log_level}
 
-deprecated use stats/level from 4.1+ 
-
-Default: -
-
-### stats_freq (*int, optional) {#globaloptions-stats_freq}
-
-deprecated use stats/freq from 4.1+ 
+Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level 
 
 Default: -
 
@@ -110,20 +104,26 @@ Stats https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-o
 
 Default: -
 
-### log_level (*string, optional) {#globaloptions-log_level}
+### stats_freq (*int, optional) {#globaloptions-stats_freq}
 
-Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level 
+deprecated use stats/freq from 4.1+ 
+
+Default: -
+
+### stats_level (*int, optional) {#globaloptions-stats_level}
+
+deprecated use stats/level from 4.1+ 
 
 Default: -
 
 
 ## Stats
 
-### level (*int, optional) {#stats-level}
+### freq (*int, optional) {#stats-freq}
 
 Default: -
 
-### freq (*int, optional) {#stats-freq}
+### level (*int, optional) {#stats-level}
 
 Default: -
 

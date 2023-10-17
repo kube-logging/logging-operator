@@ -24,15 +24,27 @@ generated_file: true
 ## Configuration
 ## Output Config
 
-### webhook_url (*secret.Secret, required) {#output config-webhook_url}
+### ca_path (*secret.Secret, optional) {#output config-ca_path}
 
-webhook_url Incoming Webhook URI (Required for Incoming Webhook mode). 
+ca_path you can set the path of the certificates. 
 
 Default: -
 
 ### channel_id (string, optional) {#output config-channel_id}
 
 channel_id the id of the channel where you want to receive the information. 
+
+Default: -
+
+### enable_tls (*bool, optional) {#output config-enable_tls}
+
+enable_tls you can set the communication channel if it uses tls.
+
+Default: true
+
+### message (string, optional) {#output config-message}
+
+message The message you want to send, can be a static message, which you add at this point, or you can receive the fluent infos with the %s 
 
 Default: -
 
@@ -48,21 +60,9 @@ message_title title you want to add to the message.
 
 Default: fluent_title_default
 
-### message (string, optional) {#output config-message}
+### webhook_url (*secret.Secret, required) {#output config-webhook_url}
 
-message The message you want to send, can be a static message, which you add at this point, or you can receive the fluent infos with the %s 
-
-Default: -
-
-### enable_tls (*bool, optional) {#output config-enable_tls}
-
-enable_tls you can set the communication channel if it uses tls.
-
-Default: true
-
-### ca_path (*secret.Secret, optional) {#output config-ca_path}
-
-ca_path you can set the path of the certificates. 
+webhook_url Incoming Webhook URI (Required for Incoming Webhook mode). 
 
 Default: -
 

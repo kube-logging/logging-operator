@@ -26,15 +26,9 @@ generated_file: true
 
 Send your logs to a Kinesis Firehose
 
-### delivery_stream_name (string, required) {#kinesisfirehose-delivery_stream_name}
+### aws_iam_retries (int, optional) {#kinesisfirehose-aws_iam_retries}
 
-Name of the delivery stream to put data. 
-
-Default: -
-
-### append_new_line (*bool, optional) {#kinesisfirehose-append_new_line}
-
-If it is enabled, the plugin adds new line character (\n) to each serialized record. Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true) 
+The number of attempts to make (with exponential backoff) when loading instance profile credentials from the EC2 metadata service using an IAM role. Defaults to 5 retries. 
 
 Default: -
 
@@ -56,39 +50,15 @@ AWS session token. This parameter is optional, but can be provided if using MFA 
 
 Default: -
 
-### aws_iam_retries (int, optional) {#kinesisfirehose-aws_iam_retries}
+### append_new_line (*bool, optional) {#kinesisfirehose-append_new_line}
 
-The number of attempts to make (with exponential backoff) when loading instance profile credentials from the EC2 metadata service using an IAM role. Defaults to 5 retries. 
+If it is enabled, the plugin adds new line character (\n) to each serialized record. Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true) 
 
 Default: -
 
 ### assume_role_credentials (*KinesisFirehoseAssumeRoleCredentials, optional) {#kinesisfirehose-assume_role_credentials}
 
 Typically, you can use AssumeRole for cross-account access or federation. 
-
-Default: -
-
-### process_credentials (*KinesisFirehoseProcessCredentials, optional) {#kinesisfirehose-process_credentials}
-
-This loads AWS access credentials from an external process. 
-
-Default: -
-
-### region (string, optional) {#kinesisfirehose-region}
-
-AWS region of your stream. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION. 
-
-Default: -
-
-### retries_on_batch_request (int, optional) {#kinesisfirehose-retries_on_batch_request}
-
-The plugin will put multiple records to Amazon Kinesis Data Streams in batches using PutRecords. A set of records in a batch may fail for reasons documented in the Kinesis Service API Reference for PutRecords. Failed records will be retried retries_on_batch_request times 
-
-Default: -
-
-### reset_backoff_if_success (bool, optional) {#kinesisfirehose-reset_backoff_if_success}
-
-Boolean, default true. If enabled, when after retrying, the next retrying checks the number of succeeded records on the former batch request and reset exponential backoff if there is any success. Because batch request could be composed by requests across shards, simple exponential backoff for the batch request wouldn't work some cases. 
 
 Default: -
 
@@ -104,15 +74,45 @@ Integer. The number of max size of making batch request from record chunk. It ca
 
 Default: -
 
+### buffer (*Buffer, optional) {#kinesisfirehose-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
+
+### delivery_stream_name (string, required) {#kinesisfirehose-delivery_stream_name}
+
+Name of the delivery stream to put data. 
+
+Default: -
+
 ### format (*Format, optional) {#kinesisfirehose-format}
 
 [Format](../format/) 
 
 Default: -
 
-### buffer (*Buffer, optional) {#kinesisfirehose-buffer}
+### process_credentials (*KinesisFirehoseProcessCredentials, optional) {#kinesisfirehose-process_credentials}
 
-[Buffer](../buffer/) 
+This loads AWS access credentials from an external process. 
+
+Default: -
+
+### region (string, optional) {#kinesisfirehose-region}
+
+AWS region of your stream. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION. 
+
+Default: -
+
+### reset_backoff_if_success (bool, optional) {#kinesisfirehose-reset_backoff_if_success}
+
+Boolean, default true. If enabled, when after retrying, the next retrying checks the number of succeeded records on the former batch request and reset exponential backoff if there is any success. Because batch request could be composed by requests across shards, simple exponential backoff for the batch request wouldn't work some cases. 
+
+Default: -
+
+### retries_on_batch_request (int, optional) {#kinesisfirehose-retries_on_batch_request}
+
+The plugin will put multiple records to Amazon Kinesis Data Streams in batches using PutRecords. A set of records in a batch may fail for reasons documented in the Kinesis Service API Reference for PutRecords. Failed records will be retried retries_on_batch_request times 
 
 Default: -
 
@@ -127,24 +127,6 @@ Default: -
 
 assume_role_credentials
 
-### role_arn (string, required) {#assume role credentials-role_arn}
-
-The Amazon Resource Name (ARN) of the role to assume 
-
-Default: -
-
-### role_session_name (string, required) {#assume role credentials-role_session_name}
-
-An identifier for the assumed role session 
-
-Default: -
-
-### policy (string, optional) {#assume role credentials-policy}
-
-An IAM policy in JSON format 
-
-Default: -
-
 ### duration_seconds (string, optional) {#assume role credentials-duration_seconds}
 
 The duration, in seconds, of the role session (900-3600) 
@@ -154,6 +136,24 @@ Default: -
 ### external_id (string, optional) {#assume role credentials-external_id}
 
 A unique identifier that is used by third parties when assuming roles in their customers' accounts. 
+
+Default: -
+
+### policy (string, optional) {#assume role credentials-policy}
+
+An IAM policy in JSON format 
+
+Default: -
+
+### role_arn (string, required) {#assume role credentials-role_arn}
+
+The Amazon Resource Name (ARN) of the role to assume 
+
+Default: -
+
+### role_session_name (string, required) {#assume role credentials-role_session_name}
+
+An identifier for the assumed role session 
 
 Default: -
 

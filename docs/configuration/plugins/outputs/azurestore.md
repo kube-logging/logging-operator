@@ -12,29 +12,11 @@ generated_file: true
 ## Configuration
 ## Output Config
 
-### path (string, optional) {#output config-path}
+### auto_create_container (bool, optional) {#output config-auto_create_container}
 
-Path prefix of the files on Azure 
+Automatically create container if not exists
 
-Default: -
-
-### azure_storage_account (*secret.Secret, required) {#output config-azure_storage_account}
-
-Your azure storage account [Secret](../secret/) 
-
-Default: -
-
-### azure_storage_access_key (*secret.Secret, optional) {#output config-azure_storage_access_key}
-
-Your azure storage access key [Secret](../secret/) 
-
-Default: -
-
-### azure_storage_sas_token (*secret.Secret, optional) {#output config-azure_storage_sas_token}
-
-Your azure storage sas token [Secret](../secret/) 
-
-Default: -
+Default: true
 
 ### azure_container (string, required) {#output config-azure_container}
 
@@ -54,11 +36,29 @@ Object key format
 
 Default: %{path}%{time_slice}_%{index}.%{file_extension}
 
-### auto_create_container (bool, optional) {#output config-auto_create_container}
+### azure_storage_access_key (*secret.Secret, optional) {#output config-azure_storage_access_key}
 
-Automatically create container if not exists
+Your azure storage access key [Secret](../secret/) 
 
-Default: true
+Default: -
+
+### azure_storage_account (*secret.Secret, required) {#output config-azure_storage_account}
+
+Your azure storage account [Secret](../secret/) 
+
+Default: -
+
+### azure_storage_sas_token (*secret.Secret, optional) {#output config-azure_storage_sas_token}
+
+Your azure storage sas token [Secret](../secret/) 
+
+Default: -
+
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
 
 ### format (string, optional) {#output config-format}
 
@@ -66,9 +66,9 @@ Compat format type: out_file, json, ltsv (default: out_file)
 
 Default: json
 
-### buffer (*Buffer, optional) {#output config-buffer}
+### path (string, optional) {#output config-path}
 
-[Buffer](../buffer/) 
+Path prefix of the files on Azure 
 
 Default: -
 

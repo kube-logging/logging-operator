@@ -31,77 +31,23 @@ This parameter is required in order to authenticate your fluent agent.  +docLink
 
 Default: nil
 
-### use_json (bool, optional) {#output config-use_json}
+### buffer (*Buffer, optional) {#output config-buffer}
 
-Event format, if true, the event is sent in json format. Othwerwise, in plain text.
+[Buffer](../buffer/) 
 
-Default: true
-
-### include_tag_key (bool, optional) {#output config-include_tag_key}
-
-Automatically include the Fluentd tag in the record.
-
-Default: false
-
-### tag_key (string, optional) {#output config-tag_key}
-
-Where to store the Fluentd tag.
-
-Default: "tag"
-
-### timestamp_key (string, optional) {#output config-timestamp_key}
-
-Name of the attribute which will contain timestamp of the log event. If nil, timestamp attribute is not added.
-
-Default: "@timestamp"
-
-### use_ssl (bool, optional) {#output config-use_ssl}
-
-If true, the agent initializes a secure connection to Datadog. In clear TCP otherwise.
-
-Default: true
-
-### no_ssl_validation (bool, optional) {#output config-no_ssl_validation}
-
-Disable SSL validation (useful for proxy forwarding)
-
-Default: false
-
-### ssl_port (string, optional) {#output config-ssl_port}
-
-Port used to send logs over a SSL encrypted connection to Datadog. If use_http is disabled, use 10516 for the US region and 443 for the EU region.
-
-Default: "443"
-
-### max_retries (string, optional) {#output config-max_retries}
-
-The number of retries before the output plugin stops. Set to -1 for unlimited retries
-
-Default: "-1"
-
-### max_backoff (string, optional) {#output config-max_backoff}
-
-The maximum time waited between each retry in seconds
-
-Default: "30"
-
-### use_http (bool, optional) {#output config-use_http}
-
-Enable HTTP forwarding. If you disable it, make sure to change the port to 10514 or ssl_port to 10516
-
-Default: true
-
-### use_compression (bool, optional) {#output config-use_compression}
-
-Enable log compression for HTTP
-
-Default: true
+Default: -
 
 ### compression_level (string, optional) {#output config-compression_level}
 
 Set the log compression level for HTTP (1 to 9, 9 being the best ratio)
 
 Default: "6"
+
+### dd_hostname (string, optional) {#output config-dd_hostname}
+
+Used by Datadog to identify the host submitting the logs.
+
+Default: "hostname -f"
 
 ### dd_source (string, optional) {#output config-dd_source}
 
@@ -121,17 +67,35 @@ Custom tags with the following format "key1:value1, key2:value2"
 
 Default: nil
 
-### dd_hostname (string, optional) {#output config-dd_hostname}
+### host (string, optional) {#output config-host}
 
-Used by Datadog to identify the host submitting the logs.
+Proxy endpoint when logs are not directly forwarded to Datadog
 
-Default: "hostname -f"
+Default: "http-intake.logs.datadoghq.com"
 
-### service (string, optional) {#output config-service}
+### include_tag_key (bool, optional) {#output config-include_tag_key}
 
-Used by Datadog to correlate between logs, traces and metrics.
+Automatically include the Fluentd tag in the record.
 
-Default: nil
+Default: false
+
+### max_backoff (string, optional) {#output config-max_backoff}
+
+The maximum time waited between each retry in seconds
+
+Default: "30"
+
+### max_retries (string, optional) {#output config-max_retries}
+
+The number of retries before the output plugin stops. Set to -1 for unlimited retries
+
+Default: "-1"
+
+### no_ssl_validation (bool, optional) {#output config-no_ssl_validation}
+
+Disable SSL validation (useful for proxy forwarding)
+
+Default: false
 
 ### port (string, optional) {#output config-port}
 
@@ -139,22 +103,58 @@ Proxy port when logs are not directly forwarded to Datadog and ssl is not used
 
 Default: "80"
 
-### host (string, optional) {#output config-host}
+### service (string, optional) {#output config-service}
 
-Proxy endpoint when logs are not directly forwarded to Datadog
+Used by Datadog to correlate between logs, traces and metrics.
 
-Default: "http-intake.logs.datadoghq.com"
-
-### buffer (*Buffer, optional) {#output config-buffer}
-
-[Buffer](../buffer/) 
-
-Default: -
+Default: nil
 
 ### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
 
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
+
+### ssl_port (string, optional) {#output config-ssl_port}
+
+Port used to send logs over a SSL encrypted connection to Datadog. If use_http is disabled, use 10516 for the US region and 443 for the EU region.
+
+Default: "443"
+
+### tag_key (string, optional) {#output config-tag_key}
+
+Where to store the Fluentd tag.
+
+Default: "tag"
+
+### timestamp_key (string, optional) {#output config-timestamp_key}
+
+Name of the attribute which will contain timestamp of the log event. If nil, timestamp attribute is not added.
+
+Default: "@timestamp"
+
+### use_compression (bool, optional) {#output config-use_compression}
+
+Enable log compression for HTTP
+
+Default: true
+
+### use_http (bool, optional) {#output config-use_http}
+
+Enable HTTP forwarding. If you disable it, make sure to change the port to 10514 or ssl_port to 10516
+
+Default: true
+
+### use_json (bool, optional) {#output config-use_json}
+
+Event format, if true, the event is sent in json format. Othwerwise, in plain text.
+
+Default: true
+
+### use_ssl (bool, optional) {#output config-use_ssl}
+
+If true, the agent initializes a secure connection to Datadog. In clear TCP otherwise.
+
+Default: true
 
 

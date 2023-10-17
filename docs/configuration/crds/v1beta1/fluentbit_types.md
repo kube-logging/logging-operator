@@ -46,11 +46,7 @@ Default: -
 
 FluentbitSpec defines the desired state of FluentbitAgent
 
-### loggingRef (string, optional) {#fluentbitspec-loggingref}
-
-Default: -
-
-### daemonsetAnnotations (map[string]string, optional) {#fluentbitspec-daemonsetannotations}
+### affinity (*corev1.Affinity, optional) {#fluentbitspec-affinity}
 
 Default: -
 
@@ -58,7 +54,67 @@ Default: -
 
 Default: -
 
-### labels (map[string]string, optional) {#fluentbitspec-labels}
+### bufferStorage (BufferStorage, optional) {#fluentbitspec-bufferstorage}
+
+Default: -
+
+### bufferStorageVolume (volume.KubernetesVolume, optional) {#fluentbitspec-bufferstoragevolume}
+
+[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
+
+Default: -
+
+### bufferVolumeArgs ([]string, optional) {#fluentbitspec-buffervolumeargs}
+
+Default: -
+
+### bufferVolumeImage (ImageSpec, optional) {#fluentbitspec-buffervolumeimage}
+
+Default: -
+
+### bufferVolumeMetrics (*Metrics, optional) {#fluentbitspec-buffervolumemetrics}
+
+Default: -
+
+### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentbitspec-buffervolumeresources}
+
+Default: -
+
+### coroStackSize (int32, optional) {#fluentbitspec-corostacksize}
+
+Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer. Do not change the default value of this parameter unless you know what you are doing. (default: 24576) 
+
+Default: 24576
+
+### customConfigSecret (string, optional) {#fluentbitspec-customconfigsecret}
+
+Default: -
+
+### customParsers (string, optional) {#fluentbitspec-customparsers}
+
+Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
+
+Default: -
+
+### dnsConfig (*corev1.PodDNSConfig, optional) {#fluentbitspec-dnsconfig}
+
+Default: -
+
+### dnsPolicy (corev1.DNSPolicy, optional) {#fluentbitspec-dnspolicy}
+
+Default: -
+
+### daemonsetAnnotations (map[string]string, optional) {#fluentbitspec-daemonsetannotations}
+
+Default: -
+
+### disableKubernetesFilter (*bool, optional) {#fluentbitspec-disablekubernetesfilter}
+
+Disable Kubernetes metadata filter 
+
+Default: -
+
+### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
 
 Default: -
 
@@ -66,7 +122,133 @@ Default: -
 
 Default: -
 
+### extraVolumeMounts ([]*VolumeMount, optional) {#fluentbitspec-extravolumemounts}
+
+Default: -
+
+### filterAws (*FilterAws, optional) {#fluentbitspec-filteraws}
+
+Default: -
+
+### filterKubernetes (FilterKubernetes, optional) {#fluentbitspec-filterkubernetes}
+
+Parameters for Kubernetes metadata filter 
+
+Default: -
+
+### filterModify ([]FilterModify, optional) {#fluentbitspec-filtermodify}
+
+Default: -
+
+### flush (int32, optional) {#fluentbitspec-flush}
+
+Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1) 
+
+Default: 1
+
+### forwardOptions (*ForwardOptions, optional) {#fluentbitspec-forwardoptions}
+
+Default: -
+
+### grace (int32, optional) {#fluentbitspec-grace}
+
+Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5) 
+
+Default: 5
+
+### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
+
+Default: -
+
+### HostNetwork (bool, optional) {#fluentbitspec-hostnetwork}
+
+Default: -
+
 ### image (ImageSpec, optional) {#fluentbitspec-image}
+
+Default: -
+
+### inputTail (InputTail, optional) {#fluentbitspec-inputtail}
+
+Default: -
+
+### labels (map[string]string, optional) {#fluentbitspec-labels}
+
+Default: -
+
+### livenessDefaultCheck (bool, optional) {#fluentbitspec-livenessdefaultcheck}
+
+Default: -
+
+### livenessProbe (*corev1.Probe, optional) {#fluentbitspec-livenessprobe}
+
+Default: -
+
+### logLevel (string, optional) {#fluentbitspec-loglevel}
+
+Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info) 
+
+Default: info
+
+### loggingRef (string, optional) {#fluentbitspec-loggingref}
+
+Default: -
+
+### metrics (*Metrics, optional) {#fluentbitspec-metrics}
+
+Default: -
+
+### mountPath (string, optional) {#fluentbitspec-mountpath}
+
+Default: -
+
+### network (*FluentbitNetwork, optional) {#fluentbitspec-network}
+
+Default: -
+
+### nodeSelector (map[string]string, optional) {#fluentbitspec-nodeselector}
+
+Default: -
+
+### parser (string, optional) {#fluentbitspec-parser}
+
+Deprecated, use inputTail.parser 
+
+Default: -
+
+### podPriorityClassName (string, optional) {#fluentbitspec-podpriorityclassname}
+
+Default: -
+
+### position_db (*volume.KubernetesVolume, optional) {#fluentbitspec-position_db}
+
+Deprecated, use positiondb 
+
+Default: -
+
+### positiondb (volume.KubernetesVolume, optional) {#fluentbitspec-positiondb}
+
+[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
+
+Default: -
+
+### readinessProbe (*corev1.Probe, optional) {#fluentbitspec-readinessprobe}
+
+Default: -
+
+### resources (corev1.ResourceRequirements, optional) {#fluentbitspec-resources}
+
+Default: -
+
+### security (*Security, optional) {#fluentbitspec-security}
+
+Default: -
+
+### serviceAccount (*typeoverride.ServiceAccount, optional) {#fluentbitspec-serviceaccount}
+
+Default: -
+
+### syslogng_output (*FluentbitTCPOutput, optional) {#fluentbitspec-syslogng_output}
 
 Default: -
 
@@ -82,193 +264,11 @@ Default: -
 
 Default: -
 
-### flush (int32, optional) {#fluentbitspec-flush}
-
-Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1) 
-
-Default: 1
-
-### grace (int32, optional) {#fluentbitspec-grace}
-
-Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5) 
-
-Default: 5
-
-### logLevel (string, optional) {#fluentbitspec-loglevel}
-
-Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info) 
-
-Default: info
-
-### coroStackSize (int32, optional) {#fluentbitspec-corostacksize}
-
-Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer. Do not change the default value of this parameter unless you know what you are doing. (default: 24576) 
-
-Default: 24576
-
-### resources (corev1.ResourceRequirements, optional) {#fluentbitspec-resources}
-
-Default: -
-
 ### tolerations ([]corev1.Toleration, optional) {#fluentbitspec-tolerations}
 
 Default: -
 
-### nodeSelector (map[string]string, optional) {#fluentbitspec-nodeselector}
-
-Default: -
-
-### affinity (*corev1.Affinity, optional) {#fluentbitspec-affinity}
-
-Default: -
-
-### metrics (*Metrics, optional) {#fluentbitspec-metrics}
-
-Default: -
-
-### security (*Security, optional) {#fluentbitspec-security}
-
-Default: -
-
-### positiondb (volume.KubernetesVolume, optional) {#fluentbitspec-positiondb}
-
-[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
-
-Default: -
-
-### position_db (*volume.KubernetesVolume, optional) {#fluentbitspec-position_db}
-
-Deprecated, use positiondb 
-
-Default: -
-
-### mountPath (string, optional) {#fluentbitspec-mountpath}
-
-Default: -
-
-### extraVolumeMounts ([]*VolumeMount, optional) {#fluentbitspec-extravolumemounts}
-
-Default: -
-
-### inputTail (InputTail, optional) {#fluentbitspec-inputtail}
-
-Default: -
-
-### filterAws (*FilterAws, optional) {#fluentbitspec-filteraws}
-
-Default: -
-
-### filterModify ([]FilterModify, optional) {#fluentbitspec-filtermodify}
-
-Default: -
-
-### parser (string, optional) {#fluentbitspec-parser}
-
-Deprecated, use inputTail.parser 
-
-Default: -
-
-### filterKubernetes (FilterKubernetes, optional) {#fluentbitspec-filterkubernetes}
-
-Parameters for Kubernetes metadata filter 
-
-Default: -
-
-### disableKubernetesFilter (*bool, optional) {#fluentbitspec-disablekubernetesfilter}
-
-Disable Kubernetes metadata filter 
-
-Default: -
-
-### bufferStorage (BufferStorage, optional) {#fluentbitspec-bufferstorage}
-
-Default: -
-
-### bufferStorageVolume (volume.KubernetesVolume, optional) {#fluentbitspec-bufferstoragevolume}
-
-[volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
-
-Default: -
-
-### bufferVolumeMetrics (*Metrics, optional) {#fluentbitspec-buffervolumemetrics}
-
-Default: -
-
-### bufferVolumeImage (ImageSpec, optional) {#fluentbitspec-buffervolumeimage}
-
-Default: -
-
-### bufferVolumeArgs ([]string, optional) {#fluentbitspec-buffervolumeargs}
-
-Default: -
-
-### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentbitspec-buffervolumeresources}
-
-Default: -
-
-### customConfigSecret (string, optional) {#fluentbitspec-customconfigsecret}
-
-Default: -
-
-### podPriorityClassName (string, optional) {#fluentbitspec-podpriorityclassname}
-
-Default: -
-
-### livenessProbe (*corev1.Probe, optional) {#fluentbitspec-livenessprobe}
-
-Default: -
-
-### livenessDefaultCheck (bool, optional) {#fluentbitspec-livenessdefaultcheck}
-
-Default: -
-
-### readinessProbe (*corev1.Probe, optional) {#fluentbitspec-readinessprobe}
-
-Default: -
-
-### network (*FluentbitNetwork, optional) {#fluentbitspec-network}
-
-Default: -
-
-### forwardOptions (*ForwardOptions, optional) {#fluentbitspec-forwardoptions}
-
-Default: -
-
-### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
-
-Default: -
-
-### serviceAccount (*typeoverride.ServiceAccount, optional) {#fluentbitspec-serviceaccount}
-
-Default: -
-
-### dnsPolicy (corev1.DNSPolicy, optional) {#fluentbitspec-dnspolicy}
-
-Default: -
-
-### dnsConfig (*corev1.PodDNSConfig, optional) {#fluentbitspec-dnsconfig}
-
-Default: -
-
-### HostNetwork (bool, optional) {#fluentbitspec-hostnetwork}
-
-Default: -
-
-### syslogng_output (*FluentbitTCPOutput, optional) {#fluentbitspec-syslogng_output}
-
-Default: -
-
 ### updateStrategy (appsv1.DaemonSetUpdateStrategy, optional) {#fluentbitspec-updatestrategy}
-
-Default: -
-
-### customParsers (string, optional) {#fluentbitspec-customparsers}
-
-Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
-
-Default: -
-
-### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
 
 Default: -
 
@@ -299,13 +299,13 @@ Default: -
 
 FluentbitTCPOutput defines the TLS configs
 
-### json_date_key (string, optional) {#fluentbittcpoutput-json_date_key}
-
-Default: ts
-
 ### json_date_format (string, optional) {#fluentbittcpoutput-json_date_format}
 
 Default: iso8601
+
+### json_date_key (string, optional) {#fluentbittcpoutput-json_date_key}
+
+Default: ts
 
 ### Workers (*int, optional) {#fluentbittcpoutput-workers}
 
@@ -375,6 +375,24 @@ Default: disabled
 
 BufferStorage is the Service Section Configuration of fluent-bit
 
+### storage.backlog.mem_limit (string, optional) {#bufferstorage-storage.backlog.mem_limit}
+
+If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records.
+
+Default: 5M
+
+### storage.checksum (string, optional) {#bufferstorage-storage.checksum}
+
+Enable the data integrity check when writing and reading data from the filesystem. The storage layer uses the CRC32 algorithm.
+
+Default: Off
+
+### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
+
+If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.
+
+Default: Off
+
 ### storage.path (string, optional) {#bufferstorage-storage.path}
 
 Set an optional location in the file system to store streams and chunks of data. If this parameter is not set, Input plugins can only use in-memory buffering. 
@@ -387,24 +405,6 @@ Configure the synchronization mode used to store the data into the file system. 
 
 Default: normal
 
-### storage.checksum (string, optional) {#bufferstorage-storage.checksum}
-
-Enable the data integrity check when writing and reading data from the filesystem. The storage layer uses the CRC32 algorithm.
-
-Default: Off
-
-### storage.backlog.mem_limit (string, optional) {#bufferstorage-storage.backlog.mem_limit}
-
-If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records.
-
-Default: 5M
-
-### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
-
-If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.
-
-Default: Off
-
 
 ## HealthCheck
 
@@ -416,28 +416,22 @@ The error count to meet the unhealthy requirement, this is a sum for all output 
 
 Default: 5
 
-### hcRetryFailureCount (int, optional) {#healthcheck-hcretryfailurecount}
-
-The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period
-
-Default: 5
-
 ### hcPeriod (int, optional) {#healthcheck-hcperiod}
 
 The time period by second to count the error and retry failure data point
 
 Default: 60
 
+### hcRetryFailureCount (int, optional) {#healthcheck-hcretryfailurecount}
+
+The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period
+
+Default: 5
+
 
 ## InputTail
 
 InputTail defines FluentbitAgent tail input configuration The tail input plugin allows to monitor one or several text files. It has a similar behavior like tail -f shell command.
-
-### storage.type (string, optional) {#inputtail-storage.type}
-
-Specify the buffering mechanism to use. It can be memory or filesystem.
-
-Default: memory
 
 ### Buffer_Chunk_Size (string, optional) {#inputtail-buffer_chunk_size}
 
@@ -451,6 +445,108 @@ Set the limit of the buffer size per monitored file. When a buffer needs to be i
 
 Default: Buffer_Chunk_Size
 
+### DB (*string, optional) {#inputtail-db}
+
+Specify the database file to keep track of monitored files and offsets. 
+
+Default: -
+
+### DB.journal_mode (string, optional) {#inputtail-db.journal_mode}
+
+sets the journal mode for databases (WAL). Enabling WAL provides higher performance. Note that WAL is not compatible with shared network file systems.
+
+Default: WAL
+
+### DB.locking (*bool, optional) {#inputtail-db.locking}
+
+Specify that the database will be accessed only by Fluent Bit. Enabling this feature helps to increase performance when accessing the database but it restrict any external tool to query the content.
+
+Default: true
+
+### DB_Sync (string, optional) {#inputtail-db_sync}
+
+Set a default synchronization (I/O) method. Values: Extra, Full, Normal, Off. This flag affects how the internal SQLite engine do synchronization to disk, for more details about each option please refer to this section.
+
+Default: Full
+
+### Docker_Mode (string, optional) {#inputtail-docker_mode}
+
+If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline.
+
+Default: Off
+
+### Docker_Mode_Flush (string, optional) {#inputtail-docker_mode_flush}
+
+Wait period time in seconds to flush queued unfinished split lines.
+
+Default: 4
+
+### Docker_Mode_Parser (string, optional) {#inputtail-docker_mode_parser}
+
+Specify an optional parser for the first line of the docker multiline mode. 
+
+Default: -
+
+### Exclude_Path (string, optional) {#inputtail-exclude_path}
+
+Set one or multiple shell patterns separated by commas to exclude files matching a certain criteria, e.g: exclude_path=*.gz,*.zip 
+
+Default: -
+
+### Ignore_Older (string, optional) {#inputtail-ignore_older}
+
+Ignores files that have been last modified before this time in seconds. Supports m,h,d (minutes, hours,days) syntax. Default behavior is to read all specified files. 
+
+Default: -
+
+### Key (string, optional) {#inputtail-key}
+
+When a message is unstructured (no parser applied), it's appended as a string under the key name log. This option allows to define an alternative name for that key.
+
+Default: log
+
+### Mem_Buf_Limit (string, optional) {#inputtail-mem_buf_limit}
+
+Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes. 
+
+Default: -
+
+### Multiline (string, optional) {#inputtail-multiline}
+
+If enabled, the plugin will try to discover multiline messages and use the proper parsers to compose the outgoing messages. Note that when this option is enabled the Parser option is not used.
+
+Default: Off
+
+### Multiline_Flush (string, optional) {#inputtail-multiline_flush}
+
+Wait period time in seconds to process queued multiline messages
+
+Default: 4
+
+### multiline.parser ([]string, optional) {#inputtail-multiline.parser}
+
+Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8
+
+Default: ""
+
+### Parser (string, optional) {#inputtail-parser}
+
+Specify the name of a parser to interpret the entry as a structured message. 
+
+Default: -
+
+### Parser_Firstline (string, optional) {#inputtail-parser_firstline}
+
+Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture) 
+
+Default: -
+
+### Parser_N ([]string, optional) {#inputtail-parser_n}
+
+Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN. 
+
+Default: -
+
 ### Path (string, optional) {#inputtail-path}
 
 Pattern specifying a specific log files or multiple ones through the use of common wildcards. 
@@ -460,12 +556,6 @@ Default: -
 ### Path_Key (string, optional) {#inputtail-path_key}
 
 If enabled, it appends the name of the monitored file as part of the record. The value assigned becomes the key in the map. 
-
-Default: -
-
-### Exclude_Path (string, optional) {#inputtail-exclude_path}
-
-Set one or multiple shell patterns separated by commas to exclude files matching a certain criteria, e.g: exclude_path=*.gz,*.zip 
 
 Default: -
 
@@ -487,59 +577,17 @@ Specify the number of extra time in seconds to monitor a file once is rotated in
 
 Default: 5
 
-### Ignore_Older (string, optional) {#inputtail-ignore_older}
-
-Ignores files that have been last modified before this time in seconds. Supports m,h,d (minutes, hours,days) syntax. Default behavior is to read all specified files. 
-
-Default: -
-
 ### Skip_Long_Lines (string, optional) {#inputtail-skip_long_lines}
 
 When a monitored file reach it buffer capacity due to a very long line (Buffer_Max_Size), the default behavior is to stop monitoring that file. Skip_Long_Lines alter that behavior and instruct Fluent Bit to skip long lines and continue processing other lines that fits into the buffer size.
 
 Default: Off
 
-### DB (*string, optional) {#inputtail-db}
+### storage.type (string, optional) {#inputtail-storage.type}
 
-Specify the database file to keep track of monitored files and offsets. 
+Specify the buffering mechanism to use. It can be memory or filesystem.
 
-Default: -
-
-### DB_Sync (string, optional) {#inputtail-db_sync}
-
-Set a default synchronization (I/O) method. Values: Extra, Full, Normal, Off. This flag affects how the internal SQLite engine do synchronization to disk, for more details about each option please refer to this section.
-
-Default: Full
-
-### DB.locking (*bool, optional) {#inputtail-db.locking}
-
-Specify that the database will be accessed only by Fluent Bit. Enabling this feature helps to increase performance when accessing the database but it restrict any external tool to query the content.
-
-Default: true
-
-### DB.journal_mode (string, optional) {#inputtail-db.journal_mode}
-
-sets the journal mode for databases (WAL). Enabling WAL provides higher performance. Note that WAL is not compatible with shared network file systems.
-
-Default: WAL
-
-### Mem_Buf_Limit (string, optional) {#inputtail-mem_buf_limit}
-
-Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes. 
-
-Default: -
-
-### Parser (string, optional) {#inputtail-parser}
-
-Specify the name of a parser to interpret the entry as a structured message. 
-
-Default: -
-
-### Key (string, optional) {#inputtail-key}
-
-When a message is unstructured (no parser applied), it's appended as a string under the key name log. This option allows to define an alternative name for that key.
-
-Default: log
+Default: memory
 
 ### Tag (string, optional) {#inputtail-tag}
 
@@ -553,64 +601,16 @@ Set a regex to extract fields from the file.
 
 Default: -
 
-### Multiline (string, optional) {#inputtail-multiline}
-
-If enabled, the plugin will try to discover multiline messages and use the proper parsers to compose the outgoing messages. Note that when this option is enabled the Parser option is not used.
-
-Default: Off
-
-### Multiline_Flush (string, optional) {#inputtail-multiline_flush}
-
-Wait period time in seconds to process queued multiline messages
-
-Default: 4
-
-### Parser_Firstline (string, optional) {#inputtail-parser_firstline}
-
-Name of the parser that machs the beginning of a multiline message. Note that the regular expression defined in the parser must include a group name (named capture) 
-
-Default: -
-
-### Parser_N ([]string, optional) {#inputtail-parser_n}
-
-Optional-extra parser to interpret and structure multiline entries. This option can be used to define multiple parsers, e.g: Parser_1 ab1,  Parser_2 ab2, Parser_N abN. 
-
-Default: -
-
-### Docker_Mode (string, optional) {#inputtail-docker_mode}
-
-If enabled, the plugin will recombine split Docker log lines before passing them to any parser as configured above. This mode cannot be used at the same time as Multiline.
-
-Default: Off
-
-### Docker_Mode_Parser (string, optional) {#inputtail-docker_mode_parser}
-
-Specify an optional parser for the first line of the docker multiline mode. 
-
-Default: -
-
-### Docker_Mode_Flush (string, optional) {#inputtail-docker_mode_flush}
-
-Wait period time in seconds to flush queued unfinished split lines.
-
-Default: 4
-
-### multiline.parser ([]string, optional) {#inputtail-multiline.parser}
-
-Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8
-
-Default: ""
-
 
 ## FilterKubernetes
 
 FilterKubernetes Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata.
 
-### Match (string, optional) {#filterkubernetes-match}
+### Annotations (string, optional) {#filterkubernetes-annotations}
 
-Match filtered records (default:kube.*) 
+Include Kubernetes resource annotations in the extra metadata.
 
-Default: kubernetes.*
+Default: On
 
 ### Buffer_Size (string, optional) {#filterkubernetes-buffer_size}
 
@@ -618,11 +618,47 @@ Set the buffer size for HTTP client when reading responses from Kubernetes API s
 
 Default: "0"
 
-### Kube_URL (string, optional) {#filterkubernetes-kube_url}
+### Cache_Use_Docker_Id (string, optional) {#filterkubernetes-cache_use_docker_id}
 
-API Server end-point (default:https://kubernetes.default.svc:443) 
+When enabled, metadata will be fetched from K8s when docker_id is changed.
 
-Default: https://kubernetes.default.svc:443
+Default: Off
+
+### DNS_Retries (string, optional) {#filterkubernetes-dns_retries}
+
+DNS lookup retries N times until the network start working
+
+Default: 6
+
+### DNS_Wait_Time (string, optional) {#filterkubernetes-dns_wait_time}
+
+DNS lookup interval between network status checks
+
+Default: 30
+
+### Dummy_Meta (string, optional) {#filterkubernetes-dummy_meta}
+
+If set, use dummy-meta data (for test/dev purposes)
+
+Default: Off
+
+### K8S-Logging.Exclude (string, optional) {#filterkubernetes-k8s-logging.exclude}
+
+Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section).
+
+Default: On
+
+### K8S-Logging.Parser (string, optional) {#filterkubernetes-k8s-logging.parser}
+
+Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section)
+
+Default: Off
+
+### Keep_Log (string, optional) {#filterkubernetes-keep_log}
+
+When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well).
+
+Default: On
 
 ### Kube_CA_File (string, optional) {#filterkubernetes-kube_ca_file}
 
@@ -636,6 +672,24 @@ Absolute path to scan for certificate files
 
 Default: -
 
+### Kube_Meta_Cache_TTL (string, optional) {#filterkubernetes-kube_meta_cache_ttl}
+
+Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted.
+
+Default: 0
+
+### Kube_meta_preload_cache_dir (string, optional) {#filterkubernetes-kube_meta_preload_cache_dir}
+
+If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta 
+
+Default: -
+
+### Kube_Tag_Prefix (string, optional) {#filterkubernetes-kube_tag_prefix}
+
+When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.) 
+
+Default: kubernetes.var.log.containers
+
 ### Kube_Token_File (string, optional) {#filterkubernetes-kube_token_file}
 
 Token file  (default:/var/run/secrets/kubernetes.io/serviceaccount/token) 
@@ -648,11 +702,29 @@ Token TTL configurable 'time to live' for the K8s token. By default, it is set t
 
 Default: 600
 
-### Kube_Tag_Prefix (string, optional) {#filterkubernetes-kube_tag_prefix}
+### Kube_URL (string, optional) {#filterkubernetes-kube_url}
 
-When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.) 
+API Server end-point (default:https://kubernetes.default.svc:443) 
 
-Default: kubernetes.var.log.containers
+Default: https://kubernetes.default.svc:443
+
+### Kubelet_Port (string, optional) {#filterkubernetes-kubelet_port}
+
+kubelet port using for HTTP request, this only works when Use_Kubelet  set to On
+
+Default: 10250
+
+### Labels (string, optional) {#filterkubernetes-labels}
+
+Include Kubernetes resource labels in the extra metadata.
+
+Default: On
+
+### Match (string, optional) {#filterkubernetes-match}
+
+Match filtered records (default:kube.*) 
+
+Default: kubernetes.*
 
 ### Merge_Log (string, optional) {#filterkubernetes-merge_log}
 
@@ -678,11 +750,11 @@ Optional parser name to specify how to parse the data contained in the log key. 
 
 Default: -
 
-### Keep_Log (string, optional) {#filterkubernetes-keep_log}
+### Regex_Parser (string, optional) {#filterkubernetes-regex_parser}
 
-When Keep_Log is disabled, the log field is removed from the incoming message once it has been successfully merged (Merge_Log must be enabled as well).
+Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example). 
 
-Default: On
+Default: -
 
 ### tls.debug (string, optional) {#filterkubernetes-tls.debug}
 
@@ -702,100 +774,34 @@ When enabled, the filter reads logs coming in Journald format.
 
 Default: Off
 
-### Cache_Use_Docker_Id (string, optional) {#filterkubernetes-cache_use_docker_id}
-
-When enabled, metadata will be fetched from K8s when docker_id is changed.
-
-Default: Off
-
-### Regex_Parser (string, optional) {#filterkubernetes-regex_parser}
-
-Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example). 
-
-Default: -
-
-### K8S-Logging.Parser (string, optional) {#filterkubernetes-k8s-logging.parser}
-
-Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section)
-
-Default: Off
-
-### K8S-Logging.Exclude (string, optional) {#filterkubernetes-k8s-logging.exclude}
-
-Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section).
-
-Default: On
-
-### Labels (string, optional) {#filterkubernetes-labels}
-
-Include Kubernetes resource labels in the extra metadata.
-
-Default: On
-
-### Annotations (string, optional) {#filterkubernetes-annotations}
-
-Include Kubernetes resource annotations in the extra metadata.
-
-Default: On
-
-### Kube_meta_preload_cache_dir (string, optional) {#filterkubernetes-kube_meta_preload_cache_dir}
-
-If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta 
-
-Default: -
-
-### Dummy_Meta (string, optional) {#filterkubernetes-dummy_meta}
-
-If set, use dummy-meta data (for test/dev purposes)
-
-Default: Off
-
-### DNS_Retries (string, optional) {#filterkubernetes-dns_retries}
-
-DNS lookup retries N times until the network start working
-
-Default: 6
-
-### DNS_Wait_Time (string, optional) {#filterkubernetes-dns_wait_time}
-
-DNS lookup interval between network status checks
-
-Default: 30
-
 ### Use_Kubelet (string, optional) {#filterkubernetes-use_kubelet}
 
 This is an optional feature flag to get metadata information from kubelet instead of calling Kube Server API to enhance the log.
 
 Default: Off
 
-### Kubelet_Port (string, optional) {#filterkubernetes-kubelet_port}
-
-kubelet port using for HTTP request, this only works when Use_Kubelet  set to On
-
-Default: 10250
-
-### Kube_Meta_Cache_TTL (string, optional) {#filterkubernetes-kube_meta_cache_ttl}
-
-Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted.
-
-Default: 0
-
 
 ## FilterAws
 
 FilterAws The AWS Filter Enriches logs with AWS Metadata.
-
-### imds_version (string, optional) {#filteraws-imds_version}
-
-Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default). 
-
-Default: v2
 
 ### az (*bool, optional) {#filteraws-az}
 
 The availability zone (default:true). 
 
 Default: true
+
+### account_id (*bool, optional) {#filteraws-account_id}
+
+The account ID for current EC2 instance. (default:false) 
+
+Default: false
+
+### ami_id (*bool, optional) {#filteraws-ami_id}
+
+The EC2 instance image id. (default:false) 
+
+Default: false
 
 ### ec2_instance_id (*bool, optional) {#filteraws-ec2_instance_id}
 
@@ -809,27 +815,27 @@ The EC2 instance type. (default:false)
 
 Default: false
 
-### private_ip (*bool, optional) {#filteraws-private_ip}
-
-The EC2 instance private ip. (default:false) 
-
-Default: false
-
-### ami_id (*bool, optional) {#filteraws-ami_id}
-
-The EC2 instance image id. (default:false) 
-
-Default: false
-
-### account_id (*bool, optional) {#filteraws-account_id}
-
-The account ID for current EC2 instance. (default:false) 
-
-Default: false
-
 ### hostname (*bool, optional) {#filteraws-hostname}
 
 The hostname for current EC2 instance. (default:false) 
+
+Default: false
+
+### imds_version (string, optional) {#filteraws-imds_version}
+
+Specify which version of the instance metadata service to use. Valid values are 'v1' or 'v2' (default). 
+
+Default: v2
+
+### Match (string, optional) {#filteraws-match}
+
+Match filtered records (default:*) 
+
+Default: *
+
+### private_ip (*bool, optional) {#filteraws-private_ip}
+
+The EC2 instance private ip. (default:false) 
 
 Default: false
 
@@ -839,26 +845,20 @@ The VPC ID for current EC2 instance. (default:false)
 
 Default: false
 
-### Match (string, optional) {#filteraws-match}
-
-Match filtered records (default:*) 
-
-Default: *
-
 
 ## FilterModify
 
 FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
 
-### rules ([]FilterModifyRule, optional) {#filtermodify-rules}
-
-FluentbitAgent Filter Modification Rule 
-
-Default: -
-
 ### conditions ([]FilterModifyCondition, optional) {#filtermodify-conditions}
 
 FluentbitAgent Filter Modification Condition 
+
+Default: -
+
+### rules ([]FilterModifyRule, optional) {#filtermodify-rules}
+
+FluentbitAgent Filter Modification Rule 
 
 Default: -
 
@@ -867,45 +867,9 @@ Default: -
 
 FilterModifyRule The Modify Filter plugin allows you to change records using rules and conditions.
 
-### Set (*FilterKeyValue, optional) {#filtermodifyrule-set}
-
-Add a key/value pair with key KEY and value VALUE. If KEY already exists, this field is overwritten 
-
-Default: -
-
 ### Add (*FilterKeyValue, optional) {#filtermodifyrule-add}
 
 Add a key/value pair with key KEY and value VALUE if KEY does not exist 
-
-Default: -
-
-### Remove (*FilterKey, optional) {#filtermodifyrule-remove}
-
-Remove a key/value pair with key KEY if it exists 
-
-Default: -
-
-### Remove_wildcard (*FilterKey, optional) {#filtermodifyrule-remove_wildcard}
-
-Remove all key/value pairs with key matching wildcard KEY 
-
-Default: -
-
-### Remove_regex (*FilterKey, optional) {#filtermodifyrule-remove_regex}
-
-Remove all key/value pairs with key matching regexp KEY 
-
-Default: -
-
-### Rename (*FilterKeyValue, optional) {#filtermodifyrule-rename}
-
-Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists AND RENAMED_KEY does not exist 
-
-Default: -
-
-### Hard_rename (*FilterKeyValue, optional) {#filtermodifyrule-hard_rename}
-
-Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists. If RENAMED_KEY already exists, this field is overwritten 
 
 Default: -
 
@@ -921,14 +885,50 @@ Copy a key/value pair with key KEY to COPIED_KEY if KEY exists. If COPIED_KEY al
 
 Default: -
 
+### Hard_rename (*FilterKeyValue, optional) {#filtermodifyrule-hard_rename}
+
+Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists. If RENAMED_KEY already exists, this field is overwritten 
+
+Default: -
+
+### Remove (*FilterKey, optional) {#filtermodifyrule-remove}
+
+Remove a key/value pair with key KEY if it exists 
+
+Default: -
+
+### Remove_regex (*FilterKey, optional) {#filtermodifyrule-remove_regex}
+
+Remove all key/value pairs with key matching regexp KEY 
+
+Default: -
+
+### Remove_wildcard (*FilterKey, optional) {#filtermodifyrule-remove_wildcard}
+
+Remove all key/value pairs with key matching wildcard KEY 
+
+Default: -
+
+### Rename (*FilterKeyValue, optional) {#filtermodifyrule-rename}
+
+Rename a key/value pair with key KEY to RENAMED_KEY if KEY exists AND RENAMED_KEY does not exist 
+
+Default: -
+
+### Set (*FilterKeyValue, optional) {#filtermodifyrule-set}
+
+Add a key/value pair with key KEY and value VALUE. If KEY already exists, this field is overwritten 
+
+Default: -
+
 
 ## FilterModifyCondition
 
 FilterModifyCondition The Modify Filter plugin allows you to change records using rules and conditions.
 
-### Key_exists (*FilterKey, optional) {#filtermodifycondition-key_exists}
+### A_key_matches (*FilterKey, optional) {#filtermodifycondition-a_key_matches}
 
-Is true if KEY exists 
+Is true if a key matches regex KEY 
 
 Default: -
 
@@ -938,21 +938,9 @@ Is true if KEY does not exist
 
 Default: -
 
-### A_key_matches (*FilterKey, optional) {#filtermodifycondition-a_key_matches}
+### Key_exists (*FilterKey, optional) {#filtermodifycondition-key_exists}
 
-Is true if a key matches regex KEY 
-
-Default: -
-
-### No_key_matches (*FilterKey, optional) {#filtermodifycondition-no_key_matches}
-
-Is true if no key matches regex KEY 
-
-Default: -
-
-### Key_value_equals (*FilterKeyValue, optional) {#filtermodifycondition-key_value_equals}
-
-Is true if KEY exists and its value is VALUE 
+Is true if KEY exists 
 
 Default: -
 
@@ -962,21 +950,21 @@ Is true if KEY exists and its value is not VALUE
 
 Default: -
 
-### Key_value_matches (*FilterKeyValue, optional) {#filtermodifycondition-key_value_matches}
-
-Is true if key KEY exists and its value matches VALUE 
-
-Default: -
-
 ### Key_value_does_not_match (*FilterKeyValue, optional) {#filtermodifycondition-key_value_does_not_match}
 
 Is true if key KEY exists and its value does not match VALUE 
 
 Default: -
 
-### Matching_keys_have_matching_values (*FilterKeyValue, optional) {#filtermodifycondition-matching_keys_have_matching_values}
+### Key_value_equals (*FilterKeyValue, optional) {#filtermodifycondition-key_value_equals}
 
-Is true if all keys matching KEY have values that match VALUE 
+Is true if KEY exists and its value is VALUE 
+
+Default: -
+
+### Key_value_matches (*FilterKeyValue, optional) {#filtermodifycondition-key_value_matches}
+
+Is true if key KEY exists and its value matches VALUE 
 
 Default: -
 
@@ -986,16 +974,28 @@ Is true if all keys matching KEY have values that do not match VALUE
 
 Default: -
 
+### Matching_keys_have_matching_values (*FilterKeyValue, optional) {#filtermodifycondition-matching_keys_have_matching_values}
+
+Is true if all keys matching KEY have values that match VALUE 
+
+Default: -
+
+### No_key_matches (*FilterKey, optional) {#filtermodifycondition-no_key_matches}
+
+Is true if no key matches regex KEY 
+
+Default: -
+
 
 ## Operation
 
 Operation Doc stub
 
-### Op (string, optional) {#operation-op}
+### Key (string, optional) {#operation-key}
 
 Default: -
 
-### Key (string, optional) {#operation-key}
+### Op (string, optional) {#operation-op}
 
 Default: -
 
@@ -1026,12 +1026,6 @@ Default: -
 
 VolumeMount defines source and destination folders of a hostPath type pod mount
 
-### source (string, required) {#volumemount-source}
-
-Source folder 
-
-Default: -
-
 ### destination (string, required) {#volumemount-destination}
 
 Destination Folder 
@@ -1044,24 +1038,18 @@ Mount Mode
 
 Default: -
 
+### source (string, required) {#volumemount-source}
+
+Source folder 
+
+Default: -
+
 
 ## ForwardOptions
 
 ForwardOptions defines custom forward output plugin options, see https://docs.fluentbit.io/manual/pipeline/outputs/forward
 
-### Time_as_Integer (bool, optional) {#forwardoptions-time_as_integer}
-
-Default: -
-
-### Send_options (bool, optional) {#forwardoptions-send_options}
-
-Default: -
-
 ### Require_ack_response (bool, optional) {#forwardoptions-require_ack_response}
-
-Default: -
-
-### Tag (string, optional) {#forwardoptions-tag}
 
 Default: -
 
@@ -1069,9 +1057,21 @@ Default: -
 
 Default: -
 
+### Send_options (bool, optional) {#forwardoptions-send_options}
+
+Default: -
+
 ### storage.total_limit_size (string, optional) {#forwardoptions-storage.total_limit_size}
 
 `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination. 
+
+Default: -
+
+### Tag (string, optional) {#forwardoptions-tag}
+
+Default: -
+
+### Time_as_Integer (bool, optional) {#forwardoptions-time_as_integer}
 
 Default: -
 

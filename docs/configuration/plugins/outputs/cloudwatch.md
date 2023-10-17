@@ -50,21 +50,15 @@ AWS access key id [Secret](../secret/)
 
 Default: -
 
-### aws_sec_key (*secret.Secret, optional) {#output config-aws_sec_key}
-
-AWS secret key. [Secret](../secret/) 
-
-Default: -
-
 ### aws_instance_profile_credentials_retries (int, optional) {#output config-aws_instance_profile_credentials_retries}
 
 Instance Profile Credentials call retries
 
 Default: nil
 
-### aws_use_sts (bool, optional) {#output config-aws_use_sts}
+### aws_sec_key (*secret.Secret, optional) {#output config-aws_sec_key}
 
-Enable AssumeRoleCredentials to authenticate, rather than the default credential hierarchy. See 'Cross-Account Operation' below for more detail. 
+AWS secret key. [Secret](../secret/) 
 
 Default: -
 
@@ -80,6 +74,18 @@ The session name to use with sts authentication
 
 Default: 'fluentd'
 
+### aws_use_sts (bool, optional) {#output config-aws_use_sts}
+
+Enable AssumeRoleCredentials to authenticate, rather than the default credential hierarchy. See 'Cross-Account Operation' below for more detail. 
+
+Default: -
+
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
+
 ### concurrency (int, optional) {#output config-concurrency}
 
 Use to set the number of threads pushing data to CloudWatch.
@@ -89,6 +95,12 @@ Default: 1
 ### endpoint (string, optional) {#output config-endpoint}
 
 Use this parameter to connect to the local API endpoint (for testing) 
+
+Default: -
+
+### format (*Format, optional) {#output config-format}
+
+[Format](../format/) 
 
 Default: -
 
@@ -236,6 +248,12 @@ Use specified field of records as retention period
 
 Default: -
 
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+
+Default: -
+
 ### use_tag_as_group (bool, optional) {#output config-use_tag_as_group}
 
 Use tag as a group name 
@@ -245,24 +263,6 @@ Default: -
 ### use_tag_as_stream (bool, optional) {#output config-use_tag_as_stream}
 
 Use tag as a stream name 
-
-Default: -
-
-### buffer (*Buffer, optional) {#output config-buffer}
-
-[Buffer](../buffer/) 
-
-Default: -
-
-### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
-
-The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
-
-Default: -
-
-### format (*Format, optional) {#output config-format}
-
-[Format](../format/) 
 
 Default: -
 

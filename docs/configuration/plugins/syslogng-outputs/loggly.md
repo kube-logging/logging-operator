@@ -18,6 +18,12 @@ generated_file: true
 
 Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 
+###  (SyslogOutput, required) {#loggly-}
+
+syslog output configuration 
+
+Default: -
+
 ### host (string, optional) {#loggly-host}
 
 Address of the destination host 
@@ -33,12 +39,6 @@ Default: -
 ### token (*secret.Secret, required) {#loggly-token}
 
 Your Customer Token that you received from Loggly [more information](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/) 
-
-Default: -
-
-###  (SyslogOutput, required) {#loggly-}
-
-syslog output configuration 
 
 Default: -
 

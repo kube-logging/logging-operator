@@ -5,11 +5,11 @@
 ## Configuration
 ## Throttle
 
-### group_key (string, optional) {#throttle-group_key}
+### group_bucket_limit (int, optional) {#throttle-group_bucket_limit}
 
-Used to group logs. Groups are rate limited independently
+Maximum number logs allowed per groups over the period of group_bucket_period_s
 
-Default: kubernetes.container_name
+Default: 6000
 
 ### group_bucket_period_s (int, optional) {#throttle-group_bucket_period_s}
 
@@ -17,17 +17,17 @@ This is the period of of time over which group_bucket_limit applies
 
 Default: 60
 
-### group_bucket_limit (int, optional) {#throttle-group_bucket_limit}
-
-Maximum number logs allowed per groups over the period of group_bucket_period_s
-
-Default: 6000
-
 ### group_drop_logs (bool, optional) {#throttle-group_drop_logs}
 
 When a group reaches its limit, logs will be dropped from further processing if this value is true
 
 Default: true
+
+### group_key (string, optional) {#throttle-group_key}
+
+Used to group logs. Groups are rate limited independently
+
+Default: kubernetes.container_name
 
 ### group_reset_rate_s (int, optional) {#throttle-group_reset_rate_s}
 

@@ -83,27 +83,15 @@ For details on the available options of the output, see the [syslog-ng documenta
 
 Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/
 
-### host (string, optional) {#syslogoutput-host}
-
-Address of the destination host 
-
-Default: -
-
-### port (int, optional) {#syslogoutput-port}
-
-The port number to connect to. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor895) 
-
-Default: -
-
-### transport (string, optional) {#syslogoutput-transport}
-
-Specifies the protocol used to send messages to the destination server. [more information]() [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor911) 
-
-Default: -
-
 ### close_on_input (*bool, optional) {#syslogoutput-close_on_input}
 
 By default, syslog-ng OSE closes destination sockets if it receives any input from the socket (for example, a reply). If this option is set to no, syslog-ng OSE just ignores the input, but does not close the socket. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor859) 
+
+Default: -
+
+### disk_buffer (*DiskBuffer, optional) {#syslogoutput-disk_buffer}
+
+Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). 
 
 Default: -
 
@@ -119,6 +107,24 @@ Specifies how many lines are flushed to a destination at a time. [more informati
 
 Default: -
 
+### host (string, optional) {#syslogoutput-host}
+
+Address of the destination host 
+
+Default: -
+
+### persist_name (string, optional) {#syslogoutput-persist_name}
+
+Unique name for the syslog-ng driver [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.16/administration-guide/persist-name) 
+
+Default: -
+
+### port (int, optional) {#syslogoutput-port}
+
+The port number to connect to. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor895) 
+
+Default: -
+
 ### so_keepalive (*bool, optional) {#syslogoutput-so_keepalive}
 
 Enables keep-alive messages, keeping the socket open. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor897) 
@@ -128,18 +134,6 @@ Default: -
 ### suppress (int, optional) {#syslogoutput-suppress}
 
 Specifies the number of seconds syslog-ng waits for identical messages. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor901) 
-
-Default: -
-
-### template (string, optional) {#syslogoutput-template}
-
-Specifies a template defining the logformat to be used in the destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor905)
-
-Default: 0
-
-### template_escape (*bool, optional) {#syslogoutput-template_escape}
-
-Turns on escaping for the ', ", and backspace characters in templated output files. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor906) 
 
 Default: -
 
@@ -155,15 +149,21 @@ Override the global timestamp format (set in the global ts-format() parameter) f
 
 Default: -
 
-### disk_buffer (*DiskBuffer, optional) {#syslogoutput-disk_buffer}
+### template (string, optional) {#syslogoutput-template}
 
-Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). 
+Specifies a template defining the logformat to be used in the destination. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor905)
+
+Default: 0
+
+### template_escape (*bool, optional) {#syslogoutput-template_escape}
+
+Turns on escaping for the ', ", and backspace characters in templated output files. [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor906) 
 
 Default: -
 
-### persist_name (string, optional) {#syslogoutput-persist_name}
+### transport (string, optional) {#syslogoutput-transport}
 
-Unique name for the syslog-ng driver [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.16/administration-guide/persist-name) 
+Specifies the protocol used to send messages to the destination server. [more information]() [more information](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#kanchor911) 
 
 Default: -
 

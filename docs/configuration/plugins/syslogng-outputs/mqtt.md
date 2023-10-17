@@ -35,15 +35,15 @@ Address of the destination host
 
 Default: -
 
-### topic (string, optional) {#mqtt-topic}
-
-Topic defines in which topic syslog-ng stores the log message. You can also use templates here, and use, for example, the $HOST macro in the topic name hierarchy. 
-
-Default: -
-
 ### fallback-topic (string, optional) {#mqtt-fallback-topic}
 
 fallback-topic is used when syslog-ng cannot post a message to the originally defined topic (which can include invalid characters coming from templates). 
+
+Default: -
+
+### qos (int, optional) {#mqtt-qos}
+
+qos stands for quality of service and can take three values in the MQTT world. Its default value is 0, where there is no guarantee that the message is ever delivered. 
 
 Default: -
 
@@ -53,9 +53,9 @@ Template where you can configure the message template sent to the MQTT broker. B
 
 Default: -
 
-### qos (int, optional) {#mqtt-qos}
+### topic (string, optional) {#mqtt-topic}
 
-qos stands for quality of service and can take three values in the MQTT world. Its default value is 0, where there is no guarantee that the message is ever delivered. 
+Topic defines in which topic syslog-ng stores the log message. You can also use templates here, and use, for example, the $HOST macro in the topic name hierarchy. 
 
 Default: -
 

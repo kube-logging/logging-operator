@@ -33,45 +33,9 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 
 Default: -
 
-### token (secret.Secret, optional) {#splunkhecoutput-token}
+### content_type (string, optional) {#splunkhecoutput-content_type}
 
-The token that syslog-ng OSE uses to authenticate on the event collector. 
-
-Default: -
-
-### event (string, optional) {#splunkhecoutput-event}
-
-event() accepts a template, which declares the content of the log message sent to Splunk. Default value: ${MSG} 
-
-Default: -
-
-### index (string, optional) {#splunkhecoutput-index}
-
-Splunk index where the messages will be stored. 
-
-Default: -
-
-### source (string, optional) {#splunkhecoutput-source}
-
-Sets the source field. 
-
-Default: -
-
-### sourcetype (string, optional) {#splunkhecoutput-sourcetype}
-
-Sets the sourcetype field. 
-
-Default: -
-
-### host (string, optional) {#splunkhecoutput-host}
-
-Sets the host field. 
-
-Default: -
-
-### time (string, optional) {#splunkhecoutput-time}
-
-Sets the time field. 
+Additional HTTP request content-type option. 
 
 Default: -
 
@@ -93,9 +57,9 @@ Fallback option for sourcetype field.
 
 Default: -
 
-### fields (string, optional) {#splunkhecoutput-fields}
+### event (string, optional) {#splunkhecoutput-event}
 
-Additional indexing metadata for Splunk. 
+event() accepts a template, which declares the content of the log message sent to Splunk. Default value: ${MSG} 
 
 Default: -
 
@@ -111,9 +75,45 @@ Additional HTTP request query options.
 
 Default: -
 
-### content_type (string, optional) {#splunkhecoutput-content_type}
+### fields (string, optional) {#splunkhecoutput-fields}
 
-Additional HTTP request content-type option. 
+Additional indexing metadata for Splunk. 
+
+Default: -
+
+### host (string, optional) {#splunkhecoutput-host}
+
+Sets the host field. 
+
+Default: -
+
+### index (string, optional) {#splunkhecoutput-index}
+
+Splunk index where the messages will be stored. 
+
+Default: -
+
+### source (string, optional) {#splunkhecoutput-source}
+
+Sets the source field. 
+
+Default: -
+
+### sourcetype (string, optional) {#splunkhecoutput-sourcetype}
+
+Sets the sourcetype field. 
+
+Default: -
+
+### time (string, optional) {#splunkhecoutput-time}
+
+Sets the time field. 
+
+Default: -
+
+### token (secret.Secret, optional) {#splunkhecoutput-token}
+
+The token that syslog-ng OSE uses to authenticate on the event collector. 
 
 Default: -
 

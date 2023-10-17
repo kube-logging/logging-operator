@@ -8,9 +8,45 @@ generated_file: true
 
 LoggingSpec defines the desired state of Logging
 
-### loggingRef (string, optional) {#loggingspec-loggingref}
+### allowClusterResourcesFromAllNamespaces (bool, optional) {#loggingspec-allowclusterresourcesfromallnamespaces}
 
-Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset. 
+Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources 
+
+Default: -
+
+### clusterDomain (*string, optional) {#loggingspec-clusterdomain}
+
+Cluster domain name to be used when templating URLs to services .
+
+Default: "cluster.local."
+
+### configCheck (ConfigCheck, optional) {#loggingspec-configcheck}
+
+ConfigCheck settings that apply to both fluentd and syslog-ng 
+
+Default: -
+
+### controlNamespace (string, required) {#loggingspec-controlnamespace}
+
+Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
+
+Default: -
+
+### defaultFlow (*DefaultFlowSpec, optional) {#loggingspec-defaultflow}
+
+Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow. 
+
+Default: -
+
+### enableRecreateWorkloadOnImmutableFieldChange (bool, optional) {#loggingspec-enablerecreateworkloadonimmutablefieldchange}
+
+EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 
+
+Default: -
+
+### errorOutputRef (string, optional) {#loggingspec-erroroutputref}
+
+GlobalOutput name to flush ERROR events to 
 
 Default: -
 
@@ -20,21 +56,9 @@ Disable configuration check before applying new fluentd configuration.
 
 Default: -
 
-### skipInvalidResources (bool, optional) {#loggingspec-skipinvalidresources}
-
-Whether to skip invalid Flow and ClusterFlow resources 
-
-Default: -
-
 ### flowConfigOverride (string, optional) {#loggingspec-flowconfigoverride}
 
 Override generated config. This is a *raw* configuration string for troubleshooting purposes. 
-
-Default: -
-
-### configCheck (ConfigCheck, optional) {#loggingspec-configcheck}
-
-ConfigCheck settings that apply to both fluentd and syslog-ng 
 
 Default: -
 
@@ -50,57 +74,15 @@ Fluentd statefulset configuration
 
 Default: -
 
-### syslogNG (*SyslogNGSpec, optional) {#loggingspec-syslogng}
-
-Syslog-NG statefulset configuration 
-
-Default: -
-
-### defaultFlow (*DefaultFlowSpec, optional) {#loggingspec-defaultflow}
-
-Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow. 
-
-Default: -
-
-### errorOutputRef (string, optional) {#loggingspec-erroroutputref}
-
-GlobalOutput name to flush ERROR events to 
-
-Default: -
-
 ### globalFilters ([]Filter, optional) {#loggingspec-globalfilters}
 
 Global filters to apply on logs before any match or filter mechanism. 
 
 Default: -
 
-### watchNamespaces ([]string, optional) {#loggingspec-watchnamespaces}
+### loggingRef (string, optional) {#loggingspec-loggingref}
 
-Limit namespaces to watch Flow and Output custom resources. 
-
-Default: -
-
-### watchNamespaceSelector (*metav1.LabelSelector, optional) {#loggingspec-watchnamespaceselector}
-
-WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces 
-
-Default: -
-
-### clusterDomain (*string, optional) {#loggingspec-clusterdomain}
-
-Cluster domain name to be used when templating URLs to services .
-
-Default: "cluster.local."
-
-### controlNamespace (string, required) {#loggingspec-controlnamespace}
-
-Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
-
-Default: -
-
-### allowClusterResourcesFromAllNamespaces (bool, optional) {#loggingspec-allowclusterresourcesfromallnamespaces}
-
-Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources 
+Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset. 
 
 Default: -
 
@@ -110,14 +92,38 @@ InlineNodeAgent Configuration Deprecated, will be removed with next major versio
 
 Default: -
 
-### enableRecreateWorkloadOnImmutableFieldChange (bool, optional) {#loggingspec-enablerecreateworkloadonimmutablefieldchange}
+### skipInvalidResources (bool, optional) {#loggingspec-skipinvalidresources}
 
-EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 
+Whether to skip invalid Flow and ClusterFlow resources 
+
+Default: -
+
+### syslogNG (*SyslogNGSpec, optional) {#loggingspec-syslogng}
+
+Syslog-NG statefulset configuration 
+
+Default: -
+
+### watchNamespaceSelector (*metav1.LabelSelector, optional) {#loggingspec-watchnamespaceselector}
+
+WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces 
+
+Default: -
+
+### watchNamespaces ([]string, optional) {#loggingspec-watchnamespaces}
+
+Limit namespaces to watch Flow and Output custom resources. 
 
 Default: -
 
 
 ## ConfigCheck
+
+### labels (map[string]string, optional) {#configcheck-labels}
+
+Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten. 
+
+Default: -
 
 ### strategy (ConfigCheckStrategy, optional) {#configcheck-strategy}
 
@@ -128,12 +134,6 @@ Default: -
 ### timeoutSeconds (int, optional) {#configcheck-timeoutseconds}
 
 Configure timeout in seconds if strategy is StartWithTimeout 
-
-Default: -
-
-### labels (map[string]string, optional) {#configcheck-labels}
-
-Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten. 
 
 Default: -
 
@@ -213,9 +213,7 @@ DefaultFlowSpec is a Flow for logs that did not match any other Flow
 
 Default: -
 
-### outputRefs ([]string, optional) {#defaultflowspec-outputrefs}
-
-Deprecated 
+### flowLabel (string, optional) {#defaultflowspec-flowlabel}
 
 Default: -
 
@@ -223,11 +221,13 @@ Default: -
 
 Default: -
 
-### flowLabel (string, optional) {#defaultflowspec-flowlabel}
+### includeLabelInRouter (*bool, optional) {#defaultflowspec-includelabelinrouter}
 
 Default: -
 
-### includeLabelInRouter (*bool, optional) {#defaultflowspec-includelabelinrouter}
+### outputRefs ([]string, optional) {#defaultflowspec-outputrefs}
+
+Deprecated 
 
 Default: -
 

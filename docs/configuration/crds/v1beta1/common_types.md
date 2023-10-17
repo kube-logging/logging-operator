@@ -8,11 +8,7 @@ generated_file: true
 
 ImageSpec struct hold information about image specification
 
-### repository (string, optional) {#imagespec-repository}
-
-Default: -
-
-### tag (string, optional) {#imagespec-tag}
+### imagePullSecrets ([]corev1.LocalObjectReference, optional) {#imagespec-imagepullsecrets}
 
 Default: -
 
@@ -20,7 +16,11 @@ Default: -
 
 Default: -
 
-### imagePullSecrets ([]corev1.LocalObjectReference, optional) {#imagespec-imagepullsecrets}
+### repository (string, optional) {#imagespec-repository}
+
+Default: -
+
+### tag (string, optional) {#imagespec-tag}
 
 Default: -
 
@@ -33,7 +33,7 @@ Metrics defines the service monitor endpoints
 
 Default: -
 
-### timeout (string, optional) {#metrics-timeout}
+### path (string, optional) {#metrics-path}
 
 Default: -
 
@@ -41,7 +41,11 @@ Default: -
 
 Default: -
 
-### path (string, optional) {#metrics-path}
+### prometheusAnnotations (bool, optional) {#metrics-prometheusannotations}
+
+Default: -
+
+### prometheusRules (bool, optional) {#metrics-prometheusrules}
 
 Default: -
 
@@ -53,11 +57,7 @@ Default: -
 
 Default: -
 
-### prometheusAnnotations (bool, optional) {#metrics-prometheusannotations}
-
-Default: -
-
-### prometheusRules (bool, optional) {#metrics-prometheusrules}
+### timeout (string, optional) {#metrics-timeout}
 
 Default: -
 
@@ -87,11 +87,11 @@ Default: -
 
 Default: -
 
-### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
+### metricRelabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-metricrelabelings}
 
 Default: -
 
-### metricRelabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-metricrelabelings}
+### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
 
 Default: -
 
@@ -108,11 +108,7 @@ Default: -
 
 Security defines Fluentd, FluentbitAgent deployment security properties
 
-### serviceAccount (string, optional) {#security-serviceaccount}
-
-Default: -
-
-### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
+### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
 
 Default: -
 
@@ -120,11 +116,15 @@ Default: -
 
 Default: -
 
+### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
+
+Default: -
+
 ### securityContext (*corev1.SecurityContext, optional) {#security-securitycontext}
 
 Default: -
 
-### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
+### serviceAccount (string, optional) {#security-serviceaccount}
 
 Default: -
 
@@ -132,6 +132,14 @@ Default: -
 ## ReadinessDefaultCheck
 
 ReadinessDefaultCheck Enable default readiness checks
+
+### bufferFileNumber (bool, optional) {#readinessdefaultcheck-bufferfilenumber}
+
+Default: -
+
+### bufferFileNumberMax (int32, optional) {#readinessdefaultcheck-bufferfilenumbermax}
+
+Default: -
 
 ### bufferFreeSpace (bool, optional) {#readinessdefaultcheck-bufferfreespace}
 
@@ -143,19 +151,11 @@ Default: -
 
 Default: -
 
-### bufferFileNumber (bool, optional) {#readinessdefaultcheck-bufferfilenumber}
-
-Default: -
-
-### bufferFileNumberMax (int32, optional) {#readinessdefaultcheck-bufferfilenumbermax}
+### failureThreshold (int32, optional) {#readinessdefaultcheck-failurethreshold}
 
 Default: -
 
 ### initialDelaySeconds (int32, optional) {#readinessdefaultcheck-initialdelayseconds}
-
-Default: -
-
-### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
 
 Default: -
 
@@ -167,7 +167,7 @@ Default: -
 
 Default: -
 
-### failureThreshold (int32, optional) {#readinessdefaultcheck-failurethreshold}
+### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
 
 Default: -
 

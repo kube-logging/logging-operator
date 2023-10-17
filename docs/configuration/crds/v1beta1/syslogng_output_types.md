@@ -8,6 +8,22 @@ generated_file: true
 
 SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 
+### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
+
+Default: -
+
+### file (*output.FileOutput, optional) {#syslogngoutputspec-file}
+
+Default: -
+
+### http (*output.HTTPOutput, optional) {#syslogngoutputspec-http}
+
+Default: -
+
+### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
+
+Default: -
+
 ### loggingRef (string, optional) {#syslogngoutputspec-loggingref}
 
 Default: -
@@ -16,11 +32,7 @@ Default: -
 
 Default: -
 
-### syslog (*output.SyslogOutput, optional) {#syslogngoutputspec-syslog}
-
-Default: -
-
-### file (*output.FileOutput, optional) {#syslogngoutputspec-file}
+### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
 
 Default: -
 
@@ -28,11 +40,19 @@ Default: -
 
 Default: -
 
+### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+
+Default: -
+
 ### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
 
 Default: -
 
-### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+
+Default: -
+
+### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
 
 Default: -
 
@@ -44,27 +64,7 @@ Default: -
 
 Default: -
 
-### http (*output.HTTPOutput, optional) {#syslogngoutputspec-http}
-
-Default: -
-
-### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
-
-Default: -
-
-### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
-
-Default: -
-
-### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
-
-Default: -
-
-### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
-
-Default: -
-
-### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+### syslog (*output.SyslogOutput, optional) {#syslogngoutputspec-syslog}
 
 Default: -
 

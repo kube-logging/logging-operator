@@ -26,15 +26,9 @@ generated_file: true
 
 Send your logs to a Kinesis Stream
 
-### stream_name (string, required) {#kinesisstream-stream_name}
+### aws_iam_retries (int, optional) {#kinesisstream-aws_iam_retries}
 
-Name of the stream to put data. 
-
-Default: -
-
-### partition_key (string, optional) {#kinesisstream-partition_key}
-
-A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly. 
+The number of attempts to make (with exponential backoff) when loading instance profile credentials from the EC2 metadata service using an IAM role. Defaults to 5 retries. 
 
 Default: -
 
@@ -56,39 +50,9 @@ AWS session token. This parameter is optional, but can be provided if using MFA 
 
 Default: -
 
-### aws_iam_retries (int, optional) {#kinesisstream-aws_iam_retries}
-
-The number of attempts to make (with exponential backoff) when loading instance profile credentials from the EC2 metadata service using an IAM role. Defaults to 5 retries. 
-
-Default: -
-
 ### assume_role_credentials (*KinesisStreamAssumeRoleCredentials, optional) {#kinesisstream-assume_role_credentials}
 
 Typically, you can use AssumeRole for cross-account access or federation. 
-
-Default: -
-
-### process_credentials (*KinesisStreamProcessCredentials, optional) {#kinesisstream-process_credentials}
-
-This loads AWS access credentials from an external process. 
-
-Default: -
-
-### region (string, optional) {#kinesisstream-region}
-
-AWS region of your stream. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION. 
-
-Default: -
-
-### retries_on_batch_request (int, optional) {#kinesisstream-retries_on_batch_request}
-
-The plugin will put multiple records to Amazon Kinesis Data Streams in batches using PutRecords. A set of records in a batch may fail for reasons documented in the Kinesis Service API Reference for PutRecords. Failed records will be retried retries_on_batch_request times 
-
-Default: -
-
-### reset_backoff_if_success (bool, optional) {#kinesisstream-reset_backoff_if_success}
-
-Boolean, default true. If enabled, when after retrying, the next retrying checks the number of succeeded records on the former batch request and reset exponential backoff if there is any success. Because batch request could be composed by requests across shards, simple exponential backoff for the batch request wouldn't work some cases. 
 
 Default: -
 
@@ -104,15 +68,45 @@ Integer. The number of max size of making batch request from record chunk. It ca
 
 Default: -
 
+### buffer (*Buffer, optional) {#kinesisstream-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
+
 ### format (*Format, optional) {#kinesisstream-format}
 
 [Format](../format/) 
 
 Default: -
 
-### buffer (*Buffer, optional) {#kinesisstream-buffer}
+### partition_key (string, optional) {#kinesisstream-partition_key}
 
-[Buffer](../buffer/) 
+A key to extract partition key from JSON object. Default nil, which means partition key will be generated randomly. 
+
+Default: -
+
+### process_credentials (*KinesisStreamProcessCredentials, optional) {#kinesisstream-process_credentials}
+
+This loads AWS access credentials from an external process. 
+
+Default: -
+
+### region (string, optional) {#kinesisstream-region}
+
+AWS region of your stream. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION. 
+
+Default: -
+
+### reset_backoff_if_success (bool, optional) {#kinesisstream-reset_backoff_if_success}
+
+Boolean, default true. If enabled, when after retrying, the next retrying checks the number of succeeded records on the former batch request and reset exponential backoff if there is any success. Because batch request could be composed by requests across shards, simple exponential backoff for the batch request wouldn't work some cases. 
+
+Default: -
+
+### retries_on_batch_request (int, optional) {#kinesisstream-retries_on_batch_request}
+
+The plugin will put multiple records to Amazon Kinesis Data Streams in batches using PutRecords. A set of records in a batch may fail for reasons documented in the Kinesis Service API Reference for PutRecords. Failed records will be retried retries_on_batch_request times 
 
 Default: -
 
@@ -122,28 +116,16 @@ The threshold for chunk flush performance check. Parameter type is float, not ti
 
 Default: -
 
+### stream_name (string, required) {#kinesisstream-stream_name}
+
+Name of the stream to put data. 
+
+Default: -
+
 
 ## Assume Role Credentials
 
 assume_role_credentials
-
-### role_arn (string, required) {#assume role credentials-role_arn}
-
-The Amazon Resource Name (ARN) of the role to assume 
-
-Default: -
-
-### role_session_name (string, required) {#assume role credentials-role_session_name}
-
-An identifier for the assumed role session 
-
-Default: -
-
-### policy (string, optional) {#assume role credentials-policy}
-
-An IAM policy in JSON format 
-
-Default: -
 
 ### duration_seconds (string, optional) {#assume role credentials-duration_seconds}
 
@@ -154,6 +136,24 @@ Default: -
 ### external_id (string, optional) {#assume role credentials-external_id}
 
 A unique identifier that is used by third parties when assuming roles in their customers' accounts. 
+
+Default: -
+
+### policy (string, optional) {#assume role credentials-policy}
+
+An IAM policy in JSON format 
+
+Default: -
+
+### role_arn (string, required) {#assume role credentials-role_arn}
+
+The Amazon Resource Name (ARN) of the role to assume 
+
+Default: -
+
+### role_session_name (string, required) {#assume role credentials-role_session_name}
+
+An identifier for the assumed role session 
 
 Default: -
 

@@ -24,12 +24,6 @@ generated_file: true
 ## Configuration
 ## Format
 
-### type (string, optional) {#format-type}
-
-Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
-
-Default: json
-
 ### add_newline (*bool, optional) {#format-add_newline}
 
 When type is single_value add '\n' to the end of the message
@@ -41,5 +35,11 @@ Default: true
 When type is single_value specify the key holding information 
 
 Default: -
+
+### type (string, optional) {#format-type}
+
+Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+
+Default: json
 
 

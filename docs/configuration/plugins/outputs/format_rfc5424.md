@@ -6,17 +6,11 @@ generated_file: true
 
 ## FormatRfc5424
 
-### type (string, optional) {#formatrfc5424-type}
+### app_name_field (string, optional) {#formatrfc5424-app_name_field}
 
-Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
+Sets app name in syslog from field in fluentd, delimited by '.'
 
-Default: json
-
-### rfc6587_message_size (*bool, optional) {#formatrfc5424-rfc6587_message_size}
-
-Prepends message length for syslog transmission
-
-Default: true
+Default: app_name
 
 ### hostname_field (string, optional) {#formatrfc5424-hostname_field}
 
@@ -24,17 +18,11 @@ Sets host name in syslog from field in fluentd, delimited by '.'
 
 Default: hostname
 
-### app_name_field (string, optional) {#formatrfc5424-app_name_field}
+### log_field (string, optional) {#formatrfc5424-log_field}
 
-Sets app name in syslog from field in fluentd, delimited by '.'
+Sets log in syslog from field in fluentd, delimited by '.'
 
-Default: app_name
-
-### proc_id_field (string, optional) {#formatrfc5424-proc_id_field}
-
-Sets proc id in syslog from field in fluentd, delimited by '.'
-
-Default: proc_id
+Default: log
 
 ### message_id_field (string, optional) {#formatrfc5424-message_id_field}
 
@@ -42,16 +30,28 @@ Sets msg id in syslog from field in fluentd, delimited by '.'
 
 Default: message_id
 
+### proc_id_field (string, optional) {#formatrfc5424-proc_id_field}
+
+Sets proc id in syslog from field in fluentd, delimited by '.'
+
+Default: proc_id
+
+### rfc6587_message_size (*bool, optional) {#formatrfc5424-rfc6587_message_size}
+
+Prepends message length for syslog transmission
+
+Default: true
+
 ### structured_data_field (string, optional) {#formatrfc5424-structured_data_field}
 
 Sets structured data in syslog from field in fluentd, delimited by '.' (default structured_data) 
 
 Default: -
 
-### log_field (string, optional) {#formatrfc5424-log_field}
+### type (string, optional) {#formatrfc5424-type}
 
-Sets log in syslog from field in fluentd, delimited by '.'
+Output line formatting: out_file,json,ltsv,csv,msgpack,hash,single_value
 
-Default: log
+Default: json
 
 

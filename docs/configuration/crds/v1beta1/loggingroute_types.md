@@ -25,9 +25,15 @@ Default: -
 
 LoggingRouteStatus defines the actual state of the LoggingRoute
 
-### tenants ([]Tenant, optional) {#loggingroutestatus-tenants}
+### notices ([]string, optional) {#loggingroutestatus-notices}
 
-Enumerate all loggings with all the destination namespaces expanded 
+Enumerate non-blocker issues the user should pay attention to 
+
+Default: -
+
+### noticesCount (int, optional) {#loggingroutestatus-noticescount}
+
+Summarize the number of notices for the CLI output 
 
 Default: -
 
@@ -43,15 +49,9 @@ Summarize the number of problems for the CLI output
 
 Default: -
 
-### notices ([]string, optional) {#loggingroutestatus-notices}
+### tenants ([]Tenant, optional) {#loggingroutestatus-tenants}
 
-Enumerate non-blocker issues the user should pay attention to 
-
-Default: -
-
-### noticesCount (int, optional) {#loggingroutestatus-noticescount}
-
-Summarize the number of notices for the CLI output 
+Enumerate all loggings with all the destination namespaces expanded 
 
 Default: -
 

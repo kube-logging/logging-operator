@@ -38,39 +38,9 @@ generated_file: true
 
 LogZ Send your logs to LogZ.io
 
-### endpoint (*Endpoint, required) {#logzio-endpoint}
+### buffer (*Buffer, optional) {#logzio-buffer}
 
-Define LogZ endpoint URL 
-
-Default: -
-
-### output_include_time (bool, optional) {#logzio-output_include_time}
-
-Should the appender add a timestamp to your logs on their process time (recommended). 
-
-Default: -
-
-### output_include_tags (bool, optional) {#logzio-output_include_tags}
-
-Should the appender add the fluentd tag to the document, called "fluentd_tag" 
-
-Default: -
-
-### http_idle_timeout (int, optional) {#logzio-http_idle_timeout}
-
-Timeout in seconds that the http persistent connection will stay open without traffic. 
-
-Default: -
-
-### retry_count (int, optional) {#logzio-retry_count}
-
-How many times to resend failed bulks. 
-
-Default: -
-
-### retry_sleep (int, optional) {#logzio-retry_sleep}
-
-How long to sleep initially between retries, exponential step-off. 
+[Buffer](../buffer/) 
 
 Default: -
 
@@ -86,15 +56,45 @@ Limit to the size of the Logz.io warning message when a record exceeds bulk_limi
 
 Default: -
 
+### endpoint (*Endpoint, required) {#logzio-endpoint}
+
+Define LogZ endpoint URL 
+
+Default: -
+
 ### gzip (bool, optional) {#logzio-gzip}
 
 Should the plugin ship the logs in gzip compression. Default is false. 
 
 Default: -
 
-### buffer (*Buffer, optional) {#logzio-buffer}
+### http_idle_timeout (int, optional) {#logzio-http_idle_timeout}
 
-[Buffer](../buffer/) 
+Timeout in seconds that the http persistent connection will stay open without traffic. 
+
+Default: -
+
+### output_include_tags (bool, optional) {#logzio-output_include_tags}
+
+Should the appender add the fluentd tag to the document, called "fluentd_tag" 
+
+Default: -
+
+### output_include_time (bool, optional) {#logzio-output_include_time}
+
+Should the appender add a timestamp to your logs on their process time (recommended). 
+
+Default: -
+
+### retry_count (int, optional) {#logzio-retry_count}
+
+How many times to resend failed bulks. 
+
+Default: -
+
+### retry_sleep (int, optional) {#logzio-retry_sleep}
+
+How long to sleep initially between retries, exponential step-off. 
 
 Default: -
 
@@ -109,12 +109,6 @@ Default: -
 
 Endpoint defines connection details for LogZ.io.
 
-### url (string, optional) {#endpoint-url}
-
-LogZ URL. 
-
-Default: https://listener.logz.io
-
 ### port (int, optional) {#endpoint-port}
 
 Port over which to connect to LogZ URL. 
@@ -126,5 +120,11 @@ Default: 8071
 LogZ API Token. [Secret](../secret/) 
 
 Default: -
+
+### url (string, optional) {#endpoint-url}
+
+LogZ URL. 
+
+Default: https://listener.logz.io
 
 

@@ -29,11 +29,11 @@ Default: -
 
 SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 
-### match (*SyslogNGMatch, optional) {#syslogngclusterflowspec-match}
+### filters ([]SyslogNGFilter, optional) {#syslogngclusterflowspec-filters}
 
 Default: -
 
-### filters ([]SyslogNGFilter, optional) {#syslogngclusterflowspec-filters}
+### globalOutputRefs ([]string, optional) {#syslogngclusterflowspec-globaloutputrefs}
 
 Default: -
 
@@ -41,7 +41,7 @@ Default: -
 
 Default: -
 
-### globalOutputRefs ([]string, optional) {#syslogngclusterflowspec-globaloutputrefs}
+### match (*SyslogNGMatch, optional) {#syslogngclusterflowspec-match}
 
 Default: -
 

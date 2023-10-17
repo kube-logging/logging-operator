@@ -11,9 +11,9 @@ generated_file: true
 ## Configuration
 ## GrepConfig
 
-### regexp ([]RegexpSection, optional) {#grepconfig-regexp}
+### and ([]AndSection, optional) {#grepconfig-and}
 
-[Regexp Directive](#Regexp-Directive) 
+[And Directive](#And-Directive) 
 
 Default: -
 
@@ -29,9 +29,9 @@ Default: -
 
 Default: -
 
-### and ([]AndSection, optional) {#grepconfig-and}
+### regexp ([]RegexpSection, optional) {#grepconfig-regexp}
 
-[And Directive](#And-Directive) 
+[Regexp Directive](#Regexp-Directive) 
 
 Default: -
 
@@ -146,15 +146,15 @@ Default: -
 
 Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#or directive-regexp}
-
-[Regexp Directive](#Regexp-Directive) 
-
-Default: -
-
 ### exclude ([]ExcludeSection, optional) {#or directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
+
+Default: -
+
+### regexp ([]RegexpSection, optional) {#or directive-regexp}
+
+[Regexp Directive](#Regexp-Directive) 
 
 Default: -
 
@@ -205,15 +205,15 @@ Default: -
 
 Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#and directive-regexp}
-
-[Regexp Directive](#Regexp-Directive) 
-
-Default: -
-
 ### exclude ([]ExcludeSection, optional) {#and directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
+
+Default: -
+
+### regexp ([]RegexpSection, optional) {#and directive-regexp}
+
+[Regexp Directive](#Regexp-Directive) 
 
 Default: -
 

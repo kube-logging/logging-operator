@@ -34,35 +34,23 @@ generated_file: true
 
 Send your logs to Kafka
 
+### ack_timeout (int, optional) {#kafka-ack_timeout}
+
+How long the producer waits for acks. The unit is seconds
+
+Default: nil => Uses default of ruby-kafka library
+
 ### brokers (string, required) {#kafka-brokers}
 
 The list of all seed brokers, with their host and port information. 
 
 Default: -
 
-### topic_key (string, optional) {#kafka-topic_key}
+### buffer (*Buffer, optional) {#kafka-buffer}
 
-Topic Key
+[Buffer](../buffer/) 
 
-Default: "topic"
-
-### partition_key (string, optional) {#kafka-partition_key}
-
-Partition
-
-Default: "partition"
-
-### partition_key_key (string, optional) {#kafka-partition_key_key}
-
-Partition Key
-
-Default: "partition_key"
-
-### message_key_key (string, optional) {#kafka-message_key_key}
-
-Message Key
-
-Default: "message_key"
+Default: -
 
 ### client_id (string, optional) {#kafka-client_id}
 
@@ -70,15 +58,9 @@ Client ID
 
 Default: "kafka"
 
-### default_topic (string, optional) {#kafka-default_topic}
+### compression_codec (string, optional) {#kafka-compression_codec}
 
-The name of default topic .
-
-Default: nil
-
-### default_partition_key (string, optional) {#kafka-default_partition_key}
-
-The name of default partition key .
+The codec the producer uses to compress messages . The available options are gzip and snappy.
 
 Default: nil
 
@@ -88,9 +70,21 @@ The name of default message key .
 
 Default: nil
 
-### exclude_topic_key (bool, optional) {#kafka-exclude_topic_key}
+### default_partition_key (string, optional) {#kafka-default_partition_key}
 
-Exclude Topic key
+The name of default partition key .
+
+Default: nil
+
+### default_topic (string, optional) {#kafka-default_topic}
+
+The name of default topic .
+
+Default: nil
+
+### discard_kafka_delivery_failed (bool, optional) {#kafka-discard_kafka_delivery_failed}
+
+Discard the record where Kafka DeliveryFailed occurred
 
 Default: false
 
@@ -99,6 +93,18 @@ Default: false
 Exclude Partition key
 
 Default: false
+
+### exclude_topic_key (bool, optional) {#kafka-exclude_topic_key}
+
+Exclude Topic key
+
+Default: false
+
+### format (*Format, required) {#kafka-format}
+
+[Format](../format/) 
+
+Default: -
 
 ### get_kafka_client_log (bool, optional) {#kafka-get_kafka_client_log}
 
@@ -118,73 +124,11 @@ Headers from Record
 
 Default: {}
 
-### use_default_for_unknown_topic (bool, optional) {#kafka-use_default_for_unknown_topic}
-
-Use default for unknown topics
-
-Default: false
-
 ### idempotent (bool, optional) {#kafka-idempotent}
 
 Idempotent
 
 Default: false
-
-### sasl_over_ssl (bool, required) {#kafka-sasl_over_ssl}
-
-SASL over SSL
-
-Default: true
-
-### principal (string, optional) {#kafka-principal}
-
-Default: -
-
-### keytab (*secret.Secret, optional) {#kafka-keytab}
-
-Default: -
-
-### username (*secret.Secret, optional) {#kafka-username}
-
-Username when using PLAIN/SCRAM SASL authentication 
-
-Default: -
-
-### password (*secret.Secret, optional) {#kafka-password}
-
-Password when using PLAIN/SCRAM SASL authentication 
-
-Default: -
-
-### scram_mechanism (string, optional) {#kafka-scram_mechanism}
-
-If set, use SCRAM authentication with specified mechanism. When unset, default to PLAIN authentication 
-
-Default: -
-
-### max_send_retries (int, optional) {#kafka-max_send_retries}
-
-Number of times to retry sending of messages to a leader
-
-Default: 1
-
-### required_acks (int, optional) {#kafka-required_acks}
-
-The number of acks required per request .
-
-Default: -1
-
-### ack_timeout (int, optional) {#kafka-ack_timeout}
-
-How long the producer waits for acks. The unit is seconds
-
-Default: nil => Uses default of ruby-kafka library
-
-### compression_codec (string, optional) {#kafka-compression_codec}
-
-The codec the producer uses to compress messages . The available options are gzip and snappy.
-
-Default: nil
 
 ### kafka_agg_max_bytes (int, optional) {#kafka-kafka_agg_max_bytes}
 
@@ -198,23 +142,61 @@ Maximum number of messages to include in one batch transmission. .
 
 Default: nil
 
-### discard_kafka_delivery_failed (bool, optional) {#kafka-discard_kafka_delivery_failed}
+### keytab (*secret.Secret, optional) {#kafka-keytab}
 
-Discard the record where Kafka DeliveryFailed occurred
+Default: -
 
-Default: false
+### max_send_retries (int, optional) {#kafka-max_send_retries}
 
-### ssl_ca_certs_from_system (*bool, optional) {#kafka-ssl_ca_certs_from_system}
+Number of times to retry sending of messages to a leader
 
-System's CA cert store
+Default: 1
 
-Default: false
+### message_key_key (string, optional) {#kafka-message_key_key}
+
+Message Key
+
+Default: "message_key"
+
+### partition_key (string, optional) {#kafka-partition_key}
+
+Partition
+
+Default: "partition"
+
+### partition_key_key (string, optional) {#kafka-partition_key_key}
+
+Partition Key
+
+Default: "partition_key"
+
+### password (*secret.Secret, optional) {#kafka-password}
+
+Password when using PLAIN/SCRAM SASL authentication 
+
+Default: -
+
+### principal (string, optional) {#kafka-principal}
+
+Default: -
+
+### required_acks (int, optional) {#kafka-required_acks}
+
+The number of acks required per request .
+
+Default: -1
 
 ### ssl_ca_cert (*secret.Secret, optional) {#kafka-ssl_ca_cert}
 
 CA certificate 
 
 Default: -
+
+### ssl_ca_certs_from_system (*bool, optional) {#kafka-ssl_ca_certs_from_system}
+
+System's CA cert store
+
+Default: false
 
 ### ssl_client_cert (*secret.Secret, optional) {#kafka-ssl_client_cert}
 
@@ -240,21 +222,39 @@ Verify certificate hostname
 
 Default: -
 
-### format (*Format, required) {#kafka-format}
+### sasl_over_ssl (bool, required) {#kafka-sasl_over_ssl}
 
-[Format](../format/) 
+SASL over SSL
 
-Default: -
+Default: true
 
-### buffer (*Buffer, optional) {#kafka-buffer}
+### scram_mechanism (string, optional) {#kafka-scram_mechanism}
 
-[Buffer](../buffer/) 
+If set, use SCRAM authentication with specified mechanism. When unset, default to PLAIN authentication 
 
 Default: -
 
 ### slow_flush_log_threshold (string, optional) {#kafka-slow_flush_log_threshold}
 
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+
+Default: -
+
+### topic_key (string, optional) {#kafka-topic_key}
+
+Topic Key
+
+Default: "topic"
+
+### use_default_for_unknown_topic (bool, optional) {#kafka-use_default_for_unknown_topic}
+
+Use default for unknown topics
+
+Default: false
+
+### username (*secret.Secret, optional) {#kafka-username}
+
+Username when using PLAIN/SCRAM SASL authentication 
 
 Default: -
 

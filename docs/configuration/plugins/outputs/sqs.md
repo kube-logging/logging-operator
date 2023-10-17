@@ -11,18 +11,6 @@ generated_file: true
 ## Configuration
 ## Output Config
 
-### sqs_url (string, optional) {#output config-sqs_url}
-
-SQS queue url e.g. https://sqs.us-west-2.amazonaws.com/123456789012/myqueue 
-
-Default: -
-
-### queue_name (string, optional) {#output config-queue_name}
-
-SQS queue name - required if sqs_url is not set 
-
-Default: -
-
 ### aws_key_id (*secret.Secret, optional) {#output config-aws_key_id}
 
 AWS access key id 
@@ -35,23 +23,17 @@ AWS secret key
 
 Default: -
 
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
+
 ### create_queue (*bool, optional) {#output config-create_queue}
 
 Create SQS queue
 
 Default: true
-
-### region (string, optional) {#output config-region}
-
-AWS region
-
-Default: ap-northeast-1
-
-### message_group_id (string, optional) {#output config-message_group_id}
-
-Message group id for FIFO queue 
-
-Default: -
 
 ### delay_seconds (int, optional) {#output config-delay_seconds}
 
@@ -65,15 +47,27 @@ Include tag
 
 Default: true
 
-### tag_property_name (string, optional) {#output config-tag_property_name}
+### message_group_id (string, optional) {#output config-message_group_id}
 
-Tags property name in json
+Message group id for FIFO queue 
 
-Default: '__tag'
+Default: -
 
-### buffer (*Buffer, optional) {#output config-buffer}
+### queue_name (string, optional) {#output config-queue_name}
 
-[Buffer](../buffer/) 
+SQS queue name - required if sqs_url is not set 
+
+Default: -
+
+### region (string, optional) {#output config-region}
+
+AWS region
+
+Default: ap-northeast-1
+
+### sqs_url (string, optional) {#output config-sqs_url}
+
+SQS queue url e.g. https://sqs.us-west-2.amazonaws.com/123456789012/myqueue 
 
 Default: -
 
@@ -82,6 +76,12 @@ Default: -
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
+
+### tag_property_name (string, optional) {#output config-tag_property_name}
+
+Tags property name in json
+
+Default: '__tag'
 
 
  ## Example `SQS` output configurations

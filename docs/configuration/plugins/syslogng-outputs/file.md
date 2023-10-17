@@ -25,12 +25,6 @@ For available macros like `${YEAR}/${MONTH}/${DAY}` see https://axoflow.com/docs
 
 Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/
 
-### path (string, required) {#fileoutput-path}
-
-Store file path 
-
-Default: -
-
 ### create_dirs (bool, optional) {#fileoutput-create_dirs}
 
 Enable creating non-existing directories.
@@ -61,11 +55,17 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default: false
 
-### template (string, optional) {#fileoutput-template}
+### path (string, required) {#fileoutput-path}
+
+Store file path 
 
 Default: -
 
 ### persist_name (string, optional) {#fileoutput-persist_name}
+
+Default: -
+
+### template (string, optional) {#fileoutput-template}
 
 Default: -
 

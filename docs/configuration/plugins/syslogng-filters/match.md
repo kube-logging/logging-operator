@@ -35,13 +35,13 @@ Default: -
 
 Default: -
 
-### regexp (*RegexpMatchExpr, optional) {#matchexpr-regexp}
-
-[Regexp Directive](#Regexp-Directive) 
+### or ([]MatchExpr, optional) {#matchexpr-or}
 
 Default: -
 
-### or ([]MatchExpr, optional) {#matchexpr-or}
+### regexp (*RegexpMatchExpr, optional) {#matchexpr-regexp}
+
+[Regexp Directive](#Regexp-Directive) 
 
 Default: -
 
@@ -49,6 +49,12 @@ Default: -
 ## Regexp Directive
 
 Specify filtering rule. For details, see the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/68#TOPIC-1829171).
+
+### flags ([]string, optional) {#regexp directive-flags}
+
+Pattern flags 
+
+Default: -
 
 ### pattern (string, required) {#regexp directive-pattern}
 
@@ -62,21 +68,15 @@ Specify a template of the record fields to match against.
 
 Default: -
 
-### value (string, optional) {#regexp directive-value}
-
-Specify a field name of the record to match against the value of. 
-
-Default: -
-
-### flags ([]string, optional) {#regexp directive-flags}
-
-Pattern flags 
-
-Default: -
-
 ### type (string, optional) {#regexp directive-type}
 
 Pattern type 
+
+Default: -
+
+### value (string, optional) {#regexp directive-value}
+
+Specify a field name of the record to match against the value of. 
 
 Default: -
 

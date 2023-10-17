@@ -12,15 +12,9 @@ generated_file: true
 ## Configuration
 ## GeoIP
 
-### geoip_lookup_keys (string, optional) {#geoip-geoip_lookup_keys}
+### backend_library (string, optional) {#geoip-backend_library}
 
-Specify one or more geoip lookup field which has ip address
-
-Default: host
-
-### geoip_database (string, optional) {#geoip-geoip_database}
-
-Specify optional geoip database (using bundled GeoLiteCity databse by default) 
+Specify backend library (geoip2_c, geoip, geoip2_compat) 
 
 Default: -
 
@@ -30,9 +24,21 @@ Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default)
 
 Default: -
 
-### backend_library (string, optional) {#geoip-backend_library}
+### geoip_database (string, optional) {#geoip-geoip_database}
 
-Specify backend library (geoip2_c, geoip, geoip2_compat) 
+Specify optional geoip database (using bundled GeoLiteCity databse by default) 
+
+Default: -
+
+### geoip_lookup_keys (string, optional) {#geoip-geoip_lookup_keys}
+
+Specify one or more geoip lookup field which has ip address
+
+Default: host
+
+### records ([]Record, optional) {#geoip-records}
+
+Records are represented as maps: `key: value` 
 
 Default: -
 
@@ -41,12 +47,6 @@ Default: -
 To avoid get stacktrace error with `[null, null]` array for elasticsearch. 
 
 Default: true
-
-### records ([]Record, optional) {#geoip-records}
-
-Records are represented as maps: `key: value` 
-
-Default: -
 
 
  ## Example `GeoIP` filter configurations

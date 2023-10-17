@@ -8,21 +8,31 @@ generated_file: true
 
 FlowSpec is the Kubernetes spec for Flows
 
-### selectors (map[string]string, optional) {#flowspec-selectors}
-
-Deprecated 
-
-Default: -
-
-### match ([]Match, optional) {#flowspec-match}
-
-Default: -
-
 ### filters ([]Filter, optional) {#flowspec-filters}
 
 Default: -
 
+### flowLabel (string, optional) {#flowspec-flowlabel}
+
+Default: -
+
+### globalOutputRefs ([]string, optional) {#flowspec-globaloutputrefs}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#flowspec-includelabelinrouter}
+
+Default: -
+
+### localOutputRefs ([]string, optional) {#flowspec-localoutputrefs}
+
+Default: -
+
 ### loggingRef (string, optional) {#flowspec-loggingref}
+
+Default: -
+
+### match ([]Match, optional) {#flowspec-match}
 
 Default: -
 
@@ -32,19 +42,9 @@ Deprecated
 
 Default: -
 
-### globalOutputRefs ([]string, optional) {#flowspec-globaloutputrefs}
+### selectors (map[string]string, optional) {#flowspec-selectors}
 
-Default: -
-
-### localOutputRefs ([]string, optional) {#flowspec-localoutputrefs}
-
-Default: -
-
-### flowLabel (string, optional) {#flowspec-flowlabel}
-
-Default: -
-
-### includeLabelInRouter (*bool, optional) {#flowspec-includelabelinrouter}
+Deprecated 
 
 Default: -
 
@@ -62,7 +62,7 @@ Default: -
 
 ## Select
 
-### labels (map[string]string, optional) {#select-labels}
+### container_names ([]string, optional) {#select-container_names}
 
 Default: -
 
@@ -70,14 +70,14 @@ Default: -
 
 Default: -
 
-### container_names ([]string, optional) {#select-container_names}
+### labels (map[string]string, optional) {#select-labels}
 
 Default: -
 
 
 ## Exclude
 
-### labels (map[string]string, optional) {#exclude-labels}
+### container_names ([]string, optional) {#exclude-container_names}
 
 Default: -
 
@@ -85,7 +85,7 @@ Default: -
 
 Default: -
 
-### container_names ([]string, optional) {#exclude-container_names}
+### labels (map[string]string, optional) {#exclude-labels}
 
 Default: -
 
@@ -94,15 +94,7 @@ Default: -
 
 Filter definition for FlowSpec
 
-### stdout (*filter.StdOutFilterConfig, optional) {#filter-stdout}
-
-Default: -
-
-### parser (*filter.ParserConfig, optional) {#filter-parser}
-
-Default: -
-
-### tag_normaliser (*filter.TagNormaliser, optional) {#filter-tag_normaliser}
+### concat (*filter.Concat, optional) {#filter-concat}
 
 Default: -
 
@@ -110,43 +102,11 @@ Default: -
 
 Default: -
 
-### elasticsearch_genid (*filter.ElasticsearchGenId, optional) {#filter-elasticsearch_genid}
-
-Default: -
-
-### record_transformer (*filter.RecordTransformer, optional) {#filter-record_transformer}
-
-Default: -
-
-### record_modifier (*filter.RecordModifier, optional) {#filter-record_modifier}
-
-Default: -
-
-### geoip (*filter.GeoIP, optional) {#filter-geoip}
-
-Default: -
-
-### concat (*filter.Concat, optional) {#filter-concat}
-
-Default: -
-
 ### detectExceptions (*filter.DetectExceptions, optional) {#filter-detectexceptions}
 
 Default: -
 
-### grep (*filter.GrepConfig, optional) {#filter-grep}
-
-Default: -
-
-### prometheus (*filter.PrometheusConfig, optional) {#filter-prometheus}
-
-Default: -
-
-### throttle (*filter.Throttle, optional) {#filter-throttle}
-
-Default: -
-
-### sumologic (*filter.SumoLogic, optional) {#filter-sumologic}
+### elasticsearch_genid (*filter.ElasticsearchGenId, optional) {#filter-elasticsearch_genid}
 
 Default: -
 
@@ -154,7 +114,47 @@ Default: -
 
 Default: -
 
+### geoip (*filter.GeoIP, optional) {#filter-geoip}
+
+Default: -
+
+### grep (*filter.GrepConfig, optional) {#filter-grep}
+
+Default: -
+
 ### kube_events_timestamp (*filter.KubeEventsTimestampConfig, optional) {#filter-kube_events_timestamp}
+
+Default: -
+
+### parser (*filter.ParserConfig, optional) {#filter-parser}
+
+Default: -
+
+### prometheus (*filter.PrometheusConfig, optional) {#filter-prometheus}
+
+Default: -
+
+### record_modifier (*filter.RecordModifier, optional) {#filter-record_modifier}
+
+Default: -
+
+### record_transformer (*filter.RecordTransformer, optional) {#filter-record_transformer}
+
+Default: -
+
+### stdout (*filter.StdOutFilterConfig, optional) {#filter-stdout}
+
+Default: -
+
+### sumologic (*filter.SumoLogic, optional) {#filter-sumologic}
+
+Default: -
+
+### tag_normaliser (*filter.TagNormaliser, optional) {#filter-tag_normaliser}
+
+Default: -
+
+### throttle (*filter.Throttle, optional) {#filter-throttle}
 
 Default: -
 

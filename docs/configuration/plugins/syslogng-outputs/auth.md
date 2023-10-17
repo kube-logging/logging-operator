@@ -11,15 +11,15 @@ generated_file: true
 ## Configuration
 ## Auth
 
-### alts (*ALTS, optional) {#auth-alts}
-
-Application Layer Transport Security (ALTS) is a simple to use authentication, only available within Google’s infrastructure. 
-
-Default: -
-
 ### adc (*ADC, optional) {#auth-adc}
 
 Application Default Credentials (ADC). 
+
+Default: -
+
+### alts (*ALTS, optional) {#auth-alts}
+
+Application Layer Transport Security (ALTS) is a simple to use authentication, only available within Google’s infrastructure. 
 
 Default: -
 

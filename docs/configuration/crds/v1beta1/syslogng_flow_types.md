@@ -8,15 +8,7 @@ generated_file: true
 
 SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 
-### match (*SyslogNGMatch, optional) {#syslogngflowspec-match}
-
-Default: -
-
 ### filters ([]SyslogNGFilter, optional) {#syslogngflowspec-filters}
-
-Default: -
-
-### loggingRef (string, optional) {#syslogngflowspec-loggingref}
 
 Default: -
 
@@ -25,6 +17,14 @@ Default: -
 Default: -
 
 ### localOutputRefs ([]string, optional) {#syslogngflowspec-localoutputrefs}
+
+Default: -
+
+### loggingRef (string, optional) {#syslogngflowspec-loggingref}
+
+Default: -
+
+### match (*SyslogNGMatch, optional) {#syslogngflowspec-match}
 
 Default: -
 
@@ -41,11 +41,11 @@ Default: -
 
 Default: -
 
-### rewrite ([]filter.RewriteConfig, optional) {#syslogngfilter-rewrite}
+### parser (*filter.ParserConfig, optional) {#syslogngfilter-parser}
 
 Default: -
 
-### parser (*filter.ParserConfig, optional) {#syslogngfilter-parser}
+### rewrite ([]filter.RewriteConfig, optional) {#syslogngfilter-rewrite}
 
 Default: -
 

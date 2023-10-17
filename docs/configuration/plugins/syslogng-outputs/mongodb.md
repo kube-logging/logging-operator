@@ -28,6 +28,18 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 ## Configuration
 ## MongoDB
 
+###  (Batch, required) {#mongodb-}
+
+Batching parameters 
+
+Default: -
+
+###  (Bulk, required) {#mongodb-}
+
+Bulk operation related options 
+
+Default: -
+
 ### collection (string, required) {#mongodb-collection}
 
 The name of the MongoDB collection where the log messages are stored (collections are similar to SQL tables). Note that the name of the collection must not start with a dollar sign ($), and that it may contain dot (.) characters. 
@@ -45,30 +57,6 @@ Default: -
 This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 
 Default: false
-
-### uri (*secret.Secret, optional) {#mongodb-uri}
-
-Connection string used for authentication. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri) 
-
-Default: -
-
-### value_pairs (ValuePairs, optional) {#mongodb-value_pairs}
-
-Creates structured name-value pairs from the data and metadata of the log message.
-
-Default: "scope("selected-macros" "nv-pairs")"
-
-###  (Batch, required) {#mongodb-}
-
-Batching parameters 
-
-Default: -
-
-###  (Bulk, required) {#mongodb-}
-
-Bulk operation related options 
-
-Default: -
 
 ### log-fifo-size (int, optional) {#mongodb-log-fifo-size}
 
@@ -93,6 +81,18 @@ Default: -
 The time to wait in seconds before a dead connection is reestablished.
 
 Default: 60
+
+### uri (*secret.Secret, optional) {#mongodb-uri}
+
+Connection string used for authentication. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri) 
+
+Default: -
+
+### value_pairs (ValuePairs, optional) {#mongodb-value_pairs}
+
+Creates structured name-value pairs from the data and metadata of the log message.
+
+Default: "scope("selected-macros" "nv-pairs")"
 
 ### write_concern (RawString, optional) {#mongodb-write_concern}
 
@@ -129,10 +129,6 @@ Default: no
 
 TODO move this to a common module once it is used in more places
 
-### scope (RawString, optional) {#valuepairs-scope}
-
-Default: -
-
 ### exclude (RawString, optional) {#valuepairs-exclude}
 
 Default: -
@@ -142,6 +138,10 @@ Default: -
 Default: -
 
 ### pair (RawString, optional) {#valuepairs-pair}
+
+Default: -
+
+### scope (RawString, optional) {#valuepairs-scope}
 
 Default: -
 

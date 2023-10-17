@@ -43,6 +43,10 @@ generated_file: true
 ## Configuration
 ## [Parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#TOPIC-1768819)
 
+### metrics-probe (*MetricsProbe, optional) {#[parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#topic-1768819)-metrics-probe}
+
+Default: -
+
 ### regexp (*RegexpParser, optional) {#[parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#topic-1768819)-regexp}
 
 Default: -
@@ -51,12 +55,14 @@ Default: -
 
 Default: -
 
-### metrics-probe (*MetricsProbe, optional) {#[parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/82#topic-1768819)-metrics-probe}
-
-Default: -
-
 
 ## [Regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)
+
+### flags ([]string, optional) {#[regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)-flags}
+
+Pattern flags 
+
+Default: -
 
 ### patterns ([]string, required) {#[regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)-patterns}
 
@@ -73,12 +79,6 @@ Default: -
 ### template (string, optional) {#[regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)-template}
 
 Specify a template of the record fields to match against. 
-
-Default: -
-
-### flags ([]string, optional) {#[regexp parser](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90)-flags}
-
-Pattern flags 
 
 Default: -
 

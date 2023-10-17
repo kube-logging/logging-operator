@@ -36,21 +36,21 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 
 Default: -
 
+### custom_id (string, optional) {#elasticsearchoutput-custom_id}
+
+The document ID. If no ID is specified, a document ID is automatically generated. 
+
+Default: -
+
 ### index (string, optional) {#elasticsearchoutput-index}
 
 Name of the data stream, index, or index alias to perform the action on. 
 
 Default: -
 
-### type (*string, optional) {#elasticsearchoutput-type}
+### logstash_suffix (string, optional) {#elasticsearchoutput-logstash_suffix}
 
-The document type associated with the operation. Elasticsearch indices now support a single document type: _doc 
-
-Default: -
-
-### custom_id (string, optional) {#elasticsearchoutput-custom_id}
-
-The document ID. If no ID is specified, a document ID is automatically generated. 
+Set the suffix for logs in logstash format. Default: "${YEAR}.${MONTH}.${DAY}" 
 
 Default: -
 
@@ -66,9 +66,9 @@ Set the separator between LogstashPrefix and LogStashDateformat. Default: "-"
 
 Default: -
 
-### logstash_suffix (string, optional) {#elasticsearchoutput-logstash_suffix}
+### type (*string, optional) {#elasticsearchoutput-type}
 
-Set the suffix for logs in logstash format. Default: "${YEAR}.${MONTH}.${DAY}" 
+The document type associated with the operation. Elasticsearch indices now support a single document type: _doc 
 
 Default: -
 

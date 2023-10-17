@@ -8,9 +8,21 @@ generated_file: true
 
 EventTailerSpec defines the desired state of EventTailer
 
+### containerOverrides (*types.ContainerBase, optional) {#eventtailerspec-containeroverrides}
+
+Override container fields for the given statefulset 
+
+Default: -
+
 ### controlNamespace (string, required) {#eventtailerspec-controlnamespace}
 
 The resources of EventTailer will be placed into this namespace 
+
+Default: -
+
+### image (*tailer.ImageSpec, optional) {#eventtailerspec-image}
+
+Override image related fields for the given statefulset, highest precedence 
 
 Default: -
 
@@ -20,27 +32,15 @@ Volume definition for tracking fluentbit file positions (optional)
 
 Default: -
 
-### workloadMetaOverrides (*types.MetaBase, optional) {#eventtailerspec-workloadmetaoverrides}
-
-Override metadata of the created resources 
-
-Default: -
-
 ### workloadOverrides (*types.PodSpecBase, optional) {#eventtailerspec-workloadoverrides}
 
 Override podSpec fields for the given statefulset 
 
 Default: -
 
-### containerOverrides (*types.ContainerBase, optional) {#eventtailerspec-containeroverrides}
+### workloadMetaOverrides (*types.MetaBase, optional) {#eventtailerspec-workloadmetaoverrides}
 
-Override container fields for the given statefulset 
-
-Default: -
-
-### image (*tailer.ImageSpec, optional) {#eventtailerspec-image}
-
-Override image related fields for the given statefulset, highest precedence 
+Override metadata of the created resources 
 
 Default: -
 

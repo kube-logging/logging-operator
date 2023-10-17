@@ -96,4 +96,6 @@ require (
 
 replace github.com/kube-logging/logging-operator/pkg/sdk => ./pkg/sdk
 
+replace github.com/cisco-open/operator-tools => github.com/eumel8/operator-tools v0.0.0-20231014094705-6290a1c37437
+
 replace github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config => ./pkg/sdk/logging/model/syslogng/config

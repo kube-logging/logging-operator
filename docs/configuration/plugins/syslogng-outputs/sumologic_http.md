@@ -52,6 +52,22 @@ More information at: https://axoflow.com/docs/axosyslog-core/chapter-destination
 ## Configuration
 ## SumologicHTTPOutput
 
+### batch-bytes (int, optional) {#sumologichttpoutput-batch-bytes}
+
+Default: -
+
+### batch-lines (int, optional) {#sumologichttpoutput-batch-lines}
+
+Default: -
+
+### batch-timeout (int, optional) {#sumologichttpoutput-batch-timeout}
+
+Default: -
+
+### body (string, optional) {#sumologichttpoutput-body}
+
+Default: -
+
 ### collector (*secret.Secret, optional) {#sumologichttpoutput-collector}
 
 The Cloud Syslog Cloud Token that you received from the Sumo Logic service while configuring your cloud syslog source.
@@ -64,17 +80,21 @@ This option specifies your Sumo Logic deployment.https://help.sumologic.com/APIs
 
 Default: empty
 
+### disk_buffer (*DiskBuffer, optional) {#sumologichttpoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
 ### headers ([]string, optional) {#sumologichttpoutput-headers}
 
 Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").
 
 Default: empty
 
-### time_reopen (int, optional) {#sumologichttpoutput-time_reopen}
+### persist_name (string, optional) {#sumologichttpoutput-persist_name}
 
-The time to wait in seconds before a dead connection is reestablished.
-
-Default: 60
+Default: -
 
 ### tls (*TLS, optional) {#sumologichttpoutput-tls}
 
@@ -82,33 +102,13 @@ This option sets various options related to TLS encryption, for example, key/cer
 
 Default: -
 
-### disk_buffer (*DiskBuffer, optional) {#sumologichttpoutput-disk_buffer}
+### time_reopen (int, optional) {#sumologichttpoutput-time_reopen}
 
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+The time to wait in seconds before a dead connection is reestablished.
 
-Default: false
-
-### body (string, optional) {#sumologichttpoutput-body}
-
-Default: -
+Default: 60
 
 ### url (*secret.Secret, optional) {#sumologichttpoutput-url}
-
-Default: -
-
-### batch-lines (int, optional) {#sumologichttpoutput-batch-lines}
-
-Default: -
-
-### batch-bytes (int, optional) {#sumologichttpoutput-batch-bytes}
-
-Default: -
-
-### batch-timeout (int, optional) {#sumologichttpoutput-batch-timeout}
-
-Default: -
-
-### persist_name (string, optional) {#sumologichttpoutput-persist_name}
 
 Default: -
 

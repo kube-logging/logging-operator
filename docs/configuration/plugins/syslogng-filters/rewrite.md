@@ -117,7 +117,7 @@ Default: -
 
 https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829213
 
-### oldName (string, required) {#renameconfig-oldname}
+### condition (*MatchExpr, optional) {#renameconfig-condition}
 
 Default: -
 
@@ -125,7 +125,7 @@ Default: -
 
 Default: -
 
-### condition (*MatchExpr, optional) {#renameconfig-condition}
+### oldName (string, required) {#renameconfig-oldname}
 
 Default: -
 
@@ -133,6 +133,10 @@ Default: -
 ## SetConfig
 
 https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829207
+
+### condition (*MatchExpr, optional) {#setconfig-condition}
+
+Default: -
 
 ### field (string, required) {#setconfig-field}
 
@@ -142,20 +146,12 @@ Default: -
 
 Default: -
 
-### condition (*MatchExpr, optional) {#setconfig-condition}
-
-Default: -
-
 
 ## SubstituteConfig
 
 https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829206
 
-### pattern (string, required) {#substituteconfig-pattern}
-
-Default: -
-
-### replace (string, required) {#substituteconfig-replace}
+### condition (*MatchExpr, optional) {#substituteconfig-condition}
 
 Default: -
 
@@ -167,11 +163,15 @@ Default: -
 
 Default: -
 
-### type (string, optional) {#substituteconfig-type}
+### pattern (string, required) {#substituteconfig-pattern}
 
 Default: -
 
-### condition (*MatchExpr, optional) {#substituteconfig-condition}
+### replace (string, required) {#substituteconfig-replace}
+
+Default: -
+
+### type (string, optional) {#substituteconfig-type}
 
 Default: -
 
@@ -180,11 +180,11 @@ Default: -
 
 https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 
-### field (string, required) {#unsetconfig-field}
+### condition (*MatchExpr, optional) {#unsetconfig-condition}
 
 Default: -
 
-### condition (*MatchExpr, optional) {#unsetconfig-condition}
+### field (string, required) {#unsetconfig-field}
 
 Default: -
 
@@ -193,11 +193,11 @@ Default: -
 
 https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
 
-### pattern (string, required) {#groupunsetconfig-pattern}
+### condition (*MatchExpr, optional) {#groupunsetconfig-condition}
 
 Default: -
 
-### condition (*MatchExpr, optional) {#groupunsetconfig-condition}
+### pattern (string, required) {#groupunsetconfig-pattern}
 
 Default: -
 

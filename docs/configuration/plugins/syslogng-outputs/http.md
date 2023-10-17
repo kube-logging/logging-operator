@@ -60,36 +60,6 @@ More information at: https://axoflow.com/docs/axosyslog-core/chapter-destination
 ## Configuration
 ## HTTPOutput
 
-### url (string, optional) {#httpoutput-url}
-
-Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: http://127.0.0.1:8000 
-
-Default: -
-
-### headers ([]string, optional) {#httpoutput-headers}
-
-Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").
-
-Default: empty
-
-### time_reopen (int, optional) {#httpoutput-time_reopen}
-
-The time to wait in seconds before a dead connection is reestablished.
-
-Default: 60
-
-### tls (*TLS, optional) {#httpoutput-tls}
-
-This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/). 
-
-Default: -
-
-### disk_buffer (*DiskBuffer, optional) {#httpoutput-disk_buffer}
-
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
-
-Default: false
-
 ###  (Batch, required) {#httpoutput-}
 
 Batching parameters 
@@ -120,9 +90,45 @@ By default, syslog-ng OSE separates the log messages of the batch with a newline
 
 Default: -
 
+### disk_buffer (*DiskBuffer, optional) {#httpoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
+### headers ([]string, optional) {#httpoutput-headers}
+
+Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").
+
+Default: empty
+
+### log-fifo-size (int, optional) {#httpoutput-log-fifo-size}
+
+The number of messages that the output queue can store. 
+
+Default: -
+
 ### method (string, optional) {#httpoutput-method}
 
 Specifies the HTTP method to use when sending the message to the server. POST | PUT 
+
+Default: -
+
+### password (secret.Secret, optional) {#httpoutput-password}
+
+The password that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
+
+Default: -
+
+### persist_name (string, optional) {#httpoutput-persist_name}
+
+If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+
+Default: -
+
+### response-action (filter.RawArrowMap, optional) {#httpoutput-response-action}
+
+Specifies what AxoSyslog does with the log message, based on the response code received from the HTTP server. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information. 
 
 Default: -
 
@@ -132,15 +138,33 @@ The number of times syslog-ng OSE attempts to send a message to this destination
 
 Default: -
 
-### user (string, optional) {#httpoutput-user}
+### tls (*TLS, optional) {#httpoutput-tls}
 
-The username that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
+This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/). 
 
 Default: -
 
-### password (secret.Secret, optional) {#httpoutput-password}
+### time_reopen (int, optional) {#httpoutput-time_reopen}
 
-The password that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
+The time to wait in seconds before a dead connection is reestablished.
+
+Default: 60
+
+### timeout (int, optional) {#httpoutput-timeout}
+
+Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. 
+
+Default: -
+
+### url (string, optional) {#httpoutput-url}
+
+Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: http://127.0.0.1:8000 
+
+Default: -
+
+### user (string, optional) {#httpoutput-user}
+
+The username that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
 
 Default: -
 
@@ -156,42 +180,18 @@ Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to s
 
 Default: -
 
-### persist_name (string, optional) {#httpoutput-persist_name}
-
-If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
-
-Default: -
-
-### log-fifo-size (int, optional) {#httpoutput-log-fifo-size}
-
-The number of messages that the output queue can store. 
-
-Default: -
-
-### timeout (int, optional) {#httpoutput-timeout}
-
-Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. 
-
-Default: -
-
-### response-action (filter.RawArrowMap, optional) {#httpoutput-response-action}
-
-Specifies what AxoSyslog does with the log message, based on the response code received from the HTTP server. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information. 
-
-Default: -
-
 
 ## Batch
-
-### batch-lines (int, optional) {#batch-batch-lines}
-
-Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set batch-lines() to 100, syslog-ng OSE waits for 100 messages. 
-
-Default: -
 
 ### batch-bytes (int, optional) {#batch-batch-bytes}
 
 Description: Sets the maximum size of payload in a batch. If the size of the messages reaches this value, syslog-ng OSE sends the batch to the destination even if the number of messages is less than the value of the batch-lines() option. Note that if the batch-timeout() option is enabled and the queue becomes empty, syslog-ng OSE flushes the messages only if batch-timeout() expires, or the batch reaches the limit set in batch-bytes(). 
+
+Default: -
+
+### batch-lines (int, optional) {#batch-batch-lines}
+
+Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set batch-lines() to 100, syslog-ng OSE waits for 100 messages. 
 
 Default: -
 

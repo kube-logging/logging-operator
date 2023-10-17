@@ -23,23 +23,11 @@ generated_file: true
 ## Configuration
 ## DetectExceptions
 
-### message (string, optional) {#detectexceptions-message}
+### force_line_breaks (bool, optional) {#detectexceptions-force_line_breaks}
 
-The field which contains the raw message text in the input JSON data.
+Force line breaks between each lines when comibining exception stacks.
 
-Default: ""
-
-### remove_tag_prefix (string, optional) {#detectexceptions-remove_tag_prefix}
-
-The prefix to be removed from the input tag when outputting a record.
-
-Default: kubernetes
-
-### multiline_flush_interval (string, optional) {#detectexceptions-multiline_flush_interval}
-
-The interval of flushing the buffer for multiline format.
-
-Default: nil
+Default: false
 
 ### languages ([]string, optional) {#detectexceptions-languages}
 
@@ -47,11 +35,11 @@ Programming languages for which to detect exceptions.
 
 Default: []
 
-### max_lines (int, optional) {#detectexceptions-max_lines}
+### match_tag (string, optional) {#detectexceptions-match_tag}
 
-Maximum number of lines to flush (0 means no limit)
+Tag used in match directive.
 
-Default: 1000
+Default: kubernetes.**
 
 ### max_bytes (int, optional) {#detectexceptions-max_bytes}
 
@@ -59,23 +47,35 @@ Maximum number of bytes to flush (0 means no limit)
 
 Default: 0
 
+### max_lines (int, optional) {#detectexceptions-max_lines}
+
+Maximum number of lines to flush (0 means no limit)
+
+Default: 1000
+
+### message (string, optional) {#detectexceptions-message}
+
+The field which contains the raw message text in the input JSON data.
+
+Default: ""
+
+### multiline_flush_interval (string, optional) {#detectexceptions-multiline_flush_interval}
+
+The interval of flushing the buffer for multiline format.
+
+Default: nil
+
+### remove_tag_prefix (string, optional) {#detectexceptions-remove_tag_prefix}
+
+The prefix to be removed from the input tag when outputting a record.
+
+Default: kubernetes
+
 ### stream (string, optional) {#detectexceptions-stream}
 
 Separate log streams by this field in the input JSON data.
 
 Default: ""
-
-### force_line_breaks (bool, optional) {#detectexceptions-force_line_breaks}
-
-Force line breaks between each lines when comibining exception stacks.
-
-Default: false
-
-### match_tag (string, optional) {#detectexceptions-match_tag}
-
-Tag used in match directive.
-
-Default: kubernetes.**
 
 
  ## Example `Exception Detector` filter configurations
