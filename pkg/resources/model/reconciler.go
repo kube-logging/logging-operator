@@ -204,11 +204,17 @@ func NewValidationReconciler(
 		}
 
 		registerForPatching(&resources.Logging)
+		resources.Logging.Status.Problems = nil
+		resources.Logging.Status.WatchNamespaces = nil
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
 		}
-		resources.Logging.Status.Problems = nil
+
+		if resources.Logging.Spec.WatchNamespaceSelector != nil &&
+			len(resources.Logging.Status.WatchNamespaces) == 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Defined watchNamespaceSelector did not match any namespaces")
+		}
 
 		loggingsForTheSameRef := make([]string, 0)
 		for _, l := range resources.AllLoggings {
@@ -257,6 +263,11 @@ func NewValidationReconciler(
 				}
 			}
 		}
+
+		if resources.Logging.Spec.FluentbitSpec != nil && len(resources.LoggingRoutes) > 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Logging routes are not supported for embedded fluentbit configs, please use a separate FluentbitAgent resource!")
+		}
+
 		slices.Sort(resources.Logging.Status.Problems)
 		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 
