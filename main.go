@@ -153,15 +153,8 @@ func main() {
 	if enableprofile {
 		setupLog.Info("enabling pprof")
 		pprofxIndexPath := "/debug/pprof"
-		//err = mgr.AddMetricsExtraHandler("/debug/pprof/", http.HandlerFunc(pprof.Index))
 		customMgrOptions.Metrics.ExtraHandlers = map[string]http.Handler{
 			pprofxIndexPath: http.HandlerFunc(pprof.Index),
-		}
-		pprofIndexEndpoint := fmt.Sprintf("http://127.0.0.1:%s%s", metricsAddr, pprofxIndexPath)
-		_, err := http.Get(pprofIndexEndpoint)
-		if err != nil {
-			setupLog.Error(err, "unable to attach pprof to webserver")
-			os.Exit(1)
 		}
 	}
 
