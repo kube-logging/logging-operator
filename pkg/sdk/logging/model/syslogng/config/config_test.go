@@ -814,6 +814,59 @@ source "main_input" {
 };
 `),
 		},
+		"source metrics": {
+			input: Input{
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "logging",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{
+							SourceMetrics: []filter.MetricsProbe{
+								{
+									Key: "example",
+									Labels: filter.ArrowMap{
+										"a": "b",
+									},
+									Level: 2,
+								},
+								{
+									Key: "example2",
+									Labels: filter.ArrowMap{
+										"c": "d",
+									},
+									Level: 3,
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+				SourcePort:          601,
+			},
+			wantOut: Untab(`@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+            metrics-probe(key("example") labels(
+				"a" => "b"
+			) level(2));
+            metrics-probe(key("example2") labels(
+				"c" => "d"
+			) level(3));
+        };
+    };
+};
+`),
+		},
 	}
 	for name, testCase := range testCases {
 		testCase := testCase

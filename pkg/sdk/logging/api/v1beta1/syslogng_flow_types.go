@@ -15,8 +15,9 @@
 package v1beta1
 
 import (
-	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"SyslogNGFlowSpec"
