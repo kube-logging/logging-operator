@@ -144,9 +144,25 @@ LoggingStatus defines the observed state of Logging
 
 ### configCheckResults (map[string]bool, optional) {#loggingstatus-configcheckresults}
 
+Result of the config check. Under normal conditions there is a single item in the map with a bool value. 
+
 Default: -
 
 ### problems ([]string, optional) {#loggingstatus-problems}
+
+Problems with the logging resource 
+
+Default: -
+
+### problemsCount (int, optional) {#loggingstatus-problemscount}
+
+Count of problems for printcolumn 
+
+Default: -
+
+### watchNamespaces ([]string, optional) {#loggingstatus-watchnamespaces}
+
+List of namespaces that watchNamespaces + watchNamespaceSelector is resolving to. Not set means all namespaces. 
 
 Default: -
 

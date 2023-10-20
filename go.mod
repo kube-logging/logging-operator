@@ -15,6 +15,7 @@ require (
 	github.com/pborman/uuid v1.2.1
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.68.0
 	github.com/prometheus/client_golang v1.17.0
+	github.com/siliconbrain/go-seqs v0.7.0
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
@@ -68,7 +69,6 @@ require (
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/siliconbrain/go-seqs v0.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/wayneashleyberry/terminal-dimensions v1.1.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

@@ -74,6 +74,10 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	var initContainers []corev1.Container
+
+	if c := r.tmpDirHackContainer(); c != nil {
+		initContainers = append(initContainers, *c)
+	}
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
@@ -140,20 +144,10 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		Ports:           generatePorts(spec),
 		VolumeMounts:    generateVolumeMounts(spec),
 		Resources:       spec.Resources,
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             spec.Security.SecurityContext.Capabilities,
-		},
-		Env:            envVars,
-		LivenessProbe:  spec.LivenessProbe,
-		ReadinessProbe: generateReadinessCheck(spec),
+		SecurityContext: spec.Security.SecurityContext,
+		Env:             envVars,
+		LivenessProbe:   spec.LivenessProbe,
+		ReadinessProbe:  generateReadinessCheck(spec),
 	}
 
 	if spec.FluentOutLogrotate != nil && spec.FluentOutLogrotate.Enabled {
@@ -218,20 +212,7 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Resources:       spec.ConfigReloaderResources,
 		Args:            args,
 		VolumeMounts:    vm,
-	}
-
-	if spec.Security != nil && spec.Security.SecurityContext != nil {
-		c.SecurityContext = &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             spec.Security.SecurityContext.Capabilities,
-		}
+		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
@@ -290,6 +271,13 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			MountPath: "/fluentd/tls/",
 		})
 	}
+	if isFluentdReadOnlyRootFilesystem(spec) {
+		res = append(res, corev1.VolumeMount{
+			Name:      "tmp",
+			SubPath:   "fluentd",
+			MountPath: "/tmp",
+		})
+	}
 	return res
 }
 
@@ -311,6 +299,13 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		},
+	}
+
+	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
+		v = append(v, corev1.Volume{
+			Name:         "tmp",
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		})
 	}
 
 	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
@@ -351,6 +346,25 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		v = append(v, tlsRelatedVolume)
 	}
 	return
+}
+
+func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
+	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
+		return &corev1.Container{
+			Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
+			Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
+			Name:            "tmp-dir-hack",
+			Resources:       r.Logging.Spec.FluentdSpec.Resources,
+			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "tmp",
+					MountPath: "/mnt/tmp"},
+			},
+		}
+	}
+	return nil
 }
 
 func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
@@ -409,7 +423,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: bufferPath,
 				},
 			},
-			Resources: r.Logging.Spec.FluentdSpec.BufferVolumeResources,
+			Resources:       r.Logging.Spec.FluentdSpec.BufferVolumeResources,
+			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
 		}
 	}
 	return nil
@@ -483,7 +498,16 @@ func generateInitContainer(spec *v1beta1.FluentdSpec) *corev1.Container {
 					MountPath: "/tmp/archive",
 				},
 			},
+			SecurityContext: spec.Security.SecurityContext,
 		}
 	}
 	return nil
+}
+
+func isFluentdReadOnlyRootFilesystem(spec *v1beta1.FluentdSpec) bool {
+	if spec.Security.SecurityContext.ReadOnlyRootFilesystem != nil {
+		return *spec.Security.SecurityContext.ReadOnlyRootFilesystem
+	}
+
+	return false
 }
