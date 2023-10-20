@@ -145,6 +145,141 @@ log {
 };
 `),
 		},
+		"single flow with output metrics": {
+			input: Input{
+				SourcePort: 601,
+				Logging: v1beta1.Logging{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "config-test",
+						Name:      "test",
+					},
+					Spec: v1beta1.LoggingSpec{
+						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+					},
+				},
+				Outputs: []v1beta1.SyslogNGOutput{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-syslog-out",
+						},
+						Spec: v1beta1.SyslogNGOutputSpec{
+							Syslog: &output.SyslogOutput{
+								Host:      "test.local",
+								Transport: "tcp",
+							},
+						},
+					},
+				},
+				ClusterOutputs: []v1beta1.SyslogNGClusterOutput{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "config-test",
+							Name:      "test-syslog-out-global",
+						},
+						Spec: v1beta1.SyslogNGClusterOutputSpec{
+							SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
+								Syslog: &output.SyslogOutput{
+									Host:      "test.local",
+									Transport: "tcp",
+								},
+							},
+						},
+					},
+				},
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							Match: &v1beta1.SyslogNGMatch{
+								Regexp: &filter.RegexpMatchExpr{
+									Pattern: "nginx",
+									Value:   "kubernetes.labels.app",
+								},
+							},
+							Filters: []v1beta1.SyslogNGFilter{
+								{
+									Rewrite: []filter.RewriteConfig{
+										{
+											Set: &filter.SetConfig{
+												FieldName: "cluster",
+												Value:     "test-cluster",
+											},
+										},
+									},
+								},
+							},
+							LocalOutputRefs:  []string{"test-syslog-out"},
+							GlobalOutputRefs: []string{"test-syslog-out-global"},
+							OutputMetrics: []filter.MetricsProbe{
+								{
+									Key: "example",
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+			},
+			wantOut: Untab(`@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+
+destination "clusteroutput_config-test_test-syslog-out-global" {
+	syslog("test.local" transport("tcp") persist_name("clusteroutput_config-test_test-syslog-out-global"));
+};
+
+destination "output_default_test-syslog-out" {
+	syslog("test.local" transport("tcp") persist_name("output_default_test-syslog-out"));
+};
+
+filter "flow_default_test-flow_ns_filter" {
+	match("default" value("json.kubernetes.namespace_name") type("string"));
+};
+filter "flow_default_test-flow_match" {
+	match("nginx" value("kubernetes.labels.app"));
+};
+rewrite "flow_default_test-flow_filters_0" {
+	set("test-cluster" value("cluster"));
+};
+log {
+	source("main_input");
+	filter("flow_default_test-flow_ns_filter");
+	filter("flow_default_test-flow_match");
+	rewrite("flow_default_test-flow_filters_0");
+    log {
+        parser {
+            metrics-probe(key("example") labels(
+                "output" => "clusteroutput_config-test_test-syslog-out-global"
+            ));
+        };
+        destination("clusteroutput_config-test_test-syslog-out-global");
+    };
+    log {
+        parser {
+            metrics-probe(key("example") labels(
+                "output" => "output_default_test-syslog-out"
+            ));
+        };
+        destination("output_default_test-syslog-out");
+    };
+};
+`),
+		},
 		"global options": {
 			input: Input{
 				Logging: v1beta1.Logging{

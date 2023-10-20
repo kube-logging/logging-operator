@@ -15,11 +15,20 @@
 package config
 
 import (
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"reflect"
+
 	"github.com/siliconbrain/go-seqs/seqs"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
-func logDefStmt(sourceRefs []string, transforms []render.Renderer, destRefs []string) render.Renderer {
+type destRef struct {
+	destName      string
+	metricsProbes []filter.MetricsProbe
+}
+
+func logDefStmt(sourceRefs []string, transforms []render.Renderer, destRefs []destRef) render.Renderer {
 	return braceDefStmt("log", "", render.AllOf(
 		render.AllFrom(seqs.Map(seqs.FromSlice(sourceRefs), sourceRefStmt)),
 		render.AllOf(transforms...),
@@ -35,6 +44,23 @@ func filterRefStmt(name string) render.Renderer {
 	return parenDefStmt("filter", render.Literal(name))
 }
 
-func destinationRefStmt(name string) render.Renderer {
-	return parenDefStmt("destination", render.Literal(name))
+func destinationRefStmt(dest destRef) render.Renderer {
+	if len(dest.metricsProbes) == 0 {
+		return parenDefStmt("destination", render.Literal(dest.destName))
+	}
+	metricsProbesRenderer := make([]render.Renderer, len(dest.metricsProbes))
+	for _, m := range dest.metricsProbes {
+		if m.Labels == nil {
+			m.Labels = make(filter.ArrowMap)
+		}
+		m.Labels["output"] = dest.destName
+		metricsProbesRenderer = append(metricsProbesRenderer, renderDriver(Field{
+			Value: reflect.ValueOf(m),
+		}, nil))
+	}
+
+	return braceDefStmt("log", "", render.AllOf(
+		parserDefStmt("", render.AllOf(metricsProbesRenderer...)),
+		parenDefStmt("destination", render.Literal(dest.destName))),
+	)
 }

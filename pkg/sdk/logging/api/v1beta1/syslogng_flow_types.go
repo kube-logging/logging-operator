@@ -31,11 +31,12 @@ type _metaSyslogNGFlowSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 type SyslogNGFlowSpec struct {
-	Match            *SyslogNGMatch   `json:"match,omitempty"`
-	Filters          []SyslogNGFilter `json:"filters,omitempty"`
-	LoggingRef       string           `json:"loggingRef,omitempty"`
-	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
-	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
+	Match            *SyslogNGMatch        `json:"match,omitempty"`
+	Filters          []SyslogNGFilter      `json:"filters,omitempty"`
+	LoggingRef       string                `json:"loggingRef,omitempty"`
+	GlobalOutputRefs []string              `json:"globalOutputRefs,omitempty"`
+	LocalOutputRefs  []string              `json:"localOutputRefs,omitempty"`
+	OutputMetrics    []filter.MetricsProbe `json:"outputMetrics,omitempty"`
 }
 
 type SyslogNGMatch filter.MatchExpr

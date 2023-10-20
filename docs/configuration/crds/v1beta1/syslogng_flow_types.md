@@ -28,6 +28,10 @@ Default: -
 
 Default: -
 
+### outputMetrics ([]filter.MetricsProbe, optional) {#syslogngflowspec-outputmetrics}
+
+Default: -
+
 
 ## SyslogNGFilter
 
