@@ -22,6 +22,7 @@ DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 VERSION := $(shell git describe --abbrev=0 --tags)
 
 E2E_TEST_TIMEOUT ?= 20m
+TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
 CONTROLLER_GEN_VERSION := v0.6.0
@@ -145,12 +146,27 @@ manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
+.PHONY: test
 test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./...
-	cd pkg/sdk/extensions && GOEXPERIMENT=loopvar go test ./...
-	cd pkg/sdk/logging/model/syslogng/config && GOEXPERIMENT=loopvar go test ./...
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
+	cd pkg/sdk/extensions && GOEXPERIMENT=loopvar go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
+	cd pkg/sdk/logging/model/syslogng/config && GOEXPERIMENT=loopvar go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
+
+.PHONY: install-go-test-coverage
+install-go-test-coverage:
+	GOBIN=${BIN} go install github.com/vladopajic/go-test-coverage/v2@latest
+
+.PHONY: generate-test-coverage
+generate-test-coverage: install-go-test-coverage test
+	rm -f ${TEST_COV_DIR}/coverage_all.out
+	echo "mode: set" > ${TEST_COV_DIR}/coverage_all.out
+	find -name 'cover_*.out' | xargs cat | grep -v "mode: set" >> ${TEST_COV_DIR}/coverage_all.out
+
+.PHONY: check-coverage
+check-coverage: install-go-test-coverage generate-test-coverage
+	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
 test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
