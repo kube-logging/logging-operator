@@ -25,6 +25,7 @@ type LoggingResources struct {
 	SyslogNG        SyslogNGLoggingResources
 	NodeAgents      []v1beta1.NodeAgent
 	Fluentbits      []v1beta1.FluentbitAgent
+	LoggingRoutes   []v1beta1.LoggingRoute
 	WatchNamespaces []string
 }
 

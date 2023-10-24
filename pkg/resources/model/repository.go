@@ -69,6 +69,9 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
+	res.LoggingRoutes, err = r.LoggingRoutesFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
 	res.WatchNamespaces, err = UniqueWatchNamespaces(ctx, r.Client, &logging)
 	if err != nil {
 		errs = errors.Append(errs, err)
@@ -145,16 +148,17 @@ func (r LoggingResourceRepository) ClusterFlowsFor(ctx context.Context, logging 
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.ClusterFlow
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
+
 	return res, nil
 }
 
@@ -164,16 +168,17 @@ func (r LoggingResourceRepository) ClusterOutputsFor(ctx context.Context, loggin
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.ClusterOutput
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
+
 	return res, nil
 }
 
@@ -183,16 +188,17 @@ func (r LoggingResourceRepository) FlowsInNamespaceFor(ctx context.Context, name
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.Flow
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
+
 	return res, nil
 }
 
@@ -202,16 +208,16 @@ func (r LoggingResourceRepository) OutputsInNamespaceFor(ctx context.Context, na
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.Output
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -221,16 +227,16 @@ func (r LoggingResourceRepository) SyslogNGClusterFlowsFor(ctx context.Context, 
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.SyslogNGClusterFlow
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -240,16 +246,15 @@ func (r LoggingResourceRepository) SyslogNGClusterOutputsFor(ctx context.Context
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.SyslogNGClusterOutput
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -259,16 +264,15 @@ func (r LoggingResourceRepository) SyslogNGFlowsInNamespaceFor(ctx context.Conte
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.SyslogNGFlow
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -278,16 +282,15 @@ func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Con
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.SyslogNGOutput
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -302,16 +305,15 @@ func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.NodeAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 
@@ -321,16 +323,33 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 		return nil, err
 	}
 
-	sort.Slice(list.Items, func(i, j int) bool {
-		return lessByNamespacedName(&list.Items[i], &list.Items[j])
-	})
-
 	var res []v1beta1.FluentbitAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)
 		}
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
+	return res, nil
+}
+
+func (r LoggingResourceRepository) LoggingRoutesFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.LoggingRoute, error) {
+	var list v1beta1.LoggingRouteList
+	if err := r.Client.List(ctx, &list); err != nil {
+		return nil, err
+	}
+
+	var res []v1beta1.LoggingRoute
+	for _, i := range list.Items {
+		if i.Spec.Source == logging.Spec.LoggingRef {
+			res = append(res, i)
+		}
+	}
+	sort.Slice(res, func(i, j int) bool {
+		return lessByNamespacedName(&res[i], &res[j])
+	})
 	return res, nil
 }
 

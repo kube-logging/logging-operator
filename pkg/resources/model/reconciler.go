@@ -24,9 +24,11 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 	"github.com/kube-logging/logging-operator/pkg/mirror"
@@ -202,11 +204,17 @@ func NewValidationReconciler(
 		}
 
 		registerForPatching(&resources.Logging)
+		resources.Logging.Status.Problems = nil
+		resources.Logging.Status.WatchNamespaces = nil
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
 		}
-		resources.Logging.Status.Problems = nil
+
+		if resources.Logging.Spec.WatchNamespaceSelector != nil &&
+			len(resources.Logging.Status.WatchNamespaces) == 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Defined watchNamespaceSelector did not match any namespaces")
+		}
 
 		loggingsForTheSameRef := make([]string, 0)
 		for _, l := range resources.AllLoggings {
@@ -223,6 +231,18 @@ func NewValidationReconciler(
 				strings.Join(loggingsForTheSameRef, ","))
 			logger.Info(fmt.Sprintf("WARNING %s", problem))
 			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+		}
+
+		for hash, r := range resources.Logging.Status.ConfigCheckResults {
+			if !r {
+				problem := fmt.Sprintf("Configuration with checksum %s has failed. "+
+					"Config secrets: `kubectl get secret -n %s -l %s=%s`. "+
+					"Configcheck pod log: `kubectl logs -n %s -l %s=%s --tail -1`",
+					hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+			}
 		}
 
 		if len(resources.Logging.Spec.NodeAgents) > 0 || len(resources.NodeAgents) > 0 {
@@ -243,6 +263,12 @@ func NewValidationReconciler(
 				}
 			}
 		}
+
+		if resources.Logging.Spec.FluentbitSpec != nil && len(resources.LoggingRoutes) > 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Logging routes are not supported for embedded fluentbit configs, please use a separate FluentbitAgent resource!")
+		}
+
+		slices.Sort(resources.Logging.Status.Problems)
 		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 
 		var errs error
