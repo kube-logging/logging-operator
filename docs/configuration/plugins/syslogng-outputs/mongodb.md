@@ -146,10 +146,3 @@ Default: -
 Default: -
 
 
-## RawString
-
-### raw_string (string, optional) {#rawstring-raw_string}
-
-Default: -
-
-
