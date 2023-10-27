@@ -141,7 +141,9 @@ log {
 	filter("flow_default_test-flow_ns_filter");
 	filter("flow_default_test-flow_match");
 	rewrite("flow_default_test-flow_filters_0");
-	destination("output_default_test-syslog-out");
+	log {
+        destination("output_default_test-syslog-out");
+    };
 };
 `),
 		},
@@ -264,7 +266,9 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
-                "output" => "clusteroutput_config-test_test-syslog-out-global"
+                "output_name" => "test-syslog-out-global"
+				"output_namespace" => "config-test"
+				"output_scope" => "global"
             ));
         };
         destination("clusteroutput_config-test_test-syslog-out-global");
@@ -272,7 +276,9 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
-                "output" => "output_default_test-syslog-out"
+                "output_name" => "test-syslog-out"
+				"output_namespace" => "default"
+				"output_scope" => "local"
             ));
         };
         destination("output_default_test-syslog-out");
@@ -597,7 +603,9 @@ filter "flow_default_test-flow_ns_filter" {
 log {
     source("main_input");
     filter("flow_default_test-flow_ns_filter");
-    destination("clusteroutput_logging_clusterout");
+    log {
+        destination("clusteroutput_logging_clusterout");
+    };
 };
 `,
 		},
