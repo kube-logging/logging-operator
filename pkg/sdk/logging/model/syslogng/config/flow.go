@@ -93,7 +93,7 @@ func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName st
 			seqs.ToSlice(seqs.Concat(
 				seqs.FromValues(
 					filterRefStmt(nsFilterName),
-					render.If(f.Spec.Match != nil, filterRefStmt(matchName)),
+					render.If(!f.Spec.Match.IsEmpty(), filterRefStmt(matchName)),
 				),
 				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
 					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
