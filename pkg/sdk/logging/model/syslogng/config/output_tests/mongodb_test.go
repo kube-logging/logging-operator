@@ -98,9 +98,7 @@ destination "output_default_test-mongodb-out" {
 						},
 						Collection: "messages",
 						ValuePairs: output.ValuePairs{
-							Scope: output.RawString{
-								String: `"selected-macros" "nv-pairs" "sdata"`,
-							},
+							Scope: `"selected-macros" "nv-pairs" "sdata"`,
 						},
 					},
 				},
@@ -186,11 +184,9 @@ destination "output_default_test-mongodb-out" {
 						},
 						Collection: "messages",
 						ValuePairs: output.ValuePairs{
-							Scope: output.RawString{
-								String: `"selected-macros" "nv-pairs" "sdata"`,
-							},
+							Scope: `"selected-macros" "nv-pairs" "sdata"`,
 						},
-						WriteConcern: output.RawString{String: output.Unacked},
+						WriteConcern: output.Unacked,
 					},
 				},
 			},
@@ -274,11 +270,9 @@ destination "output_default_test-mongodb-out" {
 						},
 						Collection: "messages",
 						ValuePairs: output.ValuePairs{
-							Scope: output.RawString{
-								String: `"selected-macros" "nv-pairs" "sdata"`,
-							},
+							Scope: `"selected-macros" "nv-pairs" "sdata"`,
 						},
-						WriteConcern: output.RawString{String: `5`},
+						WriteConcern: `5`,
 					},
 				},
 			},

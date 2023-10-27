@@ -14,7 +14,9 @@
 
 package output
 
-import "github.com/cisco-open/operator-tools/pkg/secret"
+import (
+	"github.com/cisco-open/operator-tools/pkg/secret"
+)
 
 // +name:"MongoDB"
 // +weight:"200"
@@ -74,6 +76,7 @@ type MongoDB struct {
 	TimeReopen int `json:"time_reopen,omitempty"`
 	// 	Description: Sets the write concern mode of the MongoDB operations, for both bulk and single mode.
 	// See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-write-concern
+	// +kubebuilder:validation:Enum=unacked;acked;majority
 	WriteConcern RawString `json:"write_concern,omitempty"`
 }
 
@@ -107,7 +110,4 @@ type ValuePairs struct {
 	Pair    RawString `json:"pair,omitempty"`
 }
 
-// +kubebuilder:object:generate=true
-type RawString struct {
-	String string `json:"raw_string,omitempty"`
-}
+type RawString string

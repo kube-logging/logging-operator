@@ -14,7 +14,9 @@
 
 package output
 
-import "github.com/cisco-open/operator-tools/pkg/secret"
+import (
+	"github.com/cisco-open/operator-tools/pkg/secret"
+)
 
 // +name:"S3"
 // +weight:"200"
