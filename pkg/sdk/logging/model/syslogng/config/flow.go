@@ -60,10 +60,13 @@ func renderClusterFlow(clusterOutputRefs map[string]types.NamespacedName, source
 					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
 				}),
 			)),
-			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destRef {
-				return destRef{
-					destName:      clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-					metricsProbes: f.Spec.OutputMetrics,
+			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
+				return destination{
+					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
+					namespace:        clusterOutputRefs[ref].Namespace,
+					name:             ref,
+					scope:            Global,
+					metricsProbes:    f.Spec.OutputMetrics,
 				}
 			})),
 		),
@@ -97,16 +100,22 @@ func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName st
 				}),
 			)),
 			seqs.ToSlice(seqs.Concat(
-				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destRef {
-					return destRef{
-						destName:      clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-						metricsProbes: f.Spec.OutputMetrics,
+				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
+					return destination{
+						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
+						namespace:        clusterOutputRefs[ref].Namespace,
+						name:             ref,
+						scope:            Global,
+						metricsProbes:    f.Spec.OutputMetrics,
 					}
 				}),
-				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) destRef {
-					return destRef{
-						destName:      outputDestName(f.Namespace, ref),
-						metricsProbes: f.Spec.OutputMetrics,
+				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) destination {
+					return destination{
+						renderedDestName: outputDestName(f.Namespace, ref),
+						namespace:        f.Namespace,
+						name:             ref,
+						scope:            Local,
+						metricsProbes:    f.Spec.OutputMetrics,
 					}
 				}),
 			)),

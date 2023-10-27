@@ -23,16 +23,26 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
-type destRef struct {
-	destName      string
-	metricsProbes []filter.MetricsProbe
+type refScope string
+
+const (
+	Local  refScope = "local"
+	Global refScope = "global"
+)
+
+type destination struct {
+	renderedDestName string
+	namespace        string
+	name             string
+	scope            refScope
+	metricsProbes    []filter.MetricsProbe
 }
 
-func logDefStmt(sourceRefs []string, transforms []render.Renderer, destRefs []destRef) render.Renderer {
+func logDefStmt(sourceRefs []string, transforms []render.Renderer, destRefs []destination) render.Renderer {
 	return braceDefStmt("log", "", render.AllOf(
 		render.AllFrom(seqs.Map(seqs.FromSlice(sourceRefs), sourceRefStmt)),
 		render.AllOf(transforms...),
-		render.AllFrom(seqs.Map(seqs.FromSlice(destRefs), destinationRefStmt)),
+		render.AllFrom(seqs.Map(seqs.FromSlice(destRefs), destinationLogPath)),
 	))
 }
 
@@ -44,16 +54,20 @@ func filterRefStmt(name string) render.Renderer {
 	return parenDefStmt("filter", render.Literal(name))
 }
 
-func destinationRefStmt(dest destRef) render.Renderer {
+func destinationLogPath(dest destination) render.Renderer {
 	if len(dest.metricsProbes) == 0 {
-		return parenDefStmt("destination", render.Literal(dest.destName))
+		return braceDefStmt("log", "", render.AllOf(
+			parenDefStmt("destination", render.Literal(dest.renderedDestName))),
+		)
 	}
 	metricsProbesRenderer := make([]render.Renderer, len(dest.metricsProbes))
 	for _, m := range dest.metricsProbes {
 		if m.Labels == nil {
 			m.Labels = make(filter.ArrowMap)
 		}
-		m.Labels["output"] = dest.destName
+		m.Labels["output_name"] = dest.name
+		m.Labels["output_namespace"] = dest.namespace
+		m.Labels["output_scope"] = string(dest.scope)
 		metricsProbesRenderer = append(metricsProbesRenderer, renderDriver(Field{
 			Value: reflect.ValueOf(m),
 		}, nil))
@@ -61,6 +75,6 @@ func destinationRefStmt(dest destRef) render.Renderer {
 
 	return braceDefStmt("log", "", render.AllOf(
 		parserDefStmt("", render.AllOf(metricsProbesRenderer...)),
-		parenDefStmt("destination", render.Literal(dest.destName))),
+		parenDefStmt("destination", render.Literal(dest.renderedDestName))),
 	)
 }
