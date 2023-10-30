@@ -16,7 +16,7 @@ spec:
   endpoints:
   - port: http
     path: /metrics
-    {{- with .Values.monitoring.serviceMonitor.metricsRelabelings }}
+    {{- with .Values.monitoring.serviceMonitor.metricRelabelings }}
     metricRelabelings:
       {{- toYaml . | nindent 6 }}
     {{- end }}
