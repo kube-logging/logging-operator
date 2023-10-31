@@ -100,13 +100,13 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderClusterFlow(clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderClusterFlow(in.Logging.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderFlow(clusterOutputRefs, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Logging.Name, clusterOutputRefs, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
 
 	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {

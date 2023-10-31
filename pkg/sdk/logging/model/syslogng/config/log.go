@@ -31,6 +31,7 @@ const (
 )
 
 type destination struct {
+	logging          string
 	renderedDestName string
 	namespace        string
 	name             string
@@ -68,6 +69,7 @@ func destinationLogPath(dest destination) render.Renderer {
 		m.Labels["output_name"] = dest.name
 		m.Labels["output_namespace"] = dest.namespace
 		m.Labels["output_scope"] = string(dest.scope)
+		m.Labels["logging"] = dest.logging
 		metricsProbesRenderer = append(metricsProbesRenderer, renderDriver(Field{
 			Value: reflect.ValueOf(m),
 		}, nil))

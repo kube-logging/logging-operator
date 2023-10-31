@@ -266,7 +266,8 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
-                "output_name" => "test-syslog-out-global"
+                "logging" => "test"
+				"output_name" => "test-syslog-out-global"
 				"output_namespace" => "config-test"
 				"output_scope" => "global"
             ));
@@ -276,6 +277,7 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
+				"logging" => "test"
                 "output_name" => "test-syslog-out"
 				"output_namespace" => "default"
 				"output_scope" => "local"
@@ -1001,9 +1003,11 @@ source "main_input" {
             json-parser(prefix("json."));
             metrics-probe(key("example") labels(
 				"a" => "b"
+				"logging" => "test"
 			) level(2));
             metrics-probe(key("example2") labels(
 				"c" => "d"
+				"logging" => "test"
 			) level(3));
         };
     };

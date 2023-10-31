@@ -41,7 +41,7 @@ func validateClusterOutputs(clusterOutputRefs map[string]types.NamespacedName, f
 	})
 }
 
-func renderClusterFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderClusterFlow(logging string, clusterOutputRefs map[string]types.NamespacedName, sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	filterDefs := seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
@@ -62,6 +62,7 @@ func renderClusterFlow(clusterOutputRefs map[string]types.NamespacedName, source
 			)),
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 				return destination{
+					logging:          logging,
 					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
 					namespace:        clusterOutputRefs[ref].Namespace,
 					name:             ref,
@@ -73,7 +74,7 @@ func renderClusterFlow(clusterOutputRefs map[string]types.NamespacedName, source
 	)
 }
 
-func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedName, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	nsFilterName := fmt.Sprintf("%s_ns_filter", baseName)
@@ -102,6 +103,7 @@ func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName st
 			seqs.ToSlice(seqs.Concat(
 				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 					return destination{
+						logging:          logging,
 						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
 						namespace:        clusterOutputRefs[ref].Namespace,
 						name:             ref,
@@ -111,6 +113,7 @@ func renderFlow(clusterOutputRefs map[string]types.NamespacedName, sourceName st
 				}),
 				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) destination {
 					return destination{
+						logging:          logging,
 						renderedDestName: outputDestName(f.Namespace, ref),
 						namespace:        f.Namespace,
 						name:             ref,
