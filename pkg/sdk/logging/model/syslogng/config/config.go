@@ -26,6 +26,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 func RenderConfigInto(in Input, out io.Writer) error {
@@ -122,6 +123,10 @@ func configRenderer(in Input) (render.Renderer, error) {
 			}, nil),
 	}
 	for _, sm := range in.Logging.Spec.SyslogNGSpec.SourceMetrics {
+		if sm.Labels == nil {
+			sm.Labels = make(filter.ArrowMap, 0)
+		}
+		sm.Labels["logging"] = in.Logging.Name
 		sourceParsers = append(sourceParsers, renderDriver(Field{
 			Value: reflect.ValueOf(sm),
 		}, nil))
