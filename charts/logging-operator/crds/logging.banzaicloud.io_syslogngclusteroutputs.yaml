@@ -1130,7 +1130,6 @@ spec:
                   time_reopen:
                     type: integer
                   timestamp:
-                    default: current
                     enum:
                     - current
                     - received
@@ -1227,31 +1226,20 @@ spec:
                   value_pairs:
                     properties:
                       exclude:
-                        properties:
-                          raw_string:
-                            type: string
-                        type: object
+                        type: string
                       key:
-                        properties:
-                          raw_string:
-                            type: string
-                        type: object
+                        type: string
                       pair:
-                        properties:
-                          raw_string:
-                            type: string
-                        type: object
+                        type: string
                       scope:
-                        properties:
-                          raw_string:
-                            type: string
-                        type: object
-                    type: object
-                  write_concern:
-                    properties:
-                      raw_string:
                         type: string
                     type: object
+                  write_concern:
+                    enum:
+                    - unacked
+                    - acked
+                    - majority
+                    type: string
                 required:
                 - collection
                 type: object
@@ -1417,10 +1405,7 @@ spec:
                   object_key:
                     type: string
                   object_key_timestamp:
-                    properties:
-                      raw_string:
-                        type: string
-                    type: object
+                    type: string
                   persist_name:
                     type: string
                   region:
@@ -1463,10 +1448,7 @@ spec:
                   storage_class:
                     type: string
                   template:
-                    properties:
-                      raw_string:
-                        type: string
-                    type: object
+                    type: string
                   throttle:
                     type: integer
                   upload_threads:
