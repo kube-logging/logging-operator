@@ -9,8 +9,6 @@ spec:
     metrics: {}
     sourceMetrics:
       - key: custom_input
-        labels:
-          logging: logging
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGFlow
@@ -21,7 +19,6 @@ spec:
   outputMetrics:
     - key: custom_output
       labels:
-        logging: logging
         flow: all1
   localOutputRefs:
     - http
@@ -37,7 +34,6 @@ spec:
   outputMetrics:
     - key: custom_output
       labels:
-        logging: logging
         flow: all2
   globalOutputRefs:
     - http2
