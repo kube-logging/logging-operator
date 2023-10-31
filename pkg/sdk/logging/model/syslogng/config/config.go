@@ -112,7 +112,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter)
 	}
 
-	parserDrivers := []render.Renderer{
+	sourceParsers := []render.Renderer{
 		renderDriver(
 			Field{
 				Value: reflect.ValueOf(JSONParser{
@@ -122,7 +122,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 			}, nil),
 	}
 	for _, sm := range in.Logging.Spec.SyslogNGSpec.SourceMetrics {
-		parserDrivers = append(parserDrivers, renderDriver(Field{
+		sourceParsers = append(sourceParsers, renderDriver(Field{
 			Value: reflect.ValueOf(sm),
 		}, nil))
 	}
@@ -146,7 +146,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 								}),
 							}, nil)),
 							[]render.Renderer{
-								parserDefStmt("", render.AllOf(parserDrivers...)),
+								parserDefStmt("", render.AllOf(sourceParsers...)),
 							},
 						),
 					),
