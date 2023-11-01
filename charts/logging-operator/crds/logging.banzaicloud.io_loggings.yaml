@@ -14652,6 +14652,19 @@ spec:
                     type: object
                   skipRBACCreate:
                     type: boolean
+                  sourceMetrics:
+                    items:
+                      properties:
+                        key:
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        level:
+                          type: integer
+                      type: object
+                    type: array
                   statefulSet:
                     properties:
                       metadata:

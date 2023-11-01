@@ -104,7 +104,7 @@ codegen: ${CONTROLLER_GEN} tidy ## Generate code
 
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
-	kubectl create -f config/crd/bases || kubectl replace -f config/crd/bases
+	kubectl apply -f config/crd/bases --server-side --force-conflicts
 
 .PHONY: license-check
 license-check: ${LICENSEI} .licensei.cache ## Run license check
