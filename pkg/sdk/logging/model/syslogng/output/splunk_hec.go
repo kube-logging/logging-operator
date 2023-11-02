@@ -22,6 +22,10 @@ type _hugoSplunkHEC interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over Splunk HEC"
 /*
+Based on the [Splunk destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/).
+
+## Example
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
@@ -36,9 +40,6 @@ spec:
             name: splunk-hec
             key: token
 {{</ highlight >}}
-
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/
-
 */
 type _docSplunkHEC interface{} //nolint:deadcode,unused
 
@@ -53,7 +54,7 @@ type SplunkHECOutput struct {
 	HTTPOutput `json:",inline"`
 	// The token that syslog-ng OSE uses to authenticate on the event collector.
 	Token secret.Secret `json:"token,omitempty"`
-	// event() accepts a template, which declares the content of the log message sent to Splunk. Default value: ${MSG}
+	// event() accepts a template, which declares the content of the log message sent to Splunk. Default value: `${MSG}`
 	Event string `json:"event,omitempty"`
 	// Splunk index where the messages will be stored.
 	Index string `json:"index,omitempty"`
@@ -66,7 +67,7 @@ type SplunkHECOutput struct {
 	// Sets the time field.
 	Time string `json:"time,omitempty"`
 	// Fallback option for index field.
-	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/)
+	// For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/).
 	DefaultIndex string `json:"default_index,omitempty"`
 	// Fallback option for source field.
 	DefaultSource string `json:"default_source,omitempty"`
