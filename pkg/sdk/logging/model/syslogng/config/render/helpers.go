@@ -45,12 +45,6 @@ func String(s string) Renderer {
 	}
 }
 
-func RawString(s string) Renderer {
-	return func(ctx RenderContext) error {
-		return writeString(ctx.Out, s)
-	}
-}
-
 func Formatted(format string, args ...any) Renderer {
 	return func(ctx RenderContext) error {
 		_, err := fmt.Fprintf(ctx.Out, format, args...)
