@@ -21,12 +21,16 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 type _hugoLoggly interface{} //nolint:deadcode,unused
 
 // +docName:"Loggly output plugin for syslog-ng"
-// The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider.
-// You can send log messages over TCP, or encrypted with [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
-//
-// ## Prerequisites
-//
-// You need a Loggly account and your user token to use this output.
+/*
+The `loggly()` destination sends log messages to the [Loggly](https://www.loggly.com/) Logging-as-a-Service provider.
+You can send log messages over TCP, or encrypted with [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
+
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/).
+
+## Prerequisites
+
+You need a Loggly account and your user token to use this output.
+*/
 type _docLoggly interface{} //nolint:deadcode,unused
 
 // +name:"Loggly"
@@ -38,11 +42,11 @@ type _metaLoggly interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 type Loggly struct {
-	// Address of the destination host
+	// Address of the destination host.
 	Host string `json:"host,omitempty"`
-	// Event tag [more information](https://documentation.solarwinds.com/en/success_center/loggly/content/admin/tags.htm)
+	// Event tag. For details, see the [Loggy documentation](https://documentation.solarwinds.com/en/success_center/loggly/content/admin/tags.htm)
 	Tag string `json:"tag,omitempty"`
-	// Your Customer Token that you received from Loggly [more information](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/)
+	// Your Customer Token that you received from Loggly. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/)
 	Token *secret.Secret `json:"token"`
 	// syslog output configuration
 	SyslogOutput `json:",inline"`
