@@ -19,6 +19,10 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
+// +name:"ElasticSearch GenId"
+// +weight:"200"
+type _hugoElasticsearchGenId interface{} //nolint:deadcode,unused
+
 // +kubebuilder:object:generate=true
 type ElasticsearchGenId struct {
 	// You can specify generated hash storing key.

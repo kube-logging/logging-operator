@@ -47,7 +47,7 @@ Default: 30 s
 
 Custom Ingester URL, Optional
 
-Default: https://logs.logdna.com
+Default: `https://logs.logdna.com`
 
 ### ingester_endpoint (string, optional) {#logdna-ingester_endpoint}
 
@@ -63,42 +63,40 @@ Default: -
 
 ### slow_flush_log_threshold (string, optional) {#logdna-slow_flush_log_threshold}
 
-The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric. 
 
 Default: -
 
 
- ## Example `LogDNA` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Output
- metadata:
 
-	name: logdna-output-sample
+## Example `LogDNA` filter configurations
 
- spec:
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: logdna-output-sample
+spec:
+  logdna:
+    api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    hostname: logging-operator
+    app: my-app
+    tags: web,dev
+    ingester_domain https://logs.logdna.com
+    ingester_endpoint /logs/ingest
+```
 
-	logdna:
-	  api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-	  hostname: logging-operator
-	  app: my-app
-	  tags: web,dev
-	  ingester_domain https://logs.logdna.com
-	  ingester_endpoint /logs/ingest
+Fluentd config result:
 
- ```
+```xml
+<match **>
+  @type logdna
+  @id test_logdna
+  api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
+  app my-app
+  hostname logging-operator
+</match>
+```
 
- #### Fluentd Config Result
- ```
- <match **>
-
-	@type logdna
-	@id test_logdna
-	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
-	app my-app
-	hostname logging-operator
-
- </match>
- ```
 
 ---

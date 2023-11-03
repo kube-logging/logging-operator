@@ -38,7 +38,7 @@ type _metaSQS interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type SQSOutputConfig struct {
-	// SQS queue url e.g. https://sqs.us-west-2.amazonaws.com/123456789012/myqueue
+	// SQS queue url e.g. `https://sqs.us-west-2.amazonaws.com/123456789012/myqueue`
 	SQSUrl string `json:"sqs_url,omitempty"`
 	// SQS queue name - required if sqs_url is not set
 	QueueName string `json:"queue_name,omitempty"`

@@ -37,9 +37,9 @@ type _metaEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type EnhanceK8s struct {
-	// parameters for read/write record (default: ['$.namespace'])
+	// parameters for read/write record (default: `['$.namespace']`)
 	InNamespacePath []string `json:"in_namespace_path,omitempty"`
-	// (default: ['$.pod','$.pod_name'])
+	// (default: `['$.pod','$.pod_name']`)
 	InPodPath []string `json:"in_pod_path,omitempty"`
 	// Sumologic data type (default: metrics)
 	DataType string `json:"data_type,omitempty"`
@@ -59,9 +59,9 @@ type EnhanceK8s struct {
 	VerifySSL *bool `json:"verify_ssl,omitempty"`
 	// Kubernetes core API version (for different Kubernetes versions) (default: ['v1'])
 	CoreAPIVersions []string `json:"core_api_versions,omitempty"`
-	// Kubernetes resources api groups (default: ["apps/v1", "extensions/v1beta1"])
+	// Kubernetes resources api groups (default: `["apps/v1", "extensions/v1beta1"]`)
 	APIGroups []string `json:"api_groups,omitempty"`
-	// if `ca_file` is for an intermediate CA, or otherwise we do not have the
+	// If `ca_file` is for an intermediate CA, or otherwise we do not have the
 	// root CA and want to trust the intermediate CA certs we do have, set this
 	// to `true` - this corresponds to the openssl s_client -partial_chain flag
 	// and X509_V_FLAG_PARTIAL_CHAIN (default: false)
@@ -76,30 +76,28 @@ type EnhanceK8s struct {
 	CacheRefreshVariation int `json:"cache_refresh_variation,omitempty"`
 }
 
-// ## Example `EnhanceK8s` filter configurations
-// ```yaml
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: Logging
-// metadata:
-//
-//	name: demo-flow
-//
-// spec:
-//
-//	globalFilters:
-//	  - enhanceK8s: {}
-//
-// ```
-//
-// #### Fluentd Config Result
-// ```yaml
-// <filter **>
-//
-//	@type enhance_k8s_metadata
-//	@id test_enhanceK8s
-//
-// </filter>
-// ```
+/*
+## Example `EnhanceK8s` filter configurations
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: demo-flow
+spec:
+  globalFilters:
+    - enhanceK8s: {}
+```
+
+Fluentd config result:
+
+```xml
+<filter **>
+  @type enhance_k8s_metadata
+  @id test_enhanceK8s
+</filter>
+```
+*/
 type _expEnhanceK8s interface{} //nolint:deadcode,unused
 
 func (c *EnhanceK8s) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

@@ -49,7 +49,7 @@ type LogDNAOutput struct {
 	Tags string `json:"tags,omitempty"`
 	// HTTPS POST Request Timeout, Optional. Supports s and ms Suffices (default: 30 s)
 	RequestTimeout string `json:"request_timeout,omitempty"`
-	// Custom Ingester URL, Optional (default: https://logs.logdna.com)
+	// Custom Ingester URL, Optional (default: `https://logs.logdna.com`)
 	IngesterDomain string `json:"ingester_domain,omitempty"`
 	// Custom Ingester Endpoint, Optional (default: /logs/ingest)
 	IngesterEndpoint string `json:"ingester_endpoint,omitempty"`
@@ -57,42 +57,40 @@ type LogDNAOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 	// The threshold for chunk flush performance check.
 	// Parameter type is float, not time, default: 20.0 (seconds)
-	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	// If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric.
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
-// ## Example `LogDNA` filter configurations
-// ```yaml
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: Output
-// metadata:
-//
-//	name: logdna-output-sample
-//
-// spec:
-//
-//	logdna:
-//	  api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-//	  hostname: logging-operator
-//	  app: my-app
-//	  tags: web,dev
-//	  ingester_domain https://logs.logdna.com
-//	  ingester_endpoint /logs/ingest
-//
-// ```
-//
-// #### Fluentd Config Result
-// ```
-// <match **>
-//
-//	@type logdna
-//	@id test_logdna
-//	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
-//	app my-app
-//	hostname logging-operator
-//
-// </match>
-// ```
+/*
+## Example `LogDNA` filter configurations
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: logdna-output-sample
+spec:
+  logdna:
+    api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    hostname: logging-operator
+    app: my-app
+    tags: web,dev
+    ingester_domain https://logs.logdna.com
+    ingester_endpoint /logs/ingest
+```
+
+Fluentd config result:
+
+```xml
+<match **>
+  @type logdna
+  @id test_logdna
+  api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
+  app my-app
+  hostname logging-operator
+</match>
+```
+*/
 type _expLogDNA interface{} //nolint:deadcode,unused
 
 func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

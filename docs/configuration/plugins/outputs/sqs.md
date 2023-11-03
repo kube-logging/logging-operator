@@ -13,7 +13,7 @@ generated_file: true
 
 ### sqs_url (string, optional) {#output config-sqs_url}
 
-SQS queue url e.g. https://sqs.us-west-2.amazonaws.com/123456789012/myqueue 
+SQS queue url e.g. `https://sqs.us-west-2.amazonaws.com/123456789012/myqueue` 
 
 Default: -
 

@@ -6,20 +6,21 @@ generated_file: true
 
 # Format output records
 ## Overview
- Specify how to format output records. For details, see [https://docs.fluentd.org/configuration/format-section](https://docs.fluentd.org/configuration/format-section).
 
- ## Example
- ```yaml
- spec:
+Specify how to format output records. For details, see [https://docs.fluentd.org/configuration/format-section](https://docs.fluentd.org/configuration/format-section).
 
-	format:
-	  path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
-	  format:
-	    type: single_value
-	    add_newline: true
-	    message_key: msg
+## Example
 
- ```
+```yaml
+spec:
+  format:
+    path: /tmp/logs/${tag}/%Y/%m/%d.%H.%M
+    format:
+      type: single_value
+      add_newline: true
+      message_key: msg
+```
+
 
 ## Configuration
 ## Format

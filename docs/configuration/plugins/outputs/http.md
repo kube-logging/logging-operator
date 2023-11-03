@@ -6,20 +6,20 @@ generated_file: true
 
 # Http plugin for Fluentd
 ## Overview
- Sends logs to HTTP/HTTPS endpoints.
- More info at https://docs.fluentd.org/output/http.
 
- ## Example output configurations
- ```yaml
- spec:
+Sends logs to HTTP/HTTPS endpoints. For details, see [https://docs.fluentd.org/output/http](https://docs.fluentd.org/output/http).
 
-	http:
-	  endpoint: http://logserver.com:9000/api
-	  buffer:
-	    tags: "[]"
-	    flush_interval: 10s
+## Example output configurations
 
- ```
+```yaml
+spec:
+  http:
+    endpoint: http://logserver.com:9000/api
+    buffer:
+      tags: "[]"
+      flush_interval: 10s
+```
+
 
 ## Configuration
 ## Output Config

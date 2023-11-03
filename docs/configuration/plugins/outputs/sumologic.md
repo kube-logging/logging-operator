@@ -6,40 +6,38 @@ generated_file: true
 
 # SumoLogic output plugin for Fluentd
 ## Overview
- This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
- More info at https://github.com/SumoLogic/fluentd-output-sumologic
 
- Example secret for HTTP input URL
- ```
- kubectl create secret generic sumo-output --from-literal "endpoint=$URL"
- ```
+This plugin has been designed to output logs or metrics to SumoLogic via a HTTP collector endpoint
+For details, see [https://github.com/SumoLogic/fluentd-output-sumologic](https://github.com/SumoLogic/fluentd-output-sumologic).
 
- # Example ClusterOutput
+## Example secret for HTTP input URL:
 
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: ClusterOutput
- metadata:
+```
+export URL='https://endpoint1.collection.eu.sumologic.com/receiver/v1/http/'
+kubectl create secret generic sumo-output --from-literal "endpoint=$URL"
+```
 
-	name: sumo-output
+## Example ClusterOutput
 
- spec:
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: sumo-output
+spec:
+  sumologic:
+    buffer:
+      flush_interval: 10s
+      flush_mode: interval
+    compress: true
+    endpoint:
+      valueFrom:
+        secretKeyRef:
+          key: endpoint
+          name: sumo-output
+    source_name: test1
+```
 
-	sumologic:
-	  buffer:
-	    flush_interval: 10s
-	    flush_mode: interval
-	  compress: true
-	  endpoint:
-	    valueFrom:
-	      secretKeyRef:
-	        key: endpoint
-	        name: sumo-output
-	  source_name: test1
-
- ```
-
-export URL='https://endpoint1.collection.eu.sumologic.com/receiver/v1/http/.......'
 
 ## Configuration
 ## Output Config
@@ -112,7 +110,7 @@ Default: 60
 
 ### add_timestamp (bool, optional) {#output config-add_timestamp}
 
-Add timestamp (or timestamp_key) field to logs before sending to sumologic
+Add timestamp (or timestamp_key) field to logs before sending to SumoLogic
 
 Default: true
 
@@ -142,7 +140,7 @@ Default: .
 
 ### custom_fields ([]string, optional) {#output config-custom_fields}
 
-Comma-separated key=value list of fields to apply to every log. [more information](https://help.sumologic.com/Manage/Fields#http-source-fields) 
+Comma-separated key=value list of fields to apply to every log. [More information](https://help.sumologic.com/Manage/Fields#http-source-fields) 
 
 Default: -
 

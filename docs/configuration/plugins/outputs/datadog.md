@@ -6,21 +6,20 @@ generated_file: true
 
 # Datadog output plugin for Fluentd
 ## Overview
- It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't wan't to.
- More info at [https://github.com/DataDog/fluent-plugin-datadog](https://github.com/DataDog/fluent-plugin-datadog).
+ It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't want to.
+For details, see [https://github.com/DataDog/fluent-plugin-datadog](https://github.com/DataDog/fluent-plugin-datadog).
 
- ## Example
- ```yaml
- spec:
+## Example
+```yaml
+spec:
+  datadog:
+    api_key:
+      value: '<YOUR_API_KEY>' # For referencing a secret, see https://kube-logging.dev/docs/configuration/plugins/outputs/secret/
+    dd_source: '<INTEGRATION_NAME>'
+    dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
+    dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
+```
 
-	datadog:
-	  api_key:
-	    value: '<YOUR_API_KEY>' # for referencing a secret see https://kube-logging.dev/docs/configuration/plugins/outputs/secret/
-	  dd_source: '<INTEGRATION_NAME>'
-	  dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
-	  dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
-
- ```
 
 ## Configuration
 ## Output Config
