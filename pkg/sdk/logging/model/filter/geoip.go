@@ -51,49 +51,48 @@ type GeoIP struct {
 	Records []Record `json:"records,omitempty"`
 }
 
-// ## Example `GeoIP` filter configurations
-// ```yaml
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: Flow
-// metadata:
-//
-//	name: demo-flow
-//
-// spec:
-//
-//	filters:
-//	  - geoip:
-//	      geoip_lookup_keys: remote_addr
-//	      records:
-//	        - city: ${city.names.en["remote_addr"]}
-//	          location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
-//	          country: ${country.iso_code["remote_addr"]}
-//	          country_name: ${country.names.en["remote_addr"]}
-//	          postal_code:  ${postal.code["remote_addr"]}
-//	selectors: {}
-//	localOutputRefs:
-//	  - demo-output
-//
-// ```
-//
-// #### Fluentd Config Result
-// ```yaml
-// <filter **>
-//
-//	@type geoip
-//	@id test_geoip
-//	geoip_lookup_keys remote_addr
-//	skip_adding_null_record true
-//	<record>
-//	  city ${city.names.en["remote_addr"]}
-//	  country ${country.iso_code["remote_addr"]}
-//	  country_name ${country.names.en["remote_addr"]}
-//	  location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
-//	  postal_code ${postal.code["remote_addr"]}
-//	</record>
-//
-// </filter>
-// ```
+/*
+## Example `GeoIP` filter configurations
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - geoip:
+        geoip_lookup_keys: remote_addr
+        records:
+          - city: ${city.names.en["remote_addr"]}
+            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
+            country: ${country.iso_code["remote_addr"]}
+            country_name: ${country.names.en["remote_addr"]}
+            postal_code:  ${postal.code["remote_addr"]}
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
+
+{{< highlight xml >}}
+<filter **>
+  @type geoip
+  @id test_geoip
+  geoip_lookup_keys remote_addr
+  skip_adding_null_record true
+  <record>
+    city ${city.names.en["remote_addr"]}
+    country ${country.iso_code["remote_addr"]}
+    country_name ${country.names.en["remote_addr"]}
+    location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
+    postal_code ${postal.code["remote_addr"]}
+  </record>
+</filter>
+{{</ highlight >}}
+*/
 type _expGeoIP interface{} //nolint:deadcode,unused
 
 func (g *GeoIP) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
