@@ -23,8 +23,8 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
@@ -108,6 +108,47 @@ type FluentdSpec struct {
 	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
 }
 
+// +name:"FluentdConfig"
+// +weight:"200"
+type _hugoFluentdConfig interface{} //nolint:deadcode,unused
+
+// +name:"FluentdConfig"
+// +version:"v1beta1"
+// +description:"FluentdConfig is a reference to the desired Fluentd state"
+type _metaFluentdConfig interface{} //nolint:deadcode,unused
+
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+
+// NodeAgent
+type FluentdConfig struct {
+	LoggingRef        string `json:"loggingRef,omitempty"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   FluentdSpec     `json:"spec,omitempty"`
+	Status NodeAgentStatus `json:"status,omitempty"`
+}
+
+// FluentdConfigStatus
+type FluentdConfigStatus struct {
+}
+
+// +kubebuilder:object:root=true
+
+// FluentdConfigList
+type FluentdConfigList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []FluentdConfig `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&FluentdConfig{}, &FluentdConfigList{})
+}
+
 // +kubebuilder:object:generate=true
 
 type FluentOutLogrotate struct {
@@ -153,10 +194,10 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
 		if f.Security.SecurityContext == nil {
-			f.Security.SecurityContext = &v1.SecurityContext{}
+			f.Security.SecurityContext = &corev1.SecurityContext{}
 		}
 		if f.Security.PodSecurityContext == nil {
-			f.Security.PodSecurityContext = &v1.PodSecurityContext{}
+			f.Security.PodSecurityContext = &corev1.PodSecurityContext{}
 		}
 		if f.Security.PodSecurityContext.FSGroup == nil {
 			f.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
@@ -186,21 +227,21 @@ func (f *FluentdSpec) SetDefaults() error {
 		if !f.DisablePvc {
 			if f.BufferStorageVolume.PersistentVolumeClaim == nil {
 				f.BufferStorageVolume.PersistentVolumeClaim = &volume.PersistentVolumeClaim{
-					PersistentVolumeClaimSpec: v1.PersistentVolumeClaimSpec{},
+					PersistentVolumeClaimSpec: corev1.PersistentVolumeClaimSpec{},
 				}
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes == nil {
-				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []v1.PersistentVolumeAccessMode{
-					v1.ReadWriteOnce,
+				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.AccessModes = []corev1.PersistentVolumeAccessMode{
+					corev1.ReadWriteOnce,
 				}
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests == nil {
-				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[v1.ResourceName]resource.Quantity{
+				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.Resources.Requests = map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("20Gi"),
 				}
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
-				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(v1.PersistentVolumeFilesystem)
+				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(corev1.PersistentVolumeFilesystem)
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
 				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = DefaultFluentdBufferStorageVolumeName
@@ -234,27 +275,27 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
 		if f.BufferVolumeResources.Limits == nil {
-			f.BufferVolumeResources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("10M"),
-				v1.ResourceCPU:    resource.MustParse("50m"),
+			f.BufferVolumeResources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("10M"),
+				corev1.ResourceCPU:    resource.MustParse("50m"),
 			}
 		}
 		if f.BufferVolumeResources.Requests == nil {
-			f.BufferVolumeResources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("10M"),
-				v1.ResourceCPU:    resource.MustParse("1m"),
+			f.BufferVolumeResources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("10M"),
+				corev1.ResourceCPU:    resource.MustParse("1m"),
 			}
 		}
 		if f.Resources.Limits == nil {
-			f.Resources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("400M"),
-				v1.ResourceCPU:    resource.MustParse("1000m"),
+			f.Resources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("400M"),
+				corev1.ResourceCPU:    resource.MustParse("1000m"),
 			}
 		}
 		if f.Resources.Requests == nil {
-			f.Resources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("100M"),
-				v1.ResourceCPU:    resource.MustParse("500m"),
+			f.Resources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("500m"),
 			}
 		}
 		if f.Port == 0 {
@@ -285,12 +326,12 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.Scaling.Drain.PauseImage.PullPolicy = "IfNotPresent"
 		}
 		if f.Scaling.Drain.Resources == nil {
-			f.Scaling.Drain.Resources = &v1.ResourceRequirements{
-				Limits: v1.ResourceList{
-					v1.ResourceMemory: resource.MustParse("50M"),
+			f.Scaling.Drain.Resources = &corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("50M"),
 				},
-				Requests: v1.ResourceList{
-					v1.ResourceCPU: resource.MustParse("20m"),
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU: resource.MustParse("20m"),
 				},
 			}
 		}
@@ -319,9 +360,9 @@ func (f *FluentdSpec) SetDefaults() error {
 		}
 		if f.LivenessProbe == nil {
 			if f.LivenessDefaultCheck {
-				f.LivenessProbe = &v1.Probe{
-					ProbeHandler: v1.ProbeHandler{
-						Exec: &v1.ExecAction{Command: []string{"/bin/healthy.sh"}},
+				f.LivenessProbe = &corev1.Probe{
+					ProbeHandler: corev1.ProbeHandler{
+						Exec: &corev1.ExecAction{Command: []string{"/bin/healthy.sh"}},
 					},
 					InitialDelaySeconds: 600,
 					TimeoutSeconds:      0,

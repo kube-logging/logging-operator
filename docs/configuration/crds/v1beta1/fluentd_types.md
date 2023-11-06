@@ -170,6 +170,51 @@ Fluentd port inside the container (24240 by default). The headless service port 
 
 
 
+---
+title: FluentdConfig
+weight: 200
+generated_file: true
+---
+
+## FluentdConfig
+
+NodeAgent
+
+###  (metav1.TypeMeta, required) {#fluentdconfig-}
+
+
+### metadata (metav1.ObjectMeta, optional) {#fluentdconfig-metadata}
+
+
+### loggingRef (string, optional) {#fluentdconfig-loggingref}
+
+
+### spec (FluentdSpec, optional) {#fluentdconfig-spec}
+
+
+### status (NodeAgentStatus, optional) {#fluentdconfig-status}
+
+
+
+## FluentdConfigStatus
+
+FluentdConfigStatus
+
+
+## FluentdConfigList
+
+FluentdConfigList
+
+###  (metav1.TypeMeta, required) {#fluentdconfiglist-}
+
+
+### metadata (metav1.ListMeta, optional) {#fluentdconfiglist-metadata}
+
+
+### items ([]FluentdConfig, required) {#fluentdconfiglist-items}
+
+
+
 ## FluentOutLogrotate
 
 ### age (string, optional) {#fluentoutlogrotate-age}

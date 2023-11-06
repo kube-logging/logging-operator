@@ -55,6 +55,8 @@ type LoggingSpec struct {
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
+	// Fluentd statefulset configuration reference by name
+	FluentdRef string `json:"fluentdRef,omitempty"`
 	// Syslog-NG statefulset configuration
 	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
 	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
@@ -518,4 +520,8 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+}
+
+func (l *Logging) AreMultipleAggregatorsSet() bool {
+	return l.Spec.SyslogNGSpec != nil && (l.Spec.FluentdSpec != nil || len(l.Spec.FluentdRef) != 0)
 }

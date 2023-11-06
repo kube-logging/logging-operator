@@ -6106,6 +6106,8 @@ spec:
                     format: int32
                     type: integer
                 type: object
+              fluentdRef:
+                type: string
               globalFilters:
                 items:
                   properties:

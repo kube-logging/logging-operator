@@ -59,6 +59,11 @@ Override generated config. This is a *raw* configuration string for troubleshoot
 FluentbitAgent daemonset configuration. Deprecated, will be removed with next major version Migrate to the standalone NodeAgent resource 
 
 
+### fluentdRef (string, optional) {#loggingspec-fluentdref}
+
+Fluentd statefulset configuration reference by name 
+
+
 ### fluentd (*FluentdSpec, optional) {#loggingspec-fluentd}
 
 Fluentd statefulset configuration 
