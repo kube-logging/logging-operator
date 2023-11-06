@@ -113,7 +113,7 @@ affinity: {}
 # -- Define which Nodes the Pods are scheduled on.
 podLabels: {}
 
-# -- Logging resources configuration.
+# Logging resources configuration.
 logging:
 
   # -- Logging resources are disabled by default
@@ -229,20 +229,37 @@ logging:
   #           type: json
   #         default_topic: topic
 
-  # -- EventTailer config
-  eventTailer: {}
-    # name: sample
-    # image:
-    #   repository: "ghcr.io/kube-logging/eventrouter"
-    #   tag: "0.4.0"
-    #   pullPolicy: IfNotPresent
-    #   imagePullSecrets: []
-    # pvc:
-    #   accessModes:
-    #     - ReadWriteOnce
-    #   volumeMode: Filesystem
-  #   storage: 1Gi
-  #   storageClassName: standard
+  # EventTailer config
+  eventTailer:
+    create: false
+    name: event-tailer
+    image:
+      # -- repository of eventTailer image
+      repository:
+      # -- tag of eventTailer image
+      tag:
+      # -- pullPolicy of eventTailer image
+      pullPolicy:
+      # -- imagePullSecrets of eventTailer image
+      imagePullSecrets:
+    pvc:
+      # -- enable pvc for 
+      enabled: true
+      # -- storage class for event tailer pvc
+      accessModes:
+        - ReadWriteOnce
+      # -- storage class for event tailer pvc
+      volumeMode: Filesystem
+      # -- storage for event tailer pvc
+      storage: 1Gi
+      # -- storage class for event tailer pvc
+      storageClassName:
+    # -- workloadMetaOverrides
+    workloadMetaOverrides:
+    # -- workloadOverrides
+    workloadOverrides:
+    # -- containerOverrides
+    containerOverrides:
 
   # -- HostTailer config
   hostTailer: {}

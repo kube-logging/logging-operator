@@ -64,7 +64,6 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | tolerations | list | `[]` | Node Tolerations |
 | affinity | object | `{}` | Node Affinity |
 | podLabels | object | `{}` | Define which Nodes the Pods are scheduled on. |
-| logging | object | `{"allowClusterResourcesFromAllNamespaces":false,"clusterDomain":"cluster.local.","clusterFlows":[],"clusterOutputs":[],"configCheck":{},"controlNamespace":"","defaultFlow":{},"enableRecreateWorkloadOnImmutableFieldChange":false,"enabled":false,"errorOutputRef":"","eventTailer":{},"flowConfigCheckDisabled":false,"flowConfigOverride":"","fluentbit":{},"fluentbitDisabled":false,"fluentd":{},"fluentdDisabled":false,"globalFilters":[],"hostTailer":{},"loggingRef":"","nodeAgents":{},"skipInvalidResources":false,"syslogNG":{},"watchNamespaceSelector":{},"watchNamespaces":[]}` | Logging resources configuration. |
 | logging.enabled | bool | `false` | Logging resources are disabled by default |
 | logging.loggingRef | string | `""` | Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset. |
 | logging.flowConfigCheckDisabled | bool | `false` | Disable configuration check before applying new fluentd configuration. |
@@ -88,7 +87,20 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.enableRecreateWorkloadOnImmutableFieldChange | bool | `false` | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update. |
 | logging.clusterFlows | list | `[]` | ClusterFlows to deploy |
 | logging.clusterOutputs | list | `[]` | ClusterOutputs to deploy |
-| logging.eventTailer | object | `{}` | EventTailer config |
+| logging.eventTailer.create | bool | `false` |  |
+| logging.eventTailer.name | string | `"event-tailer"` |  |
+| logging.eventTailer.image.repository | string | `nil` | repository of eventTailer image |
+| logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |
+| logging.eventTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
+| logging.eventTailer.image.imagePullSecrets | string | `nil` | imagePullSecrets of eventTailer image |
+| logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for  |
+| logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | storage class for event tailer pvc |
+| logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | storage class for event tailer pvc |
+| logging.eventTailer.pvc.storage | string | `"1Gi"` | storage for event tailer pvc |
+| logging.eventTailer.pvc.storageClassName | string | `nil` | storage class for event tailer pvc |
+| logging.eventTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides |
+| logging.eventTailer.workloadOverrides | string | `nil` | workloadOverrides |
+| logging.eventTailer.containerOverrides | string | `nil` | containerOverrides |
 | logging.hostTailer | object | `{}` | HostTailer config |
 | testReceiver.enabled | bool | `false` |  |
 | testReceiver.image | string | `"fluent/fluent-bit"` |  |
