@@ -101,7 +101,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "http-metrics",
-					Path:                 r.Logging.GetFluentdMetricsPath(),
+					Path:                 r.Logging.Spec.FluentdSpec.GetFluentdMetricsPath(),
 					Interval:             v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Interval),
 					ScrapeTimeout:        v1.Duration(r.Logging.Spec.FluentdSpec.Metrics.Timeout),
 					HonorLabels:          r.Logging.Spec.FluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
