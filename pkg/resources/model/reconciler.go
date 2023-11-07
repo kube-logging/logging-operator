@@ -158,6 +158,15 @@ func NewValidationReconciler(
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
+		if resources.Fluentd.Configuration != nil && resources.Logging.Spec.FluentdSpec != nil {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration found is set as well, clearing inline", resources.Fluentd.Configuration.Name))
+			resources.Logging.Spec.FluentdSpec = nil
+		}
+
+		if fluentd := resources.GetFluentd(); fluentd != nil {
+			registerForPatching(fluentd)
+		}
+
 		for i := range resources.SyslogNG.ClusterFlows {
 			flow := &resources.SyslogNG.ClusterFlows[i]
 			registerForPatching(flow)

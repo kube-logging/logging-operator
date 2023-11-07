@@ -16,6 +16,7 @@ package fluentd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 
@@ -53,23 +54,24 @@ func generateConfig(input fluentdConfig) (string, error) {
 }
 
 func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	input := fluentdConfig{
-		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
-		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
-		EnableMsgpackTimeSupport:  r.Logging.Spec.FluentdSpec.EnableMsgpackTimeSupport,
-		Workers:                   r.Logging.Spec.FluentdSpec.Workers,
-		LogLevel:                  r.Logging.Spec.FluentdSpec.LogLevel,
+		IgnoreSameLogInterval:     fluentdSpec.IgnoreSameLogInterval,
+		IgnoreRepeatedLogInterval: fluentdSpec.IgnoreRepeatedLogInterval,
+		EnableMsgpackTimeSupport:  fluentdSpec.EnableMsgpackTimeSupport,
+		Workers:                   fluentdSpec.Workers,
+		LogLevel:                  fluentdSpec.LogLevel,
 	}
 
-	input.RootDir = r.Logging.Spec.FluentdSpec.RootDir
+	input.RootDir = fluentdSpec.RootDir
 	if input.RootDir == "" {
 		input.RootDir = bufferPath
 	}
 
-	if r.Logging.Spec.FluentdSpec.Metrics != nil {
+	if fluentdSpec.Metrics != nil {
 		input.Monitor.Enabled = true
-		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
-		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
+		input.Monitor.Port = fluentdSpec.Metrics.Port
+		input.Monitor.Path = fluentdSpec.Metrics.Path
 	}
 
 	inputConfig, err := generateConfig(input)
@@ -87,10 +89,11 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
 	configMap, err := r.generateConfigSecret()
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	if err != nil {
 		return nil, nil, err
 	}
-	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
+	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, fluentdSpec.FluentLogDestination))
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data:       configMap,

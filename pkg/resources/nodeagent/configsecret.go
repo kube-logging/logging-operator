@@ -318,6 +318,10 @@ func generateUpstreamConfig(input fluentBitConfig) (string, error) {
 }
 
 func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
+	fluentdSpec := n.logging.Spec.FluentdSpec
+	if detachedFluentd := fluentd.GetFluentd(context.TODO(), n.reconciler.Client, n.reconciler.Log, n.logging.Spec.ControlNamespace); detachedFluentd != nil {
+		fluentdSpec = &detachedFluentd.Spec
+	}
 	podName := n.FluentdQualifiedName(fmt.Sprintf("%s-%d", fluentd.ComponentFluentd, index))
 	return upstreamNode{
 		Name: podName,
@@ -326,6 +330,6 @@ func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
 			n.logging.Spec.ControlNamespace,
 			n.logging.ClusterDomainAsSuffix()),
-		Port: n.logging.Spec.FluentdSpec.Port,
+		Port: fluentdSpec.Port,
 	}
 }

@@ -82,9 +82,40 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
+func GetFluentd(ctx context.Context, Client client.Client, log logr.Logger, controlNamespace string) *v1beta1.Fluentd {
+	fluentdList := v1beta1.FluentdList{}
+	// Detached fluentd must be in the `control namespace`
+	nsOpt := client.InNamespace(controlNamespace)
+
+	if err := Client.List(ctx, &fluentdList, nsOpt); err != nil {
+		log.Error(err, "listing fluentd configuration")
+		return nil
+	}
+
+	if len(fluentdList.Items) > 1 {
+		log.Error(errors.New("multiple fluentd configurations found"), fmt.Sprintf("number of configurations: %d", len(fluentdList.Items)))
+		return nil
+	}
+
+	if len(fluentdList.Items) == 1 {
+		return &fluentdList.Items[0]
+	}
+	return nil
+}
+
+func (r *Reconciler) GetFluentdSpec(ctx context.Context) *v1beta1.FluentdSpec {
+	fluentdSpec := r.Logging.Spec.FluentdSpec
+	if detachedFluentd := GetFluentd(ctx, r.Client, r.Log, r.Logging.Spec.ControlNamespace); detachedFluentd != nil {
+		fluentdSpec = &detachedFluentd.Spec
+	}
+	return fluentdSpec
+}
+
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentdSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.FluentdSpec.Security.ServiceAccount
+	ctx := context.TODO()
+	fluentdSpec := r.GetFluentdSpec(ctx)
+	if fluentdSpec.Security.ServiceAccount != "" {
+		return fluentdSpec.Security.ServiceAccount
 	}
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
@@ -102,6 +133,11 @@ func New(client client.Client, log logr.Logger,
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
+
+	fluentdSpec := r.GetFluentdSpec(ctx)
+	if err := fluentdSpec.SetDefaults(); err != nil {
+		return &reconcile.Result{}, err
+	}
 
 	objects := []resources.Resource{
 		r.serviceAccount,
@@ -265,13 +301,14 @@ func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, r
 }
 
 func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, error) {
-	if r.Logging.Spec.FluentdSpec.DisablePvc || !r.Logging.Spec.FluentdSpec.Scaling.Drain.Enabled {
+	fluentdSpec := r.GetFluentdSpec(ctx)
+	if fluentdSpec.DisablePvc || !fluentdSpec.Scaling.Drain.Enabled {
 		r.Log.Info("fluentd buffer draining is disabled")
 		return nil, nil
 	}
 
 	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd)
+	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec)
 
 	var pvcList corev1.PersistentVolumeClaimList
 	if err := r.Client.List(ctx, &pvcList, nsOpt,
@@ -286,7 +323,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		return nil, errors.WrapIf(err, "listing StatefulSet pods")
 	}
 
-	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+	bufVolName := r.Logging.QualifiedName(fluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
 	pvcsInUse := make(map[string]bool)
 	for _, pod := range stsPods.Items {
@@ -306,7 +343,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	var jobList batchv1.JobList
-	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer))); err != nil {
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer, *fluentdSpec))); err != nil {
 		return nil, errors.WrapIf(err, "listing buffer drainer jobs")
 	}
 
@@ -350,7 +387,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 				continue
 			}
 
-			if r.Logging.Spec.FluentdSpec.Scaling.Drain.DeleteVolume {
+			if fluentdSpec.Scaling.Drain.DeleteVolume {
 				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &pvc, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
 					cr.CombineErr(errors.WrapIfWithDetails(err, "deleting drained PVC", "pvc", pvc.Name))
 					continue

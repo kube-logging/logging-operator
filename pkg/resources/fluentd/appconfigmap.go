@@ -42,8 +42,9 @@ type ConfigCheckResult struct {
 
 func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
 	data := make(map[string][]byte)
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	if fluentdSpec.CompressConfigFile {
 		AppConfigKeyCompress := AppConfigKey + ".gz"
 		data[AppConfigKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
@@ -203,11 +204,12 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	data, err := r.generateConfigSecret()
 	if err != nil {
 		return nil, err
 	}
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	if fluentdSpec.CompressConfigFile {
 		ConfigCheckKeyCompress := ConfigCheckKey + ".gz"
 		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
@@ -222,8 +224,9 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 
 func (r *Reconciler) newCheckSecretAppConfig(hashKey string) (*corev1.Secret, error) {
 	data := make(map[string][]byte)
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	if fluentdSpec.CompressConfigFile {
 		ConfigCheckKeyCompress := ConfigCheckKey + ".gz"
 		data[ConfigCheckKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
@@ -252,38 +255,39 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 	volumes := r.volumesCheckPod(hashKey)
 	container := r.containerCheckPod(hashKey)
 	initContainer := r.initContainerCheckPod()
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
 	pod := &corev1.Pod{
 		ObjectMeta: r.configCheckPodObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccount(),
-			NodeSelector:       r.Logging.Spec.FluentdSpec.NodeSelector,
-			Tolerations:        r.Logging.Spec.FluentdSpec.Tolerations,
-			Affinity:           r.Logging.Spec.FluentdSpec.Affinity,
-			PriorityClassName:  r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+			NodeSelector:       fluentdSpec.NodeSelector,
+			Tolerations:        fluentdSpec.Tolerations,
+			Affinity:           fluentdSpec.Affinity,
+			PriorityClassName:  fluentdSpec.PodPriorityClassName,
 			SecurityContext: &corev1.PodSecurityContext{
-				RunAsNonRoot:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-				FSGroup:        r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
-				RunAsUser:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
-				RunAsGroup:     r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
-				SeccompProfile: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.SeccompProfile,
+				RunAsNonRoot:   fluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+				FSGroup:        fluentdSpec.Security.PodSecurityContext.FSGroup,
+				RunAsUser:      fluentdSpec.Security.PodSecurityContext.RunAsUser,
+				RunAsGroup:     fluentdSpec.Security.PodSecurityContext.RunAsGroup,
+				SeccompProfile: fluentdSpec.Security.PodSecurityContext.SeccompProfile,
 			},
 			Volumes:          volumes,
-			ImagePullSecrets: r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
+			ImagePullSecrets: fluentdSpec.Image.ImagePullSecrets,
 			InitContainers:   initContainer,
 			Containers:       container,
 		},
 	}
-	if r.Logging.Spec.FluentdSpec.ConfigCheckAnnotations != nil {
-		pod.Annotations = r.Logging.Spec.FluentdSpec.ConfigCheckAnnotations
+	if fluentdSpec.ConfigCheckAnnotations != nil {
+		pod.Annotations = fluentdSpec.ConfigCheckAnnotations
 	}
-	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
+	if fluentdSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
 			Name: "fluentd-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.FluentdSpec.TLS.SecretName,
+					SecretName: fluentdSpec.TLS.SecretName,
 				},
 			},
 		}
@@ -294,7 +298,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 		}
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
-	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+	for _, n := range fluentdSpec.ExtraVolumes {
 		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
 			r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
 		}
@@ -304,6 +308,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 }
 
 func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	v = []corev1.Volume{
 		{
 			Name: "config",
@@ -323,7 +328,7 @@ func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
 		},
 	}
 
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	if fluentdSpec.CompressConfigFile {
 		v = append(v, corev1.Volume{
 			Name: "app-config",
 			VolumeSource: corev1.VolumeSource{
@@ -372,15 +377,16 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 		}
 	}
 
-	containerArgs = append(containerArgs, r.Logging.Spec.FluentdSpec.ExtraArgs...)
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	containerArgs = append(containerArgs, fluentdSpec.ExtraArgs...)
 
 	container := []corev1.Container{
 		{
 			Name:            "fluentd",
-			Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
+			Image:           fluentdSpec.Image.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(fluentdSpec.Image.PullPolicy),
 			Args:            containerArgs,
-			Env:             r.Logging.Spec.FluentdSpec.EnvVars,
+			Env:             fluentdSpec.EnvVars,
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      "config",
@@ -395,8 +401,8 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 					MountPath: OutputSecretPath,
 				},
 			},
-			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
-			Resources:       r.Logging.Spec.FluentdSpec.ConfigCheckResources,
+			SecurityContext: fluentdSpec.Security.SecurityContext,
+			Resources:       fluentdSpec.ConfigCheckResources,
 		},
 	}
 
@@ -405,13 +411,14 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 
 func (r *Reconciler) initContainerCheckPod() []corev1.Container {
 	var initContainer []corev1.Container
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	if fluentdSpec.CompressConfigFile {
 		initContainer = []corev1.Container{
 			{
 				Name:            "config-reloader",
-				Image:           r.Logging.Spec.FluentdSpec.ConfigReloaderImage.RepositoryWithTag(),
-				ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
-				Resources:       r.Logging.Spec.FluentdSpec.ConfigReloaderResources,
+				Image:           fluentdSpec.ConfigReloaderImage.RepositoryWithTag(),
+				ImagePullPolicy: corev1.PullPolicy(fluentdSpec.Image.PullPolicy),
+				Resources:       fluentdSpec.ConfigReloaderResources,
 				Args: []string{
 					"--init-mode=true",
 					"--volume-dir-archive=/tmp/archive",

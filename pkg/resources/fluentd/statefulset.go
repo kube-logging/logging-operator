@@ -15,6 +15,7 @@
 package fluentd
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -31,24 +32,25 @@ import (
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	spec := r.statefulsetSpec()
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
-	r.Logging.Spec.FluentdSpec.BufferStorageVolume.WithDefaultHostPath(
+	fluentdSpec.BufferStorageVolume.WithDefaultHostPath(
 		fmt.Sprintf(v1beta1.HostPath, r.Logging.Name, r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName)),
 	)
-	if !r.Logging.Spec.FluentdSpec.DisablePvc {
-		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
+	if !fluentdSpec.DisablePvc {
+		err := fluentdSpec.BufferStorageVolume.ApplyPVCForStatefulSet(containerName, bufferPath, spec, func(name string) metav1.ObjectMeta {
 			return r.FluentdObjectMeta(name, ComponentFluentd)
 		})
 		if err != nil {
 			return nil, reconciler.StatePresent, err
 		}
 	} else {
-		err := r.Logging.Spec.FluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName), containerName, bufferPath, &spec.Template.Spec)
+		err := fluentdSpec.BufferStorageVolume.ApplyVolumeForPodSpec(r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName), containerName, bufferPath, &spec.Template.Spec)
 		if err != nil {
 			return nil, reconciler.StatePresent, err
 		}
 	}
-	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+	for _, n := range fluentdSpec.ExtraVolumes {
 		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil {
 			if err := n.Volume.ApplyPVCForStatefulSet(n.ContainerName, n.Path, spec, func(name string) metav1.ObjectMeta {
 				return r.FluentdObjectMeta(name, ComponentFluentd)
@@ -67,12 +69,15 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		Spec:       *spec,
 	}
 
-	desired.Annotations = util.MergeLabels(desired.Annotations, r.Logging.Spec.FluentdSpec.StatefulSetAnnotations)
+	desired.Annotations = util.MergeLabels(desired.Annotations, fluentdSpec.StatefulSetAnnotations)
 
 	return desired, reconciler.StatePresent, nil
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
+	ctx := context.TODO()
+	fluentdSpec := r.GetFluentdSpec(ctx)
+
 	var initContainers []corev1.Container
 
 	if c := r.tmpDirHackContainer(); c != nil {
@@ -81,13 +86,13 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	if c := r.volumeMountHackContainer(); c != nil {
 		initContainers = append(initContainers, *c)
 	}
-	if i := generateInitContainer(r.Logging.Spec.FluentdSpec); i != nil {
+	if i := generateInitContainer(fluentdSpec); i != nil {
 		initContainers = append(initContainers, *i)
 	}
 
 	containers := []corev1.Container{
-		fluentContainer(r.Logging.Spec.FluentdSpec),
-		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
+		fluentContainer(fluentdSpec),
+		*newConfigMapReloader(fluentdSpec),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -97,9 +102,9 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	sts := &appsv1.StatefulSetSpec{
-		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.FluentdSpec.Scaling.PodManagementPolicy),
+		PodManagementPolicy: appsv1.PodManagementPolicyType(fluentdSpec.Scaling.PodManagementPolicy),
 		Selector: &metav1.LabelSelector{
-			MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd),
+			MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: r.generatePodMeta(),
@@ -107,29 +112,29 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				Volumes:                   r.generateVolume(),
 				ServiceAccountName:        r.getServiceAccount(),
 				InitContainers:            initContainers,
-				ImagePullSecrets:          r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
+				ImagePullSecrets:          fluentdSpec.Image.ImagePullSecrets,
 				Containers:                containers,
-				NodeSelector:              r.Logging.Spec.FluentdSpec.NodeSelector,
-				Tolerations:               r.Logging.Spec.FluentdSpec.Tolerations,
-				Affinity:                  r.Logging.Spec.FluentdSpec.Affinity,
-				TopologySpreadConstraints: r.Logging.Spec.FluentdSpec.TopologySpreadConstraints,
-				PriorityClassName:         r.Logging.Spec.FluentdSpec.PodPriorityClassName,
-				DNSPolicy:                 r.Logging.Spec.FluentdSpec.DNSPolicy,
-				DNSConfig:                 r.Logging.Spec.FluentdSpec.DNSConfig,
+				NodeSelector:              fluentdSpec.NodeSelector,
+				Tolerations:               fluentdSpec.Tolerations,
+				Affinity:                  fluentdSpec.Affinity,
+				TopologySpreadConstraints: fluentdSpec.TopologySpreadConstraints,
+				PriorityClassName:         fluentdSpec.PodPriorityClassName,
+				DNSPolicy:                 fluentdSpec.DNSPolicy,
+				DNSConfig:                 fluentdSpec.DNSConfig,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:        r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:     r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
-					SeccompProfile: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.SeccompProfile,
+					RunAsNonRoot:   fluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+					FSGroup:        fluentdSpec.Security.PodSecurityContext.FSGroup,
+					RunAsUser:      fluentdSpec.Security.PodSecurityContext.RunAsUser,
+					RunAsGroup:     fluentdSpec.Security.PodSecurityContext.RunAsGroup,
+					SeccompProfile: fluentdSpec.Security.PodSecurityContext.SeccompProfile,
 				},
 			},
 		},
 		ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 	}
 
-	if r.Logging.Spec.FluentdSpec.Scaling.Replicas > 0 {
-		sts.Replicas = util.IntPointer(cast.ToInt32(r.Logging.Spec.FluentdSpec.Scaling.Replicas))
+	if fluentdSpec.Scaling.Replicas > 0 {
+		sts.Replicas = util.IntPointer(cast.ToInt32(fluentdSpec.Scaling.Replicas))
 	}
 
 	return sts
@@ -168,11 +173,12 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 }
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	meta := metav1.ObjectMeta{
-		Labels: r.Logging.GetFluentdLabels(ComponentFluentd),
+		Labels: r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
 	}
-	if r.Logging.Spec.FluentdSpec.Annotations != nil {
-		meta.Annotations = r.Logging.Spec.FluentdSpec.Annotations
+	if fluentdSpec.Annotations != nil {
+		meta.Annotations = fluentdSpec.Annotations
 	}
 	return meta
 }
@@ -285,6 +291,7 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 }
 
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	v = []corev1.Volume{
 		{
 			Name: "config",
@@ -304,14 +311,14 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
-	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
+	if isFluentdReadOnlyRootFilesystem(fluentdSpec) {
 		v = append(v, corev1.Volume{
 			Name:         "tmp",
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
 	}
 
-	if r.Logging.Spec.FluentdSpec.CompressConfigFile {
+	if fluentdSpec.CompressConfigFile {
 		v = append(v, corev1.Volume{
 			Name: "app-config",
 			VolumeSource: corev1.VolumeSource{
@@ -337,12 +344,12 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		})
 	}
 
-	if r.Logging.Spec.FluentdSpec.TLS.Enabled {
+	if fluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.FluentdSpec.TLS.SecretName,
+					SecretName: fluentdSpec.TLS.SecretName,
 				},
 			},
 		}
@@ -352,14 +359,15 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
-	if isFluentdReadOnlyRootFilesystem(r.Logging.Spec.FluentdSpec) {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	if isFluentdReadOnlyRootFilesystem(fluentdSpec) {
 		return &corev1.Container{
 			Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
-			Image:           r.Logging.Spec.FluentdSpec.Image.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Image.PullPolicy),
+			Image:           fluentdSpec.Image.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(fluentdSpec.Image.PullPolicy),
 			Name:            "tmp-dir-hack",
-			Resources:       r.Logging.Spec.FluentdSpec.Resources,
-			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
+			Resources:       fluentdSpec.Resources,
+			SecurityContext: fluentdSpec.Security.SecurityContext,
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      "tmp",
@@ -371,11 +379,12 @@ func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
 }
 
 func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
-	if r.Logging.Spec.FluentdSpec.VolumeMountChmod {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	if fluentdSpec.VolumeMountChmod {
 		return &corev1.Container{
 			Name:            "volume-mount-hack",
-			Image:           r.Logging.Spec.FluentdSpec.VolumeModImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.VolumeModImage.PullPolicy),
+			Image:           fluentdSpec.VolumeModImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(fluentdSpec.VolumeModImage.PullPolicy),
 			Command:         []string{"sh", "-c", "chmod -R 777 " + bufferPath},
 			VolumeMounts: []corev1.VolumeMount{
 				{
@@ -389,15 +398,17 @@ func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics != nil {
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+
+	if fluentdSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port != 0 {
-			port = r.Logging.Spec.FluentdSpec.BufferVolumeMetrics.Port
+		if fluentdSpec.BufferVolumeMetrics.Port != 0 {
+			port = fluentdSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
 		args := []string{portParam}
-		if len(r.Logging.Spec.FluentdSpec.BufferVolumeArgs) != 0 {
-			args = append(args, r.Logging.Spec.FluentdSpec.BufferVolumeArgs...)
+		if len(fluentdSpec.BufferVolumeArgs) != 0 {
+			args = append(args, fluentdSpec.BufferVolumeArgs...)
 		} else {
 			args = append(args, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/")
 		}
@@ -407,8 +418,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
-			Image:           r.Logging.Spec.FluentdSpec.BufferVolumeImage.RepositoryWithTag(),
-			ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.BufferVolumeImage.PullPolicy),
+			Image:           fluentdSpec.BufferVolumeImage.RepositoryWithTag(),
+			ImagePullPolicy: corev1.PullPolicy(fluentdSpec.BufferVolumeImage.PullPolicy),
 			Args: []string{
 				"--exec", nodeExporterCmd,
 				"--exec", bufferSizeCmd,
@@ -419,15 +430,15 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					Value: bufferPath,
 				},
 			},
-			Ports: generatePortsBufferVolumeMetrics(r.Logging.Spec.FluentdSpec),
+			Ports: generatePortsBufferVolumeMetrics(fluentdSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.bufferVolumeName(),
 					MountPath: bufferPath,
 				},
 			},
-			Resources:       r.Logging.Spec.FluentdSpec.BufferVolumeResources,
-			SecurityContext: r.Logging.Spec.FluentdSpec.Security.SecurityContext,
+			Resources:       fluentdSpec.BufferVolumeResources,
+			SecurityContext: fluentdSpec.Security.SecurityContext,
 		}
 	}
 	return nil
@@ -435,8 +446,9 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 
 func (r *Reconciler) bufferVolumeName() string {
 	volumeName := r.Logging.QualifiedName(v1beta1.DefaultFluentdBufferStorageVolumeName)
-	if r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim != nil {
-		volumeName = r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	if fluentdSpec.BufferStorageVolume.PersistentVolumeClaim != nil {
+		volumeName = r.Logging.QualifiedName(fluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 	}
 	return volumeName
 }

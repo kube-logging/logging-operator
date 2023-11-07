@@ -100,7 +100,11 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 		if err := r.resourceReconciler.Client.Get(ctx, types.NamespacedName{Name: t.Name}, logging); err != nil {
 			return errors.WrapIf(err, "getting logging resource")
 		}
-		if logging.Spec.FluentdSpec != nil {
+		fluentdSpec := logging.Spec.FluentdSpec
+		if detachedFluentd := fluentd.GetFluentd(ctx, r.resourceReconciler.Client, r.logger, logging.Spec.ControlNamespace); detachedFluentd != nil {
+			fluentdSpec = &detachedFluentd.Spec
+		}
+		if fluentdSpec != nil {
 			if input.FluentForwardOutput == nil {
 				input.FluentForwardOutput = &fluentForwardOutputConfig{}
 			}

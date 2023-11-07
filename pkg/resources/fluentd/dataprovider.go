@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"emperror.dev/errors"
+	"github.com/go-logr/logr"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -37,9 +38,13 @@ func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvid
 }
 
 func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
-	if p.logging.Spec.FluentdSpec != nil {
+	fluentdSpec := p.logging.Spec.FluentdSpec
+	if detachedFluentd := GetFluentd(ctx, p.client, logr.Logger{}, p.logging.Spec.ControlNamespace); detachedFluentd != nil {
+		fluentdSpec = &detachedFluentd.Spec
+	}
+	if fluentdSpec != nil {
 		sts := &v1.StatefulSet{}
-		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
+		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd, *fluentdSpec)
 		err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 		if err != nil {
 			return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")

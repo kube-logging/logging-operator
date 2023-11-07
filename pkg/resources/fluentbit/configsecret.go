@@ -184,6 +184,10 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
 	ctx := context.TODO()
+	fluentdSpec := r.Logging.Spec.FluentdSpec
+	if detachedFluentd := fluentd.GetFluentd(ctx, r.resourceReconciler.Client, r.resourceReconciler.Log, r.Logging.Spec.ControlNamespace); detachedFluentd != nil {
+		fluentdSpec = &detachedFluentd.Spec
+	}
 
 	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
@@ -239,7 +243,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if r.Logging.Spec.FluentdSpec != nil {
+	if fluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost
 		if fluentbitTargetHost == "" {
 			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
