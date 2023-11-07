@@ -29,11 +29,21 @@ type LoggingResources struct {
 	WatchNamespaces []string
 }
 
+func (l LoggingResources) FluentdSpec() *v1beta1.FluentdSpec {
+	if l.Fluentd.Configuration != nil {
+		return &l.Fluentd.Configuration.Spec
+	} else if l.Logging.Spec.FluentdSpec != nil {
+		return l.Logging.Spec.FluentdSpec
+	}
+	return nil
+}
+
 type FluentdLoggingResources struct {
 	ClusterFlows   []v1beta1.ClusterFlow
 	ClusterOutputs ClusterOutputs
 	Flows          []v1beta1.Flow
 	Outputs        Outputs
+	Configuration  *v1beta1.FluentdConfig
 }
 
 type SyslogNGLoggingResources struct {

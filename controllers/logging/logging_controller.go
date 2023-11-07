@@ -175,7 +175,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
 
-	if logging.Spec.FluentdSpec != nil {
+	fluentdSpec := loggingResources.FluentdSpec()
+	if fluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
