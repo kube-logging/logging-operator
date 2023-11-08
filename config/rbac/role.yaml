@@ -240,7 +240,9 @@ rules:
   - clusterflows
   - clusteroutputs
   - flows
+  - fluentbitagents
   - loggings
+  - nodeagents
   - outputs
   verbs:
   - create
@@ -256,8 +258,30 @@ rules:
   - clusterflows/status
   - clusteroutputs/status
   - flows/status
+  - fluentbitagents/status
   - loggings/status
+  - nodeagents/status
   - outputs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - loggingroutes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - loggingroutes/status
   verbs:
   - get
   - patch

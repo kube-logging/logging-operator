@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Amazon Kinesis"
@@ -48,8 +48,8 @@ type _docKinesisFirehose interface{} //nolint:deadcode,unused
 type _metaKinesisFirehose interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"KinesisStream"
-// Send your logs to a Kinesis Stream
+// +docName:"KinesisFirehose"
+// Send your logs to a Kinesis Firehose
 type KinesisFirehoseOutputConfig struct {
 	// Name of the delivery stream to put data.
 	DeliveryStreamName string `json:"delivery_stream_name"`

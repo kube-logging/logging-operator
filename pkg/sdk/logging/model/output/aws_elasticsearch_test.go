@@ -17,10 +17,11 @@ package output_test
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/require"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 )
 
 func TestAwsElasticsearch(t *testing.T) {

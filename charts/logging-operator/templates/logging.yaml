@@ -1,0 +1,57 @@
+{{ if .Values.logging.enabled -}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: {{ include "logging-operator.releasename" . }}
+  labels:
+{{ include "logging-operator.labels" . | indent 4 }}
+spec:
+  {{- with .Values.logging.loggingRef }}
+  loggingRef: {{ . }}
+  {{- end }}
+  {{- with .Values.logging.flowConfigCheckDisabled }}
+  flowConfigCheckDisabled: {{ . }}
+  {{- end }}
+  {{- with .Values.logging.skipInvalidResources }}
+  skipInvalidResources: {{ . }}
+  {{- end }}
+  {{- with .Values.logging.flowConfigOverride }}
+  flowConfigOverride: {{ . }}
+  {{- end }}
+  {{- if (not .Values.logging.fluentdDisabled) }}
+  {{- if .Values.logging.fluentd }}
+  fluentd: {{- toYaml .Values.logging.fluentd | nindent 4 }}
+  {{- else }}
+  fluentd: {}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.logging.syslogNG }}
+  syslogNG: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.logging.defaultFlow }}
+  defaultFlow: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.logging.errorOutputRef }}
+  errorOutputRef: {{ . }}
+  {{- end }}
+  {{- with .Values.logging.globalFilters }}
+  globalFilters: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.logging.watchNamespaces }}
+  watchNamespaces: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.logging.watchNamespaceSelector }}
+  watchNamespaceSelector: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  clusterDomain: {{ .Values.logging.clusterDomain }}
+  controlNamespace: {{ .Values.logging.controlNamespace | default .Release.Namespace }}
+  {{- with .Values.logging.allowClusterResourcesFromAllNamespaces }}
+  allowClusterResourcesFromAllNamespaces: {{ . }}
+  {{- end }}
+  {{- with .Values.logging.nodeAgents }}
+  nodeAgents: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
+  enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
+  {{- end }}
+{{- end }}

@@ -16,6 +16,10 @@ package fluentbit
 
 const BaseConfigName = "fluent-bit.conf"
 const UpstreamConfigName = "upstream.conf"
+const CustomParsersConfigName = "custom-parsers.conf"
+const StockConfigPath = "/fluent-bit/etc"
+const StockBinPath = "/fluent-bit/bin/fluent-bit"
+const OperatorConfigPath = "/fluent-bit/etc-operator"
 
 var fluentBitConfigTemplate = `
 [SERVICE]
@@ -23,7 +27,10 @@ var fluentBitConfigTemplate = `
     Grace        {{ .Grace }}
     Daemon       Off
     Log_Level    {{ .LogLevel }}
-    Parsers_File parsers.conf
+    Parsers_File {{ .DefaultParsers }}
+    {{- if .CustomParsers }}
+    Parsers_File {{ .CustomParsers }}
+    {{- end }}
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
@@ -33,6 +40,18 @@ var fluentBitConfigTemplate = `
     {{- range $key, $value := .BufferStorage }}
     {{- if $value }}
     {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
+    {{- if .HealthCheck }}
+    Health_Check On
+    {{- if.HealthCheck.HCErrorsCount }}
+    HC_Errors_Count {{ .HealthCheck.HCErrorsCount }}
+    {{- end }}
+    {{- if.HealthCheck.HCRetryFailureCount }}
+    HC_Retry_Failure_Count {{ .HealthCheck.HCRetryFailureCount }}
+    {{- end }}
+    {{- if.HealthCheck.HCPeriod }}
+    HC_Period {{ .HealthCheck.HCPeriod }}
     {{- end }}
     {{- end }}
 
@@ -63,7 +82,6 @@ var fluentBitConfigTemplate = `
 {{- end}}
 
 {{- if .AwsFilter }}
-
 [FILTER]
     Name        aws
     {{- range $key, $value := .AwsFilter }}
@@ -89,56 +107,35 @@ var fluentBitConfigTemplate = `
     {{- end }}
 {{- end}}
 
-{{- with .FluentForwardOutput }}
+{{- with $out := .FluentForwardOutput }}
+{{- range $target := $out.Targets }}
 [OUTPUT]
     Name          forward
+    {{- if $target.AllNamespaces }}
     Match         *
-    {{- if .Upstream.Enabled }}
-    Upstream      upstream.conf
     {{- else }}
-    Host          {{ .TargetHost }}
-    Port          {{ .TargetPort }}
+    Match_Regex {{ $target.NamespaceRegex }}
     {{- end }}
-    {{ if .TLS.Enabled }}
+    {{- if $out.Upstream.Enabled }}
+    Upstream      {{ $out.Upstream.Config.Path }}
+    {{- else }}
+    Host          {{ $target.Host }}
+    Port          {{ $target.Port }}
+    {{- end }}
+    {{- if $out.TLS.Enabled }}
     tls           On
     tls.verify    Off
     tls.ca_file   /fluent-bit/tls/ca.crt
     tls.crt_file  /fluent-bit/tls/tls.crt
     tls.key_file  /fluent-bit/tls/tls.key
-    {{- if .TLS.SharedKey }}
-    Shared_Key    {{ .TLS.SharedKey }}
+    {{- if $out.TLS.SharedKey }}
+    Shared_Key    {{ $out.TLS.SharedKey }}
     {{- else }}
     Empty_Shared_Key true
     {{- end }}
     {{- end }}
-    {{- if .Network.ConnectTimeoutSet }}
-    net.connect_timeout {{.Network.ConnectTimeout}}
-    {{- end }}
-    {{- if .Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
-    {{- end }}
-    {{- if .Network.DNSMode }}
-    net.dns.mode {{.Network.DNSMode}}
-    {{- end }}
-    {{- if .Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
-    {{- end }}
-    {{- if .Network.DNSResolver }}
-    net.dns.resolver {{.Network.DNSResolver}}
-    {{- end }}
-    {{- if .Network.KeepaliveSet}}
-    net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
-    {{- end }}
-    {{- if .Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
-    {{- end }}
-    {{- if .Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
-    {{- end }}
-    {{- if .Network.SourceAddress }}
-    net.source_address {{.Network.SourceAddress}}
-    {{- end }}
-    {{- with .Options }}
+    {{- template "network" $out }}
+    {{- with $out.Options }}
     {{- range $key, $value := . }}
     {{- if $value }}
     {{ $key }}  {{$value}}
@@ -146,51 +143,64 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 {{- end }}
+{{- end }}
 
-{{- with .SyslogNGOutput }}
+{{- with $out := .SyslogNGOutput }}
+{{- range $target := $out.Targets }}
 [OUTPUT]
     Name tcp
+    {{- if $target.AllNamespaces }}
     Match *
-    Host {{ .Host }}
-    Port {{ .Port }}
+    {{- else }}
+    Match_Regex {{ $target.NamespaceRegex }}
+    {{- end }}
+    Host {{ $target.Host }}
+    Port {{ $target.Port }}
     Format json_lines
-    {{- with .JSONDateKey }}
+    {{- with $out.JSONDateKey }}
     json_date_key {{ . }}
     {{- end }}
-    {{- with .JSONDateFormat }}
+    {{- with $out.JSONDateFormat }}
     json_date_format {{ . }}
     {{- end }}
-    {{- with .Workers }}
+    {{- with $out.Workers }}
     Workers {{ . }}
     {{- end }}
+    {{- template "network" $out }}
+{{- end }}
+{{- end }}
+`
+
+var fluentbitNetworkTemplate = `
+    {{- define "network" }}
     {{- if .Network.ConnectTimeoutSet }}
-    net.connect_timeout {{.Network.ConnectTimeout}}
+    net.connect_timeout {{ .Network.ConnectTimeout }}
     {{- end }}
     {{- if .Network.ConnectTimeoutLogErrorSet }}
-    net.connect_timeout_log_error {{.Network.ConnectTimeoutLogError}}
+    net.connect_timeout_log_error {{ .Network.ConnectTimeoutLogError }}
     {{- end }}
     {{- if .Network.DNSMode }}
-    net.dns.mode {{.Network.DNSMode}}
+    net.dns.mode {{ .Network.DNSMode }}
     {{- end }}
     {{- if .Network.DNSPreferIPV4Set }}
-    net.dns.prefer_ipv4 {{.Network.DNSPreferIPV4}}
+    net.dns.prefer_ipv4 {{ .Network.DNSPreferIPV4 }}
     {{- end }}
     {{- if .Network.DNSResolver }}
-    net.dns.resolver {{.Network.DNSResolver}}
+    net.dns.resolver {{ .Network.DNSResolver }}
     {{- end }}
     {{- if .Network.KeepaliveSet}}
     net.keepalive {{if .Network.Keepalive }}on{{else}}off{{end}}
     {{- end }}
     {{- if .Network.KeepaliveIdleTimeoutSet }}
-    net.keepalive_idle_timeout {{.Network.KeepaliveIdleTimeout}}
+    net.keepalive_idle_timeout {{ .Network.KeepaliveIdleTimeout }}
     {{- end }}
     {{- if .Network.KeepaliveMaxRecycleSet }}
-    net.keepalive_max_recycle {{.Network.KeepaliveMaxRecycle}}
+    net.keepalive_max_recycle {{ .Network.KeepaliveMaxRecycle }}
     {{- end }}
     {{- if .Network.SourceAddress }}
-    net.source_address {{.Network.SourceAddress}}
+    net.source_address {{ .Network.SourceAddress }}
     {{- end }}
-{{- end }}
+    {{- end }}
 `
 
 var upstreamConfigTemplate = `

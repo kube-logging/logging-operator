@@ -21,18 +21,10 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
+	"regexp"
 	"strings"
 
 	"emperror.dev/errors"
-	extensionsControllers "github.com/banzaicloud/logging-operator/controllers/extensions"
-	loggingControllers "github.com/banzaicloud/logging-operator/controllers/logging"
-	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
-	extensionsv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	loggingv1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1alpha1"
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/webhook/podhandler"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
@@ -41,14 +33,28 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
+	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -119,18 +125,36 @@ func main() {
 	klog.SetLogger(zapLogger)
 
 	mgrOptions := ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "logging-operator." + loggingv1beta1.GroupVersion.Group,
-		MapperProvider:     k8sutil.NewCached,
-		Port:               9443,
+		Scheme:           scheme,
+		Metrics:          metricsserver.Options{BindAddress: metricsAddr},
+		LeaderElection:   enableLeaderElection,
+		LeaderElectionID: "logging-operator." + loggingv1beta1.GroupVersion.Group,
+	}
+
+	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
+		webhookServerOptions := webhook.Options{
+			Port:    config.TailerWebhook.ServerPort,
+			CertDir: config.TailerWebhook.CertDir,
+		}
+		if port, ok := os.LookupEnv("WEBHOOK_PORT"); ok {
+			webhookServerOptions.Port = cast.ToInt(port)
+		}
+		webhookServer := webhook.NewServer(webhookServerOptions)
+		mgrOptions.WebhookServer = webhookServer
 	}
 
 	customMgrOptions, err := setupCustomCache(&mgrOptions, namespace, loggingRef)
 	if err != nil {
 		setupLog.Error(err, "unable to set up custom cache settings")
 		os.Exit(1)
+	}
+
+	if enableprofile {
+		setupLog.Info("enabling pprof")
+		pprofxIndexPath := "/debug/pprof"
+		customMgrOptions.Metrics.ExtraHandlers = map[string]http.Handler{
+			pprofxIndexPath: http.HandlerFunc(pprof.Index),
+		}
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), *customMgrOptions)
@@ -140,25 +164,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	if enableprofile {
-		setupLog.Info("enabling pprof")
-		err = mgr.AddMetricsExtraHandler("/debug/pprof/", http.HandlerFunc(pprof.Index))
-		if err != nil {
-			setupLog.Error(err, "unable to attach pprof to webserver")
-			os.Exit(1)
-		}
-	}
-
 	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {
 		setupLog.Error(err, "failed to detect container runtime")
 		os.Exit(1)
 	}
 
-	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Logging"))
+	if !PSPEnabled(mgr.GetConfig()) {
+		setupLog.Info("WARNING PodSecurityPolicies are disabled. Can be enabled manually with PSP_ENABLED=1")
+	}
+
+	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("logging"))
 
 	if err := (&extensionsControllers.EventTailerReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("EventTailer"),
+		Log:    ctrl.Log.WithName("event-tailer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "EventTailer")
@@ -166,7 +185,7 @@ func main() {
 	}
 	if err := (&extensionsControllers.HostTailerReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("HostTailer"),
+		Log:    ctrl.Log.WithName("host-tailer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HostTailer")
@@ -175,6 +194,11 @@ func main() {
 
 	if err := loggingControllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Logging")
+		os.Exit(1)
+	}
+
+	if err := loggingControllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
 		os.Exit(1)
 	}
 
@@ -191,16 +215,11 @@ func main() {
 		// Webhook server registration
 		setupLog.Info("Setting up webhook server...")
 		webhookServer := mgr.GetWebhookServer()
-		if config.TailerWebhook.ServerPort != 0 {
-			webhookServer.Port = config.TailerWebhook.ServerPort
-		}
-		if config.TailerWebhook.CertDir != "" {
-			webhookServer.CertDir = config.TailerWebhook.CertDir
-		}
 
 		setupLog.Info("Registering webhooks...")
-		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: podhandler.NewPodHandler(mgr.GetClient())})
-
+		webhookHandler := podhandler.NewPodHandler(ctrl.Log.WithName("webhook-tailer"))
+		webhookHandler.Decoder = admission.NewDecoder(mgr.GetScheme())
+		webhookServer.Register(config.TailerWebhook.ServerPath, &webhook.Admission{Handler: webhookHandler})
 	}
 
 	// +kubebuilder:scaffold:builder
@@ -209,6 +228,36 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func PSPEnabled(cfg *rest.Config) bool {
+	pspenv := os.Getenv("PSP_ENABLED")
+	if pspenv != "" {
+		return cast.ToBool(pspenv)
+	}
+	dsc, err := discovery.NewDiscoveryClientForConfig(cfg)
+	if err != nil {
+		setupLog.Error(err, "discovery client creation")
+		os.Exit(1)
+	}
+	serverVersion, err := dsc.ServerVersion()
+	if err != nil {
+		setupLog.Error(err, "server version")
+		os.Exit(1)
+	}
+	compiledVersion := regexp.MustCompile(`\d+`)
+	minorCompiled := compiledVersion.Find([]byte(serverVersion.Minor))
+	minor := cast.ToInt(string(minorCompiled))
+
+	if minor == 0 {
+		setupLog.Info("minor server detection failed, PSPs will be disabled")
+		return resources.PSPEnabled
+	}
+
+	if cast.ToInt(serverVersion.Major) == 1 && minor < 25 {
+		resources.PSPEnabled = true
+	}
+	return resources.PSPEnabled
 }
 
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {
@@ -243,30 +292,30 @@ func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef str
 		labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
 	}
 
-	selectorsByObject := cache.SelectorsByObject{
-		&corev1.Pod{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.DaemonSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.StatefulSet{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&appsv1.Deployment{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
-		},
-		&corev1.PersistentVolumeClaim{}: {
-			Field: namespaceSelector,
-			Label: labelSelector,
+	mgrOptions.Cache = cache.Options{
+		ByObject: map[client.Object]cache.ByObject{
+			&corev1.Pod{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.DaemonSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.StatefulSet{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&appsv1.Deployment{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
+			&corev1.PersistentVolumeClaim{}: {
+				Field: namespaceSelector,
+				Label: labelSelector,
+			},
 		},
 	}
-
-	mgrOptions.NewCache = cache.BuilderWithOptions(cache.Options{SelectorsByObject: selectorsByObject})
 
 	return mgrOptions, nil
 }

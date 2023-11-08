@@ -16,8 +16,8 @@ package fluentd
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"

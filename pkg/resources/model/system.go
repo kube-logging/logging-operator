@@ -19,15 +19,15 @@ import (
 	"strconv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/common"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/plugins"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/common"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
@@ -258,7 +258,7 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 
 	flowID := fmt.Sprintf("flow:%s:%s", flow.Namespace, flow.Name)
 
-	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace)
+	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace, flow.Spec.FlowLabel, flow.Spec.IncludeLabelInRouter)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +346,7 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 
 	flowID := fmt.Sprintf("clusterflow:%s:%s", flow.Namespace, flow.Name)
 
-	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace)
+	result, err := types.NewFlow(matches, flowID, flow.Name, flow.Namespace, flow.Spec.FlowLabel, flow.Spec.IncludeLabelInRouter)
 	if err != nil {
 		return nil, err
 	}
@@ -383,7 +383,7 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 
 	flowID := fmt.Sprintf("logging:%s:%s", logging.Namespace, logging.Name)
 
-	result, err := types.NewFlow([]types.FlowMatch{}, flowID, logging.Name, logging.Namespace)
+	result, err := types.NewFlow([]types.FlowMatch{}, flowID, logging.Name, logging.Namespace, logging.Spec.DefaultFlowSpec.FlowLabel, logging.Spec.DefaultFlowSpec.IncludeLabelInRouter)
 	if err != nil {
 		return nil, err
 	}

@@ -15,14 +15,15 @@
 package eventtailer
 
 import (
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
 // StatefulSet resource for reconciler
@@ -46,13 +47,34 @@ func (e *EventTailer) StatefulSet() (runtime.Object, reconciler.DesiredState, er
 }
 
 func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
+
+	if e.customResource.Spec.Image != nil {
+		if repositoryWithTag := e.customResource.Spec.Image.RepositoryWithTag(); repositoryWithTag != "" {
+			if e.customResource.Spec.ContainerBase == nil {
+				e.customResource.Spec.ContainerBase = &types.ContainerBase{}
+			}
+			e.customResource.Spec.ContainerBase.Image = repositoryWithTag
+		}
+	}
+	if e.customResource.Spec.Image != nil && e.customResource.Spec.Image.PullPolicy != "" {
+		if e.customResource.Spec.ContainerBase == nil {
+			e.customResource.Spec.ContainerBase = &types.ContainerBase{}
+		}
+		e.customResource.Spec.ContainerBase.PullPolicy = corev1.PullPolicy(e.customResource.Spec.ContainerBase.PullPolicy)
+	}
+
+	var imagePullSecrets []corev1.LocalObjectReference
+	if e.customResource.Spec.Image != nil {
+		imagePullSecrets = e.customResource.Spec.Image.ImagePullSecrets
+	}
+
 	spec := appsv1.StatefulSetSpec{
 		Replicas: utils.IntPointer(1),
-		Selector: &v1.LabelSelector{
+		Selector: &metav1.LabelSelector{
 			MatchLabels: e.selectorLabels(),
 		},
 		Template: corev1.PodTemplateSpec{
-			ObjectMeta: e.customResource.Spec.WorkloadMetaBase.Merge(v1.ObjectMeta{
+			ObjectMeta: e.customResource.Spec.WorkloadMetaBase.Merge(metav1.ObjectMeta{
 				Labels: e.selectorLabels(),
 			}),
 			Spec: e.customResource.Spec.WorkloadBase.Override(
@@ -60,7 +82,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 					Containers: []corev1.Container{
 						e.customResource.Spec.ContainerBase.Override(corev1.Container{
 							Name:            config.EventTailer.TailerAffix,
-							Image:           "banzaicloud/eventrouter:v0.1.0",
+							Image:           config.EventTailer.ImageWithTag,
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							VolumeMounts: []corev1.VolumeMount{
 								{
@@ -89,6 +111,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 							},
 						},
 					},
+					ImagePullSecrets: imagePullSecrets,
 				}),
 		},
 	}

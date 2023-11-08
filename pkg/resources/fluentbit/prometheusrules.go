@@ -17,10 +17,12 @@ package fluentbit
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
@@ -29,7 +31,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	}
 	state := reconciler.StateAbsent
 
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.PrometheusRules {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		obj.Spec.Groups = []v1.RuleGroup{{
@@ -38,7 +40,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "FluentbitTooManyErrors",
 					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"service":  "fluentbit",
 						"severity": "warning",

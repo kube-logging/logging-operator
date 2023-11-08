@@ -21,27 +21,28 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/banzaicloud/logging-operator/pkg/resources/annotation"
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/go-logr/logr"
+	"github.com/kube-logging/logging-operator/pkg/resources/annotation"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/siliconbrain/go-seqs/seqs"
 	corev1 "k8s.io/api/core/v1"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 // PodHandler .
 type PodHandler struct {
-	Client  client.Client
-	decoder *admission.Decoder
+	Decoder *admission.Decoder
+	Log     logr.Logger
 }
 
 var _ admission.Handler = &PodHandler{}
 
 // NewPodHandler constructor
-func NewPodHandler(client client.Client) *PodHandler {
-	return &PodHandler{Client: client}
+func NewPodHandler(log logr.Logger) *PodHandler {
+	return &PodHandler{Log: log}
 }
 
 func (p *PodHandler) sideCarsForContainer(containerName string, filesToTail []string) (sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) {
@@ -83,10 +84,15 @@ func (p *PodHandler) sideCarsForContainer(containerName string, filesToTail []st
 
 // Handle .
 func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admission.Response {
+	log := p.Log.WithValues("namespace", req.Namespace, "name", req.Name)
+
+	log.Info("webhook handler called")
+
 	pod := &corev1.Pod{}
 
-	err := p.decoder.Decode(req, pod)
+	err := p.Decoder.Decode(req, pod)
 	if err != nil {
+		log.Error(err, "unable to decode pod")
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
@@ -103,27 +109,56 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	annotationHandler := annotation.NewHandler(containerNames)
 	annotationHandler.AddTailerAnnotation(tailAnnotation)
 
-	for idx, container := range pod.Spec.Containers {
+	for _, container := range pod.Spec.Containers {
 		filePaths := annotationHandler.FilePathsForContainer(container.Name)
 
 		sideCars, volumes, volumeMounts := p.sideCarsForContainer(container.Name, filePaths)
 
 		// Append the new data to the podspec
-		pod.Spec.Containers = append(pod.Spec.Containers, sideCars...)
-		pod.Spec.Volumes = append(pod.Spec.Volumes, volumes...)
-		pod.Spec.Containers[idx].VolumeMounts = append(pod.Spec.Containers[idx].VolumeMounts, volumeMounts...)
+		if resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); resp != nil {
+			return *resp
+		}
 	}
 
 	marshaledPod, err := json.Marshal(pod)
 	if err != nil {
+		log.Error(err, "pod marshaling failed")
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
 }
 
-// InjectDecoder injects the decoder.
-func (p *PodHandler) InjectDecoder(d *admission.Decoder) error {
-	p.decoder = d
+func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
+	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
+	for idx, sideCar := range sideCars {
+		sideCar := sideCar
+		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
+			return c.Name == sideCar.Name
+		}) {
+			p.Log.Info(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
+			return &rv
+
+		} else {
+			podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
+			podToModify.Spec.Containers[idx].VolumeMounts = append(podToModify.Spec.Containers[idx].VolumeMounts, volumeMounts...)
+
+		}
+	}
+
+	for _, volume := range volumes {
+		volume := volume
+		if seqs.Any(seqs.FromSlice(podToModify.Spec.Volumes), func(v corev1.Volume) bool {
+			return v.Name == volume.Name
+		}) {
+			p.Log.Info(duplicateValuesMsg)
+			rv := admission.Denied(duplicateValuesMsg)
+			return &rv
+		} else {
+			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
+
+		}
+	}
 	return nil
 }

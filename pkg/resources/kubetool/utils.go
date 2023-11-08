@@ -19,11 +19,31 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+func FindContainerByName(cnrs []corev1.Container, name string) *corev1.Container {
+	for i := range cnrs {
+		cnr := &cnrs[i]
+		if cnr.Name == name {
+			return cnr
+		}
+	}
+	return nil
+}
+
 func FindVolumeByName(vols []corev1.Volume, name string) *corev1.Volume {
 	for i := range vols {
 		vol := &vols[i]
 		if vol.Name == name {
 			return vol
+		}
+	}
+	return nil
+}
+
+func FindVolumeMountByName(mnts []corev1.VolumeMount, name string) *corev1.VolumeMount {
+	for i := range mnts {
+		mnt := &mnts[i]
+		if mnt.Name == name {
+			return mnt
 		}
 	}
 	return nil

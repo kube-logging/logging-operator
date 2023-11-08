@@ -4,47 +4,52 @@ BIN := ${PWD}/bin
 
 export PATH := $(BIN):$(PATH)
 
-OS = $(shell go env GOOS)
-ARCH = $(shell go env GOARCH)
+OS := $(shell go env GOOS)
+ARCH := $(shell go env GOARCH)
 
-GOVERSION = $(shell go env GOVERSION)
+DOCKER ?= docker
+GOVERSION := $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
-IMG ?= controller:latest
+IMG ?= controller:local
+IMG_DEBUG ?= controller:debug
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
 
-DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/banzaicloud/fluentd-drain-watch
+DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 VERSION := $(shell git describe --abbrev=0 --tags)
 
-# Where do we use these???
-DOCKER_IMAGE = banzaicloud/logging-operator
-DOCKER_TAG ?= ${VERSION}
-
 E2E_TEST_TIMEOUT ?= 20m
+TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
-
-CONTROLLER_GEN = ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION = v0.6.0
+CONTROLLER_GEN := ${BIN}/controller-gen
+CONTROLLER_GEN_VERSION := v0.6.0
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
 ENVTEST_K8S_VERSION := 1.24.1
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
-GOLANGCI_LINT_VERSION := v1.47.2
+GOLANGCI_LINT_VERSION := v1.51.2
+
+HELM_DOCS := ${BIN}/helm-docs
+HELM_DOCS_VERSION = 1.11.0
 
 KIND := ${BIN}/kind
-KIND_VERSION := v0.11.1
+KIND_VERSION ?= v0.20.0
+KIND_IMAGE ?= kindest/node:v1.23.17@sha256:f77f8cf0b30430ca4128cc7cfafece0c274a118cd0cdb251049664ace0dee4ff
+KIND_CLUSTER := kind
 
 KUBEBUILDER := ${BIN}/kubebuilder
 KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.5.0
+LICENSEI_VERSION = v0.8.0
+
+STERN_VERSION := 1.25.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 
@@ -58,36 +63,34 @@ all: manager
 .PHONY: check
 check: license-check lint test
 
+.PHONY: generate
+generate: codegen fmt manifests docs helm-docs
+
 .PHONY: check-diff
-check-diff: generate fmt manifests
-	git diff --exit-code ':(exclude)./ADOPTERS.md' ':(exclude)./docs/*'
+check-diff: generate
+	git diff --exit-code ':(exclude)./ADOPTERS.md'
 
 .PHONY: debug
 debug: manager ## Remote debug
 	dlv --listen=:40000 --log --headless=true --api-version=2 exec bin/manager -- $(ARGS)
 
-.PHONY: deploy
-deploy: manifests ## Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-	kubectl apply -f config/crd/bases
-	kustomize build config/default | kubectl apply -f -
-
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	docker build . -t ${IMG}
+	${DOCKER} build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
-.PHONY: docker-build-e2e-fluentd
-docker-build-e2e-fluentd: ## Build fluentd docker image
-	docker build ./fluentd-image/e2e-test -t ${IMG}
+.PHONY: docker-build-debug
+docker-build-debug: ## Build the debug docker image
+	${DOCKER} build --target debug -t ${IMG_DEBUG} .
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
-	docker build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
+	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
-	docker push ${IMG}
+	${DOCKER} push ${IMG}
 
 .PHONY: docs
 docs: ## Generate docs
@@ -98,21 +101,15 @@ fmt: ## Run go fmt against code
 	go fmt ./...
 	cd pkg/sdk && go fmt ./...
 
-.PHONY: generate
-generate: ${CONTROLLER_GEN} tidy ## Generate code
+.PHONY: codegen
+codegen: ${CONTROLLER_GEN} tidy ## Generate code
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/api/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/model/...
 	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./extensions/api/...
-	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./resourcebuilder/...
-	cd pkg/sdk && go generate ./static
-
-.PHONY: help
-help: ## Show this help message
-	@grep -h -E '^[a-zA-Z0-9%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' | sort
 
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
-	kubectl create -f config/crd/bases || kubectl replace -f config/crd/bases
+	kubectl apply -f config/crd/bases --server-side --force-conflicts
 
 .PHONY: license-check
 license-check: ${LICENSEI} .licensei.cache ## Run license check
@@ -138,7 +135,7 @@ list: ## List all make targets
 	@${MAKE} -pRrn : -f $(MAKEFILE_LIST) 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | sort
 
 .PHONY: manager
-manager: generate fmt vet ## Build manager binary
+manager: codegen fmt vet ## Build manager binary
 	go build -o bin/manager main.go
 
 .PHONY: manifests
@@ -146,30 +143,73 @@ manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
 	cp config/crd/bases/* charts/logging-operator/crds/
-	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml && cat config/rbac/role.yaml |sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | cat >> ./charts/logging-operator/templates/clusterrole.yaml && echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
+	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml
+	cat config/rbac/role.yaml | sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | sed -e '/creationTimestamp/d' | cat >> ./charts/logging-operator/templates/clusterrole.yaml
+	echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
 
 .PHONY: run
-run: generate fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
+run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
-test: generate fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./...
-	cd pkg/sdk/extensions && go test ./...
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
+.PHONY: test
+test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
+	cd pkg/sdk/extensions && GOEXPERIMENT=loopvar go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
+	cd pkg/sdk/logging/model/syslogng/config && GOEXPERIMENT=loopvar go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
+
+.PHONY: install-go-test-coverage
+install-go-test-coverage:
+	GOBIN=${BIN} go install github.com/vladopajic/go-test-coverage/v2@latest
+
+.PHONY: generate-test-coverage
+generate-test-coverage: install-go-test-coverage test
+	rm -f ${TEST_COV_DIR}/coverage_all.out
+	echo "mode: set" > ${TEST_COV_DIR}/coverage_all.out
+	find -name 'cover_*.out' | xargs cat | grep -v "mode: set" >> ${TEST_COV_DIR}/coverage_all.out
+
+.PHONY: check-coverage
+check-coverage: install-go-test-coverage generate-test-coverage
+	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
-test-e2e: ${KIND} docker-build generate fmt vet manifests ## Run E2E tests
-	cd e2e && LOGGING_OPERATOR_IMAGE="${IMG}" go test -timeout ${E2E_TEST_TIMEOUT} ./...
+test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
+	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
+
+.PHONY: test-e2e-ci
+test-e2e-ci: ${BIN}
+	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64
+	chmod +x ./bin/kind
+	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
+	chmod +x ./bin/stern
+	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
+
+.PHONY: test-e2e-nodeps
+test-e2e-nodeps:
+	cd e2e && \
+		LOGGING_OPERATOR_IMAGE="${IMG}" \
+		KIND_PATH="$(KIND)" \
+		KIND_IMAGE="$(KIND_IMAGE)" \
+		PROJECT_DIR="$(PWD)" \
+		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
-	find . -iname "go.mod" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
+	find . -iname "go.mod" -not -path "./.devcontainer/*" | xargs -L1 sh -c 'cd $$(dirname $$0); go mod tidy'
 
 .PHONY: vet
 vet: ## Run go vet against code
 	go vet ./...
 	cd pkg/sdk && go vet ./...
+
+.PHONY: kind-cluster
+kind-cluster: ${KIND}
+	kind create cluster --name $(KIND_CLUSTER) --image $(KIND_IMAGE)
+
+.PHONY: helm-docs
+helm-docs: ${HELM_DOCS}
+	${HELM_DOCS} -s file -c charts/ -t ../charts-docs/templates/overrides.gotmpl -t README.md.gotmpl
 
 ## =========================
 ## ==  Tool dependencies  ==
@@ -232,8 +272,17 @@ ${SETUP_ENVTEST}: VERSION := latest
 ${SETUP_ENVTEST}: | ${BIN}
 	GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 
+stern: | ${BIN}
+	GOBIN=${BIN} go install github.com/stern/stern@latest
+
 ${ENVTEST_BIN_DIR}: | ${BIN}
 	mkdir -p $@
+
+${HELM_DOCS}: ${HELM_DOCS}-${HELM_DOCS_VERSION}
+	@ln -sf ${HELM_DOCS}-${HELM_DOCS_VERSION} ${HELM_DOCS}
+${HELM_DOCS}-${HELM_DOCS_VERSION}:
+	@mkdir -p bin
+	curl -L https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_$(shell uname)_x86_64.tar.gz | tar -zOxf - helm-docs > ${HELM_DOCS}-${HELM_DOCS_VERSION} && chmod +x ${HELM_DOCS}-${HELM_DOCS_VERSION}
 
 ${BIN}:
 	mkdir -p bin
@@ -243,3 +292,9 @@ find ${BIN} -name '$(notdir ${IMPORT_PATH})_*' -exec rm {} +
 GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 mv ${BIN}/$(notdir ${IMPORT_PATH}) $@
 endef
+
+# Self-documenting Makefile
+.DEFAULT_GOAL = help
+.PHONY: help
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)

@@ -1,4 +1,4 @@
-// Copyright © 2021 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,26 +18,28 @@ import (
 	"context"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type DataProvider struct {
-	client client.Client
+	client  client.Client
+	logging *v1beta1.Logging
 }
 
-func NewDataProvider(client client.Client) *DataProvider {
+func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvider {
 	return &DataProvider{
-		client: client,
+		client:  client,
+		logging: logging,
 	}
 }
 
-func (p *DataProvider) GetReplicaCount(ctx context.Context, logging *v1beta1.Logging) (*int32, error) {
-	if logging.Spec.FluentdSpec != nil {
+func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
+	if p.logging.Spec.FluentdSpec != nil {
 		sts := &v1.StatefulSet{}
-		om := logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
+		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
 		err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 		if err != nil {
 			return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")

@@ -25,6 +25,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Expand the name of the release.
+*/}}
+{{- define "logging-operator.releasename" -}}
+{{- default .Release.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Provides the namespace the chart will be installed in using the builtin .Release.Namespace,
 or, if provided, a manually overwritten namespace value.
 */}}
@@ -55,4 +62,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Formats the cluster domain as a suffix, e.g.:
+.Values.clusterDomain == "", returns ""
+.Values.clusterDomain == "cluster.local.", returns ".cluster.local."
+*/}}
+{{- define "logging-operator.clusterDomainAsSuffix" -}}
+{{- if .Values.clusterDomain -}}
+{{- printf ".%s" .Values.clusterDomain -}}
+{{- end -}}
 {{- end -}}

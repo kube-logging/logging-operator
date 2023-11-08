@@ -40,7 +40,7 @@ kind create cluster --name drainer
 
 Build and upload fresh drain-watch sidecar image
 ```sh
-docker build drain-watch-image -t ghcr.io/banzaicloud/fluentd-drain-watch:testing && kind load docker-image --name drainer ghcr.io/banzaicloud/fluentd-drain-watch:testing
+docker build drain-watch-image -t ghcr.io/kube-logging/fluentd-drain-watch:testing && kind load docker-image --name drainer ghcr.io/kube-logging/fluentd-drain-watch:testing
 ```
 
 Install log-generator

@@ -1,5 +1,5 @@
 <component name="CopyrightManager">
-  <settings default="Banzai Cloud">
+  <settings default="Kube Logging authors">
     <LanguageOptions name="Go">
       <option name="fileTypeOverride" value="3" />
       <option name="block" value="false" />

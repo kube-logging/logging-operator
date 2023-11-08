@@ -21,9 +21,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/siliconbrain/go-seqs/seqs"
 	"golang.org/x/exp/slices"
 )
@@ -52,6 +53,18 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		return []render.Renderer{
 			filterExpr(filterExprFromMatchExpr(matchExpr)),
 		}
+	} else if value.Type() == arrowMapType {
+		arrowMap := value.Interface().(filter.ArrowMap)
+		return []render.Renderer{render.ArrowMap(arrowMap, render.Literal[string], render.Literal[string])}
+	} else if value.Type() == rawArrowMapType {
+		rawArrowMap := value.Interface().(filter.RawArrowMap)
+		return []render.Renderer{render.ArrowMap(rawArrowMap, render.String, render.String)}
+	} else if value.Type() == stringListType {
+		stringList := value.Interface().(output.StringList)
+		return []render.Renderer{render.StringList(stringList.List)}
+	} else if value.Type() == rawStringType {
+		rawString := value.Interface().(output.RawString)
+		return []render.Renderer{render.String(string(rawString))}
 	}
 
 	switch value.Kind() {
@@ -194,6 +207,10 @@ func goNameToSyslogName(s string) string {
 }
 
 var matchExprType = reflect.TypeOf(filter.MatchExpr{})
+var arrowMapType = reflect.TypeOf(filter.ArrowMap{})
+var rawArrowMapType = reflect.TypeOf(filter.RawArrowMap{})
+var stringListType = reflect.TypeOf(output.StringList{})
+var rawStringType = reflect.TypeOf(*new(output.RawString))
 
 func derefAll[T Derefable[T]](v T) T {
 	for v.Kind() == reflect.Pointer {

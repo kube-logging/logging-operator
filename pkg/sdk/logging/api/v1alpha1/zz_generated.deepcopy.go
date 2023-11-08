@@ -20,7 +20,7 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -476,6 +476,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		in, out := &in.SQSOutputConfig, &out.SQSOutputConfig
 		*out = new(output.SQSOutputConfig)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.RelabelOutputConfig != nil {
+		in, out := &in.RelabelOutputConfig, &out.RelabelOutputConfig
+		*out = new(output.RelabelOutputConfig)
+		**out = **in
 	}
 }
 

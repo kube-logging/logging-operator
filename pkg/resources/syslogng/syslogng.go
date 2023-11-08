@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,8 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -32,6 +30,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -39,25 +41,25 @@ const (
 	ServicePort                       = 601
 	configSecretName                  = "syslog-ng"
 	configKey                         = "syslog-ng.conf"
-	statefulSetName                   = "syslog-ng"
+	StatefulSetName                   = "syslog-ng"
 	outputSecretName                  = "syslog-ng-output"
 	OutputSecretPath                  = "/etc/syslog-ng/secret"
-	bufferPath                        = "/buffers"
+	BufferPath                        = "/buffers"
 	serviceAccountName                = "syslog-ng"
 	roleBindingName                   = "syslog-ng"
 	roleName                          = "syslog-ng"
 	clusterRoleBindingName            = "syslog-ng"
 	clusterRoleName                   = "syslog-ng"
-	containerName                     = "syslog-ng"
+	ContainerName                     = "syslog-ng"
 	defaultBufferVolumeMetricsPort    = 9200
-	syslogngImageRepository           = "balabit/syslog-ng"
-	syslogngImageTag                  = "4.0.1"
-	prometheusExporterImageRepository = "ghcr.io/banzaicloud/syslog-ng-exporter"
-	prometheusExporterImageTag        = "0.0.13"
-	bufferVolumeImageRepository       = "ghcr.io/banzaicloud/custom-runner"
-	bufferVolumeImageTag              = "0.1.3"
-	configReloaderImageRepository     = "ghcr.io/banzaicloud/syslogng-reload"
-	configReloaderImageTag            = "v1.0.1"
+	syslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
+	syslogngImageTag                  = "4.4.0"
+	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	prometheusExporterImageTag        = "0.0.2"
+	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
+	bufferVolumeImageTag              = "v0.7.1"
+	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
+	configReloaderImageTag            = "v1.3.1"
 	socketVolumeName                  = "socket"
 	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
 	configDir                         = "/etc/syslog-ng/config"
@@ -100,8 +102,7 @@ func New(
 }
 
 // Reconcile reconciles the syslog-ng resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	ctx := context.Background()
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
 	for _, res := range []resources.Resource{
@@ -132,28 +133,31 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if err != nil {
 			return nil, err
 		}
-		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
-			// We already have an existing configcheck result:
-			// - bail out if it was unsuccessful
-			// - cleanup previous results if it's successful
-			if !result {
-				return nil, errors.Errorf("current config is invalid")
+
+		// Fail when the current config is invalid
+		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
+			if hasPod, err := r.hasConfigCheckPod(ctx, hash); hasPod {
+				return nil, errors.WrapIf(err, "current config is invalid")
 			}
-			var removedHashes []string
-			if removedHashes, err = r.configCheckCleanup(hash); err != nil {
-				r.Log.Error(err, "failed to cleanup resources")
-			} else {
-				if len(removedHashes) > 0 {
-					for _, removedHash := range removedHashes {
-						delete(r.Logging.Status.ConfigCheckResults, removedHash)
-					}
-					if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
-						return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
-					} else {
-						// explicitly ask for a requeue to short circuit the controller loop after the status update
-						return &reconcile.Result{Requeue: true}, nil
-					}
-				}
+			// clean the status so that we can rerun the check
+			return r.statusUpdate(ctx, patchBase, nil)
+		}
+
+		// Cleanup previous configcheck results
+		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
+			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck)
+
+			var cleanupErrs error
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.SecretCleanup(ctx, hash))
+			cleanupErrs = errors.Append(cleanupErrs, cleaner.PodCleanup(ctx, hash))
+
+			if cleanupErrs != nil {
+				// Errors with the cleanup should not block the reconciliation, we just note it
+				r.Log.Error(err, "issues during configcheck cleanup, moving on")
+			} else if len(r.Logging.Status.ConfigCheckResults) > 1 {
+				return r.statusUpdate(ctx, patchBase, map[string]bool{
+					hash: result,
+				})
 			}
 		} else {
 			// We don't have an existing result
@@ -207,18 +211,21 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			return result, nil
 		}
 	}
-	for _, res := range []resources.Resource{
+	resourceObjects := []resources.Resource{
 		r.configSecret,
 		r.statefulset,
 		r.service,
 		r.headlessService,
 		r.serviceMetrics,
-		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
-		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
-	} {
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		resourceObjects = append(resourceObjects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+	}
+	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
+		resourceObjects = append(resourceObjects, r.prometheusRules, r.bufferVolumePrometheusRules)
+	}
+	for _, res := range resourceObjects {
 		o, state, err := res()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")
@@ -236,6 +243,31 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string) (bool, error) {
+	var err error
+	pod, err := r.newCheckPod(hashKey)
+	if err != nil {
+		return false, err
+	}
+
+	p := &corev1.Pod{}
+	err = r.Client.Get(ctx, client.ObjectKeyFromObject(pod), p)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, result map[string]bool) (*reconcile.Result, error) {
+	r.Logging.Status.ConfigCheckResults = result
+	if err := r.Client.Status().Patch(ctx, r.Logging, patchBase); err != nil {
+		return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
+	} else {
+		// explicitly ask for a requeue to short circuit the controller loop after the status update
+		return &reconcile.Result{Requeue: true}, nil
+	}
 }
 
 func (r *Reconciler) getServiceAccountName() string {

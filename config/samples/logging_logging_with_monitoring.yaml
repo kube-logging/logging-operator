@@ -1,0 +1,39 @@
+# example config to activate monitoring,
+# required to use logging dashboard
+# depends on https://github.com/prometheus-operator/prometheus-operator
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: logging-example
+spec:
+  controlNamespace: kube-logging
+  enableRecreateWorkloadOnImmutableFieldChange: true
+  fluentd:
+    bufferVolumeImage:
+      repository: ghcr.io/kube-logging/node-exporter
+    bufferVolumeMetrics: 
+      prometheusRules: true
+      serviceMonitor: true
+    metrics: 
+      prometheusRules: true
+      serviceMonitor: true
+  fluentbit:
+    metrics:
+      prometheusRules: true
+      serviceMonitor: true
+    bufferStorage:
+      storage.metrics: "On"
+    healthCheck:
+      hcErrorsCount: 15
+      hcPeriod: 60
+      hcRetryFailureCount: 5
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: logging-example
+spec:
+  metrics: 
+    prometheusRules: true
+    serviceMonitor: true

@@ -21,15 +21,15 @@ import (
 	"text/template"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 type fluentbitInputConfig struct {
@@ -46,6 +46,7 @@ type upstreamNode struct {
 
 type upstream struct {
 	Name  string
+	Path  string
 	Nodes []upstreamNode
 }
 
@@ -69,15 +70,26 @@ type fluentBitConfig struct {
 	FilterModify            []v1beta1.FilterModify
 	FluentForwardOutput     *fluentForwardOutputConfig
 	SyslogNGOutput          *syslogNGOutputConfig
+	DefaultParsers          string
+	CustomParsers           string
+	HealthCheck             *v1beta1.HealthCheck
 }
 
 type fluentForwardOutputConfig struct {
 	Network    FluentbitNetwork
 	Options    map[string]string
+	Targets    []forwardTargetConfig
 	TargetHost string
 	TargetPort int32
 	TLS        fluentForwardOutputTLSConfig
 	Upstream   fluentForwardOutputUpstreamConfig
+}
+
+type forwardTargetConfig struct {
+	AllNamespaces  bool
+	NamespaceRegex string
+	Host           string
+	Port           int32
 }
 
 type fluentForwardOutputTLSConfig struct {
@@ -110,11 +122,19 @@ type FluentbitNetwork struct {
 // https://docs.fluentbit.io/manual/pipeline/outputs/tcp-and-tls
 type syslogNGOutputConfig struct {
 	Host           string
-	Port           int
+	Port           int32
+	Targets        []forwardTargetConfig
 	JSONDateKey    string
 	JSONDateFormat string
 	Workers        *int
 	Network        FluentbitNetwork
+}
+
+func newSyslogNGOutputConfig() *syslogNGOutputConfig {
+	return &syslogNGOutputConfig{
+		JSONDateKey:    "ts",
+		JSONDateFormat: "iso8601",
+	}
 }
 
 func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetwork) {
@@ -163,67 +183,79 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 }
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentbitSpec.CustomConfigSecret != "" {
+	ctx := context.TODO()
+
+	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
 		}, reconciler.StateAbsent, nil
 	}
 
-	disableKubernetesFilter := r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter != nil && *r.Logging.Spec.FluentbitSpec.DisableKubernetesFilter
+	disableKubernetesFilter := r.fluentbitSpec.DisableKubernetesFilter != nil && *r.fluentbitSpec.DisableKubernetesFilter
 
 	if !disableKubernetesFilter {
-		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize == "" {
-			log.Log.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
-			r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize = "0"
-		} else if r.Logging.Spec.FluentbitSpec.FilterKubernetes.BufferSize != "0" {
-			log.Log.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+		if r.fluentbitSpec.FilterKubernetes.BufferSize == "" {
+			r.logger.Info("Notice: If the Buffer_Size value is empty we will set it 0. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+			r.fluentbitSpec.FilterKubernetes.BufferSize = "0"
+		} else if r.fluentbitSpec.FilterKubernetes.BufferSize != "0" {
+			r.logger.Info("Notice: If the kubernetes filter buffer_size parameter is underestimated it can cause log loss. For more information: https://github.com/fluent/fluent-bit/issues/2111")
+		}
+		if r.fluentbitSpec.FilterKubernetes.K8SLoggingExclude == "" {
+			r.fluentbitSpec.FilterKubernetes.K8SLoggingExclude = "On"
 		}
 	}
 
 	input := fluentBitConfig{
-		Flush:                   r.Logging.Spec.FluentbitSpec.Flush,
-		Grace:                   r.Logging.Spec.FluentbitSpec.Grace,
-		LogLevel:                r.Logging.Spec.FluentbitSpec.LogLevel,
-		CoroStackSize:           r.Logging.Spec.FluentbitSpec.CoroStackSize,
+		Flush:                   r.fluentbitSpec.Flush,
+		Grace:                   r.fluentbitSpec.Grace,
+		LogLevel:                r.fluentbitSpec.LogLevel,
+		CoroStackSize:           r.fluentbitSpec.CoroStackSize,
 		Namespace:               r.Logging.Spec.ControlNamespace,
 		DisableKubernetesFilter: disableKubernetesFilter,
-		FilterModify:            r.Logging.Spec.FluentbitSpec.FilterModify,
+		FilterModify:            r.fluentbitSpec.FilterModify,
+		HealthCheck:             r.fluentbitSpec.HealthCheck,
 	}
 
-	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
+	input.DefaultParsers = fmt.Sprintf("%s/%s", StockConfigPath, "parsers.conf")
+
+	if r.fluentbitSpec.CustomParsers != "" {
+		input.CustomParsers = fmt.Sprintf("%s/%s", OperatorConfigPath, CustomParsersConfigName)
+	}
+
+	if r.fluentbitSpec.Metrics != nil {
 		input.Monitor.Enabled = true
-		input.Monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
-		input.Monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
+		input.Monitor.Port = r.fluentbitSpec.Metrics.Port
+		input.Monitor.Path = r.fluentbitSpec.Metrics.Path
 	}
 
-	if r.Logging.Spec.FluentbitSpec.InputTail.Parser == "" {
+	if r.fluentbitSpec.InputTail.Parser == "" {
 		switch types.ContainerRuntime {
 		case "docker":
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "docker"
+			r.fluentbitSpec.InputTail.Parser = "docker"
 		case "containerd":
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+			r.fluentbitSpec.InputTail.Parser = "cri"
 		default:
-			r.Logging.Spec.FluentbitSpec.InputTail.Parser = "cri"
+			r.fluentbitSpec.InputTail.Parser = "cri"
 		}
 	}
 
 	if r.Logging.Spec.FluentdSpec != nil {
-		fluentbitTargetHost := r.Logging.Spec.FluentbitSpec.TargetHost
+		fluentbitTargetHost := r.fluentbitSpec.TargetHost
 		if fluentbitTargetHost == "" {
-			fluentbitTargetHost = fmt.Sprintf("%s.%s.svc%s", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace, r.Logging.ClusterDomainAsSuffix())
+			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
 		}
 
-		fluentbitTargetPort := r.Logging.Spec.FluentbitSpec.TargetPort
-		if fluentbitTargetPort == 0 {
-			fluentbitTargetPort = r.Logging.Spec.FluentdSpec.Port
+		fluentbitTargetPort := int32(fluentd.ServicePort)
+		if r.fluentbitSpec.TargetPort != 0 {
+			fluentbitTargetPort = r.fluentbitSpec.TargetPort
 		}
 
 		input.FluentForwardOutput = &fluentForwardOutputConfig{
 			TargetHost: fluentbitTargetHost,
 			TargetPort: fluentbitTargetPort,
 			TLS: fluentForwardOutputTLSConfig{
-				Enabled:   *r.Logging.Spec.FluentbitSpec.TLS.Enabled,
-				SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
+				Enabled:   *r.fluentbitSpec.TLS.Enabled,
+				SharedKey: r.fluentbitSpec.TLS.SharedKey,
 			},
 		}
 	}
@@ -231,7 +263,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	mapper := types.NewStructToStringMapper(nil)
 
 	// FluentBit input Values
-	inputTail := r.Logging.Spec.FluentbitSpec.InputTail
+	inputTail := r.fluentbitSpec.InputTail
 
 	if len(inputTail.MultilineParser) > 0 {
 		input.Input.MultilineParser = inputTail.MultilineParser
@@ -240,8 +272,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		// If MultilineParser is set, remove other parser fields
 		// See https://docs.fluentbit.io/manual/pipeline/inputs/tail#multiline-core-v1.8
 
-		log.Log.Info("Notice: MultilineParser is enabled. Disabling other parser options",
-			"logging", r.Logging.Name)
+		r.logger.Info("Notice: MultilineParser is enabled. Disabling other parser options")
 
 		inputTail.Parser = ""
 		inputTail.ParserFirstline = ""
@@ -263,84 +294,105 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	input.Input.Values = fluentbitInputValues
 
-	input.KubernetesFilter, err = mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterKubernetes)
+	input.KubernetesFilter, err = mapper.StringsMap(r.fluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
 	}
 
-	input.BufferStorage, err = mapper.StringsMap(r.Logging.Spec.FluentbitSpec.BufferStorage)
+	input.BufferStorage, err = mapper.StringsMap(r.fluentbitSpec.BufferStorage)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map buffer storage for fluentbit")
 	}
 
-	if r.Logging.Spec.FluentbitSpec.FilterAws != nil {
-		awsFilter, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.FilterAws)
+	if r.fluentbitSpec.FilterAws != nil {
+		awsFilter, err := mapper.StringsMap(r.fluentbitSpec.FilterAws)
 		if err != nil {
 			return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map aws filter for fluentbit")
 		}
 		input.AwsFilter = awsFilter
 	}
 
+	// Fluentd aggregator path
 	if input.FluentForwardOutput != nil {
-		if r.Logging.Spec.FluentbitSpec.TargetHost != "" {
-			input.FluentForwardOutput.TargetHost = r.Logging.Spec.FluentbitSpec.TargetHost
+		if r.fluentbitSpec.TargetHost != "" {
+			input.FluentForwardOutput.TargetHost = r.fluentbitSpec.TargetHost
 		}
-		if r.Logging.Spec.FluentbitSpec.TargetPort != 0 {
-			input.FluentForwardOutput.TargetPort = r.Logging.Spec.FluentbitSpec.TargetPort
+		if r.fluentbitSpec.TargetPort != 0 {
+			input.FluentForwardOutput.TargetPort = r.fluentbitSpec.TargetPort
 		}
-		if r.Logging.Spec.FluentbitSpec.ForwardOptions != nil {
-			forwardOptions, err := mapper.StringsMap(r.Logging.Spec.FluentbitSpec.ForwardOptions)
+
+		if r.fluentbitSpec.ForwardOptions != nil {
+			forwardOptions, err := mapper.StringsMap(r.fluentbitSpec.ForwardOptions)
 			if err != nil {
 				return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map forwardOptions for fluentbit")
 			}
 			input.FluentForwardOutput.Options = forwardOptions
 		}
-		if r.Logging.Spec.FluentbitSpec.Network != nil {
-			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.Logging.Spec.FluentbitSpec.Network)
-		}
+		r.applyNetworkSettings(input)
 
-		fluentdReplicas, err := r.fluentdDataProvider.GetReplicaCount(context.TODO(), r.Logging)
+		aggregatorReplicas, err := r.loggingDataProvider.GetReplicaCount(context.TODO())
 		if err != nil {
 			return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 		}
 
-		if r.Logging.Spec.FluentbitSpec.Network == nil && utils.PointerToInt32(fluentdReplicas) > 1 {
+		if r.fluentbitSpec.Network == nil && utils.PointerToInt32(aggregatorReplicas) > 1 {
 			input.FluentForwardOutput.Network.KeepaliveSet = true
 			input.FluentForwardOutput.Network.Keepalive = true
 			input.FluentForwardOutput.Network.KeepaliveIdleTimeoutSet = true
 			input.FluentForwardOutput.Network.KeepaliveIdleTimeout = 30
 			input.FluentForwardOutput.Network.KeepaliveMaxRecycleSet = true
 			input.FluentForwardOutput.Network.KeepaliveMaxRecycle = 100
-			log.Log.Info("Notice: Because the Fluentd statefulset has been scaled, we've made some changes in the fluentbit network config too. We advice to revise these default configurations.")
+			r.logger.Info("Notice: fluentbit `network` settings have been configured automatically to adapt to multiple aggregator replicas. Configure it manually to avoid this notice.")
 		}
 
-		if r.Logging.Spec.FluentbitSpec.EnableUpstream {
+		if r.fluentbitSpec.EnableUpstream {
 			input.FluentForwardOutput.Upstream.Enabled = true
+			input.FluentForwardOutput.Upstream.Config.Path = fmt.Sprintf("%s/%s", OperatorConfigPath, UpstreamConfigName)
 			input.FluentForwardOutput.Upstream.Config.Name = "fluentd-upstream"
-			for i := int32(0); i < utils.PointerToInt32(fluentdReplicas); i++ {
+			for i := int32(0); i < utils.PointerToInt32(aggregatorReplicas); i++ {
 				input.FluentForwardOutput.Upstream.Config.Nodes = append(input.FluentForwardOutput.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 			}
 		}
 	}
 
 	if r.Logging.Spec.SyslogNGSpec != nil {
-		input.SyslogNGOutput = &syslogNGOutputConfig{}
-		input.SyslogNGOutput.Host = fmt.Sprintf("%s.%s.svc.cluster.local", r.Logging.QualifiedName(syslogng.ServiceName), r.Logging.Spec.ControlNamespace)
+		input.SyslogNGOutput = newSyslogNGOutputConfig()
+		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort
-		input.SyslogNGOutput.JSONDateKey = "ts"
-		input.SyslogNGOutput.JSONDateFormat = "iso8601"
+	}
 
-		if r.Logging.Spec.FluentbitSpec.SyslogNGOutput != nil {
-			input.SyslogNGOutput.JSONDateKey = r.Logging.Spec.FluentbitSpec.SyslogNGOutput.JsonDateKey
-			input.SyslogNGOutput.JSONDateFormat = r.Logging.Spec.FluentbitSpec.SyslogNGOutput.JsonDateFormat
+	if len(r.loggingRoutes) > 0 {
+		var tenants []v1beta1.Tenant
+		for _, a := range r.loggingRoutes {
+			tenants = append(tenants, a.Status.Tenants...)
+		}
+		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
+			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
+		}
+	} else {
+		// compatibility with existing configuration
+		if input.FluentForwardOutput != nil {
+			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
+				AllNamespaces: true,
+				Host:          input.FluentForwardOutput.TargetHost,
+				Port:          input.FluentForwardOutput.TargetPort,
+			})
+		} else if input.SyslogNGOutput != nil {
+			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
+				AllNamespaces: true,
+				Host:          input.SyslogNGOutput.Host,
+				Port:          input.SyslogNGOutput.Port,
+			})
 		}
 	}
 
-	if input.SyslogNGOutput != nil {
-		if r.Logging.Spec.FluentbitSpec.Network != nil {
-			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.Logging.Spec.FluentbitSpec.Network)
-		}
+	if input.SyslogNGOutput != nil && r.fluentbitSpec.SyslogNGOutput != nil {
+		input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
+		input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
+		input.SyslogNGOutput.Workers = r.fluentbitSpec.SyslogNGOutput.Workers
 	}
+
+	r.applyNetworkSettings(input)
 
 	conf, err := generateConfig(input)
 	if err != nil {
@@ -358,6 +410,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		confs[UpstreamConfigName] = []byte(upstreamConfig)
 	}
 
+	if r.fluentbitSpec.CustomParsers != "" {
+		confs[CustomParsersConfigName] = []byte(r.fluentbitSpec.CustomParsers)
+	}
+
 	r.configs = confs
 
 	return &corev1.Secret{
@@ -366,15 +422,35 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}, reconciler.StatePresent, nil
 }
 
+func (r *Reconciler) applyNetworkSettings(input fluentBitConfig) {
+	if r.fluentbitSpec.Network != nil {
+		if input.FluentForwardOutput != nil {
+			input.FluentForwardOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+		if input.SyslogNGOutput != nil {
+			input.SyslogNGOutput.Network = newFluentbitNetwork(*r.fluentbitSpec.Network)
+		}
+	}
+}
+
+func aggregatorEndpoint(l *v1beta1.Logging, svc string) string {
+	return fmt.Sprintf("%s.%s.svc%s", l.QualifiedName(svc), l.Spec.ControlNamespace, l.ClusterDomainAsSuffix())
+}
+
 func generateConfig(input fluentBitConfig) (string, error) {
 	output := new(bytes.Buffer)
-	tmpl, err := template.New("test").Parse(fluentBitConfigTemplate)
+	tmpl := template.New("fluentbit")
+	tmpl, err := tmpl.Parse(fluentBitConfigTemplate)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "parsing fluentbit template")
+	}
+	tmpl, err = tmpl.Parse(fluentbitNetworkTemplate)
+	if err != nil {
+		return "", errors.WrapIf(err, "parsing fluentbit network nested template")
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
-		return "", err
+		return "", errors.WrapIf(err, "executing fluentbit config template")
 	}
 	outputString := output.String()
 	return outputString, nil
@@ -402,6 +478,6 @@ func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 			r.Logging.QualifiedName(fluentd.ServiceName+"-headless"),
 			r.Logging.Spec.ControlNamespace,
 			r.Logging.ClusterDomainAsSuffix()),
-		Port: 24240,
+		Port: fluentd.ServicePort,
 	}
 }

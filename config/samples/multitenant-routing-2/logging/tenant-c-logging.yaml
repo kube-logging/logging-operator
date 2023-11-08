@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c-control
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: c
+  labels:
+    tenant: c
+spec:
+  loggingRef: c
+  fluentd: {}
+  controlNamespace: c-control
+  watchNamespaces:
+  - c
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: http
+  namespace: c-control
+spec:
+  loggingRef: c
+  http:
+    endpoint: http://test-receiver.infra:8080/tenant-c
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s

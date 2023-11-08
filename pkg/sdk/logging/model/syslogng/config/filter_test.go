@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/stretchr/testify/require"
 )
 

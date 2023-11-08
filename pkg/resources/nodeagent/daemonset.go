@@ -1,4 +1,4 @@
-// Copyright © 2021 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import (
 	"strconv"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/templates"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -70,10 +70,11 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 					ServiceAccountName: n.getServiceAccount(),
 					Volumes:            n.generateVolume(),
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
-						RunAsNonRoot: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
-						RunAsUser:    n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
-						RunAsGroup:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						FSGroup:        n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.FSGroup,
+						RunAsNonRoot:   n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,
+						RunAsUser:      n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsUser,
+						RunAsGroup:     n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.RunAsGroup,
+						SeccompProfile: n.nodeAgent.FluentbitSpec.Security.PodSecurityContext.SeccompProfile,
 					},
 					Containers: []corev1.Container{
 						{
@@ -87,6 +88,8 @@ func (n *nodeAgentInstance) daemonSet() (runtime.Object, reconciler.DesiredState
 								AllowPrivilegeEscalation: n.nodeAgent.FluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
 								Privileged:               n.nodeAgent.FluentbitSpec.Security.SecurityContext.Privileged,
 								SELinuxOptions:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SELinuxOptions,
+								SeccompProfile:           n.nodeAgent.FluentbitSpec.Security.SecurityContext.SeccompProfile,
+								Capabilities:             n.nodeAgent.FluentbitSpec.Security.SecurityContext.Capabilities,
 							},
 						},
 					},
@@ -153,7 +156,7 @@ func (n *nodeAgentInstance) generateVolumeMounts() (v []corev1.VolumeMount) {
 		})
 	}
 
-	if util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
+	if n.nodeAgent.FluentbitSpec != nil && n.nodeAgent.FluentbitSpec.TLS != nil && util.PointerToBool(n.nodeAgent.FluentbitSpec.TLS.Enabled) {
 		tlsRelatedVolume := []corev1.VolumeMount{
 			{
 				Name:      "fluent-bit-tls",

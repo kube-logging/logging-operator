@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Kubernetes Events Timestamp"
@@ -24,12 +24,12 @@ import (
 type _hugoKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Kubernetes Events Timestamp Filter](https://github.com/banzaicloud/fluentd-filter-kube-events-timestamp)"
+// +docName:"[Kubernetes Events Timestamp Filter](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp)"
 // Fluentd Filter plugin to select particular timestamp into an additional field
 type _docKubeEventsTimestamp interface{} //nolint:deadcode,unused
 
 // +name:"Kubernetes Events Timestamp"
-// +url:"https://github.com/banzaicloud/fluentd-filter-kube-events-timestamp"
+// +url:"https://github.com/kube-logging/fluentd-filter-kube-events-timestamp"
 // +version:"0.1.4"
 // +description:"Fluentd Filter plugin to select particular timestamp into an additional field"
 // +status:"GA"

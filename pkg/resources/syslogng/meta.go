@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 package syslogng
 
 import (
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

@@ -15,7 +15,9 @@
 package resources
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"context"
+
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -23,6 +25,8 @@ import (
 
 // ComponentReconciler reconciler interface
 type ComponentReconciler func() (*reconcile.Result, error)
+
+type ContextAwareComponentReconciler func(context.Context) (*reconcile.Result, error)
 
 // Resource redeclaration of function with return type kubernetes Object
 type Resource func() (runtime.Object, reconciler.DesiredState, error)

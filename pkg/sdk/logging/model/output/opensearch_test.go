@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ package output_test
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/require"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 )
 
 func TestOpenSearch(t *testing.T) {
@@ -37,25 +38,25 @@ buffer:
 `)
 	expected := `
   <match **>
-	@type opensearch
-	@id test
-    catch_transport_exception_on_retry true
-    emit_error_label_event true
-    exception_backup true
-    fail_on_detecting_os_version_retry_exceed true
-    fail_on_putting_template_retry_exceed true
-	host opensearch-cluster.default.svc.cluster.local
-    http_backend_excon_nonblock true
-	port 9200
-	reload_connections true
-	scheme https
-	ssl_verify false
-    use_legacy_template true
-	utc_index true
+  @type opensearch
+  @id test
+  catch_transport_exception_on_retry true
+  emit_error_label_event true
+  exception_backup true
+  fail_on_detecting_os_version_retry_exceed true
+  fail_on_putting_template_retry_exceed true
+  host opensearch-cluster.default.svc.cluster.local
+  http_backend_excon_nonblock true
+  port 9200
+  reload_connections true
+  scheme https
+  ssl_verify false
+  ssl_version TLSv1_2
+  utc_index true
     verify_os_version_at_startup true
     <buffer tag,time>
       @type file
-	  chunk_limit_size 8MB
+    chunk_limit_size 8MB
       path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
@@ -89,7 +90,7 @@ buffer:
     @type opensearch_data_stream
     @id test
     catch_transport_exception_on_retry true
-		data_stream_name test-ds
+    data_stream_name test-ds
     emit_error_label_event true
     exception_backup true
     fail_on_detecting_os_version_retry_exceed true
@@ -100,7 +101,7 @@ buffer:
     reload_connections true
     scheme https
     ssl_verify false
-    use_legacy_template true
+    ssl_version TLSv1_2
     utc_index true
     verify_os_version_at_startup true
     <buffer tag,time>

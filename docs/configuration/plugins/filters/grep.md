@@ -36,203 +36,227 @@ Default: -
 Default: -
 
 
-## [Regexp Directive](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive) {#Regexp-Directive}
+## Regexp Directive
 
-Specify filtering rule. This directive contains two parameters.
+Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive)). This directive contains two parameters.
 
-### key (string, required) {#[regexp directive](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive) {#regexp-directive}-key}
+### key (string, required) {#regexp directive-key}
 
 Specify field name in the record to parse. 
 
 Default: -
 
-### pattern (string, required) {#[regexp directive](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive) {#regexp-directive}-pattern}
+### pattern (string, required) {#regexp directive-pattern}
 
 Pattern expression to evaluate 
 
 Default: -
 
 
- #### Example `Regexp` filter configurations
+ ## Example `Regexp` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - grep:
-        regexp:
-        - key: first
-          pattern: /^5\d\d$/
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - grep:
+	      regexp:
+	      - key: first
+	        pattern: /^5\d\d$/
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-  <filter **>
-    @type grep
-    @id demo-flow_1_grep
-    <regexp>
-      key first
-      pattern /^5\d\d$/
-    </regexp>
-  </filter>
+
+	<filter **>
+	  @type grep
+	  @id demo-flow_1_grep
+	  <regexp>
+	    key first
+	    pattern /^5\d\d$/
+	  </regexp>
+	</filter>
+
  ```
 
 ---
-## [Exclude Directive](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive) {#Exclude-Directive}
+## Exclude Directive
 
-Specify filtering rule to reject events. This directive contains two parameters.
+Specify filtering rule to reject events (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive)). This directive contains two parameters.
 
-### key (string, required) {#[exclude directive](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive) {#exclude-directive}-key}
+### key (string, required) {#exclude directive-key}
 
 Specify field name in the record to parse. 
 
 Default: -
 
-### pattern (string, required) {#[exclude directive](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive) {#exclude-directive}-pattern}
+### pattern (string, required) {#exclude directive-pattern}
 
 Pattern expression to evaluate 
 
 Default: -
 
 
- #### Example `Exclude` filter configurations
+ ## Example `Exclude` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - grep:
-        exclude:
-        - key: first
-          pattern: /^5\d\d$/
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - grep:
+	      exclude:
+	      - key: first
+	        pattern: /^5\d\d$/
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-  <filter **>
-    @type grep
-    @id demo-flow_0_grep
-    <exclude>
-      key first
-      pattern /^5\d\d$/
-    </exclude>
-  </filter>
+
+	<filter **>
+	  @type grep
+	  @id demo-flow_0_grep
+	  <exclude>
+	    key first
+	    pattern /^5\d\d$/
+	  </exclude>
+	</filter>
+
  ```
 
 ---
-## [Or Directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive) {#Or-Directive}
+## Or Directive
 
-Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
+Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#[or directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive) {#or-directive}-regexp}
+### regexp ([]RegexpSection, optional) {#or directive-regexp}
 
 [Regexp Directive](#Regexp-Directive) 
 
 Default: -
 
-### exclude ([]ExcludeSection, optional) {#[or directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive) {#or-directive}-exclude}
+### exclude ([]ExcludeSection, optional) {#or directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
 
 Default: -
 
 
- #### Example `Or` filter configurations
+ ## Example `Or` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - grep:
-        or:
-          - exclude:
-            - key: first
-              pattern: /^5\d\d$/
-            - key: second
-              pattern: /\.css$/
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
 
-  selectors: {}
-  localOutputRefs:
-    - demo-output
-```
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - grep:
+	      or:
+	        - exclude:
+	          - key: first
+	            pattern: /^5\d\d$/
+	          - key: second
+	            pattern: /\.css$/
+
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
+ ```
 
  #### Fluentd Config Result
  ```yaml
-    <or>
-      <exclude>
-        key first
-        pattern /^5\d\d$/
-      </exclude>
-      <exclude>
-        key second
-        pattern /\.css$/
-      </exclude>
-    </or>
+
+	<or>
+	  <exclude>
+	    key first
+	    pattern /^5\d\d$/
+	  </exclude>
+	  <exclude>
+	    key second
+	    pattern /\.css$/
+	  </exclude>
+	</or>
+
  ```
 
 ---
-## [And Directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive) {#And-Directive}
+## And Directive
 
-Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
+Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#[and directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive) {#and-directive}-regexp}
+### regexp ([]RegexpSection, optional) {#and directive-regexp}
 
 [Regexp Directive](#Regexp-Directive) 
 
 Default: -
 
-### exclude ([]ExcludeSection, optional) {#[and directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive) {#and-directive}-exclude}
+### exclude ([]ExcludeSection, optional) {#and directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
 
 Default: -
 
 
- #### Example `And` filter configurations
+ ## Example `And` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - grep:
-        and:
-          - regexp:
-            - key: first
-              pattern: /^5\d\d$/
-            - key: second
-              pattern: /\.css$/
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
 
-  selectors: {}
-  localOutputRefs:
-    - demo-output
-```
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - grep:
+	      and:
+	        - regexp:
+	          - key: first
+	            pattern: /^5\d\d$/
+	          - key: second
+	            pattern: /\.css$/
+
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
+ ```
 
  #### Fluentd Config Result
  ```yaml
-    <and>
-      <regexp>
-        key first
-        pattern /^5\d\d$/
-      </regexp>
-      <regexp>
-        key second
-        pattern /\.css$/
-      </regexp>
-    </and>
+
+	<and>
+	  <regexp>
+	    key first
+	    pattern /^5\d\d$/
+	  </regexp>
+	  <regexp>
+	    key second
+	    pattern /\.css$/
+	  </regexp>
+	</and>
+
  ```
 
 ---

@@ -1,0 +1,24 @@
+nameOverride: example
+
+# given we use `nameOverride: example` if testReceiver is enabled we can send http metrics to http://example-test-receiver:8080
+testReceiver:
+  enabled: true
+
+logging:
+  enabled: true
+  clusterFlows:
+    - name: all
+      spec:
+        match:
+          - select: {}
+        globalOutputRefs: ["http"]
+  clusterOutputs:
+    - name: http
+      spec:
+        http:
+          endpoint: http://example-test-receiver:8080
+          content_type: application/json
+          buffer:
+            type: memory
+            timekey: 1s
+            timekey_wait: 1s

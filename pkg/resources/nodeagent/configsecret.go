@@ -1,4 +1,4 @@
-// Copyright © 2021 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,13 +21,14 @@ import (
 	"text/template"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 type fluentbitInputConfig struct {
@@ -39,7 +40,7 @@ type fluentbitInputConfig struct {
 type upstreamNode struct {
 	Name string
 	Host string
-	Port int
+	Port int32
 }
 
 type upstream struct {
@@ -171,25 +172,28 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 	}
 
 	input := fluentBitConfig{
-		Flush:         n.nodeAgent.FluentbitSpec.Flush,
-		Grace:         n.nodeAgent.FluentbitSpec.Grace,
-		LogLevel:      n.nodeAgent.FluentbitSpec.LogLevel,
-		CoroStackSize: n.nodeAgent.FluentbitSpec.CoroStackSize,
-		Namespace:     n.logging.Spec.ControlNamespace,
-		TLS: struct {
+		Flush:                   n.nodeAgent.FluentbitSpec.Flush,
+		Grace:                   n.nodeAgent.FluentbitSpec.Grace,
+		LogLevel:                n.nodeAgent.FluentbitSpec.LogLevel,
+		CoroStackSize:           n.nodeAgent.FluentbitSpec.CoroStackSize,
+		Namespace:               n.logging.Spec.ControlNamespace,
+		Monitor:                 monitor,
+		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
+		TargetPort:              fluentd.ServicePort,
+		Input:                   fluentbitInput,
+		DisableKubernetesFilter: disableKubernetesFilter,
+		KubernetesFilter:        fluentbitKubernetesFilter,
+		BufferStorage:           fluentbitBufferStorage,
+	}
+
+	if n.nodeAgent.FluentbitSpec != nil && n.nodeAgent.FluentbitSpec.TLS != nil {
+		input.TLS = struct {
 			Enabled   bool
 			SharedKey string
 		}{
 			Enabled:   *n.nodeAgent.FluentbitSpec.TLS.Enabled,
 			SharedKey: n.nodeAgent.FluentbitSpec.TLS.SharedKey,
-		},
-		Monitor:                 monitor,
-		TargetHost:              fmt.Sprintf("%s.%s.svc%s", n.FluentdQualifiedName(fluentd.ServiceName), n.logging.Spec.ControlNamespace, n.logging.ClusterDomainAsSuffix()),
-		TargetPort:              n.logging.Spec.FluentdSpec.Port,
-		Input:                   fluentbitInput,
-		DisableKubernetesFilter: disableKubernetesFilter,
-		KubernetesFilter:        fluentbitKubernetesFilter,
-		BufferStorage:           fluentbitBufferStorage,
+		}
 	}
 	if n.nodeAgent.FluentbitSpec.FilterAws != nil {
 		awsFilter, err := mapper.StringsMap(n.nodeAgent.FluentbitSpec.FilterAws)
@@ -234,11 +238,11 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		}
 	}
 
-	if nil == n.fluentdDataProvider {
+	if nil == n.loggingDataProvider {
 		return nil, nil, errors.WrapIf(err, "nil fluent data provider")
 	}
 
-	fluentdReplicas, err := n.fluentdDataProvider.GetReplicaCount(context.TODO(), n.logging)
+	fluentdReplicas, err := n.loggingDataProvider.GetReplicaCount(context.TODO())
 	if err != nil {
 		return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 	}
@@ -322,6 +326,6 @@ func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
 			n.logging.Spec.ControlNamespace,
 			n.logging.ClusterDomainAsSuffix()),
-		Port: 24240,
+		Port: n.logging.Spec.FluentdSpec.Port,
 	}
 }

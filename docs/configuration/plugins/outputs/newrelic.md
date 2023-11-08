@@ -6,17 +6,19 @@ generated_file: true
 
 # New Relic Logs plugin for Fluentd
 ## Overview
-**newrelic** output plugin send log data to New Relic Logs
+ **newrelic** output plugin send log data to New Relic Logs
 
- #### Example output configurations
+ ## Example output configurations
  ```yaml
  spec:
-   newrelic:
-     license_key:
-       valueFrom:
-         secretKeyRef:
-           name: logging-newrelic
-           key: licenseKey
+
+	newrelic:
+	  license_key:
+	    valueFrom:
+	      secretKeyRef:
+	        name: logging-newrelic
+	        key: licenseKey
+
  ```
 
 ## Configuration
@@ -39,5 +41,17 @@ Default: -
 New Relic ingestion endpoint [Secret](../secret/) 
 
 Default: https://log-api.newrelic.com/log/v1
+
+### format (*Format, optional) {#output config-format}
+
+[Format](../format/) 
+
+Default: -
+
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
+Default: -
 
 

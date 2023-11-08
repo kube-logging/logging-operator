@@ -1,0 +1,246 @@
+name: Artifacts
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: Publish artifacts to the artifact store
+        default: false
+        required: false
+        type: boolean
+      release:
+        description: Whether this is a release build
+        default: false
+        required: false
+        type: boolean
+    outputs:
+      container-image-name:
+        description: Container image name
+        value: ${{ jobs.container-image.outputs.name }}
+      container-image-digest:
+        description: Container image digest
+        value: ${{ jobs.container-image.outputs.digest }}
+      container-image-tag:
+        description: Container image tag
+        value: ${{ jobs.container-image.outputs.tag }}
+      container-image-ref:
+        description: Container image ref
+        value: ${{ jobs.container-image.outputs.ref }}
+      helm-chart-name:
+        description: Helm chart OCI name
+        value: ${{ jobs.helm-chart.outputs.name }}
+      helm-chart-tag:
+        description: Helm chart tag
+        value: ${{ jobs.helm-chart.outputs.tag }}
+      helm-chart-package:
+        description: Helm chart package name
+        value: ${{ jobs.helm-chart.outputs.package }}
+
+permissions:
+  contents: read
+
+jobs:
+  container-image:
+    name: Container image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+    outputs:
+      name: ${{ steps.image-name.outputs.value }}
+      digest: ${{ steps.build.outputs.digest }}
+      tag: ${{ steps.meta.outputs.version }}
+      ref: ${{ steps.image-ref.outputs.value }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7 # v2.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4c0219f9ac95b02789c1075625400b2acbff50b1 # v2.9.1
+
+      - name: Set image name
+        id: image-name
+        run: echo "value=ghcr.io/${{ github.repository }}" >> "$GITHUB_OUTPUT"
+
+      - name: Gather build metadata
+        id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
+        with:
+          images: ${{ steps.image-name.outputs.value }}
+          flavor: |
+            latest = false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr,prefix=pr-
+            type=semver,pattern={{raw}}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.description=The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline.
+            org.opencontainers.image.title=Logging operator
+            org.opencontainers.image.authors=Kube logging authors
+            org.opencontainers.image.documentation=https://kube-logging.dev/docs/
+
+
+      # Multiple exporters are not supported yet
+      # See https://github.com/moby/buildkit/pull/2760
+      - name: Determine build output
+        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        id: build-output
+        with:
+          cond: ${{ inputs.publish }}
+          if_true: type=image,push=true
+          if_false: type=oci,dest=image.tar
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+        if: inputs.publish
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+          # push: ${{ inputs.publish }}
+
+      - name: Set image ref
+        id: image-ref
+        run: echo "value=${{ steps.image-name.outputs.value }}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch image
+        run: skopeo --insecure-policy copy docker://${{ steps.image-name.outputs.value }}:${{ steps.meta.outputs.version }} oci-archive:image.tar
+        if: inputs.publish
+
+      - name: Extract OCI tarball
+        run: |
+          mkdir -p image
+          tar -xf image.tar -C image
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@fbd16365eb88e12433951383f5e99bd901fc618f # 0.12.0
+        with:
+          input: image
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: "[${{ github.job }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@0116bc2df50751f9724a2e35ef1f24d22f90e4e1 # v2.22.3
+        with:
+          sarif_file: trivy-results.sarif
+
+  helm-chart:
+    name: Helm chart
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+    outputs:
+      name: ${{ steps.oci-chart-name.outputs.value }}
+      tag: ${{ steps.version.outputs.value }}
+      package: ${{ steps.build.outputs.package }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
+        with:
+          version: v3.12.0
+
+      - name: Set chart name
+        id: chart-name
+        run: echo "value=${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Set OCI registry name
+        id: oci-registry-name
+        run: echo "value=ghcr.io/${{ github.repository_owner }}/helm-charts" >> "$GITHUB_OUTPUT"
+
+      - name: Set OCI chart name
+        id: oci-chart-name
+        run: echo "value=${{ steps.oci-registry-name.outputs.value }}/${{ steps.chart-name.outputs.value }}" >> "$GITHUB_OUTPUT"
+
+      - name: Helm lint
+        run: helm lint charts/${{ steps.chart-name.outputs.value }}
+
+      - name: Determine raw version
+        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        id: version
+        with:
+          cond: ${{ inputs.release }}
+          if_true: ${{ github.ref_name }}
+          if_false: 0.0.0
+
+      - name: Helm package
+        id: build
+        run: |
+          helm package charts/${{ steps.chart-name.outputs.value }} --version ${{ steps.version.outputs.value }} --app-version ${{ steps.version.outputs.value }}
+          echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
+
+      - name: Upload chart as artifact
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: "[${{ github.job }}] Helm chart"
+          path: ${{ steps.build.outputs.package }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+        if: inputs.publish && inputs.release
+
+      - name: Helm push
+        run: helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }}
+        env:
+          HELM_REGISTRY_CONFIG: ~/.docker/config.json
+        if: inputs.publish && inputs.release
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@fbd16365eb88e12433951383f5e99bd901fc618f # 0.12.0
+        with:
+          scan-type: config
+          scan-ref: charts/${{ steps.chart-name.outputs.value }}
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: "[${{ github.job }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@0116bc2df50751f9724a2e35ef1f24d22f90e4e1 # v2.22.3
+        with:
+          sarif_file: trivy-results.sarif

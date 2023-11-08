@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ package syslogng
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -84,6 +84,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.SyslogNGSpec.Metrics != nil && r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
 		if r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -99,14 +100,18 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
-					Port:          "http-metrics",
-					Path:          "/metrics",
-					Interval:      "15s",
-					ScrapeTimeout: "5s",
+					Port:           "http-metrics",
+					Path:           "/metrics",
+					Interval:       "15s",
+					ScrapeTimeout:  "5s",
+					HonorLabels:    r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs: r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
+					TLSConfig:      r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+					Scheme:         r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
@@ -146,6 +151,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil && r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
 		if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -167,10 +173,12 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+					TLSConfig:            r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+					Scheme:               r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}

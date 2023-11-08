@@ -1,4 +1,4 @@
-// Copyright © 2021 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,17 +17,16 @@ package setup
 import (
 	"context"
 	"testing"
-	"time"
 
-	"github.com/banzaicloud/operator-tools/pkg/utils"
-	"github.com/stretchr/testify/require"
+	"github.com/MakeNowJust/heredoc"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/banzaicloud/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
 func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
@@ -40,7 +39,6 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 		opt.ApplyToLogProducerOptions(&options)
 	}
 
-	logProducerSource := `setInterval(() => console.log('this is a line of log', new Date()), 500);`
 	lbls := map[string]string{
 		"app.kubernetes.io/name": options.Name,
 	}
@@ -61,13 +59,24 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 					Containers: []corev1.Container{
 						{
 							Name:  "producer",
-							Image: "node:latest",
-							Command: []string{
-								"node",
+							Image: "ghcr.io/kube-logging/log-generator:latest",
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "config",
+									MountPath: "/conf",
+								},
 							},
-							Args: []string{
-								"-e",
-								logProducerSource,
+						},
+					},
+					Volumes: []corev1.Volume{
+						{
+							Name: "config",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "log-generator-config",
+									},
+								},
 							},
 						},
 					},
@@ -75,8 +84,23 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 			},
 		},
 	}
-	require.NoError(t, c.Create(context.Background(), &logProducerDeployment))
-	require.Eventually(t, cond.AnyPodShouldBeRunning(t, c, client.MatchingLabels(lbls)), 2*time.Minute, 5*time.Second)
+	logProducerConfig := corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "log-generator-config",
+			Namespace: options.Namespace,
+		},
+		Data: map[string]string{
+			"config.ini": heredoc.Doc(`
+				[message]
+				count = -1
+				
+				[golang]
+				enabled = true
+			`),
+		},
+	}
+	common.RequireNoError(t, c.Create(context.Background(), &logProducerConfig))
+	common.RequireNoError(t, c.Create(context.Background(), &logProducerDeployment))
 }
 
 type LogProducerOption interface {

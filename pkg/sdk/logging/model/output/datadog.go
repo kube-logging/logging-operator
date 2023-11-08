@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Datadog"
@@ -32,7 +32,8 @@ type _hugoDatadog interface{} //nolint:deadcode,unused
 // spec:
 //
 //	datadog:
-//	  api_key '<YOUR_API_KEY>'
+//	  api_key:
+//	    value: '<YOUR_API_KEY>' # for referencing a secret see https://kube-logging.dev/docs/configuration/plugins/outputs/secret/
 //	  dd_source: '<INTEGRATION_NAME>'
 //	  dd_tags: '<KEY1:VALUE1>,<KEY2:VALUE2>'
 //	  dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'

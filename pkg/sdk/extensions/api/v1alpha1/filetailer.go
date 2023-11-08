@@ -17,8 +17,8 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/tailer"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
 func (f FileTailer) defaults() FileTailer {
@@ -59,5 +59,5 @@ func (f FileTailer) Command(Name string) []string {
 
 // GeneralDescriptor returns the tailer.General general Tailer struct
 func (f FileTailer) GeneralDescriptor() tailer.General {
-	return tailer.General{Name: f.Name, Path: f.Path, Disabled: f.Disabled, ContainerBase: f.ContainerBase}
+	return tailer.General{Name: f.Name, Path: f.Path, Disabled: f.Disabled, ContainerBase: f.ContainerBase, Image: f.Image}
 }

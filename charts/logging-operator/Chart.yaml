@@ -1,5 +1,15 @@
-apiVersion: v1
-appVersion: "3.17.10"
-description: A Helm chart to install Banzai Cloud logging-operator
+apiVersion: v2
+type: application
 name: logging-operator
-version: 3.17.10
+version: 0.0.0
+appVersion: latest
+kubeVersion: ">=1.22.0-0"
+description: Logging operator for Kubernetes based on Fluentd and Fluentbit.
+keywords:
+  - logging
+  - fluentd
+  - fluentbit
+home: https://kube-logging.github.io
+sources:
+  - https://github.com/kube-logging/logging-operator
+  - https://github.com/kube-logging/helm-charts/tree/main/charts/logging-operator

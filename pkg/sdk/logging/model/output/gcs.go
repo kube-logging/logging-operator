@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Google Cloud Storage"
@@ -24,7 +24,7 @@ import (
 type _hugoGCS interface{} //nolint:deadcode,unused
 
 // +docName:"Google Cloud Storage"
-// Store logs in Google Cloud Storage. For details, see [https://github.com/banzaicloud/fluent-plugin-gcs](https://github.com/banzaicloud/fluent-plugin-gcs).
+// Store logs in Google Cloud Storage. For details, see [https://github.com/kube-logging/fluent-plugin-gcs](https://github.com/kube-logging/fluent-plugin-gcs).
 //
 // ## Example
 // ```yaml
@@ -39,7 +39,7 @@ type _hugoGCS interface{} //nolint:deadcode,unused
 type _docGCS interface{} //nolint:deadcode,unused
 
 // +name:"Google Cloud Storage"
-// +url:"https://github.com/banzaicloud/fluent-plugin-gcs"
+// +url:"https://github.com/kube-logging/fluent-plugin-gcs"
 // +version:"0.4.0"
 // +description:"Store logs in Google Cloud Storage"
 // +status:"GA"

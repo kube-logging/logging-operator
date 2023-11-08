@@ -22,7 +22,7 @@ Default: -
 
 ### skipInvalidResources (bool, optional) {#loggingspec-skipinvalidresources}
 
-Skip Invalid Resources 
+Whether to skip invalid Flow and ClusterFlow resources 
 
 Default: -
 
@@ -32,9 +32,15 @@ Override generated config. This is a *raw* configuration string for troubleshoot
 
 Default: -
 
+### configCheck (ConfigCheck, optional) {#loggingspec-configcheck}
+
+ConfigCheck settings that apply to both fluentd and syslog-ng 
+
+Default: -
+
 ### fluentbit (*FluentbitSpec, optional) {#loggingspec-fluentbit}
 
-Fluentbit daemonset configuration. 
+FluentbitAgent daemonset configuration. Deprecated, will be removed with next major version Migrate to the standalone NodeAgent resource 
 
 Default: -
 
@@ -74,9 +80,21 @@ Limit namespaces to watch Flow and Output custom resources.
 
 Default: -
 
+### watchNamespaceSelector (*metav1.LabelSelector, optional) {#loggingspec-watchnamespaceselector}
+
+WatchNamespaceSelector is a LabelSelector to find matching namespaces to watch as in WatchNamespaces 
+
+Default: -
+
+### clusterDomain (*string, optional) {#loggingspec-clusterdomain}
+
+Cluster domain name to be used when templating URLs to services .
+
+Default: "cluster.local."
+
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}
 
-Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
+Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
 
 Default: -
 
@@ -86,9 +104,9 @@ Allow configuration of cluster resources from any namespace. Mutually exclusive 
 
 Default: -
 
-### nodeAgents ([]*NodeAgent, optional) {#loggingspec-nodeagents}
+### nodeAgents ([]*InlineNodeAgent, optional) {#loggingspec-nodeagents}
 
-NodeAgent Configuration 
+InlineNodeAgent Configuration Deprecated, will be removed with next major version 
 
 Default: -
 
@@ -99,11 +117,52 @@ EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate th
 Default: -
 
 
+## ConfigCheck
+
+### strategy (ConfigCheckStrategy, optional) {#configcheck-strategy}
+
+Select the config check strategy to use. `DryRun`: parse and validate configuration `StartWithTimeout`: start with given configuration and exit after specified timeout Default: `DryRun` 
+
+Default: -
+
+### timeoutSeconds (int, optional) {#configcheck-timeoutseconds}
+
+Configure timeout in seconds if strategy is StartWithTimeout 
+
+Default: -
+
+### labels (map[string]string, optional) {#configcheck-labels}
+
+Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten. 
+
+Default: -
+
+
 ## LoggingStatus
 
 LoggingStatus defines the observed state of Logging
 
 ### configCheckResults (map[string]bool, optional) {#loggingstatus-configcheckresults}
+
+Result of the config check. Under normal conditions there is a single item in the map with a bool value. 
+
+Default: -
+
+### problems ([]string, optional) {#loggingstatus-problems}
+
+Problems with the logging resource 
+
+Default: -
+
+### problemsCount (int, optional) {#loggingstatus-problemscount}
+
+Count of problems for printcolumn 
+
+Default: -
+
+### watchNamespaces ([]string, optional) {#loggingstatus-watchnamespaces}
+
+List of namespaces that watchNamespaces + watchNamespaceSelector is resolving to. Not set means all namespaces. 
 
 Default: -
 
@@ -161,6 +220,14 @@ Deprecated
 Default: -
 
 ### globalOutputRefs ([]string, optional) {#defaultflowspec-globaloutputrefs}
+
+Default: -
+
+### flowLabel (string, optional) {#defaultflowspec-flowlabel}
+
+Default: -
+
+### includeLabelInRouter (*bool, optional) {#defaultflowspec-includelabelinrouter}
 
 Default: -
 

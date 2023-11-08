@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Geo IP"
@@ -42,11 +42,11 @@ type GeoIP struct {
 	//Specify optional geoip database (using bundled GeoLiteCity databse by default)
 	GeoipDatabase string `json:"geoip_database,omitempty"`
 	//Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default)
-	Geoip2Database string `json:"geoip_2_database,omitempty"`
+	Geoip2Database string `json:"geoip2_database,omitempty"`
 	//Specify backend library (geoip2_c, geoip, geoip2_compat)
 	BackendLibrary string `json:"backend_library,omitempty"`
 	// To avoid get stacktrace error with `[null, null]` array for elasticsearch.
-	SkipAddingNullRecord bool `json:"skip_adding_null_record,omitempty" plugin:"default:true"`
+	SkipAddingNullRecord *bool `json:"skip_adding_null_record,omitempty" plugin:"default:true"`
 	// Records are represented as maps: `key: value`
 	Records []Record `json:"records,omitempty"`
 }

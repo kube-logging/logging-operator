@@ -1,6 +1,0 @@
-apiVersion: v1
-appVersion: "3.17.10"
-description: A Helm chart to configure logging resource for the Logging operator
-name: logging-operator-logging
-version: 3.17.10
-icon: https://raw.githubusercontent.com/banzaicloud/logging-operator/master/docs/img/icon.png

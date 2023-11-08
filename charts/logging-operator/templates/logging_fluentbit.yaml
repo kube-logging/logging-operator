@@ -1,0 +1,17 @@
+{{- if and .Values.logging.enabled (not .Values.logging.fluentbitDisabled) -}}
+{{- $fluentbitSpec := .Values.logging.fluentbit }}
+{{- if .Values.logging.loggingRef }}
+  {{- $fluentbitSpec := set .Values.logging.fluentbit "loggingRef" (default .Values.logging.loggingRef .Values.logging.fluentbit.loggingRef) -}}
+{{- end }}
+
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: {{ include "logging-operator.releasename" . }}
+  labels: {{ include "logging-operator.labels" . | nindent 4 }}
+{{- if $fluentbitSpec }}
+spec: {{- toYaml $fluentbitSpec | nindent 2 }}
+{{- else }}
+spec: {}
+{{- end }}
+{{- end }}

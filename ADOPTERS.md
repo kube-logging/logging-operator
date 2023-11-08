@@ -2,14 +2,18 @@
 
 This is a list of production adopters of Logging Operator:
 
-| Company | Industry |
-| :--- | :--- |
-|[Banzai Cloud](https://banzaicloud.com)|Enterprise Technology|
-|[hipages](https://hipages.com.au)|E-commerce|
-|[Code Factory](https://codefactory.hu)|Software Development/Consultancy|
-|[Flexera](https://www.flexera.com/)|Optimizing your IT assets from on-premises to the cloud|
-|[Rancher](https://rancher.com/docs/rancher/v2.x/en/logging/#changes-in-rancher-v2-5)|As of Rancher 2.5, Rancher’s logging feature is powered by the Banzai Cloud Logging operator instead of Rancher’s in-house logging solution|
-|staffscale.io|Enterprise Resource Planning|
-|[Liquid Reply](https://liquidreply.net/monitor-your-multi-cluster-environments)|AWS Premier Consulting Partner for professional cloud computing services|
-|[Carrefour](https://carrefour.com)|Retail|
-|[KubeGems](https://kubegems.io)|KubeGems observability/logging is powerd by Banzai Cloud Logging operator |
+| Company                                                                      | Industry                                                                                                                                                                |
+|:-----------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Acquia](https://www.acquia.com)                                             | Drupal site hosting as a service                                                                                                                                        |
+| [Carrefour](https://carrefour.com)                                           | Retail                                                                                                                                                                  |
+| [Cisco](https://www.cisco.com)                                               | Digital communications technology                                                                                                                                       |
+| [Code Factory](https://codefactory.hu)                                       | Software Development/Consultancy                                                                                                                                        |
+| [Dailymotion](https://dailymotion.com)                                       | Video streaming, Adtech                                                                                                                                                 |
+| [D2IQ](https://d2iq.com)                                                     | Kubernetes management tool. D2IQ's logging offering is based on the Logging Operator https://docs.d2iq.com/dkp/2.5/logging                                              |
+| [Flexera](https://www.flexera.com)                                           | Optimizing your IT assets from on-premises to the cloud                                                                                                                 |
+| [hipages](https://hipages.com.au)                                            | E-commerce                                                                                                                                                              |
+| [KubeGems](https://kubegems.io)                                              | KubeGems observability/logging is powerd by Banzai Cloud Logging operator                                                                                               |
+| [Liquid Reply](https://liquidreply.net)                                      | AWS Premier Consulting Partner for professional cloud computing services https://liquidreply.net/monitor-your-multi-cluster-environments                                |
+| [NAIS](https://nais.io)                                                      | The Norwegian Labour and Welfare Administration (NAV) uses the Logging Operator in the NAIS application platform                                                        |
+| [PITS Global Data Recovery Services](https://www.pitsdatarecovery.net)       | Data Recovery Services                                                                                                                                                  |
+| [Rancher](https://rancher.com)                                               | Kubernetes management tool. RKE’s default logging solution is based on the Logging Operator   https://ranchermanager.docs.rancher.com/v2.5/pages-for-subheaders/logging |

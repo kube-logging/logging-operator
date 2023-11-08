@@ -15,8 +15,8 @@
 package filter
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Grep"
@@ -48,8 +48,8 @@ type GrepConfig struct {
 }
 
 // +kubebuilder:object:generate=true
-// +docName:"[Regexp Directive](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive) {#Regexp-Directive}"
-// Specify filtering rule. This directive contains two parameters.
+// +docName:"Regexp Directive"
+// Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-regexp-greater-than-directive)). This directive contains two parameters.
 type RegexpSection struct {
 	// Specify field name in the record to parse.
 	Key string `json:"key"`
@@ -94,8 +94,8 @@ type RegexpSection struct {
 type _expRegexp interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Exclude Directive](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive) {#Exclude-Directive}"
-// Specify filtering rule to reject events. This directive contains two parameters.
+// +docName:"Exclude Directive"
+// Specify filtering rule to reject events (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-exclude-greater-than-directive)). This directive contains two parameters.
 type ExcludeSection struct {
 	// Specify field name in the record to parse.
 	Key string `json:"key"`
@@ -140,8 +140,8 @@ type ExcludeSection struct {
 type _expExclude interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Or Directive](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive) {#Or-Directive}"
-// Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
+// +docName:"Or Directive"
+// Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 type OrSection struct {
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp []RegexpSection `json:"regexp,omitempty"`
@@ -192,8 +192,8 @@ type OrSection struct {
 type _expOR interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[And Directive](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive) {#And-Directive}"
-// Specify filtering rule. This directive contains either `regexp` or `exclude` directive.
+// +docName:"And Directive"
+// Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 type AndSection struct {
 	// +docLink:"Regexp Directive,#Regexp-Directive"
 	Regexp []RegexpSection `json:"regexp,omitempty"`

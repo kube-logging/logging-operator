@@ -15,7 +15,9 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"errors"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
 )
 
@@ -24,8 +26,9 @@ func (o *Output) ConvertTo(dstRaw conversion.Hub) error {
 
 	Log.Info("ConvertTo", "source", o.TypeMeta, "destination", dst.TypeMeta)
 
+	Log.Error(errors.New("unsupported conversion"), "conversion is not supported, spec will be omitted")
+
 	dst.ObjectMeta = o.ObjectMeta
-	dst.Spec = v1beta1.OutputSpec(o.Spec)
 	dst.Status = v1beta1.OutputStatus(o.Status)
 
 	return nil
@@ -36,8 +39,9 @@ func (o *Output) ConvertFrom(srcRaw conversion.Hub) error {
 
 	Log.Info("ConvertFrom", "source", src.TypeMeta, "destination", o.TypeMeta)
 
+	Log.Error(errors.New("unsupported conversion"), "conversion is not supported, spec will be omitted")
+
 	o.ObjectMeta = src.ObjectMeta
-	o.Spec = OutputSpec(src.Spec)
 	o.Status = OutputStatus(src.Status)
 
 	return nil

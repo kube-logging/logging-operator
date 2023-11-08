@@ -17,9 +17,9 @@ package output_test
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/ghodss/yaml"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,6 +42,7 @@ buffer:
     @id test
     extra_labels {"testing":"testing"}
     extract_kubernetes_labels true
+	include_thread_label true
     line_format json
     remove_keys ["kubernetes"]
     url http://loki:3100

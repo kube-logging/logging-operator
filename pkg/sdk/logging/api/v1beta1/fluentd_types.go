@@ -15,10 +15,11 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/input"
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
 
 // +name:"FluentdSpec"
@@ -43,21 +44,24 @@ type FluentdSpec struct {
 	Image                  ImageSpec         `json:"image,omitempty"`
 	DisablePvc             bool              `json:"disablePvc,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
-	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
+	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
 	// Deprecated, use bufferStorageVolume
-	FluentdPvcSpec            *volume.KubernetesVolume          `json:"fluentdPvcSpec,omitempty"`
-	VolumeMountChmod          bool                              `json:"volumeMountChmod,omitempty"`
-	VolumeModImage            ImageSpec                         `json:"volumeModImage,omitempty"`
-	ConfigReloaderImage       ImageSpec                         `json:"configReloaderImage,omitempty"`
-	Resources                 corev1.ResourceRequirements       `json:"resources,omitempty"`
-	ConfigCheckResources      corev1.ResourceRequirements       `json:"configCheckResources,omitempty"`
-	ConfigReloaderResources   corev1.ResourceRequirements       `json:"configReloaderResources,omitempty"`
-	LivenessProbe             *corev1.Probe                     `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck      bool                              `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe            *corev1.Probe                     `json:"readinessProbe,omitempty"`
-	ReadinessDefaultCheck     ReadinessDefaultCheck             `json:"readinessDefaultCheck,omitempty"`
+	FluentdPvcSpec          *volume.KubernetesVolume    `json:"fluentdPvcSpec,omitempty"`
+	VolumeMountChmod        bool                        `json:"volumeMountChmod,omitempty"`
+	VolumeModImage          ImageSpec                   `json:"volumeModImage,omitempty"`
+	ConfigReloaderImage     ImageSpec                   `json:"configReloaderImage,omitempty"`
+	Resources               corev1.ResourceRequirements `json:"resources,omitempty"`
+	ConfigCheckResources    corev1.ResourceRequirements `json:"configCheckResources,omitempty"`
+	ConfigReloaderResources corev1.ResourceRequirements `json:"configReloaderResources,omitempty"`
+	LivenessProbe           *corev1.Probe               `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck    bool                        `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe          *corev1.Probe               `json:"readinessProbe,omitempty"`
+	ReadinessDefaultCheck   ReadinessDefaultCheck       `json:"readinessDefaultCheck,omitempty"`
+	// Fluentd port inside the container (24240 by default)
+	// The headless service port is controlled by this field as well
+	// Note, that the default ClusterIP service port is always 24240 regardless of this field
 	Port                      int32                             `json:"port,omitempty"`
 	Tolerations               []corev1.Toleration               `json:"tolerations,omitempty"`
 	NodeSelector              map[string]string                 `json:"nodeSelector,omitempty"`
@@ -67,6 +71,7 @@ type FluentdSpec struct {
 	BufferVolumeMetrics       *Metrics                          `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeImage         ImageSpec                         `json:"bufferVolumeImage,omitempty"`
 	BufferVolumeArgs          []string                          `json:"bufferVolumeArgs,omitempty"`
+	BufferVolumeResources     corev1.ResourceRequirements       `json:"bufferVolumeResources,omitempty"`
 	Security                  *Security                         `json:"security,omitempty"`
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`
@@ -146,11 +151,17 @@ type FluentdTLS struct {
 type FluentdDrainConfig struct {
 	// Should buffers on persistent volumes left after scaling down the statefulset be drained
 	Enabled bool `json:"enabled,omitempty"`
-	// Container image to use for the drain watch sidecar
+	// Annotations to use for the drain watch sidecar
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten.
+	Labels map[string]string `json:"labels,omitempty"`
 	// Should persistent volume claims be deleted after draining is done
 	DeleteVolume bool      `json:"deleteVolume,omitempty"`
 	Image        ImageSpec `json:"image,omitempty"`
 	// Container image to use for the fluentd placeholder pod
 	PauseImage ImageSpec `json:"pauseImage,omitempty"`
+	// Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+	// Configurable security context, uses fluentd pods' security context by default
+	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 }

@@ -1,0 +1,53 @@
+{{ if .Values.testReceiver.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "logging-operator.releasename" . }}-test-receiver
+  namespace: {{ include "logging-operator.namespace" . }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.testReceiver.port }}
+      targetPort: receiver
+      protocol: TCP
+      name: receiver
+  selector:
+    app.kubernetes.io/name: {{ include "logging-operator.releasename" . }}-test-receiver
+    app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "logging-operator.releasename" . }}-test-receiver
+  namespace: {{ include "logging-operator.namespace" . }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "logging-operator.releasename" . }}-test-receiver
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "logging-operator.releasename" . }}-test-receiver
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        fluentbit.io/exclude: "true"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.testReceiver.image }}"
+          args:
+          {{- range .Values.testReceiver.args }}
+            - {{ . }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.testReceiver.pullPolicy }}
+          resources:
+            {{- toYaml .Values.testReceiver.resources | nindent 12 }}
+          ports:
+            - name: receiver
+              containerPort: {{ .Values.testReceiver.port }}
+{{- end }}

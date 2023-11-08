@@ -17,22 +17,17 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentbit"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/resources/model"
-	"github.com/banzaicloud/logging-operator/pkg/resources/nodeagent"
-	"github.com/banzaicloud/logging-operator/pkg/resources/syslogng"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/render"
-	syslogngconfig "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -41,9 +36,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	loggingv1beta1 "github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
+	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
@@ -60,8 +64,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;flows;clusterflows;outputs;clusteroutputs,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -79,7 +83,7 @@ type LoggingReconciler struct {
 
 // Reconcile logging resources
 func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("logging", req.NamespacedName)
+	log := r.Log.WithValues("logging", req.Name)
 
 	var logging loggingv1beta1.Logging
 	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
@@ -89,9 +93,24 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
+	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
+	} else {
+		log.Info("WARNING ServiceMonitor is not supported in the cluster")
+	}
+
+	if err := r.Client.List(ctx, &v1.PrometheusRuleList{}); err == nil {
+		//nolint:staticcheck
+		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
+	} else {
+		log.Info("WARNING PrometheusRule is not supported in the cluster")
+	}
+
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
+	r.dynamicDefaults(ctx, log, logging)
 
 	reconcilerOpts := reconciler.ReconcilerOpts{
 		RecreateErrorMessageCondition:                reconciler.MatchImmutableErrorMessages,
@@ -102,7 +121,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			"As of fluent-bit, to avoid duplicated logs, make sure to configure a hostPath volume for the positions through `logging.spec.fluentbit.spec.positiondb`. ",
 	}
 
-	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client)
+	loggingResourceRepo := model.NewLoggingResourceRepository(r.Client, log)
 
 	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
@@ -141,15 +160,26 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}()
 
-	reconcilers := []resources.ComponentReconciler{
-		model.NewValidationReconciler(ctx, r.Client, loggingResources, &secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath}),
+	reconcilers := []resources.ContextAwareComponentReconciler{
+		model.NewValidationReconciler(
+			r.Client,
+			loggingResources,
+			&secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath},
+			log.WithName("validation"),
+		),
 	}
+
+	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
+		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
+	}
+
+	var loggingDataProvider loggingdataprovider.LoggingDataProvider
 
 	if logging.Spec.FluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -157,13 +187,14 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
-			reconcilers = append(reconcilers, func() (*reconcile.Result, error) {
+			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
 				return &reconcile.Result{}, err
 			})
 		} else {
@@ -171,18 +202,66 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
+		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
 	}
 
-	if logging.Spec.FluentbitSpec != nil {
-		reconcilers = append(reconcilers, fluentbit.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+	switch len(loggingResources.Fluentbits) {
+	case 0:
+		// check for legacy definition
+		if logging.Spec.FluentbitSpec != nil {
+			log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
+			nameProvider := fluentbit.NewLegacyFluentbitNameProvider(&logging)
+			reconcilers = append(reconcilers, fluentbit.New(
+				r.Client,
+				log.WithName("fluentbit-legacy"),
+				&logging,
+				reconcilerOpts,
+				logging.Spec.FluentbitSpec,
+				loggingDataProvider,
+				nameProvider,
+				nil, // Not implemented for the embedded fluentbit config
+			).Reconcile)
+		}
+	default:
+		if logging.Spec.FluentbitSpec != nil {
+			return ctrl.Result{}, errors.New("fluentbit has to be removed from the logging resource before the new FluentbitAgent can be reconciled")
+		}
+		l := log.WithName("fluentbit")
+		for _, f := range loggingResources.Fluentbits {
+			f := f
+			reconcilers = append(reconcilers, fluentbit.New(
+				r.Client,
+				l.WithValues("fluentbitagent", f.Name),
+				&logging,
+				reconcilerOpts,
+				&f.Spec,
+				loggingDataProvider,
+				fluentbit.NewStandaloneFluentbitNameProvider(&f),
+				loggingResources.LoggingRoutes,
+			).Reconcile)
+		}
 	}
 
-	if len(logging.Spec.NodeAgents) > 0 {
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, reconcilerOpts, fluentd.NewDataProvider(r.Client)).Reconcile)
+	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
+		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
+		// for compatibility reasons
+		agents := make(map[string]loggingv1beta1.NodeAgentConfig)
+		for _, a := range loggingResources.NodeAgents {
+			agents[a.Name] = a.Spec.NodeAgentConfig
+		}
+		for _, a := range logging.Spec.NodeAgents {
+			if _, exists := agents[a.Name]; !exists {
+				agents[a.Name] = a.NodeAgentConfig
+			} else {
+				problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name)
+				log.Error(errors.New("nodeagent definition conflict"), problem)
+			}
+		}
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
-		result, err := rec()
+		result, err := rec(ctx)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -191,7 +270,18 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return *result, err
 		}
 	}
+
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, logging loggingv1beta1.Logging) {
+	nodes := corev1.NodeList{}
+	if err := r.Client.List(ctx, &nodes); err != nil {
+		log.Error(err, "listing nodes")
+	}
+	if logging.Spec.SyslogNGSpec != nil && logging.Spec.SyslogNGSpec.MaxConnections == 0 {
+		logging.Spec.SyslogNGSpec.MaxConnections = max(100, min(1000, len(nodes.Items)*10))
+	}
 }
 
 func updateResourceStateMetrics(obj client.Object, active bool, problemsCount int, statusMetric *prometheus.GaugeVec, problemsMetric *prometheus.GaugeVec) {
@@ -221,11 +311,11 @@ func getResourceStateMetrics(logger logr.Logger) (stateMetrics *prometheus.Gauge
 
 func getOrRegisterGaugeVec(reg prometheus.Registerer, gv *prometheus.GaugeVec) (*prometheus.GaugeVec, error) {
 	if err := reg.Register(gv); err != nil {
-		if err, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			if gv, ok := err.ExistingCollector.(*prometheus.GaugeVec); ok {
+		if suberr, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			if gv, ok := suberr.ExistingCollector.(*prometheus.GaugeVec); ok {
 				return gv, nil
 			} else {
-				return nil, errors.WrapIfWithDetails(err, "already registered metric name with different type ", "metric", gv)
+				return nil, errors.WrapIfWithDetails(suberr, "already registered metric name with different type ", "metric", gv)
 			}
 		} else {
 			return nil, err
@@ -312,10 +402,10 @@ func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.
 
 // SetupLoggingWithManager setup logging manager
 func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder {
-	requestMapper := handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+	requestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
 		// get all the logging resources from the cache
 		var loggingList loggingv1beta1.LoggingList
-		if err := mgr.GetCache().List(context.TODO(), &loggingList); err != nil {
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
 			logger.Error(err, "failed to list logging resources")
 			return nil
 		}
@@ -337,8 +427,14 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.NodeAgent:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.FluentbitAgent:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
+		case *loggingv1beta1.LoggingRoute:
+			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
 		case *corev1.Secret:
-			r := regexp.MustCompile("logging.banzaicloud.io/(.*)")
+			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
 			for key := range o.Annotations {
 				if result := r.FindStringSubmatch(key); len(result) > 1 {
@@ -355,18 +451,46 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		return nil
 	})
 
+	// Trigger reconcile for all logging resources on namespace changes that define a watchNamespaceSelector
+	namespaceRequestMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
+		var loggingList loggingv1beta1.LoggingList
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
+			logger.Error(err, "failed to list logging resources")
+			return nil
+		}
+		requests := make([]reconcile.Request, 0)
+		for _, l := range loggingList.Items {
+			if l.Spec.WatchNamespaceSelector != nil {
+				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+					Name: l.Name,
+				}})
+			}
+		}
+		return requests
+	})
+
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.ClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Output{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.Flow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGClusterFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGOutput{}}, requestMapper).
-		Watches(&source.Kind{Type: &loggingv1beta1.SyslogNGFlow{}}, requestMapper).
-		Watches(&source.Kind{Type: &corev1.Secret{}}, requestMapper)
+		Watches(&corev1.Namespace{}, namespaceRequestMapper).
+		Watches(&loggingv1beta1.ClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.ClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.Output{}, requestMapper).
+		Watches(&loggingv1beta1.Flow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGClusterFlow{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
+		Watches(&corev1.Secret{}, requestMapper).
+		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper)
+
+	// TODO remove with the next major release
+	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
+		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
+		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
+	}
+
+	builder.Watches(&loggingv1beta1.FluentbitAgent{}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
@@ -388,4 +512,18 @@ func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRe
 		}
 	}
 	return
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

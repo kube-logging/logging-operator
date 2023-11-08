@@ -19,13 +19,13 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/tailer"
-	v1alpha1 "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/api/v1alpha1"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
+	v1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -151,7 +151,7 @@ func (h *HostTailer) Containers(tailers []tailer.Tailer, volumePaths []string) [
 			WithName(volumepath.ConvertFilePath(*path)).
 			VolumeMount
 		command := t.Command(h.Name(generalDescriptor.Name))
-		containers = append(containers, h.Container(generalDescriptor.Name, volumeMount, command, generalDescriptor.ContainerBase))
+		containers = append(containers, h.Container(generalDescriptor.Name, volumeMount, command, generalDescriptor.ContainerBase, generalDescriptor.Image))
 	}
 	return containers
 }

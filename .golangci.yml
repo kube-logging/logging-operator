@@ -8,8 +8,6 @@ linters-settings:
         min-confidence: 0.9
     gocyclo:
         min-complexity: 15
-    # goimports:
-        # local-prefixes: github.com/banzaicloud/logging-operator
 
 linters:
 

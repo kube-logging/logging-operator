@@ -15,8 +15,9 @@
 package v1beta1
 
 import (
-	filter "github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"SyslogNGFlowSpec"
@@ -30,14 +31,20 @@ type _metaSyslogNGFlowSpec interface{} //nolint:deadcode,unused
 
 // SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 type SyslogNGFlowSpec struct {
-	Match            *SyslogNGMatch   `json:"match,omitempty"`
-	Filters          []SyslogNGFilter `json:"filters,omitempty"`
-	LoggingRef       string           `json:"loggingRef,omitempty"`
-	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
-	LocalOutputRefs  []string         `json:"localOutputRefs,omitempty"`
+	Match            *SyslogNGMatch        `json:"match,omitempty"`
+	Filters          []SyslogNGFilter      `json:"filters,omitempty"`
+	LoggingRef       string                `json:"loggingRef,omitempty"`
+	GlobalOutputRefs []string              `json:"globalOutputRefs,omitempty"`
+	LocalOutputRefs  []string              `json:"localOutputRefs,omitempty"`
+	OutputMetrics    []filter.MetricsProbe `json:"outputMetrics,omitempty"`
 }
 
 type SyslogNGMatch filter.MatchExpr
+
+// IsEmpty returns true if the match is not specified, i.e. empty.
+func (m *SyslogNGMatch) IsEmpty() bool {
+	return (*filter.MatchExpr)(m).IsEmpty()
+}
 
 // Filter definition for SyslogNGFlowSpec
 type SyslogNGFilter struct {

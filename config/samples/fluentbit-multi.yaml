@@ -1,0 +1,59 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: multi
+spec:
+  fluentd: {}
+#  # the legacy fluentbit spec should now be used separately
+#  fluentbit:
+#    positiondb:
+#      hostPath:
+#        path: ""
+#    bufferStorageVolume:
+#      hostPath:
+#        path: ""
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  # in a migration scenario it is important to use the same name as the logging resource in order to keep the same buffers and position volume names (if the defaults are used as in the example)
+  name: multi
+spec:
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: multi-2
+spec:
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+spec:
+  filters:
+    - stdout: {}
+  match:
+    - select: {}
+  localOutputRefs:
+    - "null"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: "null"
+spec:
+  nullout: {}

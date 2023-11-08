@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@ package syslogng
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"

@@ -1,6 +1,0 @@
-apiVersion: v1
-appVersion: "3.17.10"
-description: A Helm chart for Kubernetes
-name: logging-demo
-version: 3.17.10
-icon: https://raw.githubusercontent.com/banzaicloud/logging-operator/master/docs/img/icon.png

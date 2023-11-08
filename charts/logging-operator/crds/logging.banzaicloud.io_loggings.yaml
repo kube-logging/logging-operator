@@ -37,7 +37,24 @@ spec:
     storage: false
     subresources:
       status: {}
-  - name: v1beta1
+  - additionalPrinterColumns:
+    - description: Logging reference
+      jsonPath: .spec.loggingRef
+      name: LoggingRef
+      type: string
+    - description: Control namespace
+      jsonPath: .spec.controlNamespace
+      name: ControlNamespace
+      type: string
+    - description: Watched namespaces
+      jsonPath: .status.watchNamespaces
+      name: WatchNamespaces
+      type: string
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
     schema:
       openAPIV3Schema:
         properties:
@@ -53,6 +70,17 @@ spec:
                 type: boolean
               clusterDomain:
                 type: string
+              configCheck:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  strategy:
+                    type: string
+                  timeoutSeconds:
+                    type: integer
+                type: object
               controlNamespace:
                 type: string
               defaultFlow:
@@ -78,7 +106,13 @@ spec:
                               type: string
                             n_lines:
                               type: integer
+                            partial_cri_logtag_key:
+                              type: string
+                            partial_cri_stream_key:
+                              type: string
                             partial_key:
+                              type: string
+                            partial_metadata_format:
                               type: string
                             partial_value:
                               type: string
@@ -89,6 +123,8 @@ spec:
                             timeout_label:
                               type: string
                             use_first_timestamp:
+                              type: boolean
+                            use_partial_cri_logtag:
                               type: boolean
                             use_partial_metadata:
                               type: string
@@ -284,11 +320,11 @@ spec:
                           properties:
                             backend_library:
                               type: string
-                            geoip_2_database:
-                              type: string
                             geoip_database:
                               type: string
                             geoip_lookup_keys:
+                              type: string
+                            geoip2_database:
                               type: string
                             records:
                               items:
@@ -977,10 +1013,14 @@ spec:
                           type: object
                       type: object
                     type: array
+                  flowLabel:
+                    type: string
                   globalOutputRefs:
                     items:
                       type: string
                     type: array
+                  includeLabelInRouter:
+                    type: boolean
                   outputRefs:
                     items:
                       type: string
@@ -1362,6 +1402,8 @@ spec:
                         type: string
                       storage.checksum:
                         type: string
+                      storage.metrics:
+                        type: string
                       storage.path:
                         type: string
                       storage.sync:
@@ -1435,12 +1477,26 @@ spec:
                                     type: string
                                   name:
                                     type: string
+                                  namespace:
+                                    type: string
                                 required:
                                 - kind
                                 - name
                                 type: object
                               resources:
                                 properties:
+                                  claims:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                      - name
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                    - name
+                                    x-kubernetes-list-type: map
                                   limits:
                                     additionalProperties:
                                       anyOf:
@@ -1488,6 +1544,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   bufferVolumeArgs:
@@ -1557,6 +1638,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -1600,6 +1685,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -1699,10 +1788,43 @@ spec:
                       timeout:
                         type: string
                     type: object
+                  bufferVolumeResources:
+                    properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                    type: object
                   coroStackSize:
                     format: int32
                     type: integer
                   customConfigSecret:
+                    type: string
+                  customParsers:
                     type: string
                   daemonsetAnnotations:
                     additionalProperties:
@@ -2045,12 +2167,23 @@ spec:
                         type: string
                       Time_as_Integer:
                         type: boolean
+                      Workers:
+                        type: integer
                       storage.total_limit_size:
                         type: string
                     type: object
                   grace:
                     format: int32
                     type: integer
+                  healthCheck:
+                    properties:
+                      hcErrorsCount:
+                        type: integer
+                      hcPeriod:
+                        type: integer
+                      hcRetryFailureCount:
+                        type: integer
+                    type: object
                   image:
                     properties:
                       imagePullSecrets:
@@ -2216,6 +2349,8 @@ spec:
                     type: object
                   logLevel:
                     type: string
+                  loggingRef:
+                    type: string
                   metrics:
                     properties:
                       interval:
@@ -2263,6 +2398,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -2306,6 +2445,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -2507,12 +2650,26 @@ spec:
                                     type: string
                                   name:
                                     type: string
+                                  namespace:
+                                    type: string
                                 required:
                                 - kind
                                 - name
                                 type: object
                               resources:
                                 properties:
+                                  claims:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                      - name
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                    - name
+                                    x-kubernetes-list-type: map
                                   limits:
                                     additionalProperties:
                                       anyOf:
@@ -2560,6 +2717,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   positiondb:
@@ -2630,12 +2812,26 @@ spec:
                                     type: string
                                   name:
                                     type: string
+                                  namespace:
+                                    type: string
                                 required:
                                 - kind
                                 - name
                                 type: object
                               resources:
                                 properties:
+                                  claims:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                      - name
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                    - name
+                                    x-kubernetes-list-type: map
                                   limits:
                                     additionalProperties:
                                       anyOf:
@@ -2683,6 +2879,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   readinessProbe:
@@ -2765,6 +2986,18 @@ spec:
                     type: object
                   resources:
                     properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
                       limits:
                         additionalProperties:
                           anyOf:
@@ -2960,6 +3193,8 @@ spec:
                     type: object
                   syslogng_output:
                     properties:
+                      Workers:
+                        type: integer
                       json_date_format:
                         type: string
                       json_date_key:
@@ -3444,12 +3679,26 @@ spec:
                                     type: string
                                   name:
                                     type: string
+                                  namespace:
+                                    type: string
                                 required:
                                 - kind
                                 - name
                                 type: object
                               resources:
                                 properties:
+                                  claims:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                      - name
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                    - name
+                                    x-kubernetes-list-type: map
                                   limits:
                                     additionalProperties:
                                       anyOf:
@@ -3497,6 +3746,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   bufferVolumeArgs:
@@ -3566,6 +3840,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -3609,6 +3887,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -3708,6 +3990,37 @@ spec:
                       timeout:
                         type: string
                     type: object
+                  bufferVolumeResources:
+                    properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        type: object
+                    type: object
                   compressConfigFile:
                     type: boolean
                   configCheckAnnotations:
@@ -3716,6 +4029,18 @@ spec:
                     type: object
                   configCheckResources:
                     properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
                       limits:
                         additionalProperties:
                           anyOf:
@@ -3751,6 +4076,18 @@ spec:
                     type: object
                   configReloaderResources:
                     properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
                       limits:
                         additionalProperties:
                           anyOf:
@@ -3933,12 +4270,26 @@ spec:
                                           type: string
                                         name:
                                           type: string
+                                        namespace:
+                                          type: string
                                       required:
                                       - kind
                                       - name
                                       type: object
                                     resources:
                                       properties:
+                                        claims:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                            required:
+                                            - name
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-map-keys:
+                                          - name
+                                          x-kubernetes-list-type: map
                                         limits:
                                           additionalProperties:
                                             anyOf:
@@ -3986,6 +4337,31 @@ spec:
                                     volumeName:
                                       type: string
                                   type: object
+                              type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
                               type: object
                           type: object
                         volumeName:
@@ -4075,12 +4451,26 @@ spec:
                                     type: string
                                   name:
                                     type: string
+                                  namespace:
+                                    type: string
                                 required:
                                 - kind
                                 - name
                                 type: object
                               resources:
                                 properties:
+                                  claims:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                      - name
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                    - name
+                                    x-kubernetes-list-type: map
                                   limits:
                                     additionalProperties:
                                       anyOf:
@@ -4128,6 +4518,31 @@ spec:
                               volumeName:
                                 type: string
                             type: object
+                        type: object
+                      secret:
+                        properties:
+                          defaultMode:
+                            format: int32
+                            type: integer
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  format: int32
+                                  type: integer
+                                path:
+                                  type: string
+                              required:
+                              - key
+                              - path
+                              type: object
+                            type: array
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
                         type: object
                     type: object
                   forwardInputConfig:
@@ -4353,6 +4768,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -4396,6 +4815,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -4612,6 +5035,18 @@ spec:
                     type: object
                   resources:
                     properties:
+                      claims:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
                       limits:
                         additionalProperties:
                           anyOf:
@@ -4659,6 +5094,10 @@ spec:
                               tag:
                                 type: string
                             type: object
+                          labels:
+                            additionalProperties:
+                              type: string
+                            type: object
                           pauseImage:
                             properties:
                               imagePullSecrets:
@@ -4674,6 +5113,98 @@ spec:
                                 type: string
                               tag:
                                 type: string
+                            type: object
+                          resources:
+                            properties:
+                              claims:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                                type: array
+                                x-kubernetes-list-map-keys:
+                                - name
+                                x-kubernetes-list-type: map
+                              limits:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                type: object
+                            type: object
+                          securityContext:
+                            properties:
+                              allowPrivilegeEscalation:
+                                type: boolean
+                              capabilities:
+                                properties:
+                                  add:
+                                    items:
+                                      type: string
+                                    type: array
+                                  drop:
+                                    items:
+                                      type: string
+                                    type: array
+                                type: object
+                              privileged:
+                                type: boolean
+                              procMount:
+                                type: string
+                              readOnlyRootFilesystem:
+                                type: boolean
+                              runAsGroup:
+                                format: int64
+                                type: integer
+                              runAsNonRoot:
+                                type: boolean
+                              runAsUser:
+                                format: int64
+                                type: integer
+                              seLinuxOptions:
+                                properties:
+                                  level:
+                                    type: string
+                                  role:
+                                    type: string
+                                  type:
+                                    type: string
+                                  user:
+                                    type: string
+                                type: object
+                              seccompProfile:
+                                properties:
+                                  localhostProfile:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                              windowsOptions:
+                                properties:
+                                  gmsaCredentialSpec:
+                                    type: string
+                                  gmsaCredentialSpecName:
+                                    type: string
+                                  hostProcess:
+                                    type: boolean
+                                  runAsUserName:
+                                    type: string
+                                type: object
                             type: object
                         type: object
                       podManagementPolicy:
@@ -4982,7 +5513,13 @@ spec:
                           type: string
                         n_lines:
                           type: integer
+                        partial_cri_logtag_key:
+                          type: string
+                        partial_cri_stream_key:
+                          type: string
                         partial_key:
+                          type: string
+                        partial_metadata_format:
                           type: string
                         partial_value:
                           type: string
@@ -4993,6 +5530,8 @@ spec:
                         timeout_label:
                           type: string
                         use_first_timestamp:
+                          type: boolean
+                        use_partial_cri_logtag:
                           type: boolean
                         use_partial_metadata:
                           type: string
@@ -5188,11 +5727,11 @@ spec:
                       properties:
                         backend_library:
                           type: string
-                        geoip_2_database:
-                          type: string
                         geoip_database:
                           type: string
                         geoip_lookup_keys:
+                          type: string
+                        geoip2_database:
                           type: string
                         records:
                           items:
@@ -5907,6 +6446,8 @@ spec:
                               type: string
                             storage.checksum:
                               type: string
+                            storage.metrics:
+                              type: string
                             storage.path:
                               type: string
                             storage.sync:
@@ -5980,12 +6521,26 @@ spec:
                                           type: string
                                         name:
                                           type: string
+                                        namespace:
+                                          type: string
                                       required:
                                       - kind
                                       - name
                                       type: object
                                     resources:
                                       properties:
+                                        claims:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                            required:
+                                            - name
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-map-keys:
+                                          - name
+                                          x-kubernetes-list-type: map
                                         limits:
                                           additionalProperties:
                                             anyOf:
@@ -6033,6 +6588,31 @@ spec:
                                     volumeName:
                                       type: string
                                   type: object
+                              type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
                               type: object
                           type: object
                         containersPath:
@@ -6841,8 +7421,33 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
+                                                  claims:
+                                                    items:
+                                                      properties:
+                                                        name:
+                                                          type: string
+                                                      required:
+                                                      - name
+                                                      type: object
+                                                    type: array
+                                                    x-kubernetes-list-map-keys:
+                                                    - name
+                                                    x-kubernetes-list-type: map
                                                   limits:
                                                     additionalProperties:
                                                       anyOf:
@@ -6860,6 +7465,8 @@ spec:
                                                       x-kubernetes-int-or-string: true
                                                     type: object
                                                 type: object
+                                              restartPolicy:
+                                                type: string
                                               securityContext:
                                                 properties:
                                                   allowPrivilegeEscalation:
@@ -7452,8 +8059,33 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
+                                                  claims:
+                                                    items:
+                                                      properties:
+                                                        name:
+                                                          type: string
+                                                      required:
+                                                      - name
+                                                      type: object
+                                                    type: array
+                                                    x-kubernetes-list-map-keys:
+                                                    - name
+                                                    x-kubernetes-list-type: map
                                                   limits:
                                                     additionalProperties:
                                                       anyOf:
@@ -7471,6 +8103,8 @@ spec:
                                                       x-kubernetes-int-or-string: true
                                                     type: object
                                                 type: object
+                                              restartPolicy:
+                                                type: string
                                               securityContext:
                                                 properties:
                                                   allowPrivilegeEscalation:
@@ -8067,8 +8701,33 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+                                              resizePolicy:
+                                                items:
+                                                  properties:
+                                                    resourceName:
+                                                      type: string
+                                                    restartPolicy:
+                                                      type: string
+                                                  required:
+                                                  - resourceName
+                                                  - restartPolicy
+                                                  type: object
+                                                type: array
+                                                x-kubernetes-list-type: atomic
                                               resources:
                                                 properties:
+                                                  claims:
+                                                    items:
+                                                      properties:
+                                                        name:
+                                                          type: string
+                                                      required:
+                                                      - name
+                                                      type: object
+                                                    type: array
+                                                    x-kubernetes-list-map-keys:
+                                                    - name
+                                                    x-kubernetes-list-type: map
                                                   limits:
                                                     additionalProperties:
                                                       anyOf:
@@ -8086,6 +8745,8 @@ spec:
                                                       x-kubernetes-int-or-string: true
                                                     type: object
                                                 type: object
+                                              restartPolicy:
+                                                type: string
                                               securityContext:
                                                 properties:
                                                   allowPrivilegeEscalation:
@@ -8670,12 +9331,26 @@ spec:
                                                                 type: string
                                                               name:
                                                                 type: string
+                                                              namespace:
+                                                                type: string
                                                             required:
                                                             - kind
                                                             - name
                                                             type: object
                                                           resources:
                                                             properties:
+                                                              claims:
+                                                                items:
+                                                                  properties:
+                                                                    name:
+                                                                      type: string
+                                                                  required:
+                                                                  - name
+                                                                  type: object
+                                                                type: array
+                                                                x-kubernetes-list-map-keys:
+                                                                - name
+                                                                x-kubernetes-list-type: map
                                                               limits:
                                                                 additionalProperties:
                                                                   anyOf:
@@ -9278,6 +9953,8 @@ spec:
                               type: string
                             Time_as_Integer:
                               type: boolean
+                            Workers:
+                              type: integer
                             storage.total_limit_size:
                               type: string
                           type: object
@@ -9398,6 +10075,10 @@ spec:
                                         - Lowercase
                                         - uppercase
                                         - Uppercase
+                                        - keepequal
+                                        - KeepEqual
+                                        - dropequal
+                                        - DropEqual
                                         type: string
                                       modulus:
                                         format: int64
@@ -9441,6 +10122,10 @@ spec:
                                         - Lowercase
                                         - uppercase
                                         - Uppercase
+                                        - keepequal
+                                        - KeepEqual
+                                        - dropequal
+                                        - DropEqual
                                         type: string
                                       modulus:
                                         format: int64
@@ -9737,12 +10422,26 @@ spec:
                                           type: string
                                         name:
                                           type: string
+                                        namespace:
+                                          type: string
                                       required:
                                       - kind
                                       - name
                                       type: object
                                     resources:
                                       properties:
+                                        claims:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                            required:
+                                            - name
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-map-keys:
+                                          - name
+                                          x-kubernetes-list-type: map
                                         limits:
                                           additionalProperties:
                                             anyOf:
@@ -9790,6 +10489,31 @@ spec:
                                     volumeName:
                                       type: string
                                   type: object
+                              type: object
+                            secret:
+                              properties:
+                                defaultMode:
+                                  format: int32
+                                  type: integer
+                                items:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        format: int32
+                                        type: integer
+                                      path:
+                                        type: string
+                                    required:
+                                    - key
+                                    - path
+                                    type: object
+                                  type: array
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
                               type: object
                           type: object
                         security:
@@ -10044,6 +10768,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -10087,6 +10815,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -11031,8 +11763,33 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
+                                claims:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
                                 limits:
                                   additionalProperties:
                                     anyOf:
@@ -11050,6 +11807,8 @@ spec:
                                     x-kubernetes-int-or-string: true
                                   type: object
                               type: object
+                            restartPolicy:
+                              type: string
                             securityContext:
                               properties:
                                 allowPrivilegeEscalation:
@@ -11642,8 +12401,33 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
+                                claims:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
                                 limits:
                                   additionalProperties:
                                     anyOf:
@@ -11661,6 +12445,8 @@ spec:
                                     x-kubernetes-int-or-string: true
                                   type: object
                               type: object
+                            restartPolicy:
+                              type: string
                             securityContext:
                               properties:
                                 allowPrivilegeEscalation:
@@ -12257,8 +13043,33 @@ spec:
                                   format: int32
                                   type: integer
                               type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
                             resources:
                               properties:
+                                claims:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
                                 limits:
                                   additionalProperties:
                                     anyOf:
@@ -12276,6 +13087,8 @@ spec:
                                     x-kubernetes-int-or-string: true
                                   type: object
                               type: object
+                            restartPolicy:
+                              type: string
                             securityContext:
                               properties:
                                 allowPrivilegeEscalation:
@@ -12860,12 +13673,26 @@ spec:
                                               type: string
                                             name:
                                               type: string
+                                            namespace:
+                                              type: string
                                           required:
                                           - kind
                                           - name
                                           type: object
                                         resources:
                                           properties:
+                                            claims:
+                                              items:
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                required:
+                                                - name
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-map-keys:
+                                              - name
+                                              x-kubernetes-list-type: map
                                             limits:
                                               additionalProperties:
                                                 anyOf:
@@ -13328,6 +14155,15 @@ spec:
                     type: object
                   globalOptions:
                     properties:
+                      log_level:
+                        type: string
+                      stats:
+                        properties:
+                          freq:
+                            type: integer
+                          level:
+                            type: integer
+                        type: object
                       stats_freq:
                         type: integer
                       stats_level:
@@ -13388,6 +14224,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -13431,6 +14271,10 @@ spec:
                                   - Lowercase
                                   - uppercase
                                   - Uppercase
+                                  - keepequal
+                                  - KeepEqual
+                                  - dropequal
+                                  - DropEqual
                                   type: string
                                 modulus:
                                   format: int64
@@ -13808,6 +14652,19 @@ spec:
                     type: object
                   skipRBACCreate:
                     type: boolean
+                  sourceMetrics:
+                    items:
+                      properties:
+                        key:
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        level:
+                          type: integer
+                      type: object
+                    type: array
                   statefulSet:
                     properties:
                       metadata:
@@ -14611,8 +15468,33 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
+                                            claims:
+                                              items:
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                required:
+                                                - name
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-map-keys:
+                                              - name
+                                              x-kubernetes-list-type: map
                                             limits:
                                               additionalProperties:
                                                 anyOf:
@@ -14630,6 +15512,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:
@@ -15222,8 +16106,33 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
+                                            claims:
+                                              items:
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                required:
+                                                - name
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-map-keys:
+                                              - name
+                                              x-kubernetes-list-type: map
                                             limits:
                                               additionalProperties:
                                                 anyOf:
@@ -15241,6 +16150,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:
@@ -15837,8 +16748,33 @@ spec:
                                               format: int32
                                               type: integer
                                           type: object
+                                        resizePolicy:
+                                          items:
+                                            properties:
+                                              resourceName:
+                                                type: string
+                                              restartPolicy:
+                                                type: string
+                                            required:
+                                            - resourceName
+                                            - restartPolicy
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
                                         resources:
                                           properties:
+                                            claims:
+                                              items:
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                required:
+                                                - name
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-map-keys:
+                                              - name
+                                              x-kubernetes-list-type: map
                                             limits:
                                               additionalProperties:
                                                 anyOf:
@@ -15856,6 +16792,8 @@ spec:
                                                 x-kubernetes-int-or-string: true
                                               type: object
                                           type: object
+                                        restartPolicy:
+                                          type: string
                                         securityContext:
                                           properties:
                                             allowPrivilegeEscalation:
@@ -16440,12 +17378,26 @@ spec:
                                                           type: string
                                                         name:
                                                           type: string
+                                                        namespace:
+                                                          type: string
                                                       required:
                                                       - kind
                                                       - name
                                                       type: object
                                                     resources:
                                                       properties:
+                                                        claims:
+                                                          items:
+                                                            properties:
+                                                              name:
+                                                                type: string
+                                                            required:
+                                                            - name
+                                                            type: object
+                                                          type: array
+                                                          x-kubernetes-list-map-keys:
+                                                          - name
+                                                          x-kubernetes-list-type: map
                                                         limits:
                                                           additionalProperties:
                                                             anyOf:
@@ -16965,12 +17917,26 @@ spec:
                                           type: string
                                         name:
                                           type: string
+                                        namespace:
+                                          type: string
                                       required:
                                       - kind
                                       - name
                                       type: object
                                     resources:
                                       properties:
+                                        claims:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                            required:
+                                            - name
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-map-keys:
+                                          - name
+                                          x-kubernetes-list-type: map
                                         limits:
                                           additionalProperties:
                                             anyOf:
@@ -17034,6 +18000,29 @@ spec:
                     - enabled
                     type: object
                 type: object
+              watchNamespaceSelector:
+                properties:
+                  matchExpressions:
+                    items:
+                      properties:
+                        key:
+                          type: string
+                        operator:
+                          type: string
+                        values:
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                type: object
               watchNamespaces:
                 items:
                   type: string
@@ -17047,6 +18036,16 @@ spec:
                 additionalProperties:
                   type: boolean
                 type: object
+              problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
+              watchNamespaces:
+                items:
+                  type: string
+                type: array
             type: object
         type: object
     served: true

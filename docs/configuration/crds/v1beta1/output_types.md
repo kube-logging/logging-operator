@@ -72,6 +72,10 @@ Default: -
 
 Default: -
 
+### kinesisFirehose (*output.KinesisFirehoseOutputConfig, optional) {#outputspec-kinesisfirehose}
+
+Default: -
+
 ### kinesisStream (*output.KinesisStreamOutputConfig, optional) {#outputspec-kinesisstream}
 
 Default: -
@@ -109,6 +113,14 @@ Default: -
 Default: -
 
 ### sqs (*output.SQSOutputConfig, optional) {#outputspec-sqs}
+
+Default: -
+
+### mattermost (*output.MattermostOutputConfig, optional) {#outputspec-mattermost}
+
+Default: -
+
+### relabel (*output.RelabelOutputConfig, optional) {#outputspec-relabel}
 
 Default: -
 

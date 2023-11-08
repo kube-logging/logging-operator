@@ -25,14 +25,11 @@ import (
 	"emperror.dev/errors"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/andreyvit/diff"
-	controllers "github.com/banzaicloud/logging-operator/controllers/logging"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
 	"github.com/pborman/uuid"
+	"golang.org/x/exp/slices"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -43,6 +40,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	controllers "github.com/kube-logging/logging-operator/controllers/logging"
+	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var (
@@ -262,6 +266,64 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
 
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
+}
+
+func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging1 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-1",
+		},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: controlNamespace,
+		},
+	}
+	logging2 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-2",
+		},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: controlNamespace,
+		},
+	}
+	logging3 := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-3",
+		},
+		Spec: v1beta1.LoggingSpec{
+			LoggingRef:       "test",
+			ControlNamespace: controlNamespace,
+		},
+	}
+
+	defer ensureCreated(t, logging1)()
+	defer ensureCreated(t, logging2)()
+	defer ensureCreated(t, logging3)()
+
+	// The first logging resource won't be populated with a warning initially since at the time of creation it is unique
+	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
+	g.Eventually(getLoggingProblems(logging2)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+	g.Eventually(getLoggingProblems(logging3)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
+
+	g.Eventually(func() error {
+		l := &v1beta1.Logging{}
+		if err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(logging1), l); err != nil {
+			return err
+		}
+		l.Spec.ErrorOutputRef = "trigger reconcile"
+		return mgr.GetClient().Update(context.TODO(), l)
+	}).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.Succeed())
+	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+}
+
+func getLoggingProblems(logging *v1beta1.Logging) func() ([]string, error) {
+	return func() ([]string, error) {
+		l := &v1beta1.Logging{}
+		err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(logging), l)
+		return l.Status.Problems, err
+	}
 }
 
 func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
@@ -1159,6 +1221,179 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	}, timeout).Should(gomega.BeTrue())
 }
 
+func TestWatchNamespaces(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	defer ensureCreated(t, &corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-bylabel-1",
+			Labels: map[string]string{
+				"bylabel": "test1",
+			},
+		},
+	})()
+	defer ensureCreated(t, &corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-bylabel-2",
+			Labels: map[string]string{
+				"bylabel": "test2",
+			},
+		},
+	})()
+
+	type ReturnVal struct {
+		namespaces []string
+		err        error
+	}
+
+	cases := []struct {
+		name           string
+		logging        *v1beta1.Logging
+		expectedResult func() ReturnVal
+		expectError    bool
+	}{
+		{
+			name: "full list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces:        []string{},
+					WatchNamespaceSelector: nil,
+				},
+			},
+			expectedResult: func() ReturnVal {
+				allNamespaces := &corev1.NamespaceList{}
+				err := mgr.GetClient().List(context.TODO(), allNamespaces)
+				if err != nil {
+					t.Fatalf("unexpected error when getting namespaces %s", err)
+				}
+				items := []string{}
+				for _, i := range allNamespaces.Items {
+					items = append(items, i.Name)
+				}
+				slices.Sort(items)
+				return ReturnVal{
+					namespaces: items,
+				}
+			},
+		},
+		{
+			name: "explicit list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces:        []string{"test-explicit-1", "test-explicit-2"},
+					WatchNamespaceSelector: nil,
+				},
+			},
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-explicit-1", "test-explicit-2"},
+				}
+			},
+		},
+		{
+			name: "bylabel list",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchLabels: map[string]string{
+							"bylabel": "test1",
+						},
+					},
+				},
+			},
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-bylabel-1"},
+				}
+			},
+		},
+		{
+			name: "bylabel negative list (label exists but value should be different)",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchExpressions: []v1.LabelSelectorRequirement{
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpExists,
+							},
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpNotIn,
+								Values:   []string{"test1"},
+							},
+						},
+					},
+				},
+			},
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"test-bylabel-2"},
+				}
+			},
+		},
+		{
+			name: "merge two sets uniquely",
+			logging: &v1beta1.Logging{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "test-" + uuid.New()[:8],
+				},
+				Spec: v1beta1.LoggingSpec{
+					WatchNamespaces: []string{"a", "b", "c", "test-bylabel-1"},
+					WatchNamespaceSelector: &v1.LabelSelector{
+						MatchExpressions: []v1.LabelSelectorRequirement{
+							{
+								Key:      "bylabel",
+								Operator: v1.LabelSelectorOpExists,
+							},
+						},
+					},
+				},
+			},
+			expectedResult: func() ReturnVal {
+				return ReturnVal{
+					namespaces: []string{"a", "b", "c", "test-bylabel-1", "test-bylabel-2"},
+				}
+			},
+		},
+	}
+
+	for _, c := range cases {
+		if c.expectError {
+			_, err := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			if c.expectError && err == nil {
+				t.Fatalf("expected error for test case %s", c.name)
+			}
+			continue
+		}
+
+		g.Eventually(func() ReturnVal {
+			n, e := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
+			return ReturnVal{
+				namespaces: n,
+				err:        e,
+			}
+		}, timeout).Should(gomega.Equal(
+			c.expectedResult(),
+		))
+	}
+}
+
 func beforeEach(t *testing.T) func() {
 	return beforeEachWithError(t, nil)
 }
@@ -1170,7 +1405,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                  scheme.Scheme,
-		MetricsBindAddress:      "0",
+		Metrics:                 metricsserver.Options{BindAddress: "0"},
 		GracefulShutdownTimeout: &timeout,
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
@@ -1211,14 +1446,30 @@ func ensureCreated(t *testing.T, obj runtime.Object) func() {
 	}
 }
 
+func ensureCreatedAll[O client.Object](t *testing.T, objs []O) func() {
+	for _, object := range objs {
+		if err := mgr.GetClient().Create(context.TODO(), object); err != nil {
+			t.Fatalf("%+v", err)
+		}
+	}
+	return func() {
+		for _, object := range objs {
+			err := mgr.GetClient().Delete(context.TODO(), object)
+			if err != nil {
+				t.Fatalf("%+v", errors.WithStack(err))
+			}
+		}
+	}
+}
+
 func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) func() {
 	object, ok := obj.(client.Object)
 	if !ok {
 		t.Fatalf("unable to cast runtime.Object to client.Object")
 	}
 
-	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
-		err := mgr.GetClient().Get(context.TODO(), types.NamespacedName{
+	err := wait.PollUntilContextTimeout(context.TODO(), time.Second, time.Second*3, false, func(ctx context.Context) (bool, error) {
+		err := mgr.GetClient().Get(ctx, types.NamespacedName{
 			Name: name, Namespace: ns,
 		}, object)
 		if apierrors.IsNotFound(err) {
@@ -1238,7 +1489,7 @@ func ensureCreatedEventually(t *testing.T, ns, name string, obj runtime.Object) 
 }
 
 func expectError(t *testing.T, expected string, reconcilerErrors <-chan error) {
-	err := wait.Poll(time.Second, time.Second*3, func() (bool, error) {
+	err := wait.PollUntilContextTimeout(context.TODO(), time.Second, time.Second*3, false, func(ctx context.Context) (bool, error) {
 		select {
 		case err := <-reconcilerErrors:
 			if !strings.Contains(err.Error(), expected) {

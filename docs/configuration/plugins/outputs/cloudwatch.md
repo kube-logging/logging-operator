@@ -6,31 +6,33 @@ generated_file: true
 
 # CloudWatch output plugin for Fluentd
 ## Overview
-This plugin has been designed to output logs or metrics to Amazon CloudWatch.
-More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs
+ This plugin has been designed to output logs or metrics to Amazon CloudWatch.
+ More info at [https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs).
 
- #### Example output configurations
+ ## Example output configurations
  ```yaml
  spec:
-  cloudwatch:
-    aws_key_id:
-      valueFrom:
-        secretKeyRef:
-          name: logging-s3
-          key: awsAccessKeyId
-    aws_sec_key:
-      valueFrom:
-        secretKeyRef:
-          name: logging-s3
-          key: awsSecretAccessKey
-    log_group_name: operator-log-group
-    log_stream_name: operator-log-stream
-    region: us-east-1
-    auto_create_stream true
-    buffer:
-      timekey: 30s
-      timekey_wait: 30s
-      timekey_use_utc: true
+
+	cloudwatch:
+	  aws_key_id:
+	    valueFrom:
+	      secretKeyRef:
+	        name: logging-s3
+	        key: awsAccessKeyId
+	  aws_sec_key:
+	    valueFrom:
+	      secretKeyRef:
+	        name: logging-s3
+	        key: awsSecretAccessKey
+	  log_group_name: operator-log-group
+	  log_stream_name: operator-log-stream
+	  region: us-east-1
+	  auto_create_stream true
+	  buffer:
+	    timekey: 30s
+	    timekey_wait: 30s
+	    timekey_use_utc: true
+
  ```
 
 ## Configuration
@@ -38,9 +40,9 @@ More info at https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-
 
 ### auto_create_stream (bool, optional) {#output config-auto_create_stream}
 
-Create log group and stream automatically.  
+Create log group and stream automatically.
 
-Default:  false
+Default: false
 
 ### aws_key_id (*secret.Secret, optional) {#output config-aws_key_id}
 
@@ -56,9 +58,9 @@ Default: -
 
 ### aws_instance_profile_credentials_retries (int, optional) {#output config-aws_instance_profile_credentials_retries}
 
-Instance Profile Credentials call retries  
+Instance Profile Credentials call retries
 
-Default:  nil
+Default: nil
 
 ### aws_use_sts (bool, optional) {#output config-aws_use_sts}
 
@@ -74,15 +76,15 @@ Default: -
 
 ### aws_sts_session_name (string, optional) {#output config-aws_sts_session_name}
 
-The session name to use with sts authentication   
+The session name to use with sts authentication
 
-Default:  'fluentd'
+Default: 'fluentd'
 
 ### concurrency (int, optional) {#output config-concurrency}
 
-Use to set the number of threads pushing data to CloudWatch.  
+Use to set the number of threads pushing data to CloudWatch.
 
-Default:  1
+Default: 1
 
 ### endpoint (string, optional) {#output config-endpoint}
 
@@ -98,9 +100,9 @@ Default: -
 
 ### include_time_key (bool, optional) {#output config-include_time_key}
 
-Include time key as part of the log entry  
+Include time key as part of the log entry
 
-Default:  UTC
+Default: UTC
 
 ### json_handler (string, optional) {#output config-json_handler}
 
@@ -140,9 +142,9 @@ Default: -
 
 ### log_rejected_request (string, optional) {#output config-log_rejected_request}
 
-Output rejected_log_events_info request log.  
+Output rejected_log_events_info request log.
 
-Default:  false
+Default: false
 
 ### log_stream_name (string, optional) {#output config-log_stream_name}
 
@@ -158,9 +160,9 @@ Default: -
 
 ### max_events_per_batch (int, optional) {#output config-max_events_per_batch}
 
-Maximum number of events to send at once  
+Maximum number of events to send at once
 
-Default:  10000
+Default: 10000
 
 ### max_message_length (int, optional) {#output config-max_message_length}
 
@@ -249,6 +251,12 @@ Default: -
 ### buffer (*Buffer, optional) {#output config-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

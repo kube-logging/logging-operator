@@ -22,8 +22,9 @@ import (
 	"testing"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -59,20 +60,29 @@ func TestRequiredMeansItCannotEvenBeEmpty(t *testing.T) {
 
 func TestJsonTagsWithDefaultsAndOmitempty(t *testing.T) {
 	type Asd struct {
-		Field1 string `json:"field1"`
-		Field2 string `json:"field2,omitempty" plugin:"default:http://asdf and some space"`
-		Field3 string `json:"field3,omitempty"`
+		Field1 string  `json:"field1"`
+		Field2 string  `json:"field2,omitempty" plugin:"default:http://asdf and some space"`
+		Field3 string  `json:"field3,omitempty"`
+		Field4 *string `json:"field4,omitempty" plugin:"default:nonempty"`
+		Field5 *string `json:"field5,omitempty" plugin:"default:nonempty"`
 	}
-	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{Field1: "value"})
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(
+		Asd{
+			Field1: "value",
+			Field4: utils.StringPointer(""), // looks like empty, but it's not, we expect this to be set
+			Field5: nil,                     // empty for real
+		})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
 	expected := map[string]string{
 		"field1": "value",
 		"field2": "http://asdf and some space",
+		"field4": "",
+		"field5": "nonempty",
 	}
 	if !reflect.DeepEqual(expected, actual) {
-		t.Fatalf("failed to match expected %+v with %+v", expected, actual)
+		t.Fatalf("failed to match\nexpected:\n%+v\n\nactual:\n%+v", expected, actual)
 	}
 }
 

@@ -17,10 +17,10 @@ package test
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -43,7 +43,7 @@ func TestLogglyOutput(t *testing.T) {
 		},
 		`
 destination "output_default_test-loggly-out" {
-	loggly("localhost" tag("test-tag") token("asd") persist_name("output_default_test-syslog-out"));
+	loggly("localhost" tag("test-tag") token("asd") persist_name("output_default_test-loggly-out"));
 };
 `,
 	)

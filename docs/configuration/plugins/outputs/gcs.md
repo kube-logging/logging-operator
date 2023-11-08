@@ -4,6 +4,22 @@ weight: 200
 generated_file: true
 ---
 
+# Google Cloud Storage
+## Overview
+ Store logs in Google Cloud Storage. For details, see [https://github.com/kube-logging/fluent-plugin-gcs](https://github.com/kube-logging/fluent-plugin-gcs).
+
+ ## Example
+ ```yaml
+ spec:
+
+	gcs:
+	  project: logging-example
+	  bucket: banzai-log-test
+	  path: logs/${tag}/%Y/%m/%d/
+
+ ```
+
+## Configuration
 ## GCSOutput
 
 ### project (string, required) {#gcsoutput-project}
@@ -44,9 +60,9 @@ Default: -
 
 ### object_key_format (string, optional) {#gcsoutput-object_key_format}
 
-Format of GCS object keys  
+Format of GCS object keys
 
-Default:  %{path}%{time_slice}_%{index}.%{file_extension}
+Default: %{path}%{time_slice}_%{index}.%{file_extension}
 
 ### path (string, optional) {#gcsoutput-path}
 
@@ -56,9 +72,9 @@ Default: -
 
 ### store_as (string, optional) {#gcsoutput-store_as}
 
-Archive format on GCS: gzip json text  
+Archive format on GCS: gzip json text
 
-Default:  gzip
+Default: gzip
 
 ### transcoding (bool, optional) {#gcsoutput-transcoding}
 
@@ -68,21 +84,21 @@ Default: -
 
 ### auto_create_bucket (bool, optional) {#gcsoutput-auto_create_bucket}
 
-Create GCS bucket if it does not exists  
+Create GCS bucket if it does not exists
 
-Default:  true
+Default: true
 
 ### hex_random_length (int, optional) {#gcsoutput-hex_random_length}
 
-Max length of `%{hex_random}` placeholder(4-16)  
+Max length of `%{hex_random}` placeholder(4-16)
 
-Default:  4
+Default: 4
 
 ### overwrite (bool, optional) {#gcsoutput-overwrite}
 
-Overwrite already existing path  
+Overwrite already existing path
 
-Default:  false
+Default: false
 
 ### acl (string, optional) {#gcsoutput-acl}
 
@@ -117,6 +133,12 @@ Default: -
 ### buffer (*Buffer, optional) {#gcsoutput-buffer}
 
 [Buffer](../buffer/) 
+
+Default: -
+
+### slow_flush_log_threshold (string, optional) {#gcsoutput-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 Default: -
 

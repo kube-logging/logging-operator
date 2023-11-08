@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"OpenSearch"
@@ -129,6 +129,7 @@ type OpenSearchOutput struct {
 	// CA certificate
 	SSLCACert *secret.Secret `json:"ca_file,omitempty"`
 	// If you want to configure SSL/TLS version, you can specify ssl_version parameter. [SSLv23, TLSv1, TLSv1_1, TLSv1_2]
+	SslVersion string `json:"ssl_version,omitempty"`
 	// Remove keys on update will not update the configured keys in OpenSearch when a record is being updated. This setting only has any effect if the write operation is update or upsert.
 	RemoveKeysOnUpdate string `json:"remove_keys_on_update,omitempty"`
 	// This setting allows remove_keys_on_update to be configured with a key in each record, in much the same way as target_index_key works.
@@ -226,9 +227,9 @@ type OpenSearchOutput struct {
 	CompressionLevel string `json:"compression_level,omitempty"`
 	// truncate_caches_interval
 	TruncateCachesInterval string `json:"truncate_caches_interval,omitempty"`
-	// use_legacy_template (default: true)
+	// Specify wether to use legacy template or not. (default: true)
 	// +kubebuilder:validation:Optional
-	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty" plugin:"default:true"`
+	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty"`
 	// catch_transport_exception_on_retry (default: true)
 	// +kubebuilder:validation:Optional
 	CatchTransportExceptionOnRetry *bool `json:"catch_transport_exception_on_retry,omitempty" plugin:"default:true"`

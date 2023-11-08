@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,15 +20,17 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
@@ -36,15 +38,12 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
 		configReloadContainer(r.Logging.Spec.SyslogNGSpec),
 	}
-	if c := r.bufferMetricsSidecarContainer(); c != nil {
-		containers = append(containers, *c)
-	}
 	if c := r.syslogNGMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
 
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.Logging.SyslogNGObjectMeta(statefulSetName, ComponentSyslogNG),
+		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
 		Spec: appsv1.StatefulSetSpec{
 			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
 			Selector: &metav1.LabelSelector{
@@ -53,6 +52,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+					Annotations: map[string]string{
+						"fluentbit.io/exclude": "true",
+					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: containers,
@@ -73,12 +75,32 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 	}
 
+	// HACK: try to _guess_ if user has configured a persistent volume for buffers and move syslog-ng's persist file there
+	buffersVolumeName := "buffers"
+	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
+		if name := r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
+			buffersVolumeName = name
+		}
+	}
+
+	syslogngContainer := kubetool.FindContainerByName(desired.Spec.Template.Spec.Containers, ContainerName)
+	if mnt := kubetool.FindVolumeMountByName(syslogngContainer.VolumeMounts, buffersVolumeName); mnt != nil {
+		if !sliceAny(syslogngContainer.Args, func(arg string) bool { return strings.Contains(arg, "--persist-file") }) {
+			syslogngContainer.Args = append(syslogngContainer.Args,
+				"--persist-file", filepath.Join(mnt.MountPath, "/syslog-ng.persist"))
+		}
+
+		if c := r.bufferMetricsSidecarContainer(); c != nil {
+			desired.Spec.Template.Spec.Containers = append(desired.Spec.Template.Spec.Containers, *c)
+		}
+	}
+
 	return desired, reconciler.StatePresent, nil
 }
 
 func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	return corev1.Container{
-		Name:            containerName,
+		Name:            ContainerName,
 		Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{{
@@ -103,7 +125,7 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 				corev1.ResourceCPU:    resource.MustParse("500m"),
 			},
 		},
-		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: bufferPath}},
+		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: BufferPath}},
 		LivenessProbe: &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				Exec: &corev1.ExecAction{
@@ -240,19 +262,41 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			port = r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
-		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem"}
+		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/"}
 
-		customRunner := fmt.Sprintf("./bin/node_exporter %v", strings.Join(args, " "))
+		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))
+		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
+
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           v1beta1.RepositoryWithTag(bufferVolumeImageRepository, bufferVolumeImageTag),
 			ImagePullPolicy: corev1.PullIfNotPresent,
-			Args:            []string{"--port", "7358", "--startup", customRunner},
-			Ports:           generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
+			Args: []string{
+				"--port", "7358",
+				"--exec", nodeExporterCmd,
+				"--exec", bufferSizeCmd,
+			},
+			Env: []corev1.EnvVar{
+				{
+					Name:  "BUFFER_PATH",
+					Value: BufferPath,
+				},
+			},
+			Ports: generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName,
-					MountPath: bufferPath,
+					MountPath: BufferPath,
+				},
+			},
+			Resources: corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("10M"),
+					corev1.ResourceCPU:    resource.MustParse("50m"),
+				},
+				Requests: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("10M"),
+					corev1.ResourceCPU:    resource.MustParse("1m"),
 				},
 			},
 		}
@@ -319,7 +363,7 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 }
 
 func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
-	//TODO: ADD TLS reload watch
+	// TODO: ADD TLS reload watch
 	container := corev1.Container{
 		Name:            "config-reloader",
 		Image:           v1beta1.RepositoryWithTag(configReloaderImageRepository, configReloaderImageTag),
@@ -357,4 +401,13 @@ func generateConfigReloaderConfig(configDir string) string {
 		}
 	  }
 	`, filepath.Join(configDir, "..data"), socketPath)
+}
+
+func sliceAny[S ~[]E, E any](s S, fn func(E) bool) bool {
+	for _, e := range s {
+		if fn(e) {
+			return true
+		}
+	}
+	return false
 }

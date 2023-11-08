@@ -17,10 +17,12 @@ package fluentbit
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 )
 
 func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.DesiredState, error) {
@@ -29,7 +31,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 	}
 	state := reconciler.StateAbsent
 
-	if r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics != nil && r.Logging.Spec.FluentbitSpec.BufferVolumeMetrics.PrometheusRules {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentbit-buffervolume"
@@ -39,7 +41,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 				{
 					Alert: "FluentbitBufferSize",
 					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentbit",
@@ -53,7 +55,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 				{
 					Alert: "FluentbitBufferSize",
 					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 5`, nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentbit",

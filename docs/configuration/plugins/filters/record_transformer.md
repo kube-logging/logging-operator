@@ -25,9 +25,9 @@ Default: -
 
 ### renew_record (bool, optional) {#recordtransformer-renew_record}
 
-Create new Hash to transform incoming data  
+Create new Hash to transform incoming data
 
-Default:  false
+Default: false
 
 ### renew_time_key (string, optional) {#recordtransformer-renew_time_key}
 
@@ -37,15 +37,15 @@ Default: -
 
 ### enable_ruby (bool, optional) {#recordtransformer-enable_ruby}
 
-When set to true, the full Ruby syntax is enabled in the ${...} expression.  
+When set to true, the full Ruby syntax is enabled in the ${...} expression.
 
-Default:  false
+Default: false
 
 ### auto_typecast (bool, optional) {#recordtransformer-auto_typecast}
 
-Use original value type.  
+Use original value type.
 
-Default:  true
+Default: true
 
 ### records ([]Record, optional) {#recordtransformer-records}
 
@@ -54,31 +54,37 @@ Add records docs at: https://docs.fluentd.org/filter/record_transformer Records 
 Default: -
 
 
- #### Example `Record Transformer` filter configurations
+ ## Example `Record Transformer` filter configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Flow
-metadata:
-  name: demo-flow
-spec:
-  filters:
-    - record_transformer:
-        records:
-        - foo: "bar"
-  selectors: {}
-  localOutputRefs:
-    - demo-output
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Flow
+ metadata:
+
+	name: demo-flow
+
+ spec:
+
+	filters:
+	  - record_transformer:
+	      records:
+	      - foo: "bar"
+	selectors: {}
+	localOutputRefs:
+	  - demo-output
+
  ```
 
  #### Fluentd Config Result
  ```yaml
-<filter **>
-  @type record_transformer
-  @id test_record_transformer
-  <record>
-    foo bar
-  </record>
-</filter>
+ <filter **>
+
+	@type record_transformer
+	@id test_record_transformer
+	<record>
+	  foo bar
+	</record>
+
+ </filter>
  ```
 
 ---

@@ -15,8 +15,8 @@
 package output
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 // +name:"Alibaba Cloud"
@@ -57,7 +57,7 @@ type OSSOutput struct {
 	AccessKeyId *secret.Secret `json:"access_key_id"`
 	// Your access secret key
 	// +docLink:"Secret,../secret/"
-	AaccessKeySecret *secret.Secret `json:"aaccess_key_secret"`
+	AccessKeySecret *secret.Secret `json:"access_key_secret"`
 	// Path prefix of the files on OSS (default: fluent/logs)
 	Path string `json:"path,omitempty"`
 	// Upload crc enabled (default: true)

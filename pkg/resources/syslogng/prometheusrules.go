@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@ package syslogng
 import (
 	"fmt"
 
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {
@@ -39,7 +41,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGNodeDown",
 					Expr:  intstr.FromString(fmt.Sprintf("up{%s} == 0", nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -53,7 +55,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGQueueLength",
 					Expr:  intstr.FromString(fmt.Sprintf("rate(syslog_ng_status_buffer_queue_length{%s}[5m]) > 0.3", nsJobLabel)),
-					For:   "1m",
+					For:   prometheus_operator.Duration("1m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -67,7 +69,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGQueueLength",
 					Expr:  intstr.FromString(fmt.Sprintf("rate(syslog_ng_status_buffer_queue_length{%s}[5m]) > 0.5", nsJobLabel)),
-					For:   "1m",
+					For:   prometheus_operator.Duration("1m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -81,7 +83,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGRecordsCountsHigh",
 					Expr:  intstr.FromString(fmt.Sprintf("sum(rate(syslog_ng_output_status_emit_records{%[1]s}[5m])) by (job,pod,namespace) > (3 * sum(rate(syslog_ng_output_status_emit_records{%[1]s}[15m])) by (job,pod,namespace))", nsJobLabel)),
-					For:   "1m",
+					For:   prometheus_operator.Duration("1m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -95,7 +97,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGRetry",
 					Expr:  intstr.FromString(fmt.Sprintf("increase(syslog_ng_status_retry_count{%s}[10m]) > 0", nsJobLabel)),
-					For:   "20m",
+					For:   prometheus_operator.Duration("20m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -109,7 +111,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGOutputError",
 					Expr:  intstr.FromString(fmt.Sprintf("increase(syslog_ng_output_status_num_errors{%s}[10m]) > 0", nsJobLabel)),
-					For:   "1s",
+					For:   prometheus_operator.Duration("1s"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
@@ -123,7 +125,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				{
 					Alert: "SyslogNGPredictedBufferGrowth",
 					Expr:  intstr.FromString(fmt.Sprintf("predict_linear(syslog_ng_output_status_buffer_total_bytes{%[1]s}[10m], 600) > syslog_ng_output_status_buffer_total_bytes{%[1]s}", nsJobLabel)),
-					For:   "10m",
+					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",

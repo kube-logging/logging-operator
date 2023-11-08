@@ -6,7 +6,7 @@ generated_file: true
 
 # [LogDNA Output](https://github.com/logdna/fluent-plugin-logdna)
 ## Overview
- This plugin has been designed to output logs to LogDNA. Example Deployment: [Transport Nginx Access Logs into LogDNA with Logging Operator](https://raw.githubusercontent.com/banzaicloud/logging-operator/master/docs/examples/logging_output_logdna.yaml)
+ This plugin has been designed to output logs to LogDNA.
 
 ## Configuration
 ## LogDNA
@@ -39,21 +39,21 @@ Default: -
 
 ### request_timeout (string, optional) {#logdna-request_timeout}
 
-HTTPS POST Request Timeout, Optional. Supports s and ms Suffices  
+HTTPS POST Request Timeout, Optional. Supports s and ms Suffices
 
-Default:  30 s
+Default: 30 s
 
 ### ingester_domain (string, optional) {#logdna-ingester_domain}
 
-Custom Ingester URL, Optional  
+Custom Ingester URL, Optional
 
-Default:  https://logs.logdna.com
+Default: https://logs.logdna.com
 
 ### ingester_endpoint (string, optional) {#logdna-ingester_endpoint}
 
-Custom Ingester Endpoint, Optional  
+Custom Ingester Endpoint, Optional
 
-Default:  /logs/ingest
+Default: /logs/ingest
 
 ### buffer (*Buffer, optional) {#logdna-buffer}
 
@@ -61,32 +61,44 @@ Default:  /logs/ingest
 
 Default: -
 
+### slow_flush_log_threshold (string, optional) {#logdna-slow_flush_log_threshold}
 
- #### Example `LogDNA` filter configurations
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+
+Default: -
+
+
+ ## Example `LogDNA` filter configurations
  ```yaml
  apiVersion: logging.banzaicloud.io/v1beta1
  kind: Output
  metadata:
-   name: logdna-output-sample
+
+	name: logdna-output-sample
+
  spec:
-   logdna:
-     api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-     hostname: logging-operator
-     app: my-app
-     tags: web,dev
-     ingester_domain https://logs.logdna.com
-     ingester_endpoint /logs/ingest
+
+	logdna:
+	  api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+	  hostname: logging-operator
+	  app: my-app
+	  tags: web,dev
+	  ingester_domain https://logs.logdna.com
+	  ingester_endpoint /logs/ingest
+
  ```
 
  #### Fluentd Config Result
  ```
-<match **>
+ <match **>
+
 	@type logdna
 	@id test_logdna
 	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
 	app my-app
 	hostname logging-operator
-</match>
+
+ </match>
  ```
 
 ---

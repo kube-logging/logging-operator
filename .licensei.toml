@@ -9,7 +9,7 @@ approved = [
 ]
 
 ignored = [
- "github.com/banzaicloud/logging-operator/pkg/sdk", # go submodule
+ "github.com/kube-logging/logging-operator/pkg/sdk", # go submodule
   "github.com/davecgh/go-spew", # ISC
   # Unsupported VCS
   "google.golang.org/protobuf",
@@ -23,7 +23,8 @@ ignored = [
 [header]
 ignorePaths = ["vendor"]
 ignoreFiles = ["zz_generated.*.go", "generated.go","cache.go"]
-template = """// Copyright © :YEAR: Banzai Cloud
+authors = ["Banzai Cloud", "Cisco Systems, Inc. and/or its affiliates", "Kube logging authors"]
+template = """// Copyright © :YEAR: :AUTHOR:
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

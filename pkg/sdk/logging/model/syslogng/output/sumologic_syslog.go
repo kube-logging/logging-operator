@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package output
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over syslog"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122
+// More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/
 type _docSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +name:"Sumo Logic Syslog"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829122"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/"
 // +description:"Storing messages in Sumo Logic over syslog"
 // +status:"Testing"
 type _metaSumologicSyslog interface{} //nolint:deadcode,unused
@@ -38,7 +38,7 @@ type SumologicSyslogOutput struct {
 	Tag string `json:"tag,omitempty"`
 	// The Cloud Syslog Cloud Token that you received from the Sumo Logic service while configuring your cloud syslog source. https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/Cloud-Syslog-Source#configure-a-cloud%C2%A0syslog%C2%A0source
 	Token int `json:"token,omitempty"`
-	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193).
+	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
 	TLS *TLS `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer  *DiskBuffer `json:"disk_buffer,omitempty"`

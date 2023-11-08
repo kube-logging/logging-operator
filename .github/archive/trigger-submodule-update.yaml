@@ -1,0 +1,29 @@
+name: Trigger docs update
+
+# on:
+#   push:
+#     tags:
+#       - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  trigger-docs-update:
+    name: Trigger docs update
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set Git refname
+        id: set-git-refname
+        run: |
+          GIT_REFNAME="$(echo "${{ github.ref }}" | sed -r 's@refs/(heads|pull|tags)/@@g')"
+
+          echo "GIT_REFNAME=${GIT_REFNAME}"
+          echo "git_refname=${GIT_REFNAME}" >> $GITHUB_OUTPUT
+
+      - name: Trigger
+        env:
+          GITHUB_TOKEN: '${{ secrets.CR_PAT }}'
+        run: |
+          scripts/trigger-docs-update.sh "${{ steps.set-git-refname.outputs.git_refname }}"

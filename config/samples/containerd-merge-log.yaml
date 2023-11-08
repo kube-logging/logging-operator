@@ -1,0 +1,53 @@
+# start minikube with containerd
+#     minikube start --driver=docker --container-runtime=containerd
+# install some workload that generates json and non-json logs
+#     helm upgrade --install log-generator kube-logging/log-generator --set app.golang=true
+# verify produced logs in the fluentd container (json logs should be expanded)
+#     kubectl exec -ti containerd-fluentd-0 -- tail -f /fluentd/log/out
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: containerd
+spec:
+  fluentd: {}
+  controlNamespace: default
+  fluentbit:
+    image:
+      tag: 1.9.10-debug
+    inputTail:
+      Parser: cri-log-key
+    # Parser that populates `log` instead of `message` to enable the kubernetes filter's Merge_Log feature to work
+    # Mind the indentation, otherwise fluentbit will symply parse the whole message into the `log` key
+    customParsers: |
+                    [PARSER]
+                        Name cri-log-key
+                        Format regex
+                        Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
+                        Time_Key    time
+                        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+    # Required key remap if one wants to rely on the existing auto-detected log key in the fluentd parser and concat filter
+    # otherwise should be omitted
+    filterModify:
+      - rules:
+        - Rename:
+            key: log
+            value: message
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+spec:
+  filters:
+    - stdout: {}
+  match:
+    - select: {}
+  localOutputRefs:
+    - "null"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: "null"
+spec:
+  nullout: {}

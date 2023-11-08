@@ -1,9 +1,0 @@
-dependencies:
-- name: minio
-  repository: https://helm.min.io/
-  version: 8.0.9
-- name: log-generator
-  repository: https://kubernetes-charts.banzaicloud.com/
-  version: 0.1.5
-digest: sha256:8c6a3777c9e971fc03bad54b76fa62ef58b07f73436121522c7a6e97fce6ece5
-generated: "2021-01-08T16:16:09.458546+01:00"

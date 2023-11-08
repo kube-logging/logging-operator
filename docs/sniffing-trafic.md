@@ -32,9 +32,9 @@ Create a *fluentd.conf*.
 </match>
 ```
 
-Start locasl fluentd
+Start local fluentd
 ```bash
-docker run -p 8888:8888 -v $PWD/fluentd.conf:/fluent/fluent.conf --rm banzaicloud/fluentd:v1.11.2-alpine-2 -c /fluent/fluent.conf
+docker run -p 8888:8888 -v $PWD/fluentd.conf:/fluent/fluent.conf --rm ghcr.io/kube-logging/fluentd:v1.11 -c /fluent/fluent.conf
 ```
 
 Setup kurun service for port-forward

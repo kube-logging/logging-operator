@@ -1,0 +1,65 @@
+kind: Logging
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: logging
+spec:
+  controlNamespace: default
+  syslogNG:
+    bufferVolumeMetrics:
+      mount_name: buffers
+      # prometheus chart or the operator should be installed for this to work
+      serviceMonitor: true
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: syslog-ng
+                volumeMounts:
+                  - mountPath: /buffers
+                    name: buffers
+        volumeClaimTemplates:
+          - metadata:
+              name: buffers
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 3Gi
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all1
+spec:
+  match: {}
+  localOutputRefs:
+    - http
+    - http2
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all2
+spec:
+  match: {}
+  localOutputRefs:
+    - http
+    - http2
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http
+spec:
+  file:
+    path: "/tmp/log"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http2
+spec:
+  file:
+    path: "/tmp/log"

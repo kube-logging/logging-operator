@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: b1
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: log-generator
+  namespace: b1
+spec:
+  loggingRef: b
+  match:
+    regexp:
+      pattern: log-generator
+      type: string
+      value: json#kubernetes#labels#app.kubernetes.io/name
+  localOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http
+  namespace: b1
+spec:
+  loggingRef: b
+  http:
+    url: http://test-receiver.infra:8080/tenant-b-namespace-b1
+    headers:
+      - "Content-type: application/json"

@@ -17,34 +17,174 @@ package test
 import (
 	"testing"
 
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/syslogng/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestHTTPOutput(t *testing.T) {
-	config.CheckConfigForOutput(t,
-		v1beta1.SyslogNGOutput{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "default",
-				Name:      "test-http-out",
-			},
-			Spec: v1beta1.SyslogNGOutputSpec{
-				HTTP: &output.HTTPOutput{
-					URL:     "test.local",
-					Headers: []string{"a:b", "c:d"},
-					Batch: output.Batch{
-						BatchLines: 2000,
+func TestHTTPOutputTable(t *testing.T) {
+	var tests = []struct {
+		name   string
+		output v1beta1.SyslogNGOutput
+		config string
+	}{
+		{
+			name: "test_peer_verify_true",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+						TLS: &output.TLS{
+							PeerVerify: config.NewTrue(),
+						},
 					},
-					Workers: 3,
 				},
 			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") tls(peer_verify(yes)) batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
+};
+`,
 		},
-		`
-destination "output_default_test-http-out" {
+		{
+			name: "test_peer_verify_false",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+						TLS: &output.TLS{
+							PeerVerify: config.NewFalse(),
+						},
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") tls(peer_verify(no)) batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
+};
+`,
+		},
+		{
+			name: "test_peer_verify_omitted",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
 	http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
 };
 `,
-	)
+		},
+		{
+			name: "test_fifo_size",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers:     3,
+						LogFIFOSize: 1000,
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-http-out") log-fifo-size(1000));
+};
+`,
+		},
+		{
+			name: "test_timeout",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+						Timeout: 100,
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-http-out") timeout(100));
+};
+		`,
+		},
+		{
+			name: "test_response_action",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+						ResponseAction: filter.RawArrowMap{
+							"418": "drop",
+						},
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") batch-lines(2000) workers(3) persist_name("output_default_test-http-out") response-action(
+		418 => drop
+	));
+};
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config.CheckConfigForOutput(t, tt.output, tt.config)
+		})
+	}
 }

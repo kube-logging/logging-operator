@@ -15,14 +15,17 @@
 package fluentbit
 
 import (
+	"context"
+	"fmt"
+
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/resources/fluentddataprovider"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/banzaicloud/logging-operator/pkg/resources"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
+
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -30,6 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -49,15 +55,29 @@ func generateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
-	return util.MergeLabels(r.Logging.Spec.FluentbitSpec.Labels, map[string]string{
-		"app.kubernetes.io/name": "fluentbit"}, generateLoggingRefLabels(r.Logging.ObjectMeta.GetName()))
+	return util.MergeLabels(
+		r.fluentbitSpec.Labels,
+		map[string]string{
+			"app.kubernetes.io/instance": r.nameProvider.Name(),
+			"app.kubernetes.io/name":     "fluentbit",
+		},
+		generateLoggingRefLabels(r.Logging.GetName()))
 }
 
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentbitSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.FluentbitSpec.Security.ServiceAccount
+	if r.fluentbitSpec.Security.ServiceAccount != "" {
+		return r.fluentbitSpec.Security.ServiceAccount
 	}
-	return r.Logging.QualifiedName(defaultServiceAccountName)
+	return r.nameProvider.ComponentName(defaultServiceAccountName)
+}
+
+type NameProvider interface {
+	// ComponentName provides a qualified name using (Name + "-" + name)
+	ComponentName(name string) string
+	// Name returns the name of the resource, that is owning fluentbit
+	// It is Logging.Name for legacy but the resource's name for FluentbitAgent
+	Name() string
+	OwnerRef() v1.OwnerReference
 }
 
 type DesiredObject struct {
@@ -67,39 +87,61 @@ type DesiredObject struct {
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1beta1.Logging
-	*reconciler.GenericResourceReconciler
+	resourceReconciler  *reconciler.GenericResourceReconciler
+	logger              logr.Logger
+	Logging             *v1beta1.Logging
 	configs             map[string][]byte
-	fluentdDataProvider fluentddataprovider.FluentdDataProvider
+	fluentbitSpec       *v1beta1.FluentbitSpec
+	loggingDataProvider loggingdataprovider.LoggingDataProvider
+	nameProvider        NameProvider
+	loggingRoutes       []v1beta1.LoggingRoute
 }
 
-// NewReconciler creates a new Fluentbit reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, opts reconciler.ReconcilerOpts, fluentdDataProvider fluentddataprovider.FluentdDataProvider) *Reconciler {
+// NewReconciler creates a new FluentbitAgent reconciler
+func New(client client.Client,
+	logger logr.Logger,
+	logging *v1beta1.Logging,
+	opts reconciler.ReconcilerOpts,
+	fluentbitSpec *v1beta1.FluentbitSpec,
+	loggingDataProvider loggingdataprovider.LoggingDataProvider,
+	nameProvider NameProvider,
+	loggingRoutes []v1beta1.LoggingRoute) *Reconciler {
 	return &Reconciler{
-		Logging:                   logging,
-		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
-		fluentdDataProvider:       fluentdDataProvider,
+		Logging:             logging,
+		logger:              logger,
+		resourceReconciler:  reconciler.NewGenericReconciler(client, logger.WithName("reconciler"), opts),
+		fluentbitSpec:       fluentbitSpec,
+		loggingDataProvider: loggingDataProvider,
+		nameProvider:        nameProvider,
+		loggingRoutes:       loggingRoutes,
 	}
 }
 
 // Reconcile reconciles the fluentBit resource
-func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
-	for _, factory := range []resources.Resource{
+func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
+	if err := v1beta1.FluentBitDefaults(r.fluentbitSpec); err != nil {
+		return nil, err
+	}
+
+	objects := []resources.Resource{
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.clusterPodSecurityPolicy,
-		r.pspClusterRole,
-		r.pspClusterRoleBinding,
 		r.configSecret,
 		r.daemonSet,
 		r.serviceMetrics,
-		r.monitorServiceMetrics,
 		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
-		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
-	} {
+	}
+	if resources.PSPEnabled {
+		objects = append(objects, r.clusterPodSecurityPolicy, r.pspClusterRole, r.pspClusterRoleBinding)
+	}
+	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
+		objects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
+	}
+	if resources.IsSupported(ctx, resources.PrometheusRuleKey) {
+		objects = append(objects, r.prometheusRules, r.bufferVolumePrometheusRules)
+	}
+	for _, factory := range objects {
 		o, state, err := factory()
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to create desired object")
@@ -107,7 +149,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		if o == nil {
 			return nil, errors.Errorf("Reconcile error! Resource %#v returns with nil object", factory)
 		}
-		result, err := r.ReconcileResource(o, state)
+		result, err := r.resourceReconciler.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapWithDetails(err,
 				"failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
@@ -118,6 +160,56 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 	}
 
 	return nil, nil
+}
+
+type FluentbitNameProvider struct {
+	logging   *v1beta1.Logging
+	fluentbit *v1beta1.FluentbitAgent
+}
+
+func (l *FluentbitNameProvider) ComponentName(name string) string {
+	if l.logging != nil {
+		return l.logging.QualifiedName(name)
+	}
+	return fmt.Sprintf("%s-%s", l.fluentbit.Name, name)
+}
+
+func (l *FluentbitNameProvider) Name() string {
+	if l.logging != nil {
+		return l.logging.Name
+	}
+	return l.fluentbit.Name
+}
+
+func (l *FluentbitNameProvider) OwnerRef() v1.OwnerReference {
+	if l.logging != nil {
+		return v1.OwnerReference{
+			APIVersion: l.logging.APIVersion,
+			Kind:       l.logging.Kind,
+			Name:       l.logging.Name,
+			UID:        l.logging.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
+	return v1.OwnerReference{
+		APIVersion: l.fluentbit.APIVersion,
+		Kind:       l.fluentbit.Kind,
+		Name:       l.fluentbit.Name,
+		UID:        l.fluentbit.UID,
+		Controller: util.BoolPointer(true),
+	}
+}
+
+func NewLegacyFluentbitNameProvider(logging *v1beta1.Logging) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		logging: logging,
+	}
+}
+
+func NewStandaloneFluentbitNameProvider(agent *v1beta1.FluentbitAgent) *FluentbitNameProvider {
+	return &FluentbitNameProvider{
+		fluentbit: agent,
+	}
 }
 
 func RegisterWatches(builder *builder.Builder) *builder.Builder {

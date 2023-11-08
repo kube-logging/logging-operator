@@ -15,7 +15,9 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"SyslogNGSpec"
@@ -47,6 +49,7 @@ type SyslogNGSpec struct {
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
 	MaxConnections                      int                          `json:"maxConnections,omitempty"`
 	LogIWSize                           int                          `json:"logIWSize,omitempty"`
+	SourceMetrics                       []filter.MetricsProbe        `json:"sourceMetrics,omitempty"`
 
 	// TODO: option to turn on/off buffer volume PVC
 }
@@ -61,6 +64,17 @@ type SyslogNGTLS struct {
 }
 
 type GlobalOptions struct {
+	// deprecated use stats/level from 4.1+
 	StatsLevel *int `json:"stats_level,omitempty"`
-	StatsFreq  *int `json:"stats_freq,omitempty"`
+	// deprecated use stats/freq from 4.1+
+	StatsFreq *int `json:"stats_freq,omitempty"`
+	// Stats https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats
+	Stats *Stats `json:"stats,omitempty"`
+	// Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level
+	LogLevel *string `json:"log_level,omitempty"`
+}
+
+type Stats struct {
+	Level *int `json:"level,omitempty"`
+	Freq  *int `json:"freq,omitempty"`
 }

@@ -1,4 +1,4 @@
-// Copyright © 2021 Banzai Cloud
+// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ package nodeagent
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -56,6 +56,7 @@ func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if n.nodeAgent.FluentbitSpec.Metrics != nil && n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitor {
 		objectMetadata := n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics")
 		if n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -77,12 +78,14 @@ func (n *nodeAgentInstance) monitorServiceMetrics() (runtime.Object, reconciler.
 					MetricRelabelConfigs: n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 					Interval:             v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Interval),
 					ScrapeTimeout:        v1.Duration(n.nodeAgent.FluentbitSpec.Metrics.Timeout),
+					Scheme:               n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            n.nodeAgent.FluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(n.getFluentBitLabels(), generateLoggingRefLabels(n.logging.ObjectMeta.GetName())),
 				},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{n.logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}

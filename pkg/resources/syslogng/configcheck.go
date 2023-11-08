@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,13 +21,17 @@ import (
 	"io"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type ConfigCheckResult struct {
@@ -44,6 +48,21 @@ func (r *Reconciler) configHash() (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
 }
 
+func (r *Reconciler) CheckForObjectExistence(ctx context.Context, object client.Object) (*ConfigCheckResult, error) {
+	if err := r.Client.Get(ctx, client.ObjectKeyFromObject(object), object); err != nil {
+		if apierrors.IsNotFound(err) {
+			objNotFoundMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s not found", object.GetName(), object.GetNamespace())
+			r.Log.Info(objNotFoundMsg)
+			err = nil
+		}
+		errMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s is not available", object.GetName(), object.GetNamespace())
+		return &ConfigCheckResult{
+			Ready: false, Valid: false, Message: errMsg,
+		}, err
+	}
+	return nil, nil
+}
+
 func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
 	hashKey, err := r.configHash()
 	if err != nil {
@@ -54,24 +73,33 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	if err != nil {
 		return nil, err
 	}
+	configcheck.WithHashLabel(checkSecret, hashKey)
 	err = r.Client.Create(ctx, checkSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create secret for syslog-ng configcheck")
+	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find secret for syslog-ng configcheck")
 	}
 
 	checkOutputSecret, err := r.newCheckOutputSecret(hashKey)
 	if err != nil {
 		return nil, err
 	}
+	configcheck.WithHashLabel(checkOutputSecret, hashKey)
 	err = r.Client.Create(ctx, checkOutputSecret)
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return nil, errors.WrapIf(err, "failed to create output secret for syslog-ng configcheck")
+	}
+	if res, err := r.CheckForObjectExistence(ctx, checkSecret); res != nil {
+		return res, errors.WrapIf(err, "failed to find output secret for syslog-ng configcheck")
 	}
 
 	pod, err := r.newCheckPod(hashKey)
 	if err != nil {
 		return nil, errors.WrapIff(err, "failed to create resource description for config check pod %s", hashKey)
 	}
+	configcheck.WithHashLabel(pod, hashKey)
 
 	existingPods := &corev1.PodList{}
 	err = r.Client.List(ctx, existingPods, client.MatchingLabels(pod.Labels))
@@ -134,57 +162,9 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	return &ConfigCheckResult{}, nil
 }
 
-func (r *Reconciler) configCheckCleanup(currentHash string) (removedHashes []string, multierr error) {
-	for configHash := range r.Logging.Status.ConfigCheckResults {
-		if configHash == currentHash {
-			continue
-		}
-		newSecret, err := r.newCheckSecret(configHash)
-		if err != nil {
-			multierr = errors.Combine(multierr,
-				errors.Wrapf(err, "failed to create config check secret %s", configHash))
-			continue
-		}
-		if err := r.Client.Delete(context.TODO(), newSecret); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check secret %s", configHash))
-				continue
-			}
-		}
-		checkOutputSecret, err := r.newCheckOutputSecret(configHash)
-		if err != nil {
-			multierr = errors.Combine(multierr,
-				errors.Wrapf(err, "failed to create config check output secret %s", configHash))
-			continue
-		}
-		if err := r.Client.Delete(context.TODO(), checkOutputSecret); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check output secret %s", configHash))
-				continue
-			}
-		}
-		checkPod, err := r.newCheckPod(configHash)
-		if err != nil {
-			multierr = errors.Append(multierr, errors.WrapIff(err, "failed to create resource description for config check pod %s", configHash))
-			continue
-		}
-		if err := r.Client.Delete(context.TODO(), checkPod); err != nil {
-			if !apierrors.IsNotFound(err) {
-				multierr = errors.Combine(multierr,
-					errors.Wrapf(err, "failed to remove config check pod %s", configHash))
-				continue
-			}
-		}
-		removedHashes = append(removedHashes, configHash)
-	}
-	return
-}
-
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 	return &corev1.Secret{
-		ObjectMeta: r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-%s", hashKey), ComponentConfigCheck),
+		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Data: map[string][]byte{
 			configKey: []byte(r.config),
 		},
@@ -204,8 +184,33 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 }
 
 func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
+	var containerArgs, containerCommand []string
+
+	switch r.Logging.Spec.ConfigCheck.Strategy {
+	case v1beta1.ConfigCheckStrategyTimeout:
+		containerCommand = []string{
+			"timeout", cast.ToString(r.Logging.Spec.ConfigCheck.TimeoutSeconds),
+			"/usr/sbin/syslog-ng",
+		}
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-Fe",
+			"--no-caps",
+		}
+	case v1beta1.ConfigCheckStrategyDryRun:
+		fallthrough
+	default:
+		// use the default entrypoint
+		containerCommand = nil
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-s",
+			"--no-caps",
+		}
+	}
+
 	pod := &corev1.Pod{
-		ObjectMeta: r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-%s", hashKey), ComponentConfigCheck),
+		ObjectMeta: r.configCheckPodObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: r.getServiceAccountName(),
@@ -214,7 +219,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Name: "config",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: r.Logging.QualifiedName(fmt.Sprintf("syslog-ng-configcheck-%s", hashKey)),
+							SecretName: r.Logging.QualifiedName(configCheckResourceName(hashKey)),
 						},
 					},
 				},
@@ -232,11 +237,8 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 					Name:            "syslog-ng",
 					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
 					ImagePullPolicy: corev1.PullIfNotPresent,
-					Args: []string{
-						"--cfgfile=" + configDir + "/" + configKey,
-						"-s",
-						"--no-caps",
-					},
+					Command:         containerCommand,
+					Args:            containerArgs,
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceMemory: resource.MustParse("400M"),
@@ -281,4 +283,18 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 	err := merge.Merge(&pod.Spec, r.Logging.Spec.SyslogNGSpec.ConfigCheckPodOverrides)
 
 	return pod, err
+}
+
+func configCheckResourceName(hash string) string {
+	return fmt.Sprintf("syslog-ng-configcheck-%s", hash)
+}
+
+func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
+	objectMeta := r.SyslogNGObjectMeta(name, component)
+
+	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
+		objectMeta.Labels[key] = value
+	}
+
+	return objectMeta
 }

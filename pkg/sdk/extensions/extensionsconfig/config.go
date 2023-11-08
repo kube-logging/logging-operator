@@ -26,7 +26,6 @@ import (
 type GlobalConfig struct {
 	FluentBitPosFilePath   string
 	FluentBitPosVolumeName string
-	OperatorImage          string
 	ContainerRuntime       string
 }
 
@@ -43,6 +42,7 @@ func (t HostTailerConfig) VersionedFluentBitPathArgs(filePath string) []string {
 
 // EventTailerConfig is a configuration type for EventTailer
 type EventTailerConfig struct {
+	ImageWithTag          string
 	TailerAffix           string
 	ConfigurationFileName string
 	PositionVolumeName    string
@@ -67,17 +67,17 @@ func (t TailerWebhookConfig) VersionedFluentBitPathArgs(filePath string) []strin
 var Global = GlobalConfig{
 	FluentBitPosFilePath:   "/var/pos",
 	FluentBitPosVolumeName: "positions",
-	OperatorImage:          "033498657557.dkr.ecr.us-east-2.amazonaws.com/banzaicloud/logging-extensions:0.2.0",
 }
 
 // HostTailer configuration
 var HostTailer = HostTailerConfig{
-	FluentBitImage: "fluent/fluent-bit:1.9.5",
+	FluentBitImage: "fluent/fluent-bit:2.1.8",
 	TailerAffix:    "host-tailer",
 }
 
 // EventTailer configuration
 var EventTailer = EventTailerConfig{
+	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:0.4.0",
 	TailerAffix:           "event-tailer",
 	ConfigurationFileName: "config.json",
 	PositionVolumeName:    "event-tailer-position",
@@ -85,7 +85,7 @@ var EventTailer = EventTailerConfig{
 
 // TailerWebhook configuration
 var TailerWebhook = TailerWebhookConfig{
-	FluentBitImage:    "fluent/fluent-bit:1.9.5",
+	FluentBitImage:    "fluent/fluent-bit:2.1.8",
 	AnnotationKey:     "sidecar.logging-extensions.banzaicloud.io/tail",
 	ServerPath:        "/tailer-webhook",
 	ServerPort:        9443,

@@ -19,9 +19,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/banzaicloud/logging-operator/pkg/resources/kubetool"
-	"github.com/banzaicloud/logging-operator/pkg/resources/volumepath"
-	config "github.com/banzaicloud/logging-operator/pkg/sdk/extensions/extensionsconfig"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	corev1 "k8s.io/api/core/v1"
 )
 

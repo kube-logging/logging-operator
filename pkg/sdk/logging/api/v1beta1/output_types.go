@@ -15,7 +15,7 @@
 package v1beta1
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -46,6 +46,7 @@ type OutputSpec struct {
 	NullOutputConfig             *output.NullOutputConfig             `json:"nullout,omitempty"`
 	KafkaOutputConfig            *output.KafkaOutputConfig            `json:"kafka,omitempty"`
 	CloudWatchOutput             *output.CloudWatchOutput             `json:"cloudwatch,omitempty"`
+	KinesisFirehoseOutputConfig  *output.KinesisFirehoseOutputConfig  `json:"kinesisFirehose,omitempty"`
 	KinesisStreamOutputConfig    *output.KinesisStreamOutputConfig    `json:"kinesisStream,omitempty"`
 	LogDNAOutput                 *output.LogDNAOutput                 `json:"logdna,omitempty"`
 	NewRelicOutputConfig         *output.NewRelicOutputConfig         `json:"newrelic,omitempty"`
@@ -56,6 +57,8 @@ type OutputSpec struct {
 	SyslogOutputConfig           *output.SyslogOutputConfig           `json:"syslog,omitempty"`
 	GELFOutputConfig             *output.GELFOutputConfig             `json:"gelf,omitempty"`
 	SQSOutputConfig              *output.SQSOutputConfig              `json:"sqs,omitempty"`
+	MattermostOutputConfig       *output.MattermostOutputConfig       `json:"mattermost,omitempty"`
+	RelabelOutputConfig          *output.RelabelOutputConfig          `json:"relabel,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

@@ -15,13 +15,18 @@
 package model
 
 import (
-	"github.com/banzaicloud/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type LoggingResources struct {
-	Logging  v1beta1.Logging
-	Fluentd  FluentdLoggingResources
-	SyslogNG SyslogNGLoggingResources
+	AllLoggings     []v1beta1.Logging
+	Logging         v1beta1.Logging
+	Fluentd         FluentdLoggingResources
+	SyslogNG        SyslogNGLoggingResources
+	NodeAgents      []v1beta1.NodeAgent
+	Fluentbits      []v1beta1.FluentbitAgent
+	LoggingRoutes   []v1beta1.LoggingRoute
+	WatchNamespaces []string
 }
 
 type FluentdLoggingResources struct {

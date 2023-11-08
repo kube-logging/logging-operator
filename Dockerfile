@@ -1,7 +1,15 @@
-# Build the manager binary
-FROM golang:1.19 as builder
+FROM --platform=$BUILDPLATFORM golang:1.21alpine3.18@sha256:a76f153cff6a59112777c071b0cde1b6e4691ddc7f172be424228da1bfb7bbda AS builder
 
-WORKDIR /workspace
+RUN apk add --update --no-cache ca-certificates make git curl
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETPLATFORM
+
+WORKDIR /usr/local/src/logging-operator
+
+ARG GOPROXY
+
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
@@ -20,11 +28,16 @@ COPY controllers/ controllers/
 COPY pkg/ pkg/
 
 # Build
-RUN CGO_ENABLED=0 GO111MODULE=on go build -a -o manager main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/manager
 
-# Use distroless as minimal base image to package the manager binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:latest
-WORKDIR /
-COPY --from=builder /workspace/manager .
+FROM builder as debug
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go install github.com/go-delve/delve/cmd/dlv@latest
+
+CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/usr/local/bin/manager"]
+
+FROM gcr.io/distroless/static:latest@sha256:6706c73aae2afaa8201d63cc3dda48753c09bcd6c300762251065c0f7e602b25
+
+COPY --from=builder /usr/local/bin/manager /manager
+
 ENTRYPOINT ["/manager"]

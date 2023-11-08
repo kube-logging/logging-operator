@@ -4,113 +4,61 @@ set -eufo pipefail
 set -x
 
 SCRIPT_PATH="hack"
-BUCKET='minio/test'
 
 function main()
 {
-    load_images
-    local mc_pod="$(get_mc_pod_name)"
-    remove_test_bucket "${mc_pod}"
-    create_test_bucket "${mc_pod}"
-    kubectl apply -f "${SCRIPT_PATH}/secret.yaml"
-    helm_deploy_logging_operator
-    configure_logging
+    kubectl get namespace logging || kubectl create namespace logging
+    kubectl config set-context --current --namespace=logging
 
-    wait_for_log_files "${mc_pod}" 300
-    print_logs "${mc_pod}"
+    load_images
+    helm_deploy_logging_operator
+
+    test_pod=$(get_test_pod_name)
+
+    wait_for_logs "${test_pod}" 300
 }
 
 function load_images()
 {
-    local images=( "fluentd:local" "controller:local")
+    local images=( "controller:local")
     for image in ${images[@]}; do
         kind load docker-image "${image}"
     done
 }
 
-function remove_test_bucket()
-{
-    local mc_pod="$1"
-    kubectl exec --namespace logging "${mc_pod}" -- \
-        mc rb "${BUCKET}" || true
-}
-
-function create_test_bucket()
-{
-    local mc_pod="$1"
-    kubectl exec --namespace logging "${mc_pod}" -- \
-        mc mb --region 'test_region' "${BUCKET}"
-}
-
 function helm_deploy_logging_operator()
 {
-    helm install \
-        --debug \
-        --wait \
-        logging-operator \
-        --set image.tag='local' \
-        --set image.repository='controller' \
-        "${SCRIPT_PATH}/../charts/logging-operator"
-}
-
-function configure_logging()
-{
-    helm install \
+    helm upgrade --install \
         --debug \
         --wait \
         --create-namespace \
-        --namespace logging \
-        --set fluentd.image.tag='local' \
-        --set fluentd.image.repository='fluentd' \
-        'logging-operator-logging-tls' \
-        "${SCRIPT_PATH}/../charts/logging-operator-logging"
-    kubectl apply -f "${SCRIPT_PATH}/clusteroutput.yaml"
-    kubectl apply -f "${SCRIPT_PATH}/clusterflow.yaml"
+        -f hack/values.yaml \
+        logging-operator \
+        "charts/logging-operator"
 }
 
-function get_mc_pod_name()
+function get_test_pod_name()
 {
-    kubectl get pod --namespace logging -l app=minio-mc -o 'jsonpath={.items[0].metadata.name}'
+    kubectl get pod -l app.kubernetes.io/name=e2e-test-receiver -o 'jsonpath={.items[0].metadata.name}'
 }
 
-function wait_for_log_files()
+function wait_for_logs()
 {
-    local mc_pod="$1"
+    local test_pod="$1"
     local deadline="$(( $(date +%s) + $2 ))"
 
     echo 'Waiting for log files...'
     while [ $(date +%s) -lt ${deadline} ]; do
-        if [ $(count_log_files "${mc_pod}") -gt 0 ]; then
+        if [[ $(kubectl logs -l app.kubernetes.io/name=e2e-test-receiver | grep e2e.tag | wc -l) -gt 0 ]]; then
             return
         fi
-        sleep 5
+        sleep 2
     done
 
     echo 'Cannot find any log files within timeout'
-    kubectl get pod,svc --namespace logging
-    kubectl exec -it --namespace logging logging-operator-logging-fluentd-0 cat /fluentd/log/out
+    kubectl get pod,svc
+    kubectl exec -it e2e-fluentd-0 cat /fluentd/log/out
     exit 1
-}
-
-function count_log_files()
-{
-    local mc_pod="$1"
-
-    get_log_files "${mc_pod}" |  wc -l
-}
-
-function get_log_files()
-{
-    local mc_pod="$1"
-
-    kubectl exec --namespace logging "${mc_pod}" -- mc find "${BUCKET}"  --name '*.gz'
-}
-
-function print_logs()
-{
-    local mc_pod="$1"
-
-    kubectl exec --namespace logging "${mc_pod}" -- mc find "${BUCKET}" --name '*.gz' -exec 'mc cat {}' | gzip -d
 }
 
 main "$@"

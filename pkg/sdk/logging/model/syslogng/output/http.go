@@ -1,4 +1,4 @@
-// Copyright © 2022 Banzai Cloud
+// Copyright © 2022 Cisco Systems, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
 package output
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"HTTP"
@@ -23,11 +25,60 @@ import (
 type _hugoHTTP interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over HTTP"
-// More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058
-type _docSHTTP interface{} //nolint:deadcode,unused
+/*
+A simple example sending logs over HTTP to a fluentbit HTTP endpoint:
+{{< highlight yaml >}}
+kind: SyslogNGOutput
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: http
+spec:
+  http:
+    #URL of the ingest endpoint
+    url: http://fluentbit-endpoint:8080/tag
+    method: POST
+    headers:
+      - "Content-type: application/json"
+{{</ highlight >}}
+
+A more complex example to demonstrate sending logs to OpenObserve
+{{< highlight yaml >}}
+kind: SyslogNGOutput
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: openobserve
+spec:
+  http:
+    #URL of the ingest endpoint
+    url: https://openobserve-endpoint/api/default/log-generator/_json
+    user: "username"
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: openobserve
+          key: password
+    method: POST
+    # Parameters for sending logs in batches
+    batch-lines: 5000
+    batch-bytes: 4096
+    batch-timeout: 300
+    headers:
+      - "Connection: keep-alive"
+    # Disable TLS peer verification for demo
+    tls:
+      peer_verify: "no"
+    body-prefix: "["
+    body-suffix: "]"
+    delimiter: ","
+    body: "${MESSAGE}"
+{{</ highlight >}}
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/
+*/
+type _docHTTP interface{} //nolint:deadcode,unused
 
 // +name:"HTTP"
-// +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/40#TOPIC-1829058"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/"
 // +description:"Sending messages over HTTP"
 // +status:"Testing"
 type _metaHTTP interface{} //nolint:deadcode,unused
@@ -40,7 +91,7 @@ type HTTPOutput struct {
 	Headers []string `json:"headers,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`
-	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [syslog-ng documentation](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/73#TOPIC-1829193).
+	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
 	TLS *TLS `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
@@ -64,9 +115,18 @@ type HTTPOutput struct {
 	Password secret.Secret `json:"password,omitempty"`
 	// The value of the USER-AGENT header in the messages sent to the server.
 	UserAgent string `json:"user-agent,omitempty"`
-	// Description: Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.
-	Workers     int    `json:"workers,omitempty"`
+	// Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination.
+	Workers int `json:"workers,omitempty"`
+	// If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers:
+	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.`
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
 	PersistName string `json:"persist_name,omitempty"`
+	// The number of messages that the output queue can store.
+	LogFIFOSize int `json:"log-fifo-size,omitempty"`
+	// Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited.
+	Timeout int `json:"timeout,omitempty"`
+	// Specifies what AxoSyslog does with the log message, based on the response code received from the HTTP server. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information.
+	ResponseAction filter.RawArrowMap `json:"response-action,omitempty"`
 }
 
 type Batch struct {

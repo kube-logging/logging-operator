@@ -16,17 +16,17 @@ package fluentbit
 
 import (
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/merge"
-	"github.com/banzaicloud/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate {
 		clusterRoleResources := []string{"pods", "namespaces"}
-		if r.Logging.Spec.FluentbitSpec.FilterKubernetes.UseKubelet == "On" {
+		if r.fluentbitSpec.FilterKubernetes.UseKubelet == "On" {
 			clusterRoleResources = append(clusterRoleResources, "nodes", "nodes/proxy")
 		}
 		return &rbacv1.ClusterRole{
@@ -46,13 +46,13 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate {
+	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
 				APIGroup: "rbac.authorization.k8s.io",
-				Name:     r.Logging.QualifiedName(clusterRoleName),
+				Name:     r.nameProvider.ComponentName(clusterRoleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{
@@ -69,11 +69,11 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentbitSpec.Security.ServiceAccount == "" {
+	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate && r.fluentbitSpec.Security.ServiceAccount == "" {
 		desired := &corev1.ServiceAccount{
 			ObjectMeta: r.FluentbitObjectMeta(defaultServiceAccountName),
 		}
-		err := merge.Merge(desired, r.Logging.Spec.FluentbitSpec.ServiceAccountOverrides)
+		err := merge.Merge(desired, r.fluentbitSpec.ServiceAccountOverrides)
 		if err != nil {
 			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 		}

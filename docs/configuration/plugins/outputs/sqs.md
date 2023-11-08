@@ -37,15 +37,15 @@ Default: -
 
 ### create_queue (*bool, optional) {#output config-create_queue}
 
-Create SQS queue  
+Create SQS queue
 
-Default:  true
+Default: true
 
 ### region (string, optional) {#output config-region}
 
-AWS region  
+AWS region
 
-Default:  ap-northeast-1
+Default: ap-northeast-1
 
 ### message_group_id (string, optional) {#output config-message_group_id}
 
@@ -55,21 +55,21 @@ Default: -
 
 ### delay_seconds (int, optional) {#output config-delay_seconds}
 
-Delivery delay seconds  
+Delivery delay seconds
 
-Default:  0
+Default: 0
 
 ### include_tag (*bool, optional) {#output config-include_tag}
 
-Include tag  
+Include tag
 
-Default:  true
+Default: true
 
 ### tag_property_name (string, optional) {#output config-tag_property_name}
 
-Tags property name in json  
+Tags property name in json
 
-Default:  '__tag'
+Default: '__tag'
 
 ### buffer (*Buffer, optional) {#output config-buffer}
 
@@ -77,30 +77,41 @@ Default:  '__tag'
 
 Default: -
 
+### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
+
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+
+Default: -
 
 
- #### Example `SQS` output configurations
+ ## Example `SQS` output configurations
  ```yaml
-apiVersion: logging.banzaicloud.io/v1beta1
-kind: Output
-metadata:
-  name: sqs-output-sample
-spec:
-  sqs:
-    queue_name: some-aws-sqs-queue
-    create_queue: false
-    region: us-east-1
+ apiVersion: logging.banzaicloud.io/v1beta1
+ kind: Output
+ metadata:
+
+	name: sqs-output-sample
+
+ spec:
+
+	sqs:
+	  queue_name: some-aws-sqs-queue
+	  create_queue: false
+	  region: us-east-1
+
  ```
 
  #### Fluentd Config Result
  ```
-  <match **>
-      @type sqs
-      @id test_sqs
-      queue_name some-aws-sqs-queue
-      create_queue false
-      region us-east-1
-  </match>
+
+	<match **>
+	    @type sqs
+	    @id test_sqs
+	    queue_name some-aws-sqs-queue
+	    create_queue false
+	    region us-east-1
+	</match>
+
  ```
 
 ---

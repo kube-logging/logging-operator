@@ -15,8 +15,9 @@
 package v1alpha1
 
 import (
-	"github.com/banzaicloud/operator-tools/pkg/types"
-	"github.com/banzaicloud/operator-tools/pkg/volume"
+	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/cisco-open/operator-tools/pkg/volume"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -48,6 +49,8 @@ type EventTailerSpec struct {
 	WorkloadBase *types.PodSpecBase `json:"workloadOverrides,omitempty"`
 	// Override container fields for the given statefulset
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
+	// Override image related fields for the given statefulset, highest precedence
+	Image *tailer.ImageSpec `json:"image,omitempty"`
 }
 
 // EventTailerStatus defines the observed state of EventTailer

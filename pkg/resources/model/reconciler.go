@@ -21,21 +21,26 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/operator-tools/pkg/secret"
-	"github.com/banzaicloud/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/go-logr/logr"
+	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/banzaicloud/logging-operator/pkg/mirror"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+
+	"github.com/kube-logging/logging-operator/pkg/mirror"
 )
 
 func NewValidationReconciler(
-	ctx context.Context,
 	repo client.StatusClient,
 	resources LoggingResources,
 	secrets SecretLoaderFactory,
-) func() (*reconcile.Result, error) {
-	return func() (*reconcile.Result, error) {
+	logger logr.Logger,
+) func(ctx context.Context) (*reconcile.Result, error) {
+	return func(ctx context.Context) (*reconcile.Result, error) {
 		var patchRequests []patchRequest
 		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{
@@ -197,6 +202,74 @@ func NewValidationReconciler(
 			}
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
+
+		registerForPatching(&resources.Logging)
+		resources.Logging.Status.Problems = nil
+		resources.Logging.Status.WatchNamespaces = nil
+
+		if !resources.Logging.WatchAllNamespaces() {
+			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
+		}
+
+		if resources.Logging.Spec.WatchNamespaceSelector != nil &&
+			len(resources.Logging.Status.WatchNamespaces) == 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Defined watchNamespaceSelector did not match any namespaces")
+		}
+
+		loggingsForTheSameRef := make([]string, 0)
+		for _, l := range resources.AllLoggings {
+			if l.Name == resources.Logging.Name {
+				continue
+			}
+			if l.Spec.LoggingRef == resources.Logging.Spec.LoggingRef {
+				loggingsForTheSameRef = append(loggingsForTheSameRef, l.Name)
+			}
+		}
+
+		if len(loggingsForTheSameRef) > 0 {
+			problem := fmt.Sprintf("Deprecated behaviour! Other logging resources exist with the same loggingRef: %s. This is going to be an error with the next major release.",
+				strings.Join(loggingsForTheSameRef, ","))
+			logger.Info(fmt.Sprintf("WARNING %s", problem))
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+		}
+
+		for hash, r := range resources.Logging.Status.ConfigCheckResults {
+			if !r {
+				problem := fmt.Sprintf("Configuration with checksum %s has failed. "+
+					"Config secrets: `kubectl get secret -n %s -l %s=%s`. "+
+					"Configcheck pod log: `kubectl logs -n %s -l %s=%s --tail -1`",
+					hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
+					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+			}
+		}
+
+		if len(resources.Logging.Spec.NodeAgents) > 0 || len(resources.NodeAgents) > 0 {
+			// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
+			// for compatibility reasons
+			agents := make(map[string]loggingv1beta1.NodeAgentConfig)
+			for _, a := range resources.NodeAgents {
+				agents[a.Name] = a.Spec.NodeAgentConfig
+			}
+			for _, a := range resources.Logging.Spec.NodeAgents {
+				if _, exists := agents[a.Name]; !exists {
+					agents[a.Name] = a.NodeAgentConfig
+					problem := fmt.Sprintf("inline nodeAgent definition (%s) in Logging resource is deprecated, use standalone NodeAgent CRD instead!", a.Name)
+					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+				} else {
+					problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition (%s) in Logging resource", a.Name)
+					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
+				}
+			}
+		}
+
+		if resources.Logging.Spec.FluentbitSpec != nil && len(resources.LoggingRoutes) > 0 {
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "Logging routes are not supported for embedded fluentbit configs, please use a separate FluentbitAgent resource!")
+		}
+
+		slices.Sort(resources.Logging.Status.Problems)
+		resources.Logging.Status.ProblemsCount = len(resources.Logging.Status.Problems)
 
 		var errs error
 		for _, req := range patchRequests {

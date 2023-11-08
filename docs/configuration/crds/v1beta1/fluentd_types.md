@@ -42,7 +42,7 @@ Default: -
 
 ### bufferStorageVolume (volume.KubernetesVolume, optional) {#fluentdspec-bufferstoragevolume}
 
-BufferStorageVolume is by default configured as PVC using FluentdPvcSpec [volume.KubernetesVolume](https://github.com/banzaicloud/operator-tools/tree/master/docs/types) 
+BufferStorageVolume is by default configured as PVC using FluentdPvcSpec [volume.KubernetesVolume](https://github.com/cisco-open/operator-tools/tree/master/docs/types) 
 
 Default: -
 
@@ -98,6 +98,8 @@ Default: -
 
 ### port (int32, optional) {#fluentdspec-port}
 
+Fluentd port inside the container (24240 by default) The headless service port is controlled by this field as well Note, that the default ClusterIP service port is always 24240 regardless of this field 
+
 Default: -
 
 ### tolerations ([]corev1.Toleration, optional) {#fluentdspec-tolerations}
@@ -129,6 +131,10 @@ Default: -
 Default: -
 
 ### bufferVolumeArgs ([]string, optional) {#fluentdspec-buffervolumeargs}
+
+Default: -
+
+### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentdspec-buffervolumeresources}
 
 Default: -
 
@@ -201,6 +207,10 @@ Default: -
 Default: -
 
 ### extraArgs ([]string, optional) {#fluentdspec-extraargs}
+
+Default: -
+
+### compressConfigFile (bool, optional) {#fluentdspec-compressconfigfile}
 
 Default: -
 
@@ -291,7 +301,19 @@ Default: -
 
 ### annotations (map[string]string, optional) {#fluentddrainconfig-annotations}
 
-Container image to use for the drain watch sidecar 
+Annotations to use for the drain watch sidecar 
+
+Default: -
+
+### labels (map[string]string, optional) {#fluentddrainconfig-labels}
+
+Labels to use for the drain watch sidecar on top of labels added by the operator by default. Default values can be overwritten. 
+
+Default: -
+
+### deleteVolume (bool, optional) {#fluentddrainconfig-deletevolume}
+
+Should persistent volume claims be deleted after draining is done 
 
 Default: -
 
@@ -302,6 +324,18 @@ Default: -
 ### pauseImage (ImageSpec, optional) {#fluentddrainconfig-pauseimage}
 
 Container image to use for the fluentd placeholder pod 
+
+Default: -
+
+### resources (*corev1.ResourceRequirements, optional) {#fluentddrainconfig-resources}
+
+Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit 
+
+Default: -
+
+### securityContext (*corev1.SecurityContext, optional) {#fluentddrainconfig-securitycontext}
+
+Configurable security context, uses fluentd pods' security context by default 
 
 Default: -
 

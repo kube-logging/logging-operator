@@ -15,7 +15,7 @@
 package nodeagent
 
 import (
-	util "github.com/banzaicloud/operator-tools/pkg/utils"
+	util "github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

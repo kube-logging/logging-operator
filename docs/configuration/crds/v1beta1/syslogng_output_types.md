@@ -24,11 +24,47 @@ Default: -
 
 Default: -
 
+### mqtt (*output.MQTT, optional) {#syslogngoutputspec-mqtt}
+
+Default: -
+
+### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
+
+Default: -
+
+### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+
+Default: -
+
 ### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
 
 Default: -
 
 ### sumologic-syslog (*output.SumologicSyslogOutput, optional) {#syslogngoutputspec-sumologic-syslog}
+
+Default: -
+
+### http (*output.HTTPOutput, optional) {#syslogngoutputspec-http}
+
+Default: -
+
+### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
+
+Default: -
+
+### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
+
+Default: -
+
+### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
+
+Default: -
+
+### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
+
+Default: -
+
+### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
 
 Default: -
 
