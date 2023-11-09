@@ -771,6 +771,8 @@ spec:
                 properties:
                   auto_create_container:
                     type: boolean
+                  azure_cloud:
+                    type: string
                   azure_container:
                     type: string
                   azure_imds_api_version:
@@ -7087,6 +7089,8 @@ spec:
                 properties:
                   auto_create_container:
                     type: boolean
+                  azure_cloud:
+                    type: string
                   azure_container:
                     type: string
                   azure_imds_api_version:

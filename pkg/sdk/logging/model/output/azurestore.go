@@ -40,6 +40,9 @@ type _metaAzure interface{} //nolint:deadcode,unused
 type AzureStorage struct {
 	// Path prefix of the files on Azure
 	Path string `json:"path,omitempty"`
+	// Azure Cloud to use. e.g. AzurePublicCloud, AzureChinaCloud, AzureGermanCloud, AzureUSGovernmentCloud
+	// This field is supported only if the fluentd plugin honors it. e.g https://github.com/elsesiy/fluent-plugin-azure-storage-append-blob-lts
+	AzureCloud string `json:"azure_cloud,omitempty"`
 	// Your azure storage account
 	// +docLink:"Secret,../secret/"
 	AzureStorageAccount *secret.Secret `json:"azure_storage_account"`
