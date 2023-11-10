@@ -345,21 +345,24 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 	}
 
 	var res []v1beta1.Fluentd
-	for _, i := range list.Items {
-		if i.Name == logging.Spec.FluentdRef {
-			res = append(res, i)
-		}
-	}
-	if len(res) > 1 {
-		return nil, errors.New("multiple fluentd configurations found, only one is allowed")
-	}
-	if len(res) != 0 {
-		// Detached fluentd configuration found
-		err := res[0].Spec.SetDefaults()
-		return &res[0], err
-	} else {
+	res = append(res, list.Items...)
+	if len(res) < 1 {
 		return nil, nil
 	}
+
+	// Multiple detached fluentds
+	if len(res) > 1 {
+		for _, i := range res {
+			// Explicit reference is set and found
+			if i.Name == logging.Spec.FluentdRef {
+				err := i.Spec.SetDefaults()
+				return &i, err
+			}
+		}
+		return nil, errors.New("multiple fluentd configurations found, could't associate it with logging")
+	}
+	err := res[0].Spec.SetDefaults()
+	return &res[0], err
 }
 
 func (r LoggingResourceRepository) LoggingRoutesFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.LoggingRoute, error) {
