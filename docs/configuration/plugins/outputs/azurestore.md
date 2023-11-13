@@ -20,7 +20,7 @@ Default: -
 
 ### azure_cloud (string, optional) {#output config-azure_cloud}
 
-Azure Cloud to use. e.g. AzurePublicCloud, AzureChinaCloud, AzureGermanCloud, AzureUSGovernmentCloud This field is supported only if the fluentd plugin honors it. e.g https://github.com/elsesiy/fluent-plugin-azure-storage-append-blob-lts 
+Azure Cloud to use. e.g. AzurePublicCloud, AzureChinaCloud, AzureGermanCloud, AzureUSGovernmentCloud, AZURESTACKCLOUD (in uppercase) This field is supported only if the fluentd plugin honors it. e.g https://github.com/elsesiy/fluent-plugin-azure-storage-append-blob-lts 
 
 Default: -
 
