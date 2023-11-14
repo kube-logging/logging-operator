@@ -15,7 +15,6 @@
 package fluentd
 
 import (
-	"context"
 	"strings"
 
 	batchv1 "k8s.io/api/batch/v1"
@@ -25,11 +24,10 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
+func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim, fluentdSpec v1beta1.FluentdSpec) (*batchv1.Job, error) {
 	bufVolName := r.Logging.QualifiedName(fluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
-	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(fluentdSpec))
+	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(&fluentdSpec))
 	fluentdContainer.VolumeMounts = append(fluentdContainer.VolumeMounts, corev1.VolumeMount{
 		Name:      bufVolName,
 		MountPath: bufferPath,
@@ -53,7 +51,7 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels:      r.getDrainerLabels(),
+				Labels:      r.getDrainerLabels(fluentdSpec),
 				Annotations: fluentdSpec.Scaling.Drain.Annotations,
 			},
 			Spec: corev1.PodSpec{
@@ -131,10 +129,8 @@ func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
 	return res
 }
 
-func (r *Reconciler) getDrainerLabels() map[string]string {
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
-	labels := r.Logging.GetFluentdLabels(ComponentDrainer, *fluentdSpec)
+func (r *Reconciler) getDrainerLabels(fluentdSpec v1beta1.FluentdSpec) map[string]string {
+	labels := r.Logging.GetFluentdLabels(ComponentDrainer, fluentdSpec)
 
 	for key, value := range fluentdSpec.Scaling.Drain.Labels {
 		labels[key] = value

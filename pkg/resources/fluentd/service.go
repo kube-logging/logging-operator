@@ -15,8 +15,6 @@
 package fluentd
 
 import (
-	"context"
-
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -27,8 +25,6 @@ import (
 )
 
 func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) {
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
 	desired := &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName, ComponentFluentd),
 		Spec: corev1.ServiceSpec{
@@ -37,16 +33,16 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 					Name:       "tcp-fluentd",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       ServicePort,
-					TargetPort: intstr.IntOrString{IntVal: fluentdSpec.Port},
+					TargetPort: intstr.IntOrString{IntVal: r.fluentdSpec.Port},
 				},
 				{
 					Name:       "udp-fluentd",
 					Protocol:   corev1.ProtocolUDP,
 					Port:       ServicePort,
-					TargetPort: intstr.IntOrString{IntVal: fluentdSpec.Port},
+					TargetPort: intstr.IntOrString{IntVal: r.fluentdSpec.Port},
 				},
 			},
-			Selector: r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
+			Selector: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
 	}
@@ -64,9 +60,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
-	if fluentdSpec.Metrics != nil {
+	if r.fluentdSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 			Spec: corev1.ServiceSpec{
@@ -74,11 +68,11 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 					{
 						Protocol:   corev1.ProtocolTCP,
 						Name:       "http-metrics",
-						Port:       fluentdSpec.Metrics.Port,
-						TargetPort: intstr.IntOrString{IntVal: fluentdSpec.Metrics.Port},
+						Port:       r.fluentdSpec.Metrics.Port,
+						TargetPort: intstr.IntOrString{IntVal: r.fluentdSpec.Metrics.Port},
 					},
 				},
-				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
+				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
@@ -91,12 +85,10 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
-	if fluentdSpec.Metrics != nil && fluentdSpec.Metrics.ServiceMonitor {
+	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
-		if fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
@@ -109,16 +101,16 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "http-metrics",
-					Path:                 fluentdSpec.GetFluentdMetricsPath(),
-					Interval:             v1.Duration(fluentdSpec.Metrics.Interval),
-					ScrapeTimeout:        v1.Duration(fluentdSpec.Metrics.Timeout),
-					HonorLabels:          fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs:       fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
-					MetricRelabelConfigs: fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               fluentdSpec.Metrics.ServiceMonitorConfig.Scheme,
-					TLSConfig:            fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+					Path:                 r.fluentdSpec.GetFluentdMetricsPath(),
+					Interval:             v1.Duration(r.fluentdSpec.Metrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.fluentdSpec.Metrics.Timeout),
+					HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+					Scheme:               r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec)},
+				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
@@ -131,12 +123,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
-	if fluentdSpec.BufferVolumeMetrics != nil {
+	if r.fluentdSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if fluentdSpec.BufferVolumeMetrics != nil && fluentdSpec.BufferVolumeMetrics.Port != 0 {
-			port = fluentdSpec.BufferVolumeMetrics.Port
+		if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.fluentdSpec.BufferVolumeMetrics.Port
 		}
 
 		return &corev1.Service{
@@ -150,7 +140,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 						TargetPort: intstr.IntOrString{IntVal: port},
 					},
 				},
-				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
+				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
@@ -163,12 +153,10 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
-	if fluentdSpec.BufferVolumeMetrics != nil && fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
-		if fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
+		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
@@ -180,16 +168,16 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "buffer-metrics",
-					Path:                 fluentdSpec.BufferVolumeMetrics.Path,
-					Interval:             v1.Duration(fluentdSpec.BufferVolumeMetrics.Interval),
-					ScrapeTimeout:        v1.Duration(fluentdSpec.BufferVolumeMetrics.Timeout),
-					HonorLabels:          fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs:       fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
-					MetricRelabelConfigs: fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme,
-					TLSConfig:            fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
+					Path:                 r.fluentdSpec.BufferVolumeMetrics.Path,
+					Interval:             v1.Duration(r.fluentdSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.fluentdSpec.BufferVolumeMetrics.Timeout),
+					HonorLabels:          r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+					Scheme:               r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme,
+					TLSConfig:            r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec)},
+				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
@@ -202,8 +190,6 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 }
 
 func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState, error) {
-	ctx := context.TODO()
-	fluentdSpec := r.GetFluentdSpec(ctx)
 	desired := &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-headless", ComponentFluentd),
 		Spec: corev1.ServiceSpec{
@@ -213,17 +199,17 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 					Protocol: corev1.ProtocolTCP,
 					// This port should match the containerport and targetPort will be automatically set to the same
 					// https://github.com/kubernetes/kubernetes/issues/20488
-					Port: fluentdSpec.Port,
+					Port: r.fluentdSpec.Port,
 				},
 				{
 					Name:     "udp-fluentd",
 					Protocol: corev1.ProtocolUDP,
 					// This port should match the containerport and targetPort will be automatically set to the same
 					// https://github.com/kubernetes/kubernetes/issues/20488
-					Port: fluentdSpec.Port,
+					Port: r.fluentdSpec.Port,
 				},
 			},
-			Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *fluentdSpec),
+			Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 			Type:      corev1.ServiceTypeClusterIP,
 			ClusterIP: corev1.ClusterIPNone,
 		},

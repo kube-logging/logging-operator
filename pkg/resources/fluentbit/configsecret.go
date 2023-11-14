@@ -370,7 +370,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		for _, a := range r.loggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
-		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
+		if err := r.configureOutputsForTenants(ctx, tenants, &input, fluentdSpec); err != nil {
 			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
 	} else {

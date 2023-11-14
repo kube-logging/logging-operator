@@ -16,12 +16,12 @@ package fluentd
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"html/template"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -53,8 +53,7 @@ func generateConfig(input fluentdConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
+func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[string][]byte, error) {
 	input := fluentdConfig{
 		IgnoreSameLogInterval:     fluentdSpec.IgnoreSameLogInterval,
 		IgnoreRepeatedLogInterval: fluentdSpec.IgnoreRepeatedLogInterval,
@@ -88,12 +87,11 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
-	configMap, err := r.generateConfigSecret()
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	configMap, err := r.generateConfigSecret(*r.fluentdSpec)
 	if err != nil {
 		return nil, nil, err
 	}
-	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, fluentdSpec.FluentLogDestination))
+	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.fluentdSpec.FluentLogDestination))
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data:       configMap,

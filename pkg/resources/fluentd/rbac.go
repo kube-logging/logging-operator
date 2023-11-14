@@ -15,8 +15,6 @@
 package fluentd
 
 import (
-	"context"
-
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -26,8 +24,7 @@ import (
 )
 
 func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	if *fluentdSpec.Security.RoleBasedAccessControlCreate {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.Role{
 			ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
@@ -45,8 +42,7 @@ func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 }
 
 func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	if *fluentdSpec.Security.RoleBasedAccessControlCreate {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
@@ -78,8 +74,7 @@ func (r *Reconciler) isEnhanceK8sFilter() bool {
 }
 
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	if *fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
@@ -120,8 +115,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	if *fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
@@ -144,12 +138,11 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	if *fluentdSpec.Security.RoleBasedAccessControlCreate && fluentdSpec.Security.ServiceAccount == "" {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.fluentdSpec.Security.ServiceAccount == "" {
 		desired := &corev1.ServiceAccount{
 			ObjectMeta: r.FluentdObjectMeta(defaultServiceAccountName, ComponentFluentd),
 		}
-		err := merge.Merge(desired, fluentdSpec.ServiceAccountOverrides)
+		err := merge.Merge(desired, r.fluentdSpec.ServiceAccountOverrides)
 		if err != nil {
 			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 		}

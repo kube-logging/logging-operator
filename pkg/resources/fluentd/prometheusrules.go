@@ -15,7 +15,6 @@
 package fluentd
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -31,9 +30,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	}
 	state := reconciler.StateAbsent
 
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-
-	if fluentdSpec.Metrics != nil && fluentdSpec.Metrics.PrometheusRules {
+	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentd"

@@ -42,9 +42,8 @@ type ConfigCheckResult struct {
 
 func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState, error) {
 	data := make(map[string][]byte)
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
-	if fluentdSpec.CompressConfigFile {
+	if r.fluentdSpec.CompressConfigFile {
 		AppConfigKeyCompress := AppConfigKey + ".gz"
 		data[AppConfigKeyCompress] = compression.CompressString(*r.config, r.Log)
 	} else {
@@ -66,9 +65,9 @@ func (r *Reconciler) configHash() (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum32()), nil
 }
 
-func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string) (bool, error) {
+func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string, fluentdSpec v1beta1.FluentdSpec) (bool, error) {
 	var err error
-	pod := r.newCheckPod(hashKey)
+	pod := r.newCheckPod(hashKey, fluentdSpec)
 
 	p := &corev1.Pod{}
 	err = r.Client.Get(ctx, client.ObjectKeyFromObject(pod), p)
@@ -99,12 +98,12 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		return nil, err
 	}
 
-	checkSecret, err := r.newCheckSecret(hashKey)
+	checkSecret, err := r.newCheckSecret(hashKey, *r.fluentdSpec)
 	if err != nil {
 		return nil, err
 	}
 	configcheck.WithHashLabel(checkSecret, hashKey)
-	checkSecretAppConfig, err := r.newCheckSecretAppConfig(hashKey)
+	checkSecretAppConfig, err := r.newCheckSecretAppConfig(hashKey, *r.fluentdSpec)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +138,7 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		return res, errors.WrapIf(err, "failed to find output secret for fluentd configcheck")
 	}
 
-	pod := r.newCheckPod(hashKey)
+	pod := r.newCheckPod(hashKey, *r.fluentdSpec)
 	configcheck.WithHashLabel(pod, hashKey)
 
 	existingPods := &corev1.PodList{}
@@ -203,9 +202,8 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	return &ConfigCheckResult{}, nil
 }
 
-func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
-	data, err := r.generateConfigSecret()
+func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
+	data, err := r.generateConfigSecret(fluentdSpec)
 	if err != nil {
 		return nil, err
 	}
@@ -222,9 +220,8 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 	}, nil
 }
 
-func (r *Reconciler) newCheckSecretAppConfig(hashKey string) (*corev1.Secret, error) {
+func (r *Reconciler) newCheckSecretAppConfig(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
 	data := make(map[string][]byte)
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
 	if fluentdSpec.CompressConfigFile {
 		ConfigCheckKeyCompress := ConfigCheckKey + ".gz"
@@ -250,12 +247,11 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
 }
 
-func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
+func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) *corev1.Pod {
 
-	volumes := r.volumesCheckPod(hashKey)
-	container := r.containerCheckPod(hashKey)
-	initContainer := r.initContainerCheckPod()
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
+	volumes := r.volumesCheckPod(hashKey, fluentdSpec)
+	container := r.containerCheckPod(hashKey, fluentdSpec)
+	initContainer := r.initContainerCheckPod(fluentdSpec)
 
 	pod := &corev1.Pod{
 		ObjectMeta: r.configCheckPodObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
@@ -307,8 +303,7 @@ func (r *Reconciler) newCheckPod(hashKey string) *corev1.Pod {
 	return pod
 }
 
-func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
+func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
 			Name: "config",
@@ -357,7 +352,7 @@ func (r *Reconciler) volumesCheckPod(hashKey string) (v []corev1.Volume) {
 	return v
 }
 
-func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
+func (r *Reconciler) containerCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) []corev1.Container {
 	var containerArgs []string
 
 	switch r.Logging.Spec.ConfigCheck.Strategy {
@@ -377,7 +372,6 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 		}
 	}
 
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	containerArgs = append(containerArgs, fluentdSpec.ExtraArgs...)
 
 	container := []corev1.Container{
@@ -409,9 +403,8 @@ func (r *Reconciler) containerCheckPod(hashKey string) []corev1.Container {
 	return container
 }
 
-func (r *Reconciler) initContainerCheckPod() []corev1.Container {
+func (r *Reconciler) initContainerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1.Container {
 	var initContainer []corev1.Container
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
 	if fluentdSpec.CompressConfigFile {
 		initContainer = []corev1.Container{
 			{

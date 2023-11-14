@@ -88,7 +88,7 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 	return tenants, nil
 }
 
-func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v1beta1.Tenant, input *fluentBitConfig) error {
+func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v1beta1.Tenant, input *fluentBitConfig, fluentdSpec *v1beta1.FluentdSpec) error {
 	var errs error
 	for _, t := range tenants {
 		allNamespaces := len(t.Namespaces) == 0
@@ -99,10 +99,6 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 		logging := &v1beta1.Logging{}
 		if err := r.resourceReconciler.Client.Get(ctx, types.NamespacedName{Name: t.Name}, logging); err != nil {
 			return errors.WrapIf(err, "getting logging resource")
-		}
-		fluentdSpec := logging.Spec.FluentdSpec
-		if detachedFluentd := fluentd.GetFluentd(ctx, r.resourceReconciler.Client, r.logger, logging.Spec.ControlNamespace); detachedFluentd != nil {
-			fluentdSpec = &detachedFluentd.Spec
 		}
 		if fluentdSpec != nil {
 			if input.FluentForwardOutput == nil {

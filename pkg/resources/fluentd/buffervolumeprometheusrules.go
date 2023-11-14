@@ -15,7 +15,6 @@
 package fluentd
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -31,9 +30,8 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
 	}
 	state := reconciler.StateAbsent
-	fluentdSpec := r.GetFluentdSpec(context.TODO())
 
-	if fluentdSpec.BufferVolumeMetrics != nil && fluentdSpec.BufferVolumeMetrics.PrometheusRules {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentd-buffervolume"

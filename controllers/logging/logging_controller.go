@@ -186,9 +186,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
@@ -258,7 +258,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
