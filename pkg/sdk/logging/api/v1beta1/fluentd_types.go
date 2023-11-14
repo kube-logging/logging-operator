@@ -120,6 +120,8 @@ type _metaFluentd interface{} //nolint:deadcode,unused
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the fluentd configuration active?"
+// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 // +kubebuilder:storageversion
 
 // Fluentd
@@ -133,6 +135,10 @@ type Fluentd struct {
 
 // FluentdStatus
 type FluentdStatus struct {
+	Logging       string   `json:"logging,omitempty"`
+	Active        *bool    `json:"active,omitempty"`
+	Problems      []string `json:"problems,omitempty"`
+	ProblemsCount int      `json:"problemsCount,omitempty"`
 }
 
 // +kubebuilder:object:root=true

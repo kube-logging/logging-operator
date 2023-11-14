@@ -18,7 +18,16 @@ spec:
     singular: fluentd
   scope: Namespaced
   versions:
-  - name: v1beta1
+  - additionalPrinterColumns:
+    - description: Is the fluentd configuration active?
+      jsonPath: .status.active
+      name: Active
+      type: boolean
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
     schema:
       openAPIV3Schema:
         properties:
@@ -2270,6 +2279,17 @@ spec:
                 type: integer
             type: object
           status:
+            properties:
+              active:
+                type: boolean
+              logging:
+                type: string
+              problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
             type: object
         type: object
     served: true
