@@ -132,6 +132,12 @@ LoggingStatus defines the observed state of Logging
 Result of the config check. Under normal conditions there is a single item in the map with a bool value. 
 
 
+### fluentdConfigName (string, optional) {#loggingstatus-fluentdconfigname}
+
+Name of the matched detached fluentd configuration object 
+
+Default: -
+
 ### problems ([]string, optional) {#loggingstatus-problems}
 
 Problems with the logging resource 

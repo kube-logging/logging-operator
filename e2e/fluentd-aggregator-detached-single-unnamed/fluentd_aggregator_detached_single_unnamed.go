@@ -118,8 +118,36 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 				Workers: 2,
 			},
 		}
-
 		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
+
+		fluentdNotUsed := v1beta1.Fluentd{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "not-to-be-used-fluentd",
+				Namespace: ns,
+			},
+			Spec: v1beta1.FluentdSpec{
+				Resources: corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("500m"),
+						corev1.ResourceMemory: resource.MustParse("200M"),
+					},
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("250m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+				BufferVolumeMetrics: &v1beta1.Metrics{},
+				Scaling: &v1beta1.FluentdScaling{
+					Replicas: 1,
+					Drain: v1beta1.FluentdDrainConfig{
+						Enabled: true,
+					},
+				},
+				Workers: 2,
+			},
+		}
+		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentdNotUsed))
+
 		t.Logf("fluentd is: %v", fluentd)
 		tags := "time"
 		output := v1beta1.Output{
@@ -178,6 +206,14 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
+			if len(fluentdNotUsed.Status.Problems) == 0 {
+				t.Log("second fluentd instance should have it's problems field filled")
+				return false
+			}
+			if logging.Status.FluentdConfigName != &fluentd.Name {
+				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
+				return false
+			}
 			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
 				t.Log("waiting for the operator")
 				return false

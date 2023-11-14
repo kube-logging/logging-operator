@@ -111,6 +111,8 @@ type ConfigCheck struct {
 type LoggingStatus struct {
 	// Result of the config check. Under normal conditions there is a single item in the map with a bool value.
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
+	// Name of the matched detached fluentd configuration object
+	FluentdConfigName string `json:"fluentdConfigName,omitempty"`
 
 	// Problems with the logging resource
 	Problems []string `json:"problems,omitempty"`

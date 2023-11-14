@@ -18652,6 +18652,8 @@ spec:
                 additionalProperties:
                   type: boolean
                 type: object
+              fluentdConfigName:
+                type: string
               problems:
                 items:
                   type: string

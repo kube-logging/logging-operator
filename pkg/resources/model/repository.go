@@ -20,6 +20,7 @@ import (
 	"sort"
 
 	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -338,6 +339,19 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	return res, nil
 }
 
+func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]v1beta1.Fluentd, logging v1beta1.Logging) (*v1beta1.Fluentd, error) {
+	for _, i := range *list {
+		if logging.Status.FluentdConfigName != "" {
+			if i.Name != logging.Status.FluentdConfigName {
+				i.Status.Problems = append(i.Status.Problems, "Logging already has a detached fluentd configuration, remove excess configuration objects")
+			}
+		}
+	}
+	multipleFluentdErrors := "multiple fluentd configurations found, couldn't associate it with logging"
+	logging.Status.Problems = append(logging.Status.Problems, multipleFluentdErrors)
+	return nil, errors.New(multipleFluentdErrors)
+}
+
 func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.Fluentd, error) {
 	var list v1beta1.FluentdList
 	if err := r.Client.List(ctx, &list); err != nil {
@@ -346,23 +360,23 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 
 	var res []v1beta1.Fluentd
 	res = append(res, list.Items...)
-	if len(res) < 1 {
-		return nil, nil
-	}
 
-	// Multiple detached fluentds
-	if len(res) > 1 {
-		for _, i := range res {
-			// Explicit reference is set and found
-			if i.Name == logging.Spec.FluentdRef {
-				err := i.Spec.SetDefaults()
-				return &i, err
-			}
+	switch len(res) {
+	case 0:
+		return nil, nil
+	case 1:
+		// Implicitly associate fluentd configuration object with logging
+		detachedFluentd := res[0]
+		err := detachedFluentd.Spec.SetDefaults()
+		if err != nil {
+			logging.Status.FluentdConfigName = detachedFluentd.Name
+			detachedFluentd.Status.Active = utils.BoolPointer(true)
+			detachedFluentd.Status.Logging = logging.Name
 		}
-		return nil, errors.New("multiple fluentd configurations found, could't associate it with logging")
+		return &detachedFluentd, err
+	default:
+		return r.handleMultipleDetachedFluentdObjects(&res, logging)
 	}
-	err := res[0].Spec.SetDefaults()
-	return &res[0], err
 }
 
 func (r LoggingResourceRepository) LoggingRoutesFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.LoggingRoute, error) {
