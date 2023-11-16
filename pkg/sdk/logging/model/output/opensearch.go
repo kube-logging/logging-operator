@@ -248,6 +248,15 @@ type OpenSearchOutput struct {
 	DataStreamName string `json:"data_stream_name,omitempty"`
 	// Specify an existing index template for the data stream. If not present, a new template is created and named after the data stream. (default: data_stream_name)
 	DataStreamTemplateName string `json:"data_stream_template_name,omitempty"`
+
+	// AWS Endpoint Credentials
+	Endpoint *OpenSearchEndpointCredentials `json:"endpoint,omitempty"` 
+}
+
+func (o *OpenSearchEndpointCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	return types.NewFlatDirective(types.PluginMeta{
+		Directive: "endpoint",
+	}, o, secretLoader)
 }
 
 func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
@@ -268,6 +277,13 @@ func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 	} else {
 		opensearch.Params = params
 	}
+	if e.Endpoint != nil {
+		if assumeRoleCredentials, err := e.Endpoint.ToDirective(secretLoader, id); err != nil {
+			return nil, err
+		} else {
+			opensearch.SubDirectives = append(opensearch.SubDirectives, assumeRoleCredentials)
+		}
+	}
 	if e.Buffer == nil {
 		e.Buffer = &Buffer{}
 	}
@@ -277,4 +293,35 @@ func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 		opensearch.SubDirectives = append(opensearch.SubDirectives, buffer)
 	}
 	return opensearch, nil
+}
+
+
+
+type OpenSearchEndpointCredentials struct {
+	// AWS region. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION.
+	Region string `json:"region,omitempty"`
+
+	// AWS connection url.
+	Url string `json:"url,omitempty"`
+
+	// AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.
+	AccessKeyId *secret.Secret `json:"access_key_id,omitempty"`
+
+	// AWS secret key. This parameter is required when your agent is not running on EC2 instance with an IAM Role.
+	SecretAccessKey *secret.Secret `json:"secret_access_key,omitempty"`
+
+	// Typically, you can use AssumeRole for cross-account access or federation.
+	AssumeRoleArn *secret.Secret `json:"assume_role_arn,omitempty"`
+
+	// Set with AWS_CONTAINER_CREDENTIALS_RELATIVE_URI environment variable value
+	EcsContainerCredentialsRelativeUri *secret.Secret `json:"ecs_container_credentials_relative_uri,omitempty"`
+
+	// AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
+	AssumeRoleSessionName *secret.Secret `json:"assume_role_session_name,omitempty"`
+
+	// AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
+	AssumeRoleWebIdentityTokenFile *secret.Secret `json:"assume_role_web_identity_token_file,omitempty"`
+
+	// By default, the AWS Security Token Service (AWS STS) is available as a global service, and all AWS STS requests go to a single endpoint at https://sts.amazonaws.com. AWS recommends using Regional AWS STS endpoints instead of the global endpoint to reduce latency, build in redundancy, and increase session token validity. https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
+	StsCredentialsRegion *secret.Secret `json:"sts_credentials_region,omitempty"`
 }
