@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -107,7 +108,7 @@ type OpenSearchOutput struct {
 	// You can tune how the OpenSearch-transport host reloading feature works.(default: true)
 	// +kubebuilder:validation:Optional
 	ReloadConnections *bool `json:"reload_connections,omitempty" plugin:"default:true"`
-	//Indicates that the OpenSearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.(default: false)
+	// Indicates that the OpenSearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.(default: false)
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
 	// This setting allows custom routing of messages in response to bulk request failures. The default behavior is to emit failed records using the same tag that was provided.
 	RetryTag string `json:"retry_tag,omitempty"`
@@ -115,7 +116,7 @@ type OpenSearchOutput struct {
 	ResurrectAfter string `json:"resurrect_after,omitempty"`
 	// By default, when inserting records in Logstash format, @timestamp is dynamically created with the time at log ingestion. If you'd like to use a custom time, include an @timestamp with your record.
 	TimeKey string `json:"time_key,omitempty"`
-	//time_key_exclude_timestamp (default: false)
+	// time_key_exclude_timestamp (default: false)
 	TimeKeyExcludeTimestamp bool `json:"time_key_exclude_timestamp,omitempty"`
 	// +kubebuilder:validation:Optional
 	// Skip ssl verification (default: true)
@@ -185,7 +186,7 @@ type OpenSearchOutput struct {
 	SelectorClassName string `json:"selector_class_name,omitempty"`
 	// When reload_connections true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000.
 	ReloadAfter string `json:"reload_after,omitempty"`
-	//With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
+	// With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
 	IncludeIndexInUrl bool `json:"include_index_in_url,omitempty"`
 	// With http_backend typhoeus, opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
 	HttpBackend string `json:"http_backend,omitempty"`
@@ -295,6 +296,7 @@ func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 	return opensearch, nil
 }
 
+// +kubebuilder:object:generate=true
 type OpenSearchEndpointCredentials struct {
 	// AWS region. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION.
 	Region string `json:"region,omitempty"`
