@@ -131,7 +131,6 @@ buffer:
 	test.DiffResult(expected)
 }
 
-
 func TestOpenSearchDataStream(t *testing.T) {
 	CONFIG := []byte(`
 host: opensearch-cluster.default.svc.cluster.local

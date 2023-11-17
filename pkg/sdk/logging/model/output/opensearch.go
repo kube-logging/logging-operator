@@ -250,7 +250,7 @@ type OpenSearchOutput struct {
 	DataStreamTemplateName string `json:"data_stream_template_name,omitempty"`
 
 	// AWS Endpoint Credentials
-	Endpoint *OpenSearchEndpointCredentials `json:"endpoint,omitempty"` 
+	Endpoint *OpenSearchEndpointCredentials `json:"endpoint,omitempty"`
 }
 
 func (o *OpenSearchEndpointCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
@@ -295,14 +295,12 @@ func (e *OpenSearchOutput) ToDirective(secretLoader secret.SecretLoader, id stri
 	return opensearch, nil
 }
 
-
-
 type OpenSearchEndpointCredentials struct {
 	// AWS region. It should be in form like us-east-1, us-west-2. Default nil, which means try to find from environment variable AWS_REGION.
 	Region string `json:"region,omitempty"`
 
 	// AWS connection url.
-	Url string `json:"url,omitempty"`
+	Url string `json:"url"`
 
 	// AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.
 	AccessKeyId *secret.Secret `json:"access_key_id,omitempty"`

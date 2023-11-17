@@ -566,7 +566,7 @@ AWS region. It should be in form like us-east-1, us-west-2. Default nil, which m
 
 Default: -
 
-### url (string, optional) {#opensearchendpointcredentials-url}
+### url (string, required) {#opensearchendpointcredentials-url}
 
 AWS connection url. 
 

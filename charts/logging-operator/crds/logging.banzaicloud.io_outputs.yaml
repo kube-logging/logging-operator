@@ -4542,6 +4542,8 @@ spec:
                         type: object
                       url:
                         type: string
+                    required:
+                    - url
                     type: object
                   exception_backup:
                     type: boolean
@@ -11092,6 +11094,8 @@ spec:
                         type: object
                       url:
                         type: string
+                    required:
+                    - url
                     type: object
                   exception_backup:
                     type: boolean
