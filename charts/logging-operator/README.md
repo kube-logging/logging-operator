@@ -86,7 +86,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.enableRecreateWorkloadOnImmutableFieldChange | bool | `false` | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update. |
 | logging.clusterFlows | list | `[]` | ClusterFlows to deploy |
 | logging.clusterOutputs | list | `[]` | ClusterOutputs to deploy |
-| logging.eventTailer.create | bool | `false` |  |
+| logging.eventTailer.enabled | bool | `false` |  |
 | logging.eventTailer.name | string | `"event-tailer"` |  |
 | logging.eventTailer.image.repository | string | `nil` | repository of eventTailer image |
 | logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |

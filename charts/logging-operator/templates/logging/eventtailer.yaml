@@ -1,6 +1,6 @@
 {{ if .Values.logging.enabled -}}
 {{- with $.Values.logging.eventTailer }}
-{{- if .create }}
+{{- if .enabled }}
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: EventTailer
 metadata:

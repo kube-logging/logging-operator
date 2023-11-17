@@ -228,7 +228,7 @@ logging:
 
   # EventTailer config
   eventTailer:
-    create: false
+    enabled: false
     name: event-tailer
     image:
       # -- repository of eventTailer image
