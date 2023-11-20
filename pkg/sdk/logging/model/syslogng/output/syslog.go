@@ -90,6 +90,8 @@ spec:
 {{</ highlight >}}
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/).
+*/
+type _docSyslogOutput interface{} //nolint:deadcode,unused
 
 // +name:"Syslog output configuration"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/"
