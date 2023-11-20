@@ -37,11 +37,15 @@ func (l LoggingResources) GetFluentd() *v1beta1.Fluentd {
 }
 
 func (l LoggingResources) GetFluentdSpec() *v1beta1.FluentdSpec {
+
 	if detachedFluentd := l.GetFluentd(); detachedFluentd != nil {
 		return &detachedFluentd.Spec
 	}
+	if l.Logging.Spec.FluentdSpec != nil {
+		return l.Logging.Spec.FluentdSpec
+	}
 
-	return l.Logging.Spec.FluentdSpec
+	return nil
 }
 
 type FluentdLoggingResources struct {

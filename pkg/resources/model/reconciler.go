@@ -159,15 +159,15 @@ func NewValidationReconciler(
 		}
 
 		if resources.Fluentd.Configuration != nil {
+			registerForPatching(resources.Fluentd.Configuration)
 
-		}
-		if resources.Fluentd.Configuration != nil && resources.Logging.Spec.FluentdSpec != nil {
-			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration found is set as well, clearing inline", resources.Fluentd.Configuration.Name))
-			resources.Logging.Spec.FluentdSpec = nil
-		}
-
-		if fluentd := resources.GetFluentd(); fluentd != nil {
-			registerForPatching(fluentd)
+			if resources.Logging.Spec.FluentdSpec != nil {
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration is set as well, clearing inline", resources.Fluentd.Configuration.Name))
+				resources.Logging.Spec.FluentdSpec = nil
+			}
+			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
+			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
 		}
 
 		for i := range resources.SyslogNG.ClusterFlows {
