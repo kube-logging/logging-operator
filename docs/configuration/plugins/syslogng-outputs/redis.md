@@ -7,6 +7,8 @@ generated_file: true
 # Sending messages from a local network to the Redis server
 ## Overview
 
+Based on the [Redis destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/).
+
 ## Example
 
 {{< highlight yaml >}}
@@ -51,7 +53,7 @@ Default: 6379
 
 ### retries (int, optional) {#redisoutput-retries}
 
-If syslog-ng OSE cannot send a message, it will try again until the number of attempts reaches retries().
+If syslog-ng OSE cannot send a message, it will try again until the number of attempts reaches `retries()`.
 
 Default: 3
 
@@ -75,7 +77,7 @@ Default: 1
 
 ### command_and_arguments ([]string, optional) {#redisoutput-command_and_arguments}
 
-The Redis command to execute, for example, LPUSH, INCR, or HINCRBY. Using the HINCRBY command with an increment value of 1 allows you to create various statistics. For example, the command("HINCRBY" "${HOST}/programs" "${PROGRAM}" "1") command counts the number of log messages on each host for each program.
+The Redis command to execute, for example, LPUSH, INCR, or HINCRBY. Using the HINCRBY command with an increment value of 1 allows you to create various statistics. For example, the `command("HINCRBY" "${HOST}/programs" "${PROGRAM}" "1")` command counts the number of log messages on each host for each program.
 
 Default: ""
 

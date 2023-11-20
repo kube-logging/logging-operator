@@ -7,6 +7,10 @@ generated_file: true
 # Sending messages over Splunk HEC
 ## Overview
 
+Based on the [Splunk destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/).
+
+## Example
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
@@ -21,9 +25,6 @@ spec:
             name: splunk-hec
             key: token
 {{</ highlight >}}
-
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/
-
 
 
 ## Configuration
@@ -41,7 +42,7 @@ Default: -
 
 ### event (string, optional) {#splunkhecoutput-event}
 
-event() accepts a template, which declares the content of the log message sent to Splunk. Default value: ${MSG} 
+event() accepts a template, which declares the content of the log message sent to Splunk. Default value: `${MSG}` 
 
 Default: -
 
@@ -77,7 +78,7 @@ Default: -
 
 ### default_index (string, optional) {#splunkhecoutput-default_index}
 
-Fallback option for index field. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/) 
+Fallback option for index field. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/). 
 
 Default: -
 

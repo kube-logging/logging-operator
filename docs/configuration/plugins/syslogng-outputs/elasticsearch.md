@@ -7,6 +7,8 @@ generated_file: true
 # Sending messages over Elasticsearch
 ## Overview
 
+Based on the [ElasticSearch destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/).
+
 ## Example
 
 {{< highlight yaml >}}
@@ -26,7 +28,6 @@ spec:
           name: elastic
           key: password
 {{</ highlight >}}
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
 
 
 ## Configuration
@@ -44,7 +45,7 @@ Default: -
 
 ### type (*string, optional) {#elasticsearchoutput-type}
 
-The document type associated with the operation. Elasticsearch indices now support a single document type: _doc 
+The document type associated with the operation. Elasticsearch indices now support a single document type: `_doc` 
 
 Default: -
 
@@ -56,7 +57,7 @@ Default: -
 
 ### logstash_prefix (string, optional) {#elasticsearchoutput-logstash_prefix}
 
-Set the prefix for logs in logstash format. If set, then Index field will be ignored. 
+Set the prefix for logs in logstash format. If set, then the Index field will be ignored. 
 
 Default: -
 
@@ -68,7 +69,7 @@ Default: -
 
 ### logstash_suffix (string, optional) {#elasticsearchoutput-logstash_suffix}
 
-Set the suffix for logs in logstash format. Default: "${YEAR}.${MONTH}.${DAY}" 
+Set the suffix for logs in logstash format. Default: `"${YEAR}.${MONTH}.${DAY}"` 
 
 Default: -
 

@@ -7,6 +7,8 @@ generated_file: true
 # Sending messages from a local network to an MongoDB database
 ## Overview
 
+Based on the [MongoDB destination of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/).
+
 ## Example
 
 {{< highlight yaml >}}
@@ -22,7 +24,7 @@ spec:
     value_pairs: scope("selected-macros" "nv-pairs")
 {{</ highlight >}}
 
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/
+For more information, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/).
 
 
 ## Configuration
@@ -48,7 +50,7 @@ Default: false
 
 ### uri (*secret.Secret, optional) {#mongodb-uri}
 
-Connection string used for authentication. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri) 
+Connection string used for authentication. See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-uri) 
 
 Default: -
 
@@ -56,7 +58,7 @@ Default: -
 
 Creates structured name-value pairs from the data and metadata of the log message.
 
-Default: "scope("selected-macros" "nv-pairs")"
+Default: `"scope("selected-macros" "nv-pairs")"`
 
 ###  (Batch, required) {#mongodb-}
 
@@ -78,7 +80,7 @@ Default: -
 
 ### persist_name (string, optional) {#mongodb-persist_name}
 
-If you receive the following error message during AxoSyslog startup, set the persist-name() option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
 
 Default: -
 
@@ -96,7 +98,7 @@ Default: 60
 
 ### write_concern (RawString, optional) {#mongodb-write_concern}
 
-Description: Sets the write concern mode of the MongoDB operations, for both bulk and single mode. See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-write-concern 
+Description: Sets the write concern mode of the MongoDB operations, for both bulk and single mode. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-write-concern). 
 
 Default: -
 
@@ -104,7 +106,7 @@ Default: -
 ## Bulk
 
 Bulk operation related options
-See [syslog-ng docs] https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk).
 
 ### bulk (*bool, optional) {#bulk-bulk}
 

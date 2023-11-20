@@ -6,7 +6,13 @@ generated_file: true
 
 # Storing messages in Sumo Logic over syslog
 ## Overview
- More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/
+ 
+The `sumologic-syslog` output sends log records over HTTP to Sumo Logic. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-options/).
+
+## Prerequisites
+
+You need a Sumo Logic account to use this output. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/).
+
 
 ## Configuration
 ## SumologicSyslogOutput
@@ -37,7 +43,7 @@ Default: -
 
 ### tls (*TLS, optional) {#sumologicsyslogoutput-tls}
 
-This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/). 
+This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/). 
 
 Default: -
 
