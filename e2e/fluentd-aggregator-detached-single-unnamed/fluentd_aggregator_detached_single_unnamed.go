@@ -210,7 +210,7 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 				t.Log("second fluentd instance should have it's problems field filled")
 				return false
 			}
-			if logging.Status.FluentdConfigName != &fluentd.Name {
+			if logging.Status.FluentdConfigName != fluentd.Name {
 				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
 				return false
 			}
