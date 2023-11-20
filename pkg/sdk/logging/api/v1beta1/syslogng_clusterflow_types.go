@@ -16,6 +16,8 @@ package v1beta1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"SyslogNGClusterFlow"
@@ -45,10 +47,11 @@ type SyslogNGClusterFlow struct {
 
 // SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 type SyslogNGClusterFlowSpec struct {
-	Match            *SyslogNGMatch   `json:"match,omitempty"`
-	Filters          []SyslogNGFilter `json:"filters,omitempty"`
-	LoggingRef       string           `json:"loggingRef,omitempty"`
-	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
+	Match            *SyslogNGMatch        `json:"match,omitempty"`
+	Filters          []SyslogNGFilter      `json:"filters,omitempty"`
+	LoggingRef       string                `json:"loggingRef,omitempty"`
+	GlobalOutputRefs []string              `json:"globalOutputRefs,omitempty"`
+	OutputMetrics    []filter.MetricsProbe `json:"outputMetrics,omitempty"`
 }
 
 type SyslogNGClusterMatch SyslogNGMatch

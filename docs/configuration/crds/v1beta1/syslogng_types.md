@@ -72,6 +72,10 @@ Default: -
 
 Default: -
 
+### sourceMetrics ([]filter.MetricsProbe, optional) {#syslogngspec-sourcemetrics}
+
+Default: -
+
 
 ## SyslogNGTLS
 

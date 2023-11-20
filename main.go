@@ -133,13 +133,11 @@ func main() {
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
 		webhookServerOptions := webhook.Options{
-			Port: 9443,
+			Port:    config.TailerWebhook.ServerPort,
+			CertDir: config.TailerWebhook.CertDir,
 		}
-		if config.TailerWebhook.ServerPort != 0 {
-			webhookServerOptions.Port = config.TailerWebhook.ServerPort
-		}
-		if config.TailerWebhook.CertDir != "" {
-			webhookServerOptions.CertDir = config.TailerWebhook.CertDir
+		if port, ok := os.LookupEnv("WEBHOOK_PORT"); ok {
+			webhookServerOptions.Port = cast.ToInt(port)
 		}
 		webhookServer := webhook.NewServer(webhookServerOptions)
 		mgrOptions.WebhookServer = webhookServer

@@ -114,6 +114,7 @@ spec:
             namespace: "${json.kubernetes.namespace_name}"{{< /highlight >}}
 */
 type MetricsProbe struct {
+	__meta struct{} `json:"-" syslog-ng:"name=metrics-probe"`
 	// The name of the counter to create. Note that the value of this option is always prefixed with `syslogng_`, so for example `key("my-custom-key")` becomes `syslogng_my-custom-key`.
 	Key string `json:"key,omitempty"`
 	// The labels used to create separate counters, based on the fields of the messages processed by `metrics-probe()`. The keys of the map are the name of the label, and the values are syslog-ng templates. 
