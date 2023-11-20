@@ -434,7 +434,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		case *loggingv1beta1.LoggingRoute:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
 		case *loggingv1beta1.FluentdConfig:
-			return reconcileRequestsForLoggingRef(loggingList.Items, o.LoggingRef)
+			return reconcileRequestsForMatchingControlNamespace(loggingList.Items, o.Namespace)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -506,6 +506,20 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRef string) (reqs []reconcile.Request) {
 	for _, l := range loggings {
 		if l.Spec.LoggingRef == loggingRef {
+			reqs = append(reqs, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
+					Name:      l.Name,
+				},
+			})
+		}
+	}
+	return
+}
+
+func reconcileRequestsForMatchingControlNamespace(loggings []loggingv1beta1.Logging, ControlNamespace string) (reqs []reconcile.Request) {
+	for _, l := range loggings {
+		if l.Spec.ControlNamespace == ControlNamespace {
 			reqs = append(reqs, reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
