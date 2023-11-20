@@ -38,15 +38,15 @@ Default: -
 
 ### message_color (string, optional) {#output config-message_color}
 
-message_color color of the message you are sending, the format is hex code.  
+message_color color of the message you are sending, the format is hex code.
 
-Default:  #A9A9A9
+Default: #A9A9A9
 
 ### message_title (string, optional) {#output config-message_title}
 
-message_title title you want to add to the message.  
+message_title title you want to add to the message.
 
-Default:  fluent_title_default
+Default: fluent_title_default
 
 ### message (string, optional) {#output config-message}
 
@@ -56,9 +56,9 @@ Default: -
 
 ### enable_tls (*bool, optional) {#output config-enable_tls}
 
-enable_tls you can set the communication channel if it uses tls.  
+enable_tls you can set the communication channel if it uses tls.
 
-Default:  true
+Default: true
 
 ### ca_path (*secret.Secret, optional) {#output config-ca_path}
 

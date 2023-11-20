@@ -94,6 +94,10 @@ Default: -
 
 ## MetricsProbe
 
+### - (struct{}, required) {#metricsprobe--}
+
+Default: -
+
 ### key (string, optional) {#metricsprobe-key}
 
 The name of the counter to create. Note that the value of this option is always prefixed with syslogng_, so for example key("my-custom-key") becomes syslogng_my-custom-key. 

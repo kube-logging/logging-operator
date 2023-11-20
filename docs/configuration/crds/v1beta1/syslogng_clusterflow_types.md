@@ -45,6 +45,10 @@ Default: -
 
 Default: -
 
+### outputMetrics ([]filter.MetricsProbe, optional) {#syslogngclusterflowspec-outputmetrics}
+
+Default: -
+
 
 ## SyslogNGClusterFlowList
 

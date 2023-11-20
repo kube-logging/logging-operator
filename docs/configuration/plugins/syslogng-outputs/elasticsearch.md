@@ -6,7 +6,28 @@ generated_file: true
 
 # Sending messages over Elasticsearch
 ## Overview
- More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
+
+## Example
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: elasticsearch
+spec:
+  elasticsearch:
+    url: "https://elastic-search-endpoint:9200/_bulk"
+    index: "indexname"
+    type: ""
+    user: "username"
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: elastic
+          key: password
+{{</ highlight >}}
+More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
+
 
 ## Configuration
 ## ElasticsearchOutput

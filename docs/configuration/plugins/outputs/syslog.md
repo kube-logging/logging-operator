@@ -19,27 +19,27 @@ Default: -
 
 ### port (int, optional) {#syslogoutputconfig-port}
 
-Destination host port  
+Destination host port
 
-Default:  "514"
+Default: "514"
 
 ### transport (string, optional) {#syslogoutputconfig-transport}
 
-Transport Protocol  
+Transport Protocol
 
-Default:  "tls"
+Default: "tls"
 
 ### insecure (*bool, optional) {#syslogoutputconfig-insecure}
 
-skip ssl validation  
+skip ssl validation
 
-Default:  false
+Default: false
 
 ### verify_fqdn (*bool, optional) {#syslogoutputconfig-verify_fqdn}
 
-verify_fqdn  
+verify_fqdn
 
-Default:  nil
+Default: nil
 
 ### enable_system_cert_store (*bool, optional) {#syslogoutputconfig-enable_system_cert_store}
 
@@ -67,27 +67,27 @@ Default: -
 
 ### private_key_passphrase (*secret.Secret, optional) {#syslogoutputconfig-private_key_passphrase}
 
-PrivateKeyPassphrase for private key   
+PrivateKeyPassphrase for private key
 
-Default:  "nil"
+Default: "nil"
 
 ### allow_self_signed_cert (*bool, optional) {#syslogoutputconfig-allow_self_signed_cert}
 
-allow_self_signed_cert for mutual tls  
+allow_self_signed_cert for mutual tls
 
-Default:  false
+Default: false
 
 ### fqdn (string, optional) {#syslogoutputconfig-fqdn}
 
-Fqdn  
+Fqdn
 
-Default:  "nil"
+Default: "nil"
 
 ### version (string, optional) {#syslogoutputconfig-version}
 
-TLS Version   
+TLS Version
 
-Default:  "TLSv1_2"
+Default: "TLSv1_2"
 
 ### format (*FormatRfc5424, optional) {#syslogoutputconfig-format}
 

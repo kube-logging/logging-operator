@@ -19,10 +19,18 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
 
       - name: Test
         run: make test
+      
+      - name: Generate test coverage
+        run: make generate-test-coverage
+    
+      - name: Test Coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          config: ./.testcoverage.yml
 
       - name: Check diff
         run: make check-diff
@@ -38,7 +46,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
 
       - name: Lint
         run: make lint
@@ -56,7 +64,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
 
       - name: Cache licenses
         uses: actions/cache@v3

@@ -13,13 +13,13 @@ generated_file: true
 
 ### de_dot_nested (bool, optional) {#dedotfilterconfig-de_dot_nested}
 
-Will cause the plugin to recurse through nested structures (hashes and arrays), and remove dots in those key-names too. 
+Will cause the plugin to recurse through nested structures (hashes and arrays), and remove dots in those key-names too.
 
-Default:  false
+Default: false
 
 ### de_dot_separator (string, optional) {#dedotfilterconfig-de_dot_separator}
 
-Separator  
+Separator
 
 Default: _
 

@@ -31,15 +31,15 @@ Default: true
 
 ### path_suffix (string, optional) {#fileoutputconfig-path_suffix}
 
-The suffix of output result. 
+The suffix of output result.
 
-Default:  ".log"
+Default: ".log"
 
 ### symlink_path (bool, optional) {#fileoutputconfig-symlink_path}
 
-Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs. 
+Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.
 
-Default:  false
+Default: false
 
 ### compress (string, optional) {#fileoutputconfig-compress}
 
@@ -49,9 +49,9 @@ Default: -
 
 ### recompress (bool, optional) {#fileoutputconfig-recompress}
 
-Performs compression again even if the buffer chunk is already compressed.  
+Performs compression again even if the buffer chunk is already compressed.
 
-Default:  false
+Default: false
 
 ### format (*Format, optional) {#fileoutputconfig-format}
 

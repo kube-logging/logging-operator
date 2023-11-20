@@ -44,6 +44,9 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	if i := generateInitContainer(r.Logging.Spec.FluentdSpec); i != nil {
 		initContainers = append(initContainers, *i)
 	}
+	if c := r.tmpDirHackContainer(); c != nil {
+		initContainers = append(initContainers, *c)
+	}
 
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{

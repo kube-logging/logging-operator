@@ -16,6 +16,7 @@ package eventtailer
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -46,6 +47,27 @@ func (e *EventTailer) StatefulSet() (runtime.Object, reconciler.DesiredState, er
 }
 
 func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
+
+	if e.customResource.Spec.Image != nil {
+		if repositoryWithTag := e.customResource.Spec.Image.RepositoryWithTag(); repositoryWithTag != "" {
+			if e.customResource.Spec.ContainerBase == nil {
+				e.customResource.Spec.ContainerBase = &types.ContainerBase{}
+			}
+			e.customResource.Spec.ContainerBase.Image = repositoryWithTag
+		}
+	}
+	if e.customResource.Spec.Image != nil && e.customResource.Spec.Image.PullPolicy != "" {
+		if e.customResource.Spec.ContainerBase == nil {
+			e.customResource.Spec.ContainerBase = &types.ContainerBase{}
+		}
+		e.customResource.Spec.ContainerBase.PullPolicy = corev1.PullPolicy(e.customResource.Spec.ContainerBase.PullPolicy)
+	}
+
+	var imagePullSecrets []corev1.LocalObjectReference
+	if e.customResource.Spec.Image != nil {
+		imagePullSecrets = e.customResource.Spec.Image.ImagePullSecrets
+	}
+
 	spec := appsv1.StatefulSetSpec{
 		Replicas: utils.IntPointer(1),
 		Selector: &metav1.LabelSelector{
@@ -60,7 +82,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 					Containers: []corev1.Container{
 						e.customResource.Spec.ContainerBase.Override(corev1.Container{
 							Name:            config.EventTailer.TailerAffix,
-							Image:           "ghcr.io/kube-logging/eventrouter:0.4.0",
+							Image:           config.EventTailer.ImageWithTag,
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							VolumeMounts: []corev1.VolumeMount{
 								{
@@ -89,6 +111,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 							},
 						},
 					},
+					ImagePullSecrets: imagePullSecrets,
 				}),
 		},
 	}

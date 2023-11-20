@@ -26,21 +26,21 @@ generated_file: true
 
 ### host (string, optional) {#output config-host}
 
-Host Redis endpoint  
+Host Redis endpoint
 
-Default:  localhost
+Default: localhost
 
 ### port (int, optional) {#output config-port}
 
-Port of the Redis server  
+Port of the Redis server
 
-Default:  6379
+Default: 6379
 
 ### db_number (int, optional) {#output config-db_number}
 
-DbNumber database number is optional.  
+DbNumber database number is optional.
 
-Default:  0
+Default: 0
 
 ### password (*secret.Secret, optional) {#output config-password}
 
@@ -50,21 +50,21 @@ Default: -
 
 ### insert_key_prefix (string, optional) {#output config-insert_key_prefix}
 
-insert_key_prefix  
+insert_key_prefix
 
-Default:  "${tag}"
+Default: "${tag}"
 
 ### strftime_format (string, optional) {#output config-strftime_format}
 
-strftime_format Users can set strftime format.  
+strftime_format Users can set strftime format.
 
-Default:  "%s"
+Default: "%s"
 
 ### allow_duplicate_key (bool, optional) {#output config-allow_duplicate_key}
 
-allow_duplicate_key Allow insert key duplicate. It will work as update values.  
+allow_duplicate_key Allow insert key duplicate. It will work as update values.
 
-Default:  false
+Default: false
 
 ### ttl (int, optional) {#output config-ttl}
 

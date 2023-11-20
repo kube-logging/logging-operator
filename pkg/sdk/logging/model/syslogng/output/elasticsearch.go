@@ -21,7 +21,28 @@ import "fmt"
 type _hugoElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch"
-// More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
+/*
+## Example
+
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: elasticsearch
+spec:
+  elasticsearch:
+    url: "https://elastic-search-endpoint:9200/_bulk"
+    index: "indexname"
+    type: ""
+    user: "username"
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: elastic
+          key: password
+{{</ highlight >}}
+More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
+*/
 type _docSElasticsearch interface{} //nolint:deadcode,unused
 
 // +name:"Elasticsearch"

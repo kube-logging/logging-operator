@@ -15,7 +15,7 @@ metadata:
   name: loki-output
 spec:
   loki:
-    url: 	"loki.loki:8000"
+    url: "loki.loki:8000"
     batch-lines: 2000
     batch-timeout: 10
     workers: 3
@@ -28,7 +28,9 @@ spec:
     auth:
       insecure: {}
 {{</ highlight >}}
-More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
+For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 
 
 ## Configuration
@@ -36,7 +38,7 @@ More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog
 
 ### auth (*Auth, optional) {#lokioutput-auth}
 
-Auth TODO 
+Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth 
 
 Default: -
 
@@ -54,15 +56,15 @@ Default: -
 
 ### time_reopen (int, optional) {#lokioutput-time_reopen}
 
-The time to wait in seconds before a dead connection is reestablished.  
+The time to wait in seconds before a dead connection is reestablished.
 
-Default:  60
+Default: 60
 
 ### disk_buffer (*DiskBuffer, optional) {#lokioutput-disk_buffer}
 
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).  
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 
-Default:  false
+Default: false
 
 ### batch-lines (int, optional) {#lokioutput-batch-lines}
 

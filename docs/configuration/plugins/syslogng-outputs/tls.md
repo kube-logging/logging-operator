@@ -6,7 +6,7 @@ generated_file: true
 
 # TLS config for syslog-ng outputs
 ## Overview
- More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+ More info at https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/
 
 ## Configuration
 ## TLS

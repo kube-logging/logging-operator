@@ -18,6 +18,12 @@ Path prefix of the files on Azure
 
 Default: -
 
+### azure_cloud (string, optional) {#output config-azure_cloud}
+
+Azure Cloud to use. e.g. AzurePublicCloud, AzureChinaCloud, AzureGermanCloud, AzureUSGovernmentCloud, AZURESTACKCLOUD (in uppercase) This field is supported only if the fluentd plugin honors it. e.g https://github.com/elsesiy/fluent-plugin-azure-storage-append-blob-lts 
+
+Default: -
+
 ### azure_storage_account (*secret.Secret, required) {#output config-azure_storage_account}
 
 Your azure storage account [Secret](../secret/) 
@@ -50,15 +56,15 @@ Default: -
 
 ### azure_object_key_format (string, optional) {#output config-azure_object_key_format}
 
-Object key format  
+Object key format
 
-Default:  %{path}%{time_slice}_%{index}.%{file_extension}
+Default: %{path}%{time_slice}_%{index}.%{file_extension}
 
 ### auto_create_container (bool, optional) {#output config-auto_create_container}
 
-Automatically create container if not exists 
+Automatically create container if not exists
 
-Default:  true
+Default: true
 
 ### format (string, optional) {#output config-format}
 
