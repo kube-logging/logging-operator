@@ -198,7 +198,13 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 			"--no-caps",
 		}
 	case v1beta1.ConfigCheckStrategyDryRun:
-		fallthrough
+		containerCommand = nil
+		containerArgs = []string{
+			"--cfgfile=" + configDir + "/" + configKey,
+			"-Fe",
+			"--check-startup",
+			"--no-caps",
+		}
 	default:
 		// use the default entrypoint
 		containerCommand = nil
