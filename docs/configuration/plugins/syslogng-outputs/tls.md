@@ -53,4 +53,10 @@ Description: Specifies the cipher, hash, and key-exchange algorithms used for th
 
 Default: -
 
+### ssl_version (string, optional) {#tls-ssl_version}
+
+Configure required TLS version. Accepted values: [sslv3, tlsv1, tlsv1_0, tlsv1_1, tlsv1_2, tlsv1_3] 
+
+Default: -
+
 
