@@ -12,6 +12,7 @@ GOVERSION := $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
 IMG ?= controller:local
+IMG_DEBUG ?= controller:debug
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
@@ -22,6 +23,7 @@ DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 VERSION := $(shell git describe --abbrev=0 --tags)
 
 E2E_TEST_TIMEOUT ?= 20m
+TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
 CONTROLLER_GEN_VERSION := v0.6.0
@@ -78,6 +80,10 @@ docker-build: ## Build the docker image
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
+.PHONY: docker-build-debug
+docker-build-debug: ## Build the debug docker image
+	${DOCKER} build --target debug -t ${IMG_DEBUG} .
+
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
 	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
@@ -103,7 +109,7 @@ codegen: ${CONTROLLER_GEN} tidy ## Generate code
 
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
-	kubectl create -f config/crd/bases || kubectl replace -f config/crd/bases
+	kubectl apply -f config/crd/bases --server-side --force-conflicts
 
 .PHONY: license-check
 license-check: ${LICENSEI} .licensei.cache ## Run license check
@@ -145,12 +151,27 @@ manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go --verbose --pprof
 
+.PHONY: test
 test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./...
-	cd pkg/sdk/extensions && go test ./...
-	cd pkg/sdk/logging/model/syslogng/config && go test ./...
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/... -coverprofile cover.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/... -coverprofile cover.out
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
+	cd pkg/sdk/extensions && GOEXPERIMENT=loopvar go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
+	cd pkg/sdk/logging/model/syslogng/config && GOEXPERIMENT=loopvar go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
+
+.PHONY: install-go-test-coverage
+install-go-test-coverage:
+	GOBIN=${BIN} go install github.com/vladopajic/go-test-coverage/v2@latest
+
+.PHONY: generate-test-coverage
+generate-test-coverage: install-go-test-coverage test
+	rm -f ${TEST_COV_DIR}/coverage_all.out
+	echo "mode: set" > ${TEST_COV_DIR}/coverage_all.out
+	find -name 'cover_*.out' | xargs cat | grep -v "mode: set" >> ${TEST_COV_DIR}/coverage_all.out
+
+.PHONY: check-coverage
+check-coverage: install-go-test-coverage generate-test-coverage
+	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
 test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
@@ -171,7 +192,7 @@ test-e2e-nodeps:
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
-		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
+		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

@@ -21,7 +21,25 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 type _hugoSplunkHEC interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over Splunk HEC"
-// More info at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/
+/*
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: splunkhec
+spec:
+  splunk_hec_event:
+    url: "https://splunk-endpoint"
+    token:
+      valueFrom:
+          secretKeyRef:
+            name: splunk-hec
+            key: token
+{{</ highlight >}}
+
+More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/
+
+*/
 type _docSplunkHEC interface{} //nolint:deadcode,unused
 
 // +name:"SplunkHEC"

@@ -84,6 +84,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.SyslogNGSpec.Metrics != nil && r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
 		if r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -110,7 +111,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
@@ -150,6 +151,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	var SampleLimit uint64 = 0
 	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil && r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
 		if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -176,7 +178,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
-				SampleLimit:       0,
+				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}

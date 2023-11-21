@@ -101,7 +101,7 @@ parser("clusterflow_test_ns_test_clusterflow_filters_0");
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			out := strings.Builder{}
-			require.NoError(t, renderClusterFlow(nil, "test_input", testCase.clusterFlow, &TestSecretLoaderFactory{})(render.RenderContext{
+			require.NoError(t, renderClusterFlow("", nil, "test_input", testCase.clusterFlow, &TestSecretLoaderFactory{})(render.RenderContext{
 				Out: &out,
 			}))
 			assert.Equal(t, testCase.expected, out.String())

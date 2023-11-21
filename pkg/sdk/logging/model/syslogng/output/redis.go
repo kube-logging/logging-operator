@@ -41,6 +41,8 @@ spec:
 	time-reopen: 60
 	workers: 1
 {{</ highlight >}}
+
+More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/
 */
 type _docRedis interface{} //nolint:deadcode,unused
 

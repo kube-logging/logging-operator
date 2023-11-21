@@ -28,7 +28,7 @@ generated_file: true
 
 ### url (string, optional) {#output config-url}
 
-The url of the Loki server to send logs to.  
+The url of the Loki server to send logs to.
 
 Default: https://logs-us-west1.grafana.net
 
@@ -64,9 +64,9 @@ Default: -
 
 ### insecure_tls (*bool, optional) {#output config-insecure_tls}
 
-TLS: disable server certificate verification  
+TLS: disable server certificate verification
 
-Default:  false
+Default: false
 
 ### tenant (string, optional) {#output config-tenant}
 
@@ -94,33 +94,33 @@ Default: json
 
 ### extract_kubernetes_labels (*bool, optional) {#output config-extract_kubernetes_labels}
 
-Extract kubernetes labels as loki labels  
+Extract kubernetes labels as loki labels
 
-Default:  false
+Default: false
 
 ### remove_keys ([]string, optional) {#output config-remove_keys}
 
-Comma separated list of needless record keys to remove  
+Comma separated list of needless record keys to remove
 
-Default:  []
+Default: []
 
 ### drop_single_key (*bool, optional) {#output config-drop_single_key}
 
-If a record only has 1 key, then just set the log line to the value and discard the key.  
+If a record only has 1 key, then just set the log line to the value and discard the key.
 
-Default:  false
+Default: false
 
 ### configure_kubernetes_labels (*bool, optional) {#output config-configure_kubernetes_labels}
 
-Configure Kubernetes metadata in a Prometheus like format  
+Configure Kubernetes metadata in a Prometheus like format
 
-Default:  false
+Default: false
 
 ### include_thread_label (*bool, optional) {#output config-include_thread_label}
 
-whether to include the fluentd_thread label when multiple threads are used for flushing.  
+whether to include the fluentd_thread label when multiple threads are used for flushing.
 
-Default:  true
+Default: true
 
 ### buffer (*Buffer, optional) {#output config-buffer}
 

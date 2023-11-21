@@ -16,6 +16,7 @@ package v1alpha1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -46,6 +47,7 @@ type HostTailerSpec struct {
 	WorkloadMetaBase *types.MetaBase `json:"workloadMetaOverrides,omitempty"`
 	// Override podSpec fields for the given daemonset
 	WorkloadBase *types.PodSpecBase `json:"workloadOverrides,omitempty"`
+	Image        tailer.ImageSpec   `json:"image,omitempty"`
 }
 
 // HostTailerStatus defines the observed state of [HostTailer](#hosttailer).
@@ -90,6 +92,8 @@ type FileTailer struct {
 	ReadFromHead bool `json:"read_from_head,omitempty"`
 	// Override container fields for the given tailer
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
+	// Override image field for the given trailer
+	Image *tailer.ImageSpec `json:"image,omitempty"`
 }
 
 // SystemdTailer configuration options
@@ -106,6 +110,8 @@ type SystemdTailer struct {
 	MaxEntries int `json:"maxEntries,omitempty"`
 	// Override container fields for the given tailer
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
+	// Override image field for the given trailer
+	Image *tailer.ImageSpec `json:"image,omitempty"`
 }
 
 func init() {

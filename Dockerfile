@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.20-alpine3.18@sha256:7839c9f01b5502d7cb5198b2c032857023424470b3e31ae46a8261ffca72912a AS builder
+FROM --platform=$BUILDPLATFORM golang:1.21alpine3.18@sha256:a76f153cff6a59112777c071b0cde1b6e4691ddc7f172be424228da1bfb7bbda AS builder
 
 RUN apk add --update --no-cache ca-certificates make git curl
 
@@ -30,8 +30,13 @@ COPY pkg/ pkg/
 # Build
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/manager
 
+FROM builder as debug
 
-FROM gcr.io/distroless/static:latest@sha256:7198a357ff3a8ef750b041324873960cf2153c11cc50abb9d8d5f8bb089f6b4e
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go install github.com/go-delve/delve/cmd/dlv@latest
+
+CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/usr/local/bin/manager"]
+
+FROM gcr.io/distroless/static:latest@sha256:6706c73aae2afaa8201d63cc3dda48753c09bcd6c300762251065c0f7e602b25
 
 COPY --from=builder /usr/local/bin/manager /manager
 

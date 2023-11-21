@@ -16,6 +16,8 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 // +name:"SyslogNGSpec"
@@ -47,6 +49,7 @@ type SyslogNGSpec struct {
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
 	MaxConnections                      int                          `json:"maxConnections,omitempty"`
 	LogIWSize                           int                          `json:"logIWSize,omitempty"`
+	SourceMetrics                       []filter.MetricsProbe        `json:"sourceMetrics,omitempty"`
 
 	// TODO: option to turn on/off buffer volume PVC
 }

@@ -26,6 +26,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
 func RenderConfigInto(in Input, out io.Writer) error {
@@ -99,17 +100,36 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderClusterFlow(clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderClusterFlow(in.Logging.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderFlow(clusterOutputRefs, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Logging.Name, clusterOutputRefs, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
 
 	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {
 		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter)
+	}
+
+	sourceParsers := []render.Renderer{
+		renderDriver(
+			Field{
+				Value: reflect.ValueOf(JSONParser{
+					Prefix:       in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix,
+					KeyDelimiter: in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter,
+				}),
+			}, nil),
+	}
+	for _, sm := range in.Logging.Spec.SyslogNGSpec.SourceMetrics {
+		if sm.Labels == nil {
+			sm.Labels = make(filter.ArrowMap, 0)
+		}
+		sm.Labels["logging"] = in.Logging.Name
+		sourceParsers = append(sourceParsers, renderDriver(Field{
+			Value: reflect.ValueOf(sm),
+		}, nil))
 	}
 
 	return render.AllFrom(seqs.Intersperse(
@@ -131,14 +151,10 @@ func configRenderer(in Input) (render.Renderer, error) {
 								}),
 							}, nil)),
 							[]render.Renderer{
-								parserDefStmt("", renderDriver(Field{
-									Value: reflect.ValueOf(JSONParser{
-										Prefix:       in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix,
-										KeyDelimiter: in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter,
-									}),
-								}, nil)),
+								parserDefStmt("", render.AllOf(sourceParsers...)),
 							},
-						)),
+						),
+					),
 				),
 				seqs.FromSlice(destinationDefs),
 				seqs.FromSlice(logDefs),

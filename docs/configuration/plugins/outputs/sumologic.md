@@ -46,9 +46,9 @@ export URL='https://endpoint1.collection.eu.sumologic.com/receiver/v1/http/.....
 
 ### data_type (string, optional) {#output config-data_type}
 
-The type of data that will be sent to Sumo Logic, either logs or metrics  
+The type of data that will be sent to Sumo Logic, either logs or metrics
 
-Default:  logs
+Default: logs
 
 ### endpoint (*secret.Secret, required) {#output config-endpoint}
 
@@ -58,33 +58,33 @@ Default: -
 
 ### verify_ssl (bool, optional) {#output config-verify_ssl}
 
-Verify ssl certificate.  
+Verify ssl certificate.
 
-Default:  true
+Default: true
 
 ### metric_data_format (string, optional) {#output config-metric_data_format}
 
-The format of metrics you will be sending, either graphite or carbon2 or prometheus  
+The format of metrics you will be sending, either graphite or carbon2 or prometheus
 
-Default:  graphite
+Default: graphite
 
 ### log_format (string, optional) {#output config-log_format}
 
-Format to post logs into Sumo.  
+Format to post logs into Sumo.
 
-Default:  json
+Default: json
 
 ### log_key (string, optional) {#output config-log_key}
 
-Used to specify the key when merging json or sending logs in text format  
+Used to specify the key when merging json or sending logs in text format
 
-Default:  message
+Default: message
 
 ### source_category (string, optional) {#output config-source_category}
 
-Set _sourceCategory metadata field within SumoLogic  
+Set _sourceCategory metadata field within SumoLogic
 
-Default:  nil
+Default: nil
 
 ### source_name (string, required) {#output config-source_name}
 
@@ -94,33 +94,33 @@ Default: -
 
 ### source_name_key (string, optional) {#output config-source_name_key}
 
-Set as source::path_key's value so that the source_name can be extracted from Fluentd's buffer  
+Set as source::path_key's value so that the source_name can be extracted from Fluentd's buffer
 
-Default:  source_name
+Default: source_name
 
 ### source_host (string, optional) {#output config-source_host}
 
-Set _sourceHost metadata field within SumoLogic  
+Set _sourceHost metadata field within SumoLogic
 
-Default:  nil
+Default: nil
 
 ### open_timeout (int, optional) {#output config-open_timeout}
 
-Set timeout seconds to wait until connection is opened.  
+Set timeout seconds to wait until connection is opened.
 
-Default:  60
+Default: 60
 
 ### add_timestamp (bool, optional) {#output config-add_timestamp}
 
-Add timestamp (or timestamp_key) field to logs before sending to sumologic  
+Add timestamp (or timestamp_key) field to logs before sending to sumologic
 
-Default:  true
+Default: true
 
 ### timestamp_key (string, optional) {#output config-timestamp_key}
 
-Field name when add_timestamp is on  
+Field name when add_timestamp is on
 
-Default:  timestamp
+Default: timestamp
 
 ### proxy_uri (string, optional) {#output config-proxy_uri}
 
@@ -130,15 +130,15 @@ Default: -
 
 ### disable_cookies (bool, optional) {#output config-disable_cookies}
 
-Option to disable cookies on the HTTP Client.  
+Option to disable cookies on the HTTP Client.
 
-Default:  false
+Default: false
 
 ### delimiter (string, optional) {#output config-delimiter}
 
-Delimiter  
+Delimiter
 
-Default:  .
+Default: .
 
 ### custom_fields ([]string, optional) {#output config-custom_fields}
 
@@ -148,21 +148,21 @@ Default: -
 
 ### sumo_client (string, optional) {#output config-sumo_client}
 
-Name of sumo client which is send as X-Sumo-Client header  
+Name of sumo client which is send as X-Sumo-Client header
 
-Default:  fluentd-output
+Default: fluentd-output
 
 ### compress (*bool, optional) {#output config-compress}
 
-Compress payload  
+Compress payload
 
-Default:  false
+Default: false
 
 ### compress_encoding (string, optional) {#output config-compress_encoding}
 
-Encoding method of compression (either gzip or deflate)  
+Encoding method of compression (either gzip or deflate)
 
-Default:  gzip
+Default: gzip
 
 ### custom_dimensions (string, optional) {#output config-custom_dimensions}
 
