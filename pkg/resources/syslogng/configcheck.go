@@ -263,12 +263,12 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 			},
 		},
 	}
-	if r.Logging.Spec.SyslogNGSpec.TLS.Enabled {
+	if r.syslogNGSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
 			Name: "syslog-ng-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.SyslogNGSpec.TLS.SecretName,
+					SecretName: r.syslogNGSpec.TLS.SecretName,
 				},
 			},
 		}
@@ -280,7 +280,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
 
-	err := merge.Merge(&pod.Spec, r.Logging.Spec.SyslogNGSpec.ConfigCheckPodOverrides)
+	err := merge.Merge(&pod.Spec, r.syslogNGSpec.ConfigCheckPodOverrides)
 
 	return pod, err
 }

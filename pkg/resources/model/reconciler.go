@@ -240,6 +240,20 @@ func NewValidationReconciler(
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
 		}
 
+		if resources.SyslogNG.Configuration != nil {
+			registerForPatching(resources.SyslogNG.Configuration)
+
+			if resources.Logging.Spec.SyslogNGSpec != nil {
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("syslog-ng configuration reference set (name=%s), but inline syslog-ng configuration is set as well, clearing inline", resources.SyslogNG.Configuration.Name))
+				resources.Logging.Spec.SyslogNGSpec = nil
+			}
+			logger.Info("found detached syslog-ng aggregator, making association", "name=", resources.SyslogNG.Configuration.Name)
+			resources.Logging.Status.SyslogNGConfigName = resources.SyslogNG.Configuration.Name
+			logger.Info("found detached syslog-ng aggregator, making association, done: ", "name=", resources.Logging.Status.SyslogNGConfigName)
+			resources.SyslogNG.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.SyslogNG.Configuration.Status.Logging = resources.Logging.Name
+		}
+
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
 		}

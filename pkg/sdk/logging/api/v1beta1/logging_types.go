@@ -199,8 +199,9 @@ func (l *Logging) SetDefaults() error {
 	if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
 		l.Spec.ConfigCheck.TimeoutSeconds = 10
 	}
-
-	l.Spec.SyslogNGSpec.SetDefaults()
+	if len(l.Status.SyslogNGConfigName) == 0 {
+		l.Spec.SyslogNGSpec.SetDefaults()
+	}
 
 	return nil
 }

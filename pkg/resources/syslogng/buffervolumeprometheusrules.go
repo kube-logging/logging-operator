@@ -31,7 +31,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 	}
 	state := reconciler.StateAbsent
 
-	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil && r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.PrometheusRules {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "syslog-ng-buffervolume"

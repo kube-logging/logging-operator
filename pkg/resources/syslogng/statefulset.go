@@ -35,8 +35,8 @@ import (
 
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	containers := []corev1.Container{
-		syslogNGContainer(r.Logging.Spec.SyslogNGSpec),
-		configReloadContainer(r.Logging.Spec.SyslogNGSpec),
+		syslogNGContainer(r.syslogNGSpec),
+		configReloadContainer(r.syslogNGSpec),
 	}
 	if c := r.syslogNGMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -67,18 +67,18 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			ServiceName: r.Logging.QualifiedName(ServiceName + "-headless"),
 		},
 	}
-	if !r.Logging.Spec.SyslogNGSpec.SkipRBACCreate {
+	if !r.syslogNGSpec.SkipRBACCreate {
 		desired.Spec.Template.Spec.ServiceAccountName = r.getServiceAccountName()
 	}
-	err := merge.Merge(desired, r.Logging.Spec.SyslogNGSpec.StatefulSetOverrides)
+	err := merge.Merge(desired, r.syslogNGSpec.StatefulSetOverrides)
 	if err != nil {
 		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 	}
 
 	// HACK: try to _guess_ if user has configured a persistent volume for buffers and move syslog-ng's persist file there
 	buffersVolumeName := "buffers"
-	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
-		if name := r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil {
+		if name := r.syslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
 			buffersVolumeName = name
 		}
 	}
@@ -194,12 +194,12 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		},
 	}
-	if r.Logging.Spec.SyslogNGSpec.TLS.Enabled {
+	if r.syslogNGSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: tlsVolumeName,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.Spec.SyslogNGSpec.TLS.SecretName,
+					SecretName: r.syslogNGSpec.TLS.SecretName,
 				},
 			},
 		}
@@ -228,7 +228,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
-	if r.Logging.Spec.SyslogNGSpec.Metrics != nil {
+	if r.syslogNGSpec.Metrics != nil {
 		return &corev1.Container{
 			Name:            "exporter",
 			ImagePullPolicy: corev1.PullIfNotPresent,
@@ -256,10 +256,10 @@ func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port != 0 {
-			port = r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port
+		if r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.syslogNGSpec.BufferVolumeMetrics.Port
 		}
 		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
 		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/"}
@@ -282,10 +282,10 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					Value: BufferPath,
 				},
 			},
-			Ports: generatePortsBufferVolumeMetrics(r.Logging.Spec.SyslogNGSpec),
+			Ports: generatePortsBufferVolumeMetrics(r.syslogNGSpec),
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.MountName,
+					Name:      r.syslogNGSpec.BufferVolumeMetrics.MountName,
 					MountPath: BufferPath,
 				},
 			},

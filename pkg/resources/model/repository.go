@@ -60,6 +60,9 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentd.Configuration, res.Fluentd.ExcessFluentds, err = r.FluentdConfigFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
+	res.SyslogNG.Configuration, err = r.SyslogNGConfigFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
 	res.SyslogNG.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
@@ -376,6 +379,43 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 	default:
 		excessFluentds := r.handleMultipleDetachedFluentdObjects(res, logging)
 		return nil, excessFluentds, nil
+	}
+}
+func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list *[]v1beta1.SyslogNG, logging v1beta1.Logging) (*v1beta1.SyslogNG, error) {
+	for _, i := range *list {
+		if len(logging.Status.SyslogNGConfigName) != 0 {
+			if i.Name != logging.Status.SyslogNGConfigName {
+				i.Status.Problems = []string{}
+				i.Status.Problems = append(i.Status.Problems, "Logging already has a detached SyslogNG configuration, remove excess configuration objects")
+			}
+		}
+	}
+	multipleSyslogNGErrors := "multiple SyslogNG configurations found, couldn't associate it with logging"
+	logging.Status.Problems = append(logging.Status.Problems, multipleSyslogNGErrors)
+	return nil, errors.New(multipleSyslogNGErrors)
+}
+
+func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.SyslogNG, error) {
+	var list v1beta1.SyslogNGList
+	if err := r.Client.List(ctx, &list); err != nil {
+		return nil, err
+	}
+
+	var res []v1beta1.SyslogNG
+	res = append(res, list.Items...)
+
+	switch len(res) {
+	case 0:
+		return nil, nil
+	case 1:
+		// Implicitly associate syslogng configuration object with logging
+		detachedSyslogNG := res[0]
+		detachedSyslogNG.Spec.SetDefaults()
+		r.Logger.Info("found detached syslog-ng aggregator", "name=", detachedSyslogNG.Name)
+
+		return &detachedSyslogNG, nil
+	default:
+		return r.handleMultipleDetachedSyslogNGObjects(&res, logging)
 	}
 }
 
