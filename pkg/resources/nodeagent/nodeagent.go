@@ -269,7 +269,8 @@ func (n *nodeAgentInstance) getServiceAccount() string {
 //
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1beta1.Logging
+	Logging     *v1beta1.Logging
+	fluentdSpec *v1beta1.FluentdSpec
 	*reconciler.GenericResourceReconciler
 	configs             map[string][]byte
 	agents              map[string]v1beta1.NodeAgentConfig
@@ -277,12 +278,13 @@ type Reconciler struct {
 }
 
 // New creates a new NodeAgent reconciler
-func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
+func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
 		agents:                    agents,
 		fluentdDataProvider:       fluentdDataProvider,
+		fluentdSpec:               fluentdSpec,
 	}
 }
 
@@ -291,6 +293,7 @@ type nodeAgentInstance struct {
 	nodeAgent           *v1beta1.NodeAgentConfig
 	reconciler          *reconciler.GenericResourceReconciler
 	logging             *v1beta1.Logging
+	fluentdSpec         *v1beta1.FluentdSpec
 	configs             map[string][]byte
 	loggingDataProvider loggingdataprovider.LoggingDataProvider
 }
@@ -340,6 +343,7 @@ func (r *Reconciler) processAgent(ctx context.Context, name string, userDefinedA
 		reconciler:          r.GenericResourceReconciler,
 		logging:             r.Logging,
 		loggingDataProvider: r.fluentdDataProvider,
+		fluentdSpec:         r.fluentdSpec,
 	}
 
 	return instance.Reconcile(ctx)

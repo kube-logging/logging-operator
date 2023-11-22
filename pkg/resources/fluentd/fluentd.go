@@ -104,14 +104,6 @@ func GetFluentd(ctx context.Context, Client client.Client, log logr.Logger, cont
 	return nil
 }
 
-func (r *Reconciler) GetFluentdSpec(ctx context.Context) *v1beta1.FluentdSpec {
-	fluentdSpec := r.Logging.Spec.FluentdSpec
-	if detachedFluentd := GetFluentd(ctx, r.Client, r.Log, r.Logging.Spec.ControlNamespace); detachedFluentd != nil {
-		fluentdSpec = &detachedFluentd.Spec
-	}
-	return fluentdSpec
-}
-
 func (r *Reconciler) getServiceAccount() string {
 	if r.fluentdSpec.Security.ServiceAccount != "" {
 		return r.fluentdSpec.Security.ServiceAccount

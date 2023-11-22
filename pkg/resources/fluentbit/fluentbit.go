@@ -90,6 +90,7 @@ type Reconciler struct {
 	resourceReconciler  *reconciler.GenericResourceReconciler
 	logger              logr.Logger
 	Logging             *v1beta1.Logging
+	fluentdSpec         *v1beta1.FluentdSpec
 	configs             map[string][]byte
 	fluentbitSpec       *v1beta1.FluentbitSpec
 	loggingDataProvider loggingdataprovider.LoggingDataProvider
@@ -101,6 +102,7 @@ type Reconciler struct {
 func New(client client.Client,
 	logger logr.Logger,
 	logging *v1beta1.Logging,
+	fluentdSpec *v1beta1.FluentdSpec,
 	opts reconciler.ReconcilerOpts,
 	fluentbitSpec *v1beta1.FluentbitSpec,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
@@ -108,6 +110,7 @@ func New(client client.Client,
 	loggingRoutes []v1beta1.LoggingRoute) *Reconciler {
 	return &Reconciler{
 		Logging:             logging,
+		fluentdSpec:         fluentdSpec,
 		logger:              logger,
 		resourceReconciler:  reconciler.NewGenericReconciler(client, logger.WithName("reconciler"), opts),
 		fluentbitSpec:       fluentbitSpec,

@@ -216,6 +216,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				log.WithName("fluentbit-legacy"),
 				&logging,
+				fluentdSpec,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
@@ -234,6 +235,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
 				&logging,
+				fluentdSpec,
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
@@ -258,7 +260,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {

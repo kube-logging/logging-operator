@@ -184,11 +184,6 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 
 func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
 	ctx := context.TODO()
-	fluentdSpec := r.Logging.Spec.FluentdSpec
-	if detachedFluentd := fluentd.GetFluentd(ctx, r.resourceReconciler.Client, r.resourceReconciler.Log, r.Logging.Spec.ControlNamespace); detachedFluentd != nil {
-		fluentdSpec = &detachedFluentd.Spec
-	}
-
 	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{
 			ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
@@ -243,7 +238,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if fluentdSpec != nil {
+	if r.fluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost
 		if fluentbitTargetHost == "" {
 			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
@@ -370,7 +365,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		for _, a := range r.loggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
-		if err := r.configureOutputsForTenants(ctx, tenants, &input, fluentdSpec); err != nil {
+		if err := r.configureOutputsForTenants(ctx, tenants, &input, r.fluentdSpec); err != nil {
 			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
 	} else {

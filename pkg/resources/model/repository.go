@@ -366,14 +366,14 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		return nil, nil
 	case 1:
 		// Implicitly associate fluentd configuration object with logging
-		detachedFluentd := res[0]
+		detachedFluentd := &res[0]
 		err := detachedFluentd.Spec.SetDefaults()
 		if err != nil {
 			logging.Status.FluentdConfigName = detachedFluentd.Name
 			detachedFluentd.Status.Active = utils.BoolPointer(true)
 			detachedFluentd.Status.Logging = logging.Name
 		}
-		return &detachedFluentd, err
+		return detachedFluentd, err
 	default:
 		return r.handleMultipleDetachedFluentdObjects(&res, logging)
 	}
