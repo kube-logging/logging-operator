@@ -87,3 +87,25 @@ type Stats struct {
 	Level *int `json:"level,omitempty"`
 	Freq  *int `json:"freq,omitempty"`
 }
+
+func (s *SyslogNGSpec) SetDefaults() {
+	if s != nil {
+		// if s.MaxConnections == 0 {
+		// 	max connections is now configured dynamically if not set
+		// }
+		if s.Metrics != nil {
+			if s.Metrics.Path == "" {
+				s.Metrics.Path = "/metrics"
+			}
+			if s.Metrics.Port == 0 {
+				s.Metrics.Port = 9577
+			}
+			if s.Metrics.Timeout == "" {
+				s.Metrics.Timeout = "5s"
+			}
+			if s.Metrics.Interval == "" {
+				s.Metrics.Interval = "15s"
+			}
+		}
+	}
+}

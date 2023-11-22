@@ -197,25 +197,8 @@ func (l *Logging) SetDefaults() error {
 	if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
 		l.Spec.ConfigCheck.TimeoutSeconds = 10
 	}
-	if l.Spec.SyslogNGSpec != nil {
-		// if l.Spec.SyslogNGSpec.MaxConnections == 0 {
-		// 	max connections is now configured dynamically if not set
-		// }
-		if l.Spec.SyslogNGSpec.Metrics != nil {
-			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
-				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Port == 0 {
-				l.Spec.SyslogNGSpec.Metrics.Port = 9577
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Timeout == "" {
-				l.Spec.SyslogNGSpec.Metrics.Timeout = "5s"
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Interval == "" {
-				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
-			}
-		}
-	}
+
+	l.Spec.SyslogNGSpec.SetDefaults()
 
 	return nil
 }
