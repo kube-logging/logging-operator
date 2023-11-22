@@ -339,7 +339,7 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 }
 func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]v1beta1.Fluentd, logging *v1beta1.Logging) (*v1beta1.Fluentd, error) {
 	for _, i := range *list {
-		if logging.Status.FluentdConfigName != "" {
+		if len(logging.Status.FluentdConfigName) != 0 {
 			if i.Name != logging.Status.FluentdConfigName {
 				i.Status.Problems = []string{}
 				i.Status.Problems = append(i.Status.Problems, "Logging already has a detached fluentd configuration, remove excess configuration objects")

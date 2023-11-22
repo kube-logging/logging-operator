@@ -158,18 +158,6 @@ func NewValidationReconciler(
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
-		if resources.Fluentd.Configuration != nil {
-			registerForPatching(resources.Fluentd.Configuration)
-
-			if resources.Logging.Spec.FluentdSpec != nil {
-				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration is set as well, clearing inline", resources.Fluentd.Configuration.Name))
-				resources.Logging.Spec.FluentdSpec = nil
-			}
-			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
-			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
-			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
-		}
-
 		for i := range resources.SyslogNG.ClusterFlows {
 			flow := &resources.SyslogNG.ClusterFlows[i]
 			registerForPatching(flow)
@@ -218,6 +206,20 @@ func NewValidationReconciler(
 		registerForPatching(&resources.Logging)
 		resources.Logging.Status.Problems = nil
 		resources.Logging.Status.WatchNamespaces = nil
+
+		if resources.Fluentd.Configuration != nil {
+			registerForPatching(resources.Fluentd.Configuration)
+
+			if resources.Logging.Spec.FluentdSpec != nil {
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration is set as well, clearing inline", resources.Fluentd.Configuration.Name))
+				resources.Logging.Spec.FluentdSpec = nil
+			}
+			logger.Info("found detached fluentd aggregator, making association", "name=", resources.Fluentd.Configuration.Name)
+			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
+
+			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
+		}
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces

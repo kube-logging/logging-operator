@@ -88,7 +88,6 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 						Keepalive: utils.BoolPointer(false),
 					},
 				},
-				FluentdRef: "detached-fluentd",
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
@@ -189,6 +188,11 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 			}
 			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
+				return false
+			}
+			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
+				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
 				return false
 			}
 
