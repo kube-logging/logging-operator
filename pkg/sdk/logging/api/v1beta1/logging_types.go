@@ -111,6 +111,8 @@ type LoggingStatus struct {
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
 	// Name of the matched detached fluentd configuration object
 	FluentdConfigName string `json:"fluentdConfigName,omitempty"`
+	// Name of the matched detached SyslogNG configuration object
+	SyslogNGConfigName string `json:"syslogNGConfigName,omitempty"`
 
 	// Problems with the logging resource
 	Problems []string `json:"problems,omitempty"`
@@ -508,5 +510,6 @@ func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (l *Logging) AreMultipleAggregatorsSet() bool {
-	return l.Spec.SyslogNGSpec != nil && (l.Spec.FluentdSpec != nil || len(l.Status.FluentdConfigName) != 0)
+	return (l.Spec.SyslogNGSpec != nil || len(l.Status.SyslogNGConfigName) != 0) &&
+		(l.Spec.FluentdSpec != nil || len(l.Status.FluentdConfigName) != 0)
 }

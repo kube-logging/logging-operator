@@ -78,6 +78,58 @@ Default(depending on JSONKeyPrefix): "${json.time}"
 
 
 
+---
+title: SyslogNG
+weight: 200
+generated_file: true
+---
+
+## SyslogNG
+
+###  (metav1.TypeMeta, required) {#syslogng-}
+
+
+### metadata (metav1.ObjectMeta, optional) {#syslogng-metadata}
+
+
+### spec (SyslogNGSpec, optional) {#syslogng-spec}
+
+
+### status (SyslogNGStatus, optional) {#syslogng-status}
+
+
+
+## SyslogNGStatus
+
+SyslogNGStatus
+
+### active (*bool, optional) {#syslogngstatus-active}
+
+
+### logging (string, optional) {#syslogngstatus-logging}
+
+
+### problems ([]string, optional) {#syslogngstatus-problems}
+
+
+### problemsCount (int, optional) {#syslogngstatus-problemscount}
+
+
+
+## SyslogNGList
+
+SyslogNGList
+
+###  (metav1.TypeMeta, required) {#syslognglist-}
+
+
+### metadata (metav1.ListMeta, optional) {#syslognglist-metadata}
+
+
+### items ([]SyslogNG, required) {#syslognglist-items}
+
+
+
 ## SyslogNGTLS
 
 SyslogNGTLS defines the TLS configs

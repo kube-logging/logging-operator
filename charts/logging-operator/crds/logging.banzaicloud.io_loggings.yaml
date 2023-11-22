@@ -18687,6 +18687,8 @@ spec:
                 type: array
               problemsCount:
                 type: integer
+              syslogNGConfigName:
+                type: string
               watchNamespaces:
                 items:
                   type: string

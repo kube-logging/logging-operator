@@ -438,6 +438,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
 		case *loggingv1beta1.FluentdConfig:
 			return reconcileRequestsForMatchingControlNamespace(loggingList.Items, o.Namespace)
+		case *loggingv1beta1.SyslogNG:
+			return reconcileRequestsForMatchingControlNamespace(loggingList.Items, o.Namespace)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -488,7 +490,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
 		Watches(&corev1.Secret{}, requestMapper).
 		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper).
-		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper)
+		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper).
+		Watches(&loggingv1beta1.SyslogNG{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
