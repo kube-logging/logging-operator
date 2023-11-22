@@ -55,8 +55,6 @@ type LoggingSpec struct {
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
-	// Fluentd statefulset configuration reference by name
-	FluentdRef string `json:"fluentdRef,omitempty"`
 	// Syslog-NG statefulset configuration
 	SyslogNGSpec *SyslogNGSpec `json:"syslogNG,omitempty"`
 	// Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow.
@@ -191,7 +189,7 @@ func (l *Logging) SetDefaults() error {
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
 	}
-	if len(l.Spec.FluentdRef) == 0 {
+	if len(l.Status.FluentdConfigName) == 0 {
 		if err := l.Spec.FluentdSpec.SetDefaults(); err != nil {
 			return err
 		}
@@ -527,5 +525,5 @@ func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (l *Logging) AreMultipleAggregatorsSet() bool {
-	return l.Spec.SyslogNGSpec != nil && (l.Spec.FluentdSpec != nil || len(l.Spec.FluentdRef) != 0)
+	return l.Spec.SyslogNGSpec != nil && (l.Spec.FluentdSpec != nil || len(l.Status.FluentdConfigName) != 0)
 }

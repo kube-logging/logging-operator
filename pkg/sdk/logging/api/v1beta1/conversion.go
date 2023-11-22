@@ -47,7 +47,7 @@ func APITypes() []runtime.Object {
 
 func (l *Logging) Default() {
 	Log.Info("Defaulter called for", "logging", l)
-	if l.Spec.FluentdSpec != nil && l.Spec.FluentdRef == "" {
+	if l.Spec.FluentdSpec != nil {
 		fluentdSpec := l.Spec.FluentdSpec
 		if fluentdSpec.Scaling == nil {
 			fluentdSpec.Scaling = new(FluentdScaling)

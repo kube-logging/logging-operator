@@ -197,21 +197,17 @@ Fluentd
 
 FluentdStatus
 
-### logging (string, optional) {#fluentdstatus-logging}
-
-Default: -
-
 ### active (*bool, optional) {#fluentdstatus-active}
 
-Default: -
+
+### logging (string, optional) {#fluentdstatus-logging}
+
 
 ### problems ([]string, optional) {#fluentdstatus-problems}
 
-Default: -
 
 ### problemsCount (int, optional) {#fluentdstatus-problemscount}
 
-Default: -
 
 
 ## FluentdList
