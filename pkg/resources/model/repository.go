@@ -20,7 +20,6 @@ import (
 	"sort"
 
 	"emperror.dev/errors"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -339,10 +338,10 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	return res, nil
 }
 func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]v1beta1.Fluentd, logging *v1beta1.Logging) (*v1beta1.Fluentd, error) {
-	// TODO add a bit more verbose error handling
 	for _, i := range *list {
 		if logging.Status.FluentdConfigName != "" {
 			if i.Name != logging.Status.FluentdConfigName {
+				i.Status.Problems = []string{}
 				i.Status.Problems = append(i.Status.Problems, "Logging already has a detached fluentd configuration, remove excess configuration objects")
 			}
 		}
@@ -368,11 +367,6 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		// Implicitly associate fluentd configuration object with logging
 		detachedFluentd := &res[0]
 		err := detachedFluentd.Spec.SetDefaults()
-		if err != nil {
-			logging.Status.FluentdConfigName = detachedFluentd.Name
-			detachedFluentd.Status.Active = utils.BoolPointer(true)
-			detachedFluentd.Status.Logging = logging.Name
-		}
 		return detachedFluentd, err
 	default:
 		return r.handleMultipleDetachedFluentdObjects(&res, logging)
