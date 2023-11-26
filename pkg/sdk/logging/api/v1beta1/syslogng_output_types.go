@@ -43,7 +43,9 @@ type SyslogNGOutputSpec struct {
 	Elasticsearch   *output.ElasticsearchOutput   `json:"elasticsearch,omitempty" syslog-ng:"dest-drv,name=elasticsearch-http"`
 	LogScale        *output.LogScaleOutput        `json:"logscale,omitempty" syslog-ng:"dest-drv"`
 	SplunkHEC       *output.SplunkHECOutput       `json:"splunk_hec_event,omitempty" syslog-ng:"dest-drv"`
+	// Available in Logging operator version 4.4 and later.
 	Loki            *output.LokiOutput            `json:"loki,omitempty" syslog-ng:"dest-drv"`
+	// Available in Logging operator version 4.4 and later.
 	S3              *output.S3Output              `json:"s3,omitempty" syslog-ng:"dest-drv"`
 }
 

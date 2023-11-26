@@ -123,9 +123,11 @@ type FluentbitSpec struct {
 	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
 	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+	// Available in Logging operator version 4.2 and later.
 	// Specify a custom parser file to load in addition to the default parsers file.
 	// It must be a valid key in the configmap specified by customConfig
 	CustomParsers string       `json:"customParsers,omitempty"`
+	// The following example defines a [Fluentd parser]({{< relref "/docs/configuration/plugins/filters/parser.md" >}}) that places the parsed containerd log messages into the `log` field instead of the `message` field.
 	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
 }
 
@@ -148,6 +150,7 @@ type FluentbitTLS struct {
 type FluentbitTCPOutput struct {
 	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
 	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
+	// Available in Logging operator version 4.4 and later.
 	Workers        *int   `json:"Workers,omitempty"`
 }
 
@@ -196,7 +199,7 @@ type BufferStorage struct {
 	StorageChecksum string `json:"storage.checksum,omitempty"`
 	// If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records. (default:5M)
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
-	// If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed. (default:Off)
+	// Available in Logging operator version 4.4 and later. If the `http_server` option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed. (default:Off)
 	StorageMetrics string `json:"storage.metrics,omitempty"`
 }
 
@@ -206,7 +209,7 @@ type HealthCheck struct {
 	HCErrorsCount int `json:"hcErrorsCount,omitempty"`
 	// The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period (default:5)
 	HCRetryFailureCount int `json:"hcRetryFailureCount,omitempty"`
-	// The time period by second to count the error and retry failure data point (default:60)
+	// The time period (in seconds) to count the error and retry failure data point. (default:60)
 	HCPeriod int `json:"hcPeriod,omitempty"`
 }
 
@@ -276,7 +279,7 @@ type FilterKubernetes struct {
 	Match string `json:"Match,omitempty" plugin:"default:kubernetes.*"`
 	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs. If this value is empty we will set it "0". (default:"0")
 	BufferSize string `json:"Buffer_Size,omitempty"`
-	// API Server end-point (default:https://kubernetes.default.svc:443)
+	// API Server end-point (default: `https://kubernetes.default.svc:443`)
 	KubeURL string `json:"Kube_URL,omitempty" plugin:"default:https://kubernetes.default.svc:443"`
 	//	CA certificate file (default:/var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
 	KubeCAFile string `json:"Kube_CA_File,omitempty" plugin:"default:/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"`

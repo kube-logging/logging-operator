@@ -71,7 +71,7 @@ type LoggingSpec struct {
 	WatchNamespaceSelector *metav1.LabelSelector `json:"watchNamespaceSelector,omitempty"`
 	// Cluster domain name to be used when templating URLs to services (default: "cluster.local.").
 	ClusterDomain *string `json:"clusterDomain,omitempty"`
-	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
+	// Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
@@ -96,8 +96,8 @@ const (
 
 type ConfigCheck struct {
 	// Select the config check strategy to use.
-	// `DryRun`: parse and validate configuration
-	// `StartWithTimeout`: start with given configuration and exit after specified timeout
+	// `DryRun`: Parse and validate configuration.
+	// `StartWithTimeout`: Start with given configuration and exit after specified timeout.
 	// Default: `DryRun`
 	Strategy ConfigCheckStrategy `json:"strategy,omitempty"`
 
