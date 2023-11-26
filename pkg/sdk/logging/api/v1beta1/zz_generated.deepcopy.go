@@ -507,6 +507,11 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 		*out = new(filter.GeoIP)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.UserAgent != nil {
+		in, out := &in.UserAgent, &out.UserAgent
+		*out = new(filter.UserAgent)
+		**out = **in
+	}
 	if in.Concat != nil {
 		in, out := &in.Concat, &out.Concat
 		*out = new(filter.Concat)

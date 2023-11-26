@@ -965,6 +965,17 @@ spec:
                         group_warning_delay_s:
                           type: integer
                       type: object
+                    useragent:
+                      properties:
+                        delete_key:
+                          type: boolean
+                        flatten:
+                          type: boolean
+                        key_name:
+                          type: string
+                        out_key:
+                          type: string
+                      type: object
                   type: object
                 type: array
               flowLabel:
@@ -1987,6 +1998,17 @@ spec:
                           type: integer
                         group_warning_delay_s:
                           type: integer
+                      type: object
+                    useragent:
+                      properties:
+                        delete_key:
+                          type: boolean
+                        flatten:
+                          type: boolean
+                        key_name:
+                          type: string
+                        out_key:
+                          type: string
                       type: object
                   type: object
                 type: array
