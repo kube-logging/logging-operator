@@ -29,6 +29,7 @@ import (
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/api/core/v1"
+	policyv1 "k8s.io/api/policy/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -1596,6 +1597,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
+	}
+	if in.Pdb != nil {
+		in, out := &in.Pdb, &out.Pdb
+		*out = new(policyv1.PodDisruptionBudgetSpec)
+		(*in).DeepCopyInto(*out)
 	}
 }
 

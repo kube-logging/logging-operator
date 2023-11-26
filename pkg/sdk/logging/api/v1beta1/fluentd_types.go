@@ -23,6 +23,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
+	policyv1 "k8s.io/api/policy/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -98,14 +99,15 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
-	FluentOutLogrotate      *FluentOutLogrotate          `json:"fluentOutLogrotate,omitempty"`
-	ForwardInputConfig      *input.ForwardInputConfig    `json:"forwardInputConfig,omitempty"`
-	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
-	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
-	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
-	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
-	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
-	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
+	FluentOutLogrotate      *FluentOutLogrotate               `json:"fluentOutLogrotate,omitempty"`
+	ForwardInputConfig      *input.ForwardInputConfig         `json:"forwardInputConfig,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount      `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy                  `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
+	ExtraArgs               []string                          `json:"extraArgs,omitempty"`
+	CompressConfigFile      bool                              `json:"compressConfigFile,omitempty"`
+	SidecarContainers       []corev1.Container                `json:"sidecarContainers,omitempty"`
+	Pdb                     *policyv1.PodDisruptionBudgetSpec `json:"pdb,omitempty"`
 }
 
 // +name:"FluentdConfig"
