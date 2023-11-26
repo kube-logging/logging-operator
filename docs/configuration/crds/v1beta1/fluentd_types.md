@@ -98,7 +98,7 @@ Default: -
 
 ### port (int32, optional) {#fluentdspec-port}
 
-Fluentd port inside the container (24240 by default) The headless service port is controlled by this field as well Note, that the default ClusterIP service port is always 24240 regardless of this field 
+Fluentd port inside the container (24240 by default). The headless service port is controlled by this field as well. Note that the default ClusterIP service port is always 24240, regardless of this field. 
 
 Default: -
 
@@ -329,13 +329,13 @@ Default: -
 
 ### resources (*corev1.ResourceRequirements, optional) {#fluentddrainconfig-resources}
 
-Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit 
+Available in Logging operator version 4.4 and later. Configurable resource requirements for the drainer sidecar container. Default 20m cpu request, 20M memory limit 
 
 Default: -
 
 ### securityContext (*corev1.SecurityContext, optional) {#fluentddrainconfig-securitycontext}
 
-Configurable security context, uses fluentd pods' security context by default 
+Available in Logging operator version 4.4 and later. Configurable security context, uses fluentd pods' security context by default 
 
 Default: -
 

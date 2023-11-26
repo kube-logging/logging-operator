@@ -62,9 +62,13 @@ Default: -
 
 ### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
 
+Available in Logging operator version 4.4 and later. 
+
 Default: -
 
 ### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+
+Available in Logging operator version 4.4 and later. 
 
 Default: -
 

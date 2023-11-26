@@ -264,11 +264,13 @@ Default: -
 
 ### customParsers (string, optional) {#fluentbitspec-customparsers}
 
-Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
+Available in Logging operator version 4.2 and later. Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
 
 Default: -
 
 ### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
+
+The following example defines a [Fluentd parser]({{< relref "/docs/configuration/plugins/filters/parser.md" >}}) that places the parsed containerd log messages into the `log` field instead of the `message` field. 
 
 Default: -
 
@@ -308,6 +310,8 @@ Default: ts
 Default: iso8601
 
 ### Workers (*int, optional) {#fluentbittcpoutput-workers}
+
+Available in Logging operator version 4.4 and later. 
 
 Default: -
 
@@ -401,7 +405,7 @@ Default: 5M
 
 ### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
 
-If http_server option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.
+Available in Logging operator version 4.4 and later. If the `http_server` option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.
 
 Default: Off
 
@@ -424,7 +428,7 @@ Default: 5
 
 ### hcPeriod (int, optional) {#healthcheck-hcperiod}
 
-The time period by second to count the error and retry failure data point
+The time period (in seconds) to count the error and retry failure data point.
 
 Default: 60
 
@@ -620,7 +624,7 @@ Default: "0"
 
 ### Kube_URL (string, optional) {#filterkubernetes-kube_url}
 
-API Server end-point (default:https://kubernetes.default.svc:443) 
+API Server end-point (default: `https://kubernetes.default.svc:443`) 
 
 Default: https://kubernetes.default.svc:443
 

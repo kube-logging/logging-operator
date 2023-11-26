@@ -16,7 +16,7 @@ Default: -
 
 ### targets (metav1.LabelSelector, required) {#loggingroutespec-targets}
 
-Targets refers to the list of logging resources specified by a label selector to forward logs to Filtering of namespaces will happen based on the watchNamespaces and watchNamespaceSelector fields of the target logging resource 
+Targets refers to the list of logging resources specified by a label selector to forward logs to. Filtering of namespaces will happen based on the watchNamespaces and watchNamespaceSelector fields of the target logging resource. 
 
 Default: -
 
