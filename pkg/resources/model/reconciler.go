@@ -41,6 +41,7 @@ func NewValidationReconciler(
 	logger logr.Logger,
 ) func(ctx context.Context) (*reconcile.Result, error) {
 	return func(ctx context.Context) (*reconcile.Result, error) {
+		// Make sure that you call registerForPatching() before modifying the object
 		var patchRequests []patchRequest
 		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{
