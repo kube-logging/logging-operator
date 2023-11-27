@@ -92,8 +92,8 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
-	if len(r.Logging.Spec.FluentdSpec.SidecarContainers) != 0 {
-		containers = append(containers, r.Logging.Spec.FluentdSpec.SidecarContainers...)
+	if len(r.fluentdSpec.SidecarContainers) != 0 {
+		containers = append(containers, r.fluentdSpec.SidecarContainers...)
 	}
 
 	sts := &appsv1.StatefulSetSpec{
