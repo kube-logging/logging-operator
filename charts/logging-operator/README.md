@@ -92,7 +92,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.eventTailer.image.repository | string | `nil` | repository of eventTailer image |
 | logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |
 | logging.eventTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
-| logging.eventTailer.image.imagePullSecrets | string | `nil` | imagePullSecrets of eventTailer image |
+| logging.eventTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
 | logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for  |
 | logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | storage class for event tailer pvc |
 | logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | storage class for event tailer pvc |
@@ -106,7 +106,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.hostTailer.image.repository | string | `nil` | repository of eventTailer image |
 | logging.hostTailer.image.tag | string | `nil` | tag of eventTailer image |
 | logging.hostTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
-| logging.hostTailer.image.imagePullSecrets | string | `nil` | imagePullSecrets of eventTailer image |
+| logging.hostTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
 | logging.hostTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides of HostTailer |
 | logging.hostTailer.workloadOverrides | string | `nil` | workloadOverrides of HostTailer |
 | logging.hostTailer.fileTailers | list | `[]` | configure fileTailers of HostTailer example:   - name: sample-file     path: /var/log/sample-file     disabled: false     buffer_max_size:     buffer_chunk_size:     skip_long_lines:     read_from_head: false     containerOverrides:     image: |

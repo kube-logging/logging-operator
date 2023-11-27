@@ -241,7 +241,7 @@ logging:
       # -- pullPolicy of eventTailer image
       pullPolicy:
       # -- imagePullSecrets of eventTailer image
-      imagePullSecrets:
+      imagePullSecrets: []
     pvc:
       # -- enable pvc for 
       enabled: true
@@ -274,7 +274,7 @@ logging:
       # -- pullPolicy of eventTailer image
       pullPolicy:
       # -- imagePullSecrets of eventTailer image
-      imagePullSecrets:
+      imagePullSecrets: []
     # -- workloadMetaOverrides of HostTailer
     workloadMetaOverrides:
     # -- workloadOverrides of HostTailer
