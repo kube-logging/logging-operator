@@ -1,26 +1,31 @@
-{{ if .Values.logging.enabled -}}
-{{- with $.Values.logging.hostTailer }}
+{{- with .Values.logging.hostTailer }}
+{{- if and $.Values.logging.enabled .enabled }}
+---
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: HostTailer
 metadata:
-  name: {{ .name | default "hosttailer" }}
+  name: {{ .name }}
 spec:
-  enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
-{{- with .workloadOverrides }}
-  workloadOverrides:
-{{ toYaml . | indent 4 }}
-{{- end }}
-{{- with .containerOverrides }}
-  containerOverrides:
-{{- toYaml . | nindent 4 }}
-{{- end }}
-{{- with .fileTailers }}
+  {{- with .fileTailers }}
   fileTailers:
-{{ toYaml . | indent 4 }}
-{{- end }}
-{{- with .systemdTailers }}
+    {{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .systemdTailers }}
   systemdTailers:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{ toYaml . | indent 4 }}
+  {{- end }}
+  enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
+  {{- with .workloadMetaOverrides }}
+  workloadMetaOverrides:
+    {{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .workloadOverrides }}
+  workloadOverrides:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .image }}
+  image:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
 {{- end }}

@@ -1,6 +1,5 @@
-{{ if .Values.logging.enabled -}}
 {{- with $.Values.logging.eventTailer }}
-{{- if .enabled }}
+{{- if and $.Values.logging.enabled .enabled }}
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: EventTailer
 metadata:
@@ -38,6 +37,5 @@ spec:
   containerOverrides:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-{{- end }}{{/* end if create */}}
+{{- end }}{{/* end if enabled */}}
 {{- end }}{{/* end with event-tailer */}}
-{{- end }}{{/* end if logging-enabled */}}

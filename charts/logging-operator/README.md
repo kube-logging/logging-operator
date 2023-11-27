@@ -101,7 +101,16 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.eventTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides |
 | logging.eventTailer.workloadOverrides | string | `nil` | workloadOverrides |
 | logging.eventTailer.containerOverrides | string | `nil` | containerOverrides |
-| logging.hostTailer | object | `{}` | HostTailer config |
+| logging.hostTailer.enabled | bool | `false` | HostTailer |
+| logging.hostTailer.name | string | `"hosttailer"` | name of HostTailer |
+| logging.hostTailer.image.repository | string | `nil` | repository of eventTailer image |
+| logging.hostTailer.image.tag | string | `nil` | tag of eventTailer image |
+| logging.hostTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
+| logging.hostTailer.image.imagePullSecrets | string | `nil` | imagePullSecrets of eventTailer image |
+| logging.hostTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides of HostTailer |
+| logging.hostTailer.workloadOverrides | string | `nil` | workloadOverrides of HostTailer |
+| logging.hostTailer.fileTailers | list | `[]` | configure fileTailers of HostTailer example:   - name: sample-file     path: /var/log/sample-file     disabled: false     buffer_max_size:     buffer_chunk_size:     skip_long_lines:     read_from_head: false     containerOverrides:     image: |
+| logging.hostTailer.systemdTailers | list | `[]` | configure systemdTailers of HostTailer example:   - name: system-sample     disabled: false     systemdFilter: kubelet.service     maxEntries: 20     containerOverrides:     image: |
 | testReceiver.enabled | bool | `false` |  |
 | testReceiver.image | string | `"fluent/fluent-bit"` |  |
 | testReceiver.pullPolicy | string | `"IfNotPresent"` |  |
