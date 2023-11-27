@@ -57,7 +57,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentd.ClusterOutputs, err = r.ClusterOutputsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	res.Fluentd.Configuration, err = r.FluentdConfigFor(ctx, &logging)
+	res.Fluentd.Configuration, err = r.FluentdConfigFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
 	res.SyslogNG.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
@@ -337,7 +337,7 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	})
 	return res, nil
 }
-func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]v1beta1.Fluentd, logging *v1beta1.Logging) (*v1beta1.Fluentd, error) {
+func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]v1beta1.Fluentd, logging v1beta1.Logging) (*v1beta1.Fluentd, error) {
 	for _, i := range *list {
 		if len(logging.Status.FluentdConfigName) != 0 {
 			if i.Name != logging.Status.FluentdConfigName {
@@ -351,7 +351,7 @@ func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list *[]
 	return nil, errors.New(multipleFluentdErrors)
 }
 
-func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging *v1beta1.Logging) (*v1beta1.Fluentd, error) {
+func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.Fluentd, error) {
 	var list v1beta1.FluentdList
 	if err := r.Client.List(ctx, &list); err != nil {
 		return nil, err
@@ -365,9 +365,9 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		return nil, nil
 	case 1:
 		// Implicitly associate fluentd configuration object with logging
-		detachedFluentd := &res[0]
+		detachedFluentd := res[0]
 		err := detachedFluentd.Spec.SetDefaults()
-		return detachedFluentd, err
+		return &detachedFluentd, err
 	default:
 		return r.handleMultipleDetachedFluentdObjects(&res, logging)
 	}
