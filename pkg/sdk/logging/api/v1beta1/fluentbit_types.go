@@ -126,9 +126,9 @@ type FluentbitSpec struct {
 	// Available in Logging operator version 4.2 and later.
 	// Specify a custom parser file to load in addition to the default parsers file.
 	// It must be a valid key in the configmap specified by customConfig
-	CustomParsers string       `json:"customParsers,omitempty"`
+	CustomParsers string `json:"customParsers,omitempty"`
 	// The following example defines a [Fluentd parser]({{< relref "/docs/configuration/plugins/filters/parser.md" >}}) that places the parsed containerd log messages into the `log` field instead of the `message` field.
-	HealthCheck   *HealthCheck `json:"healthCheck,omitempty"`
+	HealthCheck *HealthCheck `json:"healthCheck,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent
@@ -151,7 +151,7 @@ type FluentbitTCPOutput struct {
 	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
 	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
 	// Available in Logging operator version 4.4 and later.
-	Workers        *int   `json:"Workers,omitempty"`
+	Workers *int `json:"Workers,omitempty"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit
