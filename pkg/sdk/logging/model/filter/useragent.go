@@ -47,41 +47,41 @@ type UserAgent struct {
 	Flatten bool `json:"flatten,omitempty"`
 }
 
-// ## Example `UserAgent` filter configurations
-// ```yaml
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: Flow
-// metadata:
-//
-//	name: demo-flow
-//
-// spec:
-//
-//	filters:
-//	  - useragent:
-//	      key_name: my_agent
-//	      delete_key: true
-//	      out_key: ua_fields
-//	      flatten: true
-//	selectors: {}
-//	localOutputRefs:
-//	  - demo-output
-//
-// ```
-//
-// #### Fluentd Config Result
-// ```yaml
-// <filter **>
-//
-//	@type ua_parser
-//	@id test_useragent
-//	key_name my_agent
-//	delete_key true
-//	out_key ua_fields
-//	flatten true
-//
-// </filter>
-// ```
+/*
+## Example `UserAgent` filter configurations
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+
+  name: demo-flow
+
+spec:
+  filters:
+    - useragent:
+        key_name: my_agent
+        delete_key: true
+        out_key: ua_fields
+        flatten: true
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+```
+*/
+// +docName:"Fluentd Config Result"
+/*
+## Fluentd Config Result
+```xml
+<filter **>
+  @type ua_parser
+  @id test_useragent
+  key_name my_agent
+  delete_key true
+  out_key ua_fields
+  flatten true
+</filter>
+```
+*/
 type _expUserAgent interface{} //nolint:deadcode,unused
 
 func (g *UserAgent) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
