@@ -57,15 +57,15 @@ type UserAgent struct {
 //
 // spec:
 //
-//		filters:
-//		  - useragent:
-//		      key_name: my_agent
-//	        delete_key: true
-//	        out_key: ua_fields
-//	        flatten: true
-//		selectors: {}
-//		localOutputRefs:
-//		  - demo-output
+//	filters:
+//	  - useragent:
+//	      key_name: my_agent
+//	      delete_key: true
+//	      out_key: ua_fields
+//	      flatten: true
+//	selectors: {}
+//	localOutputRefs:
+//	  - demo-output
 //
 // ```
 //
@@ -73,12 +73,12 @@ type UserAgent struct {
 // ```yaml
 // <filter **>
 //
-//		@type ua_parser
-//		@id test_useragent
-//	 key_name my_agent
-//	 delete_key true
-//	 out_key ua_fields
-//	 flatten true
+//	@type ua_parser
+//	@id test_useragent
+//	key_name my_agent
+//	delete_key true
+//	out_key ua_fields
+//	flatten true
 //
 // </filter>
 // ```
