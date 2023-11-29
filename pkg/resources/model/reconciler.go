@@ -277,7 +277,8 @@ func NewValidationReconciler(
 				continue
 			}
 
-			if err := repo.Status().Patch(ctx, req.Obj, req.Patch); err != nil {
+			obj := req.Obj.DeepCopyObject().(client.Object) // copy object so that the original is not changed by the call to Patch
+			if err := repo.Status().Patch(ctx, obj, req.Patch); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}

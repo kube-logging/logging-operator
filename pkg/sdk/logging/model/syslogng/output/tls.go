@@ -46,4 +46,7 @@ type TLS struct {
 	UseSystemCertStore *bool `json:"use-system-cert-store,omitempty"`
 	// Description: Specifies the cipher, hash, and key-exchange algorithms used for the encryption, for example, ECDHE-ECDSA-AES256-SHA384. The list of available algorithms depends on the version of OpenSSL used to compile syslog-ng.
 	CipherSuite string `json:"cipher-suite,omitempty"`
+	// Configure required TLS version. Accepted values: [sslv3, tlsv1, tlsv1_0, tlsv1_1, tlsv1_2, tlsv1_3]
+	// +kubebuilder:validation:Enum=sslv3;tlsv1;tlsv1_0;tlsv1_1;tlsv1_2;tlsv1_3
+	SslVersion string `json:"ssl_version,omitempty"`
 }

@@ -92,6 +92,9 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
+	if len(r.Logging.Spec.FluentdSpec.SidecarContainers) != 0 {
+		containers = append(containers, r.Logging.Spec.FluentdSpec.SidecarContainers...)
+	}
 
 	sts := &appsv1.StatefulSetSpec{
 		PodManagementPolicy: appsv1.PodManagementPolicyType(r.Logging.Spec.FluentdSpec.Scaling.PodManagementPolicy),
