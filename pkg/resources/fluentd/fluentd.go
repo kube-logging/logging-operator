@@ -124,11 +124,6 @@ func New(client client.Client, log logr.Logger,
 
 // Reconcile reconciles the fluentd resource
 func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
-	// No fluentdSpec yet, explicitly ask for a requeue to short circuit the controller loop after the status update
-	if r.fluentdSpec == nil {
-		return &reconcile.Result{Requeue: true}, nil
-	}
-
 	patchBase := client.MergeFrom(r.Logging.DeepCopy())
 
 	objects := []resources.Resource{
