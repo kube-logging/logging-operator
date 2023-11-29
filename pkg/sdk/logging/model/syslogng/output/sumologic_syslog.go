@@ -19,7 +19,7 @@ package output
 type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over syslog"
-/* 
+/*
 The `sumologic-syslog` output sends log records over HTTP to Sumo Logic. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-options/).
 
 ## Prerequisites

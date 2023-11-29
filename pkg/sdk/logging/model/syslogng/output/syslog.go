@@ -128,6 +128,6 @@ type SyslogOutput struct {
 	TSFormat string `json:"ts_format,omitempty"`
 	// Enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
 	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
-	// Unique name for the syslog-ng driver. If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+	// Unique name for the syslog-ng driver. If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
 	PersistName string `json:"persist_name,omitempty"`
 }
