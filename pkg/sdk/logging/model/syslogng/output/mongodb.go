@@ -70,8 +70,8 @@ type MongoDB struct {
 	Bulk `json:",inline"`
 	// The number of messages that the output queue can store.
 	LogFIFOSize int `json:"log-fifo-size,omitempty"`
-	// If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: 
-	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` 
+	// If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers:
+	// `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.`
 	// See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
 	PersistName string `json:"persist_name,omitempty"`
 	// The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches retries, then drops the message.
