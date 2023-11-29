@@ -45,7 +45,8 @@ func RenderConfigInto(in Input, out io.Writer) error {
 }
 
 type Input struct {
-	Logging             v1beta1.Logging
+	Name                string
+	Namespace           string
 	SyslogNGSpec        *v1beta1.SyslogNGSpec
 	ClusterOutputs      []v1beta1.SyslogNGClusterOutput
 	Outputs             []v1beta1.SyslogNGOutput
@@ -63,10 +64,6 @@ const configVersion = "current"
 const sourceName = "main_input"
 
 func configRenderer(in Input) (render.Renderer, error) {
-	if in.SyslogNGSpec == nil && in.Logging.Spec.SyslogNGSpec != nil {
-		in.SyslogNGSpec = in.Logging.Spec.SyslogNGSpec
-	}
-
 	if in.SyslogNGSpec == nil {
 		return nil, errors.New("missing syslog-ng spec")
 	}
@@ -86,7 +83,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 		setDefault(&in.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
 	}
 
-	globalOptions := renderAny(in.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))
+	globalOptions := renderAny(in.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Namespace))
 
 	destinationDefs := make([]render.Renderer, 0, len(in.ClusterOutputs)+len(in.Outputs))
 	clusterOutputRefs := make(map[string]types.NamespacedName, len(in.ClusterOutputs))
@@ -106,13 +103,13 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderClusterFlow(in.Logging.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderClusterFlow(in.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderFlow(in.Logging.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
 
 	if in.SyslogNGSpec.JSONKeyPrefix == "" {
@@ -146,7 +143,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if sm.Labels == nil {
 			sm.Labels = make(filter.ArrowMap, 0)
 		}
-		sm.Labels["logging"] = in.Logging.Name
+		sm.Labels["logging"] = in.Name
 		sourceParsers = append(sourceParsers, renderDriver(Field{
 			Value: reflect.ValueOf(sm),
 		}, nil))

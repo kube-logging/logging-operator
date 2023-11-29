@@ -50,15 +50,9 @@ destination "output_default_test-mongodb-out" {
 `)
 
 	testCaseInput := config.Input{
-		Logging: v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "config-test",
-				Name:      "test",
-			},
-			Spec: v1beta1.LoggingSpec{
-				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-			},
-		},
+		SyslogNGSpec:   &v1beta1.SyslogNGSpec{},
+		Namespace:      "config-test",
+		Name:           "test",
 		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
 		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
 		Flows:          []v1beta1.SyslogNGFlow{},
@@ -136,15 +130,9 @@ destination "output_default_test-mongodb-out" {
 `)
 
 	testCaseInput := config.Input{
-		Logging: v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "config-test",
-				Name:      "test",
-			},
-			Spec: v1beta1.LoggingSpec{
-				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-			},
-		},
+		SyslogNGSpec:   &v1beta1.SyslogNGSpec{},
+		Namespace:      "config-test",
+		Name:           "test",
 		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
 		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
 		Flows:          []v1beta1.SyslogNGFlow{},

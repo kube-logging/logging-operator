@@ -376,7 +376,8 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	}
 
 	in := syslogngconfig.Input{
-		Logging:             resources.Logging,
+		Name:                resources.Logging.Name,
+		Namespace:           resources.Logging.Namespace,
 		ClusterOutputs:      resources.SyslogNG.ClusterOutputs,
 		Outputs:             resources.SyslogNG.Outputs,
 		ClusterFlows:        resources.SyslogNG.ClusterFlows,
