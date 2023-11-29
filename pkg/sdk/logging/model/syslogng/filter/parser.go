@@ -66,7 +66,7 @@ type _metaParser interface{} //nolint:deadcode,unused
 // +docName:"[Parser](https://axoflow.com/docs/axosyslog-core/chapter-parsers/)"
 type ParserConfig struct {
 	// The regular expression patterns that you want to find a match. `regexp-parser()` supports multiple patterns, and stops the processing at the first successful match. For details, see the [regexp-parser() documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-parsers/parser-regexp/parser-regexp-options/#patterns).
-	Regexp       *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
+	Regexp *RegexpParser `json:"regexp,omitempty" syslog-ng:"parser-drv,name=regexp-parser"`
 	// Parse message as a [syslog message](https://axoflow.com/docs/axosyslog-core/chapter-parsers/parser-syslog/).
 	SyslogParser *SyslogParser `json:"syslog-parser,omitempty," syslog-ng:"parser-drv,name=syslog-parser"`
 	// Counts the messages that pass through the flow, and creates labeled stats counters based on the fields of the passing messages. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-parsers/metrics-probe/).
@@ -96,7 +96,7 @@ type SyslogParser struct {
 
 // +kubebuilder:object:generate=true
 // +docName:"[Metrics Probe](https://axoflow.com/docs/axosyslog-core/chapter-parsers/metrics-probe/)
-/* 
+/*
 Counts the messages that pass through the flow, and creates labeled stats counters based on the fields of the passing messages. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-parsers/metrics-probe/).
 
 {{< highlight yaml>}}SyslogNGFlow
@@ -117,7 +117,7 @@ type MetricsProbe struct {
 	__meta struct{} `json:"-" syslog-ng:"name=metrics-probe"`
 	// The name of the counter to create. Note that the value of this option is always prefixed with `syslogng_`, so for example `key("my-custom-key")` becomes `syslogng_my-custom-key`.
 	Key string `json:"key,omitempty"`
-	// The labels used to create separate counters, based on the fields of the messages processed by `metrics-probe()`. The keys of the map are the name of the label, and the values are syslog-ng templates. 
+	// The labels used to create separate counters, based on the fields of the messages processed by `metrics-probe()`. The keys of the map are the name of the label, and the values are syslog-ng templates.
 	Labels ArrowMap `json:"labels,omitempty"`
 	// Sets the stats level of the generated metrics (default 0).
 	Level int `json:"level,omitempty"`

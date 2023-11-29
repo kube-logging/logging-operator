@@ -101,7 +101,7 @@ Default: -
 
 ## MetricsProbe
 
- 
+
 Counts the messages that pass through the flow, and creates labeled stats counters based on the fields of the passing messages. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-parsers/metrics-probe/).
 
 {{< highlight yaml>}}SyslogNGFlow
