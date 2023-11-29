@@ -100,24 +100,26 @@ metadata:
 spec:
   filters:
     - match:
-        regexp:
-        - value: first
-          pattern: ^5\d\d$
-  match: {}
+	  regexp:
+	    - value: first
+		  pattern: ^5\d\d$
+	match: {}
   localOutputRefs:
     - demo-output
 ```
+*/
+/*
 
 #### Syslog-NG Config Result
 ```
 log {
     source(main_input);
     filter {
-        match("^5\d\d$" value("first"));
-    };
-    destination(output_default_demo-output);
+      match("^5\d\d$" value("first"));
+	};
+	destination(output_default_demo-output);
 };
-```
 
+```
 */
 type _expRegexpMatch interface{} //nolint:deadcode,unused
