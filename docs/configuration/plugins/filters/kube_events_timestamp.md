@@ -24,37 +24,38 @@ Added time field name
 Default: triggerts
 
 
- ## Example `Kubernetes Events Timestamp` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: es-flow
+## Example `Kubernetes Events Timestamp` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: es-flow
+spec:
+  filters:
+    - kube_events_timestamp:
+        timestamp_fields:
+          - "event.eventTime"
+          - "event.lastTimestamp"
+          - "event.firstTimestamp"
+        mapped_time_key: mytimefield
+  selectors: {}
+  localOutputRefs:
+    - es-output
+{{</ highlight >}}
 
-	filters:
-	  - kube_events_timestamp:
-	      timestamp_fields:
-	        - "event.eventTime"
-	        - "event.lastTimestamp"
-	        - "event.firstTimestamp"
-	      mapped_time_key: mytimefield
-	selectors: {}
-	localOutputRefs:
-	  - es-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
+{{< highlight xml >}}
  <filter **>
  @type kube_events_timestamp
  @id test-kube-events-timestamp
  timestamp_fields ["event.eventTime","event.lastTimestamp","event.firstTimestamp"]
  mapped_time_key mytimefield
  </filter>
- ```
+{{</ highlight >}}
+
 
 ---

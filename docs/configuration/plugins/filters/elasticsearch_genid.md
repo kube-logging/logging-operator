@@ -1,3 +1,37 @@
+---
+title: ElasticSearch GenId
+weight: 200
+generated_file: true
+---
+
+# ElasticSearch GenId
+## Overview
+
+TODO: FILL
+// ## Example `Elasticsearch Genid` filter configurations
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+ name: demo-flow
+spec:
+ filters:
+   - elasticsearch_genid:
+       hash_id_key: gen_id
+ selectors: {}
+ localOutputRefs:
+   - demo-output
+
+#### Fluentd Config Result
+<filter **>
+ @type elasticsearch_genid
+ @id test_elasticsearch_genid
+ hash_id_key gen_id
+</filter>
+{{</ highlight >}}
+
+
+## Configuration
 ## ElasticsearchGenId
 
 ### hash_id_key (string, optional) {#elasticsearchgenid-hash_id_key}

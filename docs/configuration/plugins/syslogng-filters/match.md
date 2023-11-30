@@ -6,7 +6,7 @@ generated_file: true
 
 # Match
 ## Overview
- Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/logging-operator/configuration/plugins/syslog-ng-filters/match.md" >}}).
+ Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/configuration/plugins/syslogng-filters/match.md" >}}).
 
  {{< highlight yaml >}}
 

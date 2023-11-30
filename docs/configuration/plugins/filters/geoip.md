@@ -49,48 +49,47 @@ Records are represented as maps: `key: value`
 Default: -
 
 
- ## Example `GeoIP` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `GeoIP` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - geoip:
+        geoip_lookup_keys: remote_addr
+        records:
+          - city: ${city.names.en["remote_addr"]}
+            location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
+            country: ${country.iso_code["remote_addr"]}
+            country_name: ${country.names.en["remote_addr"]}
+            postal_code:  ${postal.code["remote_addr"]}
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - geoip:
-	      geoip_lookup_keys: remote_addr
-	      records:
-	        - city: ${city.names.en["remote_addr"]}
-	          location_array: '''[${location.longitude["remote"]},${location.latitude["remote"]}]'''
-	          country: ${country.iso_code["remote_addr"]}
-	          country_name: ${country.names.en["remote_addr"]}
-	          postal_code:  ${postal.code["remote_addr"]}
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight xml >}}
+<filter **>
+  @type geoip
+  @id test_geoip
+  geoip_lookup_keys remote_addr
+  skip_adding_null_record true
+  <record>
+    city ${city.names.en["remote_addr"]}
+    country ${country.iso_code["remote_addr"]}
+    country_name ${country.names.en["remote_addr"]}
+    location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
+    postal_code ${postal.code["remote_addr"]}
+  </record>
+</filter>
+{{</ highlight >}}
 
-	@type geoip
-	@id test_geoip
-	geoip_lookup_keys remote_addr
-	skip_adding_null_record true
-	<record>
-	  city ${city.names.en["remote_addr"]}
-	  country ${country.iso_code["remote_addr"]}
-	  country_name ${country.names.en["remote_addr"]}
-	  location_array '[${location.longitude["remote"]},${location.latitude["remote"]}]'
-	  postal_code ${postal.code["remote_addr"]}
-	</record>
-
- </filter>
- ```
 
 ---

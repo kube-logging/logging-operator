@@ -55,7 +55,7 @@ Default: -
 
 ### flush_interval (int, optional) {#concat-flush_interval}
 
-The number of seconds after which the last received event log will be flushed. If specified 0, wait for next line forever. 
+The number of seconds after which the last received event log is flushed. If set to 0, flushing is disabled (wait for next line forever). 
 
 Default: -
 
@@ -126,38 +126,37 @@ The key name that is referred to detect stream name on cri log
 Default: -
 
 
- ## Example `Concat` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Concat` filter configurations
 
- spec:
+// {{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - concat:
+        partial_key: "partial_message"
+        separator: ""
+        n_lines: 10
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+// {{< /highlight >}}
 
-	filters:
-	  - concat:
-	      partial_key: "partial_message"
-	      separator: ""
-	      n_lines: 10
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight xml >}}
+<filter **>
+  @type concat
+  @id test_concat
+  key message
+  n_lines 10
+  partial_key partial_message
+</filter>
+{{< /highlight >}}
 
-	@type concat
-	@id test_concat
-	key message
-	n_lines 10
-	partial_key partial_message
-
- </filter>
- ```
 
 ---

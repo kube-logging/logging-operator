@@ -18,34 +18,33 @@ This is the option of stdout format.
 Default: -
 
 
- ## Example `StdOut` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `StdOut` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - stdout:
+        output_type: json
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - stdout:
-	      output_type: json
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight yaml >}}
+<filter **>
+  @type stdout
+  @id test_stdout
+  output_type json
+</filter>
+{{</ highlight >}}
 
-	@type stdout
-	@id test_stdout
-	output_type json
-
- </filter>
- ```
 
 ---
