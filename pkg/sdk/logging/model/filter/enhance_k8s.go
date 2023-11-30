@@ -89,11 +89,10 @@ spec:
     - enhanceK8s: {}
 {{</ highlight >}}
 */
-
 /*
 #### Fluentd config result:
 
-{{< highlight yaml >}}
+{{< highlight xml >}}
 <filter **>
   @type enhance_k8s_metadata
   @id test_enhanceK8s

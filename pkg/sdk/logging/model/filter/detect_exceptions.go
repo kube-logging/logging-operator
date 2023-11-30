@@ -87,10 +87,10 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
-Fluentd config result:
-{{< highlight yaml >}}
+#### Fluentd config result:
+
+{{< highlight xml >}}
 <match kubernetes.**>
   @type detect_exceptions
   @id test_detect_exceptions

@@ -68,7 +68,6 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
 #### Fluentd config result:
 

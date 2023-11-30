@@ -76,9 +76,9 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
-Fluentd config result:
+#### Fluentd config result:
+
 {{< highlight xml >}}
   <filter **>
     @type grep
@@ -171,21 +171,20 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
 #### Fluentd config result:
 
 {{< highlight xml >}}
-    <or>
-      <exclude>
-        key first
-        pattern /^5\d\d$/
-      </exclude>
-      <exclude>
-        key second
-        pattern /\.css$/
-      </exclude>
-    </or>
+<or>
+	<exclude>
+	key first
+	pattern /^5\d\d$/
+	</exclude>
+	<exclude>
+	key second
+	pattern /\.css$/
+	</exclude>
+</or>
 {{</ highlight >}}
 */
 type _expOR interface{} //nolint:deadcode,unused
@@ -223,21 +222,20 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
-Fluentd config result:
+Fluentd #### config result:
 
 {{< highlight xml >}}
-    <and>
-      <regexp>
-        key first
-        pattern /^5\d\d$/
-      </regexp>
-      <regexp>
-        key second
-        pattern /\.css$/
-      </regexp>
-    </and>
+	<and>
+	  <regexp>
+	    key first
+	    pattern /^5\d\d$/
+	  </regexp>
+	  <regexp>
+	    key second
+	    pattern /\.css$/
+	  </regexp>
+	</and>
 {{</ highlight >}}
 */
 type _expAND interface{} //nolint:deadcode,unused

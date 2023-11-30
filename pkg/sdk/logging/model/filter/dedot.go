@@ -60,11 +60,10 @@ spec:
     - demo-output
 {{</ highlight >}}
 */
-
 /*
 #### Fluentd config result:
 
-{{< highlight yaml >}}
+{{< highlight xml >}}
 <filter **>
   @type dedot
   @id test_dedot

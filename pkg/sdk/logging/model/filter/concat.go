@@ -97,11 +97,10 @@ spec:
     - demo-output
 // {{< /highlight >}}
 */
-
 /*
 #### Fluentd config result:
 
-// {{< highlight yaml >}}
+{{< highlight xml >}}
 <filter **>
   @type concat
   @id test_concat
@@ -109,8 +108,7 @@ spec:
   n_lines 10
   partial_key partial_message
 </filter>
-// {{< /highlight >}}
-
+{{< /highlight >}}
 */
 type _expConcat interface{} //nolint:deadcode,unused
 
