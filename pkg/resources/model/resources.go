@@ -54,6 +54,7 @@ type FluentdLoggingResources struct {
 	Flows          []v1beta1.Flow
 	Outputs        Outputs
 	Configuration  *v1beta1.Fluentd
+	ExcessFluentds []v1beta1.Fluentd
 }
 
 type SyslogNGLoggingResources struct {

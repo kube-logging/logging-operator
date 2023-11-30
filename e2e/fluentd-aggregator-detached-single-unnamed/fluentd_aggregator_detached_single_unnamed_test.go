@@ -18,9 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -34,14 +32,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
@@ -58,6 +54,29 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func checkExcessFluentd(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.Fluentd) bool {
+	fluentdInstanceName := fluentd.Name
+	cluster := *c
+
+	if len(fluentd.Status.Problems) == 0 {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's problems field filled", fluentdInstanceName)
+		return false
+	}
+	if fluentd.Status.Logging != "" {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's logging field empty, found: %s", fluentdInstanceName, fluentd.Status.Logging)
+		return false
+	}
+	if *fluentd.Status.Active != false {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's active field set as false, found: %v", fluentdInstanceName, *fluentd.Status.Active)
+		return false
+	}
+
+	return true
 }
 
 func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
@@ -92,9 +111,9 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 
-		fluentd := v1beta1.Fluentd{
+		fluentd1 := v1beta1.Fluentd{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "name-not-to-be-used",
+				Name:      "not-to-be-used-fluentd-1",
 				Namespace: ns,
 			},
 			Spec: v1beta1.FluentdSpec{
@@ -118,11 +137,11 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 				Workers: 2,
 			},
 		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd1))
 
-		fluentdNotUsed := v1beta1.Fluentd{
+		fluentd2 := v1beta1.Fluentd{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "not-to-be-used-fluentd",
+				Name:      "not-to-be-used-fluentd-2",
 				Namespace: ns,
 			},
 			Spec: v1beta1.FluentdSpec{
@@ -146,9 +165,9 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 				Workers: 2,
 			},
 		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentdNotUsed))
+		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd2))
 
-		t.Logf("fluentd is: %v", fluentd)
+		t.Logf("fluentd is: %v", fluentd1)
 		tags := "time"
 		output := v1beta1.Output{
 			ObjectMeta: metav1.ObjectMeta{
@@ -192,53 +211,19 @@ func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
-		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
-		}
-		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
-		}
-
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))
 
 		require.Eventually(t, func() bool {
-			if len(fluentdNotUsed.Status.Problems) == 0 {
-				t.Log("second fluentd instance should have it's problems field filled")
+			if rv := checkExcessFluentd(t, &c, &ctx, &fluentd1); !rv {
 				return false
 			}
-			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
+			if rv := checkExcessFluentd(t, &c, &ctx, &fluentd2); !rv {
 				return false
 			}
-			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
+			return true
 		}, 5*time.Minute, 3*time.Second)
 
 	}, func(t *testing.T, c common.Cluster) error {

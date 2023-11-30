@@ -208,6 +208,24 @@ func NewValidationReconciler(
 		resources.Logging.Status.Problems = nil
 		resources.Logging.Status.WatchNamespaces = nil
 
+		if len(resources.Fluentd.ExcessFluentds) != 0 {
+			logger.Info("Excess Fluentd CRDs found")
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+			for i := range resources.Fluentd.ExcessFluentds {
+				excessFluentd := &resources.Fluentd.ExcessFluentds[i]
+				registerForPatching(excessFluentd)
+				excessFluentd.Status.Problems = nil
+				excessFluentd.Status.Active = utils.BoolPointer(false)
+				excessFluentd.Status.Logging = ""
+
+				if len(resources.Logging.Status.FluentdConfigName) == 0 {
+					excessFluentd.Status.Problems = append(excessFluentd.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+				} else if resources.Logging.Status.FluentdConfigName != excessFluentd.Name {
+					excessFluentd.Status.Problems = append(excessFluentd.Status.Problems, "logging already has a detached fluentd configuration, remove excess configuration objects")
+				}
+				excessFluentd.Status.ProblemsCount = len(excessFluentd.Status.Problems)
+			}
+		}
 		if resources.Fluentd.Configuration != nil {
 			registerForPatching(resources.Fluentd.Configuration)
 
