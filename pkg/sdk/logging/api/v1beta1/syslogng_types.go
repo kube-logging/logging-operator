@@ -47,11 +47,20 @@ type SyslogNGSpec struct {
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
-	MaxConnections                      int                          `json:"maxConnections,omitempty"`
-	LogIWSize                           int                          `json:"logIWSize,omitempty"`
-	SourceMetrics                       []filter.MetricsProbe        `json:"sourceMetrics,omitempty"`
-
+	// Parses date automatically from the timestamp registered by the container runtime.
+	// Note: json key prefix and delimiter are respected
+	SourceDateParser *SourceDateParser     `json:"sourceDateParser,omitempty"`
+	MaxConnections   int                   `json:"maxConnections,omitempty"`
+	LogIWSize        int                   `json:"logIWSize,omitempty"`
+	SourceMetrics    []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
 	// TODO: option to turn on/off buffer volume PVC
+}
+
+type SourceDateParser struct {
+	// Default: "%FT%T.%f%z"
+	Format *string `json:"format,omitempty"`
+	// Default(depending on JSONKeyPrefix): "${json.time}"
+	Template *string `json:"template,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

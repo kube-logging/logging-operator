@@ -19,12 +19,13 @@ import (
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 )
 
 func TestRedisOutput(t *testing.T) {
