@@ -79,11 +79,11 @@ func checkExcessFluentd(t *testing.T, c *common.Cluster, ctx *context.Context, f
 	return true
 }
 
-func TestFluentdAggregator_detached_multiple_MultiWorker(t *testing.T) {
+func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-1"
 	releaseNameOverride := "e2e"
-	testTag := "test.fluentd_aggregator_multiworker_multiple_detached"
+	testTag := "test.fluentd_aggregator_multiworker_multiple_detached_failure"
 	outputName := "test-output"
 	flowName := "test-flow"
 	common.WithCluster("fluentd-1-detached-unnamed", t, func(t *testing.T, c common.Cluster) {
