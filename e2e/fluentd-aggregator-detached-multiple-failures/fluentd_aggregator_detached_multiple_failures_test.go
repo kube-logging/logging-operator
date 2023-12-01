@@ -38,6 +38,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
@@ -54,29 +55,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func checkExcessFluentd(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.Fluentd) bool {
-	fluentdInstanceName := fluentd.Name
-	cluster := *c
-
-	if len(fluentd.Status.Problems) == 0 {
-		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
-		t.Logf("%s should have it's problems field filled", fluentdInstanceName)
-		return false
-	}
-	if fluentd.Status.Logging != "" {
-		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
-		t.Logf("%s should have it's logging field empty, found: %s", fluentdInstanceName, fluentd.Status.Logging)
-		return false
-	}
-	if *fluentd.Status.Active != false {
-		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
-		t.Logf("%s should have it's active field set as false, found: %v", fluentdInstanceName, *fluentd.Status.Active)
-		return false
-	}
-
-	return true
 }
 
 func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
@@ -217,10 +195,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			if rv := checkExcessFluentd(t, &c, &ctx, &fluentd1); !rv {
+			if rv := cond.CheckExcessFluentdStatus(t, &c, &ctx, &fluentd1); !rv {
 				return false
 			}
-			if rv := checkExcessFluentd(t, &c, &ctx, &fluentd2); !rv {
+			if rv := cond.CheckExcessFluentdStatus(t, &c, &ctx, &fluentd2); !rv {
 				return false
 			}
 			return true

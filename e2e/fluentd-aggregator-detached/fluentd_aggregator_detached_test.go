@@ -121,6 +121,32 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 
 		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
 		t.Logf("fluentd is: %v", fluentd)
+
+		excessFluentd := v1beta1.Fluentd{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "excess-fluentd",
+				Namespace: ns,
+			},
+			Spec: v1beta1.FluentdSpec{
+				Resources: corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("500m"),
+						corev1.ResourceMemory: resource.MustParse("200M"),
+					},
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("250m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+				BufferVolumeMetrics: &v1beta1.Metrics{},
+				Scaling: &v1beta1.FluentdScaling{
+					Replicas: 1,
+					Drain: v1beta1.FluentdDrainConfig{
+						Enabled: true,
+					},
+				},
+			},
+		}
 		tags := "time"
 		output := v1beta1.Output{
 			ObjectMeta: metav1.ObjectMeta{
@@ -193,6 +219,22 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
 				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
 				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
+				return false
+			}
+			if isValid := cond.CheckFluentdStatus(t, &c, &ctx, &fluentd, logging.Name); !isValid {
+				t.Log("checking detached fluentd status")
+				return false
+			}
+			var detachedFluentds v1beta1.FluentdList
+			common.RequireNoError(t, c.GetClient().List(ctx, &detachedFluentds))
+			if len(detachedFluentds.Items) != 2 {
+				// Add a new detached fluentd that is not going to be used
+				common.RequireNoError(t, c.GetClient().Create(ctx, &excessFluentd))
+				t.Log("creating excess detached fluentd")
+				return false
+			} else if isValid := cond.CheckExcessFluentdStatus(t, &c, &ctx, &excessFluentd); !isValid && len(detachedFluentds.Items) == 2 {
+				t.Log("checking excess detached fluentd status")
+				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessFluentd), &excessFluentd))
 				return false
 			}
 
