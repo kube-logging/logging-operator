@@ -145,6 +145,58 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &syslogNG))
 
+		excessSyslogNG := v1beta1.SyslogNG{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "excess-syslog-ng",
+				Namespace: ns,
+			},
+			Spec: v1beta1.SyslogNGSpec{
+				StatefulSetOverrides: &typeoverride.StatefulSet{
+					Spec: typeoverride.StatefulSetSpec{
+						Template: typeoverride.PodTemplateSpec{
+							Spec: typeoverride.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: syslogng.ContainerName,
+										Resources: corev1.ResourceRequirements{
+											Limits: corev1.ResourceList{
+												corev1.ResourceCPU:    resource.MustParse("100m"),
+												corev1.ResourceMemory: resource.MustParse("100M"),
+											},
+											Requests: corev1.ResourceList{
+												corev1.ResourceCPU:    resource.MustParse("25m"),
+												corev1.ResourceMemory: resource.MustParse("10M"),
+											},
+										},
+										VolumeMounts: []corev1.VolumeMount{
+											{
+												Name:      "buffers",
+												MountPath: "/buffers",
+											},
+										},
+									},
+								},
+								Volumes: []corev1.Volume{
+									{
+										Name: "buffers",
+										VolumeSource: corev1.VolumeSource{
+											EmptyDir: &corev1.EmptyDirVolumeSource{},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				BufferVolumeMetrics: &v1beta1.BufferMetrics{
+					Metrics: v1beta1.Metrics{
+						Interval: "1s",
+					},
+					MountName: "buffers",
+				},
+			},
+		}
+
 		testTag := "test.tag"
 
 		output := v1beta1.SyslogNGOutput{
@@ -215,8 +267,25 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				return false
 			}
 			if logging.Status.SyslogNGConfigName != syslogNG.Name {
-				t.Logf("logging should use the detached syslogng configuration (name=%s), found: %v", syslogNG.Name, logging.Status.SyslogNGConfigName)
+				t.Logf("logging should use the detached SyslogNG configuration (name=%s), found: %v", syslogNG.Name, logging.Status.SyslogNGConfigName)
 				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+				return false
+			}
+
+			if isValid := cond.CheckSyslogNGStatus(t, &c, &ctx, &syslogNG, logging.Name); !isValid {
+				t.Log("checking detached SyslogNG status")
+				return false
+			}
+			var detachedSyslogNGs v1beta1.SyslogNGList
+			common.RequireNoError(t, c.GetClient().List(ctx, &detachedSyslogNGs))
+			if len(detachedSyslogNGs.Items) != 2 {
+				// Add a new detached fluentd that is not going to be used
+				common.RequireNoError(t, c.GetClient().Create(ctx, &excessSyslogNG))
+				t.Log("creating excess detached syslog-ng")
+				return false
+			} else if isValid := cond.CheckExcessSyslogNGStatus(t, &c, &ctx, &excessSyslogNG); !isValid && len(detachedSyslogNGs.Items) == 2 {
+				t.Log("checking excess detached SyslogNG status")
+				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessSyslogNG), &excessSyslogNG))
 				return false
 			}
 

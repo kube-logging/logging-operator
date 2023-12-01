@@ -130,3 +130,49 @@ func CheckExcessFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Cont
 
 	return true
 }
+
+func CheckSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNG, loggingName string) bool {
+	instanceName := syslogNG.Name
+	cluster := *c
+
+	if len(syslogNG.Status.Problems) != 0 {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have 0 problems, problems=%v", instanceName, syslogNG.Status.Problems)
+		return false
+	}
+	if syslogNG.Status.Logging != loggingName {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", instanceName, syslogNG.Status.Logging, loggingName)
+		return false
+	}
+	if !*syslogNG.Status.Active {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have it's active field set as true, found: %v", instanceName, *syslogNG.Status.Active)
+		return false
+	}
+
+	return true
+}
+
+func CheckExcessSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNG) bool {
+	instanceName := syslogNG.Name
+	cluster := *c
+
+	if len(syslogNG.Status.Problems) == 0 {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have it's problems field filled", instanceName)
+		return false
+	}
+	if syslogNG.Status.Logging != "" {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have it's logging field empty, found: %s", instanceName, syslogNG.Status.Logging)
+		return false
+	}
+	if *syslogNG.Status.Active {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(syslogNG), syslogNG))
+		t.Logf("%s should have it's active field set as false, found: %v", instanceName, *syslogNG.Status.Active)
+		return false
+	}
+
+	return true
+}
