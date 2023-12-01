@@ -60,7 +60,7 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentd.Configuration, res.Fluentd.ExcessFluentds, err = r.FluentdConfigFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
-	res.SyslogNG.Configuration, err = r.SyslogNGConfigFor(ctx, logging)
+	res.SyslogNG.Configuration, res.SyslogNG.ExcessSyslogNGs, err = r.SyslogNGConfigFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
 	res.SyslogNG.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
@@ -381,24 +381,28 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		return nil, excessFluentds, nil
 	}
 }
-func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list *[]v1beta1.SyslogNG, logging v1beta1.Logging) (*v1beta1.SyslogNG, error) {
-	for _, i := range *list {
+func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list []v1beta1.SyslogNG, logging v1beta1.Logging) []v1beta1.SyslogNG {
+
+	r.Logger.Info("multiple detached SyslogNG CRDs found")
+
+	var excessSyslogNGs []v1beta1.SyslogNG
+	for _, i := range list {
 		if len(logging.Status.SyslogNGConfigName) != 0 {
 			if i.Name != logging.Status.SyslogNGConfigName {
-				i.Status.Problems = []string{}
-				i.Status.Problems = append(i.Status.Problems, "Logging already has a detached SyslogNG configuration, remove excess configuration objects")
+				excessSyslogNGs = append(excessSyslogNGs, i)
 			}
+		} else {
+			// No association, mark everything as excess
+			excessSyslogNGs = append(excessSyslogNGs, i)
 		}
 	}
-	multipleSyslogNGErrors := "multiple SyslogNG configurations found, couldn't associate it with logging"
-	logging.Status.Problems = append(logging.Status.Problems, multipleSyslogNGErrors)
-	return nil, errors.New(multipleSyslogNGErrors)
+	return excessSyslogNGs
 }
 
-func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.SyslogNG, error) {
+func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.SyslogNG, []v1beta1.SyslogNG, error) {
 	var list v1beta1.SyslogNGList
 	if err := r.Client.List(ctx, &list); err != nil {
-		return nil, err
+		return nil, []v1beta1.SyslogNG{}, err
 	}
 
 	var res []v1beta1.SyslogNG
@@ -406,16 +410,18 @@ func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, loggin
 
 	switch len(res) {
 	case 0:
-		return nil, nil
+		return nil, []v1beta1.SyslogNG{}, nil
+
 	case 1:
 		// Implicitly associate syslogng configuration object with logging
 		detachedSyslogNG := res[0]
 		detachedSyslogNG.Spec.SetDefaults()
 		r.Logger.Info("found detached syslog-ng aggregator", "name=", detachedSyslogNG.Name)
 
-		return &detachedSyslogNG, nil
+		return &detachedSyslogNG, []v1beta1.SyslogNG{}, nil
 	default:
-		return r.handleMultipleDetachedSyslogNGObjects(&res, logging)
+		excessSyslogNGs := r.handleMultipleDetachedSyslogNGObjects(res, logging)
+		return nil, excessSyslogNGs, nil
 	}
 }
 

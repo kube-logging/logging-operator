@@ -240,6 +240,25 @@ func NewValidationReconciler(
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
 		}
 
+		if len(resources.SyslogNG.ExcessSyslogNGs) != 0 {
+			logger.Info("Excess SyslogNG CRDs found")
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "multiple syslog-ng configurations found, couldn't associate it with logging")
+			for i := range resources.SyslogNG.ExcessSyslogNGs {
+				excessSyslogNG := &resources.SyslogNG.ExcessSyslogNGs[i]
+				registerForPatching(excessSyslogNG)
+				excessSyslogNG.Status.Problems = nil
+				excessSyslogNG.Status.Active = utils.BoolPointer(false)
+				excessSyslogNG.Status.Logging = ""
+
+				if len(resources.Logging.Status.SyslogNGConfigName) == 0 {
+					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+				} else if resources.Logging.Status.FluentdConfigName != excessSyslogNG.Name {
+					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "logging already has a detached syslog-ng configuration, remove excess configuration objects")
+				}
+				excessSyslogNG.Status.ProblemsCount = len(excessSyslogNG.Status.Problems)
+			}
+		}
+
 		if resources.SyslogNG.Configuration != nil {
 			registerForPatching(resources.SyslogNG.Configuration)
 

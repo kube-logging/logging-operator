@@ -77,11 +77,12 @@ func (l LoggingResources) GetSyslogNGSpec() *v1beta1.SyslogNGSpec {
 }
 
 type SyslogNGLoggingResources struct {
-	ClusterFlows   []v1beta1.SyslogNGClusterFlow
-	ClusterOutputs SyslogNGClusterOutputs
-	Flows          []v1beta1.SyslogNGFlow
-	Outputs        SyslogNGOutputs
-	Configuration  *v1beta1.SyslogNG
+	ClusterFlows    []v1beta1.SyslogNGClusterFlow
+	ClusterOutputs  SyslogNGClusterOutputs
+	Flows           []v1beta1.SyslogNGFlow
+	Outputs         SyslogNGOutputs
+	Configuration   *v1beta1.SyslogNG
+	ExcessSyslogNGs []v1beta1.SyslogNG
 }
 
 type ClusterOutputs []v1beta1.ClusterOutput
