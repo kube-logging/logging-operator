@@ -7,19 +7,19 @@ generated_file: true
 # Kinesis Firehose output plugin for Fluentd
 ## Overview
 
-	More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose
 
- ## Example output configurations
- ```yaml
- spec:
+For details, see [https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose](https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose).
 
-	kinesisFirehose:
-	  delivery_stream_name: example-stream-name
-	  region: us-east-1
-	  format:
-	    type: json
+## Example output configurations
+```yaml
+spec:
+  kinesisFirehose:
+    delivery_stream_name: example-stream-name
+    region: us-east-1
+    format:
+      type: json
+```
 
- ```
 
 ## Configuration
 ## KinesisFirehose

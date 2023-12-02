@@ -25,20 +25,21 @@ import (
 type _hugoMattermost interface{} //nolint:deadcode,unused
 
 // +docName:"Mattermost plugin for Fluentd"
-// Sends logs to Mattermost via webhooks.
-// More info at https://github.com/levigo-systems/fluent-plugin-mattermost
-//
-// ## Example output configurations
-// ```yaml
-// spec:
-//
-//	mattermost:
-//	  webhook_url: https://xxx.xx/hooks/xxxxxxxxxxxxxxx
-//	  channel_id: xxxxxxxxxxxxxxx
-//	  message_color: "#FFA500"
-//	  enable_tls: false
-//
-// ```
+/*
+Sends logs to Mattermost via webhooks.
+For details, see [https://github.com/levigo-systems/fluent-plugin-mattermost](https://github.com/levigo-systems/fluent-plugin-mattermost).
+
+## Example output configurations
+
+```yaml
+spec:
+  mattermost:
+    webhook_url: https://xxx.xx/hooks/xxxxxxxxxxxxxxx
+    channel_id: xxxxxxxxxxxxxxx
+    message_color: "#FFA500"
+    enable_tls: false
+```
+*/
 type _docMattermost interface{} //nolint:deadcode,unused
 
 // +name:"Mattermost"
@@ -51,19 +52,19 @@ type _metaMattermost interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type MattermostOutputConfig struct {
-	// webhook_url Incoming Webhook URI (Required for Incoming Webhook mode).
+	// Incoming Webhook URI (Required for Incoming Webhook mode).
 	WebhookURL *secret.Secret `json:"webhook_url"`
-	// channel_id the id of the channel where you want to receive the information.
+	// The ID of the channel where you want to receive the information.
 	ChannelID string `json:"channel_id,omitempty"`
-	// message_color color of the message you are sending, the format is hex code. (default: #A9A9A9)
+	// Color of the message you are sending, in hexadecimal format. (default: #A9A9A9)
 	MessageColor string `json:"message_color,omitempty"`
-	// message_title title you want to add to the message. (default: fluent_title_default)
+	// The title you want to add to the message. (default: fluent_title_default)
 	MessageTitle string `json:"message_title,omitempty"`
-	// message The message you want to send, can be a static message, which you add at this point, or you can receive the fluent infos with the %s
+	// The message you want to send. It can be a static message, which you add at this point, or you can receive the Fluentd infos with the %s
 	Message string `json:"message,omitempty"`
-	// enable_tls you can set the communication channel if it uses tls. (default: true)
+	// You can set the communication channel if it uses TLS. (default: true)
 	EnableTLS *bool `json:"enable_tls,omitempty"`
-	// ca_path you can set the path of the certificates.
+	// The path of the CA certificates.
 	CAPath *secret.Secret `json:"ca_path,omitempty"`
 }
 

@@ -25,25 +25,27 @@ import (
 type _hugoOpenSearch interface{} //nolint:deadcode,unused
 
 // +docName:"OpenSearch output plugin for Fluentd"
-// More info at https://github.com/fluent/fluent-plugin-opensearch
-// >Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
-//
-// ## Example output configurations
-// ```yaml
-// spec:
-//
-//	opensearch:
-//	  host: opensearch-cluster.default.svc.cluster.local
-//	  port: 9200
-//	  scheme: https
-//	  ssl_verify: false
-//	  ssl_version: TLSv1_2
-//	  buffer:
-//	    timekey: 1m
-//	    timekey_wait: 30s
-//	    timekey_use_utc: true
-//
-// ```
+/*
+For details, see [https://github.com/fluent/fluent-plugin-opensearch](https://github.com/fluent/fluent-plugin-opensearch).
+
+For an example deployment, see [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/).
+
+## Example output configurations
+
+```yaml
+spec:
+  opensearch:
+    host: opensearch-cluster.default.svc.cluster.local
+    port: 9200
+    scheme: https
+    ssl_verify: false
+    ssl_version: TLSv1_2
+    buffer:
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true
+```
+*/
 type _docOpenSearch interface{} //nolint:deadcode,unused
 
 // +name:"OpenSearch"
@@ -61,7 +63,7 @@ type OpenSearchOutput struct {
 	Host string `json:"host,omitempty"`
 	// You can specify OpenSearch port by this parameter.(default: 9200)
 	Port int `json:"port,omitempty"`
-	// User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+}
+	// User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. `%{demo+}`
 	User string `json:"user,omitempty"`
 	// Password for HTTP Basic authentication.
 	// +docLink:"Secret,../secret/"
@@ -74,7 +76,7 @@ type OpenSearchOutput struct {
 	Hosts string `json:"hosts,omitempty"`
 	// Tell this plugin to find the index name to write to in the record under this key in preference to other mechanisms. Key can be specified as path to nested record using dot ('.') as a separator.
 	TargetIndexKey string `json:"target_index_key,omitempty"`
-	// The format of the time stamp field (@timestamp or what you specify with time_key). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to.
+	// The format of the time stamp field (@timestamp or what you specify with `time_key`). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to.
 	TimeKeyFormat string `json:"time_key_format,omitempty"`
 	// Should the record not include a time_key, define the degree of sub-second time precision to preserve from the time portion of the routed event.
 	TimePrecision string `json:"time_precision,omitempty"`
@@ -88,7 +90,7 @@ type OpenSearchOutput struct {
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty"`
 	// Set the Logstash date format.(default: %Y.%m.%d)
 	LogstashDateformat string `json:"logstash_dateformat,omitempty"`
-	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe utc_index to false.(default: true)
+	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false.(default: true)
 	// +kubebuilder:validation:Optional
 	UtcIndex *bool `json:"utc_index,omitempty" plugin:"default:true"`
 	// Suppress type name to avoid warnings in OpenSearch
@@ -135,7 +137,7 @@ type OpenSearchOutput struct {
 	RemoveKeysOnUpdate string `json:"remove_keys_on_update,omitempty"`
 	// This setting allows remove_keys_on_update to be configured with a key in each record, in much the same way as target_index_key works.
 	RemoveKeysOnUpdateKey string `json:"remove_keys_on_update_key,omitempty"`
-	// https://github.com/fluent/fluent-plugin-opensearch#hash-flattening
+	// [https://github.com/fluent/fluent-plugin-opensearch#hash-flattening](https://github.com/fluent/fluent-plugin-opensearch#hash-flattening)
 	FlattenHashes bool `json:"flatten_hashes,omitempty"`
 	// Flatten separator
 	FlattenHashesSeparator string `json:"flatten_hashes_separator,omitempty"`
@@ -158,7 +160,7 @@ type OpenSearchOutput struct {
 	Templates string `json:"templates,omitempty"`
 	// You can specify times of retry putting template.(default: 10)
 	MaxRetryPuttingTemplate string `json:"max_retry_putting_template,omitempty"`
-	// Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true)
+	// Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on Fluentd statup.(default: true)
 	// +kubebuilder:validation:Optional
 	FailOnPuttingTemplateRetryExceed *bool `json:"fail_on_putting_template_retry_exceed,omitempty" plugin:"default:true"`
 	// fail_on_detecting_os_version_retry_exceed (default: true)
@@ -170,17 +172,17 @@ type OpenSearchOutput struct {
 	IncludeTagKey bool `json:"include_tag_key,omitempty"`
 	// This will add the Fluentd tag in the JSON record.(default: tag)
 	TagKey string `json:"tag_key,omitempty"`
-	// With logstash_format true, OpenSearch plugin parses timestamp field for generating index name. If the record has invalid timestamp value, this plugin emits an error event to @ERROR label with time_parse_error_tag configured tag.
+	// With logstash_format true, OpenSearch plugin parses timestamp field for generating index name. If the record has invalid timestamp value, this plugin emits an error event to @ERROR label with `time_parse_error_tag` configured tag.
 	TimeParseErrorTag string `json:"time_parse_error_tag,omitempty"`
 	// Indicates that the plugin should reset connection on any error (reconnect on next send). By default it will reconnect only on "host unreachable exceptions". We recommended to set this true in the presence of OpenSearch shield.(default: false)
 	ReconnectOnError bool `json:"reconnect_on_error,omitempty"`
-	// This param is to set a pipeline id of your OpenSearch to be added into the request, you can configure ingest node.
+	// This param is to set a pipeline ID of your OpenSearch to be added into the request, you can configure ingest node.
 	Pipeline string `json:"pipeline,omitempty"`
 	// This is debugging purpose option to enable to obtain transporter layer log. (default: false)
 	WithTransporterLog bool `json:"with_transporter_log,omitempty"`
 	//  emit_error_for_missing_id (default: false)
 	EmitErrorForMissingID bool `json:"emit_error_for_missing_id,omitempty"`
-	// TThe default Sniffer used by the OpenSearch::Transport class works well when Fluentd has a direct connection to all of the OpenSearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::OpenSearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. For example, a configuration like this would cause connections to logging-os to reload every 100 operations: https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name
+	// The default Sniffer used by the OpenSearch::Transport class works well when Fluentd has a direct connection to all of the OpenSearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The `sniffer_class_name` parameter gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::OpenSearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. For example, a configuration like this would cause connections to logging-os to reload every 100 operations: [https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name](https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name).
 	SnifferClassName string `json:"sniffer_class_name,omitempty"`
 	// selector_class_name
 	SelectorClassName string `json:"selector_class_name,omitempty"`
@@ -188,7 +190,7 @@ type OpenSearchOutput struct {
 	ReloadAfter string `json:"reload_after,omitempty"`
 	// With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
 	IncludeIndexInUrl bool `json:"include_index_in_url,omitempty"`
-	// With http_backend typhoeus, opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
+	// With http_backend typhoeus, the opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
 	HttpBackend string `json:"http_backend,omitempty"`
 	// http_backend_excon_nonblock (default: true)
 	// +kubebuilder:validation:Optional
@@ -211,7 +213,7 @@ type OpenSearchOutput struct {
 	DefaultOpensearchVersion int `json:"default_opensearch_version,omitempty"`
 	// log_os_400_reason (default: false)
 	LogOs400Reason bool `json:"log_os_400_reason,omitempty"`
-	// This parameter adds additional headers to request. Example: {"token":"secret"} (default: {})
+	// This parameter adds additional headers to request. Example: `{"token":"secret"}` (default: {})
 	CustomHeaders string `json:"custom_headers,omitempty"`
 	// By default, record body is wrapped by 'doc'. This behavior can not handle update script requests. You can set this to suppress doc wrapping and allow record body to be untouched. (default: false)
 	SuppressDocWrap bool `json:"suppress_doc_wrap,omitempty"`
@@ -240,7 +242,7 @@ type OpenSearchOutput struct {
 	Buffer *Buffer `json:"buffer,omitempty"`
 	// The threshold for chunk flush performance check.
 	// Parameter type is float, not time, default: 20.0 (seconds)
-	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
+	// If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the  `fluentd_output_status_slow_flush_count` metric.
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 
 	// Use @type opensearch_data_stream

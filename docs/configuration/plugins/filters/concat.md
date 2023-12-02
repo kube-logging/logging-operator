@@ -126,10 +126,10 @@ The key name that is referred to detect stream name on cri log
 Default: -
 
 
+ ## Example `Concat` filter configurations
 
-## Example `Concat` filter configurations
 
-// {{< highlight yaml >}}
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -143,10 +143,9 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-// {{< /highlight >}}
+{{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>
@@ -156,7 +155,8 @@ spec:
   n_lines 10
   partial_key partial_message
 </filter>
-{{< /highlight >}}
+{{</ highlight >}}
+
 
 
 ---

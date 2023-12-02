@@ -7,19 +7,20 @@ generated_file: true
 # Kinesis Stream output plugin for Fluentd
 ## Overview
 
-	More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
 
- ## Example output configurations
- ```yaml
- spec:
+For details, see [https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams](https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams).
 
-	kinesisStream:
-	  stream_name: example-stream-name
-	  region: us-east-1
-	  format:
-	    type: json
+## Example output configurations
 
- ```
+```yaml
+spec:
+  kinesisStream:
+    stream_name: example-stream-name
+    region: us-east-1
+    format:
+      type: json
+```
+
 
 ## Configuration
 ## KinesisStream

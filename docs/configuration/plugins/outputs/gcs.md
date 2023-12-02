@@ -6,18 +6,19 @@ generated_file: true
 
 # Google Cloud Storage
 ## Overview
- Store logs in Google Cloud Storage. For details, see [https://github.com/kube-logging/fluent-plugin-gcs](https://github.com/kube-logging/fluent-plugin-gcs).
 
- ## Example
- ```yaml
- spec:
+Store logs in Google Cloud Storage. For details, see [https://github.com/kube-logging/fluent-plugin-gcs](https://github.com/kube-logging/fluent-plugin-gcs).
 
-	gcs:
-	  project: logging-example
-	  bucket: banzai-log-test
-	  path: logs/${tag}/%Y/%m/%d/
+## Example
 
- ```
+```yaml
+spec:
+  gcs:
+    project: logging-example
+    bucket: banzai-log-test
+    path: logs/${tag}/%Y/%m/%d/
+```
+
 
 ## Configuration
 ## GCSOutput
@@ -62,7 +63,7 @@ Default: -
 
 Format of GCS object keys
 
-Default: %{path}%{time_slice}_%{index}.%{file_extension}
+Default: `%{path}%{time_slice}_%{index}.%{file_extension}`
 
 ### path (string, optional) {#gcsoutput-path}
 
@@ -102,13 +103,13 @@ Default: false
 
 ### acl (string, optional) {#gcsoutput-acl}
 
-Permission for the object in GCS: auth_read owner_full owner_read private project_private public_read 
+Permission for the object in GCS: `auth_read` `owner_full` `owner_read` `private` `project_private` `public_read` 
 
 Default: -
 
 ### storage_class (string, optional) {#gcsoutput-storage_class}
 
-Storage class of the file: dra nearline coldline multi_regional regional standard 
+Storage class of the file: `dra` `nearline` `coldline` `multi_regional` `regional` `standard` 
 
 Default: -
 

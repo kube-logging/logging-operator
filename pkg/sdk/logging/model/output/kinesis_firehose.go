@@ -25,19 +25,19 @@ type _hugoKinesisFirehose interface{} //nolint:deadcode,unused
 
 // +docName:"Kinesis Firehose output plugin for Fluentd"
 //
-//	More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose
-//
-// ## Example output configurations
-// ```yaml
-// spec:
-//
-//	kinesisFirehose:
-//	  delivery_stream_name: example-stream-name
-//	  region: us-east-1
-//	  format:
-//	    type: json
-//
-// ```
+/*
+For details, see [https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose](https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose).
+
+## Example output configurations
+```yaml
+spec:
+  kinesisFirehose:
+    delivery_stream_name: example-stream-name
+    region: us-east-1
+    format:
+      type: json
+```
+*/
 type _docKinesisFirehose interface{} //nolint:deadcode,unused
 
 // +name:"Amazon Kinesis Firehose"

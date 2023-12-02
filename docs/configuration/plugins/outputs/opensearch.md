@@ -6,25 +6,27 @@ generated_file: true
 
 # OpenSearch output plugin for Fluentd
 ## Overview
- More info at https://github.com/fluent/fluent-plugin-opensearch
- >Example Deployment: [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/)
 
- ## Example output configurations
- ```yaml
- spec:
+For details, see [https://github.com/fluent/fluent-plugin-opensearch](https://github.com/fluent/fluent-plugin-opensearch).
 
-	opensearch:
-	  host: opensearch-cluster.default.svc.cluster.local
-	  port: 9200
-	  scheme: https
-	  ssl_verify: false
-	  ssl_version: TLSv1_2
-	  buffer:
-	    timekey: 1m
-	    timekey_wait: 30s
-	    timekey_use_utc: true
+For an example deployment, see [Save all logs to OpenSearch](../../../../quickstarts/es-nginx/).
 
- ```
+## Example output configurations
+
+```yaml
+spec:
+  opensearch:
+    host: opensearch-cluster.default.svc.cluster.local
+    port: 9200
+    scheme: https
+    ssl_verify: false
+    ssl_version: TLSv1_2
+    buffer:
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true
+```
+
 
 ## Configuration
 ## OpenSearch
@@ -45,7 +47,7 @@ Default: 9200
 
 ### user (string, optional) {#opensearch-user}
 
-User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+} 
+User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. `%{demo+}` 
 
 Default: -
 
@@ -81,7 +83,7 @@ Default: -
 
 ### time_key_format (string, optional) {#opensearch-time_key_format}
 
-The format of the time stamp field (@timestamp or what you specify with time_key). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to. 
+The format of the time stamp field (@timestamp or what you specify with `time_key`). This parameter only has an effect when logstash_format is true as it only affects the name of the index we write to. 
 
 Default: -
 
@@ -123,7 +125,7 @@ Default: %Y.%m.%d
 
 ### utc_index (*bool, optional) {#opensearch-utc_index}
 
-By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe utc_index to false.(default: true) 
+By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false.(default: true) 
 
 Default: true
 
@@ -255,7 +257,7 @@ Default: -
 
 ### flatten_hashes (bool, optional) {#opensearch-flatten_hashes}
 
-https://github.com/fluent/fluent-plugin-opensearch#hash-flattening 
+[https://github.com/fluent/fluent-plugin-opensearch#hash-flattening](https://github.com/fluent/fluent-plugin-opensearch#hash-flattening) 
 
 Default: -
 
@@ -321,7 +323,7 @@ Default: 10
 
 ### fail_on_putting_template_retry_exceed (*bool, optional) {#opensearch-fail_on_putting_template_retry_exceed}
 
-Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on fluentd statup.(default: true) 
+Indicates whether to fail when max_retry_putting_template is exceeded. If you have multiple output plugin, you could use this property to do not fail on Fluentd statup.(default: true) 
 
 Default: true
 
@@ -351,7 +353,7 @@ Default: tag
 
 ### time_parse_error_tag (string, optional) {#opensearch-time_parse_error_tag}
 
-With logstash_format true, OpenSearch plugin parses timestamp field for generating index name. If the record has invalid timestamp value, this plugin emits an error event to @ERROR label with time_parse_error_tag configured tag. 
+With logstash_format true, OpenSearch plugin parses timestamp field for generating index name. If the record has invalid timestamp value, this plugin emits an error event to @ERROR label with `time_parse_error_tag` configured tag. 
 
 Default: -
 
@@ -363,7 +365,7 @@ Default: false
 
 ### pipeline (string, optional) {#opensearch-pipeline}
 
-This param is to set a pipeline id of your OpenSearch to be added into the request, you can configure ingest node. 
+This param is to set a pipeline ID of your OpenSearch to be added into the request, you can configure ingest node. 
 
 Default: -
 
@@ -381,7 +383,7 @@ Default: false
 
 ### sniffer_class_name (string, optional) {#opensearch-sniffer_class_name}
 
-TThe default Sniffer used by the OpenSearch::Transport class works well when Fluentd has a direct connection to all of the OpenSearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The parameter sniffer_class_name gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::OpenSearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. For example, a configuration like this would cause connections to logging-os to reload every 100 operations: https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name 
+The default Sniffer used by the OpenSearch::Transport class works well when Fluentd has a direct connection to all of the OpenSearch servers and can make effective use of the _nodes API. This doesn't work well when Fluentd must connect through a load balancer or proxy. The `sniffer_class_name` parameter gives you the ability to provide your own Sniffer class to implement whatever connection reload logic you require. In addition, there is a new Fluent::Plugin::OpenSearchSimpleSniffer class which reuses the hosts given in the configuration, which is typically the hostname of the load balancer or proxy. For example, a configuration like this would cause connections to logging-os to reload every 100 operations: [https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name](https://github.com/fluent/fluent-plugin-opensearch#sniffer-class-name). 
 
 Default: -
 
@@ -405,7 +407,7 @@ Default: -
 
 ### http_backend (string, optional) {#opensearch-http_backend}
 
-With http_backend typhoeus, opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive.
+With http_backend typhoeus, the opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive.
 
 Default: excon
 
@@ -465,7 +467,7 @@ Default: false
 
 ### custom_headers (string, optional) {#opensearch-custom_headers}
 
-This parameter adds additional headers to request. Example: {"token":"secret"}
+This parameter adds additional headers to request. Example: `{"token":"secret"}`
 
 Default: {}
 
@@ -529,7 +531,7 @@ Default: -
 
 ### slow_flush_log_threshold (string, optional) {#opensearch-slow_flush_log_threshold}
 
-The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the  `fluentd_output_status_slow_flush_count` metric. 
 
 Default: -
 

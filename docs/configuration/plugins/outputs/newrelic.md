@@ -6,20 +6,21 @@ generated_file: true
 
 # New Relic Logs plugin for Fluentd
 ## Overview
- **newrelic** output plugin send log data to New Relic Logs
 
- ## Example output configurations
- ```yaml
- spec:
+Output plugin send log data to New Relic Logs
 
-	newrelic:
-	  license_key:
-	    valueFrom:
-	      secretKeyRef:
-	        name: logging-newrelic
-	        key: licenseKey
+## Example output configurations
 
- ```
+```yaml
+spec:
+  newrelic:
+    license_key:
+      valueFrom:
+        secretKeyRef:
+          name: logging-newrelic
+          key: licenseKey
+```
+
 
 ## Configuration
 ## Output Config

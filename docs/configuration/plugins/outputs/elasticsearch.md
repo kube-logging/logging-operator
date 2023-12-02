@@ -6,25 +6,26 @@ generated_file: true
 
 # Elasticsearch output plugin for Fluentd
 ## Overview
- More info at https://github.com/uken/fluent-plugin-elasticsearch
- >Example Deployment: [Save all logs to ElasticSearch](../../../../quickstarts/es-nginx/)
+ For details, see [https://github.com/uken/fluent-plugin-elasticsearch](https://github.com/uken/fluent-plugin-elasticsearch).
 
- ## Example output configurations
- ```yaml
- spec:
+Example Deployment: [Save all logs to Elasticsearch](../../../../quickstarts/es-nginx/)
 
-	elasticsearch:
-	  host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
-	  port: 9200
-	  scheme: https
-	  ssl_verify: false
-	  ssl_version: TLSv1_2
-	  buffer:
-	    timekey: 1m
-	    timekey_wait: 30s
-	    timekey_use_utc: true
+## Example output configurations
 
- ```
+```yaml
+spec:
+  elasticsearch:
+    host: elasticsearch-elasticsearch-cluster.default.svc.cluster.local
+    port: 9200
+    scheme: https
+    ssl_verify: false
+    ssl_version: TLSv1_2
+    buffer:
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true
+```
+
 
 ## Configuration
 ## Elasticsearch
@@ -33,25 +34,25 @@ Send your logs to Elasticsearch
 
 ### host (string, optional) {#elasticsearch-host}
 
-You can specify Elasticsearch host by this parameter.
+You can specify the Elasticsearch host using this parameter.
 
 Default: localhost
 
 ### port (int, optional) {#elasticsearch-port}
 
-You can specify Elasticsearch port by this parameter.
+You can specify the Elasticsearch port using this parameter.
 
 Default: 9200
 
 ### hosts (string, optional) {#elasticsearch-hosts}
 
-You can specify multiple Elasticsearch hosts with separator ",". If you specify hosts option, host and port options are ignored. 
+You can specify multiple Elasticsearch hosts with separator ",". If you specify the `hosts` option, the `host` and `port` options are ignored. 
 
 Default: -
 
 ### user (string, optional) {#elasticsearch-user}
 
-User for HTTP Basic authentication. This plugin will escape required URL encoded characters within %{} placeholders. e.g. %{demo+} 
+User for HTTP Basic authentication. This plugin will escape required URL encoded characters within `%{}` placeholders, for example, `%{demo+}` 
 
 Default: -
 
@@ -289,7 +290,7 @@ Default: true
 
 ### max_retry_get_es_version (string, optional) {#elasticsearch-max_retry_get_es_version}
 
-You can specify times of retry obtaining Elasticsearch version.
+You can specify the times for retrying to obtain the Elasticsearch version.
 
 Default: 15
 
@@ -307,13 +308,13 @@ Default: true
 
 ### reload_on_failure (bool, optional) {#elasticsearch-reload_on_failure}
 
-Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request, this can be useful to quickly remove a dead node from the list of addresses.
+Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request. This can be useful to quickly remove a dead node from the list of addresses.
 
 Default: false
 
 ### reload_after (string, optional) {#elasticsearch-reload_after}
 
-When reload_connections true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000. 
+When `reload_connections` is true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000. 
 
 Default: -
 

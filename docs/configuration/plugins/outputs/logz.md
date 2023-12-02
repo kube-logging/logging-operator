@@ -6,32 +6,33 @@ generated_file: true
 
 # LogZ output plugin for Fluentd
 ## Overview
- More info at https://github.com/tarokkk/fluent-plugin-logzio
 
- ## Example output configurations
- ```yaml
- spec:
+For details, see [https://github.com/tarokkk/fluent-plugin-logzio](https://github.com/tarokkk/fluent-plugin-logzio).
 
-	logz:
-	  endpoint:
-	    url: https://listener.logz.io
-	    port: 8071
-	    token:
-	      valueFrom:
-	       secretKeyRef:
-	   	  name: logz-token
-	         key: token
-	  output_include_tags: true
-	  output_include_time: true
-	  buffer:
-	    type: file
-	    flush_mode: interval
-	    flush_thread_count: 4
-	    flush_interval: 5s
-	    chunk_limit_size: 16m
-	    queue_limit_length: 4096
+## Example output configurations
 
- ```
+```yaml
+spec:
+  logz:
+    endpoint:
+      url: https://listener.logz.io
+      port: 8071
+      token:
+        valueFrom:
+         secretKeyRef:
+           name: logz-token
+           key: token
+    output_include_tags: true
+    output_include_time: true
+    buffer:
+      type: file
+      flush_mode: interval
+      flush_thread_count: 4
+      flush_interval: 5s
+      chunk_limit_size: 16m
+      queue_limit_length: 4096
+```
+
 
 ## Configuration
 ## Logzio
@@ -100,7 +101,7 @@ Default: -
 
 ### slow_flush_log_threshold (string, optional) {#logzio-slow_flush_log_threshold}
 
-The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric. 
 
 Default: -
 

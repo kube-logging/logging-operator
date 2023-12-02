@@ -16,6 +16,7 @@ package filter
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -37,13 +38,13 @@ type _metaGeoIP interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GeoIP struct {
-	//Specify one or more geoip lookup field which has ip address (default: host)
+	// Specify one or more geoip lookup field which has ip address (default: host)
 	GeoipLookupKeys string `json:"geoip_lookup_keys,omitempty"`
-	//Specify optional geoip database (using bundled GeoLiteCity databse by default)
+	// Specify optional geoip database (using bundled GeoLiteCity databse by default)
 	GeoipDatabase string `json:"geoip_database,omitempty"`
-	//Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default)
+	// Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default)
 	Geoip2Database string `json:"geoip2_database,omitempty"`
-	//Specify backend library (geoip2_c, geoip, geoip2_compat)
+	// Specify backend library (geoip2_c, geoip, geoip2_compat)
 	BackendLibrary string `json:"backend_library,omitempty"`
 	// To avoid get stacktrace error with `[null, null]` array for elasticsearch.
 	SkipAddingNullRecord *bool `json:"skip_adding_null_record,omitempty" plugin:"default:true"`

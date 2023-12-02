@@ -37,37 +37,35 @@ Default: false
 
 ### tls_options (map[string]string, optional) {#output config-tls_options}
 
-TLS Options  - for options see https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12
+TLS Options .
 
-Default: {}
+Default: {}). For details, see [https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12](https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12
 
 
  ## Example `GELF` output configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Output
- metadata:
 
-	name: gelf-output-sample
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: gelf-output-sample
+spec:
+  gelf:
+    host: gelf-host
+    port: 12201
+{{</ highlight >}}
 
-	gelf:
-	  host: gelf-host
-	  port: 12201
+Fluentd config result:
 
- ```
+{{< highlight xml >}}
+<match **>
+	@type gelf
+	@id test_gelf
+	host gelf-host
+	port 12201
+</match>
+{{</ highlight >}}
 
- ## Fluentd Config Result
- ```
-
-	 <match **>
-		@type gelf
-		@id test_gelf
-		host gelf-host
-		port 12201
-	 </match>
-
- ```
 
 ---

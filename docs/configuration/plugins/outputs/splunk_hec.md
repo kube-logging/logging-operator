@@ -6,18 +6,20 @@ generated_file: true
 
 # Splunk via Hec output plugin for Fluentd
 ## Overview
- More info at https://github.com/splunk/fluent-plugin-splunk-hec
 
- ## Example output configurations
- ```yaml
- spec:
+For details, see [https://github.com/splunk/fluent-plugin-splunk-hec](https://github.com/splunk/fluent-plugin-splunk-hec).
 
-	splunkHec:
-	  hec_host: splunk.default.svc.cluster.local
-	  hec_port: 8088
-	  protocol: http
 
- ```
+## Example output configurations
+
+```yaml
+spec:
+  splunkHec:
+    hec_host: splunk.default.svc.cluster.local
+    hec_port: 8088
+    protocol: http
+```
+
 
 ## Configuration
 ## SplunkHecOutput
@@ -56,19 +58,19 @@ Default: -
 
 ### metrics_from_event (*bool, optional) {#splunkhecoutput-metrics_from_event}
 
-When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use metric_name_key and metric_value_key to define metrics. (Default:true) 
+When data_type is set to "metric", the ingest API will treat every key-value pair in the input event as a metric name-value pair. Set metrics_from_event to false to disable this behavior and use `metric_name_key` and `metric_value_key` to define metrics. (Default:true) 
 
 Default: -
 
 ### metric_name_key (string, optional) {#splunkhecoutput-metric_name_key}
 
-Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the metrics_from_event parameter is automatically set to false.
+Field name that contains the metric name. This parameter only works in conjunction with the metrics_from_event parameter. When this prameter is set, the `metrics_from_event` parameter is automatically set to false.
 
 Default: true
 
 ### metric_value_key (string, optional) {#splunkhecoutput-metric_value_key}
 
-Field name that contains the metric value, this parameter is required when metric_name_key is configured. 
+Field name that contains the metric value, this parameter is required when `metric_name_key` is configured. 
 
 Default: -
 
@@ -122,7 +124,7 @@ Default: -
 
 ### sourcetype (string, optional) {#splunkhecoutput-sourcetype}
 
-The sourcetype field for events. When not set, the sourcetype is decided by HEC. Cannot set both source and source_key parameters at the same time. 
+The sourcetype field for events. When not set, the sourcetype is decided by HEC. Cannot set both source and `source_key` parameters at the same time. 
 
 Default: -
 
@@ -134,7 +136,7 @@ Default: -
 
 ### keep_keys (bool, optional) {#splunkhecoutput-keep_keys}
 
-By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in index_key, host_key, source_key, sourcetype_key, metric_name_key, and metric_value_key are saved in the original event. 
+By default, all the fields used by the *_key parameters are removed from the original input events. To change this behavior, set this parameter to true. This parameter is set to false by default. When set to true, all fields defined in `index_key`, `host_key`, `source_key`, `sourcetype_key`, `metric_name_key`, and `metric_value_key` are saved in the original event. 
 
 Default: -
 
@@ -194,7 +196,7 @@ Default: false
 
 ### fields (Fields, optional) {#splunkhecoutput-fields}
 
-In this case, parameters inside <fields> are used as indexed fields and removed from the original input events 
+In this case, parameters inside `<fields>` are used as indexed fields and removed from the original input events 
 
 Default: -
 

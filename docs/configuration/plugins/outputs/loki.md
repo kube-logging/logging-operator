@@ -6,22 +6,23 @@ generated_file: true
 
 # Loki output plugin 
 ## Overview
- Fluentd output plugin to ship logs to a Loki server.
- More info at https://grafana.com/docs/loki/latest/clients/fluentd/
- >Example: [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/)
 
- ## Example output configurations
- ```yaml
- spec:
+Fluentd output plugin to ship logs to a Loki server. For details, see [https://grafana.com/docs/loki/latest/clients/fluentd/](https://grafana.com/docs/loki/latest/clients/fluentd/).
 
-	loki:
-	  url: http://loki:3100
-	  buffer:
-	    timekey: 1m
-	    timekey_wait: 30s
-	    timekey_use_utc: true
+For a detailed example, see [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/).
 
- ```
+## Example output configurations
+
+```yaml
+spec:
+  loki:
+    url: http://loki:3100
+    buffer:
+      timekey: 1m
+      timekey_wait: 30s
+      timekey_use_utc: true
+```
+
 
 ## Configuration
 ## Output Config
@@ -30,7 +31,7 @@ generated_file: true
 
 The url of the Loki server to send logs to.
 
-Default: https://logs-us-west1.grafana.net
+Default: `https://logs-us-west1.grafana.net`
 
 ### username (*secret.Secret, optional) {#output config-username}
 
@@ -130,7 +131,7 @@ Default: -
 
 ### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
 
-The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
+The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric. 
 
 Default: -
 
