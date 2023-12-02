@@ -15,11 +15,11 @@ generated_file: true
 
 parameters for read/write record
 
-Default: ['$.namespace']
+Default: `['$.namespace']`
 
 ### in_pod_path ([]string, optional) {#enhancek8s-in_pod_path}
 
-Default: ['$.pod','$.pod_name']
+Default: `['$.pod','$.pod_name']`
 
 ### data_type (string, optional) {#enhancek8s-data_type}
 
@@ -79,11 +79,11 @@ Default: ['v1']
 
 Kubernetes resources api groups
 
-Default: ["apps/v1", "extensions/v1beta1"]
+Default: `["apps/v1", "extensions/v1beta1"]`
 
 ### ssl_partial_chain (*bool, optional) {#enhancek8s-ssl_partial_chain}
 
-if `ca_file` is for an intermediate CA, or otherwise we do not have the root CA and want to trust the intermediate CA certs we do have, set this to `true` - this corresponds to the openssl s_client -partial_chain flag and X509_V_FLAG_PARTIAL_CHAIN
+If `ca_file` is for an intermediate CA, or otherwise we do not have the root CA and want to trust the intermediate CA certs we do have, set this to `true` - this corresponds to the openssl s_client -partial_chain flag and X509_V_FLAG_PARTIAL_CHAIN
 
 Default: false
 
@@ -112,29 +112,28 @@ Cache refresh variation
 Default: 60*15
 
 
- ## Example `EnhanceK8s` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Logging
- metadata:
 
-	name: demo-flow
+## Example `EnhanceK8s` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: demo-flow
+spec:
+  globalFilters:
+    - enhanceK8s: {}
+{{</ highlight >}}
 
-	globalFilters:
-	  - enhanceK8s: {}
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight xml >}}
+<filter **>
+  @type enhance_k8s_metadata
+  @id test_enhanceK8s
+</filter>
+{{</ highlight >}}
 
-	@type enhance_k8s_metadata
-	@id test_enhanceK8s
-
- </filter>
- ```
 
 ---

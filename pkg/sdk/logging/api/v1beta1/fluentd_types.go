@@ -98,6 +98,7 @@ type FluentdSpec struct {
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
+	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

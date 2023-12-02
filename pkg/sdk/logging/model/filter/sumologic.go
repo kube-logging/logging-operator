@@ -93,7 +93,7 @@ type SumoLogic struct {
 /*
 ## Example `Parser` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -105,17 +105,18 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <filter **>
   @type kubernetes_sumologic
   @id test_sumologic
   source_name elso
 </filter>
-```
+{{</ highlight >}}
 */
 type _expSumologic interface{} //nolint:deadcode,unused
 

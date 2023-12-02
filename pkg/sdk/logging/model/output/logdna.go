@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -61,10 +62,10 @@ type LogDNAOutput struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
+// ## Example `LogDNA` filter configurations
 /*
-## Example `LogDNA` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -77,19 +78,21 @@ spec:
     tags: web,dev
     ingester_domain https://logs.logdna.com
     ingester_endpoint /logs/ingest
-```
+{{</ highlight >}}
 
 Fluentd config result:
 
-```xml
+{{< highlight yaml >}}
 <match **>
-  @type logdna
-  @id test_logdna
-  api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
-  app my-app
-  hostname logging-operator
+
+	@type logdna
+	@id test_logdna
+	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
+	app my-app
+	hostname logging-operator
+
 </match>
-```
+{{</ highlight >}}
 */
 type _expLogDNA interface{} //nolint:deadcode,unused
 

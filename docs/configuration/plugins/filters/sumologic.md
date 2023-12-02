@@ -15,7 +15,7 @@ generated_file: true
 
 Source Category
 
-Default: "%{namespace}/%{pod_name}"
+Default: `%{namespace}/%{pod_name}`
 
 ### source_category_replace_dash (string, optional) {#sumologic-source_category_replace_dash}
 
@@ -33,7 +33,7 @@ Default: kubernetes/
 
 Source Name
 
-Default: "%{namespace}.%{pod}.%{container}"
+Default: `%{namespace}.%{pod}.%{container}`
 
 ### log_format (string, optional) {#sumologic-log_format}
 
@@ -129,37 +129,37 @@ Default: "hostname"
 
 Tracing Label Prefix
 
-Default: "pod_label_"
+Default: `pod_label_`
 
 ### tracing_annotation_prefix (string, optional) {#sumologic-tracing_annotation_prefix}
 
 Tracing Annotation Prefix
 
-Default: "pod_annotation_"
+Default: `pod_annotation_`
 
 ### source_host_key_name (string, optional) {#sumologic-source_host_key_name}
 
 Source HostKey Name
 
-Default: "_sourceHost"
+Default: `_sourceHost`
 
 ### source_category_key_name (string, optional) {#sumologic-source_category_key_name}
 
 Source CategoryKey Name
 
-Default: "_sourceCategory"
+Default: `_sourceCategory`
 
 ### source_name_key_name (string, optional) {#sumologic-source_name_key_name}
 
 Source NameKey Name
 
-Default: "_sourceName"
+Default: `_sourceName`
 
 ### collector_key_name (string, optional) {#sumologic-collector_key_name}
 
 CollectorKey Name
 
-Default: "_collector"
+Default: `_collector`
 
 ### collector_value (string, optional) {#sumologic-collector_value}
 
@@ -168,34 +168,33 @@ Collector Value
 Default: "undefined"
 
 
- ## Example `Parser` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Parser` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - sumologic:
+        source_name: "elso"
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - sumologic:
-	      source_name: "elso"
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight xml >}}
+<filter **>
+  @type kubernetes_sumologic
+  @id test_sumologic
+  source_name elso
+</filter>
+{{</ highlight >}}
 
-	@type kubernetes_sumologic
-	@id test_sumologic
-	source_name elso
-
- </filter>
- ```
 
 ---

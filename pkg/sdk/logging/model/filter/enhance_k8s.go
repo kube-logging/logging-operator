@@ -16,6 +16,7 @@ package filter
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -79,7 +80,7 @@ type EnhanceK8s struct {
 /*
 ## Example `EnhanceK8s` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
 metadata:
@@ -87,16 +88,17 @@ metadata:
 spec:
   globalFilters:
     - enhanceK8s: {}
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <filter **>
   @type enhance_k8s_metadata
   @id test_enhanceK8s
 </filter>
-```
+{{</ highlight >}}
 */
 type _expEnhanceK8s interface{} //nolint:deadcode,unused
 

@@ -23,9 +23,11 @@ type _hugoSumologicHTTP interface{} //nolint:deadcode,unused
 // +docName:"Storing messages in Sumo Logic over http"
 // The `sumologic-http` output sends log records over HTTP to Sumo Logic.
 /*
+The `sumologic-http` output sends log records over HTTP to Sumo Logic. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-options/).
+
 ## Prerequisites
 
-You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/).
+You need a Sumo Logic account to use this output. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/).
 
 ## Example
 
@@ -77,11 +79,11 @@ type SumologicHTTPOutput struct {
 	Collector *secret.Secret `json:"collector,omitempty"`
 	// This option specifies your Sumo Logic deployment.https://help.sumologic.com/APIs/General-API-Information/Sumo-Logic-Endpoints-by-Deployment-and-Firewall-Security  (default: empty)
 	Deployment string `json:"deployment,omitempty"`
-	// Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").  (default: empty)
+	// Custom HTTP headers to include in the request, for example, `headers("HEADER1: header1", "HEADER2: header2")`.  (default: empty)
 	Headers []string `json:"headers,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`
-	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/).
+	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/).
 	TLS *TLS `json:"tls,omitempty"`
 	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
 	DiskBuffer   *DiskBuffer    `json:"disk_buffer,omitempty"`

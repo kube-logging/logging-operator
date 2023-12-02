@@ -16,6 +16,7 @@ package filter
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -45,7 +46,7 @@ type DedotFilterConfig struct {
 
 /*
 ## Example `Dedot` filter configurations
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -58,18 +59,19 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <filter **>
   @type dedot
   @id test_dedot
   de_dot_nested true
   de_dot_separator -
 </filter>
-```
+{{</ highlight >}}
 */
 type _expDedot interface{} //nolint:deadcode,unused
 

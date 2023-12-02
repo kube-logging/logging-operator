@@ -54,7 +54,7 @@ type Throttle struct {
 /*
 ## Example `Throttle` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -66,17 +66,18 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <filter **>
   @type throttle
   @id test_throttle
   group_key $.kubernetes.container_name
 </filter>
-```
+{{</ highlight >}}
 */
 type _expThrottle interface{} //nolint:deadcode,unused
 

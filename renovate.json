@@ -17,10 +17,6 @@
   "constraints": {
     "go": "1.21"
   },
-  "ignoreDeps": [
-    "github.com/shurcooL/vfsgen",
-    "golang.org/x/exp"
-  ],
   "packageRules": [
     {
       "matchPackageNames": ["k8s.io/client-go"],

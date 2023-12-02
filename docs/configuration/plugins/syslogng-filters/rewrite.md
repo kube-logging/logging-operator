@@ -4,90 +4,94 @@ weight: 200
 generated_file: true
 ---
 
-# [Rewrite](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/76#TOPIC-1829205)
+# [Rewrite](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/)
 ## Overview
- Rewrite filters can be used to modify record contents. Logging operator currently supports the following rewrite functions:
 
- - [group_unset](#groupunset)
- - [rename](#rename)
- - [set](#set)
- - [substitute](#subst)
- - [unset](#unset)
+Rewrite filters can be used to modify record contents. Logging operator currently supports the following rewrite functions:
 
- > Note: All rewrite functions support an optional `condition` which has the same syntax as the [match filter](../match/).
+- [group_unset](#groupunset)
+- [rename](#rename)
+- [set](#set)
+- [substitute](#subst)
+- [unset](#unset)
 
- ## Group unset {#groupunset}
+> Note: All rewrite functions support an optional `condition` which has the same syntax as the [match filter](../match/).
 
- The `group_unset` function removes from the record a group of fields matching a pattern.
+For details on how rewrite rules work in syslog-ng, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/).
 
- {{< highlight yaml >}}
+## Group unset {#groupunset}
 
-	filters:
-	- rewrite:
-	  - group_unset:
-	      pattern: "json.kubernetes.annotations.*"
+The `group_unset` function removes from the record a group of fields matching a pattern.
 
- {{</ highlight >}}
+{{< highlight yaml >}}
+  filters:
+  - rewrite:
+    - group_unset:
+        pattern: "json.kubernetes.annotations.*"
+{{</ highlight >}}
 
- ## Rename
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
- The `rename` function changes the name of an existing field name.
+## Rename
 
- {{< highlight yaml >}}
+The `rename` function changes the name of an existing field name.
 
-	filters:
-	- rewrite:
-	  - rename:
-	      oldName: "json.kubernetes.labels.app"
-	      newName: "json.kubernetes.labels.app.kubernetes.io/name"
+{{< highlight yaml >}}
+  filters:
+  - rewrite:
+    - rename:
+        oldName: "json.kubernetes.labels.app"
+        newName: "json.kubernetes.labels.app.kubernetes.io/name"
+{{</ highlight >}}
 
- {{</ highlight >}}
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-rename/).
 
- ## Set
+## Set
 
- The `set` function sets the value of a field.
+The `set` function sets the value of a field.
 
- {{< highlight yaml >}}
+{{< highlight yaml >}}
+  filters:
+  - rewrite:
+    - set:
+        field: "json.kubernetes.cluster"
+        value: "prod-us"
+{{</ highlight >}}
 
-	filters:
-	- rewrite:
-	  - set:
-	      field: "json.kubernetes.cluster"
-	      value: "prod-us"
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-set/).
 
- {{</ highlight >}}
+## Substitute (subst) {#subst}
 
- ## Substitute (subst) {#subst}
+The `subst` function replaces parts of a field with a replacement value based on a pattern.
 
- The `subst` function replaces parts of a field with a replacement value based on a pattern.
+{{< highlight yaml >}}
+  filters:
+  - rewrite:
+    - subst:
+        pattern: "\d\d\d\d-\d\d\d\d-\d\d\d\d-\d\d\d\d"
+        replace: "[redacted bank card number]"
+        field: "MESSAGE"
+{{</ highlight >}}
 
- {{< highlight yaml >}}
+The function also supports the `type` and `flags` fields for specifying pattern type and flags as described in the [match expression regexp function](../match/).
 
-	filters:
-	- rewrite:
-	  - subst:
-	      pattern: "\d\d\d\d-\d\d\d\d-\d\d\d\d-\d\d\d\d"
-	      replace: "[redacted bank card number]"
-	      field: "MESSAGE"
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-replace/).
 
- {{</ highlight >}}
+## Unset
 
- The function also supports the `type` and `flags` fields for specifying pattern type and flags as described in the [match expression regexp function](../match/).
+You can unset macros or fields of the message.
 
- ## Unset
+> Note: Unsetting a field completely deletes any previous value of the field.
 
- You can unset macros or fields of the message.
+{{< highlight yaml >}}
+  filters:
+  - rewrite:
+    - unset:
+        field: "json.kubernetes.cluster"
+{{</ highlight >}}
 
- > Note: Unsetting a field completely deletes any previous value of the field.
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
- {{< highlight yaml >}}
-
-	filters:
-	- rewrite:
-	  - unset:
-	      field: "json.kubernetes.cluster"
-
- {{</ highlight >}}
 
 ## Configuration
 ## RewriteConfig
@@ -115,7 +119,7 @@ Default: -
 
 ## RenameConfig
 
-https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829213
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-rename/).
 
 ### oldName (string, required) {#renameconfig-oldname}
 
@@ -132,7 +136,7 @@ Default: -
 
 ## SetConfig
 
-https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829207
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-set/).
 
 ### field (string, required) {#setconfig-field}
 
@@ -149,7 +153,7 @@ Default: -
 
 ## SubstituteConfig
 
-https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77#TOPIC-1829206
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-set/).
 
 ### pattern (string, required) {#substituteconfig-pattern}
 
@@ -178,7 +182,7 @@ Default: -
 
 ## UnsetConfig
 
-https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
 ### field (string, required) {#unsetconfig-field}
 
@@ -191,7 +195,7 @@ Default: -
 
 ## GroupUnsetConfig
 
-https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/78#TOPIC-1829212
+For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
 ### pattern (string, required) {#groupunsetconfig-pattern}
 

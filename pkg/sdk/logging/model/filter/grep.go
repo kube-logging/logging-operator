@@ -60,7 +60,7 @@ type RegexpSection struct {
 /*
 ## Example `Regexp` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -74,11 +74,12 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
- ```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
   <filter **>
     @type grep
     @id demo-flow_1_grep
@@ -87,7 +88,7 @@ Fluentd config result:
       pattern /^5\d\d$/
     </regexp>
   </filter>
-```
+{{</ highlight >}}
 */
 type _expRegexp interface{} //nolint:deadcode,unused
 
@@ -104,7 +105,7 @@ type ExcludeSection struct {
 /*
 ## Example `Exclude` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -118,11 +119,13 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
- ```
+{{</ highlight >}}
 
-Fluentd config result:
+*/
+/*
+#### Fluentd config result:
 
-```xml
+{{< highlight xml >}}
   <filter **>
     @type grep
     @id demo-flow_0_grep
@@ -131,7 +134,7 @@ Fluentd config result:
       pattern /^5\d\d$/
     </exclude>
   </filter>
-```
+{{</ highlight >}}
 */
 type _expExclude interface{} //nolint:deadcode,unused
 
@@ -148,7 +151,7 @@ type OrSection struct {
 /*
 ## Example `Or` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -166,22 +169,23 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
-    <or>
-      <exclude>
-        key first
-        pattern /^5\d\d$/
-      </exclude>
-      <exclude>
-        key second
-        pattern /\.css$/
-      </exclude>
-    </or>
-```
+{{< highlight xml >}}
+<or>
+	<exclude>
+	key first
+	pattern /^5\d\d$/
+	</exclude>
+	<exclude>
+	key second
+	pattern /\.css$/
+	</exclude>
+</or>
+{{</ highlight >}}
 */
 type _expOR interface{} //nolint:deadcode,unused
 
@@ -198,7 +202,7 @@ type AndSection struct {
 /*
 ## Example `And` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -216,22 +220,23 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+Fluentd #### config result:
 
-Fluentd config result:
-
-```xml
-    <and>
-      <regexp>
-        key first
-        pattern /^5\d\d$/
-      </regexp>
-      <regexp>
-        key second
-        pattern /\.css$/
-      </regexp>
-    </and>
-```
+{{< highlight xml >}}
+	<and>
+	  <regexp>
+	    key first
+	    pattern /^5\d\d$/
+	  </regexp>
+	  <regexp>
+	    key second
+	    pattern /\.css$/
+	  </regexp>
+	</and>
+{{</ highlight >}}
 */
 type _expAND interface{} //nolint:deadcode,unused
 

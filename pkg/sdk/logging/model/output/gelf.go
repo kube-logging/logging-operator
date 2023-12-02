@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -50,10 +51,10 @@ type GELFOutputConfig struct {
 	TLSOptions map[string]string `json:"tls_options,omitempty"`
 }
 
+// ## Example `GELF` output configurations
 /*
-## Example `GELF` output configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -62,18 +63,18 @@ spec:
   gelf:
     host: gelf-host
     port: 12201
-```
+{{</ highlight >}}
 
 Fluentd config result:
 
-```xml
+{{< highlight xml >}}
 <match **>
 	@type gelf
 	@id test_gelf
 	host gelf-host
 	port 12201
 </match>
-```
+{{</ highlight >}}
 */
 type _expGELF interface{} //nolint:deadcode,unused
 

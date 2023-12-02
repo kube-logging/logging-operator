@@ -108,10 +108,10 @@ The threshold for chunk flush performance check. Parameter type is float, not ti
 Default: -
 
 
+ ## Example `File` output configurations
 
-## Example `File` output configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -127,11 +127,11 @@ spec:
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true
-```
+{{</ highlight >}}
 
 Fluentd config result:
 
-```xml
+{{< highlight xml >}}
 <match **>
 	@type syslog_rfc5424
 	@id test_syslog
@@ -151,7 +151,7 @@ Fluentd config result:
 	  timekey_wait 30s
 	</buffer>
 </match>
-```
+{{</ highlight >}}
 
 
 ---

@@ -214,6 +214,10 @@ Default: -
 
 Default: -
 
+### sidecarContainers ([]corev1.Container, optional) {#fluentdspec-sidecarcontainers}
+
+Default: -
+
 
 ## FluentOutLogrotate
 

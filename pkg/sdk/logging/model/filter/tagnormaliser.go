@@ -60,7 +60,7 @@ type TagNormaliser struct {
 /*
 ## Example `Parser` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -72,17 +72,18 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <match kubernetes.**>
   @type tag_normaliser
   @id test_tag_normaliser
   format cluster1.${namespace_name}.${pod_name}.${labels.app}
 </match>
-```
+{{</ highlight >}}
 */
 type _expTagNormaliser interface{} //nolint:deadcode,unused
 

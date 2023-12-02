@@ -53,40 +53,39 @@ Pattern expression to evaluate
 Default: -
 
 
- ## Example `Regexp` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Regexp` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - grep:
+        regexp:
+        - key: first
+          pattern: /^5\d\d$/
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - grep:
-	      regexp:
-	      - key: first
-	        pattern: /^5\d\d$/
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
+{{< highlight xml >}}
+  <filter **>
+    @type grep
+    @id demo-flow_1_grep
+    <regexp>
+      key first
+      pattern /^5\d\d$/
+    </regexp>
+  </filter>
+{{</ highlight >}}
 
-	<filter **>
-	  @type grep
-	  @id demo-flow_1_grep
-	  <regexp>
-	    key first
-	    pattern /^5\d\d$/
-	  </regexp>
-	</filter>
-
- ```
 
 ---
 ## Exclude Directive
@@ -106,40 +105,40 @@ Pattern expression to evaluate
 Default: -
 
 
- ## Example `Exclude` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Exclude` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - grep:
+        exclude:
+        - key: first
+          pattern: /^5\d\d$/
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - grep:
-	      exclude:
-	      - key: first
-	        pattern: /^5\d\d$/
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
 
- #### Fluentd Config Result
- ```yaml
+#### Fluentd config result:
 
-	<filter **>
-	  @type grep
-	  @id demo-flow_0_grep
-	  <exclude>
-	    key first
-	    pattern /^5\d\d$/
-	  </exclude>
-	</filter>
+{{< highlight xml >}}
+  <filter **>
+    @type grep
+    @id demo-flow_0_grep
+    <exclude>
+      key first
+      pattern /^5\d\d$/
+    </exclude>
+  </filter>
+{{</ highlight >}}
 
- ```
 
 ---
 ## Or Directive
@@ -159,46 +158,45 @@ Default: -
 Default: -
 
 
- ## Example `Or` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Or` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - grep:
+        or:
+          - exclude:
+            - key: first
+              pattern: /^5\d\d$/
+            - key: second
+              pattern: /\.css$/
 
-	filters:
-	  - grep:
-	      or:
-	        - exclude:
-	          - key: first
-	            pattern: /^5\d\d$/
-	          - key: second
-	            pattern: /\.css$/
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
+{{< highlight xml >}}
+<or>
+	<exclude>
+	key first
+	pattern /^5\d\d$/
+	</exclude>
+	<exclude>
+	key second
+	pattern /\.css$/
+	</exclude>
+</or>
+{{</ highlight >}}
 
-	<or>
-	  <exclude>
-	    key first
-	    pattern /^5\d\d$/
-	  </exclude>
-	  <exclude>
-	    key second
-	    pattern /\.css$/
-	  </exclude>
-	</or>
-
- ```
 
 ---
 ## And Directive
@@ -218,34 +216,33 @@ Default: -
 Default: -
 
 
- ## Example `And` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `And` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - grep:
+        and:
+          - regexp:
+            - key: first
+              pattern: /^5\d\d$/
+            - key: second
+              pattern: /\.css$/
 
-	filters:
-	  - grep:
-	      and:
-	        - regexp:
-	          - key: first
-	            pattern: /^5\d\d$/
-	          - key: second
-	            pattern: /\.css$/
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+Fluentd #### config result:
 
- #### Fluentd Config Result
- ```yaml
-
+{{< highlight xml >}}
 	<and>
 	  <regexp>
 	    key first
@@ -256,7 +253,7 @@ Default: -
 	    pattern /\.css$/
 	  </regexp>
 	</and>
+{{</ highlight >}}
 
- ```
 
 ---

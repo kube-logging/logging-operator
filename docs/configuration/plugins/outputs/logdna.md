@@ -68,10 +68,10 @@ The threshold for chunk flush performance check. Parameter type is float, not ti
 Default: -
 
 
+ ## Example `LogDNA` filter configurations
 
-## Example `LogDNA` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -84,19 +84,21 @@ spec:
     tags: web,dev
     ingester_domain https://logs.logdna.com
     ingester_endpoint /logs/ingest
-```
+{{</ highlight >}}
 
 Fluentd config result:
 
-```xml
+{{< highlight yaml >}}
 <match **>
-  @type logdna
-  @id test_logdna
-  api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
-  app my-app
-  hostname logging-operator
+
+	@type logdna
+	@id test_logdna
+	api_key xxxxxxxxxxxxxxxxxxxxxxxxxxy
+	app my-app
+	hostname logging-operator
+
 </match>
-```
+{{</ highlight >}}
 
 
 ---

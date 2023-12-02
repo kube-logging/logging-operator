@@ -54,7 +54,7 @@ type RecordModifier struct {
 
 /*
 ## Example `Record Modifier` filter configurations
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -67,11 +67,12 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <filter **>
   @type record_modifier
   @id test_record_modifier
@@ -79,7 +80,7 @@ Fluentd config result:
     foo bar
   </record>
 </filter>
-```
+{{</ highlight >}}
 */
 type _expRecordModifier interface{} //nolint:deadcode,unused
 

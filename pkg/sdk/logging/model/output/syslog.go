@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -73,10 +74,10 @@ type SyslogOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
+// ## Example `File` output configurations
 /*
-## Example `File` output configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Output
 metadata:
@@ -92,11 +93,11 @@ spec:
       timekey: 1m
       timekey_wait: 10s
       timekey_use_utc: true
-```
+{{</ highlight >}}
 
 Fluentd config result:
 
-```xml
+{{< highlight xml >}}
 <match **>
 	@type syslog_rfc5424
 	@id test_syslog
@@ -116,7 +117,7 @@ Fluentd config result:
 	  timekey_wait 30s
 	</buffer>
 </match>
-```
+{{</ highlight >}}
 */
 type _expSyslog interface{} //nolint:deadcode,unused
 

@@ -46,7 +46,7 @@ type KubeEventsTimestampConfig struct {
 /*
 ## Example `Kubernetes Events Timestamp` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -62,18 +62,19 @@ spec:
   selectors: {}
   localOutputRefs:
     - es-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
  <filter **>
  @type kube_events_timestamp
  @id test-kube-events-timestamp
  timestamp_fields ["event.eventTime","event.lastTimestamp","event.firstTimestamp"]
  mapped_time_key mytimefield
  </filter>
-```
+{{</ highlight >}}
 */
 type _expKubeEventsTimestamp interface{} //nolint:deadcode,unused
 

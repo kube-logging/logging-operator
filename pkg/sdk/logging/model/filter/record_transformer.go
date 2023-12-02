@@ -57,7 +57,7 @@ type RecordTransformer struct {
 /*
 ## Example `Record Transformer` filter configurations
 
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -70,11 +70,13 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
 
 Fluentd config result:
 
-```xml
+{{< highlight xml >}}
 <filter **>
   @type record_transformer
   @id test_record_transformer
@@ -82,7 +84,7 @@ Fluentd config result:
     foo bar
   </record>
 </filter>
-```
+{{</ highlight >}}
 */
 type _expRecordTransformer interface{} //nolint:deadcode,unused
 

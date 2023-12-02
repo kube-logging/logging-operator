@@ -16,6 +16,7 @@ package filter
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -70,7 +71,7 @@ type DetectExceptions struct {
 
 /*
 ## Example `Exception Detector` filter configurations
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
@@ -85,11 +86,12 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
+{{</ highlight >}}
+*/
+/*
+#### Fluentd config result:
 
-Fluentd config result:
-
-```xml
+{{< highlight xml >}}
 <match kubernetes.**>
   @type detect_exceptions
   @id test_detect_exceptions
@@ -97,7 +99,7 @@ Fluentd config result:
   multiline_flush_interval 0.1
   remove_tag_prefix kubernetes
 </match>
-```
+{{</ highlight >}}
 */
 type _expDetectExceptions interface{} //nolint:deadcode,unused
 
