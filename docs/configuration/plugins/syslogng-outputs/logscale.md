@@ -9,6 +9,8 @@ generated_file: true
  The `LogScale` output sends log records over HTTP to Falcon's LogScale.
 
 
+Based on the [LogScale destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/). Sends log records over HTTP to Falcon's LogScale.
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
@@ -30,8 +32,6 @@ spec:
       reliable: true
 {{</ highlight >}}
 
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/
-
 
 ## Configuration
 ## LogScaleOutput
@@ -44,7 +44,7 @@ Default: https://cloud.humio.com
 
 ### token (*secret.Secret, optional) {#logscaleoutput-token}
 
-An Ingest Token is a unique string that identifies a repository and allows you to send data to that repository(https://library.humio.com/falcon-logscale/ingesting-data-tokens.html).
+An [Ingest Token](https://library.humio.com/data-analysis/ingesting-data-tokens.html) is a unique string that identifies a repository and allows you to send data to that repository.
 
 Default: empty
 
@@ -58,7 +58,7 @@ Default: empty
 
 A JSON object representing key-value pairs for the Event. These key-value pairs adds structure to Events, making it easier to search. Attributes can be nested JSON objects, however, we recommend limiting the amount of nesting.
 
-Default: "--scope rfc5424 --exclude MESSAGE --exclude DATE --leave-initial-dot"
+Default: `"--scope rfc5424 --exclude MESSAGE --exclude DATE --leave-initial-dot"`
 
 ### timezone (string, optional) {#logscaleoutput-timezone}
 
@@ -76,7 +76,7 @@ Default: empty
 
 This field specifies the content type of the log records being sent to Falcon's LogScale.
 
-Default: "application/json"
+Default: `"application/json"`
 
 ### disk_buffer (*DiskBuffer, optional) {#logscaleoutput-disk_buffer}
 

@@ -22,6 +22,8 @@ type _hugoElasticsearch interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch"
 /*
+Based on the [ElasticSearch destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/).
+
 ## Example
 
 {{< highlight yaml >}}
@@ -41,7 +43,6 @@ spec:
           name: elastic
           key: password
 {{</ highlight >}}
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/
 */
 type _docSElasticsearch interface{} //nolint:deadcode,unused
 
@@ -56,15 +57,15 @@ type ElasticsearchOutput struct {
 	HTTPOutput `json:",inline"`
 	// Name of the data stream, index, or index alias to perform the action on.
 	Index string `json:"index,omitempty"`
-	// The document type associated with the operation. Elasticsearch indices now support a single document type: _doc
+	// The document type associated with the operation. Elasticsearch indices now support a single document type: `_doc`
 	Type *string `json:"type,omitempty"`
 	// The document ID. If no ID is specified, a document ID is automatically generated.
 	CustomID string `json:"custom_id,omitempty"`
-	// Set the prefix for logs in logstash format. If set, then Index field will be ignored.
+	// Set the prefix for logs in logstash format. If set, then the Index field will be ignored.
 	LogstashPrefix string `json:"logstash_prefix,omitempty" syslog-ng:"ignore"`
 	// Set the separator between LogstashPrefix and LogStashDateformat. Default: "-"
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty" syslog-ng:"ignore"`
-	// Set the suffix for logs in logstash format. Default: "${YEAR}.${MONTH}.${DAY}"
+	// Set the suffix for logs in logstash format. Default: `"${YEAR}.${MONTH}.${DAY}"`
 	LogStashSuffix string `json:"logstash_suffix,omitempty" syslog-ng:"ignore"`
 }
 

@@ -24,6 +24,8 @@ type _hugoS3 interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to a S3 (compatible) server"
 /*
+Sends messages from a local network to a S3 (compatible) server. For more information, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/).
+
 ## Example
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -47,9 +49,7 @@ spec:
     object_key: "path/to/my-logs/${HOST}"
 {{</ highlight >}}
 
-For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
-
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/
+For available macros like `$PROGRAM` and `$HOST`,  see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/).
 */
 type _docS3 interface{} //nolint:deadcode,unused
 

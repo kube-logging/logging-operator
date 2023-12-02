@@ -8,9 +8,11 @@ generated_file: true
 ## Overview
  The `sumologic-http` output sends log records over HTTP to Sumo Logic.
 
+The `sumologic-http` output sends log records over HTTP to Sumo Logic. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-options/).
+
 ## Prerequisites
 
-You need a Sumo Logic account to use this output. For details, see the [syslog-ng documentation](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/).
+You need a Sumo Logic account to use this output. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/).
 
 ## Example
 
@@ -66,7 +68,7 @@ Default: empty
 
 ### headers ([]string, optional) {#sumologichttpoutput-headers}
 
-Custom HTTP headers to include in the request, for example, headers("HEADER1: header1", "HEADER2: header2").
+Custom HTTP headers to include in the request, for example, `headers("HEADER1: header1", "HEADER2: header2")`.
 
 Default: empty
 
@@ -78,7 +80,7 @@ Default: 60
 
 ### tls (*TLS, optional) {#sumologichttpoutput-tls}
 
-This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](/docs/configuration/plugins/syslog-ng-outputs/tls/). 
+This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/). 
 
 Default: -
 
