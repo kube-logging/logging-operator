@@ -19,9 +19,9 @@ package output
 type _hugoMQTT interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to an MQTT broker"
-//
-// ## Prerequisites
 /*
+Sends messages from a local network to an MQTT broker. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/).
+
 # Example
 
 {{< highlight yaml >}}
@@ -35,8 +35,6 @@ spec:
     address: tcp://mosquitto:1883
     topic: test/demo
 {{</ highlight >}}
-
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/
 */
 type _docMQTT interface{} //nolint:deadcode,unused
 
@@ -54,7 +52,7 @@ type MQTT struct {
 	Topic string `json:"topic,omitempty"`
 	// fallback-topic is used when syslog-ng cannot post a message to the originally defined topic (which can include invalid characters coming from templates).
 	FallbackTopic string `json:"fallback-topic,omitempty"`
-	// Template where you can configure the message template sent to the MQTT broker. By default, the template is: “$ISODATE $HOST $MSGHDR$MSG”
+	// Template where you can configure the message template sent to the MQTT broker. By default, the template is: `$ISODATE $HOST $MSGHDR$MSG`
 	Template string `json:"template,omitempty"`
 	// qos stands for quality of service and can take three values in the MQTT world. Its default value is 0, where there is no guarantee that the message is ever delivered.
 	QOS int `json:"qos,omitempty"`

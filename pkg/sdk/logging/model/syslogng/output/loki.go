@@ -24,7 +24,10 @@ type _hugoLoki interface{} //nolint:deadcode,unused
 
 // +docName:"Sending messages to Loki over gRPC"
 /*
+Sends messages to Grafana Loki over gRPC, based on the [Loki destination of AxoSyslog Core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/).
+
 ## Example
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGOutput
@@ -61,9 +64,9 @@ type _metaLoki interface{} //nolint:deadcode,unused
 type LokiOutput struct {
 	// Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth
 	Auth *Auth `json:"auth,omitempty"`
-	// Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: {"app" : "$PROGRAM"}
+	// Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: `{"app" : "$PROGRAM"}`
 	Labels filter.ArrowMap `json:"labels,omitempty"`
-	// Specifies the hostname or IP address and optionally the port number of the  service that can receive log data via gRPC. Use a colon (:) after the address to specify the port number of the server. For example: grpc://127.0.0.1:8000
+	// Specifies the hostname or IP address and optionally the port number of the  service that can receive log data via gRPC. Use a colon (:) after the address to specify the port number of the server. For example: `grpc://127.0.0.1:8000`
 	URL string `json:"url,omitempty"`
 	// The time to wait in seconds before a dead connection is reestablished. (default: 60)
 	TimeReopen int `json:"time_reopen,omitempty"`

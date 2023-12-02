@@ -7,7 +7,7 @@ generated_file: true
 # Disk buffer configuration
 ## Overview
  The parameters of the syslog-ng disk buffer. Using a disk buffer on the output helps avoid message loss in case of a system failure on the destination side.
- More info at https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338
+ For details on how [syslog-ng disk buffers work, see the documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/).
 
 ## Configuration
 ## DiskBuffer

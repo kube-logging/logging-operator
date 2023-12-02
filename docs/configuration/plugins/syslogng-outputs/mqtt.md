@@ -7,7 +7,7 @@ generated_file: true
 # Sending messages from a local network to an MQTT broker
 ## Overview
 
- ## Prerequisites
+Sends messages from a local network to an MQTT broker. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/).
 
 # Example
 
@@ -22,8 +22,6 @@ spec:
     address: tcp://mosquitto:1883
     topic: test/demo
 {{</ highlight >}}
-
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/
 
 
 ## Configuration
@@ -49,7 +47,7 @@ Default: -
 
 ### template (string, optional) {#mqtt-template}
 
-Template where you can configure the message template sent to the MQTT broker. By default, the template is: “$ISODATE $HOST $MSGHDR$MSG” 
+Template where you can configure the message template sent to the MQTT broker. By default, the template is: `$ISODATE $HOST $MSGHDR$MSG` 
 
 Default: -
 

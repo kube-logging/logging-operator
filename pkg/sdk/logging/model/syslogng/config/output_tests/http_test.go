@@ -106,6 +106,32 @@ func TestHTTPOutputTable(t *testing.T) {
 `,
 		},
 		{
+			name: "test_tls_version",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-http-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					HTTP: &output.HTTPOutput{
+						URL:     "test.local",
+						Headers: []string{"a:b", "c:d"},
+						Batch: output.Batch{
+							BatchLines: 2000,
+						},
+						Workers: 3,
+						TLS: &output.TLS{
+							SslVersion: "tlsv1_3",
+						},
+					},
+				},
+			},
+			config: `destination "output_default_test-http-out" {
+	http(url("test.local") headers("a:b" "c:d") tls(ssl_version("tlsv1_3")) batch-lines(2000) workers(3) persist_name("output_default_test-http-out"));
+};
+`,
+		},
+		{
 			name: "test_fifo_size",
 			output: v1beta1.SyslogNGOutput{
 				ObjectMeta: metav1.ObjectMeta{

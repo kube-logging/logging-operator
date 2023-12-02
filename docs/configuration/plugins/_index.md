@@ -57,7 +57,7 @@ For more information please click on the plugin name
 | **[SumoLogic](outputs/sumologic/)** | outputs | Send your logs to Sumologic | GA | [1.8.0](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.8.0) |
 | **[Syslog](outputs/syslog/)** | outputs | Output plugin writes events to syslog | GA | [0.9.0.rc.8](https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424) |
 | **[Syslog-NG Match](syslogng-filters/match/)** | syslogng-filters | Selectively keep records | GA | [more info](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/65#TOPIC-1829159) |
-| **[Syslog-NG Parser](syslogng-filters/parser/)** | syslogng-filters | Parse data from records | GA | [more info](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.36/administration-guide/90) |
+| **[Syslog-NG Parser](syslogng-filters/parser/)** | syslogng-filters | Parse data from records | GA | [more info](https://axoflow.com/docs/axosyslog-core/chapter-parsers/) |
 | **[Syslog-NG Rewrite](syslogng-filters/rewrite/)** | syslogng-filters | Rewrite parts of the message | GA | [more info](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77) |
 | **[Authentication config for syslog-ng outputs](syslogng-outputs/auth/)** | syslogng-outputs | Authentication config for syslog-ng outputs | Testing | []() |
 | **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338) |
