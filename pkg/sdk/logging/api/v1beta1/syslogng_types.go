@@ -64,13 +64,13 @@ type SyslogNGTLS struct {
 }
 
 type GlobalOptions struct {
-	// deprecated use stats/level from 4.1+
+	// Deprecated. Use stats/level from 4.1+
 	StatsLevel *int `json:"stats_level,omitempty"`
-	// deprecated use stats/freq from 4.1+
+	// Deprecated. Use stats/freq from 4.1+
 	StatsFreq *int `json:"stats_freq,omitempty"`
-	// Stats https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats
+	// See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats).
 	Stats *Stats `json:"stats,omitempty"`
-	// Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level
+	// See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level).
 	LogLevel *string `json:"log_level,omitempty"`
 }
 

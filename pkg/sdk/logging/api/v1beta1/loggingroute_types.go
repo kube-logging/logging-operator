@@ -30,8 +30,8 @@ type LoggingRouteSpec struct {
 	// Source identifies the logging that this policy applies to
 	Source string `json:"source"`
 
-	// Targets refers to the list of logging resources specified by a label selector to forward logs to
-	// Filtering of namespaces will happen based on the watchNamespaces and watchNamespaceSelector fields of the target logging resource
+	// Targets refers to the list of logging resources specified by a label selector to forward logs to.
+	// Filtering of namespaces will happen based on the watchNamespaces and watchNamespaceSelector fields of the target logging resource.
 	Targets metav1.LabelSelector `json:"targets"`
 }
 

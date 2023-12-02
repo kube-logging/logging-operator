@@ -1,0 +1,15 @@
+daemonset:
+  enabled: true
+config:
+  sources:
+    kubernetes:
+      enabled: true
+      prefix: "k8s#"
+      keyDelimiter: "#"
+  destinations:
+    network:
+    - transport: tcp
+      address: logging-syslog-ng.logging.svc.cluster.local
+      port: 601
+      template: "$(format-json --key-delimiter # --scope all-nv-pairs)\n"
+      extraOptionsRaw: "time-reopen(10)"

@@ -94,7 +94,7 @@ Default: "cluster.local."
 
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}
 
-Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
+Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. 
 
 Default: -
 
@@ -121,7 +121,7 @@ Default: -
 
 ### strategy (ConfigCheckStrategy, optional) {#configcheck-strategy}
 
-Select the config check strategy to use. `DryRun`: parse and validate configuration `StartWithTimeout`: start with given configuration and exit after specified timeout Default: `DryRun` 
+Select the config check strategy to use. `DryRun`: Parse and validate configuration. `StartWithTimeout`: Start with given configuration and exit after specified timeout. Default: `DryRun` 
 
 Default: -
 

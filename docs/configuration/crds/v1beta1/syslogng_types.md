@@ -98,25 +98,25 @@ Default: -
 
 ### stats_level (*int, optional) {#globaloptions-stats_level}
 
-deprecated use stats/level from 4.1+ 
+Deprecated. Use stats/level from 4.1+ 
 
 Default: -
 
 ### stats_freq (*int, optional) {#globaloptions-stats_freq}
 
-deprecated use stats/freq from 4.1+ 
+Deprecated. Use stats/freq from 4.1+ 
 
 Default: -
 
 ### stats (*Stats, optional) {#globaloptions-stats}
 
-Stats https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats 
+See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats). 
 
 Default: -
 
 ### log_level (*string, optional) {#globaloptions-log_level}
 
-Log level https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level 
+See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level). 
 
 Default: -
 
