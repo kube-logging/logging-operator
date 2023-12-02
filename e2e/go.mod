@@ -6,9 +6,9 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.32.0
-	github.com/kube-logging/logging-operator v0.0.0-20231121122147-3e95d3e054ea
+	github.com/kube-logging/logging-operator v0.0.0-20231202165825-3ecf5dabc669
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
-	github.com/spf13/cast v1.5.1
+	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
 	helm.sh/helm/v3 v3.13.2
 	k8s.io/api v0.28.4
