@@ -61,61 +61,59 @@ Additional labels for this metric
 Default: -
 
 
- ## Example `Prometheus` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Prometheus` filter configurations
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - tag_normaliser: {}
+    - parser:
+        remove_key_name_field: true
+        reserve_data: true
+        parse:
+          type: nginx
+    - prometheus:
+        metrics:
+        - name: total_counter
+          desc: The total number of foo in message.
+          type: counter
+          labels:
+            foo: bar
+        labels:
+          host: ${hostname}
+          tag: ${tag}
+          namespace: $.kubernetes.namespace
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
- spec:
 
-	filters:
-	  - tag_normaliser: {}
-	  - parser:
-	      remove_key_name_field: true
-	      reserve_data: true
-	      parse:
-	        type: nginx
-	  - prometheus:
-	      metrics:
-	      - name: total_counter
-	        desc: The total number of foo in message.
-	        type: counter
-	        labels:
-	          foo: bar
-	      labels:
-	        host: ${hostname}
-	        tag: ${tag}
-	        namespace: $.kubernetes.namespace
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
+#### Fluentd config result:
 
- ```
+{{< highlight xml>}}
+  <filter **>
+    @type prometheus
+    @id logging-demo-flow_2_prometheus
+    <metric>
+      desc The total number of foo in message.
+      name total_counter
+      type counter
+      <labels>
+        foo bar
+      </labels>
+    </metric>
+    <labels>
+      host ${hostname}
+      namespace $.kubernetes.namespace
+      tag ${tag}
+    </labels>
+  </filter>
+{{</ highlight >}}
 
- #### Fluentd Config Result
- ```
-
-	<filter **>
-	  @type prometheus
-	  @id logging-demo-flow_2_prometheus
-	  <metric>
-	    desc The total number of foo in message.
-	    name total_counter
-	    type counter
-	    <labels>
-	      foo bar
-	    </labels>
-	  </metric>
-	  <labels>
-	    host ${hostname}
-	    namespace $.kubernetes.namespace
-	    tag ${tag}
-	  </labels>
-	</filter>
-
- ```
 
 ---

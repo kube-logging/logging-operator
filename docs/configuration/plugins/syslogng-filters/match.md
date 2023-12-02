@@ -6,21 +6,23 @@ generated_file: true
 
 # Match
 ## Overview
- Match filters can be used to select the log records to process. These filters have the same options and syntax as the [syslog-ng flow match expressions]({{< relref "/docs/configuration/plugins/syslog-ng-filters/match.md" >}}).
-
-{{< highlight yaml >}}
-  filters:
-  - match:
-      or:
-      - regexp:
-          value: json.kubernetes.labels.app.kubernetes.io/name
-          pattern: apache
-          type: string
-      - regexp:
-          value: json.kubernetes.labels.app.kubernetes.io/name
-          pattern: nginx
-          type: string
-{{</ highlight >}} 
+ Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/configuration/plugins/syslogng-filters/match.md" >}}).
+//
+// {{< highlight yaml >}}
+//
+//	filters:
+//	- match:
+//	    or:
+//	    - regexp:
+//	        value: json.kubernetes.labels.app.kubernetes.io/name
+//	        pattern: apache
+//	        type: string
+//	    - regexp:
+//	        value: json.kubernetes.labels.app.kubernetes.io/name
+//	        pattern: nginx
+//	        type: string
+//
+// {{</ highlight >}} 
 
 ## Configuration
 ## MatchExpr

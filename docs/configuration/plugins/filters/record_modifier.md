@@ -13,7 +13,7 @@ generated_file: true
 
 ### prepare_value (string, optional) {#recordmodifier-prepare_value}
 
-Prepare values for filtering in configure phase. Prepared values can be used in <record>. You can write any ruby code. 
+Prepare values for filtering in configure phase. Prepared values can be used in `<record>`. You can write any ruby code. 
 
 Default: -
 
@@ -48,38 +48,36 @@ Add records docs at: https://github.com/repeatedly/fluent-plugin-record-modifier
 Default: -
 
 
- ## Example `Record Modifier` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Record Modifier` filter configurations
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - record_modifier:
+        records:
+        - foo: "bar"
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
- spec:
 
-	filters:
-	  - record_modifier:
-	      records:
-	      - foo: "bar"
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
+#### Fluentd config result:
 
- ```
+{{< highlight xml >}}
+<filter **>
+  @type record_modifier
+  @id test_record_modifier
+  <record>
+    foo bar
+  </record>
+</filter>
+{{</ highlight >}}
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
-
-	@type record_modifier
-	@id test_record_modifier
-	<record>
-	  foo bar
-	</record>
-
- </filter>
- ```
 
 ---
 ## [Replace Directive](https://github.com/repeatedly/fluent-plugin-record-modifier#replace_keys_value)

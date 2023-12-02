@@ -1,3 +1,9 @@
+---
+title: Throttle
+weight: 200
+generated_file: true
+---
+
 # [Throttle Filter](https://github.com/rubrikinc/fluent-plugin-throttle)
 ## Overview
  A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group.
@@ -42,34 +48,33 @@ When a group reaches its limit and as long as it is not reset, a warning message
 Default: 10 seconds
 
 
- ## Example `Throttle` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Throttle` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - throttle:
+        group_key: "$.kubernetes.container_name"
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - throttle:
-	      group_key: "$.kubernetes.container_name"
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
+#### Fluentd config result:
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+{{< highlight xml >}}
+<filter **>
+  @type throttle
+  @id test_throttle
+  group_key $.kubernetes.container_name
+</filter>
+{{</ highlight >}}
 
-	@type throttle
-	@id test_throttle
-	group_key $.kubernetes.container_name
-
- </filter>
- ```
 
 ---

@@ -52,7 +52,7 @@ type Concat struct {
 	ContinuousLineRegexp string `json:"continuous_line_regexp,omitempty"`
 	//The key to determine which stream an event belongs to.
 	StreamIdentityKey string `json:"stream_identity_key,omitempty"`
-	//The number of seconds after which the last received event log will be flushed. If specified 0, wait for next line forever.
+	//The number of seconds after which the last received event log is flushed. If set to 0, flushing is disabled (wait for next line forever).
 	FlushInterval int `json:"flush_interval,omitempty"`
 	//The label name to handle events caused by timeout.
 	TimeoutLabel string `json:"timeout_label,omitempty"`
@@ -78,39 +78,38 @@ type Concat struct {
 	PartialCriStreamKey string `json:"partial_cri_stream_key,omitempty"`
 }
 
-// ## Example `Concat` filter configurations
-// ```yaml
-// apiVersion: logging.banzaicloud.io/v1beta1
-// kind: Flow
-// metadata:
-//
-//	name: demo-flow
-//
-// spec:
-//
-//	filters:
-//	  - concat:
-//	      partial_key: "partial_message"
-//	      separator: ""
-//	      n_lines: 10
-//	selectors: {}
-//	localOutputRefs:
-//	  - demo-output
-//
-// ```
-//
-// #### Fluentd Config Result
-// ```yaml
-// <filter **>
-//
-//	@type concat
-//	@id test_concat
-//	key message
-//	n_lines 10
-//	partial_key partial_message
-//
-// </filter>
-// ```
+/*
+## Example `Concat` filter configurations
+
+// {{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - concat:
+        partial_key: "partial_message"
+        separator: ""
+        n_lines: 10
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+// {{< /highlight >}}
+*/
+/*
+#### Fluentd config result:
+
+{{< highlight xml >}}
+<filter **>
+  @type concat
+  @id test_concat
+  key message
+  n_lines 10
+  partial_key partial_message
+</filter>
+{{< /highlight >}}
+*/
 type _expConcat interface{} //nolint:deadcode,unused
 
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

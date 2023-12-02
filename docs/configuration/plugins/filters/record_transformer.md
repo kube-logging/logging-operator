@@ -37,7 +37,7 @@ Default: -
 
 ### enable_ruby (bool, optional) {#recordtransformer-enable_ruby}
 
-When set to true, the full Ruby syntax is enabled in the ${...} expression.
+When set to true, the full Ruby syntax is enabled in the `${...}` expression.
 
 Default: false
 
@@ -54,37 +54,37 @@ Add records docs at: https://docs.fluentd.org/filter/record_transformer Records 
 Default: -
 
 
- ## Example `Record Transformer` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Record Transformer` filter configurations
 
- spec:
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - record_transformer:
+        records:
+        - foo: "bar"
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
-	filters:
-	  - record_transformer:
-	      records:
-	      - foo: "bar"
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
 
- ```
 
- #### Fluentd Config Result
- ```yaml
- <filter **>
+Fluentd config result:
 
-	@type record_transformer
-	@id test_record_transformer
-	<record>
-	  foo bar
-	</record>
+{{< highlight xml >}}
+<filter **>
+  @type record_transformer
+  @id test_record_transformer
+  <record>
+    foo bar
+  </record>
+</filter>
+{{</ highlight >}}
 
- </filter>
- ```
 
 ---

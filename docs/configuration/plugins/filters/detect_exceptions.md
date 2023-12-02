@@ -45,7 +45,7 @@ Default: nil
 
 Programming languages for which to detect exceptions.
 
-Default: []
+Default: `[]`
 
 ### max_lines (int, optional) {#detectexceptions-max_lines}
 
@@ -75,42 +75,40 @@ Default: false
 
 Tag used in match directive.
 
-Default: kubernetes.**
+Default: `kubernetes.**`
 
 
- ## Example `Exception Detector` filter configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Flow
- metadata:
 
-	name: demo-flow
+## Example `Exception Detector` filter configurations
+{{< highlight yaml >}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: demo-flow
+spec:
+  filters:
+    - detectExceptions:
+        multiline_flush_interval: 0.1
+        languages:
+          - java
+          - python
+  selectors: {}
+  localOutputRefs:
+    - demo-output
+{{</ highlight >}}
 
- spec:
 
-	filters:
-	  - detectExceptions:
-	      multiline_flush_interval: 0.1
-	      languages:
-	        - java
-	        - python
-	selectors: {}
-	localOutputRefs:
-	  - demo-output
+#### Fluentd config result:
 
- ```
+{{< highlight xml >}}
+<match kubernetes.**>
+  @type detect_exceptions
+  @id test_detect_exceptions
+  languages ["java","python"]
+  multiline_flush_interval 0.1
+  remove_tag_prefix kubernetes
+</match>
+{{</ highlight >}}
 
- #### Fluentd Config Result
- ```yaml
- <match kubernetes.**>
-
-	@type detect_exceptions
-	@id test_detect_exceptions
-	languages ["java","python"]
-	multiline_flush_interval 0.1
-	remove_tag_prefix kubernetes
-
- </match>
- ```
 
 ---
