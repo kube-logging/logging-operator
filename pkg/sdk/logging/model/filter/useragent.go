@@ -16,6 +16,7 @@ package filter
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -37,25 +38,23 @@ type _metaUserAgent interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type UserAgent struct {
-	//Target key name (default: user_agent)
+	// Target key name (default: user_agent)
 	KeyName string `json:"key_name,omitempty"`
-	//Delete input key (default: false)
+	// Delete input key (default: false)
 	DeleteKey bool `json:"delete_key,omitempty"`
-	//Output prefix key name (default: ua)
+	// Output prefix key name (default: ua)
 	OutKey string `json:"out_key,omitempty"`
-	//Join hashed data by '_' (default: false)
+	// Join hashed data by '_' (default: false)
 	Flatten bool `json:"flatten,omitempty"`
 }
 
+// ## Example `UserAgent` filter configurations
 /*
-## Example `UserAgent` filter configurations
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
-
   name: demo-flow
-
 spec:
   filters:
     - useragent:
@@ -66,12 +65,10 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
-*/
-// +docName:"Fluentd Config Result"
-/*
+{{</ highlight >}}
+
 ## Fluentd Config Result
-```xml
+{{< highlight xml >}}
 <filter **>
   @type ua_parser
   @id test_useragent
@@ -80,7 +77,7 @@ spec:
   out_key ua_fields
   flatten true
 </filter>
-```
+{{</ highlight >}}
 */
 type _expUserAgent interface{} //nolint:deadcode,unused
 

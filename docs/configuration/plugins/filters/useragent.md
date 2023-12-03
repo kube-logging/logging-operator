@@ -37,15 +37,13 @@ Output prefix key name
 Default: ua
 
 
+ ## Example `UserAgent` filter configurations
 
-## Example `UserAgent` filter configurations
-```yaml
+{{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
-
   name: demo-flow
-
 spec:
   filters:
     - useragent:
@@ -56,11 +54,10 @@ spec:
   selectors: {}
   localOutputRefs:
     - demo-output
-```
-
+{{</ highlight >}}
 
 ## Fluentd Config Result
-```xml
+{{< highlight xml >}}
 <filter **>
   @type ua_parser
   @id test_useragent
@@ -69,7 +66,7 @@ spec:
   out_key ua_fields
   flatten true
 </filter>
-```
+{{</ highlight >}}
 
 
 ---
