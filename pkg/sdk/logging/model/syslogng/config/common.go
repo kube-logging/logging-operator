@@ -18,15 +18,16 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/siliconbrain/go-seqs/seqs"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
-	"github.com/siliconbrain/go-seqs/seqs"
-	"golang.org/x/exp/slices"
 )
 
 func renderAny(value any, secretLoader secret.SecretLoader) []render.Renderer {
@@ -131,7 +132,7 @@ func renderValue(value reflect.Value, secretLoader secret.SecretLoader) []render
 		for _, f := range fs {
 			renderField(f, secretLoader, &nonPos, &posArgs)
 		}
-		slices.SortFunc(posArgs, func(a, b posArg) bool { return a.pos < b.pos })
+		sort.Slice(posArgs, func(a, b int) bool { return posArgs[a].pos < posArgs[b].pos })
 		var res []render.Renderer
 		for _, a := range posArgs {
 			res = append(res, a.rnds...)

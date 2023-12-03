@@ -17,6 +17,7 @@ package fluentbit
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"emperror.dev/errors"
@@ -70,9 +71,18 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 		}
 	}
 
+	sort.Slice(tenants, func(i, j int) bool {
+		return tenants[i].Name < tenants[j].Name
+	})
 	// Make sure our tenant list is stable
-	slices.SortStableFunc(tenants, func(a, b Tenant) bool {
-		return a.Name < b.Name
+	slices.SortStableFunc(tenants, func(a, b Tenant) int {
+		if a.Name < b.Name {
+			return -1
+		}
+		if a.Name == b.Name {
+			return 0
+		}
+		return 1
 	})
 
 	return tenants, nil
