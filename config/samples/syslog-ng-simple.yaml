@@ -1,0 +1,46 @@
+kind: Logging
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: logging
+spec:
+  controlNamespace: default
+  fluentbit: {}
+  syslogNG:
+    globalOptions:
+      log_level: trace
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all1
+spec:
+  match: {}
+  localOutputRefs:
+    - http
+    - http2
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all2
+spec:
+  match: {}
+  localOutputRefs:
+    - http
+    - http2
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http
+spec:
+  file:
+    path: "/tmp/log"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: http2
+spec:
+  file:
+    path: "/tmp/log"
