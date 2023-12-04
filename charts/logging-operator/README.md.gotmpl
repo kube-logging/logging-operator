@@ -10,7 +10,9 @@ This chart bootstraps a [Logging Operator](https://github.com/kube-logging/loggi
 
 ## Installing CRDs
 
-Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+Use `createCustomResource=false` (deprecated) with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+The prefered way is to install the crds via the subchart.
+This could be disabled by setting `crds.enabled=false`.
 
 {{ template "chart.valuesSection" . }}
 

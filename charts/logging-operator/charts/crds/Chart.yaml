@@ -1,0 +1,7 @@
+apiVersion: v2
+type: application
+name: crds
+version: 0.0.0
+appVersion: latest
+description: Logging-operator CRDs.
+home: https://kube-logging.github.io

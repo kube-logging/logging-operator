@@ -142,7 +142,7 @@ manager: codegen fmt vet ## Build manager binary
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
-	cp config/crd/bases/* charts/logging-operator/crds/
+	cp config/crd/bases/* charts/logging-operator/charts/crds/templates/
 	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml
 	cat config/rbac/role.yaml | sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | sed -e '/creationTimestamp/d' | cat >> ./charts/logging-operator/templates/clusterrole.yaml
 	echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml

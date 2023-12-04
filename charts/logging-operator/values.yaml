@@ -37,6 +37,10 @@ annotations: {}
 # -- Deploy CRDs used by Logging Operator.
 createCustomResource: false
 
+# -- Deploy CRDs as subchart.
+crds:
+  enabled: true
+
 http:
   # -- HTTP listen port number.
   port: 8080

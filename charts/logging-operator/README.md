@@ -28,7 +28,9 @@ This chart bootstraps a [Logging Operator](https://github.com/kube-logging/loggi
 
 ## Installing CRDs
 
-Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+Use `createCustomResource=false` (deprecated) with Helm v3 to avoid trying to create CRDs from the `crds` folder and from templates at the same time.
+The prefered way is to install the crds via the subchart.
+This could be disabled by setting `crds.enabled=false`.
 
 ## Values
 
@@ -48,6 +50,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | namespaceOverride | string | `""` | A namespace override for the app. |
 | annotations | object | `{}` | Define annotations for logging-operator pods. |
 | createCustomResource | bool | `false` | Deploy CRDs used by Logging Operator. |
+| crds | object | `{"enabled":true}` | Deploy CRDs as subchart. |
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
