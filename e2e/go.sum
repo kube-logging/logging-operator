@@ -59,8 +59,8 @@ github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5P
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/cisco-open/k8s-objectmatcher v1.9.0 h1:/sfuO0BD09fpynZjXsqeZrh28Juc4VEwc2P6Ov/Q6fM=
 github.com/cisco-open/k8s-objectmatcher v1.9.0/go.mod h1:CH4E6qAK+q+JwKFJn0DaTNqxrbmWCaDQzGthKLK4nZ0=
-github.com/cisco-open/operator-tools v0.32.0 h1:CGBCnfQNIq1SUo5Cfabk/NFugNx3X5HerxDVNpHoEvQ=
-github.com/cisco-open/operator-tools v0.32.0/go.mod h1:dknM0Is0/QUaslpzNbtQvlJPfboVXAmCjRgLJpAfcsI=
+github.com/cisco-open/operator-tools v0.33.0 h1:qkzuZGUOTAVgGgdQSYqXVfDgKUfmYdzAggb5k/e07LQ=
+github.com/cisco-open/operator-tools v0.33.0/go.mod h1:VN11Q9V6JK+GoEX8dIa3a493nayOK9i4NV5xp7+zmYk=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/containerd/cgroups v1.1.0 h1:v8rEWFl6EoqHB+swVNjVoCJE8o3jX7e8nqBGPLaDFBM=
 github.com/containerd/cgroups v1.1.0/go.mod h1:6ppBcbh/NOOUU+dMKrykgaBnK9lCIBxHqJDGwsa1mIw=

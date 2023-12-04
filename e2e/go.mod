@@ -5,7 +5,7 @@ go 1.21
 require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/cisco-open/operator-tools v0.32.0
+	github.com/cisco-open/operator-tools v0.33.0
 	github.com/kube-logging/logging-operator v0.0.0-20231202165825-3ecf5dabc669
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/spf13/cast v1.6.0
