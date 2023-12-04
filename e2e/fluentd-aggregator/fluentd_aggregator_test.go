@@ -89,6 +89,9 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
+					Image: v1beta1.ImageSpec{
+						Tag: "v1.16-base",
+					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),

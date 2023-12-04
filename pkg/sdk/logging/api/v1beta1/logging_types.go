@@ -167,7 +167,7 @@ const (
 	DefaultFluentbitBufferVolumeImageTag        = "v0.7.1"
 	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                      = "v1.15-ruby3"
+	DefaultFluentdImageTag                      = "v1.16-full"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag            = "v0.2.1"
