@@ -15,13 +15,11 @@ generated_file: true
 
 Destination host 
 
-Default: -
 
 ### port (int, required) {#output config-port}
 
 Destination host port 
 
-Default: -
 
 ### protocol (string, optional) {#output config-protocol}
 

@@ -8,75 +8,59 @@ generated_file: true
 
 SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 
-### loggingRef (string, optional) {#syslogngoutputspec-loggingref}
+### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
 
-Default: -
-
-### loggly (*output.Loggly, optional) {#syslogngoutputspec-loggly}
-
-Default: -
-
-### syslog (*output.SyslogOutput, optional) {#syslogngoutputspec-syslog}
-
-Default: -
 
 ### file (*output.FileOutput, optional) {#syslogngoutputspec-file}
 
-Default: -
-
-### mqtt (*output.MQTT, optional) {#syslogngoutputspec-mqtt}
-
-Default: -
-
-### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
-
-Default: -
-
-### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
-
-Default: -
-
-### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
-
-Default: -
-
-### sumologic-syslog (*output.SumologicSyslogOutput, optional) {#syslogngoutputspec-sumologic-syslog}
-
-Default: -
 
 ### http (*output.HTTPOutput, optional) {#syslogngoutputspec-http}
 
-Default: -
-
-### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
-
-Default: -
 
 ### logscale (*output.LogScaleOutput, optional) {#syslogngoutputspec-logscale}
 
-Default: -
 
-### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
+### loggingRef (string, optional) {#syslogngoutputspec-loggingref}
 
-Default: -
+
+### loggly (*output.Loggly, optional) {#syslogngoutputspec-loggly}
+
 
 ### loki (*output.LokiOutput, optional) {#syslogngoutputspec-loki}
 
 Available in Logging operator version 4.4 and later. 
 
-Default: -
 
-### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+### mqtt (*output.MQTT, optional) {#syslogngoutputspec-mqtt}
 
-Available in Logging operator version 4.4 and later. 
 
-Default: -
+### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
+
 
 ### openobserve (*output.OpenobserveOutput, optional) {#syslogngoutputspec-openobserve}
 
 Available in Logging operator version 4.5 and later. 
 
-Default: -
+
+### redis (*output.RedisOutput, optional) {#syslogngoutputspec-redis}
+
+
+### s3 (*output.S3Output, optional) {#syslogngoutputspec-s3}
+
+Available in Logging operator version 4.4 and later. 
+
+
+### splunk_hec_event (*output.SplunkHECOutput, optional) {#syslogngoutputspec-splunk_hec_event}
+
+
+### sumologic-http (*output.SumologicHTTPOutput, optional) {#syslogngoutputspec-sumologic-http}
+
+
+### sumologic-syslog (*output.SumologicSyslogOutput, optional) {#syslogngoutputspec-sumologic-syslog}
+
+
+### syslog (*output.SyslogOutput, optional) {#syslogngoutputspec-syslog}
+
 
 
 ## SyslogNGOutput
@@ -85,19 +69,15 @@ SyslogNGOutput is the Schema for the syslog-ng outputs API
 
 ###  (metav1.TypeMeta, required) {#syslogngoutput-}
 
-Default: -
 
 ### metadata (metav1.ObjectMeta, optional) {#syslogngoutput-metadata}
 
-Default: -
 
 ### spec (SyslogNGOutputSpec, optional) {#syslogngoutput-spec}
 
-Default: -
 
 ### status (SyslogNGOutputStatus, optional) {#syslogngoutput-status}
 
-Default: -
 
 
 ## SyslogNGOutputList
@@ -106,14 +86,11 @@ SyslogNGOutputList contains a list of SyslogNGOutput
 
 ###  (metav1.TypeMeta, required) {#syslogngoutputlist-}
 
-Default: -
 
 ### metadata (metav1.ListMeta, optional) {#syslogngoutputlist-metadata}
 
-Default: -
 
 ### items ([]SyslogNGOutput, required) {#syslogngoutputlist-items}
 
-Default: -
 
 

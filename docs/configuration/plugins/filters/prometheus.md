@@ -11,54 +11,46 @@ generated_file: true
 ## Configuration
 ## PrometheusConfig
 
+### labels (Label, optional) {#prometheusconfig-labels}
+
+
 ### metrics ([]MetricSection, optional) {#prometheusconfig-metrics}
 
 [Metrics Section](#metrics-section) 
 
-Default: -
-
-### labels (Label, optional) {#prometheusconfig-labels}
-
-Default: -
 
 
 ## Metrics Section
-
-### name (string, required) {#metrics section-name}
-
-Metrics name 
-
-Default: -
-
-### type (string, required) {#metrics section-type}
-
-Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counter-type), [gauge](https://github.com/fluent/fluent-plugin-prometheus#gauge-type), [summary](https://github.com/fluent/fluent-plugin-prometheus#summary-type), [histogram](https://github.com/fluent/fluent-plugin-prometheus#histogram-type) 
-
-Default: -
-
-### desc (string, required) {#metrics section-desc}
-
-Description of metric 
-
-Default: -
-
-### key (string, optional) {#metrics section-key}
-
-Key name of record for instrumentation. 
-
-Default: -
 
 ### buckets (string, optional) {#metrics section-buckets}
 
 Buckets of record for instrumentation 
 
-Default: -
+
+### desc (string, required) {#metrics section-desc}
+
+Description of metric 
+
+
+### key (string, optional) {#metrics section-key}
+
+Key name of record for instrumentation. 
+
 
 ### labels (Label, optional) {#metrics section-labels}
 
 Additional labels for this metric 
 
-Default: -
+
+### name (string, required) {#metrics section-name}
+
+Metrics name 
+
+
+### type (string, required) {#metrics section-type}
+
+Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counter-type), [gauge](https://github.com/fluent/fluent-plugin-prometheus#gauge-type), [summary](https://github.com/fluent/fluent-plugin-prometheus#summary-type), [histogram](https://github.com/fluent/fluent-plugin-prometheus#histogram-type) 
+
 
 
  ## Example `Prometheus` filter configurations

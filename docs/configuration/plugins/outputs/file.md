@@ -11,23 +11,36 @@ generated_file: true
 ## Configuration
 ## FileOutputConfig
 
-### path (string, required) {#fileoutputconfig-path}
-
-The Path of the file. The actual path is path + time + ".log" by default. 
-
-Default: -
-
-### append (bool, optional) {#fileoutputconfig-append}
-
-The flushed chunk is appended to existence file or not. The default is not appended. 
-
-Default: -
-
 ### add_path_suffix (*bool, optional) {#fileoutputconfig-add_path_suffix}
 
 Add path suffix(default: true) 
 
 Default: true
+
+### append (bool, optional) {#fileoutputconfig-append}
+
+The flushed chunk is appended to existence file or not. The default is not appended. 
+
+
+### buffer (*Buffer, optional) {#fileoutputconfig-buffer}
+
+[Buffer](../buffer/) 
+
+
+### compress (string, optional) {#fileoutputconfig-compress}
+
+Compresses flushed files using gzip. No compression is performed by default. 
+
+
+### format (*Format, optional) {#fileoutputconfig-format}
+
+[Format](../format/) 
+
+
+### path (string, required) {#fileoutputconfig-path}
+
+The Path of the file. The actual path is path + time + ".log" by default. 
+
 
 ### path_suffix (string, optional) {#fileoutputconfig-path_suffix}
 
@@ -35,41 +48,22 @@ The suffix of output result.
 
 Default: ".log"
 
-### symlink_path (bool, optional) {#fileoutputconfig-symlink_path}
-
-Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.
-
-Default: false
-
-### compress (string, optional) {#fileoutputconfig-compress}
-
-Compresses flushed files using gzip. No compression is performed by default. 
-
-Default: -
-
 ### recompress (bool, optional) {#fileoutputconfig-recompress}
 
 Performs compression again even if the buffer chunk is already compressed.
 
 Default: false
 
-### format (*Format, optional) {#fileoutputconfig-format}
-
-[Format](../format/) 
-
-Default: -
-
-### buffer (*Buffer, optional) {#fileoutputconfig-buffer}
-
-[Buffer](../buffer/) 
-
-Default: -
-
 ### slow_flush_log_threshold (string, optional) {#fileoutputconfig-slow_flush_log_threshold}
 
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
-Default: -
+
+### symlink_path (bool, optional) {#fileoutputconfig-symlink_path}
+
+Create symlink to temporary buffered file when buffer_type is file. This is useful for tailing file content to check logs.
+
+Default: false
 
 
  ## Example `File` output configurations

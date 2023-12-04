@@ -12,41 +12,37 @@ generated_file: true
 ## Configuration
 ## GeoIP
 
+### backend_library (string, optional) {#geoip-backend_library}
+
+Specify backend library (geoip2_c, geoip, geoip2_compat) 
+
+
+### geoip2_database (string, optional) {#geoip-geoip2_database}
+
+Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default) 
+
+
+### geoip_database (string, optional) {#geoip-geoip_database}
+
+Specify optional geoip database (using bundled GeoLiteCity databse by default) 
+
+
 ### geoip_lookup_keys (string, optional) {#geoip-geoip_lookup_keys}
 
 Specify one or more geoip lookup field which has ip address
 
 Default: host
 
-### geoip_database (string, optional) {#geoip-geoip_database}
+### records ([]Record, optional) {#geoip-records}
 
-Specify optional geoip database (using bundled GeoLiteCity databse by default) 
+Records are represented as maps: `key: value` 
 
-Default: -
-
-### geoip2_database (string, optional) {#geoip-geoip2_database}
-
-Specify optional geoip2 database (using bundled GeoLite2-City.mmdb by default) 
-
-Default: -
-
-### backend_library (string, optional) {#geoip-backend_library}
-
-Specify backend library (geoip2_c, geoip, geoip2_compat) 
-
-Default: -
 
 ### skip_adding_null_record (*bool, optional) {#geoip-skip_adding_null_record}
 
 To avoid get stacktrace error with `[null, null]` array for elasticsearch. 
 
 Default: true
-
-### records ([]Record, optional) {#geoip-records}
-
-Records are represented as maps: `key: value` 
-
-Default: -
 
 
 

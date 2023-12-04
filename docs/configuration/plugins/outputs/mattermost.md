@@ -25,17 +25,26 @@ spec:
 ## Configuration
 ## Output Config
 
-### webhook_url (*secret.Secret, required) {#output config-webhook_url}
+### ca_path (*secret.Secret, optional) {#output config-ca_path}
 
-Incoming Webhook URI (Required for Incoming Webhook mode). 
+The path of the CA certificates. 
 
-Default: -
 
 ### channel_id (string, optional) {#output config-channel_id}
 
 The ID of the channel where you want to receive the information. 
 
-Default: -
+
+### enable_tls (*bool, optional) {#output config-enable_tls}
+
+You can set the communication channel if it uses TLS.
+
+Default: true
+
+### message (string, optional) {#output config-message}
+
+The message you want to send. It can be a static message, which you add at this point, or you can receive the Fluentd infos with the %s 
+
 
 ### message_color (string, optional) {#output config-message_color}
 
@@ -49,22 +58,9 @@ The title you want to add to the message.
 
 Default: fluent_title_default
 
-### message (string, optional) {#output config-message}
+### webhook_url (*secret.Secret, required) {#output config-webhook_url}
 
-The message you want to send. It can be a static message, which you add at this point, or you can receive the Fluentd infos with the %s 
+Incoming Webhook URI (Required for Incoming Webhook mode). 
 
-Default: -
-
-### enable_tls (*bool, optional) {#output config-enable_tls}
-
-You can set the communication channel if it uses TLS.
-
-Default: true
-
-### ca_path (*secret.Secret, optional) {#output config-ca_path}
-
-The path of the CA certificates. 
-
-Default: -
 
 

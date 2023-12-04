@@ -98,111 +98,90 @@ For details, see the [documentation of the AxoSyslog syslog-ng distribution](htt
 
 ### group_unset (*GroupUnsetConfig, optional) {#rewriteconfig-group_unset}
 
-Default: -
 
 ### rename (*RenameConfig, optional) {#rewriteconfig-rename}
 
-Default: -
 
 ### set (*SetConfig, optional) {#rewriteconfig-set}
 
-Default: -
 
 ### subst (*SubstituteConfig, optional) {#rewriteconfig-subst}
 
-Default: -
 
 ### unset (*UnsetConfig, optional) {#rewriteconfig-unset}
 
-Default: -
 
 
 ## RenameConfig
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-rename/).
 
-### oldName (string, required) {#renameconfig-oldname}
+### condition (*MatchExpr, optional) {#renameconfig-condition}
 
-Default: -
 
 ### newName (string, required) {#renameconfig-newname}
 
-Default: -
 
-### condition (*MatchExpr, optional) {#renameconfig-condition}
+### oldName (string, required) {#renameconfig-oldname}
 
-Default: -
 
 
 ## SetConfig
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-set/).
 
+### condition (*MatchExpr, optional) {#setconfig-condition}
+
+
 ### field (string, required) {#setconfig-field}
 
-Default: -
 
 ### value (string, required) {#setconfig-value}
 
-Default: -
-
-### condition (*MatchExpr, optional) {#setconfig-condition}
-
-Default: -
 
 
 ## SubstituteConfig
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-set/).
 
-### pattern (string, required) {#substituteconfig-pattern}
+### condition (*MatchExpr, optional) {#substituteconfig-condition}
 
-Default: -
-
-### replace (string, required) {#substituteconfig-replace}
-
-Default: -
 
 ### field (string, required) {#substituteconfig-field}
 
-Default: -
 
 ### flags ([]string, optional) {#substituteconfig-flags}
 
-Default: -
+
+### pattern (string, required) {#substituteconfig-pattern}
+
+
+### replace (string, required) {#substituteconfig-replace}
+
 
 ### type (string, optional) {#substituteconfig-type}
 
-Default: -
-
-### condition (*MatchExpr, optional) {#substituteconfig-condition}
-
-Default: -
 
 
 ## UnsetConfig
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
-### field (string, required) {#unsetconfig-field}
-
-Default: -
-
 ### condition (*MatchExpr, optional) {#unsetconfig-condition}
 
-Default: -
+
+### field (string, required) {#unsetconfig-field}
+
 
 
 ## GroupUnsetConfig
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 
-### pattern (string, required) {#groupunsetconfig-pattern}
-
-Default: -
-
 ### condition (*MatchExpr, optional) {#groupunsetconfig-condition}
 
-Default: -
+
+### pattern (string, required) {#groupunsetconfig-pattern}
+
 
 

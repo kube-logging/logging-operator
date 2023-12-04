@@ -23,77 +23,15 @@ This plugin will poll events from MNS queue and extract object keys from these e
 ## Configuration
 ## Output Config
 
-### endpoint (string, required) {#output config-endpoint}
-
-OSS endpoint to connect to' 
-
-Default: -
-
-### bucket (string, required) {#output config-bucket}
-
-Your bucket name 
-
-Default: -
-
 ### access_key_id (*secret.Secret, required) {#output config-access_key_id}
 
 Your access key id [Secret](../secret/) 
 
-Default: -
 
 ### access_key_secret (*secret.Secret, required) {#output config-access_key_secret}
 
 Your access secret key [Secret](../secret/) 
 
-Default: -
-
-### path (string, optional) {#output config-path}
-
-Path prefix of the files on OSS
-
-Default: fluent/logs
-
-### upload_crc_enable (bool, optional) {#output config-upload_crc_enable}
-
-Upload crc enabled
-
-Default: true
-
-### download_crc_enable (bool, optional) {#output config-download_crc_enable}
-
-Download crc enabled
-
-Default: true
-
-### open_timeout (int, optional) {#output config-open_timeout}
-
-Timeout for open connections
-
-Default: 10
-
-### read_timeout (int, optional) {#output config-read_timeout}
-
-Timeout for read response
-
-Default: 120
-
-### oss_sdk_log_dir (string, optional) {#output config-oss_sdk_log_dir}
-
-OSS SDK log directory
-
-Default: /var/log/td-agent
-
-### key_format (string, optional) {#output config-key_format}
-
-The format of OSS object keys
-
-Default: `%{path}/%{time_slice}_%{index}_%{thread_id}.%{file_extension}`
-
-### store_as (string, optional) {#output config-store_as}
-
-Archive format on OSS: gzip, json, text, lzo, lzma2
-
-Default: gzip
 
 ### auto_create_bucket (bool, optional) {#output config-auto_create_bucket}
 
@@ -101,11 +39,15 @@ desc 'Create OSS bucket if it does not exists
 
 Default: false
 
-### overwrite (bool, optional) {#output config-overwrite}
+### bucket (string, required) {#output config-bucket}
 
-Overwrite already existing path
+Your bucket name 
 
-Default: false
+
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
 
 ### check_bucket (bool, optional) {#output config-check_bucket}
 
@@ -119,6 +61,22 @@ Check object before creation
 
 Default: true
 
+### download_crc_enable (bool, optional) {#output config-download_crc_enable}
+
+Download crc enabled
+
+Default: true
+
+### endpoint (string, required) {#output config-endpoint}
+
+OSS endpoint to connect to' 
+
+
+### format (*Format, optional) {#output config-format}
+
+[Format](../format/) 
+
+
 ### hex_random_length (int, optional) {#output config-hex_random_length}
 
 The length of `%{hex_random}` placeholder(4-16)
@@ -131,28 +89,62 @@ Default: 4
 
 Default: %d
 
-### warn_for_delay (string, optional) {#output config-warn_for_delay}
+### key_format (string, optional) {#output config-key_format}
 
-Given a threshold to treat events as delay, output warning logs if delayed events were put into OSS 
+The format of OSS object keys
 
-Default: -
+Default: `%{path}/%{time_slice}_%{index}_%{thread_id}.%{file_extension}`
 
-### format (*Format, optional) {#output config-format}
+### open_timeout (int, optional) {#output config-open_timeout}
 
-[Format](../format/) 
+Timeout for open connections
 
-Default: -
+Default: 10
 
-### buffer (*Buffer, optional) {#output config-buffer}
+### oss_sdk_log_dir (string, optional) {#output config-oss_sdk_log_dir}
 
-[Buffer](../buffer/) 
+OSS SDK log directory
 
-Default: -
+Default: /var/log/td-agent
+
+### overwrite (bool, optional) {#output config-overwrite}
+
+Overwrite already existing path
+
+Default: false
+
+### path (string, optional) {#output config-path}
+
+Path prefix of the files on OSS
+
+Default: fluent/logs
+
+### read_timeout (int, optional) {#output config-read_timeout}
+
+Timeout for read response
+
+Default: 120
 
 ### slow_flush_log_threshold (string, optional) {#output config-slow_flush_log_threshold}
 
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric. 
 
-Default: -
+
+### store_as (string, optional) {#output config-store_as}
+
+Archive format on OSS: gzip, json, text, lzo, lzma2
+
+Default: gzip
+
+### upload_crc_enable (bool, optional) {#output config-upload_crc_enable}
+
+Upload crc enabled
+
+Default: true
+
+### warn_for_delay (string, optional) {#output config-warn_for_delay}
+
+Given a threshold to treat events as delay, output warning logs if delayed events were put into OSS 
+
 
 

@@ -74,6 +74,5 @@ Using the relabel output also makes it possible to pass the messages emitted by 
 
 Specifies new label for events 
 
-Default: -
 
 

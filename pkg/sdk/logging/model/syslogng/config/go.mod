@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/cisco-open/operator-tools v0.32.0
+	github.com/cisco-open/operator-tools v0.33.0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/siliconbrain/go-seqs v0.8.1
 	github.com/stretchr/testify v1.8.4

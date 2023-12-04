@@ -65,29 +65,30 @@ For details, see the [documentation of the AxoSyslog syslog-ng distribution](htt
 ## Configuration
 ## HTTPOutput
 
-### url (string, optional) {#httpoutput-url}
+###  (Batch, required) {#httpoutput-}
 
-Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: `http://127.0.0.1:8000` 
+Batching parameters 
 
-Default: -
 
-### headers ([]string, optional) {#httpoutput-headers}
+### body (string, optional) {#httpoutput-body}
 
-Custom HTTP headers to include in the request, for example, `headers("HEADER1: header1", "HEADER2: header2")`.
+The body of the HTTP request, for example, `body("${ISODATE} ${MESSAGE}")`. You can use strings, macros, and template functions in the body. If not set, it will contain the message received from the source by default. 
 
-Default: empty
 
-### time_reopen (int, optional) {#httpoutput-time_reopen}
+### body-prefix (string, optional) {#httpoutput-body-prefix}
 
-The time to wait in seconds before a dead connection is reestablished.
+The string syslog-ng OSE puts at the beginning of the body of the HTTP request, before the log message. 
 
-Default: 60
 
-### tls (*TLS, optional) {#httpoutput-tls}
+### body-suffix (string, optional) {#httpoutput-body-suffix}
 
-This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/). 
+The string syslog-ng OSE puts to the end of the body of the HTTP request, after the log message. 
 
-Default: -
+
+### delimiter (string, optional) {#httpoutput-delimiter}
+
+By default, syslog-ng OSE separates the log messages of the batch with a newline character. 
+
 
 ### disk_buffer (*DiskBuffer, optional) {#httpoutput-disk_buffer}
 
@@ -95,115 +96,94 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default: false
 
-###  (Batch, required) {#httpoutput-}
+### headers ([]string, optional) {#httpoutput-headers}
 
-Batching parameters 
+Custom HTTP headers to include in the request, for example, `headers("HEADER1: header1", "HEADER2: header2")`.
 
-Default: -
-
-### body (string, optional) {#httpoutput-body}
-
-The body of the HTTP request, for example, `body("${ISODATE} ${MESSAGE}")`. You can use strings, macros, and template functions in the body. If not set, it will contain the message received from the source by default. 
-
-Default: -
-
-### body-prefix (string, optional) {#httpoutput-body-prefix}
-
-The string syslog-ng OSE puts at the beginning of the body of the HTTP request, before the log message. 
-
-Default: -
-
-### body-suffix (string, optional) {#httpoutput-body-suffix}
-
-The string syslog-ng OSE puts to the end of the body of the HTTP request, after the log message. 
-
-Default: -
-
-### delimiter (string, optional) {#httpoutput-delimiter}
-
-By default, syslog-ng OSE separates the log messages of the batch with a newline character. 
-
-Default: -
-
-### method (string, optional) {#httpoutput-method}
-
-Specifies the HTTP method to use when sending the message to the server. `POST | PUT` 
-
-Default: -
-
-### retries (int, optional) {#httpoutput-retries}
-
-The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches `retries`, then drops the message. 
-
-Default: -
-
-### user (string, optional) {#httpoutput-user}
-
-The username that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
-
-Default: -
-
-### password (secret.Secret, optional) {#httpoutput-password}
-
-The password that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
-
-Default: -
-
-### user-agent (string, optional) {#httpoutput-user-agent}
-
-The value of the USER-AGENT header in the messages sent to the server. 
-
-Default: -
-
-### workers (int, optional) {#httpoutput-workers}
-
-Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination. 
-
-Default: -
-
-### persist_name (string, optional) {#httpoutput-persist_name}
-
-If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
-
-Default: -
+Default: empty
 
 ### log-fifo-size (int, optional) {#httpoutput-log-fifo-size}
 
 The number of messages that the output queue can store. 
 
-Default: -
 
-### timeout (int, optional) {#httpoutput-timeout}
+### method (string, optional) {#httpoutput-method}
 
-Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. 
+Specifies the HTTP method to use when sending the message to the server. `POST | PUT` 
 
-Default: -
+
+### password (secret.Secret, optional) {#httpoutput-password}
+
+The password that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
+
+
+### persist_name (string, optional) {#httpoutput-persist_name}
+
+If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+
 
 ### response-action (filter.RawArrowMap, optional) {#httpoutput-response-action}
 
 Specifies what syslog-ng does with the log message, based on the response code received from the HTTP server. See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#response-action) for more information. 
 
-Default: -
+
+### retries (int, optional) {#httpoutput-retries}
+
+The number of times syslog-ng OSE attempts to send a message to this destination. If syslog-ng OSE could not send a message, it will try again until the number of attempts reaches `retries`, then drops the message. 
+
+
+### tls (*TLS, optional) {#httpoutput-tls}
+
+This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/). 
+
+
+### time_reopen (int, optional) {#httpoutput-time_reopen}
+
+The time to wait in seconds before a dead connection is reestablished.
+
+Default: 60
+
+### timeout (int, optional) {#httpoutput-timeout}
+
+Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. 
+
+
+### url (string, optional) {#httpoutput-url}
+
+Specifies the hostname or IP address and optionally the port number of the web service that can receive log data via HTTP. Use a colon (:) after the address to specify the port number of the server. For example: `http://127.0.0.1:8000` 
+
+
+### user (string, optional) {#httpoutput-user}
+
+The username that syslog-ng OSE uses to authenticate on the server where it sends the messages. 
+
+
+### user-agent (string, optional) {#httpoutput-user-agent}
+
+The value of the USER-AGENT header in the messages sent to the server. 
+
+
+### workers (int, optional) {#httpoutput-workers}
+
+Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to send messages to the server. Increasing the number of worker threads can drastically improve the performance of the destination. 
+
 
 
 ## Batch
-
-### batch-lines (int, optional) {#batch-batch-lines}
-
-Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set `batch-lines()` to 100, syslog-ng OSE waits for 100 messages. 
-
-Default: -
 
 ### batch-bytes (int, optional) {#batch-batch-bytes}
 
 Description: Sets the maximum size of payload in a batch. If the size of the messages reaches this value, syslog-ng OSE sends the batch to the destination even if the number of messages is less than the value of the `batch-lines()` option. Note that if the `batch-timeout()` option is enabled and the queue becomes empty, syslog-ng OSE flushes the messages only if `batch-timeout()` expires, or the batch reaches the limit set in batch-bytes(). 
 
-Default: -
+
+### batch-lines (int, optional) {#batch-batch-lines}
+
+Description: Specifies how many lines are flushed to a destination in one batch. The syslog-ng OSE application waits for this number of lines to accumulate and sends them off in a single batch. Increasing this number increases throughput as more messages are sent in a single batch, but also increases message latency. For example, if you set `batch-lines()` to 100, syslog-ng OSE waits for 100 messages. 
+
 
 ### batch-timeout (int, optional) {#batch-batch-timeout}
 
 Description: Specifies the time syslog-ng OSE waits for lines to accumulate in the output buffer. The syslog-ng OSE application sends batches to the destinations evenly. The timer starts when the first message arrives to the buffer, so if only few messages arrive, syslog-ng OSE sends messages to the destination at most once every `batch-timeout()` milliseconds. 
 
-Default: -
 
 

@@ -15,7 +15,6 @@ generated_file: true
 
 This is the option of stdout format. 
 
-Default: -
 
 
 

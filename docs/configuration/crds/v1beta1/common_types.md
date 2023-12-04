@@ -8,21 +8,17 @@ generated_file: true
 
 ImageSpec struct hold information about image specification
 
-### repository (string, optional) {#imagespec-repository}
+### imagePullSecrets ([]corev1.LocalObjectReference, optional) {#imagespec-imagepullsecrets}
 
-Default: -
-
-### tag (string, optional) {#imagespec-tag}
-
-Default: -
 
 ### pullPolicy (string, optional) {#imagespec-pullpolicy}
 
-Default: -
 
-### imagePullSecrets ([]corev1.LocalObjectReference, optional) {#imagespec-imagepullsecrets}
+### repository (string, optional) {#imagespec-repository}
 
-Default: -
+
+### tag (string, optional) {#imagespec-tag}
+
 
 
 ## Metrics
@@ -31,35 +27,27 @@ Metrics defines the service monitor endpoints
 
 ### interval (string, optional) {#metrics-interval}
 
-Default: -
-
-### timeout (string, optional) {#metrics-timeout}
-
-Default: -
-
-### port (int32, optional) {#metrics-port}
-
-Default: -
 
 ### path (string, optional) {#metrics-path}
 
-Default: -
 
-### serviceMonitor (bool, optional) {#metrics-servicemonitor}
+### port (int32, optional) {#metrics-port}
 
-Default: -
-
-### serviceMonitorConfig (ServiceMonitorConfig, optional) {#metrics-servicemonitorconfig}
-
-Default: -
 
 ### prometheusAnnotations (bool, optional) {#metrics-prometheusannotations}
 
-Default: -
 
 ### prometheusRules (bool, optional) {#metrics-prometheusrules}
 
-Default: -
+
+### serviceMonitor (bool, optional) {#metrics-servicemonitor}
+
+
+### serviceMonitorConfig (ServiceMonitorConfig, optional) {#metrics-servicemonitorconfig}
+
+
+### timeout (string, optional) {#metrics-timeout}
+
 
 
 ## BufferMetrics
@@ -68,11 +56,9 @@ BufferMetrics defines the service monitor endpoints
 
 ###  (Metrics, required) {#buffermetrics-}
 
-Default: -
 
 ### mount_name (string, optional) {#buffermetrics-mount_name}
 
-Default: -
 
 
 ## ServiceMonitorConfig
@@ -81,94 +67,74 @@ ServiceMonitorConfig defines the ServiceMonitor properties
 
 ### additionalLabels (map[string]string, optional) {#servicemonitorconfig-additionallabels}
 
-Default: -
 
 ### honorLabels (bool, optional) {#servicemonitorconfig-honorlabels}
 
-Default: -
-
-### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
-
-Default: -
 
 ### metricRelabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-metricrelabelings}
 
-Default: -
+
+### relabelings ([]*v1.RelabelConfig, optional) {#servicemonitorconfig-relabelings}
+
 
 ### scheme (string, optional) {#servicemonitorconfig-scheme}
 
-Default: -
 
 ### tlsConfig (*v1.TLSConfig, optional) {#servicemonitorconfig-tlsconfig}
 
-Default: -
 
 
 ## Security
 
 Security defines Fluentd, FluentbitAgent deployment security properties
 
-### serviceAccount (string, optional) {#security-serviceaccount}
+### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
 
-Default: -
-
-### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
-
-Default: -
 
 ### podSecurityPolicyCreate (bool, optional) {#security-podsecuritypolicycreate}
 
-Default: -
+
+### roleBasedAccessControlCreate (*bool, optional) {#security-rolebasedaccesscontrolcreate}
+
 
 ### securityContext (*corev1.SecurityContext, optional) {#security-securitycontext}
 
-Default: -
 
-### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
+### serviceAccount (string, optional) {#security-serviceaccount}
 
-Default: -
 
 
 ## ReadinessDefaultCheck
 
 ReadinessDefaultCheck Enable default readiness checks
 
+### bufferFileNumber (bool, optional) {#readinessdefaultcheck-bufferfilenumber}
+
+
+### bufferFileNumberMax (int32, optional) {#readinessdefaultcheck-bufferfilenumbermax}
+
+
 ### bufferFreeSpace (bool, optional) {#readinessdefaultcheck-bufferfreespace}
 
 Enable default Readiness check it'll fail if the buffer volume free space exceeds the `readinessDefaultThreshold` percentage (90%). 
 
-Default: -
 
 ### bufferFreeSpaceThreshold (int32, optional) {#readinessdefaultcheck-bufferfreespacethreshold}
 
-Default: -
-
-### bufferFileNumber (bool, optional) {#readinessdefaultcheck-bufferfilenumber}
-
-Default: -
-
-### bufferFileNumberMax (int32, optional) {#readinessdefaultcheck-bufferfilenumbermax}
-
-Default: -
-
-### initialDelaySeconds (int32, optional) {#readinessdefaultcheck-initialdelayseconds}
-
-Default: -
-
-### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
-
-Default: -
-
-### periodSeconds (int32, optional) {#readinessdefaultcheck-periodseconds}
-
-Default: -
-
-### successThreshold (int32, optional) {#readinessdefaultcheck-successthreshold}
-
-Default: -
 
 ### failureThreshold (int32, optional) {#readinessdefaultcheck-failurethreshold}
 
-Default: -
+
+### initialDelaySeconds (int32, optional) {#readinessdefaultcheck-initialdelayseconds}
+
+
+### periodSeconds (int32, optional) {#readinessdefaultcheck-periodseconds}
+
+
+### successThreshold (int32, optional) {#readinessdefaultcheck-successthreshold}
+
+
+### timeoutSeconds (int32, optional) {#readinessdefaultcheck-timeoutseconds}
+
 
 
