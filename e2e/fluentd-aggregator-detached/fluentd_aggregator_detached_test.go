@@ -92,7 +92,7 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 
-		fluentd := v1beta1.Fluentd{
+		fluentd := v1beta1.FluentdConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "detached-fluentd",
 				Namespace: ns,
@@ -122,7 +122,7 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
 		t.Logf("fluentd is: %v", fluentd)
 
-		excessFluentd := v1beta1.Fluentd{
+		excessFluentd := v1beta1.FluentdConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "excess-fluentd",
 				Namespace: ns,
@@ -225,7 +225,7 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 				t.Log("checking detached fluentd status")
 				return false
 			}
-			var detachedFluentds v1beta1.FluentdList
+			var detachedFluentds v1beta1.FluentdConfigList
 			common.RequireNoError(t, c.GetClient().List(ctx, &detachedFluentds))
 			if len(detachedFluentds.Items) != 2 {
 				// Add a new detached fluentd that is not going to be used

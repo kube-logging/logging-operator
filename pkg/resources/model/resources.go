@@ -29,7 +29,7 @@ type LoggingResources struct {
 	WatchNamespaces []string
 }
 
-func (l LoggingResources) GetFluentd() *v1beta1.Fluentd {
+func (l LoggingResources) GetFluentd() *v1beta1.FluentdConfig {
 	if l.Fluentd.Configuration != nil {
 		return l.Fluentd.Configuration
 	}
@@ -53,8 +53,8 @@ type FluentdLoggingResources struct {
 	ClusterOutputs ClusterOutputs
 	Flows          []v1beta1.Flow
 	Outputs        Outputs
-	Configuration  *v1beta1.Fluentd
-	ExcessFluentds []v1beta1.Fluentd
+	Configuration  *v1beta1.FluentdConfig
+	ExcessFluentds []v1beta1.FluentdConfig
 }
 
 type SyslogNGLoggingResources struct {

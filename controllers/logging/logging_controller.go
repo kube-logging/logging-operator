@@ -64,8 +64,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentds,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentds/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentdconfigs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentdconfigs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -436,7 +436,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.LoggingRoute:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
-		case *loggingv1beta1.Fluentd:
+		case *loggingv1beta1.FluentdConfig:
 			return reconcileRequestsForMatchingControlNamespace(loggingList.Items, o.Namespace)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
@@ -488,7 +488,7 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
 		Watches(&corev1.Secret{}, requestMapper).
 		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper).
-		Watches(&loggingv1beta1.Fluentd{}, requestMapper)
+		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {

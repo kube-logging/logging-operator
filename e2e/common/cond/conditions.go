@@ -85,7 +85,7 @@ func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) 
 		return false
 	}
 }
-func CheckFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.Fluentd, loggingName string) bool {
+func CheckFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.FluentdConfig, loggingName string) bool {
 	fluentdInstanceName := fluentd.Name
 	cluster := *c
 
@@ -108,7 +108,7 @@ func CheckFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, f
 	return true
 }
 
-func CheckExcessFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.Fluentd) bool {
+func CheckExcessFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.FluentdConfig) bool {
 	fluentdInstanceName := fluentd.Name
 	cluster := *c
 

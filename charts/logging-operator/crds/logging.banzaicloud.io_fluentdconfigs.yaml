@@ -6,16 +6,16 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.0
   creationTimestamp: null
-  name: fluentds.logging.banzaicloud.io
+  name: fluentdconfigs.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
   names:
     categories:
     - logging-all
-    kind: Fluentd
-    listKind: FluentdList
-    plural: fluentds
-    singular: fluentd
+    kind: FluentdConfig
+    listKind: FluentdConfigList
+    plural: fluentdconfigs
+    singular: fluentdconfig
   scope: Namespaced
   versions:
   - additionalPrinterColumns:

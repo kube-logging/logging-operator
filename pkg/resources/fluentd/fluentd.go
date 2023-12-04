@@ -83,8 +83,8 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
-func GetFluentd(ctx context.Context, Client client.Client, log logr.Logger, controlNamespace string) *v1beta1.Fluentd {
-	fluentdList := v1beta1.FluentdList{}
+func GetFluentd(ctx context.Context, Client client.Client, log logr.Logger, controlNamespace string) *v1beta1.FluentdConfig {
+	fluentdList := v1beta1.FluentdConfigList{}
 	// Detached fluentd must be in the `control namespace`
 	nsOpt := client.InNamespace(controlNamespace)
 

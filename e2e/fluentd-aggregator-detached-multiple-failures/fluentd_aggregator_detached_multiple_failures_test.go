@@ -89,7 +89,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 
-		fluentd1 := v1beta1.Fluentd{
+		fluentd1 := v1beta1.FluentdConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "not-to-be-used-fluentd-1",
 				Namespace: ns,
@@ -117,7 +117,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd1))
 
-		fluentd2 := v1beta1.Fluentd{
+		fluentd2 := v1beta1.FluentdConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "not-to-be-used-fluentd-2",
 				Namespace: ns,

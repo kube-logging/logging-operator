@@ -108,14 +108,14 @@ type FluentdSpec struct {
 	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
 }
 
-// +name:"Fluentd"
+// +name:"FluentdConfig"
 // +weight:"200"
 type _hugoFluent interface{} //nolint:deadcode,unused
 
 // +name:"Fluent"
 // +version:"v1beta1"
-// +description:"Fluentd is a reference to the desired Fluentd state"
-type _metaFluentd interface{} //nolint:deadcode,unused
+// +description:"FluentdConfig is a reference to the desired Fluentd state"
+type _metaFluentdConfig interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
@@ -124,17 +124,17 @@ type _metaFluentd interface{} //nolint:deadcode,unused
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 // +kubebuilder:storageversion
 
-// Fluentd
-type Fluentd struct {
+// FluentdConfig
+type FluentdConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   FluentdSpec   `json:"spec,omitempty"`
-	Status FluentdStatus `json:"status,omitempty"`
+	Spec   FluentdSpec         `json:"spec,omitempty"`
+	Status FluentdConfigStatus `json:"status,omitempty"`
 }
 
-// FluentdStatus
-type FluentdStatus struct {
+// FluentdConfigStatus
+type FluentdConfigStatus struct {
 	Logging       string   `json:"logging,omitempty"`
 	Active        *bool    `json:"active,omitempty"`
 	Problems      []string `json:"problems,omitempty"`
@@ -143,15 +143,15 @@ type FluentdStatus struct {
 
 // +kubebuilder:object:root=true
 
-// FluentdList
-type FluentdList struct {
+// FluentdConfigList
+type FluentdConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Fluentd `json:"items"`
+	Items           []FluentdConfig `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Fluentd{}, &FluentdList{})
+	SchemeBuilder.Register(&FluentdConfig{}, &FluentdConfigList{})
 }
 
 // +kubebuilder:object:generate=true

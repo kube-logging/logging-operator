@@ -171,56 +171,56 @@ Fluentd port inside the container (24240 by default). The headless service port 
 
 
 ---
-title: Fluentd
+title: FluentdConfig
 weight: 200
 generated_file: true
 ---
 
-## Fluentd
+## FluentdConfig
 
-Fluentd
+FluentdConfig
 
-###  (metav1.TypeMeta, required) {#fluentd-}
-
-
-### metadata (metav1.ObjectMeta, optional) {#fluentd-metadata}
+###  (metav1.TypeMeta, required) {#fluentdconfig-}
 
 
-### spec (FluentdSpec, optional) {#fluentd-spec}
+### metadata (metav1.ObjectMeta, optional) {#fluentdconfig-metadata}
 
 
-### status (FluentdStatus, optional) {#fluentd-status}
+### spec (FluentdSpec, optional) {#fluentdconfig-spec}
 
 
-
-## FluentdStatus
-
-FluentdStatus
-
-### active (*bool, optional) {#fluentdstatus-active}
-
-
-### logging (string, optional) {#fluentdstatus-logging}
-
-
-### problems ([]string, optional) {#fluentdstatus-problems}
-
-
-### problemsCount (int, optional) {#fluentdstatus-problemscount}
+### status (FluentdConfigStatus, optional) {#fluentdconfig-status}
 
 
 
-## FluentdList
+## FluentdConfigStatus
 
-FluentdList
+FluentdConfigStatus
 
-###  (metav1.TypeMeta, required) {#fluentdlist-}
-
-
-### metadata (metav1.ListMeta, optional) {#fluentdlist-metadata}
+### active (*bool, optional) {#fluentdconfigstatus-active}
 
 
-### items ([]Fluentd, required) {#fluentdlist-items}
+### logging (string, optional) {#fluentdconfigstatus-logging}
+
+
+### problems ([]string, optional) {#fluentdconfigstatus-problems}
+
+
+### problemsCount (int, optional) {#fluentdconfigstatus-problemscount}
+
+
+
+## FluentdConfigList
+
+FluentdConfigList
+
+###  (metav1.TypeMeta, required) {#fluentdconfiglist-}
+
+
+### metadata (metav1.ListMeta, optional) {#fluentdconfiglist-metadata}
+
+
+### items ([]FluentdConfig, required) {#fluentdconfiglist-items}
 
 
 
