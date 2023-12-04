@@ -72,6 +72,12 @@ Available in Logging operator version 4.4 and later.
 
 Default: -
 
+### openobserve (*output.OpenobserveOutput, optional) {#syslogngoutputspec-openobserve}
+
+Available in Logging operator version 4.5 and later. 
+
+Default: -
+
 
 ## SyslogNGOutput
 

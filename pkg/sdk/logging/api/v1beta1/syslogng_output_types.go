@@ -48,6 +48,8 @@ type SyslogNGOutputSpec struct {
 	Loki *output.LokiOutput `json:"loki,omitempty" syslog-ng:"dest-drv"`
 	// Available in Logging operator version 4.4 and later.
 	S3 *output.S3Output `json:"s3,omitempty" syslog-ng:"dest-drv"`
+	// Available in Logging operator version 4.5 and later.
+	Openobserve *output.OpenobserveOutput `json:"openobserve,omitempty" syslog-ng:"dest-drv,name=openobserve-log"`
 }
 
 type SyslogNGOutputStatus OutputStatus
