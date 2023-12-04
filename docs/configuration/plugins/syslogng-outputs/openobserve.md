@@ -35,24 +35,20 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 
 ###  (HTTPOutput, required) {#openobserveoutput-}
 
-Default: -
 
 ### organization (string, optional) {#openobserveoutput-organization}
 
 Name of the organization in Openobserve. 
 
-Default: -
-
-### stream (string, optional) {#openobserveoutput-stream}
-
-Name of the stream in Openobserve. 
-
-Default: -
 
 ### record (string, optional) {#openobserveoutput-record}
 
 Arguments to the `$format-json()` template function. Default: --scope rfc5424 --exclude DATE --key ISODATE @timestamp=${ISODATE}" 
 
-Default: -
+
+### stream (string, optional) {#openobserveoutput-stream}
+
+Name of the stream in Openobserve. 
+
 
 

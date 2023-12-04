@@ -17,31 +17,21 @@ Send your logs to LogDNA
 
 LogDNA Api key 
 
-Default: -
-
-### hostname (string, required) {#logdna-hostname}
-
-Hostname 
-
-Default: -
 
 ### app (string, optional) {#logdna-app}
 
 Application name 
 
-Default: -
 
-### tags (string, optional) {#logdna-tags}
+### buffer (*Buffer, optional) {#logdna-buffer}
 
-Comma-Separated List of Tags, Optional 
+[Buffer](../buffer/) 
 
-Default: -
 
-### request_timeout (string, optional) {#logdna-request_timeout}
+### hostname (string, required) {#logdna-hostname}
 
-HTTPS POST Request Timeout, Optional. Supports s and ms Suffices
+Hostname 
 
-Default: 30 s
 
 ### ingester_domain (string, optional) {#logdna-ingester_domain}
 
@@ -55,17 +45,21 @@ Custom Ingester Endpoint, Optional
 
 Default: /logs/ingest
 
-### buffer (*Buffer, optional) {#logdna-buffer}
+### request_timeout (string, optional) {#logdna-request_timeout}
 
-[Buffer](../buffer/) 
+HTTPS POST Request Timeout, Optional. Supports s and ms Suffices
 
-Default: -
+Default: 30 s
 
 ### slow_flush_log_threshold (string, optional) {#logdna-slow_flush_log_threshold}
 
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, Fluentd logs a warning message and increases the `fluentd_output_status_slow_flush_count` metric. 
 
-Default: -
+
+### tags (string, optional) {#logdna-tags}
+
+Comma-Separated List of Tags, Optional 
+
 
 
  ## Example `LogDNA` filter configurations

@@ -29,21 +29,17 @@ generated_file: true
 
 ### and ([]MatchExpr, optional) {#matchexpr-and}
 
-Default: -
 
 ### not (*MatchExpr, optional) {#matchexpr-not}
 
-Default: -
+
+### or ([]MatchExpr, optional) {#matchexpr-or}
+
 
 ### regexp (*RegexpMatchExpr, optional) {#matchexpr-regexp}
 
 [Regexp Directive](#Regexp-Directive) 
 
-Default: -
-
-### or ([]MatchExpr, optional) {#matchexpr-or}
-
-Default: -
 
 
 ## Regexp Directive
@@ -52,35 +48,30 @@ Default: -
 Specify filtering rule. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-template-functions/#template-function-list)
 
 
+### flags ([]string, optional) {#regexp directive-flags}
+
+Pattern flags. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/regular-expressions/reference-regexp-types/regexp-flags-options/) 
+
+
 ### pattern (string, required) {#regexp directive-pattern}
 
 Pattern expression to evaluate 
 
-Default: -
 
 ### template (string, optional) {#regexp directive-template}
 
 Specify a template of the record fields to match against. 
 
-Default: -
-
-### value (string, optional) {#regexp directive-value}
-
-Specify a field name of the record to match against the value of. 
-
-Default: -
-
-### flags ([]string, optional) {#regexp directive-flags}
-
-Pattern flags. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/regular-expressions/reference-regexp-types/regexp-flags-options/) 
-
-Default: -
 
 ### type (string, optional) {#regexp directive-type}
 
 Pattern type. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/regular-expressions/reference-regexp-types/regexp-type-options/) 
 
-Default: -
+
+### value (string, optional) {#regexp directive-value}
+
+Specify a field name of the record to match against the value of. 
+
 
 
 

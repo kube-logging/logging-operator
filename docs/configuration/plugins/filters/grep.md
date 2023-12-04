@@ -11,29 +11,25 @@ generated_file: true
 ## Configuration
 ## GrepConfig
 
-### regexp ([]RegexpSection, optional) {#grepconfig-regexp}
+### and ([]AndSection, optional) {#grepconfig-and}
 
-[Regexp Directive](#Regexp-Directive) 
+[And Directive](#And-Directive) 
 
-Default: -
 
 ### exclude ([]ExcludeSection, optional) {#grepconfig-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
 
-Default: -
 
 ### or ([]OrSection, optional) {#grepconfig-or}
 
 [Or Directive](#Or-Directive) 
 
-Default: -
 
-### and ([]AndSection, optional) {#grepconfig-and}
+### regexp ([]RegexpSection, optional) {#grepconfig-regexp}
 
-[And Directive](#And-Directive) 
+[Regexp Directive](#Regexp-Directive) 
 
-Default: -
 
 
 ## Regexp Directive
@@ -44,13 +40,11 @@ Specify filtering rule (as described in the [Fluentd documentation](https://docs
 
 Specify field name in the record to parse. 
 
-Default: -
 
 ### pattern (string, required) {#regexp directive-pattern}
 
 Pattern expression to evaluate 
 
-Default: -
 
 
 
@@ -96,13 +90,11 @@ Specify filtering rule to reject events (as described in the [Fluentd documentat
 
 Specify field name in the record to parse. 
 
-Default: -
 
 ### pattern (string, required) {#exclude directive-pattern}
 
 Pattern expression to evaluate 
 
-Default: -
 
 
 
@@ -145,17 +137,15 @@ spec:
 
 Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-or-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#or directive-regexp}
-
-[Regexp Directive](#Regexp-Directive) 
-
-Default: -
-
 ### exclude ([]ExcludeSection, optional) {#or directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
 
-Default: -
+
+### regexp ([]RegexpSection, optional) {#or directive-regexp}
+
+[Regexp Directive](#Regexp-Directive) 
+
 
 
 
@@ -203,17 +193,15 @@ spec:
 
 Specify filtering rule (as described in the [Fluentd documentation](https://docs.fluentd.org/filter/grep#less-than-and-greater-than-directive). This directive contains either `regexp` or `exclude` directive.
 
-### regexp ([]RegexpSection, optional) {#and directive-regexp}
-
-[Regexp Directive](#Regexp-Directive) 
-
-Default: -
-
 ### exclude ([]ExcludeSection, optional) {#and directive-exclude}
 
 [Exclude Directive](#Exclude-Directive) 
 
-Default: -
+
+### regexp ([]RegexpSection, optional) {#and directive-regexp}
+
+[Regexp Directive](#Regexp-Directive) 
+
 
 
 

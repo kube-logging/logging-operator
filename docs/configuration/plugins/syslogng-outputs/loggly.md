@@ -22,28 +22,24 @@ You need a Loggly account and your user token to use this output.
 
 Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf
 
+###  (SyslogOutput, required) {#loggly-}
+
+syslog output configuration 
+
+
 ### host (string, optional) {#loggly-host}
 
 Address of the destination host. 
 
-Default: -
 
 ### tag (string, optional) {#loggly-tag}
 
 Event tag. For details, see the [Loggy documentation](https://documentation.solarwinds.com/en/success_center/loggly/content/admin/tags.htm) 
 
-Default: -
 
 ### token (*secret.Secret, required) {#loggly-token}
 
 Your Customer Token that you received from Loggly. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/) 
 
-Default: -
-
-###  (SyslogOutput, required) {#loggly-}
-
-syslog output configuration 
-
-Default: -
 
 

@@ -33,23 +33,54 @@ More information at: https://axoflow.com/docs/axosyslog-core/chapter-destination
 ## Configuration
 ## RedisOutput
 
+###  (Batch, required) {#redisoutput-}
+
+Batching parameters 
+
+
+### auth (*secret.Secret, optional) {#redisoutput-auth}
+
+The password used for authentication on a password-protected Redis server. 
+
+
+### command_and_arguments ([]string, optional) {#redisoutput-command_and_arguments}
+
+The Redis command to execute, for example, LPUSH, INCR, or HINCRBY. Using the HINCRBY command with an increment value of 1 allows you to create various statistics. For example, the `command("HINCRBY" "${HOST}/programs" "${PROGRAM}" "1")` command counts the number of log messages on each host for each program.
+
+Default: ""
+
+### disk_buffer (*DiskBuffer, optional) {#redisoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
 ### host (string, optional) {#redisoutput-host}
 
 The hostname or IP address of the Redis server.
 
 Default: 127.0.0.1
 
-### auth (*secret.Secret, optional) {#redisoutput-auth}
+### log-fifo-size (int, optional) {#redisoutput-log-fifo-size}
 
-The password used for authentication on a password-protected Redis server. 
+The number of messages that the output queue can store. 
 
-Default: -
+
+### persist_name (string, optional) {#redisoutput-persist_name}
+
+Persistname 
+
 
 ### port (int, optional) {#redisoutput-port}
 
 The port number of the Redis server.
 
 Default: 6379
+
+### command (StringList, optional) {#redisoutput-command}
+
+Internal rendered form of the CommandAndArguments field 
+
 
 ### retries (int, optional) {#redisoutput-retries}
 
@@ -75,47 +106,10 @@ Specifies the number of worker threads (at least 1) that syslog-ng OSE uses to s
 
 Default: 1
 
-### command_and_arguments ([]string, optional) {#redisoutput-command_and_arguments}
-
-The Redis command to execute, for example, LPUSH, INCR, or HINCRBY. Using the HINCRBY command with an increment value of 1 allows you to create various statistics. For example, the `command("HINCRBY" "${HOST}/programs" "${PROGRAM}" "1")` command counts the number of log messages on each host for each program.
-
-Default: ""
-
-### command (StringList, optional) {#redisoutput-command}
-
-Internal rendered form of the CommandAndArguments field 
-
-Default: -
-
-###  (Batch, required) {#redisoutput-}
-
-Batching parameters 
-
-Default: -
-
-### log-fifo-size (int, optional) {#redisoutput-log-fifo-size}
-
-The number of messages that the output queue can store. 
-
-Default: -
-
-### disk_buffer (*DiskBuffer, optional) {#redisoutput-disk_buffer}
-
-This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
-
-Default: false
-
-### persist_name (string, optional) {#redisoutput-persist_name}
-
-Persistname 
-
-Default: -
-
 
 ## StringList
 
 ### string-list ([]string, optional) {#stringlist-string-list}
 
-Default: -
 
 

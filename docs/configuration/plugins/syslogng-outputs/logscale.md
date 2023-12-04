@@ -36,41 +36,23 @@ spec:
 ## Configuration
 ## LogScaleOutput
 
-### url (*secret.Secret, optional) {#logscaleoutput-url}
-
-Ingester URL is the URL of the Humio cluster you want to send data to.
-
-Default: https://cloud.humio.com
-
-### token (*secret.Secret, optional) {#logscaleoutput-token}
-
-An [Ingest Token](https://library.humio.com/data-analysis/ingesting-data-tokens.html) is a unique string that identifies a repository and allows you to send data to that repository.
-
-Default: empty
-
-### rawstring (string, optional) {#logscaleoutput-rawstring}
-
-The raw string representing the Event. The default display for an Event in LogScale is the rawstring. If you do not provide the rawstring field, then the response defaults to a JSON representation of the attributes field.
-
-Default: empty
-
 ### attributes (string, optional) {#logscaleoutput-attributes}
 
 A JSON object representing key-value pairs for the Event. These key-value pairs adds structure to Events, making it easier to search. Attributes can be nested JSON objects, however, we recommend limiting the amount of nesting.
 
 Default: `"--scope rfc5424 --exclude MESSAGE --exclude DATE --leave-initial-dot"`
 
-### timezone (string, optional) {#logscaleoutput-timezone}
+### batch_bytes (int, optional) {#logscaleoutput-batch_bytes}
 
-The timezone is only required if you specify the timestamp in milliseconds. The timezone specifies the local timezone for the event. Note that you must still specify the timestamp in UTC time. 
 
-Default: -
+### batch_lines (int, optional) {#logscaleoutput-batch_lines}
 
-### extra_headers (string, optional) {#logscaleoutput-extra_headers}
 
-This field represents additional headers that can be included in the HTTP request when sending log records to Falcon's LogScale.
+### batch_timeout (int, optional) {#logscaleoutput-batch_timeout}
 
-Default: empty
+
+### body (string, optional) {#logscaleoutput-body}
+
 
 ### content_type (string, optional) {#logscaleoutput-content_type}
 
@@ -84,24 +66,36 @@ This option enables putting outgoing messages into the disk buffer of the destin
 
 Default: false
 
-### body (string, optional) {#logscaleoutput-body}
+### extra_headers (string, optional) {#logscaleoutput-extra_headers}
 
-Default: -
+This field represents additional headers that can be included in the HTTP request when sending log records to Falcon's LogScale.
 
-### batch_lines (int, optional) {#logscaleoutput-batch_lines}
-
-Default: -
-
-### batch_bytes (int, optional) {#logscaleoutput-batch_bytes}
-
-Default: -
-
-### batch_timeout (int, optional) {#logscaleoutput-batch_timeout}
-
-Default: -
+Default: empty
 
 ### persist_name (string, optional) {#logscaleoutput-persist_name}
 
-Default: -
+
+### rawstring (string, optional) {#logscaleoutput-rawstring}
+
+The raw string representing the Event. The default display for an Event in LogScale is the rawstring. If you do not provide the rawstring field, then the response defaults to a JSON representation of the attributes field.
+
+Default: empty
+
+### timezone (string, optional) {#logscaleoutput-timezone}
+
+The timezone is only required if you specify the timestamp in milliseconds. The timezone specifies the local timezone for the event. Note that you must still specify the timestamp in UTC time. 
+
+
+### token (*secret.Secret, optional) {#logscaleoutput-token}
+
+An [Ingest Token](https://library.humio.com/data-analysis/ingesting-data-tokens.html) is a unique string that identifies a repository and allows you to send data to that repository.
+
+Default: empty
+
+### url (*secret.Secret, optional) {#logscaleoutput-url}
+
+Ingester URL is the URL of the Humio cluster you want to send data to.
+
+Default: https://cloud.humio.com
 
 
