@@ -238,6 +238,9 @@ func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra st
 			LoggingRef:       "infra",
 			ControlNamespace: nsInfra,
 			FluentdSpec: &v1beta1.FluentdSpec{
+				Image: v1beta1.ImageSpec{
+					Tag: "v1.16-base",
+				},
 				DisablePvc: true,
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
