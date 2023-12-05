@@ -64,7 +64,7 @@ all: manager
 check: license-check lint test
 
 .PHONY: generate
-generate: codegen fmt manifests docs helm-docs
+generate: codegen fmt manifests docs helm-docs ## Generate code, documentation, etc
 
 .PHONY: check-diff
 check-diff: generate
