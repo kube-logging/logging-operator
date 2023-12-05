@@ -233,7 +233,7 @@ func NewValidationReconciler(
 				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration is set as well, clearing inline", resources.Fluentd.Configuration.Name))
 				resources.Logging.Spec.FluentdSpec = nil
 			}
-			logger.Info("found detached fluentd aggregator, making association", "name=", resources.Fluentd.Configuration.Name)
+			logger.Info("found detached fluentd aggregator, making association", "name", resources.Fluentd.Configuration.Name)
 			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
 
 			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
