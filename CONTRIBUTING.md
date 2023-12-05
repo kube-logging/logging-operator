@@ -2,7 +2,8 @@
 
 Thank you for being interested in contributing to the project, all contributions are welcome!
 See the [kube-logging organization's CONTRIBUTING.md](https://github.com/kube-logging/.github/blob/main/CONTRIBUTING.md) file for general contribution guidelines.
-Please read the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)!
+
+Please read the [Organisation's Code of Conduct](https://github.com/kube-logging/.github/blob/main/CODE_OF_CONDUCT.md)!
 
 ## Ways of contributing
 

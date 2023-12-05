@@ -98,7 +98,7 @@ If you find this project useful, help us:
 - Help new users with issues they may encounter :muscle:
 - Send a pull request with your new features and bug fixes :rocket: 
 
-Please read the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)!
+Please read the [Organisation's Code of Conduct](https://github.com/kube-logging/.github/blob/main/CODE_OF_CONDUCT.md)!
 
 *For more information, read the [developer documentation](https://kube-logging.github.io/docs/developers)*.
 
