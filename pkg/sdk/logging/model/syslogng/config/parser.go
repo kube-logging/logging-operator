@@ -38,3 +38,9 @@ func isActiveParserDriver(f Field) bool {
 func hasParserDriverTag(f Field) bool {
 	return structFieldSettings(f.Meta).Has("parser-drv")
 }
+
+type DateParser struct {
+	__meta   struct{} `syslog-ng:"name=date-parser"` //lint:ignore U1000 field used for adding tag to the type
+	Format   string   `syslog-ng:"name=format,optional"`
+	Template string   `syslog-ng:"name=template,optional"`
+}

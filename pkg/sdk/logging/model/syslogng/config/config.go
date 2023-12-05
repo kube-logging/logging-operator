@@ -15,6 +15,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"reflect"
 
@@ -122,6 +123,20 @@ func configRenderer(in Input) (render.Renderer, error) {
 				}),
 			}, nil),
 	}
+
+	if in.Logging.Spec.SyslogNGSpec.SourceDateParser != nil {
+		setDefault(&in.Logging.Spec.SyslogNGSpec.SourceDateParser.Format, amp("%FT%T.%f%z"))
+		setDefault(&in.Logging.Spec.SyslogNGSpec.SourceDateParser.Template,
+			amp(fmt.Sprintf("${%stime}", in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix)))
+		sourceParsers = append(sourceParsers, renderDriver(
+			Field{
+				Value: reflect.ValueOf(DateParser{
+					Format:   *in.Logging.Spec.SyslogNGSpec.SourceDateParser.Format,
+					Template: *in.Logging.Spec.SyslogNGSpec.SourceDateParser.Template,
+				}),
+			}, nil))
+	}
+
 	for _, sm := range in.Logging.Spec.SyslogNGSpec.SourceMetrics {
 		if sm.Labels == nil {
 			sm.Labels = make(filter.ArrowMap, 0)

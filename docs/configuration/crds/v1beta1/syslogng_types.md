@@ -50,6 +50,11 @@ SyslogNGSpec defines the desired state of SyslogNG
 ### skipRBACCreate (bool, optional) {#syslogngspec-skiprbaccreate}
 
 
+### sourceDateParser (*SourceDateParser, optional) {#syslogngspec-sourcedateparser}
+
+Parses date automatically from the timestamp registered by the container runtime. Note: json key prefix and delimiter are respected 
+
+
 ### sourceMetrics ([]filter.MetricsProbe, optional) {#syslogngspec-sourcemetrics}
 
 
@@ -57,6 +62,19 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 
 ### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
+
+
+
+## SourceDateParser
+
+### format (*string, optional) {#sourcedateparser-format}
+
+Default: "%FT%T.%f%z" 
+
+
+### template (*string, optional) {#sourcedateparser-template}
+
+Default(depending on JSONKeyPrefix): "${json.time}" 
 
 
 

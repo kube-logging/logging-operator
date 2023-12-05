@@ -15288,6 +15288,13 @@ spec:
                     type: object
                   skipRBACCreate:
                     type: boolean
+                  sourceDateParser:
+                    properties:
+                      format:
+                        type: string
+                      template:
+                        type: string
+                    type: object
                   sourceMetrics:
                     items:
                       properties:
