@@ -92,7 +92,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 
-		syslogNG := v1beta1.SyslogNG{
+		syslogNG := v1beta1.SyslogNGConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "detached-syslog-ng",
 				Namespace: ns,
@@ -145,7 +145,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &syslogNG))
 
-		excessSyslogNG := v1beta1.SyslogNG{
+		excessSyslogNG := v1beta1.SyslogNGConfig{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "excess-syslog-ng",
 				Namespace: ns,
@@ -276,10 +276,10 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				t.Log("checking detached SyslogNG status")
 				return false
 			}
-			var detachedSyslogNGs v1beta1.SyslogNGList
+			var detachedSyslogNGs v1beta1.SyslogNGConfigList
 			common.RequireNoError(t, c.GetClient().List(ctx, &detachedSyslogNGs))
 			if len(detachedSyslogNGs.Items) != 2 {
-				// Add a new detached fluentd that is not going to be used
+				// Add a new detached syslogng that is not going to be used
 				common.RequireNoError(t, c.GetClient().Create(ctx, &excessSyslogNG))
 				t.Log("creating excess detached syslog-ng")
 				return false

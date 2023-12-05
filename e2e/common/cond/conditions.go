@@ -131,7 +131,7 @@ func CheckExcessFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Cont
 	return true
 }
 
-func CheckSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNG, loggingName string) bool {
+func CheckSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNGConfig, loggingName string) bool {
 	instanceName := syslogNG.Name
 	cluster := *c
 
@@ -154,7 +154,7 @@ func CheckSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, 
 	return true
 }
 
-func CheckExcessSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNG) bool {
+func CheckExcessSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Context, syslogNG *v1beta1.SyslogNGConfig) bool {
 	instanceName := syslogNG.Name
 	cluster := *c
 

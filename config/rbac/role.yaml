@@ -245,7 +245,7 @@ rules:
   - loggings
   - nodeagents
   - outputs
-  - syslogngs
+  - syslogngconfigs
   verbs:
   - create
   - delete
@@ -265,7 +265,7 @@ rules:
   - loggings/status
   - nodeagents/status
   - outputs/status
-  - syslogngs/status
+  - syslogngconfigs/status
   verbs:
   - get
   - patch

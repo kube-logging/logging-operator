@@ -6,16 +6,16 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.0
   creationTimestamp: null
-  name: syslogngs.logging.banzaicloud.io
+  name: syslogngconfigs.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
   names:
     categories:
     - logging-all
-    kind: SyslogNG
-    listKind: SyslogNGList
-    plural: syslogngs
-    singular: syslogng
+    kind: SyslogNGConfig
+    listKind: SyslogNGConfigList
+    plural: syslogngconfigs
+    singular: syslogngconfig
   scope: Namespaced
   versions:
   - name: v1beta1

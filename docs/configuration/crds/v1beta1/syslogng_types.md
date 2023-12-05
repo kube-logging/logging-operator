@@ -79,54 +79,54 @@ Default(depending on JSONKeyPrefix): "${json.time}"
 
 
 ---
-title: SyslogNG
+title: SyslogNGConfig
 weight: 200
 generated_file: true
 ---
 
-## SyslogNG
+## SyslogNGConfig
 
-###  (metav1.TypeMeta, required) {#syslogng-}
-
-
-### metadata (metav1.ObjectMeta, optional) {#syslogng-metadata}
+###  (metav1.TypeMeta, required) {#syslogngconfig-}
 
 
-### spec (SyslogNGSpec, optional) {#syslogng-spec}
+### metadata (metav1.ObjectMeta, optional) {#syslogngconfig-metadata}
 
 
-### status (SyslogNGStatus, optional) {#syslogng-status}
+### spec (SyslogNGSpec, optional) {#syslogngconfig-spec}
 
 
-
-## SyslogNGStatus
-
-SyslogNGStatus
-
-### active (*bool, optional) {#syslogngstatus-active}
-
-
-### logging (string, optional) {#syslogngstatus-logging}
-
-
-### problems ([]string, optional) {#syslogngstatus-problems}
-
-
-### problemsCount (int, optional) {#syslogngstatus-problemscount}
+### status (SyslogNGConfigStatus, optional) {#syslogngconfig-status}
 
 
 
-## SyslogNGList
+## SyslogNGConfigStatus
 
-SyslogNGList
+SyslogNGConfigStatus
 
-###  (metav1.TypeMeta, required) {#syslognglist-}
-
-
-### metadata (metav1.ListMeta, optional) {#syslognglist-metadata}
+### active (*bool, optional) {#syslogngconfigstatus-active}
 
 
-### items ([]SyslogNG, required) {#syslognglist-items}
+### logging (string, optional) {#syslogngconfigstatus-logging}
+
+
+### problems ([]string, optional) {#syslogngconfigstatus-problems}
+
+
+### problemsCount (int, optional) {#syslogngconfigstatus-problemscount}
+
+
+
+## SyslogNGConfigList
+
+SyslogNGConfigList
+
+###  (metav1.TypeMeta, required) {#syslogngconfiglist-}
+
+
+### metadata (metav1.ListMeta, optional) {#syslogngconfiglist-metadata}
+
+
+### items ([]SyslogNGConfig, required) {#syslogngconfiglist-items}
 
 
 

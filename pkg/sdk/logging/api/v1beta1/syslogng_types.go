@@ -64,30 +64,30 @@ type SourceDateParser struct {
 	Template *string `json:"template,omitempty"`
 }
 
-// +name:"SyslogNG"
+// +name:"SyslogNGConfig"
 // +weight:"200"
-type _hugoSyslogNG interface{} //nolint:deadcode,unused
+type _hugoSyslogNGConfig interface{} //nolint:deadcode,unused
 
 // +name:"SyslogNG"
 // +version:"v1beta1"
 // +description:"SyslogNG is a reference to the desired SyslogNG state"
-type _metaSyslogNG interface{} //nolint:deadcode,unused
+type _metaSyslogNGConfig interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-type SyslogNG struct {
+type SyslogNGConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SyslogNGSpec   `json:"spec,omitempty"`
-	Status SyslogNGStatus `json:"status,omitempty"`
+	Spec   SyslogNGSpec         `json:"spec,omitempty"`
+	Status SyslogNGConfigStatus `json:"status,omitempty"`
 }
 
-// SyslogNGStatus
-type SyslogNGStatus struct {
+// SyslogNGConfigStatus
+type SyslogNGConfigStatus struct {
 	Logging       string   `json:"logging,omitempty"`
 	Active        *bool    `json:"active,omitempty"`
 	Problems      []string `json:"problems,omitempty"`
@@ -96,15 +96,15 @@ type SyslogNGStatus struct {
 
 // +kubebuilder:object:root=true
 
-// SyslogNGList
-type SyslogNGList struct {
+// SyslogNGConfigList
+type SyslogNGConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SyslogNG `json:"items"`
+	Items           []SyslogNGConfig `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&SyslogNG{}, &SyslogNGList{})
+	SchemeBuilder.Register(&SyslogNGConfig{}, &SyslogNGConfigList{})
 }
 
 // +kubebuilder:object:generate=true
