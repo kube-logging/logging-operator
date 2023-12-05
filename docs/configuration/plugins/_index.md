@@ -26,6 +26,7 @@ For more information please click on the plugin name
 | **[SumoLogic](filters/sumologic/)** | filters | Sumo Logic collection solution for Kubernetes | GA | [2.3.1](https://github.com/SumoLogic/sumologic-kubernetes-collection) |
 | **[Tag Normaliser](filters/tagnormaliser/)** | filters | Re-tag based on log metadata | GA | [0.1.1](https://github.com/kube-logging/fluent-plugin-tag-normaliser) |
 | **[Throttle](filters/throttle/)** | filters | A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group. | GA | [0.0.5](https://github.com/rubrikinc/fluent-plugin-throttle) |
+| **[UserAgent](filters/useragent/)** | filters | Fluentd UserAgent filter | GA | [1.2.0](https://github.com/bungoume/fluent-plugin-ua-parser) |
 | **[Amazon Elasticsearch](outputs/aws_elasticsearch/)** | outputs | Fluent plugin for Amazon Elasticsearch | Testing | [2.4.1](https://github.com/atomita/fluent-plugin-aws-elasticsearch-service) |
 | **[Azure Storage](outputs/azurestore/)** | outputs | Store logs in Azure Storage | GA | [0.2.1](https://github.com/microsoft/fluent-plugin-azure-storage-append-blob) |
 | **[Buffer](outputs/buffer/)** | outputs | Fluentd event buffer | GA | [mode info](https://docs.fluentd.org/configuration/buffer-section) |

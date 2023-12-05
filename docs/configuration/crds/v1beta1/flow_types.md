@@ -125,6 +125,9 @@ Filter definition for FlowSpec
 ### throttle (*filter.Throttle, optional) {#filter-throttle}
 
 
+### useragent (*filter.UserAgent, optional) {#filter-useragent}
+
+
 
 ## FlowStatus
 

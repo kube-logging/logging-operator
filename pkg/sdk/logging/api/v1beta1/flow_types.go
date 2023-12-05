@@ -70,6 +70,7 @@ type Filter struct {
 	RecordTransformer   *filter.RecordTransformer         `json:"record_transformer,omitempty"`
 	RecordModifier      *filter.RecordModifier            `json:"record_modifier,omitempty"`
 	GeoIP               *filter.GeoIP                     `json:"geoip,omitempty"`
+	UserAgent           *filter.UserAgent                 `json:"useragent,omitempty"`
 	Concat              *filter.Concat                    `json:"concat,omitempty"`
 	DetectExceptions    *filter.DetectExceptions          `json:"detectExceptions,omitempty"`
 	Grep                *filter.GrepConfig                `json:"grep,omitempty"`
