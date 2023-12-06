@@ -24,24 +24,24 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
-	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim, fluentdSpec v1beta1.FluentdSpec) (*batchv1.Job, error) {
+	bufVolName := r.Logging.QualifiedName(fluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
-	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(r.Logging.Spec.FluentdSpec))
+	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(&fluentdSpec))
 	fluentdContainer.VolumeMounts = append(fluentdContainer.VolumeMounts, corev1.VolumeMount{
 		Name:      bufVolName,
 		MountPath: bufferPath,
 	})
 	containers := []corev1.Container{
 		fluentdContainer,
-		drainWatchContainer(&r.Logging.Spec.FluentdSpec.Scaling.Drain, bufVolName),
+		drainWatchContainer(&fluentdSpec.Scaling.Drain, bufVolName),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
 
 	var initContainers []corev1.Container
-	if i := generateInitContainer(r.Logging.Spec.FluentdSpec); i != nil {
+	if i := generateInitContainer(fluentdSpec); i != nil {
 		initContainers = append(initContainers, *i)
 	}
 	if c := r.tmpDirHackContainer(); c != nil {
@@ -51,26 +51,26 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 	spec := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels:      r.getDrainerLabels(),
-				Annotations: r.Logging.Spec.FluentdSpec.Scaling.Drain.Annotations,
+				Labels:      r.getDrainerLabels(fluentdSpec),
+				Annotations: fluentdSpec.Scaling.Drain.Annotations,
 			},
 			Spec: corev1.PodSpec{
 				Volumes:                   r.generateVolume(),
 				ServiceAccountName:        r.getServiceAccount(),
-				ImagePullSecrets:          r.Logging.Spec.FluentdSpec.Image.ImagePullSecrets,
+				ImagePullSecrets:          fluentdSpec.Image.ImagePullSecrets,
 				InitContainers:            initContainers,
 				Containers:                containers,
-				NodeSelector:              r.Logging.Spec.FluentdSpec.NodeSelector,
-				Tolerations:               r.Logging.Spec.FluentdSpec.Tolerations,
-				Affinity:                  r.Logging.Spec.FluentdSpec.Affinity,
-				TopologySpreadConstraints: r.Logging.Spec.FluentdSpec.TopologySpreadConstraints,
-				PriorityClassName:         r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+				NodeSelector:              fluentdSpec.NodeSelector,
+				Tolerations:               fluentdSpec.Tolerations,
+				Affinity:                  fluentdSpec.Affinity,
+				TopologySpreadConstraints: fluentdSpec.TopologySpreadConstraints,
+				PriorityClassName:         fluentdSpec.PodPriorityClassName,
 				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot:   r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:        r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:      r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:     r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.RunAsGroup,
-					SeccompProfile: r.Logging.Spec.FluentdSpec.Security.PodSecurityContext.SeccompProfile,
+					RunAsNonRoot:   fluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
+					FSGroup:        fluentdSpec.Security.PodSecurityContext.FSGroup,
+					RunAsUser:      fluentdSpec.Security.PodSecurityContext.RunAsUser,
+					RunAsGroup:     fluentdSpec.Security.PodSecurityContext.RunAsGroup,
+					SeccompProfile: fluentdSpec.Security.PodSecurityContext.SeccompProfile,
 				},
 				RestartPolicy: corev1.RestartPolicyNever,
 			},
@@ -85,7 +85,7 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.J
 			},
 		},
 	})
-	for _, n := range r.Logging.Spec.FluentdSpec.ExtraVolumes {
+	for _, n := range fluentdSpec.ExtraVolumes {
 		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 			return nil, err
 		}
@@ -129,10 +129,10 @@ func withoutFluentOutLogrotate(spec *v1beta1.FluentdSpec) *v1beta1.FluentdSpec {
 	return res
 }
 
-func (r *Reconciler) getDrainerLabels() map[string]string {
-	labels := r.Logging.GetFluentdLabels(ComponentDrainer)
+func (r *Reconciler) getDrainerLabels(fluentdSpec v1beta1.FluentdSpec) map[string]string {
+	labels := r.Logging.GetFluentdLabels(ComponentDrainer, fluentdSpec)
 
-	for key, value := range r.Logging.Spec.FluentdSpec.Scaling.Drain.Labels {
+	for key, value := range fluentdSpec.Scaling.Drain.Labels {
 		labels[key] = value
 	}
 

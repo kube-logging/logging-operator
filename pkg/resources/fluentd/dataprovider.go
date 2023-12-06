@@ -25,21 +25,23 @@ import (
 )
 
 type DataProvider struct {
-	client  client.Client
-	logging *v1beta1.Logging
+	client      client.Client
+	logging     *v1beta1.Logging
+	fluentdSpec *v1beta1.FluentdSpec
 }
 
-func NewDataProvider(client client.Client, logging *v1beta1.Logging) *DataProvider {
+func NewDataProvider(client client.Client, logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec) *DataProvider {
 	return &DataProvider{
-		client:  client,
-		logging: logging,
+		client:      client,
+		logging:     logging,
+		fluentdSpec: fluentdSpec,
 	}
 }
 
 func (p *DataProvider) GetReplicaCount(ctx context.Context) (*int32, error) {
-	if p.logging.Spec.FluentdSpec != nil {
+	if p.fluentdSpec != nil {
 		sts := &v1.StatefulSet{}
-		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd)
+		om := p.logging.FluentdObjectMeta(StatefulSetName, ComponentFluentd, *p.fluentdSpec)
 		err := p.client.Get(ctx, types.NamespacedName{Namespace: om.Namespace, Name: om.Name}, sts)
 		if err != nil {
 			return nil, errors.WrapIf(client.IgnoreNotFound(err), "getting fluentd statefulset")

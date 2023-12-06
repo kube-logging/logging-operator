@@ -28,14 +28,14 @@ func (r *Reconciler) placeholderPodFor(pvc corev1.PersistentVolumeClaim) *corev1
 			Containers: []corev1.Container{
 				{
 					Name:            "pause",
-					Image:           r.Logging.Spec.FluentdSpec.Scaling.Drain.PauseImage.RepositoryWithTag(),
-					ImagePullPolicy: corev1.PullPolicy(r.Logging.Spec.FluentdSpec.Scaling.Drain.PauseImage.PullPolicy),
+					Image:           r.fluentdSpec.Scaling.Drain.PauseImage.RepositoryWithTag(),
+					ImagePullPolicy: corev1.PullPolicy(r.fluentdSpec.Scaling.Drain.PauseImage.PullPolicy),
 				},
 			},
-			NodeSelector:                  r.Logging.Spec.FluentdSpec.NodeSelector,
-			Tolerations:                   r.Logging.Spec.FluentdSpec.Tolerations,
-			Affinity:                      r.Logging.Spec.FluentdSpec.Affinity,
-			PriorityClassName:             r.Logging.Spec.FluentdSpec.PodPriorityClassName,
+			NodeSelector:                  r.fluentdSpec.NodeSelector,
+			Tolerations:                   r.fluentdSpec.Tolerations,
+			Affinity:                      r.fluentdSpec.Affinity,
+			PriorityClassName:             r.fluentdSpec.PodPriorityClassName,
 			RestartPolicy:                 corev1.RestartPolicyNever,
 			TerminationGracePeriodSeconds: utils.IntPointer64(0), // terminate immediately
 		},

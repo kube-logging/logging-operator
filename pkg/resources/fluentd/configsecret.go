@@ -21,6 +21,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -52,24 +53,24 @@ func generateConfig(input fluentdConfig) (string, error) {
 	return output.String(), nil
 }
 
-func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
+func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[string][]byte, error) {
 	input := fluentdConfig{
-		IgnoreSameLogInterval:     r.Logging.Spec.FluentdSpec.IgnoreSameLogInterval,
-		IgnoreRepeatedLogInterval: r.Logging.Spec.FluentdSpec.IgnoreRepeatedLogInterval,
-		EnableMsgpackTimeSupport:  r.Logging.Spec.FluentdSpec.EnableMsgpackTimeSupport,
-		Workers:                   r.Logging.Spec.FluentdSpec.Workers,
-		LogLevel:                  r.Logging.Spec.FluentdSpec.LogLevel,
+		IgnoreSameLogInterval:     fluentdSpec.IgnoreSameLogInterval,
+		IgnoreRepeatedLogInterval: fluentdSpec.IgnoreRepeatedLogInterval,
+		EnableMsgpackTimeSupport:  fluentdSpec.EnableMsgpackTimeSupport,
+		Workers:                   fluentdSpec.Workers,
+		LogLevel:                  fluentdSpec.LogLevel,
 	}
 
-	input.RootDir = r.Logging.Spec.FluentdSpec.RootDir
+	input.RootDir = fluentdSpec.RootDir
 	if input.RootDir == "" {
 		input.RootDir = bufferPath
 	}
 
-	if r.Logging.Spec.FluentdSpec.Metrics != nil {
+	if fluentdSpec.Metrics != nil {
 		input.Monitor.Enabled = true
-		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
-		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
+		input.Monitor.Port = fluentdSpec.Metrics.Port
+		input.Monitor.Path = fluentdSpec.Metrics.Path
 	}
 
 	inputConfig, err := generateConfig(input)
@@ -86,11 +87,11 @@ func (r *Reconciler) generateConfigSecret() (map[string][]byte, error) {
 }
 
 func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, error) {
-	configMap, err := r.generateConfigSecret()
+	configMap, err := r.generateConfigSecret(*r.fluentdSpec)
 	if err != nil {
 		return nil, nil, err
 	}
-	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.Logging.Spec.FluentdSpec.FluentLogDestination))
+	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.fluentdSpec.FluentLogDestination))
 	configs := &corev1.Secret{
 		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
 		Data:       configMap,

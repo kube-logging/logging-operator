@@ -32,15 +32,16 @@ import (
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
 	logging := resources.Logging
+	fluentdSpec := resources.GetFluentdSpec()
 
 	var forwardInput *input.ForwardInputConfig
-	if logging.Spec.FluentdSpec != nil && logging.Spec.FluentdSpec.ForwardInputConfig != nil {
-		forwardInput = logging.Spec.FluentdSpec.ForwardInputConfig
+	if fluentdSpec != nil && fluentdSpec.ForwardInputConfig != nil {
+		forwardInput = fluentdSpec.ForwardInputConfig
 	} else {
 		forwardInput = input.NewForwardInputConfig()
 	}
 
-	if logging.Spec.FluentdSpec != nil && logging.Spec.FluentdSpec.TLS.Enabled {
+	if fluentdSpec != nil && fluentdSpec.TLS.Enabled {
 		forwardInput.Transport = &common.Transport{
 			Version:        "TLSv1_2",
 			CaPath:         "/fluentd/tls/ca.crt",
@@ -50,7 +51,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 		forwardInput.Security = &common.Security{
 			SelfHostname: "fluentd",
-			SharedKey:    logging.Spec.FluentdSpec.TLS.SharedKey,
+			SharedKey:    fluentdSpec.TLS.SharedKey,
 		}
 	}
 
@@ -60,7 +61,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	}
 
 	router := types.NewRouter("main", types.Params{
-		"metrics": strconv.FormatBool(logging.Spec.FluentdSpec.Metrics != nil),
+		"metrics": strconv.FormatBool(fluentdSpec.Metrics != nil),
 	})
 
 	var globalFilters []types.Filter
@@ -151,7 +152,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	}
 
 	// TODO: wow such hack
-	if logging.Spec.FluentdSpec.Workers > 1 {
+	if fluentdSpec.Workers > 1 {
 		for _, flow := range system.Flows {
 			for _, output := range flow.Outputs {
 				unsetBufferPath(output)

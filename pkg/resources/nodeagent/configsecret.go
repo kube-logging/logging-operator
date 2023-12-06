@@ -326,6 +326,6 @@ func (n *nodeAgentInstance) generateUpstreamNode(index int32) upstreamNode {
 			n.FluentdQualifiedName(fluentd.ServiceName+"-headless"),
 			n.logging.Spec.ControlNamespace,
 			n.logging.ClusterDomainAsSuffix()),
-		Port: n.logging.Spec.FluentdSpec.Port,
+		Port: n.fluentdSpec.Port,
 	}
 }

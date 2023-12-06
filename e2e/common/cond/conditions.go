@@ -18,6 +18,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -81,4 +84,49 @@ func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) 
 		}
 		return false
 	}
+}
+func CheckFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.FluentdConfig, loggingName string) bool {
+	fluentdInstanceName := fluentd.Name
+	cluster := *c
+
+	if len(fluentd.Status.Problems) != 0 {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have 0 problems, problems=%v", fluentdInstanceName, fluentd.Status.Problems)
+		return false
+	}
+	if fluentd.Status.Logging != loggingName {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", fluentdInstanceName, fluentd.Status.Logging, loggingName)
+		return false
+	}
+	if !*fluentd.Status.Active {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's active field set as true, found: %v", fluentdInstanceName, *fluentd.Status.Active)
+		return false
+	}
+
+	return true
+}
+
+func CheckExcessFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.FluentdConfig) bool {
+	fluentdInstanceName := fluentd.Name
+	cluster := *c
+
+	if len(fluentd.Status.Problems) == 0 {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's problems field filled", fluentdInstanceName)
+		return false
+	}
+	if fluentd.Status.Logging != "" {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's logging field empty, found: %s", fluentdInstanceName, fluentd.Status.Logging)
+		return false
+	}
+	if *fluentd.Status.Active {
+		common.RequireNoError(t, cluster.GetClient().Get(*ctx, utils.ObjectKeyFromObjectMeta(fluentd), fluentd))
+		t.Logf("%s should have it's active field set as false, found: %v", fluentdInstanceName, *fluentd.Status.Active)
+		return false
+	}
+
+	return true
 }

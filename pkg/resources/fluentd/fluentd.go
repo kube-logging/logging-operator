@@ -68,7 +68,8 @@ const (
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging *v1beta1.Logging
+	Logging     *v1beta1.Logging
+	fluentdSpec *v1beta1.FluentdSpec
 	*reconciler.GenericResourceReconciler
 	config  *string
 	secrets *secret.MountSecrets
@@ -82,17 +83,39 @@ type Desire struct {
 	BeforeUpdateHook func(runtime.Object) (reconciler.DesiredState, error)
 }
 
+func GetFluentd(ctx context.Context, Client client.Client, log logr.Logger, controlNamespace string) *v1beta1.FluentdConfig {
+	fluentdList := v1beta1.FluentdConfigList{}
+	// Detached fluentd must be in the `control namespace`
+	nsOpt := client.InNamespace(controlNamespace)
+
+	if err := Client.List(ctx, &fluentdList, nsOpt); err != nil {
+		log.Error(err, "listing fluentd configuration")
+		return nil
+	}
+
+	if len(fluentdList.Items) > 1 {
+		log.Error(errors.New("multiple fluentd configurations found"), fmt.Sprintf("number of configurations: %d", len(fluentdList.Items)))
+		return nil
+	}
+
+	if len(fluentdList.Items) == 1 {
+		return &fluentdList.Items[0]
+	}
+	return nil
+}
+
 func (r *Reconciler) getServiceAccount() string {
-	if r.Logging.Spec.FluentdSpec.Security.ServiceAccount != "" {
-		return r.Logging.Spec.FluentdSpec.Security.ServiceAccount
+	if r.fluentdSpec.Security.ServiceAccount != "" {
+		return r.fluentdSpec.Security.ServiceAccount
 	}
 	return r.Logging.QualifiedName(defaultServiceAccountName)
 }
 
 func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
+	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
+		fluentdSpec:               fluentdSpec,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
@@ -140,7 +163,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 
 		// Fail when the current config is invalid
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok && !result {
-			if hasPod, err := r.hasConfigCheckPod(ctx, hash); hasPod {
+			if hasPod, err := r.hasConfigCheckPod(ctx, hash, *r.fluentdSpec); hasPod {
 				return nil, errors.WrapIf(err, "current config is invalid")
 			}
 			// clean the status so that we can rerun the check
@@ -265,13 +288,13 @@ func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, r
 }
 
 func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, error) {
-	if r.Logging.Spec.FluentdSpec.DisablePvc || !r.Logging.Spec.FluentdSpec.Scaling.Drain.Enabled {
+	if r.fluentdSpec.DisablePvc || !r.fluentdSpec.Scaling.Drain.Enabled {
 		r.Log.Info("fluentd buffer draining is disabled")
 		return nil, nil
 	}
 
 	nsOpt := client.InNamespace(r.Logging.Spec.ControlNamespace)
-	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd)
+	fluentdLabelSet := r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)
 
 	var pvcList corev1.PersistentVolumeClaimList
 	if err := r.Client.List(ctx, &pvcList, nsOpt,
@@ -286,7 +309,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		return nil, errors.WrapIf(err, "listing StatefulSet pods")
 	}
 
-	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
+	bufVolName := r.Logging.QualifiedName(r.fluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
 	pvcsInUse := make(map[string]bool)
 	for _, pod := range stsPods.Items {
@@ -295,7 +318,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		}
 	}
 
-	replicaCount, err := NewDataProvider(r.Client, r.Logging).GetReplicaCount(ctx)
+	replicaCount, err := NewDataProvider(r.Client, r.Logging, r.fluentdSpec).GetReplicaCount(ctx)
 	if err != nil {
 		return nil, errors.WrapIf(err, "get replica count for fluentd")
 	}
@@ -306,7 +329,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	var jobList batchv1.JobList
-	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer))); err != nil {
+	if err := r.Client.List(ctx, &jobList, nsOpt, client.MatchingLabels(r.Logging.GetFluentdLabels(ComponentDrainer, *r.fluentdSpec))); err != nil {
 		return nil, errors.WrapIf(err, "listing buffer drainer jobs")
 	}
 
@@ -350,7 +373,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 				continue
 			}
 
-			if r.Logging.Spec.FluentdSpec.Scaling.Drain.DeleteVolume {
+			if r.fluentdSpec.Scaling.Drain.DeleteVolume {
 				if err := client.IgnoreNotFound(r.Client.Delete(ctx, &pvc, client.PropagationPolicy(v1.DeletePropagationBackground))); err != nil {
 					cr.CombineErr(errors.WrapIfWithDetails(err, "deleting drained PVC", "pvc", pvc.Name))
 					continue
@@ -397,7 +420,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 				continue
 			}
 
-			if job, err := r.drainerJobFor(pvc); err != nil {
+			if job, err := r.drainerJobFor(pvc, *r.fluentdSpec); err != nil {
 				cr.CombineErr(errors.WrapIf(err, "assembling drainer job"))
 			} else {
 				cr.Combine(r.ReconcileResource(job, reconciler.StatePresent))

@@ -41,6 +41,7 @@ func NewValidationReconciler(
 	logger logr.Logger,
 ) func(ctx context.Context) (*reconcile.Result, error) {
 	return func(ctx context.Context) (*reconcile.Result, error) {
+		// Make sure that you call registerForPatching() before modifying the object
 		var patchRequests []patchRequest
 		registerForPatching := func(obj client.Object) {
 			patchRequests = append(patchRequests, patchRequest{
@@ -206,6 +207,38 @@ func NewValidationReconciler(
 		registerForPatching(&resources.Logging)
 		resources.Logging.Status.Problems = nil
 		resources.Logging.Status.WatchNamespaces = nil
+
+		if len(resources.Fluentd.ExcessFluentds) != 0 {
+			logger.Info("Excess Fluentd CRDs found")
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+			for i := range resources.Fluentd.ExcessFluentds {
+				excessFluentd := &resources.Fluentd.ExcessFluentds[i]
+				registerForPatching(excessFluentd)
+				excessFluentd.Status.Problems = nil
+				excessFluentd.Status.Active = utils.BoolPointer(false)
+				excessFluentd.Status.Logging = ""
+
+				if len(resources.Logging.Status.FluentdConfigName) == 0 {
+					excessFluentd.Status.Problems = append(excessFluentd.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+				} else if resources.Logging.Status.FluentdConfigName != excessFluentd.Name {
+					excessFluentd.Status.Problems = append(excessFluentd.Status.Problems, "logging already has a detached fluentd configuration, remove excess configuration objects")
+				}
+				excessFluentd.Status.ProblemsCount = len(excessFluentd.Status.Problems)
+			}
+		}
+		if resources.Fluentd.Configuration != nil {
+			registerForPatching(resources.Fluentd.Configuration)
+
+			if resources.Logging.Spec.FluentdSpec != nil {
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("Fluentd configuration reference set (name=%s), but inline fluentd configuration is set as well, clearing inline", resources.Fluentd.Configuration.Name))
+				resources.Logging.Spec.FluentdSpec = nil
+			}
+			logger.Info("found detached fluentd aggregator, making association", "name", resources.Fluentd.Configuration.Name)
+			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
+
+			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
+		}
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces

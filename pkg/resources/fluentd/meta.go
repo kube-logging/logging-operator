@@ -24,7 +24,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 	o := metav1.ObjectMeta{
 		Name:      r.Logging.QualifiedName(name),
 		Namespace: r.Logging.Spec.ControlNamespace,
-		Labels:    r.Logging.GetFluentdLabels(component),
+		Labels:    r.Logging.GetFluentdLabels(component, *r.fluentdSpec),
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: r.Logging.APIVersion,
@@ -42,7 +42,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 func (r *Reconciler) FluentdObjectMetaClusterScope(name, component string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:   r.Logging.QualifiedName(name),
-		Labels: r.Logging.GetFluentdLabels(component),
+		Labels: r.Logging.GetFluentdLabels(component, *r.fluentdSpec),
 		OwnerReferences: []metav1.OwnerReference{
 			{
 				APIVersion: r.Logging.APIVersion,

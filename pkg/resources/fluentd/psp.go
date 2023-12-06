@@ -24,7 +24,7 @@ import (
 )
 
 func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
+	if r.fluentdSpec.Security.PodSecurityPolicyCreate {
 		return &policyv1beta1.PodSecurityPolicy{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(PodSecurityPolicyName, ComponentFluentd),
 			Spec: policyv1beta1.PodSecurityPolicySpec{
@@ -59,7 +59,7 @@ func (r *Reconciler) clusterPodSecurityPolicy() (runtime.Object, reconciler.Desi
 }
 
 func (r *Reconciler) pspRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.fluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.Role{
 			ObjectMeta: r.FluentdObjectMeta(roleName+"-psp", ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
@@ -78,7 +78,7 @@ func (r *Reconciler) pspRole() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) pspRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.Logging.Spec.FluentdSpec.Security.RoleBasedAccessControlCreate && r.Logging.Spec.FluentdSpec.Security.PodSecurityPolicyCreate {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.fluentdSpec.Security.PodSecurityPolicyCreate {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: r.FluentdObjectMeta(roleBindingName+"-psp", ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{

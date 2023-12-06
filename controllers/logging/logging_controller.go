@@ -64,8 +64,8 @@ type LoggingReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentdconfigs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentdconfigs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
@@ -169,13 +169,14 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		),
 	}
 
-	if logging.Spec.FluentdSpec != nil && logging.Spec.SyslogNGSpec != nil {
+	if logging.AreMultipleAggregatorsSet() {
 		return ctrl.Result{}, errors.New("fluentd and syslogNG cannot be enabled simultaneously")
 	}
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
 
-	if logging.Spec.FluentdSpec != nil {
+	fluentdSpec := loggingResources.GetFluentdSpec()
+	if fluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
@@ -185,9 +186,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging)
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)
 	}
 
 	if logging.Spec.SyslogNGSpec != nil {
@@ -215,6 +216,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				log.WithName("fluentbit-legacy"),
 				&logging,
+				fluentdSpec,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
@@ -233,6 +235,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
 				&logging,
+				fluentdSpec,
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
@@ -257,7 +260,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -433,6 +436,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.LoggingRoute:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.Source)
+		case *loggingv1beta1.FluentdConfig:
+			return reconcileRequestsForMatchingControlNamespace(loggingList.Items, o.Namespace)
 		case *corev1.Secret:
 			r := regexp.MustCompile(`^logging\.banzaicloud\.io/(.*)`)
 			var requestList []reconcile.Request
@@ -482,7 +487,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.SyslogNGOutput{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGFlow{}, requestMapper).
 		Watches(&corev1.Secret{}, requestMapper).
-		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper)
+		Watches(&loggingv1beta1.LoggingRoute{}, requestMapper).
+		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper)
 
 	// TODO remove with the next major release
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
@@ -503,6 +509,20 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRef string) (reqs []reconcile.Request) {
 	for _, l := range loggings {
 		if l.Spec.LoggingRef == loggingRef {
+			reqs = append(reqs, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
+					Name:      l.Name,
+				},
+			})
+		}
+	}
+	return
+}
+
+func reconcileRequestsForMatchingControlNamespace(loggings []loggingv1beta1.Logging, ControlNamespace string) (reqs []reconcile.Request) {
+	for _, l := range loggings {
+		if l.Spec.ControlNamespace == ControlNamespace {
 			reqs = append(reqs, reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
