@@ -2,7 +2,8 @@
 
 Thank you for being interested in contributing to the project, all contributions are welcome!
 See the [kube-logging organization's CONTRIBUTING.md](https://github.com/kube-logging/.github/blob/main/CONTRIBUTING.md) file for general contribution guidelines.
-Please read the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)!
+
+Please read the [Organisation's Code of Conduct](https://github.com/kube-logging/.github/blob/main/CODE_OF_CONDUCT.md)!
 
 ## Ways of contributing
 
@@ -34,7 +35,7 @@ Steps:
 1. Check if there is an [open issue](https://github.com/kube-logging/logging-operator/issues) that you can reference in your pull request
 2. Fork the [repository](https://github.com/kube-logging/logging-operator/fork)
 3. Create a new branch using `git switch -c <branch-name>`
-4. Make your modifications, add some unit tests if possible[^1]
+4. Make your modifications and add unit tests to cover most code branches, input fields, and functionality if possible[^1]
 5. Run `make fmt` to run code formatting
 6. Run `make generate` to generate code, documentation, manifests, etc.
 7. Run `make check` to run license checks, linter, tests
@@ -44,7 +45,7 @@ Steps:
 
 See the [For developers](https://kube-logging.dev/docs/developers/) page in the documentation for details (e.g. setting up a development environment, adding documentation).
 
-[^1]: For bigger features please open a new [Feature request issue](https://github.com/kube-logging/logging-operator/issues/new?assignees=&labels=&projects=&template=--feature-request.md&title=) where we can have a discussion about the proposed feature.
+[^1]: For bigger features please open a new [Feature request issue](https://github.com/kube-logging/logging-operator/issues/new?assignees=&labels=&projects=&template=--feature-request.md&title=) where we can have a discussion about the proposed feature and the suggested test cases.
 
 ### Add yourself to the production adopters list
 
