@@ -15,7 +15,7 @@ changelog:
         - enhancement
     - title: Dependency and image updates
       labels:
-        - dependency
+        - dependencies
     - title: Bug fixes
       labels:
         - bugfix
