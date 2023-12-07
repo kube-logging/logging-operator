@@ -142,6 +142,11 @@ Problems with the logging resource
 Count of problems for printcolumn 
 
 
+### syslogNGConfigName (string, optional) {#loggingstatus-syslogngconfigname}
+
+Name of the matched detached SyslogNG configuration object 
+
+
 ### watchNamespaces ([]string, optional) {#loggingstatus-watchnamespaces}
 
 List of namespaces that watchNamespaces + watchNamespaceSelector is resolving to. Not set means all namespaces. 

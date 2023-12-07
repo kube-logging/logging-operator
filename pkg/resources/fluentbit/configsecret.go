@@ -354,7 +354,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if r.Logging.Spec.SyslogNGSpec != nil {
+	if r.syslogNGSpec != nil {
 		input.SyslogNGOutput = newSyslogNGOutputConfig()
 		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort
@@ -365,7 +365,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		for _, a := range r.loggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
-		if err := r.configureOutputsForTenants(ctx, tenants, &input, r.fluentdSpec); err != nil {
+		if err := r.configureOutputsForTenants(ctx, tenants, &input, r.fluentdSpec, r.syslogNGSpec); err != nil {
 			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
 	} else {

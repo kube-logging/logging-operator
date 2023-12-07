@@ -27,7 +27,7 @@ func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 	role := &rbacv1.Role{
 		ObjectMeta: r.SyslogNGObjectMeta(roleName, ComponentSyslogNG),
 	}
-	if r.Logging.Spec.SyslogNGSpec == nil || r.Logging.Spec.SyslogNGSpec.SkipRBACCreate {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate {
 		return role, reconciler.StateAbsent, nil
 	}
 	role.Rules = []rbacv1.PolicyRule{
@@ -44,7 +44,7 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 	binding := &rbacv1.RoleBinding{
 		ObjectMeta: r.SyslogNGObjectMeta(roleBindingName, ComponentSyslogNG),
 	}
-	if r.Logging.Spec.SyslogNGSpec == nil || r.Logging.Spec.SyslogNGSpec.SkipRBACCreate {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate {
 		return binding, reconciler.StateAbsent, nil
 	}
 	binding.RoleRef = rbacv1.RoleRef{
@@ -75,7 +75,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 	role := &rbacv1.ClusterRole{
 		ObjectMeta: r.SyslogNGObjectMetaClusterScope(clusterRoleName, ComponentSyslogNG),
 	}
-	if r.Logging.Spec.SyslogNGSpec == nil || r.Logging.Spec.SyslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
 		return role, reconciler.StateAbsent, nil
 	}
 	role.Rules = []rbacv1.PolicyRule{
@@ -116,7 +116,7 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 	binding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: r.SyslogNGObjectMetaClusterScope(clusterRoleBindingName, ComponentSyslogNG),
 	}
-	if r.Logging.Spec.SyslogNGSpec == nil || r.Logging.Spec.SyslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
 		return binding, reconciler.StateAbsent, nil
 	}
 	binding.RoleRef = rbacv1.RoleRef{
@@ -138,10 +138,10 @@ func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, 
 	account := &corev1.ServiceAccount{
 		ObjectMeta: r.SyslogNGObjectMeta(serviceAccountName, ComponentSyslogNG),
 	}
-	err := merge.Merge(account, r.Logging.Spec.SyslogNGSpec.ServiceAccountOverrides)
+	err := merge.Merge(account, r.syslogNGSpec.ServiceAccountOverrides)
 	err = errors.WrapIf(err, "unable to merge overrides to base object")
 
-	if r.Logging.Spec.SyslogNGSpec == nil || r.Logging.Spec.SyslogNGSpec.SkipRBACCreate {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate {
 		return account, reconciler.StateAbsent, err
 	}
 

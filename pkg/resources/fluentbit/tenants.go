@@ -88,7 +88,7 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 	return tenants, nil
 }
 
-func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v1beta1.Tenant, input *fluentBitConfig, fluentdSpec *v1beta1.FluentdSpec) error {
+func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v1beta1.Tenant, input *fluentBitConfig, fluentdSpec *v1beta1.FluentdSpec, syslogNGSpec *v1beta1.SyslogNGSpec) error {
 	var errs error
 	for _, t := range tenants {
 		allNamespaces := len(t.Namespaces) == 0
@@ -110,7 +110,7 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 				Host:           aggregatorEndpoint(logging, fluentd.ServiceName),
 				Port:           fluentd.ServicePort,
 			})
-		} else if logging.Spec.SyslogNGSpec != nil {
+		} else if syslogNGSpec != nil {
 			if input.SyslogNGOutput == nil {
 				input.SyslogNGOutput = newSyslogNGOutputConfig()
 			}

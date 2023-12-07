@@ -49,15 +49,9 @@ destination "output_default_test-openobserve-out" {
 `)
 
 	testCaseInput := config.Input{
-		Logging: v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "config-test",
-				Name:      "test",
-			},
-			Spec: v1beta1.LoggingSpec{
-				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-			},
-		},
+		Namespace:      "config-test",
+		Name:           "test",
+		SyslogNGSpec:   &v1beta1.SyslogNGSpec{},
 		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
 		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
 		Flows:          []v1beta1.SyslogNGFlow{},

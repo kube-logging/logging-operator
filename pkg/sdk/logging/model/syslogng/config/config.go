@@ -45,7 +45,9 @@ func RenderConfigInto(in Input, out io.Writer) error {
 }
 
 type Input struct {
-	Logging             v1beta1.Logging
+	Name                string
+	Namespace           string
+	SyslogNGSpec        *v1beta1.SyslogNGSpec
 	ClusterOutputs      []v1beta1.SyslogNGClusterOutput
 	Outputs             []v1beta1.SyslogNGOutput
 	ClusterFlows        []v1beta1.SyslogNGClusterFlow
@@ -62,26 +64,26 @@ const configVersion = "current"
 const sourceName = "main_input"
 
 func configRenderer(in Input) (render.Renderer, error) {
-	if in.Logging.Spec.SyslogNGSpec == nil {
+	if in.SyslogNGSpec == nil {
 		return nil, errors.New("missing syslog-ng spec")
 	}
 
 	var errs error
 
 	// TODO: this should happen at the spec level, in something like `SyslogNGSpec.FinalGlobalOptions() GlobalOptions`
-	if in.Logging.Spec.SyslogNGSpec.Metrics != nil {
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
-		if in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsFreq != nil ||
-			in.Logging.Spec.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
+	if in.SyslogNGSpec.Metrics != nil {
+		setDefault(&in.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
+		if in.SyslogNGSpec.GlobalOptions.StatsFreq != nil ||
+			in.SyslogNGSpec.GlobalOptions.StatsLevel != nil {
 			return nil, errors.New("stats_freq and stats_level are not supported anymore, please use stats.level and stats.freq")
 		}
 
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats, &v1beta1.Stats{})
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Freq, amp(0))
-		setDefault(&in.Logging.Spec.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
+		setDefault(&in.SyslogNGSpec.GlobalOptions.Stats, &v1beta1.Stats{})
+		setDefault(&in.SyslogNGSpec.GlobalOptions.Stats.Freq, amp(0))
+		setDefault(&in.SyslogNGSpec.GlobalOptions.Stats.Level, amp(2))
 	}
 
-	globalOptions := renderAny(in.Logging.Spec.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Logging.Namespace))
+	globalOptions := renderAny(in.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Namespace))
 
 	destinationDefs := make([]render.Renderer, 0, len(in.ClusterOutputs)+len(in.Outputs))
 	clusterOutputRefs := make(map[string]types.NamespacedName, len(in.ClusterOutputs))
@@ -101,47 +103,47 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderClusterFlow(in.Logging.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderClusterFlow(in.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
-		logDefs = append(logDefs, renderFlow(in.Logging.Name, clusterOutputRefs, sourceName, keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
+		logDefs = append(logDefs, renderFlow(in.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
 
-	if in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix == "" {
-		in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter)
+	if in.SyslogNGSpec.JSONKeyPrefix == "" {
+		in.SyslogNGSpec.JSONKeyPrefix = "json" + keyDelim(in.SyslogNGSpec.JSONKeyDelimiter)
 	}
 
 	sourceParsers := []render.Renderer{
 		renderDriver(
 			Field{
 				Value: reflect.ValueOf(JSONParser{
-					Prefix:       in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix,
-					KeyDelimiter: in.Logging.Spec.SyslogNGSpec.JSONKeyDelimiter,
+					Prefix:       in.SyslogNGSpec.JSONKeyPrefix,
+					KeyDelimiter: in.SyslogNGSpec.JSONKeyDelimiter,
 				}),
 			}, nil),
 	}
 
-	if in.Logging.Spec.SyslogNGSpec.SourceDateParser != nil {
-		setDefault(&in.Logging.Spec.SyslogNGSpec.SourceDateParser.Format, amp("%FT%T.%f%z"))
-		setDefault(&in.Logging.Spec.SyslogNGSpec.SourceDateParser.Template,
-			amp(fmt.Sprintf("${%stime}", in.Logging.Spec.SyslogNGSpec.JSONKeyPrefix)))
+	if in.SyslogNGSpec.SourceDateParser != nil {
+		setDefault(&in.SyslogNGSpec.SourceDateParser.Format, amp("%FT%T.%f%z"))
+		setDefault(&in.SyslogNGSpec.SourceDateParser.Template,
+			amp(fmt.Sprintf("${%stime}", in.SyslogNGSpec.JSONKeyPrefix)))
 		sourceParsers = append(sourceParsers, renderDriver(
 			Field{
 				Value: reflect.ValueOf(DateParser{
-					Format:   *in.Logging.Spec.SyslogNGSpec.SourceDateParser.Format,
-					Template: *in.Logging.Spec.SyslogNGSpec.SourceDateParser.Template,
+					Format:   *in.SyslogNGSpec.SourceDateParser.Format,
+					Template: *in.SyslogNGSpec.SourceDateParser.Template,
 				}),
 			}, nil))
 	}
 
-	for _, sm := range in.Logging.Spec.SyslogNGSpec.SourceMetrics {
+	for _, sm := range in.SyslogNGSpec.SourceMetrics {
 		if sm.Labels == nil {
 			sm.Labels = make(filter.ArrowMap, 0)
 		}
-		sm.Labels["logging"] = in.Logging.Name
+		sm.Labels["logging"] = in.Name
 		sourceParsers = append(sourceParsers, renderDriver(Field{
 			Value: reflect.ValueOf(sm),
 		}, nil))
@@ -160,7 +162,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 								Value: reflect.ValueOf(NetworkSourceDriver{
 									Transport:      "tcp",
 									Port:           uint16(in.SourcePort),
-									MaxConnections: in.Logging.Spec.SyslogNGSpec.MaxConnections,
+									MaxConnections: in.SyslogNGSpec.MaxConnections,
 									LogIWSize:      logIWSizeCalculator(in),
 									Flags:          []string{"no-parse"},
 								}),
@@ -218,8 +220,8 @@ func amp[T any](v T) *T {
 }
 
 func logIWSizeCalculator(in Input) int {
-	if in.Logging.Spec.SyslogNGSpec.MaxConnections != 0 && in.Logging.Spec.SyslogNGSpec.LogIWSize == 0 {
-		return in.Logging.Spec.SyslogNGSpec.MaxConnections * 100
+	if in.SyslogNGSpec.MaxConnections != 0 && in.SyslogNGSpec.LogIWSize == 0 {
+		return in.SyslogNGSpec.MaxConnections * 100
 	}
-	return in.Logging.Spec.SyslogNGSpec.LogIWSize
+	return in.SyslogNGSpec.LogIWSize
 }

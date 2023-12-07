@@ -60,7 +60,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.SyslogNGSpec.Metrics != nil {
+	if r.syslogNGSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
 			Spec: corev1.ServiceSpec{
@@ -68,8 +68,8 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 					{
 						Protocol:   corev1.ProtocolTCP,
 						Name:       "http-metrics",
-						Port:       r.Logging.Spec.SyslogNGSpec.Metrics.Port,
-						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.SyslogNGSpec.Metrics.Port},
+						Port:       r.syslogNGSpec.Metrics.Port,
+						TargetPort: intstr.IntOrString{IntVal: r.syslogNGSpec.Metrics.Port},
 					},
 				},
 				Selector:  r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
@@ -85,10 +85,10 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.Logging.Spec.SyslogNGSpec.Metrics != nil && r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitor {
+	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
-		if r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
+		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
@@ -104,10 +104,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					Path:           "/metrics",
 					Interval:       "15s",
 					ScrapeTimeout:  "5s",
-					HonorLabels:    r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs: r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
-					TLSConfig:      r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-					Scheme:         r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
+					HonorLabels:    r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
+					TLSConfig:      r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+					Scheme:         r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
@@ -122,10 +122,10 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil && r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port != 0 {
-			port = r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Port
+		if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
+			port = r.syslogNGSpec.BufferVolumeMetrics.Port
 		}
 
 		return &corev1.Service{
@@ -152,10 +152,10 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics != nil && r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
-		if r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
+		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
+			for k, v := range r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
@@ -167,14 +167,14 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:                 "buffer-metrics",
-					Path:                 r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Path,
-					Interval:             v1.Duration(r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Interval),
-					ScrapeTimeout:        v1.Duration(r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.Timeout),
-					HonorLabels:          r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs:       r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
-					MetricRelabelConfigs: r.Logging.Spec.SyslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					TLSConfig:            r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-					Scheme:               r.Logging.Spec.SyslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
+					Path:                 r.syslogNGSpec.BufferVolumeMetrics.Path,
+					Interval:             v1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        v1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Timeout),
+					HonorLabels:          r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
+					RelabelConfigs:       r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
+					MetricRelabelConfigs: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
+					TLSConfig:            r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+					Scheme:               r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},

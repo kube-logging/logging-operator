@@ -16,6 +16,7 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
@@ -63,6 +64,49 @@ type SourceDateParser struct {
 	Template *string `json:"template,omitempty"`
 }
 
+// +name:"SyslogNGConfig"
+// +weight:"200"
+type _hugoSyslogNGConfig interface{} //nolint:deadcode,unused
+
+// +name:"SyslogNG"
+// +version:"v1beta1"
+// +description:"SyslogNG is a reference to the desired SyslogNG state"
+type _metaSyslogNGConfig interface{} //nolint:deadcode,unused
+
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=logging-all
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+
+type SyslogNGConfig struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   SyslogNGSpec         `json:"spec,omitempty"`
+	Status SyslogNGConfigStatus `json:"status,omitempty"`
+}
+
+// SyslogNGConfigStatus
+type SyslogNGConfigStatus struct {
+	Logging       string   `json:"logging,omitempty"`
+	Active        *bool    `json:"active,omitempty"`
+	Problems      []string `json:"problems,omitempty"`
+	ProblemsCount int      `json:"problemsCount,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// SyslogNGConfigList
+type SyslogNGConfigList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []SyslogNGConfig `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&SyslogNGConfig{}, &SyslogNGConfigList{})
+}
+
 // +kubebuilder:object:generate=true
 
 // SyslogNGTLS defines the TLS configs
@@ -86,4 +130,26 @@ type GlobalOptions struct {
 type Stats struct {
 	Level *int `json:"level,omitempty"`
 	Freq  *int `json:"freq,omitempty"`
+}
+
+func (s *SyslogNGSpec) SetDefaults() {
+	if s != nil {
+		// if s.MaxConnections == 0 {
+		// 	max connections is now configured dynamically if not set
+		// }
+		if s.Metrics != nil {
+			if s.Metrics.Path == "" {
+				s.Metrics.Path = "/metrics"
+			}
+			if s.Metrics.Port == 0 {
+				s.Metrics.Port = 9577
+			}
+			if s.Metrics.Timeout == "" {
+				s.Metrics.Timeout = "5s"
+			}
+			if s.Metrics.Interval == "" {
+				s.Metrics.Interval = "15s"
+			}
+		}
+	}
 }

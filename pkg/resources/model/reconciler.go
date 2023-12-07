@@ -240,6 +240,39 @@ func NewValidationReconciler(
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
 		}
 
+		if len(resources.SyslogNG.ExcessSyslogNGs) != 0 {
+			logger.Info("Excess SyslogNG CRDs found")
+			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, "multiple syslog-ng configurations found, couldn't associate it with logging")
+			for i := range resources.SyslogNG.ExcessSyslogNGs {
+				excessSyslogNG := &resources.SyslogNG.ExcessSyslogNGs[i]
+				registerForPatching(excessSyslogNG)
+				excessSyslogNG.Status.Problems = nil
+				excessSyslogNG.Status.Active = utils.BoolPointer(false)
+				excessSyslogNG.Status.Logging = ""
+
+				if len(resources.Logging.Status.SyslogNGConfigName) == 0 {
+					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
+				} else if resources.Logging.Status.FluentdConfigName != excessSyslogNG.Name {
+					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "logging already has a detached syslog-ng configuration, remove excess configuration objects")
+				}
+				excessSyslogNG.Status.ProblemsCount = len(excessSyslogNG.Status.Problems)
+			}
+		}
+
+		if resources.SyslogNG.Configuration != nil {
+			registerForPatching(resources.SyslogNG.Configuration)
+
+			if resources.Logging.Spec.SyslogNGSpec != nil {
+				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, fmt.Sprintf("syslog-ng configuration reference set (name=%s), but inline syslog-ng configuration is set as well, clearing inline", resources.SyslogNG.Configuration.Name))
+				resources.Logging.Spec.SyslogNGSpec = nil
+			}
+			logger.Info("found detached syslog-ng aggregator, making association", "name=", resources.SyslogNG.Configuration.Name)
+			resources.Logging.Status.SyslogNGConfigName = resources.SyslogNG.Configuration.Name
+			logger.Info("found detached syslog-ng aggregator, making association, done: ", "name=", resources.Logging.Status.SyslogNGConfigName)
+			resources.SyslogNG.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.SyslogNG.Configuration.Status.Logging = resources.Logging.Name
+		}
+
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
 		}

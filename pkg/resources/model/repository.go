@@ -60,6 +60,9 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	res.Fluentd.Configuration, res.Fluentd.ExcessFluentds, err = r.FluentdConfigFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
+	res.SyslogNG.Configuration, res.SyslogNG.ExcessSyslogNGs, err = r.SyslogNGConfigFor(ctx, logging)
+	errs = errors.Append(errs, err)
+
 	res.SyslogNG.ClusterFlows, err = r.SyslogNGClusterFlowsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
@@ -376,6 +379,49 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 	default:
 		excessFluentds := r.handleMultipleDetachedFluentdObjects(res, logging)
 		return nil, excessFluentds, nil
+	}
+}
+func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list []v1beta1.SyslogNGConfig, logging v1beta1.Logging) []v1beta1.SyslogNGConfig {
+
+	r.Logger.Info("multiple detached SyslogNG CRDs found")
+
+	var excessSyslogNGs []v1beta1.SyslogNGConfig
+	for _, i := range list {
+		if len(logging.Status.SyslogNGConfigName) != 0 {
+			if i.Name != logging.Status.SyslogNGConfigName {
+				excessSyslogNGs = append(excessSyslogNGs, i)
+			}
+		} else {
+			// No association, mark everything as excess
+			excessSyslogNGs = append(excessSyslogNGs, i)
+		}
+	}
+	return excessSyslogNGs
+}
+
+func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.SyslogNGConfig, []v1beta1.SyslogNGConfig, error) {
+	var list v1beta1.SyslogNGConfigList
+	if err := r.Client.List(ctx, &list); err != nil {
+		return nil, []v1beta1.SyslogNGConfig{}, err
+	}
+
+	var res []v1beta1.SyslogNGConfig
+	res = append(res, list.Items...)
+
+	switch len(res) {
+	case 0:
+		return nil, []v1beta1.SyslogNGConfig{}, nil
+
+	case 1:
+		// Implicitly associate syslogng configuration object with logging
+		detachedSyslogNG := res[0]
+		detachedSyslogNG.Spec.SetDefaults()
+		r.Logger.Info("found detached syslog-ng aggregator", "name=", detachedSyslogNG.Name)
+
+		return &detachedSyslogNG, []v1beta1.SyslogNGConfig{}, nil
+	default:
+		excessSyslogNGs := r.handleMultipleDetachedSyslogNGObjects(res, logging)
+		return nil, excessSyslogNGs, nil
 	}
 }
 

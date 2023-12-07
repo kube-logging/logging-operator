@@ -43,27 +43,17 @@ func TestRenderConfigInto(t *testing.T) {
 		},
 		"no syslog-ng spec": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: nil,
-					},
-				},
+				SyslogNGSpec:        nil,
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			},
 			wantErr: true,
 		},
 		"single flow with single output": {
 			input: Input{
-				SourcePort: 601,
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "config-test",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				SourcePort:   601,
+				Name:         "test",
+				Namespace:    "config-test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
 				Outputs: []v1beta1.SyslogNGOutput{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -150,16 +140,10 @@ log {
 		},
 		"single flow with output metrics": {
 			input: Input{
-				SourcePort: 601,
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "config-test",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				SourcePort:   601,
+				Name:         "test",
+				Namespace:    "config-test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
 				Outputs: []v1beta1.SyslogNGOutput{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -291,14 +275,10 @@ log {
 		},
 		"global options": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							GlobalOptions: &v1beta1.GlobalOptions{
-								StatsLevel: amp(3),
-								StatsFreq:  amp(0),
-							},
-						},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					GlobalOptions: &v1beta1.GlobalOptions{
+						StatsLevel: amp(3),
+						StatsFreq:  amp(0),
 					},
 				},
 				SourcePort:          601,
@@ -327,15 +307,11 @@ source "main_input" {
 		},
 		"global options default": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							Metrics: &v1beta1.Metrics{
-								Path: "/metrics",
-							},
-							GlobalOptions: &v1beta1.GlobalOptions{},
-						},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					Metrics: &v1beta1.Metrics{
+						Path: "/metrics",
 					},
+					GlobalOptions: &v1beta1.GlobalOptions{},
 				},
 				SourcePort:          601,
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
@@ -362,15 +338,11 @@ source "main_input" {
 		},
 		"global options_new_stats": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							GlobalOptions: &v1beta1.GlobalOptions{
-								Stats: &v1beta1.Stats{
-									Level: amp(3),
-									Freq:  amp(0),
-								},
-							},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					GlobalOptions: &v1beta1.GlobalOptions{
+						Stats: &v1beta1.Stats{
+							Level: amp(3),
+							Freq:  amp(0),
 						},
 					},
 				},
@@ -399,11 +371,7 @@ source "main_input" {
 		},
 		"rewrite condition": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				SyslogNGSpec:        &v1beta1.SyslogNGSpec{},
 				SourcePort:          601,
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				Flows: []v1beta1.SyslogNGFlow{
@@ -467,15 +435,9 @@ log {
 		},
 		"output with secret": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				Name:         "test",
+				Namespace:    "logging",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
 				Outputs: []v1beta1.SyslogNGOutput{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -541,15 +503,8 @@ destination "output_default_my-output" {
 		},
 		"clusteroutput with flow ref": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
-						ControlNamespace: "logging",
-					},
-				},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Name:         "test",
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -614,15 +569,8 @@ log {
 		},
 		"flow referencing non-existent cluster output": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
-						ControlNamespace: "logging",
-					},
-				},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Name:         "test",
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -644,15 +592,8 @@ log {
 		},
 		"clusterFlow referencing non-existent cluster output": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec:     &v1beta1.SyslogNGSpec{},
-						ControlNamespace: "logging",
-					},
-				},
+				Name:         "test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
 				ClusterFlows: []v1beta1.SyslogNGClusterFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -674,15 +615,9 @@ log {
 		},
 		"parser": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				Name:         "test",
+				Namespace:    "logging",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -738,15 +673,9 @@ log {
 		},
 		"filter with name": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Namespace:    "logging",
+				Name:         "test",
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -802,15 +731,9 @@ log {
 		},
 		"groupunset": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{},
-					},
-				},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Namespace:    "logging",
+				Name:         "test",
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -866,17 +789,11 @@ log {
 		},
 		"custom json key delimiter": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							JSONKeyDelimiter: ";",
-						},
-					},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					JSONKeyDelimiter: ";",
 				},
+				Namespace: "logging",
+				Name:      "test",
 				Flows: []v1beta1.SyslogNGFlow{
 					{
 						ObjectMeta: metav1.ObjectMeta{
@@ -930,17 +847,11 @@ log {
 		},
 		"custom json key prefix": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							JSONKeyPrefix: "asdf.",
-						},
-					},
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					JSONKeyPrefix: "asdf.",
 				},
+				Namespace:           "logging",
+				Name:                "test",
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
 			},
@@ -962,29 +873,23 @@ source "main_input" {
 		},
 		"source metrics": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							SourceMetrics: []filter.MetricsProbe{
-								{
-									Key: "example",
-									Labels: filter.ArrowMap{
-										"a": "b",
-									},
-									Level: 2,
-								},
-								{
-									Key: "example2",
-									Labels: filter.ArrowMap{
-										"c": "d",
-									},
-									Level: 3,
-								},
+				Namespace: "logging",
+				Name:      "test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					SourceMetrics: []filter.MetricsProbe{
+						{
+							Key: "example",
+							Labels: filter.ArrowMap{
+								"a": "b",
 							},
+							Level: 2,
+						},
+						{
+							Key: "example2",
+							Labels: filter.ArrowMap{
+								"c": "d",
+							},
+							Level: 3,
 						},
 					},
 				},
@@ -1017,16 +922,10 @@ source "main_input" {
 		},
 		"date-parser default": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							SourceDateParser: &v1beta1.SourceDateParser{},
-						},
-					},
+				Namespace: "logging",
+				Name:      "test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					SourceDateParser: &v1beta1.SourceDateParser{},
 				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 				SourcePort:          601,
@@ -1050,18 +949,12 @@ source "main_input" {
 		},
 		"date-parser custom": {
 			input: Input{
-				Logging: v1beta1.Logging{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "logging",
-						Name:      "test",
-					},
-					Spec: v1beta1.LoggingSpec{
-						SyslogNGSpec: &v1beta1.SyslogNGSpec{
-							SourceDateParser: &v1beta1.SourceDateParser{
-								Format:   utils.StringPointer("asd"),
-								Template: utils.StringPointer("bsd"),
-							},
-						},
+				Namespace: "logging",
+				Name:      "test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					SourceDateParser: &v1beta1.SourceDateParser{
+						Format:   utils.StringPointer("asd"),
+						Template: utils.StringPointer("bsd"),
 					},
 				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{},

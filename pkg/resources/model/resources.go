@@ -57,11 +57,32 @@ type FluentdLoggingResources struct {
 	ExcessFluentds []v1beta1.FluentdConfig
 }
 
+func (l LoggingResources) GetSyslogNG() *v1beta1.SyslogNGConfig {
+	if l.SyslogNG.Configuration != nil {
+		return l.SyslogNG.Configuration
+	}
+	return nil
+}
+
+func (l LoggingResources) GetSyslogNGSpec() *v1beta1.SyslogNGSpec {
+
+	if detachedSyslogNG := l.GetSyslogNG(); detachedSyslogNG != nil {
+		return &detachedSyslogNG.Spec
+	}
+	if l.Logging.Spec.SyslogNGSpec != nil {
+		return l.Logging.Spec.SyslogNGSpec
+	}
+
+	return nil
+}
+
 type SyslogNGLoggingResources struct {
-	ClusterFlows   []v1beta1.SyslogNGClusterFlow
-	ClusterOutputs SyslogNGClusterOutputs
-	Flows          []v1beta1.SyslogNGFlow
-	Outputs        SyslogNGOutputs
+	ClusterFlows    []v1beta1.SyslogNGClusterFlow
+	ClusterOutputs  SyslogNGClusterOutputs
+	Flows           []v1beta1.SyslogNGFlow
+	Outputs         SyslogNGOutputs
+	Configuration   *v1beta1.SyslogNGConfig
+	ExcessSyslogNGs []v1beta1.SyslogNGConfig
 }
 
 type ClusterOutputs []v1beta1.ClusterOutput

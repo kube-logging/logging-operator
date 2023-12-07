@@ -1,14 +1,14 @@
 ## Standalone Fluentd config
 
-The standalone `FluentdConfig` is a namespaced resource that allows the configuration of the Fluentd / SyslogNG 
-aggregator component in the control namespace separately from the Logging resource.
+The standalone `FluentdConfig` and `SyslogNGConfig` are namespaced resources that allow the configuration of the Fluentd / SyslogNG
+aggregator components in the control namespace separately from the Logging resource.
 
 The primary benefit of this behaviour is that it enables a multi-tenant model, where tenant owners are responsible
 for operating their own aggregator, while the Logging resource is in control of the central operations team.
 For more information about the multi-tenancy model where the collector is capable of routing logs based on namespaces
 to individual aggregators and where aggregators are fully isolated, please see [Multi-tenancy](multi-tenancy.md)
 
-Traditional configuration of fluentd within the logging resource:
+Traditional configuration of fluentd within the logging resource (the case with syslog-ng is the same expect the field is `syslogNG`):
 ```
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Logging
@@ -40,16 +40,18 @@ spec:
     replicas: 2
 ```
 
+Note: In case of syslog-ng the name of the standalone config resource is `SyslogNGConfig`.
+
 ### Schema and migration
 
-The schema for `FluentdConfig.spec` is the same as it was withing `Logging.spec.fluentd`, so the migration should be a trivial lift and shift
-exercise.
+The schema for `FluentdConfig.spec` / `SyslogNGConfig.spec` is the same as it was withing `Logging.spec.fluentd` / `Logging.spec.syslogNG`,
+so the migration should be a trivial lift and shift exercise.
 
 ### Restrictions and status
 
-There can only be one active `FluentdConfig` for a single `Logging` resource at a time. The controller will make
-sure to register the active `FluentdConfig` resource into the `Logging` resource's status under `fluentdConfigName`,
-while registering the `Logging` resource name under `logging` in the `FluentdConfig` resource's status.
+There can only be one active `FluentdConfig` or `SyslogNGConfig` for a single `Logging` resource at a time. The controller will make
+sure to register the active resource into the `Logging` resource's status under `fluentdConfigName` / `syslogNGConfigName`,
+while registering the `Logging` resource name under `logging` in the `FluentdConfig` / `SyslogNGConfig` resource's status.
 
 ```
 kubectl get logging example -o jsonpath='{.status}' | jq .

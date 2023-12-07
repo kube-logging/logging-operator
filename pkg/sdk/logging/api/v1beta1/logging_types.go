@@ -111,6 +111,8 @@ type LoggingStatus struct {
 	ConfigCheckResults map[string]bool `json:"configCheckResults,omitempty"`
 	// Name of the matched detached fluentd configuration object
 	FluentdConfigName string `json:"fluentdConfigName,omitempty"`
+	// Name of the matched detached SyslogNG configuration object
+	SyslogNGConfigName string `json:"syslogNGConfigName,omitempty"`
 
 	// Problems with the logging resource
 	Problems []string `json:"problems,omitempty"`
@@ -197,24 +199,8 @@ func (l *Logging) SetDefaults() error {
 	if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
 		l.Spec.ConfigCheck.TimeoutSeconds = 10
 	}
-	if l.Spec.SyslogNGSpec != nil {
-		// if l.Spec.SyslogNGSpec.MaxConnections == 0 {
-		// 	max connections is now configured dynamically if not set
-		// }
-		if l.Spec.SyslogNGSpec.Metrics != nil {
-			if l.Spec.SyslogNGSpec.Metrics.Path == "" {
-				l.Spec.SyslogNGSpec.Metrics.Path = "/metrics"
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Port == 0 {
-				l.Spec.SyslogNGSpec.Metrics.Port = 9577
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Timeout == "" {
-				l.Spec.SyslogNGSpec.Metrics.Timeout = "5s"
-			}
-			if l.Spec.SyslogNGSpec.Metrics.Interval == "" {
-				l.Spec.SyslogNGSpec.Metrics.Interval = "15s"
-			}
-		}
+	if len(l.Status.SyslogNGConfigName) == 0 {
+		l.Spec.SyslogNGSpec.SetDefaults()
 	}
 
 	return nil
@@ -525,5 +511,6 @@ func GenerateLoggingRefLabels(loggingRef string) map[string]string {
 }
 
 func (l *Logging) AreMultipleAggregatorsSet() bool {
-	return l.Spec.SyslogNGSpec != nil && (l.Spec.FluentdSpec != nil || len(l.Status.FluentdConfigName) != 0)
+	return (l.Spec.SyslogNGSpec != nil || len(l.Status.SyslogNGConfigName) != 0) &&
+		(l.Spec.FluentdSpec != nil || len(l.Status.FluentdConfigName) != 0)
 }
