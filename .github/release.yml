@@ -1,0 +1,30 @@
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release-note
+  categories:
+    - title: Breaking Changes
+      labels:
+        - breaking-change
+    - title: New Features
+      labels:
+        - feature
+    - title: Enhancements
+      labels:
+        - enhancement
+    - title: Dependency and image updates
+      labels:
+        - dependency
+    - title: Bug fixes
+      labels:
+        - bugfix
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Testing
+      labels:
+        - testing
+    - title: Other Changes
+      labels:
+        - "*"
