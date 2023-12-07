@@ -2,12 +2,22 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- bases/logging.banzaicloud.io_flows.yaml
+- bases/logging-extensions.banzaicloud.io_eventtailers.yaml
+- bases/logging-extensions.banzaicloud.io_hosttailers.yaml
 - bases/logging.banzaicloud.io_clusterflows.yaml
-- bases/logging.banzaicloud.io_outputs.yaml
 - bases/logging.banzaicloud.io_clusteroutputs.yaml
+- bases/logging.banzaicloud.io_flows.yaml
+- bases/logging.banzaicloud.io_fluentbitagents.yaml
+- bases/logging.banzaicloud.io_fluentdconfigs.yaml
+- bases/logging.banzaicloud.io_loggingroutes.yaml
 - bases/logging.banzaicloud.io_loggings.yaml
 - bases/logging.banzaicloud.io_nodeagents.yaml
+- bases/logging.banzaicloud.io_outputs.yaml
+- bases/logging.banzaicloud.io_syslogngclusterflows.yaml
+- bases/logging.banzaicloud.io_syslogngclusteroutputs.yaml
+- bases/logging.banzaicloud.io_syslogngconfigs.yaml
+- bases/logging.banzaicloud.io_syslogngflows.yaml
+- bases/logging.banzaicloud.io_syslogngoutputs.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patches:
