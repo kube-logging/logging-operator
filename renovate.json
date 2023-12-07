@@ -17,6 +17,7 @@
   "constraints": {
     "go": "1.21"
   },
+  "labels": ["dependencies"],
   "packageRules": [
     {
       "matchPackageNames": ["k8s.io/client-go"],
