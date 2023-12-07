@@ -9,6 +9,10 @@
     <img src="https://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="license">
   </a>
 
+  <a href="https://www.bestpractices.dev/projects/7941">
+    <img src="https://www.bestpractices.dev/projects/7941/badge?cache=20231206">
+  </a>
+
 </p>
 
 # Logging operator
@@ -101,8 +105,6 @@ If you find this project useful, help us:
 Please read the [Organisation's Code of Conduct](https://github.com/kube-logging/.github/blob/main/CODE_OF_CONDUCT.md)!
 
 *For more information, read the [developer documentation](https://kube-logging.github.io/docs/developers)*.
-
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7941/badge)](https://www.bestpractices.dev/projects/7941)
 
 ## License
 
