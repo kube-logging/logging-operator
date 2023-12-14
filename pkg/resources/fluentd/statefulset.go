@@ -15,6 +15,7 @@
 package fluentd
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -49,13 +50,17 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		}
 	}
 	for _, n := range r.fluentdSpec.ExtraVolumes {
-		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil {
+		if n.Volume == nil || n.Volume.PersistentVolumeClaim == nil {
+			continue
+		}
+
+		if !isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
 			if err := n.Volume.ApplyPVCForStatefulSet(n.ContainerName, n.Path, spec, func(name string) metav1.ObjectMeta {
 				return r.FluentdObjectMeta(name, ComponentFluentd)
 			}); err != nil {
 				return nil, reconciler.StatePresent, err
 			}
-		} else {
+		} else if !isPersistentVolumeSourceEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeSource) {
 			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 				return nil, reconciler.StatePresent, err
 			}
@@ -70,6 +75,16 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	desired.Annotations = util.MergeLabels(desired.Annotations, r.fluentdSpec.StatefulSetAnnotations)
 
 	return desired, reconciler.StatePresent, nil
+}
+
+func isPersistentVolumeClaimSpecEmpty(pvcSpec corev1.PersistentVolumeClaimSpec) bool {
+	searilizedPvcSpec, _ := json.Marshal(pvcSpec)
+	return string(searilizedPvcSpec) == `{"resources":{}}`
+}
+
+func isPersistentVolumeSourceEmpty(pvcSource corev1.PersistentVolumeClaimVolumeSource) bool {
+	searilizedPvcSource, _ := json.Marshal(pvcSource)
+	return string(searilizedPvcSource) == `{}`
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
