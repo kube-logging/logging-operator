@@ -25,8 +25,8 @@ type _hugoElasticsearchGenId interface{} //nolint:deadcode,unused
 
 // +docName:"ElasticSearch GenId"
 /*
-TODO: FILL
-// ## Example `Elasticsearch Genid` filter configurations
+## Example `Elasticsearch Genid` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -39,8 +39,11 @@ spec:
  selectors: {}
  localOutputRefs:
    - demo-output
+{{</ highlight >}}
 
-#### Fluentd Config Result
+Fluentd Config Result
+
+{{< highlight xml >}}
 <filter **>
  @type elasticsearch_genid
  @id test_elasticsearch_genid

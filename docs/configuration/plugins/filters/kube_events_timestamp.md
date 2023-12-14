@@ -45,8 +45,7 @@ spec:
     - es-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
  <filter **>

@@ -105,6 +105,7 @@ type FluentdSpec struct {
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
+	// Available in Logging operator version 4.5 and later.
 	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
 }
 

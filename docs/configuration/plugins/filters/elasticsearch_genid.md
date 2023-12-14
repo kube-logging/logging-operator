@@ -7,8 +7,8 @@ generated_file: true
 # ElasticSearch GenId
 ## Overview
 
-TODO: FILL
-// ## Example `Elasticsearch Genid` filter configurations
+## Example `Elasticsearch Genid` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -21,8 +21,11 @@ spec:
  selectors: {}
  localOutputRefs:
    - demo-output
+{{</ highlight >}}
 
-#### Fluentd Config Result
+Fluentd Config Result
+
+{{< highlight xml >}}
 <filter **>
  @type elasticsearch_genid
  @id test_elasticsearch_genid

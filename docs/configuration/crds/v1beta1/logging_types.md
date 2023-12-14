@@ -129,7 +129,7 @@ Result of the config check. Under normal conditions there is a single item in th
 
 ### fluentdConfigName (string, optional) {#loggingstatus-fluentdconfigname}
 
-Name of the matched detached fluentd configuration object 
+Available in Logging operator version 4.5 and later. Name of the matched detached fluentd configuration object. 
 
 
 ### problems ([]string, optional) {#loggingstatus-problems}
@@ -144,7 +144,7 @@ Count of problems for printcolumn
 
 ### syslogNGConfigName (string, optional) {#loggingstatus-syslogngconfigname}
 
-Name of the matched detached SyslogNG configuration object 
+Available in Logging operator version 4.5 and later. Name of the matched detached SyslogNG configuration object. 
 
 
 ### watchNamespaces ([]string, optional) {#loggingstatus-watchnamespaces}

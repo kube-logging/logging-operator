@@ -60,8 +60,9 @@ type MetricSection struct {
 	Labels Label `json:"labels,omitempty"`
 }
 
-// ## Example `Prometheus` filter configurations
 /*
+## Example `Prometheus` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -90,9 +91,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml>}}
   <filter **>

@@ -75,9 +75,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -121,9 +120,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-*/
-/*
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -170,9 +167,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <or>
@@ -221,9 +217,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-Fluentd #### config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 	<and>

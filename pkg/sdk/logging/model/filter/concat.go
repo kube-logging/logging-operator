@@ -79,8 +79,8 @@ type Concat struct {
 	PartialCriStreamKey string `json:"partial_cri_stream_key,omitempty"`
 }
 
-// ## Example `Concat` filter configurations
 /*
+## Example `Concat` filter configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -109,7 +109,6 @@ Fluentd config result:
   partial_key partial_message
 </filter>
 {{</ highlight >}}
-
 */
 type _expConcat interface{} //nolint:deadcode,unused
 

@@ -37,7 +37,8 @@ Output prefix key name
 Default: ua
 
 
- ## Example `UserAgent` filter configurations
+
+## Example `UserAgent` filter configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -56,7 +57,8 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-## Fluentd Config Result
+Fluentd config result:
+
 {{< highlight xml >}}
 <filter **>
   @type ua_parser

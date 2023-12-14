@@ -48,8 +48,9 @@ type SyslogNGSpec struct {
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
+	// Available in Logging operator version 4.5 and later.
 	// Parses date automatically from the timestamp registered by the container runtime.
-	// Note: json key prefix and delimiter are respected
+	// Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
 	SourceDateParser *SourceDateParser     `json:"sourceDateParser,omitempty"`
 	MaxConnections   int                   `json:"maxConnections,omitempty"`
 	LogIWSize        int                   `json:"logIWSize,omitempty"`
@@ -57,6 +58,13 @@ type SyslogNGSpec struct {
 	// TODO: option to turn on/off buffer volume PVC
 }
 
+/* 
+Available in Logging operator version 4.5 and later.
+
+Parses date automatically from the timestamp registered by the container runtime.
+Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+It is disabled by default, but if enabled, then the default settings parse the timestamp written by the container runtime and parsed by Fluent Bit using the `cri` or the `docker` parser.
+*/
 type SourceDateParser struct {
 	// Default: "%FT%T.%f%z"
 	Format *string `json:"format,omitempty"`

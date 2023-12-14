@@ -138,7 +138,7 @@ Default: ":"
 
 ### local_time (bool, optional) {#parse section-local_time}
 
-Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.
+If true, use local time. Otherwise, UTC is used. This is exclusive with utc.
 
 Default: true
 
@@ -255,7 +255,7 @@ If true, keep time field in the record.
 
 ### local_time (bool, optional) {#parse section (single)-local_time}
 
-Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc.
+If true, use local time. Otherwise, UTC is used. This is exclusive with utc.
 
 Default: true
 
@@ -372,8 +372,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight yaml >}}
 <filter **>

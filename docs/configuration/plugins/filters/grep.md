@@ -66,8 +66,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -116,9 +115,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -171,8 +168,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <or>
@@ -227,8 +223,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-Fluentd #### config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 	<and>

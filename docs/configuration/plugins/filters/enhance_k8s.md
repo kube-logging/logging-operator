@@ -125,8 +125,7 @@ spec:
     - enhanceK8s: {}
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

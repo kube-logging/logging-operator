@@ -25,19 +25,20 @@ import (
 type _hugoExceptionDetector interface{} //nolint:deadcode,unused
 
 // +docName:"Exception Detector"
-// This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is.
-// More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
-//
-// > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
-//
-// ## Example output configurations
-// ```yaml
-// filters:
-//   - detectExceptions:
-//     languages: java, python
-//     multiline_flush_interval: 0.1
-//
-// ```
+/*
+This filter plugin consumes a log stream of JSON objects which contain single-line log messages. If a consecutive sequence of log messages form an exception stack trace, they forwarded as a single, combined JSON object. Otherwise, the input log data is forwarded as is. More info at https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
+
+> Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
+
+## Example output configurations
+
+```yaml
+filters:
+  - detectExceptions:
+    languages: java, python
+    multiline_flush_interval: 0.1
+```
+*/
 type _docExceptionDetector interface{} //nolint:deadcode,unused
 
 // +name:"Exception Detector"
@@ -71,6 +72,7 @@ type DetectExceptions struct {
 
 /*
 ## Example `Exception Detector` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -87,9 +89,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <match kubernetes.**>

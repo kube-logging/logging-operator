@@ -48,8 +48,9 @@ type UserAgent struct {
 	Flatten bool `json:"flatten,omitempty"`
 }
 
-// ## Example `UserAgent` filter configurations
 /*
+## Example `UserAgent` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -67,7 +68,8 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-## Fluentd Config Result
+Fluentd config result:
+
 {{< highlight xml >}}
 <filter **>
   @type ua_parser

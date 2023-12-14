@@ -87,7 +87,7 @@ type ParseSection struct {
 	TimeFormat string `json:"time_format,omitempty"`
 	// Parse/format value according to this type available values: float, unixtime, string (default: string)
 	TimeType string `json:"time_type,omitempty"`
-	// Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
+	// If true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
 	LocalTime bool `json:"local_time,omitempty"`
 	// If true, use UTC. Otherwise, local time is used. This is exclusive with localtime (default: false)
 	UTC bool `json:"utc,omitempty"`
@@ -152,7 +152,7 @@ type SingleParseSection struct {
 	TimeFormat string `json:"time_format,omitempty"`
 	// Parse/format value according to this type available values: float, unixtime, string (default: string)
 	TimeType string `json:"time_type,omitempty"`
-	// Ff true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
+	// If true, use local time. Otherwise, UTC is used. This is exclusive with utc. (default: true)
 	LocalTime bool `json:"local_time,omitempty"`
 	// If true, use UTC. Otherwise, local time is used. This is exclusive with localtime (default: false)
 	UTC bool `json:"utc,omitempty"`
@@ -222,9 +222,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight yaml >}}
 <filter **>
