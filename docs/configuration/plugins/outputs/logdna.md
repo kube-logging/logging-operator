@@ -62,8 +62,7 @@ Comma-Separated List of Tags, Optional
 
 
 
- ## Example `LogDNA` filter configurations
-
+## Example `LogDNA` filter configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

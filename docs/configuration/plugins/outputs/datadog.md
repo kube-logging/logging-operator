@@ -6,7 +6,8 @@ generated_file: true
 
 # Datadog output plugin for Fluentd
 ## Overview
- It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't want to.
+
+It mainly contains a proper JSON formatter and a socket handler that streams logs directly to Datadog - so no need to use a log shipper if you don't want to.
 For details, see [https://github.com/DataDog/fluent-plugin-datadog](https://github.com/DataDog/fluent-plugin-datadog).
 
 ## Example

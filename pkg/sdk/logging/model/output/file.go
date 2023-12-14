@@ -63,8 +63,8 @@ type FileOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
-// ## Example `File` output configurations
 /*
+## Example `File` output configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -100,7 +100,7 @@ Fluentd config result:
 	  timekey_wait 30s
 	</buffer>
 </match>
-{{< highlight xml >}}
+{{</ highlight >}}
 */
 type _expFile interface{} //nolint:deadcode,unused
 

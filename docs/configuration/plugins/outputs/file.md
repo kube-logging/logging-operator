@@ -66,7 +66,7 @@ Create symlink to temporary buffered file when buffer_type is file. This is usef
 Default: false
 
 
- ## Example `File` output configurations
+## Example `File` output configurations
 
 
 {{< highlight yaml >}}

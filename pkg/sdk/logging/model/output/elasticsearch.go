@@ -148,7 +148,7 @@ type ElasticsearchOutput struct {
 	// fail_on_detecting_es_version_retry_exceed (default: true)
 	// +kubebuilder:validation:Optional
 	FailOnDetectingEsVersionRetryExceed *bool `json:"fail_on_detecting_es_version_retry_exceed,omitempty" plugin:"default:true"`
-	// You can specify the times for retrying to obtain the Elasticsearch version.(default: 15)
+	// You can specify the number of times to retry fetching the Elasticsearch version.(default: 15)
 	MaxRetryGetEsVersion string `json:"max_retry_get_es_version,omitempty"`
 	// You can specify HTTP request timeout.(default: 5s)
 	RequestTimeout string `json:"request_timeout,omitempty"`
@@ -260,7 +260,7 @@ type ElasticsearchOutput struct {
 	DataStreamIlmPolicy string `json:"data_stream_ilm_policy,omitempty"`
 	// Specify whether overwriting data stream ilm policy or not.
 	DataStreamIlmPolicyOverwrite bool `json:"data_stream_ilm_policy_overwrite,omitempty"`
-	// Specify wether to use legacy template or not. (default: true)
+	// If set to true, the output uses the [legacy index template format](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-templates-v1.html). Otherwise, it uses the [composable index template](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-templates.html) format. (default: true)
 	// +kubebuilder:validation:Optional
 	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty"`
 }
