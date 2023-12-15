@@ -6,11 +6,11 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.33.0
-	github.com/kube-logging/logging-operator v0.0.0-20231205075914-a65274d60e05
+	github.com/kube-logging/logging-operator v0.0.0-20231207163601-2c4ff95bd1a0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
-	helm.sh/helm/v3 v3.13.2
+	helm.sh/helm/v3 v3.13.3
 	k8s.io/api v0.28.4
 	k8s.io/apiextensions-apiserver v0.28.4
 	k8s.io/apimachinery v0.28.4
@@ -145,11 +145,11 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiserver v0.28.4 // indirect
-	k8s.io/cli-runtime v0.28.2 // indirect
+	k8s.io/cli-runtime v0.28.4 // indirect
 	k8s.io/component-base v0.28.4 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
-	k8s.io/kubectl v0.28.2 // indirect
+	k8s.io/kubectl v0.28.4 // indirect
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
 	oras.land/oras-go v1.2.4 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
