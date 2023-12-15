@@ -8,7 +8,7 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/siliconbrain/go-seqs v0.8.1
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20231127185646-65229373498e
+	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611
 	k8s.io/api v0.28.4
 	k8s.io/apimachinery v0.28.4
 	sigs.k8s.io/controller-runtime v0.16.3
