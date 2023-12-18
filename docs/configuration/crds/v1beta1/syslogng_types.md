@@ -31,6 +31,8 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### maxConnections (int, optional) {#syslogngspec-maxconnections}
 
+Available in Logging operator version 4.5 and later. Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/). 
+
 
 ### metrics (*Metrics, optional) {#syslogngspec-metrics}
 
@@ -56,6 +58,8 @@ Available in Logging operator version 4.5 and later. Parses date automatically f
 
 
 ### sourceMetrics ([]filter.MetricsProbe, optional) {#syslogngspec-sourcemetrics}
+
+Available in Logging operator version 4.5 and later. Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}). 
 
 
 ### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}

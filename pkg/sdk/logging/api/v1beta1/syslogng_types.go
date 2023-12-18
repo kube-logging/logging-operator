@@ -52,8 +52,12 @@ type SyslogNGSpec struct {
 	// Parses date automatically from the timestamp registered by the container runtime.
 	// Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
 	SourceDateParser *SourceDateParser     `json:"sourceDateParser,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/).
 	MaxConnections   int                   `json:"maxConnections,omitempty"`
 	LogIWSize        int                   `json:"logIWSize,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}).
 	SourceMetrics    []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
 	// TODO: option to turn on/off buffer volume PVC
 }
