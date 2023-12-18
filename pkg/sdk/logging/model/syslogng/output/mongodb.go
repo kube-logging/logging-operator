@@ -85,7 +85,7 @@ type MongoDB struct {
 }
 
 // +kubebuilder:object:generate=true
-// Bulk operation related options
+// Bulk operation related options.
 // For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk).
 type Bulk struct {
 	// Enables bulk insert mode. If disabled, each messages is inserted individually. (default: yes)

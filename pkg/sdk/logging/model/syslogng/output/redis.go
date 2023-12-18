@@ -44,7 +44,7 @@ spec:
 	workers: 1
 {{</ highlight >}}
 
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/).
 */
 type _docRedis interface{} //nolint:deadcode,unused
 
