@@ -9,6 +9,8 @@ generated_file: true
 
 Sends messages to Grafana Loki over gRPC, based on the [Loki destination of AxoSyslog Core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 
 {{< highlight yaml >}}

@@ -9,6 +9,8 @@ generated_file: true
 
 Based on the [Redis destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 
 {{< highlight yaml >}}

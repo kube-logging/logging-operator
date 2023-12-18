@@ -9,6 +9,7 @@ generated_file: true
 
 Send messages to [OpenObserve](https://openobserve.ai/docs/api/ingestion/logs/json/) using its [Logs Ingestion - JSON API](https://openobserve.ai/docs/api/ingestion/logs/json/). This API accepts multiple records in batch in JSON format.
 
+Available in Logging operator version 4.5 and later.
 
 ## Example
 

@@ -26,6 +26,8 @@ type _hugoMongoDB interface{} //nolint:deadcode,unused
 /*
 Based on the [MongoDB destination of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 
 {{< highlight yaml >}}
