@@ -77,34 +77,32 @@ Tags property name in json
 Default: '__tag'
 
 
- ## Example `SQS` output configurations
- ```yaml
- apiVersion: logging.banzaicloud.io/v1beta1
- kind: Output
- metadata:
 
-	name: sqs-output-sample
+## Example `SQS` output configurations
 
- spec:
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: sqs-output-sample
+spec:
+  sqs:
+    queue_name: some-aws-sqs-queue
+    create_queue: false
+    region: us-east-1
+```
 
-	sqs:
-	  queue_name: some-aws-sqs-queue
-	  create_queue: false
-	  region: us-east-1
+Fluentd config result:
 
- ```
+```xml
+<match **>
+    @type sqs
+    @id test_sqs
+    queue_name some-aws-sqs-queue
+    create_queue false
+    region us-east-1
+</match>
+```
 
- #### Fluentd Config Result
- ```
-
-	<match **>
-	    @type sqs
-	    @id test_sqs
-	    queue_name some-aws-sqs-queue
-	    create_queue false
-	    region us-east-1
-	</match>
-
- ```
 
 ---

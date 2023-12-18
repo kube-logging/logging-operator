@@ -6,23 +6,23 @@ generated_file: true
 
 # Match
 ## Overview
- Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/configuration/plugins/syslogng-filters/match.md" >}}).
-//
-// {{< highlight yaml >}}
-//
-//	filters:
-//	- match:
-//	    or:
-//	    - regexp:
-//	        value: json.kubernetes.labels.app.kubernetes.io/name
-//	        pattern: apache
-//	        type: string
-//	    - regexp:
-//	        value: json.kubernetes.labels.app.kubernetes.io/name
-//	        pattern: nginx
-//	        type: string
-//
-// {{</ highlight >}} 
+
+Match filters can be used to select the log records to process. These filters have the same options and syntax as [syslog-ng flow match expressions]({{< relref "/docs/configuration/plugins/syslogng-filters/match.md" >}}).
+
+{{< highlight yaml >}}
+filters:
+- match:
+    or:
+    - regexp:
+        value: json.kubernetes.labels.app.kubernetes.io/name
+        pattern: apache
+        type: string
+    - regexp:
+        value: json.kubernetes.labels.app.kubernetes.io/name
+        pattern: nginx
+        type: string
+{{</ highlight >}}
+
 
 ## Configuration
 ## MatchExpr
@@ -75,7 +75,8 @@ Specify a field name of the record to match against the value of.
 
 
 
-#### Example `Regexp` filter configurations
+## Example `Regexp` filter configurations
+
 ```yaml
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -84,26 +85,23 @@ metadata:
 spec:
   filters:
     - match:
-	  regexp:
-	    - value: first
-		  pattern: ^5\d\d$
-	match: {}
+      regexp:
+        - value: first
+          pattern: ^5\d\d$
+  match: {}
   localOutputRefs:
     - demo-output
 ```
+syslog-ng config result:
 
-
-
-#### Syslog-NG Config Result
-```
+```shell
 log {
     source(main_input);
     filter {
       match("^5\d\d$" value("first"));
-	};
-	destination(output_default_demo-output);
+    };
+    destination(output_default_demo-output);
 };
-
 ```
 
 

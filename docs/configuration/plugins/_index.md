@@ -61,7 +61,7 @@ For more information please click on the plugin name
 | **[Syslog-NG Parser](syslogng-filters/parser/)** | syslogng-filters | Parse data from records | GA | [more info](https://axoflow.com/docs/axosyslog-core/chapter-parsers/) |
 | **[Syslog-NG Rewrite](syslogng-filters/rewrite/)** | syslogng-filters | Rewrite parts of the message | GA | [more info](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77) |
 | **[Authentication config for syslog-ng outputs](syslogng-outputs/auth/)** | syslogng-outputs | Authentication config for syslog-ng outputs | Testing | []() |
-| **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338) |
+| **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/) |
 | **[Elasticsearch](syslogng-outputs/elasticsearch/)** | syslogng-outputs | Sending messages over Elasticsearch | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/) |
 | **[File](syslogng-outputs/file/)** | syslogng-outputs | SStoring messages in plain-text files | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/) |
 | **[HTTP](syslogng-outputs/http/)** | syslogng-outputs | Sending messages over HTTP | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/) |

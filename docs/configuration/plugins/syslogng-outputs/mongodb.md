@@ -96,7 +96,7 @@ Description: Sets the write concern mode of the MongoDB operations, for both bul
 
 ## Bulk
 
-Bulk operation related options
+Bulk operation related options.
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/reference-destination-mongodb/#mongodb-option-bulk).
 
 ### bulk (*bool, optional) {#bulk-bulk}

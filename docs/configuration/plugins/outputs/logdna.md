@@ -62,6 +62,7 @@ Comma-Separated List of Tags, Optional
 
 
 
+
 ## Example `LogDNA` filter configurations
 
 {{< highlight yaml >}}

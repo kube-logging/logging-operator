@@ -32,8 +32,7 @@ spec:
       insecure: {}
 {{</ highlight >}}
 
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
-For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/). For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 
 
 ## Configuration
@@ -41,7 +40,7 @@ For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/ax
 
 ### auth (*Auth, optional) {#lokioutput-auth}
 
-Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth 
+Authentication configuration, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth). 
 
 
 ### batch-lines (int, optional) {#lokioutput-batch-lines}
