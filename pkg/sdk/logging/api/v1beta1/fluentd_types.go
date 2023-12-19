@@ -26,6 +26,7 @@ import (
 	policyv1 "k8s.io/api/policy/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
@@ -99,15 +100,15 @@ type FluentdSpec struct {
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
-	FluentOutLogrotate      *FluentOutLogrotate               `json:"fluentOutLogrotate,omitempty"`
-	ForwardInputConfig      *input.ForwardInputConfig         `json:"forwardInputConfig,omitempty"`
-	ServiceAccountOverrides *typeoverride.ServiceAccount      `json:"serviceAccount,omitempty"`
-	DNSPolicy               corev1.DNSPolicy                  `json:"dnsPolicy,omitempty"`
-	DNSConfig               *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
-	ExtraArgs               []string                          `json:"extraArgs,omitempty"`
-	CompressConfigFile      bool                              `json:"compressConfigFile,omitempty"`
-	SidecarContainers       []corev1.Container                `json:"sidecarContainers,omitempty"`
-	Pdb                     *policyv1.PodDisruptionBudgetSpec `json:"pdb,omitempty"`
+	FluentOutLogrotate      *FluentOutLogrotate          `json:"fluentOutLogrotate,omitempty"`
+	ForwardInputConfig      *input.ForwardInputConfig    `json:"forwardInputConfig,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
+	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
+	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
+	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
+	Pdb                     *PdbInput                    `json:"pdb,omitempty"`
 }
 
 // +name:"FluentdConfig"
@@ -479,4 +480,12 @@ type FluentdDrainConfig struct {
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 	// Available in Logging operator version 4.4 and later. Configurable security context, uses fluentd pods' security context by default
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+type PdbInput struct {
+	MinAvailable               *intstr.IntOrString                      `json:"minAvailable,omitempty"`
+	MaxUnavailable             *intstr.IntOrString                      `json:"maxUnavailable,omitempty"`
+	UnhealthyPodEvictionPolicy *policyv1.UnhealthyPodEvictionPolicyType `json:"unhealthyPodEvictionPolicy,omitempty"`
 }

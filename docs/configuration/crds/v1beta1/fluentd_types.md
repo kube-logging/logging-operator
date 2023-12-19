@@ -219,6 +219,7 @@ FluentdConfigList
 
 ### metadata (metav1.ListMeta, optional) {#fluentdconfiglist-metadata}
 
+### pdb (*PdbInput, optional) {#fluentdspec-pdb}
 
 ### items ([]FluentdConfig, required) {#fluentdconfiglist-items}
 
@@ -325,5 +326,20 @@ Available in Logging operator version 4.4 and later. Configurable resource requi
 
 Available in Logging operator version 4.4 and later. Configurable security context, uses fluentd pods' security context by default 
 
+
+
+## PdbInput
+
+### minAvailable (*intstr.IntOrString, optional) {#pdbinput-minavailable}
+
+Default: -
+
+### maxUnavailable (*intstr.IntOrString, optional) {#pdbinput-maxunavailable}
+
+Default: -
+
+### unhealthyPodEvictionPolicy (*policyv1.UnhealthyPodEvictionPolicyType, optional) {#pdbinput-unhealthypodevictionpolicy}
+
+Default: -
 
 

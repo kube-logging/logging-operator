@@ -24,13 +24,17 @@ import (
 func (r *Reconciler) pdb() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Pdb != nil {
 		pdbSpec := r.Logging.DeepCopy().Spec.FluentdSpec.Pdb
-		pdbSpec.Selector = &metav1.LabelSelector{
-			MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd),
-		}
 
 		return &policyv1.PodDisruptionBudget{
 			ObjectMeta: r.FluentdObjectMeta(PodDisruptionBudgetName, ComponentFluentd),
-			Spec:       *pdbSpec,
+			Spec: policyv1.PodDisruptionBudgetSpec{
+				Selector: &metav1.LabelSelector{
+					MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd),
+				},
+				MinAvailable:               pdbSpec.MinAvailable,
+				MaxUnavailable:             pdbSpec.MaxUnavailable,
+				UnhealthyPodEvictionPolicy: pdbSpec.UnhealthyPodEvictionPolicy,
+			},
 		}, reconciler.StatePresent, nil
 	}
 	return &policyv1.PodDisruptionBudget{
