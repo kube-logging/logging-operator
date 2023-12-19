@@ -63,6 +63,11 @@ Allows Time object in buffer's MessagePack serde [more info]( https://docs.fluen
 ### envVars ([]corev1.EnvVar, optional) {#fluentdspec-envvars}
 
 
+### externalVolumes ([]ExtraVolume, optional) {#fluentdspec-externalvolumes}
+
+Externally managed volumes 
+
+
 ### extraArgs ([]string, optional) {#fluentdspec-extraargs}
 
 

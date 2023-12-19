@@ -29,6 +29,17 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
+func (r *Reconciler) externalVolumesHandler(spec *appsv1.StatefulSetSpec) error {
+	for _, n := range r.fluentdSpec.ExternalVolumes {
+		if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
 func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, error) {
 	spec := r.statefulsetSpec()
 
@@ -60,6 +71,10 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 				return nil, reconciler.StatePresent, err
 			}
 		}
+	}
+
+	if err := r.externalVolumesHandler(spec); err != nil {
+		return nil, reconciler.StatePresent, err
 	}
 
 	desired := &appsv1.StatefulSet{

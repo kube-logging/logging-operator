@@ -1491,6 +1491,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.ExternalVolumes != nil {
+		in, out := &in.ExternalVolumes, &out.ExternalVolumes
+		*out = make([]ExtraVolume, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.FluentdPvcSpec != nil {
 		in, out := &in.FluentdPvcSpec, &out.FluentdPvcSpec
 		*out = new(volume.KubernetesVolume)

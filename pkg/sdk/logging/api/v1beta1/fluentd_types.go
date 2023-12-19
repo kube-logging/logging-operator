@@ -54,6 +54,8 @@ type FluentdSpec struct {
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
+	// Externally managed volumes
+	ExternalVolumes []ExtraVolume `json:"externalVolumes,omitempty"`
 	// Deprecated, use bufferStorageVolume
 	FluentdPvcSpec          *volume.KubernetesVolume    `json:"fluentdPvcSpec,omitempty"`
 	VolumeMountChmod        bool                        `json:"volumeMountChmod,omitempty"`
