@@ -21,19 +21,19 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Check diff
+        run: make check-diff
+
       - name: Test
         run: make test
-      
+
       - name: Generate test coverage
         run: make generate-test-coverage
-    
+
       - name: Test Coverage
         uses: vladopajic/go-test-coverage@v2
         with:
           config: ./.testcoverage.yml
-
-      - name: Check diff
-        run: make check-diff
 
   lint:
     name: Lint
