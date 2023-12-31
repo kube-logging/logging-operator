@@ -1708,6 +1708,21 @@ spec:
                 additionalProperties:
                   type: string
                 type: object
+              pdb:
+                properties:
+                  maxUnavailable:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    x-kubernetes-int-or-string: true
+                  minAvailable:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    x-kubernetes-int-or-string: true
+                  unhealthyPodEvictionPolicy:
+                    type: string
+                type: object
               podPriorityClassName:
                 type: string
               port:

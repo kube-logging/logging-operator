@@ -2552,6 +2552,7 @@ k8s.io/component-base v0.28.2/go.mod h1:4IuQPQviQCg3du4si8GpMrhAIegxpsgPngPRR/zW
 k8s.io/component-base v0.28.3/go.mod h1:fDJ6vpVNSk6cRo5wmDa6eKIG7UlIQkaFmZN2fYgIUD8=
 k8s.io/component-helpers v0.28.2 h1:r/XJ265PMirW9EcGXr/F+2yWrLPo2I69KdvcY/h9HAo=
 k8s.io/component-helpers v0.28.2/go.mod h1:pF1R5YWQ+sgf0i6EbVm+MQCzkYuqutDUibdrkvAa6aI=
+k8s.io/component-helpers v0.28.4/go.mod h1:8LzMalOQ0K10tkBJWBWq8h0HTI9HDPx4WT3QvTFn9Ro=
 k8s.io/cri-api v0.27.1 h1:KWO+U8MfI9drXB/P4oU9VchaWYOlwDglJZVHWMpTT3Q=
 k8s.io/cri-api v0.27.1/go.mod h1:+Ts/AVYbIo04S86XbTD73UPp/DkTiYxtsFeOFEu32L0=
 k8s.io/gengo v0.0.0-20220902162205-c0856e24416d h1:U9tB195lKdzwqicbJvyJeOXV7Klv+wNAWENRnXEGi08=
@@ -2563,6 +2564,7 @@ k8s.io/kms v0.28.4 h1:PMgY/3CQTWP9eIKmNQiTgjLIZ0ns6O+voagzD2/4mSg=
 k8s.io/kms v0.28.4/go.mod h1:HL4/lR/bhjAJPbqycKtfhWiKh1Sp21cpHOL8P4oo87w=
 k8s.io/metrics v0.28.2 h1:Z/oMk5SmiT/Ji1SaWOPfW2l9W831BLO9/XxDq9iS3ak=
 k8s.io/metrics v0.28.2/go.mod h1:QTIIdjMrq+KodO+rmp6R9Pr1LZO8kTArNtkWoQXw0sw=
+k8s.io/metrics v0.28.4/go.mod h1:bBqAJxH20c7wAsTQxDXOlVqxGMdce49d7WNr1WeaLac=
 k8s.io/utils v0.0.0-20230406110748-d93618cff8a2/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
 k8s.io/utils v0.0.0-20230505201702-9f6742963106/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
