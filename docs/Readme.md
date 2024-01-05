@@ -1,1 +1,0 @@
-The documentation of the Logging operator project is available at the [Banzai Cloud Documentation Page](https://banzaicloud.com/docs/one-eye/logging-operator/).
