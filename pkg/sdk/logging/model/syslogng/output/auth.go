@@ -28,6 +28,7 @@ type _docAuth interface{} //nolint:deadcode,unused
 type _metaAuth interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
+// Authentication settings. Only one authentication method can be set. Default: Insecure
 type Auth struct {
 	// Application Layer Transport Security (ALTS) is a simple to use authentication, only available within Google’s infrastructure.
 	ALTS *ALTS `json:"alts,omitempty"`
@@ -36,7 +37,7 @@ type Auth struct {
 	// This is the default method, authentication is disabled (`auth(insecure())`).
 	Insecure *Insecure `json:"insecure,omitempty"`
 	// This option sets various options related to TLS encryption, for example, key/certificate files and trusted CA locations. TLS can be used only with tcp-based transport protocols. For details, see [TLS for syslog-ng outputs](../tls/) and the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions).
-	TLS *TLS `json:"tls,omitempty"`
+	TLS *GrpcTLS `json:"tls,omitempty"`
 }
 
 type ADC struct{}
