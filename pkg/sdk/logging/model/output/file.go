@@ -63,6 +63,7 @@ type FileOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
+//
 /*
 ## Example `File` output configurations
 

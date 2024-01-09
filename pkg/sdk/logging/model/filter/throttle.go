@@ -51,6 +51,7 @@ type Throttle struct {
 	GroupWarningDelaySeconds int `json:"group_warning_delay_s,omitempty"`
 }
 
+//
 /*
 ## Example `Throttle` filter configurations
 

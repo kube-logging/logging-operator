@@ -48,6 +48,7 @@ type UserAgent struct {
 	Flatten bool `json:"flatten,omitempty"`
 }
 
+//
 /*
 ## Example `UserAgent` filter configurations
 

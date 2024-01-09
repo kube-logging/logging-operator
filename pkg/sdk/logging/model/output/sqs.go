@@ -66,6 +66,7 @@ type SQSOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
+//
 /*
 ## Example `SQS` output configurations
 

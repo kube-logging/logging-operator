@@ -62,6 +62,7 @@ type LogDNAOutput struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
+//
 /*
 ## Example `LogDNA` filter configurations
 

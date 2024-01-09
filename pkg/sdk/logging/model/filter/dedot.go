@@ -44,6 +44,7 @@ type DedotFilterConfig struct {
 	Separator string `json:"de_dot_separator,omitempty"`
 }
 
+//
 /*
 ## Example `Dedot` filter configurations
 

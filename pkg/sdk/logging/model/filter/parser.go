@@ -198,6 +198,7 @@ type GrokSection struct {
 	Timezone string `json:"timezone,omitempty"`
 }
 
+//
 /*
 ## Example `Parser` filter configurations
 

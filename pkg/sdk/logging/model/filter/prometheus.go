@@ -60,6 +60,7 @@ type MetricSection struct {
 	Labels Label `json:"labels,omitempty"`
 }
 
+//
 /*
 ## Example `Prometheus` filter configurations
 

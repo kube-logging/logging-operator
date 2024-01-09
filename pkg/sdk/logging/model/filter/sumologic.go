@@ -90,6 +90,7 @@ type SumoLogic struct {
 	CollectorValue string `json:"collector_value,omitempty"`
 }
 
+//
 /*
 ## Example `Parser` filter configurations
 

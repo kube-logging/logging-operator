@@ -41,6 +41,7 @@ type StdOutFilterConfig struct {
 	OutputType string `json:"output_type,omitempty"`
 }
 
+//
 /*
 ## Example `StdOut` filter configurations
 

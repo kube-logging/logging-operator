@@ -62,6 +62,7 @@ type SyslogNGSpec struct {
 	// TODO: option to turn on/off buffer volume PVC
 }
 
+//
 /* 
 Available in Logging operator version 4.5 and later.
 

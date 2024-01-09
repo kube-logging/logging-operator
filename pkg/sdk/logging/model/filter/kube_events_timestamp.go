@@ -43,6 +43,7 @@ type KubeEventsTimestampConfig struct {
 	MappedTimeKey string `json:"mapped_time_key,omitempty"`
 }
 
+//
 /*
 ## Example `Kubernetes Events Timestamp` filter configurations
 

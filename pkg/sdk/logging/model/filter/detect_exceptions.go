@@ -70,6 +70,7 @@ type DetectExceptions struct {
 	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`
 }
 
+//
 /*
 ## Example `Exception Detector` filter configurations
 

@@ -52,6 +52,7 @@ type RecordModifier struct {
 	Records []Record `json:"records,omitempty"`
 }
 
+//
 /*
 ## Example `Record Modifier` filter configurations
 

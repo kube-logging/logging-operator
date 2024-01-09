@@ -77,6 +77,7 @@ type EnhanceK8s struct {
 	CacheRefreshVariation int `json:"cache_refresh_variation,omitempty"`
 }
 
+//
 /*
 ## Example `EnhanceK8s` filter configurations
 

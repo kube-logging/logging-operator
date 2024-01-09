@@ -51,6 +51,7 @@ type GELFOutputConfig struct {
 	TLSOptions map[string]string `json:"tls_options,omitempty"`
 }
 
+//
 /*
 ## Example `GELF` output configurations
 

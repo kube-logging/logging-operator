@@ -79,6 +79,7 @@ type Concat struct {
 	PartialCriStreamKey string `json:"partial_cri_stream_key,omitempty"`
 }
 
+//
 /*
 ## Example `Concat` filter configurations
 

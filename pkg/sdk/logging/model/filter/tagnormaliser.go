@@ -57,6 +57,7 @@ type TagNormaliser struct {
 	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`
 }
 
+//
 /*
 ## Example `Parser` filter configurations
 

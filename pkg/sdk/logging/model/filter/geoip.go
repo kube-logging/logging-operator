@@ -52,6 +52,7 @@ type GeoIP struct {
 	Records []Record `json:"records,omitempty"`
 }
 
+//
 /*
 ## Example `GeoIP` filter configurations
 

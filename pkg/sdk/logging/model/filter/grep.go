@@ -57,6 +57,7 @@ type RegexpSection struct {
 	Pattern string `json:"pattern"`
 }
 
+//
 /*
 ## Example `Regexp` filter configurations
 
@@ -101,6 +102,7 @@ type ExcludeSection struct {
 	Pattern string `json:"pattern"`
 }
 
+//
 /*
 ## Example `Exclude` filter configurations
 
@@ -145,6 +147,7 @@ type OrSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
+//
 /*
 ## Example `Or` filter configurations
 
@@ -195,6 +198,7 @@ type AndSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
+//
 /*
 ## Example `And` filter configurations
 
