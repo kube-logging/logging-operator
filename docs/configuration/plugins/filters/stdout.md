@@ -18,6 +18,7 @@ This is the option of stdout format.
 
 
 
+
 ## Example `StdOut` filter configurations
 
 {{< highlight yaml >}}

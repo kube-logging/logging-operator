@@ -49,6 +49,7 @@ Default: 10 seconds
 
 
 
+
 ## Example `Throttle` filter configurations
 
 {{< highlight yaml >}}

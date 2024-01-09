@@ -46,6 +46,7 @@ Default: true
 
 
 
+
 ## Example `GeoIP` filter configurations
 
 {{< highlight yaml >}}

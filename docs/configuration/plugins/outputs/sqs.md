@@ -78,6 +78,7 @@ Default: '__tag'
 
 
 
+
 ## Example `SQS` output configurations
 
 ```yaml

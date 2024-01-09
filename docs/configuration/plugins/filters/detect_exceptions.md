@@ -80,6 +80,7 @@ Default: ""
 
 
 
+
 ## Example `Exception Detector` filter configurations
 
 {{< highlight yaml >}}

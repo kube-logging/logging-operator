@@ -48,6 +48,7 @@ Pattern expression to evaluate
 
 
 
+
 ## Example `Regexp` filter configurations
 
 {{< highlight yaml >}}
@@ -97,6 +98,7 @@ Pattern expression to evaluate
 
 
 
+
 ## Example `Exclude` filter configurations
 
 {{< highlight yaml >}}
@@ -142,6 +144,7 @@ Specify filtering rule (as described in the [Fluentd documentation](https://docs
 ### regexp ([]RegexpSection, optional) {#or directive-regexp}
 
 [Regexp Directive](#Regexp-Directive) 
+
 
 
 
@@ -197,6 +200,7 @@ Specify filtering rule (as described in the [Fluentd documentation](https://docs
 ### regexp ([]RegexpSection, optional) {#and directive-regexp}
 
 [Regexp Directive](#Regexp-Directive) 
+
 
 
 

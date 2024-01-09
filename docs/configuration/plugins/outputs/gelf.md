@@ -41,6 +41,7 @@ Default: {}). For details, see [https://github.com/graylog-labs/gelf-rb/blob/729
 
 
 
+
 ## Example `GELF` output configurations
 
 {{< highlight yaml >}}

@@ -43,6 +43,7 @@ This is exclusive with remove_keys
 
 
 
+
 ## Example `Record Modifier` filter configurations
 
 {{< highlight yaml >}}

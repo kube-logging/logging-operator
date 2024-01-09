@@ -113,6 +113,7 @@ Default: true
 
 
 
+
 ## Example `EnhanceK8s` filter configurations
 
 {{< highlight yaml >}}

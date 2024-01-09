@@ -25,6 +25,7 @@ Default: event.eventTime, event.lastTimestamp, event.firstTimestamp
 
 
 
+
 ## Example `Kubernetes Events Timestamp` filter configurations
 
 {{< highlight yaml >}}

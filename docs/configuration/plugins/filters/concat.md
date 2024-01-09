@@ -111,6 +111,7 @@ Use partial metadata to concatenate multiple records
 
 
 
+
 ## Example `Concat` filter configurations
 
 {{< highlight yaml >}}

@@ -67,6 +67,7 @@ Default: false
 
 
 
+
 ## Example `File` output configurations
 
 {{< highlight yaml >}}

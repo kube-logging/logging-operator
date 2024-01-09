@@ -25,6 +25,7 @@ Default: _
 
 
 
+
 ## Example `Dedot` filter configurations
 
 {{< highlight yaml >}}

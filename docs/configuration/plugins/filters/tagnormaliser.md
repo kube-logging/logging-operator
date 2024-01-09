@@ -40,6 +40,7 @@ Default: `kubernetes.**`
 
 
 
+
 ## Example `Parser` filter configurations
 
 {{< highlight yaml >}}

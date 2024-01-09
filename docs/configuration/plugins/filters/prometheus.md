@@ -54,6 +54,7 @@ Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counte
 
 
 
+
 ## Example `Prometheus` filter configurations
 
 {{< highlight yaml >}}
