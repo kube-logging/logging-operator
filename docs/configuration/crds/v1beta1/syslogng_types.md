@@ -72,7 +72,7 @@ Available in Logging operator version 4.5 and later. Create [custom log metrics 
 ## SourceDateParser
 
 
- 
+
 Available in Logging operator version 4.5 and later.
 
 Parses date automatically from the timestamp registered by the container runtime.
