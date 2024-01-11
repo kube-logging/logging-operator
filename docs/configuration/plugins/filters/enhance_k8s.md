@@ -4,7 +4,7 @@ weight: 200
 generated_file: true
 ---
 
-# [Enhance K8s Metadata](https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata)
+# [Enhance K8s Metadata](https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata)
 ## Overview
  Fluentd Filter plugin to fetch several metadata for a Pod
 

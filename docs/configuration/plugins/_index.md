@@ -14,7 +14,7 @@ For more information please click on the plugin name
 | **[Dedot](filters/dedot/)** | filters | Concatenate multiline log separated in multiple events | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](filters/detect_exceptions/)** | filters | Exception Detector | GA | [0.0.14](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[ElasticSearch GenId](filters/elasticsearch_genid/)** | filters |  |  | [](TODO) |
-| **[Enhance K8s Metadata](filters/enhance_k8s/)** | filters | Fluentd output plugin to add extra Kubernetes metadata to the events. | GA | [2.0.0](https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata) |
+| **[Enhance K8s Metadata](filters/enhance_k8s/)** | filters | Fluentd output plugin to add extra Kubernetes metadata to the events. | GA | [2.0.0](https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata) |
 | **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.2](https://github.com/y-ken/fluent-plugin-geoip) |
 | **[Grep](filters/grep/)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Kubernetes Events Timestamp](filters/kube_events_timestamp/)** | filters | Fluentd Filter plugin to select particular timestamp into an additional field | GA | [0.1.4](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp) |
