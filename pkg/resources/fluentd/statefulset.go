@@ -15,8 +15,8 @@
 package fluentd
 
 import (
-	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -53,15 +53,14 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		if n.Volume == nil || n.Volume.PersistentVolumeClaim == nil {
 			continue
 		}
-
-		if !isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
+		if isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
+			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
+				return nil, reconciler.StatePresent, err
+			}
+		} else {
 			if err := n.Volume.ApplyPVCForStatefulSet(n.ContainerName, n.Path, spec, func(name string) metav1.ObjectMeta {
 				return r.FluentdObjectMeta(name, ComponentFluentd)
 			}); err != nil {
-				return nil, reconciler.StatePresent, err
-			}
-		} else if !isPersistentVolumeSourceEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeSource) {
-			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 				return nil, reconciler.StatePresent, err
 			}
 		}
@@ -78,13 +77,8 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 }
 
 func isPersistentVolumeClaimSpecEmpty(pvcSpec corev1.PersistentVolumeClaimSpec) bool {
-	serializedPvcSpec, _ := json.Marshal(pvcSpec) // Json serialization should not fail, hence the error is ignored
-	return string(serializedPvcSpec) == `{"resources":{}}`
-}
-
-func isPersistentVolumeSourceEmpty(pvcSource corev1.PersistentVolumeClaimVolumeSource) bool {
-	serializedPvcSource, _ := json.Marshal(pvcSource) // Json serialization should not fail, hence the error is ignored
-	return string(serializedPvcSource) == `{}`
+	empty := corev1.PersistentVolumeClaimSpec{}
+	return reflect.DeepEqual(pvcSpec, empty)
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {

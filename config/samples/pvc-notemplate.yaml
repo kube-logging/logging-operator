@@ -1,0 +1,76 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: all-to-file
+spec:
+  fluentd:
+#    image:
+#      tag: v1.16-ruby3.2-full
+    disablePvc: true
+    bufferStorageVolume:
+      pvc:
+        source:
+          claimName: manual2
+          readOnly: false
+    extraVolumes:
+      - containerName: fluentd
+        path: /manual
+        volume:
+          pvc:
+            source:
+              claimName: manual
+              readOnly: false
+        volumeName: manual
+  controlNamespace: default
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manual
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  volumeName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manual2
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  volumeName: manual2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: manual
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/asd
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: manual2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/asd2
