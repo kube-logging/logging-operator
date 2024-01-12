@@ -78,13 +78,13 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 }
 
 func isPersistentVolumeClaimSpecEmpty(pvcSpec corev1.PersistentVolumeClaimSpec) bool {
-	searilizedPvcSpec, _ := json.Marshal(pvcSpec) // Json serialization should not fail, hence the error is ignored
-	return string(searilizedPvcSpec) == `{"resources":{}}`
+	serializedPvcSpec, _ := json.Marshal(pvcSpec) // Json serialization should not fail, hence the error is ignored
+	return string(serializedPvcSpec) == `{"resources":{}}`
 }
 
 func isPersistentVolumeSourceEmpty(pvcSource corev1.PersistentVolumeClaimVolumeSource) bool {
-	searilizedPvcSource, _ := json.Marshal(pvcSource) // Json serialization should not fail, hence the error is ignored
-	return string(searilizedPvcSource) == `{}`
+	serializedPvcSource, _ := json.Marshal(pvcSource) // Json serialization should not fail, hence the error is ignored
+	return string(serializedPvcSource) == `{}`
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
