@@ -22,10 +22,8 @@ import (
 	"github.com/go-logr/logr"
 	apitypes "k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
@@ -116,6 +114,6 @@ func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.LoggingRoute{}).
-		Watches(&loggingv1beta1.Logging{}, loggingRequestMapper, builder.WithPredicates(predicate.GenerationChangedPredicate{})).
+		Watches(&loggingv1beta1.Logging{}, loggingRequestMapper). // builder.WithPredicates(predicate.GenerationChangedPredicate{})
 		Complete(NewLoggingRouteReconciler(mgr.GetClient(), logger))
 }
