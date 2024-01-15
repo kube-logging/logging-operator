@@ -114,6 +114,6 @@ func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.LoggingRoute{}).
-		Watches(&loggingv1beta1.Logging{}, loggingRequestMapper). // builder.WithPredicates(predicate.GenerationChangedPredicate{})
+		Watches(&loggingv1beta1.Logging{}, loggingRequestMapper).
 		Complete(NewLoggingRouteReconciler(mgr.GetClient(), logger))
 }
