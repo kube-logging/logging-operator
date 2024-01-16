@@ -29,7 +29,7 @@ func (r *Reconciler) pdb() (runtime.Object, reconciler.DesiredState, error) {
 			ObjectMeta: r.FluentdObjectMeta(PodDisruptionBudgetName, ComponentFluentd),
 			Spec: policyv1.PodDisruptionBudgetSpec{
 				Selector: &metav1.LabelSelector{
-					MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd),
+					MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 				},
 				MinAvailable:               pdbSpec.MinAvailable,
 				MaxUnavailable:             pdbSpec.MaxUnavailable,
