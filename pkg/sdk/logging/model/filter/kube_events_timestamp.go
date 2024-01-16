@@ -43,6 +43,7 @@ type KubeEventsTimestampConfig struct {
 	MappedTimeKey string `json:"mapped_time_key,omitempty"`
 }
 
+//
 /*
 ## Example `Kubernetes Events Timestamp` filter configurations
 
@@ -63,9 +64,8 @@ spec:
   localOutputRefs:
     - es-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
  <filter **>

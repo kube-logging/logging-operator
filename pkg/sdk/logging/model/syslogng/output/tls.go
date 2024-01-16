@@ -32,7 +32,7 @@ type _metaTLS interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type TLS struct {
-	// The name of a directory that contains a set of trusted CA certificates in PEM format. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-dir)
+	// The name of a directory that contains a set of trusted CA certificates in PEM format. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-dir).
 	CaDir *secret.Secret `json:"ca_dir,omitempty"`
 	// The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-file).
 	CaFile *secret.Secret `json:"ca_file,omitempty"`
@@ -49,4 +49,14 @@ type TLS struct {
 	// Configure required TLS version. Accepted values: [sslv3, tlsv1, tlsv1_0, tlsv1_1, tlsv1_2, tlsv1_3]
 	// +kubebuilder:validation:Enum=sslv3;tlsv1;tlsv1_0;tlsv1_1;tlsv1_2;tlsv1_3
 	SslVersion string `json:"ssl_version,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+type GrpcTLS struct {
+	// The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-file).
+	CaFile *secret.Secret `json:"ca_file,omitempty"`
+	// The name of a file that contains an unencrypted private key in PEM format, suitable as a TLS key. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#key-file).
+	KeyFile *secret.Secret `json:"key_file,omitempty"`
+	// Name of a file, that contains an X.509 certificate (or a certificate chain) in PEM format, suitable as a TLS certificate, matching the private key set in the key-file() option. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#cert-file).
+	CertFile *secret.Secret `json:"cert_file,omitempty"`
 }

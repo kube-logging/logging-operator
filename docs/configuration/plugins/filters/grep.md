@@ -48,6 +48,7 @@ Pattern expression to evaluate
 
 
 
+
 ## Example `Regexp` filter configurations
 
 {{< highlight yaml >}}
@@ -66,8 +67,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -98,6 +98,7 @@ Pattern expression to evaluate
 
 
 
+
 ## Example `Exclude` filter configurations
 
 {{< highlight yaml >}}
@@ -116,9 +117,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -149,6 +148,7 @@ Specify filtering rule (as described in the [Fluentd documentation](https://docs
 
 
 
+
 ## Example `Or` filter configurations
 
 {{< highlight yaml >}}
@@ -171,8 +171,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <or>
@@ -205,6 +204,7 @@ Specify filtering rule (as described in the [Fluentd documentation](https://docs
 
 
 
+
 ## Example `And` filter configurations
 
 {{< highlight yaml >}}
@@ -227,8 +227,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-Fluentd #### config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 	<and>

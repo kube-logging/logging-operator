@@ -51,6 +51,7 @@ Specify field name of the record to overwrite the time of events. Its value must
 
 
 
+
 ## Example `Record Transformer` filter configurations
 
 {{< highlight yaml >}}
@@ -67,8 +68,6 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-
-
 
 Fluentd config result:
 

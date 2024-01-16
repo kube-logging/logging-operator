@@ -76,7 +76,7 @@ Default: 24576
 
 ### customParsers (string, optional) {#fluentbitspec-customparsers}
 
-Available in Logging operator version 4.2 and later. Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig 
+Available in Logging operator version 4.2 and later. Specify a custom parser file to load in addition to the default parsers file. It must be a valid key in the configmap specified by customConfig. 
 
 
 ### dnsConfig (*corev1.PodDNSConfig, optional) {#fluentbitspec-dnsconfig}
@@ -124,13 +124,13 @@ Default: 1
 
 ### grace (int32, optional) {#fluentbitspec-grace}
 
-Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5) 
+Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit. 
 
 Default: 5
 
 ### healthCheck (*HealthCheck, optional) {#fluentbitspec-healthcheck}
 
-The following example defines a [Fluentd parser]({{< relref "/docs/configuration/plugins/filters/parser.md" >}}) that places the parsed containerd log messages into the `log` field instead of the `message` field. 
+Available in Logging operator version 4.4 and later. 
 
 
 ### HostNetwork (bool, optional) {#fluentbitspec-hostnetwork}
@@ -153,7 +153,7 @@ The following example defines a [Fluentd parser]({{< relref "/docs/configuration
 
 ### logLevel (string, optional) {#fluentbitspec-loglevel}
 
-Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info) 
+Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. 
 
 Default: info
 
@@ -353,7 +353,7 @@ Default: normal
 
 ## HealthCheck
 
-HealthCheck configuration
+HealthCheck configuration. Available in Logging operator version 4.4 and later.
 
 ### hcErrorsCount (int, optional) {#healthcheck-hcerrorscount}
 
@@ -634,7 +634,7 @@ Default: 600
 
 ### Kube_URL (string, optional) {#filterkubernetes-kube_url}
 
-API Server end-point (default: `https://kubernetes.default.svc:443`) 
+API Server end-point. 
 
 Default: https://kubernetes.default.svc:443
 
@@ -968,7 +968,7 @@ ForwardOptions defines custom forward output plugin options, see https://docs.fl
 
 ### Workers (*int, optional) {#forwardoptions-workers}
 
-Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0. 
+Available in Logging operator version 4.4 and later. Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0. 
 
 
 

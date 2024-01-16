@@ -110,8 +110,9 @@ Use partial metadata to concatenate multiple records
 
 
 
- ## Example `Concat` filter configurations
 
+
+## Example `Concat` filter configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -140,7 +141,6 @@ Fluentd config result:
   partial_key partial_message
 </filter>
 {{</ highlight >}}
-
 
 
 ---

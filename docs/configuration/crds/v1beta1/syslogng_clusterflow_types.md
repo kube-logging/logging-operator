@@ -39,6 +39,8 @@ SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 
 ### outputMetrics ([]filter.MetricsProbe, optional) {#syslogngclusterflowspec-outputmetrics}
 
+Output metrics are applied before the log reaches the destination and contain output metadata like: `name,` `namespace` and `scope`. Scope shows whether the output is a local or global one. Available in Logging operator version 4.5 and later. 
+
 
 
 ## SyslogNGClusterFlowList

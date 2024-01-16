@@ -12,7 +12,7 @@ generated_file: true
 ## Configuration
 ## DiskBuffer
 
-Documentation: https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/56#TOPIC-1829124
+Documentation: https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/
 
 ### compaction (*bool, optional) {#diskbuffer-compaction}
 

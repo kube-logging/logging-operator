@@ -74,9 +74,9 @@ type FluentbitSpec struct {
 	TargetPort           int32             `json:"targetPort,omitempty"`
 	// Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout to define when is required to flush the records ingested by input plugins through the defined output plugins. (default: 1)
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
-	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit (default: 5)
+	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit.
 	Grace int32 `json:"grace,omitempty" plugin:"default:5"`
-	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled. (default: info)
+	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled.
 	LogLevel string `json:"logLevel,omitempty" plugin:"default:info"`
 	// Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer.
 	// Do not change the default value of this parameter unless you know what you are doing. (default: 24576)
@@ -125,9 +125,9 @@ type FluentbitSpec struct {
 	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 	// Available in Logging operator version 4.2 and later.
 	// Specify a custom parser file to load in addition to the default parsers file.
-	// It must be a valid key in the configmap specified by customConfig
+	// It must be a valid key in the configmap specified by customConfig.
 	CustomParsers string `json:"customParsers,omitempty"`
-	// The following example defines a [Fluentd parser]({{< relref "/docs/configuration/plugins/filters/parser.md" >}}) that places the parsed containerd log messages into the `log` field instead of the `message` field.
+	// Available in Logging operator version 4.4 and later.
 	HealthCheck *HealthCheck `json:"healthCheck,omitempty"`
 }
 
@@ -203,7 +203,7 @@ type BufferStorage struct {
 	StorageMetrics string `json:"storage.metrics,omitempty"`
 }
 
-// HealthCheck configuration
+// HealthCheck configuration. Available in Logging operator version 4.4 and later.
 type HealthCheck struct {
 	// The error count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period. (default:5)
 	HCErrorsCount int `json:"hcErrorsCount,omitempty"`
@@ -279,7 +279,7 @@ type FilterKubernetes struct {
 	Match string `json:"Match,omitempty" plugin:"default:kubernetes.*"`
 	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs. If this value is empty we will set it "0". (default:"0")
 	BufferSize string `json:"Buffer_Size,omitempty"`
-	// API Server end-point (default: `https://kubernetes.default.svc:443`)
+	// API Server end-point.
 	KubeURL string `json:"Kube_URL,omitempty" plugin:"default:https://kubernetes.default.svc:443"`
 	//	CA certificate file (default:/var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
 	KubeCAFile string `json:"Kube_CA_File,omitempty" plugin:"default:/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"`
@@ -474,6 +474,7 @@ type ForwardOptions struct {
 	RetryLimit         string `json:"Retry_Limit,omitempty"`
 	// `storage.total_limit_size` Limit the maximum number of Chunks in the filesystem for the current output logical destination.
 	StorageTotalLimitSize string `json:"storage.total_limit_size,omitempty"`
+	// Available in Logging operator version 4.4 and later.
 	// Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0.
 	Workers *int `json:"Workers,omitempty"`
 }

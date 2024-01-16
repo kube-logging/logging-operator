@@ -49,6 +49,7 @@ Default: 10 seconds
 
 
 
+
 ## Example `Throttle` filter configurations
 
 {{< highlight yaml >}}
@@ -65,8 +66,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

@@ -47,12 +47,13 @@ type GELFOutputConfig struct {
 	Protocol string `json:"protocol,omitempty"`
 	// Enable TlS (default: false)
 	TLS *bool `json:"tls,omitempty"`
-	// TLS Options (default: {}). For details, see [https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12](https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12).
+	// TLS options (default: {}). For details, see [https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12](https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12).
 	TLSOptions map[string]string `json:"tls_options,omitempty"`
 }
 
-// ## Example `GELF` output configurations
+//
 /*
+## Example `GELF` output configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

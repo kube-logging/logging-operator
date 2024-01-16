@@ -142,19 +142,13 @@ func TestLokiOutputTable(t *testing.T) {
 						Workers:      3,
 						LogFIFOSize:  1000,
 						Auth: &output.Auth{
-							ALTS:     &output.ALTS{},
-							ADC:      &output.ADC{},
 							Insecure: &output.Insecure{},
-							TLS: &output.TLS{
-								PeerVerify:         config.NewTrue(),
-								UseSystemCertStore: config.NewFalse(),
-							},
 						},
 					},
 				},
 			},
 			config: `destination "output_default_test-loki-out" {
-	loki(auth(alts() adc() insecure() tls(peer_verify(yes) use-system-cert-store(no))) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
+	loki(auth(insecure()) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
 };
 `,
 		},

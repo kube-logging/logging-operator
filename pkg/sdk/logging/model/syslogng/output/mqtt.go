@@ -22,7 +22,7 @@ type _hugoMQTT interface{} //nolint:deadcode,unused
 /*
 Sends messages from a local network to an MQTT broker. For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/).
 
-# Example
+## Example
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

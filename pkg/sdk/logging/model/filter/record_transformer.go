@@ -54,6 +54,7 @@ type RecordTransformer struct {
 	Records []Record `json:"records,omitempty"`
 }
 
+//
 /*
 ## Example `Record Transformer` filter configurations
 
@@ -71,8 +72,6 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
 
 Fluentd config result:
 

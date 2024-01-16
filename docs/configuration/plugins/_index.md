@@ -14,7 +14,7 @@ For more information please click on the plugin name
 | **[Dedot](filters/dedot/)** | filters | Concatenate multiline log separated in multiple events | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](filters/detect_exceptions/)** | filters | Exception Detector | GA | [0.0.14](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[ElasticSearch GenId](filters/elasticsearch_genid/)** | filters |  |  | [](TODO) |
-| **[Enhance K8s Metadata](filters/enhance_k8s/)** | filters | Fluentd output plugin to add extra Kubernetes metadata to the events. | GA | [2.0.0](https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata) |
+| **[Enhance K8s Metadata](filters/enhance_k8s/)** | filters | Fluentd output plugin to add extra Kubernetes metadata to the events. | GA | [2.0.0](https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata) |
 | **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.2](https://github.com/y-ken/fluent-plugin-geoip) |
 | **[Grep](filters/grep/)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Kubernetes Events Timestamp](filters/kube_events_timestamp/)** | filters | Fluentd Filter plugin to select particular timestamp into an additional field | GA | [0.1.4](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp) |
@@ -61,7 +61,7 @@ For more information please click on the plugin name
 | **[Syslog-NG Parser](syslogng-filters/parser/)** | syslogng-filters | Parse data from records | GA | [more info](https://axoflow.com/docs/axosyslog-core/chapter-parsers/) |
 | **[Syslog-NG Rewrite](syslogng-filters/rewrite/)** | syslogng-filters | Rewrite parts of the message | GA | [more info](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77) |
 | **[Authentication config for syslog-ng outputs](syslogng-outputs/auth/)** | syslogng-outputs | Authentication config for syslog-ng outputs | Testing | []() |
-| **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/32#kanchor2338) |
+| **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/) |
 | **[Elasticsearch](syslogng-outputs/elasticsearch/)** | syslogng-outputs | Sending messages over Elasticsearch | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/) |
 | **[File](syslogng-outputs/file/)** | syslogng-outputs | SStoring messages in plain-text files | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/) |
 | **[HTTP](syslogng-outputs/http/)** | syslogng-outputs | Sending messages over HTTP | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/) |

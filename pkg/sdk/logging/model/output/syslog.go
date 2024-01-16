@@ -74,8 +74,9 @@ type SyslogOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
-// ## Example `File` output configurations
+//
 /*
+## Example `File` output configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

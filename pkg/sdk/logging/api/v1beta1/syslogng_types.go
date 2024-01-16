@@ -48,15 +48,28 @@ type SyslogNGSpec struct {
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
+	// Available in Logging operator version 4.5 and later.
 	// Parses date automatically from the timestamp registered by the container runtime.
-	// Note: json key prefix and delimiter are respected
-	SourceDateParser *SourceDateParser     `json:"sourceDateParser,omitempty"`
-	MaxConnections   int                   `json:"maxConnections,omitempty"`
-	LogIWSize        int                   `json:"logIWSize,omitempty"`
-	SourceMetrics    []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
+	// Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+	SourceDateParser *SourceDateParser `json:"sourceDateParser,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/).
+	MaxConnections int `json:"maxConnections,omitempty"`
+	LogIWSize      int `json:"logIWSize,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}).
+	SourceMetrics []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
 	// TODO: option to turn on/off buffer volume PVC
 }
 
+//
+/*
+Available in Logging operator version 4.5 and later.
+
+Parses date automatically from the timestamp registered by the container runtime.
+Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+It is disabled by default, but if enabled, then the default settings parse the timestamp written by the container runtime and parsed by Fluent Bit using the `cri` or the `docker` parser.
+*/
 type SourceDateParser struct {
 	// Default: "%FT%T.%f%z"
 	Format *string `json:"format,omitempty"`

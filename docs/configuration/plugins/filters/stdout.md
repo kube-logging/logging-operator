@@ -18,6 +18,7 @@ This is the option of stdout format.
 
 
 
+
 ## Example `StdOut` filter configurations
 
 {{< highlight yaml >}}
@@ -34,8 +35,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight yaml >}}
 <filter **>
