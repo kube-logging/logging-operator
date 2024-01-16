@@ -23,7 +23,7 @@ import (
 
 func (r *Reconciler) pdb() (runtime.Object, reconciler.DesiredState, error) {
 	if r.Logging.Spec.FluentdSpec.Pdb != nil {
-		pdbSpec := r.Logging.DeepCopy().Spec.FluentdSpec.Pdb
+		pdbSpec := r.Logging.Spec.FluentdSpec.Pdb
 
 		return &policyv1.PodDisruptionBudget{
 			ObjectMeta: r.FluentdObjectMeta(PodDisruptionBudgetName, ComponentFluentd),
