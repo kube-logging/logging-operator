@@ -51,8 +51,6 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
-| rbac.psp.enabled | bool | `true` | Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled. |
-| rbac.psp.annotations | object | `{"seccomp.security.alpha.kubernetes.io/allowedProfileNames":"docker/default,runtime/default","seccomp.security.alpha.kubernetes.io/defaultProfileName":"runtime/default"}` | PSP annotations |
 | monitoring.serviceMonitor.enabled | bool | `false` | Create a Prometheus Operator ServiceMonitor object. |
 | monitoring.serviceMonitor.additionalLabels | object | `{}` |  |
 | monitoring.serviceMonitor.metricRelabelings | list | `[]` |  |

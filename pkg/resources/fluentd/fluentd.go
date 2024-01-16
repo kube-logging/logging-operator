@@ -43,17 +43,16 @@ import (
 )
 
 const (
-	SecretConfigName      = "fluentd"
-	AppSecretConfigName   = "fluentd-app"
-	ConfigCheckKey        = "generated.conf"
-	ConfigKey             = "fluent.conf"
-	AppConfigKey          = "fluentd.conf"
-	StatefulSetName       = "fluentd"
-	PodSecurityPolicyName = "fluentd"
-	ServiceName           = "fluentd"
-	ServicePort           = 24240
-	OutputSecretName      = "fluentd-output"
-	OutputSecretPath      = "/fluentd/secret"
+	SecretConfigName    = "fluentd"
+	AppSecretConfigName = "fluentd-app"
+	ConfigCheckKey      = "generated.conf"
+	ConfigKey           = "fluent.conf"
+	AppConfigKey        = "fluentd.conf"
+	StatefulSetName     = "fluentd"
+	ServiceName         = "fluentd"
+	ServicePort         = 24240
+	OutputSecretName    = "fluentd-output"
+	OutputSecretPath    = "/fluentd/secret"
 
 	bufferPath                     = "/buffers"
 	defaultServiceAccountName      = "fluentd"
@@ -132,10 +131,6 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.roleBinding,
 		r.clusterRole,
 		r.clusterRoleBinding,
-	}
-
-	if resources.PSPEnabled {
-		objects = append(objects, r.clusterPodSecurityPolicy, r.pspRole, r.pspRoleBinding)
 	}
 
 	for _, res := range objects {
