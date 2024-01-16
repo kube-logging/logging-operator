@@ -1592,17 +1592,17 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.Pdb != nil {
+		in, out := &in.Pdb, &out.Pdb
+		*out = new(PdbInput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.SidecarContainers != nil {
 		in, out := &in.SidecarContainers, &out.SidecarContainers
 		*out = make([]v1.Container, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
-	}
-	if in.Pdb != nil {
-		in, out := &in.Pdb, &out.Pdb
-		*out = new(PdbInput)
-		(*in).DeepCopyInto(*out)
 	}
 }
 
