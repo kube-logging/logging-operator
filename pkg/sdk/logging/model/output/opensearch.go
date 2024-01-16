@@ -90,7 +90,7 @@ type OpenSearchOutput struct {
 	LogstashPrefixSeparator string `json:"logstash_prefix_separator,omitempty"`
 	// Set the Logstash date format.(default: %Y.%m.%d)
 	LogstashDateformat string `json:"logstash_dateformat,omitempty"`
-	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false.(default: true)
+	// By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false.
 	// +kubebuilder:validation:Optional
 	UtcIndex *bool `json:"utc_index,omitempty" plugin:"default:true"`
 	// Suppress type name to avoid warnings in OpenSearch
@@ -192,7 +192,7 @@ type OpenSearchOutput struct {
 	IncludeIndexInUrl bool `json:"include_index_in_url,omitempty"`
 	// With http_backend typhoeus, the opensearch plugin uses typhoeus faraday http backend. Typhoeus can handle HTTP keepalive. (default: excon)
 	HttpBackend string `json:"http_backend,omitempty"`
-	// http_backend_excon_nonblock (default: true)
+	// http_backend_excon_nonblock
 	// +kubebuilder:validation:Optional
 	HttpBackendExconNonblock *bool `json:"http_backend_excon_nonblock,omitempty" plugin:"default:true"`
 	// When you use mismatched OpenSearch server and client libraries, fluent-plugin-opensearch cannot send data into OpenSearch.  (default: false)
@@ -219,7 +219,7 @@ type OpenSearchOutput struct {
 	SuppressDocWrap bool `json:"suppress_doc_wrap,omitempty"`
 	// A list of exception that will be ignored - when the exception occurs the chunk will be discarded and the buffer retry mechanism won't be called. It is possible also to specify classes at higher level in the hierarchy.
 	IgnoreExceptions string `json:"ignore_exceptions,omitempty"`
-	// Indicates whether to backup chunk when ignore exception occurs. (default: true)
+	// Indicates whether to backup chunk when ignore exception occurs.
 	// +kubebuilder:validation:Optional
 	ExceptionBackup *bool `json:"exception_backup,omitempty" plugin:"default:true"`
 	// Configure bulk_message request splitting threshold size.
@@ -318,10 +318,10 @@ type OpenSearchEndpointCredentials struct {
 	// Set with AWS_CONTAINER_CREDENTIALS_RELATIVE_URI environment variable value
 	EcsContainerCredentialsRelativeUri *secret.Secret `json:"ecs_container_credentials_relative_uri,omitempty"`
 
-	// AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
+	// [AssumeRoleWithWebIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html)
 	AssumeRoleSessionName *secret.Secret `json:"assume_role_session_name,omitempty"`
 
-	// AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
+	// [AssumeRoleWithWebIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html)
 	AssumeRoleWebIdentityTokenFile *secret.Secret `json:"assume_role_web_identity_token_file,omitempty"`
 
 	// By default, the AWS Security Token Service (AWS STS) is available as a global service, and all AWS STS requests go to a single endpoint at https://sts.amazonaws.com. AWS recommends using Regional AWS STS endpoints instead of the global endpoint to reduce latency, build in redundancy, and increase session token validity. https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html

@@ -52,6 +52,7 @@ type GeoIP struct {
 	Records []Record `json:"records,omitempty"`
 }
 
+//
 /*
 ## Example `GeoIP` filter configurations
 
@@ -74,9 +75,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

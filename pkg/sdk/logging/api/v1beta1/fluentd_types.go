@@ -105,7 +105,9 @@ type FluentdSpec struct {
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
-	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Configure sidecar container in Fluentd pods, for example: [https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml](https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml).
+	SidecarContainers []corev1.Container `json:"sidecarContainers,omitempty"`
 }
 
 // +name:"FluentdConfig"

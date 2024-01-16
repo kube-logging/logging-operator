@@ -32,7 +32,7 @@ type _metaTLS interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type TLS struct {
-	// The name of a directory that contains a set of trusted CA certificates in PEM format. [more information](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-dir)
+	// The name of a directory that contains a set of trusted CA certificates in PEM format. For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-dir).
 	CaDir *secret.Secret `json:"ca_dir,omitempty"`
 	// The name of a file that contains a set of trusted CA certificates in PEM format. (Optional) For details, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/tlsoptions/#ca-file).
 	CaFile *secret.Secret `json:"ca_file,omitempty"`

@@ -9,6 +9,8 @@ generated_file: true
 
 Based on the [Splunk destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 
 {{< highlight yaml >}}

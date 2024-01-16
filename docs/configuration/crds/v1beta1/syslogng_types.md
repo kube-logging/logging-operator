@@ -31,6 +31,8 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### maxConnections (int, optional) {#syslogngspec-maxconnections}
 
+Available in Logging operator version 4.5 and later. Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/). 
+
 
 ### metrics (*Metrics, optional) {#syslogngspec-metrics}
 
@@ -52,10 +54,12 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### sourceDateParser (*SourceDateParser, optional) {#syslogngspec-sourcedateparser}
 
-Parses date automatically from the timestamp registered by the container runtime. Note: json key prefix and delimiter are respected 
+Available in Logging operator version 4.5 and later. Parses date automatically from the timestamp registered by the container runtime. Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected. 
 
 
 ### sourceMetrics ([]filter.MetricsProbe, optional) {#syslogngspec-sourcemetrics}
+
+Available in Logging operator version 4.5 and later. Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}). 
 
 
 ### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}
@@ -66,6 +70,15 @@ Parses date automatically from the timestamp registered by the container runtime
 
 
 ## SourceDateParser
+
+
+
+Available in Logging operator version 4.5 and later.
+
+Parses date automatically from the timestamp registered by the container runtime.
+Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+It is disabled by default, but if enabled, then the default settings parse the timestamp written by the container runtime and parsed by Fluent Bit using the `cri` or the `docker` parser.
+
 
 ### format (*string, optional) {#sourcedateparser-format}
 

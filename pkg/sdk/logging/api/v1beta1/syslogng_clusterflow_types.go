@@ -47,11 +47,13 @@ type SyslogNGClusterFlow struct {
 
 // SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 type SyslogNGClusterFlowSpec struct {
-	Match            *SyslogNGMatch        `json:"match,omitempty"`
-	Filters          []SyslogNGFilter      `json:"filters,omitempty"`
-	LoggingRef       string                `json:"loggingRef,omitempty"`
-	GlobalOutputRefs []string              `json:"globalOutputRefs,omitempty"`
-	OutputMetrics    []filter.MetricsProbe `json:"outputMetrics,omitempty"`
+	Match            *SyslogNGMatch   `json:"match,omitempty"`
+	Filters          []SyslogNGFilter `json:"filters,omitempty"`
+	LoggingRef       string           `json:"loggingRef,omitempty"`
+	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
+	// Output metrics are applied before the log reaches the destination and contain output metadata like: `name,` `namespace` and `scope`. Scope shows whether the output is a local or global one.
+	// Available in Logging operator version 4.5 and later.
+	OutputMetrics []filter.MetricsProbe `json:"outputMetrics,omitempty"`
 }
 
 type SyslogNGClusterMatch SyslogNGMatch

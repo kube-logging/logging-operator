@@ -77,6 +77,7 @@ type EnhanceK8s struct {
 	CacheRefreshVariation int `json:"cache_refresh_variation,omitempty"`
 }
 
+//
 /*
 ## Example `EnhanceK8s` filter configurations
 
@@ -89,9 +90,8 @@ spec:
   globalFilters:
     - enhanceK8s: {}
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

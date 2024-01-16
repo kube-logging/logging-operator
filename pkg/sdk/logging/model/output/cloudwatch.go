@@ -24,9 +24,9 @@ import (
 type _hugoCloudWatch interface{} //nolint:deadcode,unused
 
 // +docName:"CloudWatch output plugin for Fluentd"
-// This plugin outputs logs or metrics to Amazon CloudWatch.
-// For details, see [https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs).
 /*
+This plugin outputs logs or metrics to Amazon CloudWatch. For details, see [https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs](https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs).
+
 ## Example output configurations
 ```yaml
 spec:

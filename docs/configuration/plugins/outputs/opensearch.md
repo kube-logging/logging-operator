@@ -111,7 +111,7 @@ AWS Endpoint Credentials
 
 ### exception_backup (*bool, optional) {#opensearch-exception_backup}
 
-Indicates whether to backup chunk when ignore exception occurs. (default: true) 
+Indicates whether to backup chunk when ignore exception occurs. 
 
 Default: true
 
@@ -156,7 +156,7 @@ Default: excon
 
 ### http_backend_excon_nonblock (*bool, optional) {#opensearch-http_backend_excon_nonblock}
 
-http_backend_excon_nonblock (default: true) 
+http_backend_excon_nonblock 
 
 Default: true
 
@@ -489,7 +489,7 @@ User for HTTP Basic authentication. This plugin will escape required URL encoded
 
 ### utc_index (*bool, optional) {#opensearch-utc_index}
 
-By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false.(default: true) 
+By default, the records inserted into index logstash-YYMMDD with UTC (Coordinated Universal Time). This option allows to use local time if you describe `utc_index` to false. 
 
 Default: true
 
@@ -532,12 +532,12 @@ Typically, you can use AssumeRole for cross-account access or federation.
 
 ### assume_role_session_name (*secret.Secret, optional) {#opensearchendpointcredentials-assume_role_session_name}
 
-AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html 
+[AssumeRoleWithWebIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) 
 
 
 ### assume_role_web_identity_token_file (*secret.Secret, optional) {#opensearchendpointcredentials-assume_role_web_identity_token_file}
 
-AssumeRoleWithWebIdentity https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html 
+[AssumeRoleWithWebIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) 
 
 
 ### ecs_container_credentials_relative_uri (*secret.Secret, optional) {#opensearchendpointcredentials-ecs_container_credentials_relative_uri}

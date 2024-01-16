@@ -100,8 +100,9 @@ TLS Version
 Default: "TLSv1_2"
 
 
- ## Example `File` output configurations
 
+
+## Example `File` output configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

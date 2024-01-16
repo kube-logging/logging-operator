@@ -53,7 +53,9 @@ Metrics type [counter](https://github.com/fluent/fluent-plugin-prometheus#counte
 
 
 
- ## Example `Prometheus` filter configurations
+
+
+## Example `Prometheus` filter configurations
 
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -84,8 +86,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml>}}
   <filter **>
