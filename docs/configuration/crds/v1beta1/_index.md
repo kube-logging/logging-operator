@@ -18,7 +18,8 @@ For more information please click on the name
 | **[](conversion/)** |  | v1beta1 |
 | **[FlowSpec](flow_types/)** | FlowSpec is the Kubernetes spec for Flows | v1beta1 |
 | **[FluentbitSpec](fluentbit_types/)** | FluentbitSpec defines the desired state of FluentbitAgent | v1beta1 |
-| **[Fluent](fluentd_types/)** | FluentdConfig is a reference to the desired Fluentd state | v1beta1 |
+| **[Fluent](fluentd_config_types/)** | FluentdConfig is a reference to the desired Fluentd state | v1beta1 |
+| **[FluentdSpec](fluentd_types/)** | FluentdSpec defines the desired state of Fluentd | v1beta1 |
 | **[Logging](logging_types/)** | Logging system configuration | v1beta1 |
 | **[LoggingRouteSpec](loggingroute_types/)** | LoggingRouteSpec defines the desired state of LoggingRoute | v1beta1 |
 | **[_hugoNodeAgent](node_agent_types/)** |  | v1beta1 |
