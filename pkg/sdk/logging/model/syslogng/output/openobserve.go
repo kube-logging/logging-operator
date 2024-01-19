@@ -14,11 +14,11 @@
 
 package output
 
-// +name:"Openobserve"
+// +name:"OpenObserve"
 // +weight:"200"
 type _hugoOpenobserve interface{} //nolint:deadcode,unused
 
-// +docName:"Sending messages over Openobserve"
+// +docName:"Sending messages over OpenObserve"
 /*
 ## Example
 
@@ -44,9 +44,9 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 */
 type _docOpenobserve interface{} //nolint:deadcode,unused
 
-// +name:"Openobserve"
+// +name:"OpenObserve"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/"
-// +description:"Sending messages over Openobserve"
+// +description:"Sending messages over OpenObserve"
 // +status:"Testing"
 type _metaOpenobserve interface{} //nolint:deadcode,unused
 
@@ -58,7 +58,7 @@ type OpenobserveOutput struct {
 	Port int `json:"port,omitempty"`
 	// Name of the organization in OpenObserve.
 	Organization string `json:"organization,omitempty"`
-	// Name of the stream in Openobserve.
+	// Name of the stream in OpenObserve.
 	Stream string `json:"stream,omitempty"`
 	// Arguments to the `$format-json()` template function.
 	// Default: --scope rfc5424 --exclude DATE --key ISODATE @timestamp=${ISODATE}"

@@ -1,10 +1,10 @@
 ---
-title: Openobserve
+title: OpenObserve
 weight: 200
 generated_file: true
 ---
 
-# Sending messages over Openobserve
+# Sending messages over OpenObserve
 ## Overview
 
 ## Example
@@ -38,7 +38,7 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 
 ### organization (string, optional) {#openobserveoutput-organization}
 
-Name of the organization in Openobserve. 
+Name of the organization in OpenObserve. 
 
 
 ### port (int, optional) {#openobserveoutput-port}
@@ -54,7 +54,7 @@ Arguments to the `$format-json()` template function. Default: --scope rfc5424 --
 
 ### stream (string, optional) {#openobserveoutput-stream}
 
-Name of the stream in Openobserve. 
+Name of the stream in OpenObserve. 
 
 
 
