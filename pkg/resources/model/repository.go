@@ -361,7 +361,7 @@ func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list []v
 
 func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.FluentdConfig, []v1beta1.FluentdConfig, error) {
 	var list v1beta1.FluentdConfigList
-	if err := r.Client.List(ctx, &list); err != nil {
+	if err := r.Client.List(ctx, &list, client.InNamespace(logging.Spec.ControlNamespace)); err != nil {
 		return nil, []v1beta1.FluentdConfig{}, err
 	}
 
@@ -401,7 +401,7 @@ func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list []
 
 func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, logging v1beta1.Logging) (*v1beta1.SyslogNGConfig, []v1beta1.SyslogNGConfig, error) {
 	var list v1beta1.SyslogNGConfigList
-	if err := r.Client.List(ctx, &list); err != nil {
+	if err := r.Client.List(ctx, &list, client.InNamespace(logging.Spec.ControlNamespace)); err != nil {
 		return nil, []v1beta1.SyslogNGConfig{}, err
 	}
 
