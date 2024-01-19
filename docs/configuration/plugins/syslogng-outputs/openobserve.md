@@ -17,7 +17,7 @@ metadata:
 spec:
   openobserve:
     url: "https://some-openobserve-endpoint"
-    port: 5040
+    port: 5080
     organization: "default"
     stream: "default"
     user: "username"
@@ -40,6 +40,12 @@ More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations
 
 Name of the organization in Openobserve. 
 
+
+### port (int, optional) {#openobserveoutput-port}
+
+The port number of the OpenObserve server.  Specify it here instead of appending it to the URL.
+
+Default: 5080
 
 ### record (string, optional) {#openobserveoutput-record}
 

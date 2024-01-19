@@ -30,7 +30,7 @@ metadata:
 spec:
   openobserve:
     url: "https://some-openobserve-endpoint"
-    port: 5040
+    port: 5080
     organization: "default"
     stream: "default"
     user: "username"
@@ -53,7 +53,10 @@ type _metaOpenobserve interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 type OpenobserveOutput struct {
 	HTTPOutput `json:",inline"`
-	// Name of the organization in Openobserve.
+	// The port number of the OpenObserve server. (default: 5080)
+	// Specify it here instead of appending it to the URL.
+	Port int `json:"port,omitempty"`
+	// Name of the organization in OpenObserve.
 	Organization string `json:"organization,omitempty"`
 	// Name of the stream in Openobserve.
 	Stream string `json:"stream,omitempty"`
@@ -63,6 +66,10 @@ type OpenobserveOutput struct {
 }
 
 func (o *OpenobserveOutput) BeforeRender() {
+	if o.Port == 0 {
+		o.Port = 5080
+	}
+
 	if o.Organization == "" {
 		o.Organization = "default"
 	}

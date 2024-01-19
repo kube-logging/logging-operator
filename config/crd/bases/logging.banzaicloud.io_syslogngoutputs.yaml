@@ -1325,6 +1325,8 @@ spec:
                     type: object
                   persist_name:
                     type: string
+                  port:
+                    type: integer
                   record:
                     type: string
                   response-action:
