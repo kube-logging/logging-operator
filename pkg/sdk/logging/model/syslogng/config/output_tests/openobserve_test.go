@@ -44,7 +44,7 @@ source "main_input" {
 };
 
 destination "output_default_test-openobserve-out" {
-	openobserve-log(url("http://localhost:5080/") user("root@example.com") password("V2tsn88GhdNTKxaS") persist_name("output_default_test-openobserve-out") organization("default") stream("default"));
+	openobserve-log(url("http://localhost") user("root@example.com") password("V2tsn88GhdNTKxaS") persist_name("output_default_test-openobserve-out") port(5080) organization("default") stream("default"));
 };
 `)
 
@@ -81,7 +81,87 @@ destination "output_default_test-openobserve-out" {
 				Spec: v1beta1.SyslogNGOutputSpec{
 					Openobserve: &output.OpenobserveOutput{
 						HTTPOutput: output.HTTPOutput{
-							URL:  "http://localhost:5080/",
+							URL:  "http://localhost",
+							User: "root@example.com",
+							Password: secret.Secret{
+								ValueFrom: &secret.ValueFrom{
+									SecretKeyRef: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "openobserve",
+										},
+										Key: "password",
+									},
+								}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	var buf strings.Builder
+	err := config.RenderConfigInto(testCaseInput, &buf)
+	config.CheckError(t, false, err)
+	require.Equal(t, expectedConfig, buf.String())
+
+}
+
+func TestOpenobserveOutputWithOtherPort(t *testing.T) {
+	expectedConfig := config.Untab(`@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+	channel {
+		source {
+			network(flags("no-parse") port(601) transport("tcp"));
+		};
+		parser {
+			json-parser(prefix("json."));
+		};
+	};
+};
+
+destination "output_default_test-openobserve-out" {
+	openobserve-log(url("http://localhost") user("root@example.com") password("V2tsn88GhdNTKxaS") persist_name("output_default_test-openobserve-out") port(5081) organization("default") stream("default"));
+};
+`)
+
+	testCaseInput := config.Input{
+		Namespace:      "config-test",
+		Name:           "test",
+		SyslogNGSpec:   &v1beta1.SyslogNGSpec{},
+		ClusterOutputs: []v1beta1.SyslogNGClusterOutput{},
+		ClusterFlows:   []v1beta1.SyslogNGClusterFlow{},
+		Flows:          []v1beta1.SyslogNGFlow{},
+		SourcePort:     601,
+		SecretLoaderFactory: &config.TestSecretLoaderFactory{
+			Reader: config.SecretReader{
+				Secrets: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "openobserve",
+						},
+						Data: map[string][]byte{
+							"password": []byte("V2tsn88GhdNTKxaS"),
+						},
+					},
+				},
+			},
+			MountPath: "/etc/syslog-ng/secret",
+		},
+		Outputs: []v1beta1.SyslogNGOutput{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-openobserve-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					Openobserve: &output.OpenobserveOutput{
+						Port: 5081,
+						HTTPOutput: output.HTTPOutput{
+							URL:  "http://localhost",
 							User: "root@example.com",
 							Password: secret.Secret{
 								ValueFrom: &secret.ValueFrom{
