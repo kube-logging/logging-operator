@@ -57,6 +57,7 @@ type RegexpSection struct {
 	Pattern string `json:"pattern"`
 }
 
+//
 /*
 ## Example `Regexp` filter configurations
 
@@ -75,9 +76,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -102,6 +102,7 @@ type ExcludeSection struct {
 	Pattern string `json:"pattern"`
 }
 
+//
 /*
 ## Example `Exclude` filter configurations
 
@@ -121,9 +122,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-*/
-/*
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
   <filter **>
@@ -148,6 +147,7 @@ type OrSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
+//
 /*
 ## Example `Or` filter configurations
 
@@ -170,9 +170,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <or>
@@ -199,6 +198,7 @@ type AndSection struct {
 	Exclude []ExcludeSection `json:"exclude,omitempty"`
 }
 
+//
 /*
 ## Example `And` filter configurations
 
@@ -221,9 +221,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-Fluentd #### config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 	<and>

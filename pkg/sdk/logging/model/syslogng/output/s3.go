@@ -26,6 +26,8 @@ type _hugoS3 interface{} //nolint:deadcode,unused
 /*
 Sends messages from a local network to a S3 (compatible) server. For more information, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1

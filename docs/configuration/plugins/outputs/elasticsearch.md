@@ -256,7 +256,7 @@ Default: -
 
 ### max_retry_get_es_version (string, optional) {#elasticsearch-max_retry_get_es_version}
 
-You can specify the times for retrying to obtain the Elasticsearch version.
+You can specify the number of times to retry fetching the Elasticsearch version.
 
 Default: 15
 
@@ -496,7 +496,7 @@ Default unrecoverable_error_types parameter is set up strictly. Because es_rejec
 
 ### use_legacy_template (*bool, optional) {#elasticsearch-use_legacy_template}
 
-Specify wether to use legacy template or not.
+If set to true, the output uses the [legacy index template format](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-templates-v1.html). Otherwise, it uses the [composable index template](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-templates.html) format.
 
 Default: true
 

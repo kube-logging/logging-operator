@@ -26,6 +26,8 @@ type _hugoLoki interface{} //nolint:deadcode,unused
 /*
 Sends messages to Grafana Loki over gRPC, based on the [Loki destination of AxoSyslog Core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-loki/).
 
+Available in Logging operator version 4.4 and later.
+
 ## Example
 
 {{< highlight yaml >}}
@@ -49,8 +51,7 @@ spec:
       insecure: {}
 {{</ highlight >}}
 
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/
-For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/). For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 */
 type _docLoki interface{} //nolint:deadcode,unused
 
@@ -62,7 +63,7 @@ type _metaLoki interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type LokiOutput struct {
-	// Auth Authentication configuration, see https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth
+	// Authentication configuration, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth).
 	Auth *Auth `json:"auth,omitempty"`
 	// Using the Labels map, Kubernetes label to Loki label mapping can be configured. Example: `{"app" : "$PROGRAM"}`
 	Labels filter.ArrowMap `json:"labels,omitempty"`

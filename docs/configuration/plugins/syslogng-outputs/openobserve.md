@@ -7,6 +7,10 @@ generated_file: true
 # Sending messages over OpenObserve
 ## Overview
 
+Send messages to [OpenObserve](https://openobserve.ai/docs/api/ingestion/logs/json/) using its [Logs Ingestion - JSON API](https://openobserve.ai/docs/api/ingestion/logs/json/). This API accepts multiple records in batch in JSON format.
+
+Available in Logging operator version 4.5 and later.
+
 ## Example
 
 {{< highlight yaml >}}
@@ -27,7 +31,8 @@ spec:
           name: openobserve
           key: password
 {{</ highlight >}}
-More information at https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/
+
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/).
 
 
 ## Configuration
@@ -49,7 +54,7 @@ Default: 5080
 
 ### record (string, optional) {#openobserveoutput-record}
 
-Arguments to the `$format-json()` template function. Default: --scope rfc5424 --exclude DATE --key ISODATE @timestamp=${ISODATE}" 
+Arguments to the `$format-json()` template function. Default: `"--scope rfc5424 --exclude DATE --key ISODATE @timestamp=${ISODATE}"` 
 
 
 ### stream (string, optional) {#openobserveoutput-stream}

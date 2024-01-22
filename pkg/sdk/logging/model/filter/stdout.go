@@ -41,6 +41,7 @@ type StdOutFilterConfig struct {
 	OutputType string `json:"output_type,omitempty"`
 }
 
+//
 /*
 ## Example `StdOut` filter configurations
 
@@ -57,9 +58,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight yaml >}}
 <filter **>

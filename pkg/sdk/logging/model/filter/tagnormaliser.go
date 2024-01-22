@@ -57,6 +57,7 @@ type TagNormaliser struct {
 	MatchTag string `json:"match_tag,omitempty" plugin:"hidden"`
 }
 
+//
 /*
 ## Example `Parser` filter configurations
 
@@ -73,9 +74,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <match kubernetes.**>

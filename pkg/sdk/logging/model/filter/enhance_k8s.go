@@ -25,12 +25,12 @@ import (
 type _hugoEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
-// +docName:"[Enhance K8s Metadata](https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata)"
+// +docName:"[Enhance K8s Metadata](https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata)"
 // Fluentd Filter plugin to fetch several metadata for a Pod
 type _docEnhanceK8s interface{} //nolint:deadcode,unused
 
 // +name:"Enhance K8s Metadata"
-// +url:"https://github.com/SumoLogic/sumologic-kubernetes-collection/tree/main/fluent-plugin-enhance-k8s-metadata"
+// +url:"https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata"
 // +version:"2.0.0"
 // +description:"Fluentd output plugin to add extra Kubernetes metadata to the events."
 // +status:"GA"
@@ -77,6 +77,7 @@ type EnhanceK8s struct {
 	CacheRefreshVariation int `json:"cache_refresh_variation,omitempty"`
 }
 
+//
 /*
 ## Example `EnhanceK8s` filter configurations
 
@@ -89,9 +90,8 @@ spec:
   globalFilters:
     - enhanceK8s: {}
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

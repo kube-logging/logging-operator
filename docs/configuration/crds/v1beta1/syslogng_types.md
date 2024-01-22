@@ -31,6 +31,8 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### maxConnections (int, optional) {#syslogngspec-maxconnections}
 
+Available in Logging operator version 4.5 and later. Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/). 
+
 
 ### metrics (*Metrics, optional) {#syslogngspec-metrics}
 
@@ -52,10 +54,12 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### sourceDateParser (*SourceDateParser, optional) {#syslogngspec-sourcedateparser}
 
-Parses date automatically from the timestamp registered by the container runtime. Note: json key prefix and delimiter are respected 
+Available in Logging operator version 4.5 and later. Parses date automatically from the timestamp registered by the container runtime. Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected. 
 
 
 ### sourceMetrics ([]filter.MetricsProbe, optional) {#syslogngspec-sourcemetrics}
+
+Available in Logging operator version 4.5 and later. Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}). 
 
 
 ### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}
@@ -67,6 +71,15 @@ Parses date automatically from the timestamp registered by the container runtime
 
 ## SourceDateParser
 
+
+
+Available in Logging operator version 4.5 and later.
+
+Parses date automatically from the timestamp registered by the container runtime.
+Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+It is disabled by default, but if enabled, then the default settings parse the timestamp written by the container runtime and parsed by Fluent Bit using the `cri` or the `docker` parser.
+
+
 ### format (*string, optional) {#sourcedateparser-format}
 
 Default: "%FT%T.%f%z" 
@@ -75,58 +88,6 @@ Default: "%FT%T.%f%z"
 ### template (*string, optional) {#sourcedateparser-template}
 
 Default(depending on JSONKeyPrefix): "${json.time}" 
-
-
-
----
-title: SyslogNGConfig
-weight: 200
-generated_file: true
----
-
-## SyslogNGConfig
-
-###  (metav1.TypeMeta, required) {#syslogngconfig-}
-
-
-### metadata (metav1.ObjectMeta, optional) {#syslogngconfig-metadata}
-
-
-### spec (SyslogNGSpec, optional) {#syslogngconfig-spec}
-
-
-### status (SyslogNGConfigStatus, optional) {#syslogngconfig-status}
-
-
-
-## SyslogNGConfigStatus
-
-SyslogNGConfigStatus
-
-### active (*bool, optional) {#syslogngconfigstatus-active}
-
-
-### logging (string, optional) {#syslogngconfigstatus-logging}
-
-
-### problems ([]string, optional) {#syslogngconfigstatus-problems}
-
-
-### problemsCount (int, optional) {#syslogngconfigstatus-problemscount}
-
-
-
-## SyslogNGConfigList
-
-SyslogNGConfigList
-
-###  (metav1.TypeMeta, required) {#syslogngconfiglist-}
-
-
-### metadata (metav1.ListMeta, optional) {#syslogngconfiglist-metadata}
-
-
-### items ([]SyslogNGConfig, required) {#syslogngconfiglist-items}
 
 
 

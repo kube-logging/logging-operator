@@ -44,8 +44,10 @@ type DedotFilterConfig struct {
 	Separator string `json:"de_dot_separator,omitempty"`
 }
 
+//
 /*
 ## Example `Dedot` filter configurations
+
 {{< highlight yaml >}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -60,9 +62,8 @@ spec:
   localOutputRefs:
     - demo-output
 {{</ highlight >}}
-*/
-/*
-#### Fluentd config result:
+
+Fluentd config result:
 
 {{< highlight xml >}}
 <filter **>

@@ -25,6 +25,7 @@ Default: event.eventTime, event.lastTimestamp, event.firstTimestamp
 
 
 
+
 ## Example `Kubernetes Events Timestamp` filter configurations
 
 {{< highlight yaml >}}
@@ -45,8 +46,7 @@ spec:
     - es-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
  <filter **>

@@ -147,6 +147,8 @@ Fluentd port inside the container (24240 by default). The headless service port 
 
 ### sidecarContainers ([]corev1.Container, optional) {#fluentdspec-sidecarcontainers}
 
+Available in Logging operator version 4.5 and later. Configure sidecar container in Fluentd pods, for example: [https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml](https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml). 
+
 
 ### statefulsetAnnotations (map[string]string, optional) {#fluentdspec-statefulsetannotations}
 
@@ -167,60 +169,6 @@ Fluentd port inside the container (24240 by default). The headless service port 
 
 
 ### workers (int32, optional) {#fluentdspec-workers}
-
-
-
----
-title: FluentdConfig
-weight: 200
-generated_file: true
----
-
-## FluentdConfig
-
-FluentdConfig
-
-###  (metav1.TypeMeta, required) {#fluentdconfig-}
-
-
-### metadata (metav1.ObjectMeta, optional) {#fluentdconfig-metadata}
-
-
-### spec (FluentdSpec, optional) {#fluentdconfig-spec}
-
-
-### status (FluentdConfigStatus, optional) {#fluentdconfig-status}
-
-
-
-## FluentdConfigStatus
-
-FluentdConfigStatus
-
-### active (*bool, optional) {#fluentdconfigstatus-active}
-
-
-### logging (string, optional) {#fluentdconfigstatus-logging}
-
-
-### problems ([]string, optional) {#fluentdconfigstatus-problems}
-
-
-### problemsCount (int, optional) {#fluentdconfigstatus-problemscount}
-
-
-
-## FluentdConfigList
-
-FluentdConfigList
-
-###  (metav1.TypeMeta, required) {#fluentdconfiglist-}
-
-
-### metadata (metav1.ListMeta, optional) {#fluentdconfiglist-metadata}
-
-
-### items ([]FluentdConfig, required) {#fluentdconfiglist-items}
 
 
 

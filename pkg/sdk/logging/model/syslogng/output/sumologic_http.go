@@ -63,7 +63,7 @@ spec:
       use-system-cert-store: true
 {{</ highlight >}}
 
-More information at: https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-http/
+For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-http/).
 */
 type _docSumologicHTTP interface{} //nolint:deadcode,unused
 

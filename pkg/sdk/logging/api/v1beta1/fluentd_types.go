@@ -24,7 +24,6 @@ import (
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
@@ -105,53 +104,9 @@ type FluentdSpec struct {
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
-	SidecarContainers       []corev1.Container           `json:"sidecarContainers,omitempty"`
-}
-
-// +name:"FluentdConfig"
-// +weight:"200"
-type _hugoFluent interface{} //nolint:deadcode,unused
-
-// +name:"Fluent"
-// +version:"v1beta1"
-// +description:"FluentdConfig is a reference to the desired Fluentd state"
-type _metaFluentdConfig interface{} //nolint:deadcode,unused
-
-// +kubebuilder:object:root=true
-// +kubebuilder:resource:categories=logging-all
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".status.active",description="Is the fluentd configuration active?"
-// +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
-// +kubebuilder:storageversion
-
-// FluentdConfig
-type FluentdConfig struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   FluentdSpec         `json:"spec,omitempty"`
-	Status FluentdConfigStatus `json:"status,omitempty"`
-}
-
-// FluentdConfigStatus
-type FluentdConfigStatus struct {
-	Logging       string   `json:"logging,omitempty"`
-	Active        *bool    `json:"active,omitempty"`
-	Problems      []string `json:"problems,omitempty"`
-	ProblemsCount int      `json:"problemsCount,omitempty"`
-}
-
-// +kubebuilder:object:root=true
-
-// FluentdConfigList
-type FluentdConfigList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []FluentdConfig `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&FluentdConfig{}, &FluentdConfigList{})
+	// Available in Logging operator version 4.5 and later.
+	// Configure sidecar container in Fluentd pods, for example: [https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml](https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml).
+	SidecarContainers []corev1.Container `json:"sidecarContainers,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

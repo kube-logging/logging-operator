@@ -40,6 +40,7 @@ Default: `kubernetes.**`
 
 
 
+
 ## Example `Parser` filter configurations
 
 {{< highlight yaml >}}
@@ -56,8 +57,7 @@ spec:
     - demo-output
 {{</ highlight >}}
 
-
-#### Fluentd config result:
+Fluentd config result:
 
 {{< highlight xml >}}
 <match kubernetes.**>

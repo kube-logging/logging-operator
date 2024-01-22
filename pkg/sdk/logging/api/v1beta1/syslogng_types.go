@@ -16,7 +16,6 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
@@ -48,63 +47,33 @@ type SyslogNGSpec struct {
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
+	// Available in Logging operator version 4.5 and later.
 	// Parses date automatically from the timestamp registered by the container runtime.
-	// Note: json key prefix and delimiter are respected
-	SourceDateParser *SourceDateParser     `json:"sourceDateParser,omitempty"`
-	MaxConnections   int                   `json:"maxConnections,omitempty"`
-	LogIWSize        int                   `json:"logIWSize,omitempty"`
-	SourceMetrics    []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
+	// Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+	SourceDateParser *SourceDateParser `json:"sourceDateParser,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Set the maximum number of connections for the source. For details, see [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-flow-control/configuring-flow-control/).
+	MaxConnections int `json:"maxConnections,omitempty"`
+	LogIWSize      int `json:"logIWSize,omitempty"`
+	// Available in Logging operator version 4.5 and later.
+	// Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}).
+	SourceMetrics []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
 	// TODO: option to turn on/off buffer volume PVC
 }
 
+//
+/*
+Available in Logging operator version 4.5 and later.
+
+Parses date automatically from the timestamp registered by the container runtime.
+Note: `jsonKeyPrefix` and `jsonKeyDelim` are respected.
+It is disabled by default, but if enabled, then the default settings parse the timestamp written by the container runtime and parsed by Fluent Bit using the `cri` or the `docker` parser.
+*/
 type SourceDateParser struct {
 	// Default: "%FT%T.%f%z"
 	Format *string `json:"format,omitempty"`
 	// Default(depending on JSONKeyPrefix): "${json.time}"
 	Template *string `json:"template,omitempty"`
-}
-
-// +name:"SyslogNGConfig"
-// +weight:"200"
-type _hugoSyslogNGConfig interface{} //nolint:deadcode,unused
-
-// +name:"SyslogNG"
-// +version:"v1beta1"
-// +description:"SyslogNG is a reference to the desired SyslogNG state"
-type _metaSyslogNGConfig interface{} //nolint:deadcode,unused
-
-// +kubebuilder:object:root=true
-// +kubebuilder:resource:categories=logging-all
-// +kubebuilder:subresource:status
-// +kubebuilder:storageversion
-
-type SyslogNGConfig struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   SyslogNGSpec         `json:"spec,omitempty"`
-	Status SyslogNGConfigStatus `json:"status,omitempty"`
-}
-
-// SyslogNGConfigStatus
-type SyslogNGConfigStatus struct {
-	Logging       string   `json:"logging,omitempty"`
-	Active        *bool    `json:"active,omitempty"`
-	Problems      []string `json:"problems,omitempty"`
-	ProblemsCount int      `json:"problemsCount,omitempty"`
-}
-
-// +kubebuilder:object:root=true
-
-// SyslogNGConfigList
-type SyslogNGConfigList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SyslogNGConfig `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&SyslogNGConfig{}, &SyslogNGConfigList{})
 }
 
 // +kubebuilder:object:generate=true

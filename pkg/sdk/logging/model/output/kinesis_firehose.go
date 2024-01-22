@@ -29,6 +29,7 @@ type _hugoKinesisFirehose interface{} //nolint:deadcode,unused
 For details, see [https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose](https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_firehose).
 
 ## Example output configurations
+
 ```yaml
 spec:
   kinesisFirehose:
