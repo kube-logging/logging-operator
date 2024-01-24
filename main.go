@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
-	"regexp"
 	"strings"
 
 	"emperror.dev/errors"
@@ -33,10 +32,8 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/discovery"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -48,7 +45,6 @@ import (
 
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
-	"github.com/kube-logging/logging-operator/pkg/resources"
 	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
@@ -169,10 +165,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if !PSPEnabled(mgr.GetConfig()) {
-		setupLog.Info("WARNING PodSecurityPolicies are disabled. Can be enabled manually with PSP_ENABLED=1")
-	}
-
 	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("logging"))
 
 	if err := (&extensionsControllers.EventTailerReconciler{
@@ -228,36 +220,6 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
-}
-
-func PSPEnabled(cfg *rest.Config) bool {
-	pspenv := os.Getenv("PSP_ENABLED")
-	if pspenv != "" {
-		return cast.ToBool(pspenv)
-	}
-	dsc, err := discovery.NewDiscoveryClientForConfig(cfg)
-	if err != nil {
-		setupLog.Error(err, "discovery client creation")
-		os.Exit(1)
-	}
-	serverVersion, err := dsc.ServerVersion()
-	if err != nil {
-		setupLog.Error(err, "server version")
-		os.Exit(1)
-	}
-	compiledVersion := regexp.MustCompile(`\d+`)
-	minorCompiled := compiledVersion.Find([]byte(serverVersion.Minor))
-	minor := cast.ToInt(string(minorCompiled))
-
-	if minor == 0 {
-		setupLog.Info("minor server detection failed, PSPs will be disabled")
-		return resources.PSPEnabled
-	}
-
-	if cast.ToInt(serverVersion.Major) == 1 && minor < 25 {
-		resources.PSPEnabled = true
-	}
-	return resources.PSPEnabled
 }
 
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {

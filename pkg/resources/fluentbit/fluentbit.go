@@ -44,7 +44,6 @@ const (
 	clusterRoleName                = "fluentbit"
 	fluentBitSecretConfigName      = "fluentbit"
 	fluentbitDaemonSetName         = "fluentbit"
-	fluentbitPodSecurityPolicyName = "fluentbit"
 	fluentbitServiceName           = "fluentbit"
 	containerName                  = "fluent-bit"
 	defaultBufferVolumeMetricsPort = 9200
@@ -137,9 +136,6 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.daemonSet,
 		r.serviceMetrics,
 		r.serviceBufferMetrics,
-	}
-	if resources.PSPEnabled {
-		objects = append(objects, r.clusterPodSecurityPolicy, r.pspClusterRole, r.pspClusterRoleBinding)
 	}
 	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
 		objects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
