@@ -163,24 +163,26 @@ type DefaultFlowSpec struct {
 }
 
 const (
-	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                    = "2.1.8"
-	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag        = "v0.7.1"
-	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
-	DefaultFluentdImageRepository               = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                      = "v1.16-full"
-	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
-	DefaultFluentdDrainWatchImageRepository     = "ghcr.io/kube-logging/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag            = "v0.2.1"
-	DefaultFluentdDrainPauseImageRepository     = "k8s.gcr.io/pause"
-	DefaultFluentdDrainPauseImageTag            = "3.2"
-	DefaultFluentdVolumeModeImageRepository     = "busybox"
-	DefaultFluentdVolumeModeImageTag            = "latest"
-	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag        = "v0.0.5"
-	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag          = "v0.7.1"
+	DefaultFluentbitImageRepository               = "fluent/fluent-bit"
+	DefaultFluentbitImageTag                      = "2.1.8"
+	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
+	DefaultFluentbitBufferVolumeImageTag          = "v0.7.1"
+	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
+	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
+	DefaultFluentbitConfigReloaderImageTag        = "v0.0.5"
+	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/fluentd"
+	DefaultFluentdImageTag                        = "v1.16-full"
+	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
+	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
+	DefaultFluentdDrainWatchImageTag              = "v0.2.1"
+	DefaultFluentdDrainPauseImageRepository       = "k8s.gcr.io/pause"
+	DefaultFluentdDrainPauseImageTag              = "3.2"
+	DefaultFluentdVolumeModeImageRepository       = "busybox"
+	DefaultFluentdVolumeModeImageTag              = "latest"
+	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/config-reloader"
+	DefaultFluentdConfigReloaderImageTag          = "v0.0.5"
+	DefaultFluentdBufferVolumeImageRepository     = "ghcr.io/kube-logging/node-exporter"
+	DefaultFluentdBufferVolumeImageTag            = "v0.7.1"
 )
 
 // SetDefaults fills empty attributes
@@ -328,7 +330,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 				fluentbitSpec.Annotations["prometheus.io/path"] = fluentbitSpec.Metrics.Path
 				fluentbitSpec.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", fluentbitSpec.Metrics.Port)
 			}
-		} else if fluentbitSpec.LivenessDefaultCheck {
+		} else if fluentbitSpec.LivenessDefaultCheck || fluentbitSpec.ConfigHotReload != nil {
 			fluentbitSpec.Metrics = &Metrics{
 				Port: 2020,
 				Path: "/",
@@ -406,6 +408,17 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 		if fluentbitSpec.TLS.Enabled == nil {
 			fluentbitSpec.TLS.Enabled = util.BoolPointer(false)
+		}
+		if fluentbitSpec.ConfigHotReload != nil {
+			if fluentbitSpec.ConfigHotReload.Image.Repository == "" {
+				fluentbitSpec.ConfigHotReload.Image.Repository = DefaultFluentbitConfigReloaderImageRepository
+			}
+			if fluentbitSpec.ConfigHotReload.Image.Tag == "" {
+				fluentbitSpec.ConfigHotReload.Image.Tag = DefaultFluentbitConfigReloaderImageTag
+			}
+			if fluentbitSpec.ConfigHotReload.Image.PullPolicy == "" {
+				fluentbitSpec.ConfigHotReload.Image.PullPolicy = "IfNotPresent"
+			}
 		}
 	}
 	return nil

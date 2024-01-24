@@ -65,6 +65,9 @@ FluentbitSpec defines the desired state of FluentbitAgent
 ### bufferVolumeResources (corev1.ResourceRequirements, optional) {#fluentbitspec-buffervolumeresources}
 
 
+### configHotReload (*HotReload, optional) {#fluentbitspec-confighotreload}
+
+
 ### coroStackSize (int32, optional) {#fluentbitspec-corostacksize}
 
 Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer. Do not change the default value of this parameter unless you know what you are doing. (default: 24576) 
@@ -372,6 +375,17 @@ Default: 60
 The retry failure count to meet the unhealthy requirement, this is a sum for all output plugins in a defined HC_Period
 
 Default: 5
+
+
+## HotReload
+
+HotReload configuration
+
+### image (ImageSpec, optional) {#hotreload-image}
+
+
+### resources (corev1.ResourceRequirements, optional) {#hotreload-resources}
+
 
 
 ## InputTail
