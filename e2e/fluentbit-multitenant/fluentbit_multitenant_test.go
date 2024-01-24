@@ -30,7 +30,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -91,8 +90,9 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 			},
 		}))
 
-		loggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra)
-		loggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant)
+		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels, nil)
+		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
+		common.LoggingRoute(ctx, t, c.GetClient())
 
 		aggregatorLabels := map[string]string{
 			"app.kubernetes.io/name":      "fluentd",
@@ -159,159 +159,4 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
 		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
-}
-
-func loggingInfra(ctx context.Context, t *testing.T, c client.Client, nsInfra string, release string, tag string) {
-	output := v1beta1.ClusterOutput{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "http",
-			Namespace: nsInfra,
-		},
-		Spec: v1beta1.ClusterOutputSpec{
-			OutputSpec: v1beta1.OutputSpec{
-				LoggingRef: "infra",
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", release, tag),
-					ContentType: "application/json",
-					Buffer:      realTimeBuffer,
-				},
-			},
-		},
-	}
-
-	common.RequireNoError(t, c.Create(ctx, &output))
-	flow := v1beta1.ClusterFlow{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "flow",
-			Namespace: nsInfra,
-		},
-		Spec: v1beta1.ClusterFlowSpec{
-			LoggingRef: "infra",
-			Match: []v1beta1.ClusterMatch{
-				{
-					ClusterSelect: &v1beta1.ClusterSelect{
-						Labels: producerLabels,
-					},
-				},
-			},
-			GlobalOutputRefs: []string{output.Name},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &flow))
-
-	agent := v1beta1.FluentbitAgent{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "infra",
-		},
-		Spec: v1beta1.FluentbitSpec{
-			LoggingRef:      "infra",
-			ConfigHotReload: &v1beta1.HotReload{},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &agent))
-
-	ap := v1beta1.LoggingRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "tenants",
-		},
-		Spec: v1beta1.LoggingRouteSpec{
-			Source: "infra",
-			Targets: metav1.LabelSelector{
-				MatchExpressions: []metav1.LabelSelectorRequirement{
-					{
-						Key:      "tenant",
-						Operator: metav1.LabelSelectorOpExists,
-					},
-				},
-			},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &ap))
-
-	logging := v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "infra",
-			Labels: map[string]string{
-				"tenant": "infra",
-			},
-		},
-		Spec: v1beta1.LoggingSpec{
-			LoggingRef:       "infra",
-			ControlNamespace: nsInfra,
-			FluentdSpec: &v1beta1.FluentdSpec{
-				Image: v1beta1.ImageSpec{
-					Tag: "v1.16-base",
-				},
-				DisablePvc: true,
-				Resources: corev1.ResourceRequirements{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("50m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-			},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &logging))
-}
-
-func loggingTenant(ctx context.Context, t *testing.T, c client.Client, nsTenant, nsInfra, release, tag string) {
-	output := v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "http",
-			Namespace: nsTenant,
-		},
-		Spec: v1beta1.OutputSpec{
-			LoggingRef: "tenant",
-			HTTPOutput: &output.HTTPOutputConfig{
-				Endpoint:    fmt.Sprintf("http://%s-test-receiver.%s:8080/%s", release, nsInfra, tag),
-				ContentType: "application/json",
-				Buffer:      realTimeBuffer,
-			},
-		},
-	}
-
-	common.RequireNoError(t, c.Create(ctx, &output))
-	flow := v1beta1.Flow{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "flow",
-			Namespace: nsTenant,
-		},
-		Spec: v1beta1.FlowSpec{
-			LoggingRef: "tenant",
-			Match: []v1beta1.Match{
-				{
-					Select: &v1beta1.Select{
-						Labels: producerLabels,
-					},
-				},
-			},
-			LocalOutputRefs: []string{output.Name},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &flow))
-
-	logging := v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "tenant",
-			Labels: map[string]string{
-				"tenant": "tenant",
-			},
-		},
-		Spec: v1beta1.LoggingSpec{
-			LoggingRef:       "tenant",
-			ControlNamespace: nsTenant,
-			WatchNamespaces:  []string{"tenant"},
-			FluentdSpec: &v1beta1.FluentdSpec{
-				DisablePvc: true,
-				Resources: corev1.ResourceRequirements{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("50m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-			},
-		},
-	}
-	common.RequireNoError(t, c.Create(ctx, &logging))
 }
