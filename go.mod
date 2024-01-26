@@ -11,18 +11,18 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.30.0
+	github.com/onsi/gomega v1.31.1
 	github.com/pborman/uuid v1.2.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.1
 	github.com/prometheus/client_golang v1.18.0
 	github.com/siliconbrain/go-seqs v0.8.1
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
-	k8s.io/api v0.29.0
-	k8s.io/apiextensions-apiserver v0.29.0
-	k8s.io/apimachinery v0.29.0
-	k8s.io/client-go v0.29.0
+	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
+	k8s.io/api v0.29.1
+	k8s.io/apiextensions-apiserver v0.29.1
+	k8s.io/apimachinery v0.29.1
+	k8s.io/client-go v0.29.1
 	k8s.io/klog/v2 v2.110.1
 	sigs.k8s.io/controller-runtime v0.17.0
 )
@@ -86,7 +86,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/component-base v0.29.0 // indirect
+	k8s.io/component-base v0.29.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect

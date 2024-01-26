@@ -6,15 +6,15 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.34.0
-	github.com/kube-logging/logging-operator v0.0.0-20240116135622-12220f19999c
+	github.com/kube-logging/logging-operator v0.0.0-20240124150656-3b041ef4dde2
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
-	helm.sh/helm/v3 v3.13.3
-	k8s.io/api v0.29.0
-	k8s.io/apiextensions-apiserver v0.29.0
-	k8s.io/apimachinery v0.29.0
-	k8s.io/client-go v0.29.0
+	helm.sh/helm/v3 v3.14.0
+	k8s.io/api v0.29.1
+	k8s.io/apiextensions-apiserver v0.29.1
+	k8s.io/apimachinery v0.29.1
+	k8s.io/client-go v0.29.1
 	sigs.k8s.io/controller-runtime v0.17.0
 )
 
@@ -46,7 +46,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
-	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
+	github.com/evanphx/json-patch v5.7.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.8.0 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fatih/color v1.16.0 // indirect
@@ -110,7 +110,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.0 // indirect
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.1 // indirect
 	github.com/prometheus/client_golang v1.18.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
@@ -119,7 +119,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
+	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/wayneashleyberry/terminal-dimensions v1.1.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -134,7 +134,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b // indirect
+	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/oauth2 v0.12.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
@@ -150,9 +150,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiserver v0.29.0 // indirect
+	k8s.io/apiserver v0.29.1 // indirect
 	k8s.io/cli-runtime v0.29.0 // indirect
-	k8s.io/component-base v0.29.0 // indirect
+	k8s.io/component-base v0.29.1 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/kubectl v0.29.0 // indirect
