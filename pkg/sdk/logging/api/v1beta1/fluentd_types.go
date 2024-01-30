@@ -82,6 +82,8 @@ type FluentdSpec struct {
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`
 	RootDir                   string                            `json:"rootDir,omitempty"`
+	// +kubebuilder:validation:enum=json,text
+	LogFormat string `json:"logFormat,omitempty" plugin:"default:text"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel string `json:"logLevel,omitempty"`
 	// Ignore same log lines
@@ -180,6 +182,9 @@ func (f *FluentdSpec) SetDefaults() error {
 				f.Annotations["prometheus.io/path"] = f.GetFluentdMetricsPath()
 				f.Annotations["prometheus.io/port"] = fmt.Sprintf("%d", f.Metrics.Port)
 			}
+		}
+		if f.LogFormat == "" {
+			f.LogLevel = "text"
 		}
 		if f.LogLevel == "" {
 			f.LogLevel = "info"

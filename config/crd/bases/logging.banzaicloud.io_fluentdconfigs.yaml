@@ -1515,6 +1515,8 @@ spec:
                     format: int32
                     type: integer
                 type: object
+              logFormat:
+                type: string
               logLevel:
                 type: string
               metrics:

@@ -106,6 +106,11 @@ Ignore same log lines [more info]( https://docs.fluentd.org/deployment/logging#i
 
 ### livenessProbe (*corev1.Probe, optional) {#fluentdspec-livenessprobe}
 
+### logFormat (string, optional) {#fluentdspec-logformat}
+
+Set the logging format. Allowed values are: text and json. 
+
+Default: text
 
 ### logLevel (string, optional) {#fluentdspec-loglevel}
 
