@@ -184,7 +184,7 @@ func (f *FluentdSpec) SetDefaults() error {
 			}
 		}
 		if f.LogFormat == "" {
-			f.LogLevel = "text"
+			f.LogFormat = "text"
 		}
 		if f.LogLevel == "" {
 			f.LogLevel = "info"
