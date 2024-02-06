@@ -47,7 +47,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		Annotations: r.fluentbitSpec.Annotations,
 	}
 
-	if r.configs != nil {
+	if r.fluentbitSpec.ConfigHotReload == nil && r.configs != nil {
 		for key, config := range r.configs {
 			h := sha256.New()
 			_, _ = h.Write(config)
@@ -57,6 +57,9 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 
 	containers := []corev1.Container{
 		*r.fluentbitContainer(),
+	}
+	if r.fluentbitSpec.ConfigHotReload != nil {
+		containers = append(containers, newConfigMapReloader(r.fluentbitSpec))
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -110,6 +113,12 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 }
 
 func (r *Reconciler) fluentbitContainer() *corev1.Container {
+	args := []string{
+		StockBinPath, "-c", fmt.Sprintf("%s/%s", OperatorConfigPath, BaseConfigName),
+	}
+	if r.fluentbitSpec.ConfigHotReload != nil {
+		args = append(args, "--enable-hot-reload")
+	}
 	return &corev1.Container{
 		Name:            containerName,
 		Image:           r.fluentbitSpec.Image.RepositoryWithTag(),
@@ -127,9 +136,7 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 			SeccompProfile:           r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
 			Capabilities:             r.fluentbitSpec.Security.SecurityContext.Capabilities,
 		},
-		Command: []string{
-			StockBinPath, "-c", fmt.Sprintf("%s/%s", OperatorConfigPath, BaseConfigName),
-		},
+		Command:        args,
 		Env:            r.fluentbitSpec.EnvVars,
 		LivenessProbe:  r.fluentbitSpec.LivenessProbe,
 		ReadinessProbe: r.fluentbitSpec.ReadinessProbe,
@@ -145,6 +152,44 @@ func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPo
 		})
 	}
 	return
+}
+
+func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
+	var args []string
+	vm := []corev1.VolumeMount{
+		{
+			Name:      "config",
+			MountPath: OperatorConfigPath,
+		},
+	}
+
+	args = append(args,
+		fmt.Sprintf("--volume-dir=%s", OperatorConfigPath),
+		fmt.Sprintf("--webhook-url=http://127.0.0.1:%d/api/v2/reload", spec.Metrics.Port),
+	)
+
+	c := corev1.Container{
+		Name:            "config-reloader",
+		ImagePullPolicy: corev1.PullPolicy(spec.ConfigHotReload.Image.PullPolicy),
+		Image:           spec.ConfigHotReload.Image.RepositoryWithTag(),
+		Resources:       spec.ConfigHotReload.Resources,
+		Args:            args,
+		VolumeMounts:    vm,
+	}
+
+	if spec.Security != nil && spec.Security.SecurityContext != nil {
+		c.SecurityContext = &corev1.SecurityContext{
+			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
+			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
+			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
+			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
+			Privileged:               spec.Security.SecurityContext.Privileged,
+			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
+			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+		}
+	}
+
+	return c
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {

@@ -162,6 +162,16 @@ spec:
                                         type: string
                                       type: object
                                   type: object
+                                matchLabelKeys:
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   properties:
                                     matchExpressions:
@@ -228,6 +238,16 @@ spec:
                                     type: string
                                   type: object
                               type: object
+                            matchLabelKeys:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            mismatchLabelKeys:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
                             namespaceSelector:
                               properties:
                                 matchExpressions:
@@ -292,6 +312,16 @@ spec:
                                         type: string
                                       type: object
                                   type: object
+                                matchLabelKeys:
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   properties:
                                     matchExpressions:
@@ -358,6 +388,16 @@ spec:
                                     type: string
                                   type: object
                               type: object
+                            matchLabelKeys:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            mismatchLabelKeys:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
                             namespaceSelector:
                               properties:
                                 matchExpressions:
@@ -473,18 +513,6 @@ spec:
                             type: object
                           resources:
                             properties:
-                              claims:
-                                items:
-                                  properties:
-                                    name:
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -526,6 +554,8 @@ spec:
                                 type: object
                             type: object
                           storageClassName:
+                            type: string
+                          volumeAttributesClassName:
                             type: string
                           volumeMode:
                             type: string
@@ -1064,18 +1094,6 @@ spec:
                                   type: object
                                 resources:
                                   properties:
-                                    claims:
-                                      items:
-                                        properties:
-                                          name:
-                                            type: string
-                                        required:
-                                        - name
-                                        type: object
-                                      type: array
-                                      x-kubernetes-list-map-keys:
-                                      - name
-                                      x-kubernetes-list-type: map
                                     limits:
                                       additionalProperties:
                                         anyOf:
@@ -1117,6 +1135,8 @@ spec:
                                       type: object
                                   type: object
                                 storageClassName:
+                                  type: string
+                                volumeAttributesClassName:
                                   type: string
                                 volumeMode:
                                   type: string
@@ -1245,18 +1265,6 @@ spec:
                             type: object
                           resources:
                             properties:
-                              claims:
-                                items:
-                                  properties:
-                                    name:
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -1298,6 +1306,8 @@ spec:
                                 type: object
                             type: object
                           storageClassName:
+                            type: string
+                          volumeAttributesClassName:
                             type: string
                           volumeMode:
                             type: string
@@ -2324,6 +2334,14 @@ spec:
                               required:
                               - port
                               type: object
+                            sleep:
+                              properties:
+                                seconds:
+                                  format: int64
+                                  type: integer
+                              required:
+                              - seconds
+                              type: object
                             tcpSocket:
                               properties:
                                 host:
@@ -2373,6 +2391,14 @@ spec:
                                   type: string
                               required:
                               - port
+                              type: object
+                            sleep:
+                              properties:
+                                seconds:
+                                  format: int64
+                                  type: integer
+                              required:
+                              - seconds
                               type: object
                             tcpSocket:
                               properties:

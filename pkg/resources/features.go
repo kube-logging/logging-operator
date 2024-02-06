@@ -20,8 +20,6 @@ import (
 	"github.com/spf13/cast"
 )
 
-var PSPEnabled bool
-
 const ServiceMonitorKey = "ServiceMonitor"
 const PrometheusRuleKey = "PrometheusRule"
 

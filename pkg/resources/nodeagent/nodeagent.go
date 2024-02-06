@@ -39,14 +39,13 @@ import (
 )
 
 const (
-	defaultServiceAccountName      = "fluentbit"
-	clusterRoleBindingName         = "fluentbit"
-	clusterRoleName                = "fluentbit"
-	fluentBitSecretConfigName      = "fluentbit"
-	fluentbitDaemonSetName         = "fluentbit"
-	fluentbitPodSecurityPolicyName = "fluentbit"
-	fluentbitServiceName           = "fluentbit"
-	containerName                  = "fluent-bit"
+	defaultServiceAccountName = "fluentbit"
+	clusterRoleBindingName    = "fluentbit"
+	clusterRoleName           = "fluentbit"
+	fluentBitSecretConfigName = "fluentbit"
+	fluentbitDaemonSetName    = "fluentbit"
+	fluentbitServiceName      = "fluentbit"
+	containerName             = "fluent-bit"
 )
 
 func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.NodeAgentConfig, error) {
@@ -358,9 +357,6 @@ func (n *nodeAgentInstance) Reconcile(ctx context.Context) (*reconcile.Result, e
 		n.configSecret,
 		n.daemonSet,
 		n.serviceMetrics,
-	}
-	if resources.PSPEnabled {
-		objects = append(objects, n.clusterPodSecurityPolicy, n.pspClusterRole, n.pspClusterRoleBinding)
 	}
 	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
 		objects = append(objects, n.monitorServiceMetrics)

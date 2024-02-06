@@ -1,10 +1,10 @@
 ---
-title: Openobserve
+title: OpenObserve
 weight: 200
 generated_file: true
 ---
 
-# Sending messages over Openobserve
+# Sending messages over OpenObserve
 ## Overview
 
 Send messages to [OpenObserve](https://openobserve.ai/docs/api/ingestion/logs/json/) using its [Logs Ingestion - JSON API](https://openobserve.ai/docs/api/ingestion/logs/json/). This API accepts multiple records in batch in JSON format.
@@ -21,7 +21,7 @@ metadata:
 spec:
   openobserve:
     url: "https://some-openobserve-endpoint"
-    port: 5040
+    port: 5080
     organization: "default"
     stream: "default"
     user: "username"
@@ -43,8 +43,14 @@ For details on the available options of the output, see the [documentation of th
 
 ### organization (string, optional) {#openobserveoutput-organization}
 
-Name of the organization in Openobserve. 
+Name of the organization in OpenObserve. 
 
+
+### port (int, optional) {#openobserveoutput-port}
+
+The port number of the OpenObserve server.  Specify it here instead of appending it to the URL.
+
+Default: 5080
 
 ### record (string, optional) {#openobserveoutput-record}
 
@@ -53,7 +59,7 @@ Arguments to the `$format-json()` template function. Default: `"--scope rfc5424 
 
 ### stream (string, optional) {#openobserveoutput-stream}
 
-Name of the stream in Openobserve. 
+Name of the stream in OpenObserve. 
 
 
 

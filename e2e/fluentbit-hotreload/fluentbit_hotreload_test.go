@@ -1,4 +1,4 @@
-// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
+// Copyright © 2024 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fluentbit_multitenant
+package fluentbit_hotreload
 
 import (
 	"context"
@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -32,6 +33,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
@@ -68,14 +70,14 @@ var producerLabels = map[string]string{
 	"my-unique-label": "log-producer",
 }
 
-func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
+func TestFluentbitHotReload(t *testing.T) {
 	common.Initialize(t)
 	nsInfra := "infra"
 	nsTenant := "tenant"
 	tagInfra := "tag_infra"
 	tagTenant := "tag_tenant"
 
-	release := "fluentbit-multitenant"
+	release := "fluentbit-hotreload"
 	common.WithCluster(release, t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = nsInfra
@@ -90,9 +92,8 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 			},
 		}))
 
-		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels, nil)
+		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels, &v1beta1.HotReload{})
 		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
-		common.LoggingRoute(ctx, t, c.GetClient())
 
 		aggregatorLabels := map[string]string{
 			"app.kubernetes.io/name":      "fluentd",
@@ -125,7 +126,27 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 				t.Log("waiting for the tenant aggregator")
 				return false
 			}
+			return true
+		}, 5*time.Minute, 3*time.Second)
 
+		require.Eventually(t, func() bool {
+			cmd := common.CmdEnv(exec.Command("kubectl",
+				"logs",
+				"-n", nsInfra,
+				"--tail", "100",
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", release)), c)
+			rawOut, err := cmd.Output()
+			if err != nil {
+				t.Logf("failed to get log consumer logs: %v", err)
+				return false
+			}
+			t.Logf("log consumer logs should contain no tenant, only infra logs: %s", rawOut)
+			return !strings.Contains(string(rawOut), tagTenant) && strings.Contains(string(rawOut), tagInfra)
+		}, 5*time.Minute, 3*time.Second)
+
+		common.LoggingRoute(ctx, t, c.GetClient())
+
+		require.Eventually(t, func() bool {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", nsInfra,
@@ -136,9 +157,18 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 				t.Logf("failed to get log consumer logs: %v", err)
 				return false
 			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), tagTenant) && strings.Contains(string(rawOut), tagInfra)
+			t.Logf("log consumer logs should contain tenant logs: %s", rawOut)
+			return strings.Contains(string(rawOut), tagTenant)
 		}, 5*time.Minute, 3*time.Second)
+
+		ds := &appsv1.DaemonSet{}
+		err := c.GetClient().Get(ctx, types.NamespacedName{
+			Namespace: nsInfra,
+			Name:      "infra-fluentbit",
+		}, ds)
+		assert.NoError(t, err)
+
+		assert.Equal(t, int64(1), ds.Generation, "generation should not be incremented for a reloadable agent")
 
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))

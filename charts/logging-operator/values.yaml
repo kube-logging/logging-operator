@@ -54,19 +54,6 @@ rbac:
   # -- Create rbac service account and roles.
   enabled: true
 
-  psp:
-    # -- Must be used with `rbac.enabled` true. If true, creates & uses RBAC resources required in the cluster with [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) enabled.
-    enabled: true
-
-    # -- PSP annotations
-    annotations:
-      seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
-      seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
-    ## Specify pod annotations
-    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#apparmor
-    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
-    ## Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#sysctl
-
   # specify service account manually
   # serviceAccountName: custom
 
