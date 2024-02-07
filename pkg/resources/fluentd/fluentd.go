@@ -43,16 +43,17 @@ import (
 )
 
 const (
-	SecretConfigName    = "fluentd"
-	AppSecretConfigName = "fluentd-app"
-	ConfigCheckKey      = "generated.conf"
-	ConfigKey           = "fluent.conf"
-	AppConfigKey        = "fluentd.conf"
-	StatefulSetName     = "fluentd"
-	ServiceName         = "fluentd"
-	ServicePort         = 24240
-	OutputSecretName    = "fluentd-output"
-	OutputSecretPath    = "/fluentd/secret"
+	SecretConfigName        = "fluentd"
+	AppSecretConfigName     = "fluentd-app"
+	ConfigCheckKey          = "generated.conf"
+	ConfigKey               = "fluent.conf"
+	AppConfigKey            = "fluentd.conf"
+	StatefulSetName         = "fluentd"
+	ServiceName             = "fluentd"
+	ServicePort             = 24240
+	OutputSecretName        = "fluentd-output"
+	OutputSecretPath        = "/fluentd/secret"
+	PodDisruptionBudgetName = "fluentd"
 
 	bufferPath                     = "/buffers"
 	defaultServiceAccountName      = "fluentd"

@@ -97,3 +97,5 @@ example/tls-cluster-forward/*.key
 .licensei.cache
 
 .DS_Store
+
+go.work*
