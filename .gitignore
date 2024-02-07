@@ -98,4 +98,4 @@ example/tls-cluster-forward/*.key
 
 .DS_Store
 
-go.work*
+go.work.sum
