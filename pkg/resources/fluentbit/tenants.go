@@ -101,9 +101,10 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 			return errors.WrapIf(err, "getting logging resource")
 		}
 
-		loggingResources, errs := r.loggingResourcesRepo.LoggingResourcesFor(ctx, *logging)
-		if errs != nil {
-
+		loggingResources, err := r.loggingResourcesRepo.LoggingResourcesFor(ctx, *logging)
+		if err != nil {
+			errs = errors.Append(errs, errors.WrapIff(err, "querying related resources for logging %s", logging.Name))
+			continue
 		}
 
 		if loggingResources.GetFluentdSpec() != nil {
