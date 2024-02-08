@@ -43,16 +43,17 @@ import (
 )
 
 const (
-	SecretConfigName    = "fluentd"
-	AppSecretConfigName = "fluentd-app"
-	ConfigCheckKey      = "generated.conf"
-	ConfigKey           = "fluent.conf"
-	AppConfigKey        = "fluentd.conf"
-	StatefulSetName     = "fluentd"
-	ServiceName         = "fluentd"
-	ServicePort         = 24240
-	OutputSecretName    = "fluentd-output"
-	OutputSecretPath    = "/fluentd/secret"
+	SecretConfigName        = "fluentd"
+	AppSecretConfigName     = "fluentd-app"
+	ConfigCheckKey          = "generated.conf"
+	ConfigKey               = "fluent.conf"
+	AppConfigKey            = "fluentd.conf"
+	StatefulSetName         = "fluentd"
+	ServiceName             = "fluentd"
+	ServicePort             = 24240
+	OutputSecretName        = "fluentd-output"
+	OutputSecretPath        = "/fluentd/secret"
+	PodDisruptionBudgetName = "fluentd"
 
 	bufferPath                     = "/buffers"
 	defaultServiceAccountName      = "fluentd"
@@ -241,6 +242,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.headlessService,
 		r.serviceMetrics,
 		r.serviceBufferMetrics,
+		r.pdb,
 	}
 	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
 		resourceObjects = append(resourceObjects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)

@@ -116,6 +116,9 @@ Ignore same log lines [more info]( https://docs.fluentd.org/deployment/logging#i
 ### nodeSelector (map[string]string, optional) {#fluentdspec-nodeselector}
 
 
+### pdb (*PdbInput, optional) {#fluentdspec-pdb}
+
+
 ### podPriorityClassName (string, optional) {#fluentdspec-podpriorityclassname}
 
 
@@ -272,6 +275,18 @@ Available in Logging operator version 4.4 and later. Configurable resource requi
 ### securityContext (*corev1.SecurityContext, optional) {#fluentddrainconfig-securitycontext}
 
 Available in Logging operator version 4.4 and later. Configurable security context, uses fluentd pods' security context by default 
+
+
+
+## PdbInput
+
+### maxUnavailable (*intstr.IntOrString, optional) {#pdbinput-maxunavailable}
+
+
+### minAvailable (*intstr.IntOrString, optional) {#pdbinput-minavailable}
+
+
+### unhealthyPodEvictionPolicy (*policyv1.UnhealthyPodEvictionPolicyType, optional) {#pdbinput-unhealthypodevictionpolicy}
 
 
 

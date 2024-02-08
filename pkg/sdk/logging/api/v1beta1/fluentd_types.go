@@ -23,7 +23,9 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
+	policyv1 "k8s.io/api/policy/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 )
@@ -104,6 +106,7 @@ type FluentdSpec struct {
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
 	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
 	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
+	Pdb                     *PdbInput                    `json:"pdb,omitempty"`
 	// Available in Logging operator version 4.5 and later.
 	// Configure sidecar container in Fluentd pods, for example: [https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml](https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml).
 	SidecarContainers []corev1.Container `json:"sidecarContainers,omitempty"`
@@ -432,4 +435,12 @@ type FluentdDrainConfig struct {
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 	// Available in Logging operator version 4.4 and later. Configurable security context, uses fluentd pods' security context by default
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
+}
+
+// +kubebuilder:object:generate=true
+
+type PdbInput struct {
+	MinAvailable               *intstr.IntOrString                      `json:"minAvailable,omitempty"`
+	MaxUnavailable             *intstr.IntOrString                      `json:"maxUnavailable,omitempty"`
+	UnhealthyPodEvictionPolicy *policyv1.UnhealthyPodEvictionPolicyType `json:"unhealthyPodEvictionPolicy,omitempty"`
 }
