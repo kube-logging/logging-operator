@@ -238,7 +238,14 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if r.fluentdSpec != nil {
+	loggingResources, errs := r.loggingResourcesRepo.LoggingResourcesFor(ctx, *r.Logging)
+	if errs != nil {
+		return nil, nil, errs
+	}
+
+	fluentdSpec := loggingResources.GetFluentdSpec()
+
+	if fluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost
 		if fluentbitTargetHost == "" {
 			fluentbitTargetHost = aggregatorEndpoint(r.Logging, fluentd.ServiceName)
@@ -354,15 +361,15 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if r.syslogNGSpec != nil {
+	if loggingResources.GetSyslogNGSpec() != nil {
 		input.SyslogNGOutput = newSyslogNGOutputConfig()
 		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort
 	}
 
-	if len(r.loggingRoutes) > 0 {
+	if len(loggingResources.LoggingRoutes) > 0 {
 		var tenants []v1beta1.Tenant
-		for _, a := range r.loggingRoutes {
+		for _, a := range loggingResources.LoggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
 		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
