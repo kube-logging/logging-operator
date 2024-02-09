@@ -218,13 +218,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				log.WithName("fluentbit-legacy"),
 				&logging,
-				fluentdSpec,
-				syslogNGSpec,
 				reconcilerOpts,
 				logging.Spec.FluentbitSpec,
 				loggingDataProvider,
 				nameProvider,
-				nil, // Not implemented for the embedded fluentbit config
+				loggingResourceRepo,
 			).Reconcile)
 		}
 	default:
@@ -238,13 +236,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
 				&logging,
-				fluentdSpec,
-				syslogNGSpec,
 				reconcilerOpts,
 				&f.Spec,
 				loggingDataProvider,
 				fluentbit.NewStandaloneFluentbitNameProvider(&f),
-				loggingResources.LoggingRoutes,
+				loggingResourceRepo,
 			).Reconcile)
 		}
 	}
