@@ -107,7 +107,8 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 			continue
 		}
 
-		if loggingResources.GetFluentdSpec() != nil {
+		_, fluentdSpec := loggingResources.GetFluentd()
+		if fluentdSpec != nil {
 			if input.FluentForwardOutput == nil {
 				input.FluentForwardOutput = &fluentForwardOutputConfig{}
 			}

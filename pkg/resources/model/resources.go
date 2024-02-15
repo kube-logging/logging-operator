@@ -29,23 +29,19 @@ type LoggingResources struct {
 	WatchNamespaces []string
 }
 
-func (l LoggingResources) getFluentd() *v1beta1.FluentdConfig {
+func (l LoggingResources) getFluentdConfig() *v1beta1.FluentdConfig {
 	if l.Fluentd.Configuration != nil {
 		return l.Fluentd.Configuration
 	}
 	return nil
 }
 
-func (l LoggingResources) GetFluentdSpec() *v1beta1.FluentdSpec {
-
-	if detachedFluentd := l.getFluentd(); detachedFluentd != nil {
-		return &detachedFluentd.Spec
-	}
-	if l.Logging.Spec.FluentdSpec != nil {
-		return l.Logging.Spec.FluentdSpec
+func (l LoggingResources) GetFluentd() (*v1beta1.FluentdConfig, *v1beta1.FluentdSpec) {
+	if detachedFluentd := l.getFluentdConfig(); detachedFluentd != nil {
+		return detachedFluentd, &detachedFluentd.Spec
 	}
 
-	return nil
+	return nil, l.Logging.Spec.FluentdSpec
 }
 
 type FluentdLoggingResources struct {

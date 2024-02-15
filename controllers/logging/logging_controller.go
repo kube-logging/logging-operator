@@ -30,9 +30,11 @@ import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -69,6 +71,7 @@ type LoggingReconciler struct {
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentdconfigs/status;syslogngconfigs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/finalizers,verbs=update
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
@@ -127,6 +130,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
 
+	if logging.Status.FluentdConfigName != "" {
+		return r.checkFluentdConfigFinalizer(ctx, &logging, log)
+	}
+
 	r.dynamicDefaults(ctx, log, loggingResources.GetSyslogNGSpec())
 
 	// metrics
@@ -176,7 +183,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
 
-	fluentdSpec := loggingResources.GetFluentdSpec()
+	fluentdExternal, fluentdSpec := loggingResources.GetFluentd()
 	if fluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
@@ -187,9 +194,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)
 	}
 
 	syslogNGSpec := loggingResources.GetSyslogNGSpec()
@@ -260,7 +267,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -275,6 +282,40 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) checkFluentdConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+	fluentdConfigFinalizer := "fluentdconfig.logging.banzaicloud.io/finalizer"
+
+	if logging.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) {
+			controllerutil.AddFinalizer(logging, fluentdConfigFinalizer)
+			if err := r.Update(ctx, logging); err != nil {
+				return ctrl.Result{}, nil
+			}
+		}
+	} else {
+		// Marked for deletion, check for fluentdConfig
+		fluentdConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.FluentdConfigName}
+		if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && r.isExistingFluentdConfig(ctx, fluentdConfigName) {
+			return reconcile.Result{}, errors.NewWithDetails("failed to delete logging resources, delete fluentdConfig first", "fluentdConfig", logging.Status.FluentdConfigName)
+		}
+		controllerutil.RemoveFinalizer(logging, fluentdConfigFinalizer)
+		logging.Status.FluentdConfigName = ""
+		log.Info("cleaned up fluentdConfigRef", "name", fluentdConfigName)
+		if err := r.Update(ctx, logging); err != nil {
+			return ctrl.Result{}, nil
+		}
+	}
+	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) isExistingFluentdConfig(ctx context.Context, fluentdConfigRef types.NamespacedName) bool {
+	var fluentdConfig loggingv1beta1.FluentdConfig
+	if err := r.Client.Get(ctx, fluentdConfigRef, &fluentdConfig); err != nil && apierrors.IsNotFound(err) {
+		return false
+	}
+	return true
 }
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *v1beta1.SyslogNGSpec) {

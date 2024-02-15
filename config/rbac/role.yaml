@@ -293,6 +293,12 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
+  - loggings/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
   - syslogngclusterflows
   - syslogngclusteroutputs
   - syslogngflows

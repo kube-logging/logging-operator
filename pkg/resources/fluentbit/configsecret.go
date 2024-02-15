@@ -243,7 +243,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		return nil, nil, errs
 	}
 
-	fluentdSpec := loggingResources.GetFluentdSpec()
+	_, fluentdSpec := loggingResources.GetFluentd()
 
 	if fluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost

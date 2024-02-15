@@ -448,20 +448,29 @@ func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVol
 }
 
 // FluentdObjectMeta creates an objectMeta for resource fluentd
-func (l *Logging) FluentdObjectMeta(name, component string, f FluentdSpec) metav1.ObjectMeta {
+func (l *Logging) FluentdObjectMeta(name, component string, f FluentdSpec, fc *FluentdConfig) metav1.ObjectMeta {
+	ownerReference := metav1.OwnerReference{
+		APIVersion: l.APIVersion,
+		Kind:       l.Kind,
+		Name:       l.Name,
+		UID:        l.UID,
+		Controller: util.BoolPointer(true),
+	}
+
+	if fc != nil {
+		ownerReference = metav1.OwnerReference{
+			APIVersion: fc.APIVersion,
+			Kind:       fc.Kind,
+			Name:       fc.Name,
+			UID:        fc.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
 	o := metav1.ObjectMeta{
-		Name:      l.QualifiedName(name),
-		Namespace: l.Spec.ControlNamespace,
-		Labels:    l.GetFluentdLabels(component, f),
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: l.APIVersion,
-				Kind:       l.Kind,
-				Name:       l.Name,
-				UID:        l.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
+		Name:            l.QualifiedName(name),
+		Namespace:       l.Spec.ControlNamespace,
+		Labels:          l.GetFluentdLabels(component, f),
+		OwnerReferences: []metav1.OwnerReference{ownerReference},
 	}
 	return o
 }
