@@ -84,6 +84,13 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 							Name:            config.EventTailer.TailerAffix,
 							Image:           config.EventTailer.ImageWithTag,
 							ImagePullPolicy: corev1.PullIfNotPresent,
+							Ports: []corev1.ContainerPort{
+								{
+									Name:          "monitor",
+									ContainerPort: 8080,
+									Protocol:      corev1.ProtocolTCP,
+								},
+							},							
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "config-volume",
