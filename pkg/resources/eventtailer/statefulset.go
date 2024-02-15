@@ -90,7 +90,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 									ContainerPort: 8080,
 									Protocol:      corev1.ProtocolTCP,
 								},
-							},							
+							},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "config-volume",
