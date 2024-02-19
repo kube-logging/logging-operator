@@ -29,7 +29,7 @@ type LoggingResources struct {
 	WatchNamespaces []string
 }
 
-func (l LoggingResources) GetFluentd() *v1beta1.FluentdConfig {
+func (l LoggingResources) getFluentd() *v1beta1.FluentdConfig {
 	if l.Fluentd.Configuration != nil {
 		return l.Fluentd.Configuration
 	}
@@ -38,7 +38,7 @@ func (l LoggingResources) GetFluentd() *v1beta1.FluentdConfig {
 
 func (l LoggingResources) GetFluentdSpec() *v1beta1.FluentdSpec {
 
-	if detachedFluentd := l.GetFluentd(); detachedFluentd != nil {
+	if detachedFluentd := l.getFluentd(); detachedFluentd != nil {
 		return &detachedFluentd.Spec
 	}
 	if l.Logging.Spec.FluentdSpec != nil {
@@ -57,7 +57,7 @@ type FluentdLoggingResources struct {
 	ExcessFluentds []v1beta1.FluentdConfig
 }
 
-func (l LoggingResources) GetSyslogNG() *v1beta1.SyslogNGConfig {
+func (l LoggingResources) getSyslogNG() *v1beta1.SyslogNGConfig {
 	if l.SyslogNG.Configuration != nil {
 		return l.SyslogNG.Configuration
 	}
@@ -66,7 +66,7 @@ func (l LoggingResources) GetSyslogNG() *v1beta1.SyslogNGConfig {
 
 func (l LoggingResources) GetSyslogNGSpec() *v1beta1.SyslogNGSpec {
 
-	if detachedSyslogNG := l.GetSyslogNG(); detachedSyslogNG != nil {
+	if detachedSyslogNG := l.getSyslogNG(); detachedSyslogNG != nil {
 		return &detachedSyslogNG.Spec
 	}
 	if l.Logging.Spec.SyslogNGSpec != nil {

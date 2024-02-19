@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
@@ -86,39 +87,33 @@ type DesiredObject struct {
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	resourceReconciler  *reconciler.GenericResourceReconciler
-	logger              logr.Logger
-	Logging             *v1beta1.Logging
-	fluentdSpec         *v1beta1.FluentdSpec
-	syslogNGSpec        *v1beta1.SyslogNGSpec
-	configs             map[string][]byte
-	fluentbitSpec       *v1beta1.FluentbitSpec
-	loggingDataProvider loggingdataprovider.LoggingDataProvider
-	nameProvider        NameProvider
-	loggingRoutes       []v1beta1.LoggingRoute
+	resourceReconciler   *reconciler.GenericResourceReconciler
+	logger               logr.Logger
+	Logging              *v1beta1.Logging
+	configs              map[string][]byte
+	fluentbitSpec        *v1beta1.FluentbitSpec
+	loggingDataProvider  loggingdataprovider.LoggingDataProvider
+	nameProvider         NameProvider
+	loggingResourcesRepo *model.LoggingResourceRepository
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
 func New(client client.Client,
 	logger logr.Logger,
 	logging *v1beta1.Logging,
-	fluentdSpec *v1beta1.FluentdSpec,
-	syslogNGSpec *v1beta1.SyslogNGSpec,
 	opts reconciler.ReconcilerOpts,
 	fluentbitSpec *v1beta1.FluentbitSpec,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
 	nameProvider NameProvider,
-	loggingRoutes []v1beta1.LoggingRoute) *Reconciler {
+	loggingResourcesRepo *model.LoggingResourceRepository) *Reconciler {
 	return &Reconciler{
-		Logging:             logging,
-		fluentdSpec:         fluentdSpec,
-		syslogNGSpec:        syslogNGSpec,
-		logger:              logger,
-		resourceReconciler:  reconciler.NewGenericReconciler(client, logger.WithName("reconciler"), opts),
-		fluentbitSpec:       fluentbitSpec,
-		loggingDataProvider: loggingDataProvider,
-		nameProvider:        nameProvider,
-		loggingRoutes:       loggingRoutes,
+		Logging:              logging,
+		logger:               logger,
+		resourceReconciler:   reconciler.NewGenericReconciler(client, logger.WithName("reconciler"), opts),
+		fluentbitSpec:        fluentbitSpec,
+		loggingDataProvider:  loggingDataProvider,
+		nameProvider:         nameProvider,
+		loggingResourcesRepo: loggingResourcesRepo,
 	}
 }
 
