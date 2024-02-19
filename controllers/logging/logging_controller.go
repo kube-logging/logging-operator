@@ -111,6 +111,14 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		log.Info("WARNING PrometheusRule is not supported in the cluster")
 	}
 
+	// Clean up obsolete fluentdConfig reference
+	if logging.Status.FluentdConfigName != "" {
+		fluentdConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.FluentdConfigName}
+		if !r.isExistingFluentdConfig(ctx, fluentdConfigName) {
+			return r.cleanupFluentdConfigReference(ctx, &logging, log)
+		}
+	}
+
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -128,10 +136,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	loggingResources, err := loggingResourceRepo.LoggingResourcesFor(ctx, logging)
 	if err != nil {
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
-	}
-
-	if logging.Status.FluentdConfigName != "" {
-		return r.checkFluentdConfigFinalizer(ctx, &logging, log)
 	}
 
 	r.dynamicDefaults(ctx, log, loggingResources.GetSyslogNGSpec())
@@ -280,6 +284,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return *result, err
 		}
 	}
+	if logging.Status.FluentdConfigName != "" {
+		return r.checkFluentdConfigFinalizer(ctx, &logging, log)
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -301,13 +308,19 @@ func (r *LoggingReconciler) checkFluentdConfigFinalizer(ctx context.Context, log
 			return reconcile.Result{}, errors.NewWithDetails("failed to delete logging resources, delete fluentdConfig first", "fluentdConfig", logging.Status.FluentdConfigName)
 		}
 		controllerutil.RemoveFinalizer(logging, fluentdConfigFinalizer)
-		logging.Status.FluentdConfigName = ""
-		log.Info("cleaned up fluentdConfigRef", "name", fluentdConfigName)
 		if err := r.Update(ctx, logging); err != nil {
-			return ctrl.Result{}, nil
+			return r.cleanupFluentdConfigReference(ctx, logging, log)
 		}
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) cleanupFluentdConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+	log.Info("cleaned up fluentdConfigRef", "name", logging.Status.FluentdConfigName)
+	logging.Status.FluentdConfigName = ""
+	err := r.Status().Update(ctx, logging)
+
+	return ctrl.Result{}, err
 }
 
 func (r *LoggingReconciler) isExistingFluentdConfig(ctx context.Context, fluentdConfigRef types.NamespacedName) bool {
