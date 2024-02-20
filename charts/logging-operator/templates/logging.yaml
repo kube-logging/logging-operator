@@ -54,4 +54,7 @@ spec:
   {{- with .Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
   {{- end }}
+  {{- with .Values.logging.configCheck }}
+  configCheck: {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
