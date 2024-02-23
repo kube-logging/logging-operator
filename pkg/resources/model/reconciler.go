@@ -235,7 +235,6 @@ func NewValidationReconciler(
 			}
 			logger.Info("found detached fluentd aggregator, making association", "name", resources.Fluentd.Configuration.Name)
 			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
-			resources.Logging.Finalizers = append(resources.Logging.Finalizers, resources.Fluentd.Configuration.Name)
 
 			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name

@@ -43,7 +43,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 	}
 
 	desired := &appsv1.StatefulSet{
-		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG),
+		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG, r.syslogNGConfig),
 		Spec: appsv1.StatefulSetSpec{
 			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
 			Selector: &metav1.LabelSelector{

@@ -361,7 +361,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if loggingResources.GetSyslogNGSpec() != nil {
+	_, syslogNGSPec := loggingResources.GetSyslogNGSpec()
+	if syslogNGSPec != nil {
 		input.SyslogNGOutput = newSyslogNGOutputConfig()
 		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort

@@ -119,6 +119,14 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 
+	// Clean up obsolete syslogNGConfig reference
+	if logging.Status.SyslogNGConfigName != "" {
+		syslogNGConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.SyslogNGConfigName}
+		if !r.isExistingSyslogNGConfig(ctx, syslogNGConfigName) {
+			return r.cleanupSyslogNGConfigReference(ctx, &logging, log)
+		}
+	}
+
 	if err := logging.SetDefaults(); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -138,7 +146,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
 
-	r.dynamicDefaults(ctx, log, loggingResources.GetSyslogNGSpec())
+	_, syslogNGSPec := loggingResources.GetSyslogNGSpec()
+	r.dynamicDefaults(ctx, log, syslogNGSPec)
 
 	// metrics
 	defer func() {
@@ -203,7 +212,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)
 	}
 
-	syslogNGSpec := loggingResources.GetSyslogNGSpec()
+	syslogNGExternal, syslogNGSpec := loggingResources.GetSyslogNGSpec()
 	if syslogNGSpec != nil {
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
@@ -214,9 +223,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", syslogNGConfig)
 
-			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
+		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging, syslogNGExternal)
 	}
 
 	switch len(loggingResources.Fluentbits) {
@@ -288,6 +297,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return r.checkFluentdConfigFinalizer(ctx, &logging, log)
 	}
 
+	if logging.Status.SyslogNGConfigName != "" {
+		return r.checkSyslogNGConfigFinalizer(ctx, &logging, log)
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -315,9 +328,40 @@ func (r *LoggingReconciler) checkFluentdConfigFinalizer(ctx context.Context, log
 	return ctrl.Result{}, nil
 }
 
+func (r *LoggingReconciler) checkSyslogNGConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+	syslogNGConfigFinalizer := "syslogngconfig.logging.banzaicloud.io/finalizer"
+
+	if logging.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) {
+			controllerutil.AddFinalizer(logging, syslogNGConfigFinalizer)
+			if err := r.Update(ctx, logging); err != nil {
+				return ctrl.Result{}, nil
+			}
+		}
+	} else {
+		// Marked for deletion, check for syslogNGConfig
+		syslogNGConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.SyslogNGConfigName}
+		if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && r.isExistingSyslogNGConfig(ctx, syslogNGConfigName) {
+			return reconcile.Result{}, errors.NewWithDetails("failed to delete logging resources, delete syslogNGConfig first", "syslogNGConfig", logging.Status.SyslogNGConfigName)
+		}
+		controllerutil.RemoveFinalizer(logging, syslogNGConfigFinalizer)
+		if err := r.Update(ctx, logging); err != nil {
+			return r.cleanupSyslogNGConfigReference(ctx, logging, log)
+		}
+	}
+	return ctrl.Result{}, nil
+}
+
 func (r *LoggingReconciler) cleanupFluentdConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
 	log.Info("cleaned up fluentdConfigRef", "name", logging.Status.FluentdConfigName)
 	logging.Status.FluentdConfigName = ""
+	err := r.Status().Update(ctx, logging)
+
+	return ctrl.Result{}, err
+}
+func (r *LoggingReconciler) cleanupSyslogNGConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+	log.Info("cleaned up syslogNGConfigRef", "name", logging.Status.SyslogNGConfigName)
+	logging.Status.SyslogNGConfigName = ""
 	err := r.Status().Update(ctx, logging)
 
 	return ctrl.Result{}, err
@@ -326,6 +370,14 @@ func (r *LoggingReconciler) cleanupFluentdConfigReference(ctx context.Context, l
 func (r *LoggingReconciler) isExistingFluentdConfig(ctx context.Context, fluentdConfigRef types.NamespacedName) bool {
 	var fluentdConfig loggingv1beta1.FluentdConfig
 	if err := r.Client.Get(ctx, fluentdConfigRef, &fluentdConfig); err != nil && apierrors.IsNotFound(err) {
+		return false
+	}
+	return true
+}
+
+func (r *LoggingReconciler) isExistingSyslogNGConfig(ctx context.Context, syslogNGConfigref types.NamespacedName) bool {
+	var fluentdConfig loggingv1beta1.SyslogNGConfig
+	if err := r.Client.Get(ctx, syslogNGConfigref, &fluentdConfig); err != nil && apierrors.IsNotFound(err) {
 		return false
 	}
 	return true
@@ -425,6 +477,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Path:   syslogng.OutputSecretPath,
 	}
 
+	_, syslogngSpec := resources.GetSyslogNGSpec()
 	in := syslogngconfig.Input{
 		Name:                resources.Logging.Name,
 		Namespace:           resources.Logging.Namespace,
@@ -434,7 +487,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Flows:               resources.SyslogNG.Flows,
 		SecretLoaderFactory: &slf,
 		SourcePort:          syslogng.ServicePort,
-		SyslogNGSpec:        resources.GetSyslogNGSpec(),
+		SyslogNGSpec:        syslogngSpec,
 	}
 	var b strings.Builder
 	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
