@@ -201,6 +201,9 @@ logging:
   #      tls:
   #        enabled: false
 
+  # -- configCheck provides possibility for timeout-based configuration checks https://kube-logging.dev/docs/whats-new/#timeout-based-configuration-checks
+  configCheck: {}
+
   # -- EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update.
   enableRecreateWorkloadOnImmutableFieldChange: false
 
