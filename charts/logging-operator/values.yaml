@@ -232,6 +232,11 @@ logging:
   # -- EventTailer config
   eventTailer: {}
     # name: sample
+    # image:
+    #   repository: "ghcr.io/kube-logging/eventrouter"
+    #   tag: "0.4.0"
+    #   pullPolicy: IfNotPresent
+    #   imagePullSecrets: []
     # pvc:
     #   accessModes:
     #     - ReadWriteOnce
