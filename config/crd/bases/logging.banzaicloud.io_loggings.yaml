@@ -1453,6 +1453,8 @@ spec:
                         type: string
                       storage.checksum:
                         type: string
+                      storage.delete_irrecoverable_chunks:
+                        type: string
                       storage.metrics:
                         type: string
                       storage.path:
@@ -7182,6 +7184,8 @@ spec:
                             storage.backlog.mem_limit:
                               type: string
                             storage.checksum:
+                              type: string
+                            storage.delete_irrecoverable_chunks:
                               type: string
                             storage.metrics:
                               type: string
