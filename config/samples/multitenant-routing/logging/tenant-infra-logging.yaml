@@ -51,10 +51,6 @@ spec:
   loggingRef: infra
   inputTail:
     storage.type: filesystem
-  forwardOptions:
-    Workers: 0
-  syslogng_output:
-    Workers: 0
   positiondb:
     hostPath:
       path: ""
@@ -63,6 +59,9 @@ spec:
       path: ""
   network:
     connectTimeout: 2
+  metrics: {}
+  image:
+    tag: 2.1.8-debug
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: LoggingRoute

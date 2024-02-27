@@ -38,6 +38,13 @@ type fluentbitInputConfig struct {
 	MultilineParser []string
 }
 
+type fluentbitInputConfigWithTenant struct {
+	Tenant          string
+	Values          map[string]string
+	ParserN         []string
+	MultilineParser []string
+}
+
 type upstreamNode struct {
 	Name string
 	Host string
@@ -63,6 +70,7 @@ type fluentBitConfig struct {
 	CoroStackSize           int32
 	Output                  map[string]string
 	Input                   fluentbitInputConfig
+	Inputs                  []fluentbitInputConfigWithTenant
 	DisableKubernetesFilter bool
 	KubernetesFilter        map[string]string
 	AwsFilter               map[string]string
@@ -86,8 +94,8 @@ type fluentForwardOutputConfig struct {
 }
 
 type forwardTargetConfig struct {
-	AllNamespaces  bool
 	NamespaceRegex string
+	Match          string
 	Host           string
 	Port           int32
 }
@@ -373,6 +381,9 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		for _, a := range loggingResources.LoggingRoutes {
 			tenants = append(tenants, a.Status.Tenants...)
 		}
+		if err := r.configureInputsForTenants(tenants, &input); err != nil {
+			return nil, nil, errors.WrapIf(err, "configuring inputs for target tenants")
+		}
 		if err := r.configureOutputsForTenants(ctx, tenants, &input); err != nil {
 			return nil, nil, errors.WrapIf(err, "configuring outputs for target tenants")
 		}
@@ -380,15 +391,15 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		// compatibility with existing configuration
 		if input.FluentForwardOutput != nil {
 			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-				AllNamespaces: true,
-				Host:          input.FluentForwardOutput.TargetHost,
-				Port:          input.FluentForwardOutput.TargetPort,
+				Match: "*",
+				Host:  input.FluentForwardOutput.TargetHost,
+				Port:  input.FluentForwardOutput.TargetPort,
 			})
 		} else if input.SyslogNGOutput != nil {
 			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-				AllNamespaces: true,
-				Host:          input.SyslogNGOutput.Host,
-				Port:          input.SyslogNGOutput.Port,
+				Match: "*",
+				Host:  input.SyslogNGOutput.Host,
+				Port:  input.SyslogNGOutput.Port,
 			})
 		}
 	}
@@ -454,6 +465,10 @@ func generateConfig(input fluentBitConfig) (string, error) {
 	tmpl, err = tmpl.Parse(fluentbitNetworkTemplate)
 	if err != nil {
 		return "", errors.WrapIf(err, "parsing fluentbit network nested template")
+	}
+	tmpl, err = tmpl.Parse(fluentbitInputTemplate)
+	if err != nil {
+		return "", errors.WrapIf(err, "parsing fluentbit input nested template")
 	}
 	err = tmpl.Execute(output, input)
 	if err != nil {
