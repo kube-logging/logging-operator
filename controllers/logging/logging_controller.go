@@ -368,16 +368,16 @@ func (r *LoggingReconciler) cleanupSyslogNGConfigReference(ctx context.Context, 
 }
 
 func (r *LoggingReconciler) isExistingFluentdConfig(ctx context.Context, fluentdConfigRef types.NamespacedName) bool {
-	var fluentdConfig loggingv1beta1.FluentdConfig
-	if err := r.Client.Get(ctx, fluentdConfigRef, &fluentdConfig); err != nil && apierrors.IsNotFound(err) {
+	var config loggingv1beta1.FluentdConfig
+	if err := r.Client.Get(ctx, fluentdConfigRef, &config); err != nil && apierrors.IsNotFound(err) {
 		return false
 	}
 	return true
 }
 
 func (r *LoggingReconciler) isExistingSyslogNGConfig(ctx context.Context, syslogNGConfigref types.NamespacedName) bool {
-	var fluentdConfig loggingv1beta1.SyslogNGConfig
-	if err := r.Client.Get(ctx, syslogNGConfigref, &fluentdConfig); err != nil && apierrors.IsNotFound(err) {
+	var config loggingv1beta1.SyslogNGConfig
+	if err := r.Client.Get(ctx, syslogNGConfigref, &config); err != nil && apierrors.IsNotFound(err) {
 		return false
 	}
 	return true
