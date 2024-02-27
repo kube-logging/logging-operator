@@ -55,21 +55,14 @@ var fluentBitConfigTemplate = `
     {{- end }}
     {{- end }}
 
-[INPUT]
-    Name         tail
-    {{- range $key, $value := .Input.Values }}
-    {{- if $value }}
-    {{ $key }}  {{$value}}
-    {{- end }}
-    {{- end }}
-    {{- range $id, $v := .Input.ParserN }}
-    {{- if $v }}
-    Parse_{{ $id}} {{$v}}
-    {{- end }}
-    {{- end }}
-    {{- if .Input.MultilineParser }}
-    multiline.parser {{- range $i, $v := .Input.MultilineParser }}{{ if $i }},{{ end}} {{ $v }}{{ end }}
-    {{- end }}
+{{- if .Inputs }}
+{{- range $input := .Inputs }}
+# Tenant: {{ $input.Tenant }}
+{{- template "input" $input }}
+{{- end }}
+{{- else }}
+{{- template "input" .Input }}
+{{- end }}
 
 {{- if not .DisableKubernetesFilter }}
 [FILTER]
@@ -111,11 +104,7 @@ var fluentBitConfigTemplate = `
 {{- range $target := $out.Targets }}
 [OUTPUT]
     Name          forward
-    {{- if $target.AllNamespaces }}
-    Match         *
-    {{- else }}
-    Match_Regex {{ $target.NamespaceRegex }}
-    {{- end }}
+    Match         {{ $target.Match }}
     {{- if $out.Upstream.Enabled }}
     Upstream      {{ $out.Upstream.Config.Path }}
     {{- else }}
@@ -149,11 +138,7 @@ var fluentBitConfigTemplate = `
 {{- range $target := $out.Targets }}
 [OUTPUT]
     Name tcp
-    {{- if $target.AllNamespaces }}
-    Match *
-    {{- else }}
-    Match_Regex {{ $target.NamespaceRegex }}
-    {{- end }}
+    Match {{ $target.Match }}
     Host {{ $target.Host }}
     Port {{ $target.Port }}
     Format json_lines
@@ -201,6 +186,26 @@ var fluentbitNetworkTemplate = `
     net.source_address {{ .Network.SourceAddress }}
     {{- end }}
     {{- end }}
+`
+
+var fluentbitInputTemplate = `
+{{- define "input" }}
+[INPUT]
+    Name         tail
+    {{- range $key, $value := .Values }}
+    {{- if $value }}
+    {{ $key }}  {{$value}}
+    {{- end }}
+    {{- end }}
+    {{- range $id, $v := .ParserN }}
+    {{- if $v }}
+    Parse_{{ $id}} {{$v}}
+    {{- end }}
+    {{- end }}
+    {{- if .MultilineParser }}
+    multiline.parser {{- range $i, $v := .MultilineParser }}{{ if $i }},{{ end}} {{ $v }}{{ end }}
+    {{- end }}
+{{- end }}
 `
 
 var upstreamConfigTemplate = `
