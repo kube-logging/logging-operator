@@ -353,14 +353,14 @@ func (r *LoggingReconciler) checkSyslogNGConfigFinalizer(ctx context.Context, lo
 }
 
 func (r *LoggingReconciler) cleanupFluentdConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
-	log.Info("cleaned up fluentdConfigRef", "name", logging.Status.FluentdConfigName)
+	log.Info("cleaning up fluentdConfig reference from status", "name", logging.Status.FluentdConfigName)
 	logging.Status.FluentdConfigName = ""
 	err := r.Status().Update(ctx, logging)
 
 	return ctrl.Result{}, err
 }
 func (r *LoggingReconciler) cleanupSyslogNGConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
-	log.Info("cleaned up syslogNGConfigRef", "name", logging.Status.SyslogNGConfigName)
+	log.Info("cleaning up syslogNGConfig reference from status", "name", logging.Status.SyslogNGConfigName)
 	logging.Status.SyslogNGConfigName = ""
 	err := r.Status().Update(ctx, logging)
 
