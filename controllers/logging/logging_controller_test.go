@@ -41,12 +41,13 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+
 	controllers "github.com/kube-logging/logging-operator/controllers/logging"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var (
@@ -1410,7 +1411,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), ctrl.Log.WithName("controllers").WithName("Flow"))
+	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorderFor("logging-operator"), ctrl.Log.WithName("controllers").WithName("Flow"))
 
 	var stopped bool
 	wrappedReconciler := duplicateRequest(t, flowReconciler, &stopped, errors)

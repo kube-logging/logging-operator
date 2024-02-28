@@ -31,6 +31,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -53,17 +54,19 @@ import (
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
-func NewLoggingReconciler(client client.Client, log logr.Logger) *LoggingReconciler {
+func NewLoggingReconciler(client client.Client, eventRecorder record.EventRecorder, log logr.Logger) *LoggingReconciler {
 	return &LoggingReconciler{
-		Client: client,
-		Log:    log,
+		Client:        client,
+		EventRecorder: eventRecorder,
+		Log:           log,
 	}
 }
 
 // LoggingReconciler reconciles a Logging object
 type LoggingReconciler struct {
 	client.Client
-	Log logr.Logger
+	EventRecorder record.EventRecorder
+	Log           logr.Logger
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -300,7 +303,9 @@ func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging 
 			}
 		}
 	} else if externalFluentd != nil {
-		return false, errors.NewWithDetails("refusing to delete logging resource while fluentdConfig exists", "fluentdConfig", logging.Status.FluentdConfigName)
+		msg := fmt.Sprintf("refused to delete logging resource while fluentdConfig %s exists", client.ObjectKeyFromObject(externalFluentd))
+		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		return false, errors.New(msg)
 	}
 
 	if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && externalFluentd == nil {
@@ -325,12 +330,10 @@ func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging
 				return true, err
 			}
 		}
-	}
-
-	if !logging.DeletionTimestamp.IsZero() {
-		if externalSyslogNG != nil {
-			return false, errors.NewWithDetails("refusing to delete logging resource while syslogngConfig exists", "syslogNGConfig", logging.Status.SyslogNGConfigName)
-		}
+	} else if externalSyslogNG != nil {
+		msg := fmt.Sprintf("refused to delete logging resource while syslogNGConfig %s exists", client.ObjectKeyFromObject(externalSyslogNG))
+		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		return false, errors.New(msg)
 	}
 
 	if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && externalSyslogNG == nil {
