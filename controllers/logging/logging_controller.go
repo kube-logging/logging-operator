@@ -30,7 +30,6 @@ import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -109,22 +108,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
 	} else {
 		log.Info("WARNING PrometheusRule is not supported in the cluster")
-	}
-
-	// Clean up obsolete fluentdConfig reference
-	if logging.Status.FluentdConfigName != "" {
-		fluentdConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.FluentdConfigName}
-		if !r.isExistingFluentdConfig(ctx, fluentdConfigName) {
-			return r.cleanupFluentdConfigReference(ctx, &logging, log)
-		}
-	}
-
-	// Clean up obsolete syslogNGConfig reference
-	if logging.Status.SyslogNGConfigName != "" {
-		syslogNGConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.SyslogNGConfigName}
-		if !r.isExistingSyslogNGConfig(ctx, syslogNGConfigName) {
-			return r.cleanupSyslogNGConfigReference(ctx, &logging, log)
-		}
 	}
 
 	if err := logging.SetDefaults(); err != nil {
@@ -293,94 +276,72 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return *result, err
 		}
 	}
-	if logging.Status.FluentdConfigName != "" {
-		return r.checkFluentdConfigFinalizer(ctx, &logging, log)
+
+	if shouldReturn, err := r.fluentdConfigFinalizer(ctx, &logging, fluentdExternal); shouldReturn || err != nil {
+		return ctrl.Result{}, err
 	}
 
-	if logging.Status.SyslogNGConfigName != "" {
-		return r.checkSyslogNGConfigFinalizer(ctx, &logging, log)
+	if shouldReturn, err := r.syslogNGConfigFinalizer(ctx, &logging, syslogNGExternal); shouldReturn || err != nil {
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *LoggingReconciler) checkFluentdConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalFluentd *loggingv1beta1.FluentdConfig) (bool, error) {
 	fluentdConfigFinalizer := "fluentdconfig.logging.banzaicloud.io/finalizer"
 
 	if logging.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) {
+		if externalFluentd != nil && !controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) {
+			r.Log.Info("adding fluentdconfig finalizer")
 			controllerutil.AddFinalizer(logging, fluentdConfigFinalizer)
 			if err := r.Update(ctx, logging); err != nil {
-				return ctrl.Result{}, err
+				return true, err
 			}
 		}
-	} else {
-		// Marked for deletion, check for fluentdConfig
-		fluentdConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.FluentdConfigName}
-		if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && r.isExistingFluentdConfig(ctx, fluentdConfigName) {
-			return reconcile.Result{}, errors.NewWithDetails("failed to delete logging resources, delete fluentdConfig first", "fluentdConfig", logging.Status.FluentdConfigName)
-		}
+	} else if externalFluentd != nil {
+		return false, errors.NewWithDetails("refusing to delete logging resource while fluentdConfig exists", "fluentdConfig", logging.Status.FluentdConfigName)
+	}
+
+	if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && externalFluentd == nil {
+		r.Log.Info("removing fluentdconfig finalizer")
 		controllerutil.RemoveFinalizer(logging, fluentdConfigFinalizer)
 		if err := r.Update(ctx, logging); err != nil {
-			return ctrl.Result{}, err
+			return true, err
 		}
 	}
-	return ctrl.Result{}, nil
+
+	return false, nil
 }
 
-func (r *LoggingReconciler) checkSyslogNGConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
+func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalSyslogNG *loggingv1beta1.SyslogNGConfig) (bool, error) {
 	syslogNGConfigFinalizer := "syslogngconfig.logging.banzaicloud.io/finalizer"
 
 	if logging.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) {
+		if externalSyslogNG != nil && !controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) {
+			r.Log.Info("adding syslogngconfig finalizer")
 			controllerutil.AddFinalizer(logging, syslogNGConfigFinalizer)
 			if err := r.Update(ctx, logging); err != nil {
-				return ctrl.Result{}, err
+				return true, err
 			}
 		}
-	} else {
-		// Marked for deletion, check for syslogNGConfig
-		syslogNGConfigName := types.NamespacedName{Namespace: logging.Spec.ControlNamespace, Name: logging.Status.SyslogNGConfigName}
-		if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && r.isExistingSyslogNGConfig(ctx, syslogNGConfigName) {
-			return reconcile.Result{}, errors.NewWithDetails("failed to delete logging resources, delete syslogNGConfig first", "syslogNGConfig", logging.Status.SyslogNGConfigName)
+	}
+
+	if !logging.DeletionTimestamp.IsZero() {
+		if externalSyslogNG != nil {
+			return false, errors.NewWithDetails("refusing to delete logging resource while syslogngConfig exists", "syslogNGConfig", logging.Status.SyslogNGConfigName)
 		}
+	}
+
+	if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && externalSyslogNG == nil {
+		r.Log.Info("removing syslogngconfig finalizer")
 		controllerutil.RemoveFinalizer(logging, syslogNGConfigFinalizer)
 		if err := r.Update(ctx, logging); err != nil {
-			return ctrl.Result{}, err
+			return true, err
 		}
 	}
-	return ctrl.Result{}, nil
-}
 
-func (r *LoggingReconciler) cleanupFluentdConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
-	log.Info("cleaning up fluentdConfig reference from status", "name", logging.Status.FluentdConfigName)
-	logging.Status.FluentdConfigName = ""
-	err := r.Status().Update(ctx, logging)
-
-	return ctrl.Result{}, err
-}
-func (r *LoggingReconciler) cleanupSyslogNGConfigReference(ctx context.Context, logging *loggingv1beta1.Logging, log logr.Logger) (ctrl.Result, error) {
-	log.Info("cleaning up syslogNGConfig reference from status", "name", logging.Status.SyslogNGConfigName)
-	logging.Status.SyslogNGConfigName = ""
-	err := r.Status().Update(ctx, logging)
-
-	return ctrl.Result{}, err
-}
-
-func (r *LoggingReconciler) isExistingFluentdConfig(ctx context.Context, fluentdConfigRef types.NamespacedName) bool {
-	var config loggingv1beta1.FluentdConfig
-	if err := r.Client.Get(ctx, fluentdConfigRef, &config); err != nil && apierrors.IsNotFound(err) {
-		return false
-	}
-	return true
-}
-
-func (r *LoggingReconciler) isExistingSyslogNGConfig(ctx context.Context, syslogNGConfigref types.NamespacedName) bool {
-	var config loggingv1beta1.SyslogNGConfig
-	if err := r.Client.Get(ctx, syslogNGConfigref, &config); err != nil && apierrors.IsNotFound(err) {
-		return false
-	}
-	return true
+	return false, nil
 }
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *v1beta1.SyslogNGSpec) {

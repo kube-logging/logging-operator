@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: fluentd-config
+spec:
+  controlNamespace: logging
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentdConfig
+metadata:
+  name: fluentd-config
+  namespace: logging
+spec: {}
