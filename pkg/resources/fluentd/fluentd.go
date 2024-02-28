@@ -68,8 +68,9 @@ const (
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging     *v1beta1.Logging
-	fluentdSpec *v1beta1.FluentdSpec
+	Logging       *v1beta1.Logging
+	fluentdSpec   *v1beta1.FluentdSpec
+	fluentdConfig *v1beta1.FluentdConfig
 	*reconciler.GenericResourceReconciler
 	config  *string
 	secrets *secret.MountSecrets
@@ -112,10 +113,11 @@ func (r *Reconciler) getServiceAccount() string {
 }
 
 func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
+	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, fluentdConfig *v1beta1.FluentdConfig, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		fluentdSpec:               fluentdSpec,
+		fluentdConfig:             fluentdConfig,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
@@ -318,7 +320,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 		}
 	}
 
-	replicaCount, err := NewDataProvider(r.Client, r.Logging, r.fluentdSpec).GetReplicaCount(ctx)
+	replicaCount, err := NewDataProvider(r.Client, r.Logging, r.fluentdSpec, r.fluentdConfig).GetReplicaCount(ctx)
 	if err != nil {
 		return nil, errors.WrapIf(err, "get replica count for fluentd")
 	}

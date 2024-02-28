@@ -107,7 +107,8 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 			continue
 		}
 
-		if loggingResources.GetFluentdSpec() != nil {
+		_, fluentdSpec := loggingResources.GetFluentd()
+		if fluentdSpec != nil {
 			if input.FluentForwardOutput == nil {
 				input.FluentForwardOutput = &fluentForwardOutputConfig{}
 			}
@@ -117,7 +118,7 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 				Host:           aggregatorEndpoint(logging, fluentd.ServiceName),
 				Port:           fluentd.ServicePort,
 			})
-		} else if loggingResources.GetSyslogNGSpec() != nil {
+		} else if _, syslogNGSPec := loggingResources.GetSyslogNGSpec(); syslogNGSPec != nil {
 			if input.SyslogNGOutput == nil {
 				input.SyslogNGOutput = newSyslogNGOutputConfig()
 			}

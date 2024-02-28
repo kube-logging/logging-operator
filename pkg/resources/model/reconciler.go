@@ -238,6 +238,8 @@ func NewValidationReconciler(
 
 			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
+		} else {
+			resources.Logging.Status.FluentdConfigName = ""
 		}
 
 		if len(resources.SyslogNG.ExcessSyslogNGs) != 0 {
@@ -271,6 +273,8 @@ func NewValidationReconciler(
 			logger.Info("found detached syslog-ng aggregator, making association, done: ", "name=", resources.Logging.Status.SyslogNGConfigName)
 			resources.SyslogNG.Configuration.Status.Active = utils.BoolPointer(true)
 			resources.SyslogNG.Configuration.Status.Logging = resources.Logging.Name
+		} else {
+			resources.Logging.Status.SyslogNGConfigName = ""
 		}
 
 		if !resources.Logging.WatchAllNamespaces() {

@@ -31,8 +31,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -52,23 +54,26 @@ import (
 )
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
-func NewLoggingReconciler(client client.Client, log logr.Logger) *LoggingReconciler {
+func NewLoggingReconciler(client client.Client, eventRecorder record.EventRecorder, log logr.Logger) *LoggingReconciler {
 	return &LoggingReconciler{
-		Client: client,
-		Log:    log,
+		Client:        client,
+		EventRecorder: eventRecorder,
+		Log:           log,
 	}
 }
 
 // LoggingReconciler reconciles a Logging object
 type LoggingReconciler struct {
 	client.Client
-	Log logr.Logger
+	EventRecorder record.EventRecorder
+	Log           logr.Logger
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentdconfigs/status;syslogngconfigs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/finalizers,verbs=update
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=extensions;networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
@@ -127,7 +132,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, errors.WrapIfWithDetails(err, "failed to get logging resources", "logging", logging)
 	}
 
-	r.dynamicDefaults(ctx, log, loggingResources.GetSyslogNGSpec())
+	_, syslogNGSPec := loggingResources.GetSyslogNGSpec()
+	r.dynamicDefaults(ctx, log, syslogNGSPec)
 
 	// metrics
 	defer func() {
@@ -176,7 +182,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	var loggingDataProvider loggingdataprovider.LoggingDataProvider
 
-	fluentdSpec := loggingResources.GetFluentdSpec()
+	fluentdExternal, fluentdSpec := loggingResources.GetFluentd()
 	if fluentdSpec != nil {
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
@@ -187,12 +193,12 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", fluentdConfig)
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)
+		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)
 	}
 
-	syslogNGSpec := loggingResources.GetSyslogNGSpec()
+	syslogNGExternal, syslogNGSpec := loggingResources.GetSyslogNGSpec()
 	if syslogNGSpec != nil {
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
@@ -203,9 +209,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		} else {
 			log.V(1).Info("flow configuration", "config", syslogNGConfig)
 
-			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}
-		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging)
+		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging, syslogNGExternal)
 	}
 
 	switch len(loggingResources.Fluentbits) {
@@ -260,7 +266,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Error(errors.New("nodeagent definition conflict"), problem)
 			}
 		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec)).Reconcile)
+		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -274,7 +280,71 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 
+	if shouldReturn, err := r.fluentdConfigFinalizer(ctx, &logging, fluentdExternal); shouldReturn || err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if shouldReturn, err := r.syslogNGConfigFinalizer(ctx, &logging, syslogNGExternal); shouldReturn || err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
+}
+
+func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalFluentd *loggingv1beta1.FluentdConfig) (bool, error) {
+	fluentdConfigFinalizer := "fluentdconfig.logging.banzaicloud.io/finalizer"
+
+	if logging.DeletionTimestamp.IsZero() {
+		if externalFluentd != nil && !controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) {
+			r.Log.Info("adding fluentdconfig finalizer")
+			controllerutil.AddFinalizer(logging, fluentdConfigFinalizer)
+			if err := r.Update(ctx, logging); err != nil {
+				return true, err
+			}
+		}
+	} else if externalFluentd != nil {
+		msg := fmt.Sprintf("refused to delete logging resource while fluentdConfig %s exists", client.ObjectKeyFromObject(externalFluentd))
+		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		return false, errors.New(msg)
+	}
+
+	if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && externalFluentd == nil {
+		r.Log.Info("removing fluentdconfig finalizer")
+		controllerutil.RemoveFinalizer(logging, fluentdConfigFinalizer)
+		if err := r.Update(ctx, logging); err != nil {
+			return true, err
+		}
+	}
+
+	return false, nil
+}
+
+func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalSyslogNG *loggingv1beta1.SyslogNGConfig) (bool, error) {
+	syslogNGConfigFinalizer := "syslogngconfig.logging.banzaicloud.io/finalizer"
+
+	if logging.DeletionTimestamp.IsZero() {
+		if externalSyslogNG != nil && !controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) {
+			r.Log.Info("adding syslogngconfig finalizer")
+			controllerutil.AddFinalizer(logging, syslogNGConfigFinalizer)
+			if err := r.Update(ctx, logging); err != nil {
+				return true, err
+			}
+		}
+	} else if externalSyslogNG != nil {
+		msg := fmt.Sprintf("refused to delete logging resource while syslogNGConfig %s exists", client.ObjectKeyFromObject(externalSyslogNG))
+		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		return false, errors.New(msg)
+	}
+
+	if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && externalSyslogNG == nil {
+		r.Log.Info("removing syslogngconfig finalizer")
+		controllerutil.RemoveFinalizer(logging, syslogNGConfigFinalizer)
+		if err := r.Update(ctx, logging); err != nil {
+			return true, err
+		}
+	}
+
+	return false, nil
 }
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *v1beta1.SyslogNGSpec) {
@@ -371,6 +441,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Path:   syslogng.OutputSecretPath,
 	}
 
+	_, syslogngSpec := resources.GetSyslogNGSpec()
 	in := syslogngconfig.Input{
 		Name:                resources.Logging.Name,
 		Namespace:           resources.Logging.Namespace,
@@ -380,7 +451,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Flows:               resources.SyslogNG.Flows,
 		SecretLoaderFactory: &slf,
 		SourcePort:          syslogng.ServicePort,
-		SyslogNGSpec:        resources.GetSyslogNGSpec(),
+		SyslogNGSpec:        syslogngSpec,
 	}
 	var b strings.Builder
 	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
