@@ -65,14 +65,8 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim, fluentdSpec
 				Affinity:                  fluentdSpec.Affinity,
 				TopologySpreadConstraints: fluentdSpec.TopologySpreadConstraints,
 				PriorityClassName:         fluentdSpec.PodPriorityClassName,
-				SecurityContext: &corev1.PodSecurityContext{
-					RunAsNonRoot:   fluentdSpec.Security.PodSecurityContext.RunAsNonRoot,
-					FSGroup:        fluentdSpec.Security.PodSecurityContext.FSGroup,
-					RunAsUser:      fluentdSpec.Security.PodSecurityContext.RunAsUser,
-					RunAsGroup:     fluentdSpec.Security.PodSecurityContext.RunAsGroup,
-					SeccompProfile: fluentdSpec.Security.PodSecurityContext.SeccompProfile,
-				},
-				RestartPolicy: corev1.RestartPolicyNever,
+				SecurityContext:           fluentdSpec.Security.PodSecurityContext,
+				RestartPolicy:             corev1.RestartPolicyNever,
 			},
 		},
 	}
