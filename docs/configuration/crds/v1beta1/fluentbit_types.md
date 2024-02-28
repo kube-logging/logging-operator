@@ -336,6 +336,12 @@ Enable the data integrity check when writing and reading data from the filesyste
 
 Default: Off
 
+### storage.delete_irrecoverable_chunks (string, optional) {#bufferstorage-storage.delete_irrecoverable_chunks}
+
+When enabled, irrecoverable chunks will be deleted during runtime, and any other irrecoverable chunk located in the configured storage path directory will be deleted when Fluent-Bit starts.
+
+Default: Off
+
 ### storage.metrics (string, optional) {#bufferstorage-storage.metrics}
 
 Available in Logging operator version 4.4 and later. If the `http_server` option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed.
