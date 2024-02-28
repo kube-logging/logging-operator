@@ -16,7 +16,6 @@ package syslogng
 
 import (
 	"context"
-	"time"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -184,7 +183,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 				} else {
 					r.Log.Info("still waiting for the configcheck result...")
 				}
-				return &reconcile.Result{RequeueAfter: time.Minute}, nil
+				return &reconcile.Result{Requeue: true}, nil
 			}
 		}
 	}
