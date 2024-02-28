@@ -21,19 +21,27 @@ import (
 
 // SyslogNGObjectMeta creates an objectMeta for resource syslog-ng
 func (r *Reconciler) SyslogNGObjectMeta(name, component string) metav1.ObjectMeta {
+	ownerReference := metav1.OwnerReference{
+		APIVersion: r.Logging.APIVersion,
+		Kind:       r.Logging.Kind,
+		Name:       r.Logging.Name,
+		UID:        r.Logging.UID,
+		Controller: util.BoolPointer(true),
+	}
+	if r.syslogNGConfig != nil {
+		ownerReference = metav1.OwnerReference{
+			APIVersion: r.syslogNGConfig.APIVersion,
+			Kind:       r.syslogNGConfig.Kind,
+			Name:       r.syslogNGConfig.Name,
+			UID:        r.syslogNGConfig.UID,
+			Controller: util.BoolPointer(true),
+		}
+	}
 	o := metav1.ObjectMeta{
-		Name:      r.Logging.QualifiedName(name),
-		Namespace: r.Logging.Spec.ControlNamespace,
-		Labels:    r.Logging.GetSyslogNGLabels(component),
-		OwnerReferences: []metav1.OwnerReference{
-			{
-				APIVersion: r.Logging.APIVersion,
-				Kind:       r.Logging.Kind,
-				Name:       r.Logging.Name,
-				UID:        r.Logging.UID,
-				Controller: util.BoolPointer(true),
-			},
-		},
+		Name:            r.Logging.QualifiedName(name),
+		Namespace:       r.Logging.Spec.ControlNamespace,
+		Labels:          r.Logging.GetSyslogNGLabels(component),
+		OwnerReferences: []metav1.OwnerReference{ownerReference},
 	}
 	return *o.DeepCopy()
 }
