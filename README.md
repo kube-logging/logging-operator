@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/img/lo.svg" width="260"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/cncf/landscape/master/hosted_logos/logging-operator.svg" width="260"></p>
 <p align="center">
 
   <a href="https://goreportcard.com/badge/github.com/kube-logging/logging-operator">
