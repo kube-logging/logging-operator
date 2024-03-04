@@ -21,7 +21,7 @@ import (
 
 // +name:"VMware Log Intelligence"
 // +weight:"200"
-type _hugoVMWareLogIntelligence interface{} //nolint:deadcode,unused
+type _hugoVMwareLogIntelligence interface{} //nolint:deadcode,unused
 
 // +docName:"VMware Log Intelligence output plugin for Fluentd"
 /*
@@ -31,34 +31,38 @@ For details, see [https://github.com/vmware/fluent-plugin-vmware-log-intelligenc
 spec:
   vmwarelogintelligence:
     endpoint_url: https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
-	verify_ssl: true
-	http_compress: false
-	headers:
-	  Content-Type: "application/json"
-	  Authorization: "Bearer 12345"
-	  structure: simple
-	buffer:
-	  chunk_limit_records: 300
-	  flush_interval: 3s
-	  retry_max_times: 3
+    verify_ssl: true
+    http_compress: false
+    headers:
+      content_type: "application/json"
+      authorization:
+        valueFrom:
+          secretKeyRef:
+            name: vmware-log-intelligence-token
+            key: authorization
+      structure: simple
+    buffer:
+      chunk_limit_records: 300
+      flush_interval: 3s
+      retry_max_times: 3
 ```
 */
-type _docVMWareLogIntelligence interface{} //nolint:deadcode,unused
+type _docVMwareLogIntelligence interface{} //nolint:deadcode,unused
 
 // +name:"VMwareLogIntelligence"
 // +url:"https://github.com/vmware/fluent-plugin-vmware-log-intelligence/releases/tag/v2.0.8"
 // +version:"v2.0.8"
 // +description:"Send your logs to VMware Log Intelligence"
 // +status:"GA"
-type _metaVMWareLogIntelligence interface{} //nolint:deadcode,unused
+type _metaVMwareLogIntelligence interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"VMwareLogIntelligence"
-type VMWareLogIntelligenceOutput struct {
+type VMwareLogIntelligenceOutputConfig struct {
 	// Log Intelligence endpoint to send logs to https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-endpoint_url
 	EndpointURL string `json:"endpoint_url"`
 	// Verify SSL (default: true) https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-verify_ssl
-	VerifySSL bool `json:"verify_ssl" plugin:"default:true"`
+	VerifySSL *bool `json:"verify_ssl" plugin:"default:true"`
 	// Compress http request https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-http_compress
 	HTTPCompress *bool `json:"http_compress,omitempty"`
 	// Required headers for sending logs to VMware Log Intelligence https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-3Cheaders-3E
@@ -102,7 +106,7 @@ func (l *LogIntelligenceHeadersOut) ToDirective(secretLoader secret.SecretLoader
 	}, l, secretLoader)
 }
 
-func (v *VMWareLogIntelligenceOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+func (v *VMwareLogIntelligenceOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "vmware_log_intelligence"
 	vmwli := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{

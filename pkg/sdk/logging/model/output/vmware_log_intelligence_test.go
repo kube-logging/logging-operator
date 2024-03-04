@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestVMWareLogIntelligenceOutputConfig(t *testing.T) {
+func TestVMwareLogIntelligenceOutputConfig(t *testing.T) {
 	CONFIG := []byte(`
 endpoint_url: https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
 verify_ssl: true
@@ -65,13 +65,13 @@ buffer:
   </buffer>
 </match>
 `
-	s := &output.VMWareLogIntelligenceOutput{}
+	s := &output.VMwareLogIntelligenceOutputConfig{}
 	require.NoError(t, yaml.Unmarshal(CONFIG, s))
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)
 }
 
-func TestVMWareLogIntelligenceOutputConfigWithDefaultHeaderValues(t *testing.T) {
+func TestVMwareLogIntelligenceOutputConfigWithDefaultHeaderValues(t *testing.T) {
 	CONFIG := []byte(`
 endpoint_url: https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
 verify_ssl: true
@@ -85,7 +85,6 @@ buffer:
   retry_max_times: 3
 `)
 
-	//TODO: test format block
 	expected := `
   <match **>
   @type vmware_log_intelligence
@@ -111,13 +110,13 @@ buffer:
   </buffer>
 </match>
 `
-	s := &output.VMWareLogIntelligenceOutput{}
+	s := &output.VMwareLogIntelligenceOutputConfig{}
 	require.NoError(t, yaml.Unmarshal(CONFIG, s))
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)
 }
 
-func TestVMWareLogIntelligenceOutputConfigWithFormat(t *testing.T) {
+func TestVMwareLogIntelligenceOutputConfigWithFormat(t *testing.T) {
 	CONFIG := []byte(`
 endpoint_url: https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
 verify_ssl: true
@@ -134,7 +133,6 @@ format:
   type: json
 `)
 
-	//TODO: test format block
 	expected := `
   <match **>
   @type vmware_log_intelligence
@@ -162,7 +160,7 @@ format:
   </format>
 </match>
 `
-	s := &output.VMWareLogIntelligenceOutput{}
+	s := &output.VMwareLogIntelligenceOutputConfig{}
 	require.NoError(t, yaml.Unmarshal(CONFIG, s))
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)

@@ -2531,9 +2531,9 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.VMwareLogInsightOutput)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.VMWareLogIntelligenceOutput != nil {
-		in, out := &in.VMWareLogIntelligenceOutput, &out.VMWareLogIntelligenceOutput
-		*out = new(output.VMWareLogIntelligenceOutput)
+	if in.VMwareLogIntelligenceOutputConfig != nil {
+		in, out := &in.VMwareLogIntelligenceOutputConfig, &out.VMwareLogIntelligenceOutputConfig
+		*out = new(output.VMwareLogIntelligenceOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
 }

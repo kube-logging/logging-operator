@@ -13,16 +13,20 @@ For details, see [https://github.com/vmware/fluent-plugin-vmware-log-intelligenc
 spec:
   vmwarelogintelligence:
     endpoint_url: https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
-	verify_ssl: true
-	http_compress: false
-	headers:
-	  Content-Type: "application/json"
-	  Authorization: "Bearer 12345"
-	  structure: simple
-	buffer:
-	  chunk_limit_records: 300
-	  flush_interval: 3s
-	  retry_max_times: 3
+    verify_ssl: true
+    http_compress: false
+    headers:
+      content_type: "application/json"
+      authorization:
+        valueFrom:
+          secretKeyRef:
+            name: vmware-log-intelligence-token
+            key: authorization
+      structure: simple
+    buffer:
+      chunk_limit_records: 300
+      flush_interval: 3s
+      retry_max_times: 3
 ```
 
 
@@ -54,7 +58,7 @@ Compress http request https://github.com/vmware/fluent-plugin-vmware-log-intelli
 Required headers for sending logs to VMware Log Intelligence https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-3Cheaders-3E 
 
 
-### verify_ssl (bool, required) {#vmwarelogintelligence-verify_ssl}
+### verify_ssl (*bool, required) {#vmwarelogintelligence-verify_ssl}
 
 Verify SSL (default: true) https://github.com/vmware/fluent-plugin-vmware-log-intelligence?tab=readme-ov-file#label-verify_ssl 
 
