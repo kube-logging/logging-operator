@@ -251,7 +251,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		return nil, nil, errs
 	}
 
-	fluentdSpec := loggingResources.GetFluentdSpec()
+	_, fluentdSpec := loggingResources.GetFluentd()
 
 	if fluentdSpec != nil {
 		fluentbitTargetHost := r.fluentbitSpec.TargetHost
@@ -369,7 +369,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		}
 	}
 
-	if loggingResources.GetSyslogNGSpec() != nil {
+	_, syslogNGSPec := loggingResources.GetSyslogNGSpec()
+	if syslogNGSPec != nil {
 		input.SyslogNGOutput = newSyslogNGOutputConfig()
 		input.SyslogNGOutput.Host = aggregatorEndpoint(r.Logging, syslogng.ServiceName)
 		input.SyslogNGOutput.Port = syslogng.ServicePort

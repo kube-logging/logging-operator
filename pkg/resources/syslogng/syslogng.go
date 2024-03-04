@@ -70,8 +70,9 @@ const (
 
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
-	Logging      *v1beta1.Logging
-	syslogNGSpec *v1beta1.SyslogNGSpec
+	Logging        *v1beta1.Logging
+	syslogNGSpec   *v1beta1.SyslogNGSpec
+	syslogNGConfig *v1beta1.SyslogNGConfig
 	*reconciler.GenericResourceReconciler
 	config  string
 	secrets *secret.MountSecrets
@@ -90,6 +91,7 @@ func New(
 	log logr.Logger,
 	logging *v1beta1.Logging,
 	syslogNGSPec *v1beta1.SyslogNGSpec,
+	syslogNGCOnfig *v1beta1.SyslogNGConfig,
 	config string,
 	secrets *secret.MountSecrets,
 	opts reconciler.ReconcilerOpts,
@@ -97,6 +99,7 @@ func New(
 	return &Reconciler{
 		Logging:                   logging,
 		syslogNGSpec:              syslogNGSPec,
+		syslogNGConfig:            syslogNGCOnfig,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
