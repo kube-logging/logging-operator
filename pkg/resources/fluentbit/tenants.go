@@ -16,12 +16,14 @@ package fluentbit
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"sort"
 	"strings"
 
 	"emperror.dev/errors"
-	"golang.org/x/exp/slices"
+	"golang.org/x/exp/maps"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -71,18 +73,8 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 		}
 	}
 
-	sort.Slice(tenants, func(i, j int) bool {
+	sort.SliceStable(tenants, func(i, j int) bool {
 		return tenants[i].Name < tenants[j].Name
-	})
-	// Make sure our tenant list is stable
-	slices.SortStableFunc(tenants, func(a, b Tenant) int {
-		if a.Name < b.Name {
-			return -1
-		}
-		if a.Name == b.Name {
-			return 0
-		}
-		return 1
 	})
 
 	return tenants, nil
@@ -91,11 +83,7 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v1beta1.Tenant, input *fluentBitConfig) error {
 	var errs error
 	for _, t := range tenants {
-		allNamespaces := len(t.Namespaces) == 0
-		namespaceRegex := `.`
-		if !allNamespaces {
-			namespaceRegex = fmt.Sprintf("^[^_]+_(%s)_", strings.Join(t.Namespaces, "|"))
-		}
+		match := fmt.Sprintf("kubernetes.%s.*", hashFromTenantName(t.Name))
 		logging := &v1beta1.Logging{}
 		if err := r.resourceReconciler.Client.Get(ctx, types.NamespacedName{Name: t.Name}, logging); err != nil {
 			return errors.WrapIf(err, "getting logging resource")
@@ -113,24 +101,64 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 				input.FluentForwardOutput = &fluentForwardOutputConfig{}
 			}
 			input.FluentForwardOutput.Targets = append(input.FluentForwardOutput.Targets, forwardTargetConfig{
-				AllNamespaces:  allNamespaces,
-				NamespaceRegex: namespaceRegex,
-				Host:           aggregatorEndpoint(logging, fluentd.ServiceName),
-				Port:           fluentd.ServicePort,
+				Match: match,
+				Host:  aggregatorEndpoint(logging, fluentd.ServiceName),
+				Port:  fluentd.ServicePort,
 			})
 		} else if _, syslogNGSPec := loggingResources.GetSyslogNGSpec(); syslogNGSPec != nil {
 			if input.SyslogNGOutput == nil {
 				input.SyslogNGOutput = newSyslogNGOutputConfig()
 			}
 			input.SyslogNGOutput.Targets = append(input.SyslogNGOutput.Targets, forwardTargetConfig{
-				AllNamespaces:  allNamespaces,
-				NamespaceRegex: namespaceRegex,
-				Host:           aggregatorEndpoint(logging, syslogng.ServiceName),
-				Port:           syslogng.ServicePort,
+				Match: match,
+				Host:  aggregatorEndpoint(logging, syslogng.ServiceName),
+				Port:  syslogng.ServicePort,
 			})
 		} else {
 			errs = errors.Append(errs, errors.Errorf("logging %s does not provide any aggregator configured", t.Name))
 		}
 	}
 	return errs
+}
+
+func (r *Reconciler) configureInputsForTenants(tenants []v1beta1.Tenant, input *fluentBitConfig) error {
+	var errs error
+	for _, t := range tenants {
+		allNamespaces := len(t.Namespaces) == 0
+		tenantValues := maps.Clone(input.Input.Values)
+		if !allNamespaces {
+			var paths []string
+			for _, n := range t.Namespaces {
+				paths = append(paths, fmt.Sprintf("/var/log/containers/*_%s_*.log", n))
+			}
+			tenantValues["Path"] = strings.Join(paths, ",")
+		} else {
+			tenantValues["Path"] = "/var/log/containers/*.log"
+		}
+
+		tenantValues["DB"] = fmt.Sprintf("/tail-db/tail-containers-state-%s.db", t.Name)
+		tenantValues["Tag"] = fmt.Sprintf("kubernetes.%s.*", hashFromTenantName(t.Name))
+		// This helps to make sure we apply backpressure on the input, see https://docs.fluentbit.io/manual/administration/backpressure
+		tenantValues["storage.pause_on_chunks_overlimit"] = "on"
+		input.Inputs = append(input.Inputs, fluentbitInputConfigWithTenant{
+			Tenant:          t.Name,
+			Values:          tenantValues,
+			ParserN:         input.Input.ParserN,
+			MultilineParser: input.Input.MultilineParser,
+		})
+	}
+	// the regex will work only if we cut the prefix off. fluentbit doesn't care about the content, just the length
+	input.KubernetesFilter["Kube_Tag_Prefix"] = `kubernetes.0000000000.var.log.containers.`
+	return errs
+}
+
+func hashFromTenantName(input string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(input))
+	hashBytes := hasher.Sum(nil)
+
+	// Convert the hash to a hex string
+	hashString := hex.EncodeToString(hashBytes)
+
+	return hashString[0:10]
 }
