@@ -61,6 +61,11 @@ Set the prefix for logs in logstash format. If set, then the Index field will be
 Set the separator between LogstashPrefix and LogStashDateformat. Default: "-" 
 
 
+### template (string, optional) {#elasticsearchoutput-template}
+
+The template to format the record itself inside the payload body 
+
+
 ### type (*string, optional) {#elasticsearchoutput-type}
 
 The document type associated with the operation. Elasticsearch indices now support a single document type: `_doc` 
