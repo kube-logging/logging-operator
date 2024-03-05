@@ -15,8 +15,9 @@
 package v1beta1
 
 import (
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 // +name:"OutputSpec"
@@ -59,6 +60,7 @@ type OutputSpec struct {
 	SQSOutputConfig              *output.SQSOutputConfig              `json:"sqs,omitempty"`
 	MattermostOutputConfig       *output.MattermostOutputConfig       `json:"mattermost,omitempty"`
 	RelabelOutputConfig          *output.RelabelOutputConfig          `json:"relabel,omitempty"`
+	VMwareLogInsightConfig       *output.VMwareLogInsightOutput       `json:"vmwareLogInsight,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

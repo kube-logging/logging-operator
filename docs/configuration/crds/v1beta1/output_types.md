@@ -95,6 +95,9 @@ OutputSpec defines the desired state of Output
 ### syslog (*output.SyslogOutputConfig, optional) {#outputspec-syslog}
 
 
+### vmwareLogInsight (*output.VMwareLogInsightOutput, optional) {#outputspec-vmwareloginsight}
+
+
 
 ## OutputStatus
 
