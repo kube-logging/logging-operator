@@ -63,7 +63,7 @@ Set the separator between LogstashPrefix and LogStashDateformat. Default: "-"
 
 ### template (string, optional) {#elasticsearchoutput-template}
 
-The template to format the record itsels inside the payload body 
+The template to format the record itself inside the payload body 
 
 
 ### type (*string, optional) {#elasticsearchoutput-type}
