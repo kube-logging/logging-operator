@@ -98,6 +98,9 @@ OutputSpec defines the desired state of Output
 ### vmwareLogInsight (*output.VMwareLogInsightOutput, optional) {#outputspec-vmwareloginsight}
 
 
+### vmwareLogIntelligence (*output.VMwareLogIntelligenceOutputConfig, optional) {#outputspec-vmwarelogintelligence}
+
+
 
 ## OutputStatus
 
