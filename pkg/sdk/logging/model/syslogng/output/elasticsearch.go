@@ -59,7 +59,7 @@ type ElasticsearchOutput struct {
 	Index string `json:"index,omitempty"`
 	// The document type associated with the operation. Elasticsearch indices now support a single document type: `_doc`
 	Type *string `json:"type,omitempty"`
-	// The template to format the record itsels inside the payload body
+	// The template to format the record itself inside the payload body
 	Template string `json:"template,omitempty"`
 	// The document ID. If no ID is specified, a document ID is automatically generated.
 	CustomID string `json:"custom_id,omitempty"`
