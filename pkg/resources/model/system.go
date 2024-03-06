@@ -32,7 +32,7 @@ import (
 
 func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logger logr.Logger) (*types.System, error) {
 	logging := resources.Logging
-	fluentdSpec := resources.GetFluentdSpec()
+	_, fluentdSpec := resources.GetFluentd()
 
 	var forwardInput *input.ForwardInputConfig
 	if fluentdSpec != nil && fluentdSpec.ForwardInputConfig != nil {
