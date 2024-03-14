@@ -33,7 +33,7 @@ import (
 )
 
 func validateClusterOutputs(clusterOutputRefs map[string]types.NamespacedName, flow string, globalOutputRefs []string) error {
-	return seqs.Reduce(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
+	return seqs.SeededReduce(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
 		if _, ok := clusterOutputRefs[ref]; !ok {
 			return errors.Append(err, errors.Errorf("cluster output reference %s for flow %s cannot be found", ref, flow))
 		}

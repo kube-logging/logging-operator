@@ -25,7 +25,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type Renderer func(ctx RenderContext) error
+type Renderer = func(ctx RenderContext) error
 
 type RenderContext struct {
 	Out         io.Writer
