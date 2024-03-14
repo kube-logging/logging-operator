@@ -698,6 +698,21 @@ Default: On
 Optional parser name to specify how to parse the data contained in the log key. Recommended use is for developers or testing only. 
 
 
+### namespace_annotations (string, optional) {#filterkubernetes-namespace_annotations}
+
+Include Kubernetes namespace annotations on every record 
+
+
+### kube_meta_namespace_cache_ttl (string, optional) {#filterkubernetes-kube_meta_namespace_cache_ttl}
+
+Configurable TTL for K8s cached namespace metadata. (15m) 
+
+
+### namespace_labels (string, optional) {#filterkubernetes-namespace_labels}
+
+Include Kubernetes namespace labels on every record 
+
+
 ### Regex_Parser (string, optional) {#filterkubernetes-regex_parser}
 
 Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example). 

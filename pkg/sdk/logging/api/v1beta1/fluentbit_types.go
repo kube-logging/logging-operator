@@ -328,6 +328,12 @@ type FilterKubernetes struct {
 	Labels string `json:"Labels,omitempty"`
 	// Include Kubernetes resource annotations in the extra metadata. (default:On)
 	Annotations string `json:"Annotations,omitempty"`
+	// Include Kubernetes namespace labels on every record
+	NamespaceLabels string `json:"namespace_labels,omitempty"`
+	// Include Kubernetes namespace annotations on every record
+	NamespaceAnnotations string `json:"namespace_annotations,omitempty"`
+	// Configurable TTL for K8s cached namespace metadata. (15m)
+	NamespaceCacheTTL string `json:"kube_meta_namespace_cache_ttl,omitempty"`
 	// If set, Kubernetes meta-data can be cached/pre-loaded from files in JSON format in this directory, named as namespace-pod.meta
 	KubeMetaPreloadCacheDir string `json:"Kube_meta_preload_cache_dir,omitempty"`
 	// If set, use dummy-meta data (for test/dev purposes) (default:Off)
