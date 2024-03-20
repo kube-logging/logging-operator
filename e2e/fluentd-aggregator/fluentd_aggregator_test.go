@@ -223,7 +223,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-1", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-2", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -339,9 +339,9 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 			}
 
 			return logging.Status.ProblemsCount == 0
-		}, 15*time.Minute, 3*time.Second)
+		}, 5*time.Minute, 3*time.Second)
 
-		t.Logf("Breaking Output")
+		t.Logf("Breaking File Output with an invalid config")
 		patch := client.MergeFrom(output.DeepCopy())
 		output.Spec.FileOutput.Path = "/tmp/zzz"
 		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
