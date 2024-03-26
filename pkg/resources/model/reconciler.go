@@ -34,6 +34,8 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/mirror"
 )
 
+const LoggingRefConflict = "Other logging resources exist with the same loggingRef"
+
 func NewValidationReconciler(
 	repo client.StatusClient,
 	resources LoggingResources,
@@ -291,13 +293,13 @@ func NewValidationReconciler(
 			if l.Name == resources.Logging.Name {
 				continue
 			}
-			if l.Spec.LoggingRef == resources.Logging.Spec.LoggingRef {
+			if l.Spec.LoggingRef == resources.Logging.Spec.LoggingRef && hasIntersection(l.Status.WatchNamespaces, resources.Logging.Status.WatchNamespaces) {
 				loggingsForTheSameRef = append(loggingsForTheSameRef, l.Name)
 			}
 		}
 
 		if len(loggingsForTheSameRef) > 0 {
-			problem := fmt.Sprintf("Deprecated behaviour! Other logging resources exist with the same loggingRef: %s. This is going to be an error with the next major release.",
+			problem := fmt.Sprintf("%s (%s) and their watchNamespaces conflict", LoggingRefConflict,
 				strings.Join(loggingsForTheSameRef, ","))
 			logger.Info(fmt.Sprintf("WARNING %s", problem))
 			resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
@@ -416,4 +418,15 @@ func jsonFieldName(f reflect.StructField) string {
 		return n
 	}
 	return f.Name
+}
+
+func hasIntersection(a, b []string) bool {
+	for _, i := range a {
+		for _, j := range b {
+			if i == j {
+				return true
+			}
+		}
+	}
+	return false
 }
