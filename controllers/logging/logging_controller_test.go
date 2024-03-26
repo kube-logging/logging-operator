@@ -279,6 +279,7 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 		},
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: controlNamespace,
+			WatchNamespaces:  []string{"a", "b"},
 		},
 	}
 	logging2 := &v1beta1.Logging{
@@ -287,6 +288,7 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 		},
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: controlNamespace,
+			WatchNamespaces:  []string{"b", "c"},
 		},
 	}
 	logging3 := &v1beta1.Logging{
@@ -305,7 +307,7 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 
 	// The first logging resource won't be populated with a warning initially since at the time of creation it is unique
 	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
-	g.Eventually(getLoggingProblems(logging2)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+	g.Eventually(getLoggingProblems(logging2)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring(model.LoggingRefConflict)))
 	g.Eventually(getLoggingProblems(logging3)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.BeEmpty())
 
 	g.Eventually(func() error {
@@ -316,7 +318,7 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 		l.Spec.ErrorOutputRef = "trigger reconcile"
 		return mgr.GetClient().Update(context.TODO(), l)
 	}).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.Succeed())
-	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring("Deprecated")))
+	g.Eventually(getLoggingProblems(logging1)).WithPolling(time.Second).WithTimeout(5 * time.Second).Should(gomega.ContainElement(gomega.ContainSubstring(model.LoggingRefConflict)))
 }
 
 func getLoggingProblems(logging *v1beta1.Logging) func() ([]string, error) {

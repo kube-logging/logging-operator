@@ -192,7 +192,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				return &reconcile.Result{}, err
 			})
 		} else {
-			log.V(1).Info("flow configuration", "config", fluentdConfig)
+			if os.Getenv("SHOW_FLOW_CONFIG") != "" {
+				log.Info("flow configuration", "config", fluentdConfig)
+			}
 
 			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
 		}
@@ -208,7 +210,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				return &reconcile.Result{}, err
 			})
 		} else {
-			log.V(1).Info("flow configuration", "config", syslogNGConfig)
+			if os.Getenv("SHOW_FLOW_CONFIG") != "" {
+				log.Info("flow configuration", "config", syslogNGConfig)
+			}
 
 			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
 		}

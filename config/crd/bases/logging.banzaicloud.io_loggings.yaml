@@ -2104,6 +2104,12 @@ spec:
                         type: string
                       Use_Kubelet:
                         type: string
+                      kube_meta_namespace_cache_ttl:
+                        type: string
+                      namespace_annotations:
+                        type: string
+                      namespace_labels:
+                        type: string
                       tls.debug:
                         type: string
                       tls.verify:
@@ -10777,6 +10783,12 @@ spec:
                             Use_Journal:
                               type: string
                             Use_Kubelet:
+                              type: string
+                            kube_meta_namespace_cache_ttl:
+                              type: string
+                            namespace_annotations:
+                              type: string
+                            namespace_labels:
                               type: string
                             tls.debug:
                               type: string
