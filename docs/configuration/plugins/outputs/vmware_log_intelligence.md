@@ -88,28 +88,3 @@ Structure for http request to VMware Log Intelligence
 Default: simple
 
 
-## LogIntelligenceHeadersOut
-
-LogIntelligenceHeadersOut is used to convert the input LogIntelligenceHeaders to a fluentd
-output that uses the correct key names for the VMware Log Intelligence plugin. This allows the
-Ouput to accept the config is snake_case (as other output plugins do) but output the fluentd
-<headers> config with the proper key names (ie. content_type -> Content-Type)
-
-### Authorization (*secret.Secret, required) {#logintelligenceheadersout-authorization}
-
-Authorization Bearer token for http request to VMware Log Intelligence 
-
-
-### Content-Type (string, required) {#logintelligenceheadersout-content-type}
-
-Content Type for http request to VMware Log Intelligence 
-
-Default: application/json
-
-### structure (string, required) {#logintelligenceheadersout-structure}
-
-Structure for http request to VMware Log Intelligence 
-
-Default: simple
-
-
