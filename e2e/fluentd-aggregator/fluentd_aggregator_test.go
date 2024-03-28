@@ -20,6 +20,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -347,13 +348,18 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
 		require.Eventually(t, func() bool {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-			if logging.Status.ProblemsCount != 1 {
-				t.Logf("Waiting for the problem to appear in Logging status: %v", logging.Status.Problems)
-				return false
-			} else {
-				t.Logf("Found the problem in Logging status: %v", logging.Status)
-				return true
+			if logging.Status.ProblemsCount > 0 {
+				for _, problem := range logging.Status.Problems {
+					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
+					common.RequireNoError(t, err)
+					if match {
+						t.Logf("Found the problem in Logging status: %v", logging.Status)
+						return true
+					}
+				}
 			}
+			t.Logf("Waiting for the problem to appear in Logging status: %v", logging.Status.Problems)
+			return false
 		}, 5*time.Minute, 3*time.Second)
 
 		t.Logf("Fixing Output")
@@ -362,13 +368,18 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
 		require.Eventually(t, func() bool {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-			if logging.Status.ProblemsCount == 1 {
-				t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
-				return false
-			} else {
-				t.Logf("Problem cleared in Logging status: %v", logging.Status)
-				return true
+			if logging.Status.ProblemsCount > 0 {
+				for _, problem := range logging.Status.Problems {
+					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
+					common.RequireNoError(t, err)
+					if match {
+						t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
+						return false
+					}
+				}
 			}
+			t.Logf("Problem cleared in Logging status: %v", logging.Status)
+			return true
 		}, 5*time.Minute, 3*time.Second)
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
