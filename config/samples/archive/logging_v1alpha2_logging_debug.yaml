@@ -4,6 +4,7 @@ metadata:
   name: defaultlogging
 spec:
   fluentd:
+    logFormat: text
     logLevel: debug
     disablePvc: true
   fluentbit:

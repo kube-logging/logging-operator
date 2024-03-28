@@ -106,6 +106,8 @@ Ignore same log lines [more info]( https://docs.fluentd.org/deployment/logging#i
 
 ### livenessProbe (*corev1.Probe, optional) {#fluentdspec-livenessprobe}
 
+### logFormat (string, optional) {#fluentdspec-logformat}
+
 
 ### logLevel (string, optional) {#fluentdspec-loglevel}
 
