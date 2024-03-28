@@ -37,9 +37,11 @@ You can check that the custom metric is available with:
 kubectl get --raw '/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/buffer_space_usage_ratio'
 ```
 
-The replica count of the stateful set is enforced by the logging-operator based on the logging resource's replica count (even if it's not set explicitly).
-To allow for HPA to control the replica count of the stateful set this coupling has to be severed.
-***Currently, there is no way to turn off this coupling, other than shutting off the logging-operator by deleting its deployment.***
+The replica count of the stateful set is enforced by the logging-operator only if it is explicitly set in the logging resource's replica count.
+
+If it's not set explicitly in the logging resource, then the logging operator allows managing it from the outside.
+
+To allow for HPA to control the replica count of the statefulset simply avoid setting the replica count through the logging resource.
 
 Finally, the HPA resource must be created.
 ```yaml
