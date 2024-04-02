@@ -61,7 +61,7 @@ spec:
     connectTimeout: 2
   metrics: {}
   image:
-    tag: 2.1.8-debug
+    tag: 2.2.2-debug
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: LoggingRoute
