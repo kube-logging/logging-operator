@@ -267,6 +267,7 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 			ImagePullSecrets:   fluentdSpec.Image.ImagePullSecrets,
 			InitContainers:     initContainer,
 			Containers:         container,
+			DNSConfig:          fluentdSpec.DNSConfig,
 		},
 	}
 	if fluentdSpec.ConfigCheckAnnotations != nil {
