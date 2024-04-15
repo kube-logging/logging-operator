@@ -11,6 +11,11 @@ generated_file: true
 ## Configuration
 ## Output Config
 
+### buffer (*Buffer, optional) {#output config-buffer}
+
+[Buffer](../buffer/) 
+
+
 ### host (string, required) {#output config-host}
 
 Destination host 
