@@ -34,14 +34,14 @@ port: 12201
     @id test
     host gelf-host
     port 12201
-		<buffer tag,time>
-		  @type file
-		  chunk_limit_size 8MB
-		  path /buffers/test.*.buffer
-		  retry_forever true
-		  timekey 10m
-	    timekey_wait 1m
-		</buffer>
+    <buffer tag,time>
+      @type file
+      chunk_limit_size 8MB
+      path /buffers/test.*.buffer
+      retry_forever true
+      timekey 10m
+      timekey_wait 1m
+    </buffer>
   </match>
 `
 	s := &output.GELFOutputConfig{}
