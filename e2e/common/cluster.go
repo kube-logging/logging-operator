@@ -25,6 +25,8 @@ import (
 	"emperror.dev/errors"
 	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -40,6 +42,7 @@ type Cluster interface {
 	Cleanup() error
 	PrintLogs(config PrintLogConfig) error
 	KubeConfigFilePath() string
+	ShutdownLoggingOperator(string, string) error
 }
 
 type PrintLogConfig struct {
@@ -121,6 +124,24 @@ func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {
 	cmd.Env = append(os.Environ(), fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()))
 	cmd.Stderr = os.Stderr
 	return cmd
+}
+
+// Shuts down logging-operator gracefully which is required save go coverage files
+func (c kindCluster) ShutdownLoggingOperator(ns string, loggingOperatorName string) error {
+
+	clientset, err := kubernetes.NewForConfig(c.GetConfig())
+	if err != nil {
+		return errors.WrapIfWithDetails(err, "failed to create clientset")
+	}
+	deploymentsClient := clientset.AppsV1().Deployments(ns)
+	deletePolicy := metav1.DeletePropagationForeground
+	err = deploymentsClient.Delete(context.TODO(), loggingOperatorName, metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	})
+	if err != nil {
+		return errors.WrapIfWithDetails(err, "failed to delete logging-operator deployment")
+	}
+	return nil
 }
 
 type kindCluster struct {

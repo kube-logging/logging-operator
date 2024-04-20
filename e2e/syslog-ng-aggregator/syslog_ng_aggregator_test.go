@@ -108,7 +108,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 											},
 											VolumeMounts: []corev1.VolumeMount{
 												{
-													Name: "buffers",
+													Name:      "buffers",
 													MountPath: "/buffers",
 												},
 											},
@@ -209,8 +209,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride,
-				)), c)
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)
@@ -223,11 +222,23 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
-		return c.PrintLogs(common.PrintLogConfig{
+		err := c.PrintLogs(common.PrintLogConfig{
 			Namespaces: []string{ns, "default"},
 			FilePath:   path,
 			Limit:      100 * 1000,
 		})
+		if err != nil {
+			return err
+		}
+
+		loggingOperatorName := "logging-operator-" + releaseNameOverride
+		t.Logf("Shutting down logging-operator: %s/%s", ns, loggingOperatorName)
+		err = c.ShutdownLoggingOperator(ns, loggingOperatorName)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

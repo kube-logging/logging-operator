@@ -84,6 +84,11 @@ docker-build: ## Build the docker image
 docker-build-debug: ## Build the debug docker image
 	${DOCKER} build --target debug -t ${IMG_DEBUG} .
 
+.PHONY: docker-build-e2e-test
+docker-build-e2e-test: ## Build the coverage docker image
+	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover" -t ${IMG} .
+	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
 	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
@@ -174,7 +179,7 @@ check-coverage: install-go-test-coverage generate-test-coverage
 	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
-test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
@@ -192,7 +197,10 @@ test-e2e-nodeps:
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
-		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
+		KIND_CONFIG="$(PWD)/e2e/common/kind/config.yaml" \
+		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} -p 1 ./${E2E_TEST}/...
+	@echo "--- E2E test coverage report"
+	go tool covdata percent -i=${TEST_COV_DIR}
 
 .PHONY: tidy
 tidy: ## Tidy Go modules
