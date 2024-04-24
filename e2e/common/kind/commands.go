@@ -26,7 +26,6 @@ import (
 
 var KindPath string
 var KindImage string
-var KindConfig string
 
 func init() {
 	KindPath = os.Getenv("KIND_PATH")
@@ -35,16 +34,12 @@ func init() {
 		fmt.Println("KIND_PATH is not set, defaulting to ../../bin/kind")
 	}
 	KindImage = os.Getenv("KIND_IMAGE")
-	KindConfig = os.Getenv("KIND_CONFIG")
 }
 
 func CreateCluster(options CreateClusterOptions) error {
 	args := []string{"create", "cluster"}
 	if KindImage != "" && options.Image == "" {
 		options.Image = KindImage
-	}
-	if KindConfig != "" {
-		options.Config = KindConfig
 	}
 	args = options.AppendToArgs(args)
 	cmd := exec.Command(KindPath, args...)

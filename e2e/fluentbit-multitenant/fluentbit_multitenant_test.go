@@ -153,8 +153,8 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 		}
 
 		loggingOperatorName := "logging-operator-" + release
-		t.Logf("Shutting down logging-operator: %s/%s", nsInfra, loggingOperatorName)
-		err = c.ShutdownLoggingOperator(nsInfra, loggingOperatorName)
+		t.Logf("Collecting coverage files from logging-operator: %s/%s", nsInfra, loggingOperatorName)
+		err = c.CollectTestCoverageFiles(nsInfra, loggingOperatorName)
 		if err != nil {
 			return err
 		}

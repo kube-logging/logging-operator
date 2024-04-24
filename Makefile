@@ -86,7 +86,7 @@ docker-build-debug: ## Build the debug docker image
 
 .PHONY: docker-build-e2e-test
 docker-build-e2e-test: ## Build the coverage docker image
-	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover" -t ${IMG} .
+	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover -covermode=atomic" -t ${IMG} --target e2e-test .
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-drain-watch
@@ -197,10 +197,10 @@ test-e2e-nodeps:
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
-		KIND_CONFIG="$(PWD)/e2e/common/kind/config.yaml" \
-		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} -p 1 ./${E2E_TEST}/...
+		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
+		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
 	@echo "--- E2E test coverage report"
-	go tool covdata percent -i=${TEST_COV_DIR}
+	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

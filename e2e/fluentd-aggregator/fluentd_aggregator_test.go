@@ -210,8 +210,8 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 		}
 
 		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Shutting down logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.ShutdownLoggingOperator(ns, loggingOperatorName)
+		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
+		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
 		if err != nil {
 			return err
 		}

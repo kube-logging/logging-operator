@@ -96,11 +96,8 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		},
 		"volumes": []map[string]interface{}{
 			{
-				"name": "coverage-data",
-				"hostPath": map[string]string{
-					"path": "/covdatafiles",
-					"type": "Directory",
-				},
+				"name":     "coverage-data",
+				"emptyDir": map[string]string{},
 			},
 		},
 		"volumeMounts": []map[string]interface{}{

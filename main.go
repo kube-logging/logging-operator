@@ -21,7 +21,10 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
+	"os/signal"
+	"runtime/coverage"
 	"strings"
+	"syscall"
 
 	"emperror.dev/errors"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -217,12 +220,46 @@ func main() {
 	// +kubebuilder:scaffold:builder
 	setupLog.Info("starting manager")
 
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(setupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
 }
 
+// Extends sigs.k8s.io/controller-runtime@v0.17.2/pkg/manager/signals/signal.go with
+// SIGUSR1 handler for saving test coverage files
+var onlyOneSignalHandler = make(chan struct{})
+
+func setupSignalHandler() context.Context {
+	close(onlyOneSignalHandler) // panics when called twice
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-c
+		cancel()
+		<-c
+		os.Exit(1) // second signal. Exit directly.
+	}()
+
+	coverDir, exists := os.LookupEnv("GOCOVERDIR")
+	if !exists {
+		return ctx
+	}
+	coverChan := make(chan os.Signal, 1)
+	signal.Notify(coverChan, syscall.SIGUSR1)
+	go func() {
+		for {
+			<-coverChan
+			coverage.WriteCountersDir(coverDir)
+			coverage.ClearCounters()
+		}
+	}()
+
+	return ctx
+}
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 	var nodeList corev1.NodeList
 	if err := c.List(ctx, &nodeList, client.Limit(1)); err != nil {

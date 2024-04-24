@@ -37,6 +37,14 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go install github.com/go-del
 
 CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/usr/local/bin/manager"]
 
+
+FROM gcr.io/distroless/static:debug AS e2e-test
+
+COPY --from=builder /usr/local/bin/manager /manager
+
+ENTRYPOINT ["/manager"]
+
+
 FROM gcr.io/distroless/static:latest@sha256:7e5c6a2a4ae854242874d36171b31d26e0539c98fc6080f942f16b03e82851ab
 
 COPY --from=builder /usr/local/bin/manager /manager
