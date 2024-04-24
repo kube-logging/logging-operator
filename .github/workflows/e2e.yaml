@@ -31,6 +31,8 @@ jobs:
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/controller.tar
           target: e2e-test
+          build-args: |
+            GO_BUILD_FLAGS="-cover -covermode=atomic"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
