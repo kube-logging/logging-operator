@@ -54,6 +54,12 @@ Configure bulk_message request splitting threshold size. Default value is 20MB. 
 
 Default: 20MB
 
+### compression_level (string, optional) {#elasticsearch-compression_level}
+
+Option for adding gzip compression of output data. Valid options: default_compression, best_compression, best_speed, no_compression.
+
+Default: no_compression
+
 ### content_type (string, optional) {#elasticsearch-content_type}
 
 With content_type application/x-ndjson, elasticsearch plugin adds application/x-ndjson as Content-Profile in payload.

@@ -34,11 +34,13 @@ buffer:
   timekey: 1m
   timekey_wait: 30s
   timekey_use_utc: true
+compression_level: default_compression
 `)
 	expected := `
   <match **>
 	@type elasticsearch
 	@id test
+	compression_level default_compression
 	exception_backup true
 	fail_on_detecting_es_version_retry_exceed true
 	fail_on_putting_template_retry_exceed true
