@@ -253,8 +253,14 @@ func setupSignalHandler() context.Context {
 	go func() {
 		for {
 			<-coverChan
-			coverage.WriteCountersDir(coverDir)
-			coverage.ClearCounters()
+			if err := coverage.WriteCountersDir(coverDir); err != nil {
+				setupLog.Error(err, "Could not write coverage profile data files to the directory")
+				os.Exit(1)
+			}
+			if err := coverage.ClearCounters(); err != nil {
+				setupLog.Error(err, "Could not reset coverage counter variables")
+				os.Exit(1)
+			}
 		}
 	}()
 
