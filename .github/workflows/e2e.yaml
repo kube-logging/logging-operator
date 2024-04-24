@@ -30,6 +30,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/controller.tar
+          target: e2e-test
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
