@@ -36,7 +36,6 @@ license_key:
 		license_key 000000000000000000000000
 		<buffer tag,time>
 			@type file
-			chunk_limit_size 8MB
 			path /buffers/test.*.buffer
 			retry_forever true
 			timekey 10m

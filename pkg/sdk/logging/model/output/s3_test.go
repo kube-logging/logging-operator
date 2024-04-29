@@ -47,7 +47,6 @@ buffer:
     s3_region eu-central-1
     <buffer tag,time>
       @type file
-	  chunk_limit_size 8MB
       path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
