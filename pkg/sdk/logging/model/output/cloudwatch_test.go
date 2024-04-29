@@ -43,7 +43,6 @@ buffer:
     region us-east-1
     <buffer tag,time>
       @type file
-	  chunk_limit_size 8MB
       path /buffers/test_loki.*.buffer
       retry_forever true
       timekey 1m

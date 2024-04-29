@@ -31,7 +31,6 @@ region: us-east-2
 buffer:
   flush_thread_count: 8
   flush_interval: 5s
-  chunk_limit_size: 8M
   queue_limit_length: 512
   retry_max_interval: 30
   retry_forever: true
@@ -45,7 +44,6 @@ buffer:
     region us-east-2
     <buffer tag,time>
       @type file
-      chunk_limit_size 8M
       flush_interval 5s
       flush_thread_count 8
       path /buffers/test.*.buffer
