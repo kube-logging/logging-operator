@@ -5333,6 +5333,8 @@ spec:
                 - bucket
                 - endpoint
                 type: object
+              protected:
+                type: boolean
               redis:
                 properties:
                   allow_duplicate_key:
@@ -12334,6 +12336,8 @@ spec:
                 - bucket
                 - endpoint
                 type: object
+              protected:
+                type: boolean
               redis:
                 properties:
                   allow_duplicate_key:

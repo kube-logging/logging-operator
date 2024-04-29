@@ -49,7 +49,6 @@ buffer:
 	tags web,dev
 	<buffer tag,time>
 	  @type file
-	  chunk_limit_size 8MB
 	  path /buffers/test_logdna.*.buffer
 	  retry_forever true
 	  timekey 1m

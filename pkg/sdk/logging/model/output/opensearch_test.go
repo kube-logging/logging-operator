@@ -56,7 +56,6 @@ buffer:
   verify_os_version_at_startup true
   <buffer tag,time>
     @type file
-  chunk_limit_size 8MB
     path /buffers/test.*.buffer
     retry_forever true
     timekey 1m
@@ -116,7 +115,6 @@ buffer:
   </endpoint>
   <buffer tag,time>
     @type file
-  chunk_limit_size 8MB
     path /buffers/test.*.buffer
     retry_forever true
     timekey 1m
@@ -166,7 +164,6 @@ buffer:
     verify_os_version_at_startup true
     <buffer tag,time>
       @type file
-      chunk_limit_size 8MB
       path /buffers/test.*.buffer
       retry_forever true
       timekey 1m

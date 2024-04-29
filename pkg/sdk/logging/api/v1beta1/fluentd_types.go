@@ -84,6 +84,9 @@ type FluentdSpec struct {
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`
 	RootDir                   string                            `json:"rootDir,omitempty"`
+	// Set the logging format. Allowed values are: "text" (default) and "json".
+	// +kubebuilder:validation:enum=json,text
+	LogFormat string `json:"logFormat,omitempty"`
 	// +kubebuilder:validation:enum=fatal,error,warn,info,debug,trace
 	LogLevel string `json:"logLevel,omitempty"`
 	// Ignore same log lines

@@ -22,6 +22,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/common"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
@@ -269,6 +270,10 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 	var allOutputs []types.Output
 	for _, outputRef := range flow.Spec.GlobalOutputRefs {
 		if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
+			if clusterOutput.Spec.Protected {
+				errs = errors.Append(errs, errors.WrapIff(err, "referenced clusteroutput is protected %s", outputRef))
+				continue
+			}
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)
 			plugin, err := plugins.CreateOutput(clusterOutput.Spec.OutputSpec, outputID, secrets.OutputSecretLoaderForNamespace(clusterOutput.Namespace))
 			if err != nil {

@@ -27,8 +27,9 @@ import (
 )
 
 type fluentdConfig struct {
-	LogLevel string
-	Monitor  struct {
+	LogFormat string
+	LogLevel  string
+	Monitor   struct {
 		Enabled bool
 		Port    int32
 		Path    string
@@ -59,6 +60,7 @@ func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[
 		IgnoreRepeatedLogInterval: fluentdSpec.IgnoreRepeatedLogInterval,
 		EnableMsgpackTimeSupport:  fluentdSpec.EnableMsgpackTimeSupport,
 		Workers:                   fluentdSpec.Workers,
+		LogFormat:                 fluentdSpec.LogFormat,
 		LogLevel:                  fluentdSpec.LogLevel,
 	}
 

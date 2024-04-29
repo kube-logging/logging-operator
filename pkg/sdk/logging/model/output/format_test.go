@@ -43,7 +43,6 @@ buffer:
 	path /tmp/logs/${tag}/%Y/%m/%d.%H.%M
     <buffer tag,time>
       @type file
-	  chunk_limit_size 8MB
       path /buffers/test.*.buffer
       retry_forever true
       timekey 1m
