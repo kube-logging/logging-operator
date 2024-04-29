@@ -31,6 +31,9 @@ ClusterOutputSpec contains Kubernetes spec for ClusterOutput
 ### enabledNamespaces ([]string, optional) {#clusteroutputspec-enablednamespaces}
 
 
+### protected (bool, optional) {#clusteroutputspec-protected}
+
+
 
 ## ClusterOutputList
 
