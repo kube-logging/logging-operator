@@ -235,9 +235,10 @@ func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 		setupLog.Info("Detected container runtime", "runtime", runtime)
 
 		types.ContainerRuntime = runtime
+	} else {
+		setupLog.Info("Unable to detect container runtime, keeping default value", "runtime", types.ContainerRuntime)
 	}
 
-	setupLog.Info("Unable to detect container runtime, keeping default value", "runtime", types.ContainerRuntime)
 	return nil
 }
 
