@@ -41,6 +41,12 @@ For details on the available options of the output, see the [documentation of th
 ###  (HTTPOutput, required) {#openobserveoutput-}
 
 
+### disk_buffer (*DiskBuffer, optional) {#openobserveoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
 ### organization (string, optional) {#openobserveoutput-organization}
 
 Name of the organization in OpenObserve. 

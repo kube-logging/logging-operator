@@ -105,4 +105,6 @@ type S3Output struct {
 	Retries int `json:"retries,omitempty"`
 	//  Sets the maximum number of messages sent to the destination per second. Use this output-rate-limiting functionality only when using disk-buffer as well to avoid the risk of losing messages. Specifying 0 or a lower value sets the output limit to unlimited. (default: 0)
 	Throttle int `json:"throttle,omitempty"`
+	// This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/). (default: false)
+	DiskBuffer *DiskBuffer `json:"disk_buffer,omitempty"`
 }
