@@ -74,9 +74,9 @@ type S3Output struct {
 	// The object_key for the S3 server.
 	ObjectKey string `json:"object_key,omitempty"`
 	// Set object_key_timestamp
-	ObjectKeyTimestamp RawString `json:"object_key_timestamp,omitempty"`
+	ObjectKeyTimestamp string `json:"object_key_timestamp,omitempty"`
 	// Template
-	Template RawString `json:"template,omitempty"`
+	Template string `json:"template,omitempty"`
 	// Enable or disable compression. (default: false)
 	Compression *bool `json:"compression,omitempty"`
 	// Set the compression level (1-9). (default: 9)
