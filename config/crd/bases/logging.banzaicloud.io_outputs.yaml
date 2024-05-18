@@ -2202,6 +2202,8 @@ spec:
                     type: array
                   slow_flush_log_threshold:
                     type: string
+                  time_as_integer:
+                    type: boolean
                   tls_allow_self_signed_cert:
                     type: boolean
                   tls_cert_logical_store_name:
@@ -8693,6 +8695,8 @@ spec:
                     type: array
                   slow_flush_log_threshold:
                     type: string
+                  time_as_integer:
+                    type: boolean
                   tls_allow_self_signed_cert:
                     type: boolean
                   tls_cert_logical_store_name:
