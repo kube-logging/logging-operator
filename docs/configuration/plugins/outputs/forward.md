@@ -111,6 +111,11 @@ Default: 60
 The threshold for chunk flush performance check. Parameter type is float, not time, default: 20.0 (seconds) If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count. 
 
 
+### time_as_integer (bool, optional) {#forwardoutput-time_as_integer}
+
+Format forwarded events time as an epoch Integer with second resolution. Useful when forwarding to old ( <= 0.12 ) Fluentd servers. 
+
+
 ### tls_allow_self_signed_cert (bool, optional) {#forwardoutput-tls_allow_self_signed_cert}
 
 Allow self signed certificates or not.
