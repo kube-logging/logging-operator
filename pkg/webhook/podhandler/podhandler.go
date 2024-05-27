@@ -22,19 +22,20 @@ import (
 	"path/filepath"
 
 	"github.com/go-logr/logr"
+	"github.com/siliconbrain/go-seqs/seqs"
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/annotation"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	"github.com/siliconbrain/go-seqs/seqs"
-	corev1 "k8s.io/api/core/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 // PodHandler .
 type PodHandler struct {
-	Decoder *admission.Decoder
+	Decoder admission.Decoder
 	Log     logr.Logger
 }
 

@@ -2691,24 +2691,16 @@ func (in *ServiceMonitorConfig) DeepCopyInto(out *ServiceMonitorConfig) {
 	}
 	if in.Relabelings != nil {
 		in, out := &in.Relabelings, &out.Relabelings
-		*out = make([]*monitoringv1.RelabelConfig, len(*in))
+		*out = make([]monitoringv1.RelabelConfig, len(*in))
 		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(monitoringv1.RelabelConfig)
-				(*in).DeepCopyInto(*out)
-			}
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.MetricsRelabelings != nil {
 		in, out := &in.MetricsRelabelings, &out.MetricsRelabelings
-		*out = make([]*monitoringv1.RelabelConfig, len(*in))
+		*out = make([]monitoringv1.RelabelConfig, len(*in))
 		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(monitoringv1.RelabelConfig)
-				(*in).DeepCopyInto(*out)
-			}
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.TLSConfig != nil {
