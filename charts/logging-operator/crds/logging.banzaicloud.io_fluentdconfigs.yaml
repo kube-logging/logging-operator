@@ -856,6 +856,17 @@ spec:
                 type: object
               compressConfigFile:
                 type: boolean
+              configCheck:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  strategy:
+                    type: string
+                  timeoutSeconds:
+                    type: integer
+                type: object
               configCheckAnnotations:
                 additionalProperties:
                   type: string

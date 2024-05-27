@@ -58,7 +58,9 @@ type SyslogNGSpec struct {
 	// Available in Logging operator version 4.5 and later.
 	// Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}).
 	SourceMetrics []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
-	// TODO: option to turn on/off buffer volume PVC
+	// Overrides the default logging level configCheck setup
+	// This field is not used directly, just copied over the field in the logging resource if defined
+	ConfigCheck *ConfigCheck `json:"configCheck,omitempty"`
 }
 
 //

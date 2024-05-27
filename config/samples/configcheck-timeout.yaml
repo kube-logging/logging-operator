@@ -3,10 +3,9 @@ kind: Logging
 metadata:
   name: all-to-file
 spec:
-  configCheck:
-    strategy: StartWithTimeout
-    timeoutSeconds: 5
-  fluentd: {}
+  fluentd:
+    configCheck:
+      strategy: StartWithTimeout
   controlNamespace: default
 ---
 apiVersion: logging.banzaicloud.io/v1beta1

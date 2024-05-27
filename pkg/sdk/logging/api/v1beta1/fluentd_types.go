@@ -113,6 +113,9 @@ type FluentdSpec struct {
 	// Available in Logging operator version 4.5 and later.
 	// Configure sidecar container in Fluentd pods, for example: [https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml](https://github.com/kube-logging/logging-operator/config/samples/logging_logging_fluentd_sidecars.yaml).
 	SidecarContainers []corev1.Container `json:"sidecarContainers,omitempty"`
+	// Overrides the default logging level configCheck setup
+	// This field is not used directly, just copied over the field in the logging resource if defined
+	ConfigCheck *ConfigCheck `json:"configCheck,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

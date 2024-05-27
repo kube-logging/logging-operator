@@ -47,7 +47,8 @@ type LoggingSpec struct {
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
-	// ConfigCheck settings that apply to both fluentd and syslog-ng
+	// ConfigCheck settings that apply to both fluentd or syslog-ng
+	// Can be overridden on the fluentd / syslog-ng level
 	ConfigCheck ConfigCheck `json:"configCheck,omitempty"`
 	// FluentbitAgent daemonset configuration.
 	// Deprecated, will be removed with next major version
@@ -198,14 +199,25 @@ func (l *Logging) SetDefaults() error {
 			return err
 		}
 	}
-	if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
-		l.Spec.ConfigCheck.TimeoutSeconds = 10
-	}
+	l.configCheckDefaults()
 	if len(l.Status.SyslogNGConfigName) == 0 {
 		l.Spec.SyslogNGSpec.SetDefaults()
 	}
 
 	return nil
+}
+
+func (l *Logging) AggregatorLevelConfigCheck(check *ConfigCheck) {
+	if check != nil {
+		l.Spec.ConfigCheck = *check
+		l.configCheckDefaults()
+	}
+}
+
+func (l *Logging) configCheckDefaults() {
+	if l.Spec.ConfigCheck.TimeoutSeconds == 0 {
+		l.Spec.ConfigCheck.TimeoutSeconds = 10
+	}
 }
 
 func (logging *Logging) WatchAllNamespaces() bool {
