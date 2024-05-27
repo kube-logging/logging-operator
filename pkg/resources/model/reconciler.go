@@ -142,7 +142,7 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
+				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil && !output.Spec.Protected {
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
 				} else {

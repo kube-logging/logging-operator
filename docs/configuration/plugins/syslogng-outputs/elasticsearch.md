@@ -41,6 +41,12 @@ spec:
 The document ID. If no ID is specified, a document ID is automatically generated. 
 
 
+### disk_buffer (*DiskBuffer, optional) {#elasticsearchoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
 ### index (string, optional) {#elasticsearchoutput-index}
 
 Name of the data stream, index, or index alias to perform the action on. 

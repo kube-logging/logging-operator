@@ -23,28 +23,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestS3(t *testing.T) {
+func TestForward(t *testing.T) {
 	CONFIG := []byte(`
-assume_role_credentials:
-  role_arn: arn:aws:iam::123456789012:role/logs
-s3_bucket: logging-amazon-s3
-s3_region: eu-central-1
-path: logs/${tag}/%Y/%m/%d/
-compress:
-  parquet_compression_codec: snappy
-buffer:
-  timekey: 1m
-  timekey_wait: 30s
-  timekey_use_utc: true
+  servers: 
+    - host: 192.168.1.3
+      name: myserver1
+      port: 24224
+      weight: 60
+    - host: 192.168.1.4
+      name: myserver2
+      port: 24223
+      weight: 40
+  buffer:
+    timekey: 1m
+    timekey_wait: 30s
+    timekey_use_utc: true
+  keepalive: true
+  keepalive_timeout: 20
+  time_as_integer: true
+  send_timeout: 60
 `)
 	expected := `
   <match **>
-    @type s3
+    @type forward
     @id test
-    path logs/${tag}/%Y/%m/%d/
-    s3_bucket logging-amazon-s3
-    s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
-    s3_region eu-central-1
+    keepalive true
+    keepalive_timeout 20
+    send_timeout 60
+    time_as_integer true
     <buffer tag,time>
       @type file
       path /buffers/test.*.buffer
@@ -53,17 +59,22 @@ buffer:
       timekey_use_utc true
       timekey_wait 30s
     </buffer>
-	<compress>
-	  parquet_compression_codec snappy
-	</compress>
-    <assume_role_credentials>
-      role_arn arn:aws:iam::123456789012:role/logs
-      role_session_name
-    </assume_role_credentials>
+    <server>
+      host 192.168.1.3
+      name myserver1
+      port 24224
+      weight 60
+    </server>
+    <server>
+      host 192.168.1.4
+      name myserver2
+      port 24223
+      weight 40
+    </server>
   </match>
 `
-	s3 := &output.S3OutputConfig{}
-	require.NoError(t, yaml.Unmarshal(CONFIG, s3))
-	test := render.NewOutputPluginTest(t, s3)
+	g := &output.ForwardOutput{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, g))
+	test := render.NewOutputPluginTest(t, g)
 	test.DiffResult(expected)
 }

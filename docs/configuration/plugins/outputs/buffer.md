@@ -18,9 +18,8 @@ The max number of events that each chunks can store in it
 
 ### chunk_limit_size (string, optional) {#buffer-chunk_limit_size}
 
-The max size of each chunks: events will be written into chunks until the size of chunks become this size (default: 8MB) 
+The max size of each chunks: events will be written into chunks until the size of chunks become this size 
 
-Default: 8MB
 
 ### compress (string, optional) {#buffer-compress}
 

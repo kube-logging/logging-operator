@@ -55,7 +55,6 @@ buffer:
   <buffer tag,time>
 	@type file
 	chunk_limit_records 300
-	chunk_limit_size 8MB
 	flush_interval 3s
 	path /buffers/test.*.buffer
 	retry_forever true
@@ -100,7 +99,6 @@ buffer:
   <buffer tag,time>
 	@type file
 	chunk_limit_records 300
-	chunk_limit_size 8MB
 	flush_interval 3s
 	path /buffers/test.*.buffer
 	retry_forever true
@@ -147,7 +145,6 @@ format:
   <buffer tag,time>
 	@type file
 	chunk_limit_records 300
-	chunk_limit_size 8MB
 	flush_interval 3s
 	path /buffers/test.*.buffer
 	retry_forever true
