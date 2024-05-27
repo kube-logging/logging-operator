@@ -11,16 +11,16 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/zapr v1.3.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.32.0
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.73.0
+	github.com/onsi/gomega v1.33.1
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.74.0
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/net v0.24.0
-	k8s.io/api v0.29.3
-	k8s.io/apimachinery v0.29.3
-	k8s.io/client-go v0.29.3
-	sigs.k8s.io/controller-runtime v0.17.3
+	golang.org/x/net v0.25.0
+	k8s.io/api v0.29.5
+	k8s.io/apimachinery v0.29.5
+	k8s.io/client-go v0.29.5
+	sigs.k8s.io/controller-runtime v0.18.3
 )
 
 require (

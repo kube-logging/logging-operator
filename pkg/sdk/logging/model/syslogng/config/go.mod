@@ -6,12 +6,12 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/cisco-open/operator-tools v0.34.0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
-	github.com/siliconbrain/go-seqs v0.10.0
+	github.com/siliconbrain/go-seqs v0.12.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-	k8s.io/api v0.29.3
-	k8s.io/apimachinery v0.29.3
-	sigs.k8s.io/controller-runtime v0.17.3
+	golang.org/x/exp 4c93da0ed11d
+	k8s.io/api v0.29.5
+	k8s.io/apimachinery v0.29.5
+	sigs.k8s.io/controller-runtime v0.18.3
 )
 
 require (
