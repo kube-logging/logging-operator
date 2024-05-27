@@ -21,7 +21,7 @@ Default: "cluster.local."
 
 ### configCheck (ConfigCheck, optional) {#loggingspec-configcheck}
 
-ConfigCheck settings that apply to both fluentd or syslog-ng Can be overridden on the fluentd / syslog-ng level 
+ConfigCheck settings that apply to both fluentd or syslog-ng. Can be overridden on the fluentd / syslog-ng level. 
 
 
 ### controlNamespace (string, required) {#loggingspec-controlnamespace}

@@ -47,8 +47,8 @@ type LoggingSpec struct {
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`
 	// Override generated config. This is a *raw* configuration string for troubleshooting purposes.
 	FlowConfigOverride string `json:"flowConfigOverride,omitempty"`
-	// ConfigCheck settings that apply to both fluentd or syslog-ng
-	// Can be overridden on the fluentd / syslog-ng level
+	// ConfigCheck settings that apply to both fluentd or syslog-ng.
+	// Can be overridden on the fluentd / syslog-ng level.
 	ConfigCheck ConfigCheck `json:"configCheck,omitempty"`
 	// FluentbitAgent daemonset configuration.
 	// Deprecated, will be removed with next major version

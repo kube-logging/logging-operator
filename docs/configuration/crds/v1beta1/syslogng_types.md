@@ -16,7 +16,7 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 ### configCheck (*ConfigCheck, optional) {#syslogngspec-configcheck}
 
-Overrides the default logging level configCheck setup This field is not used directly, just copied over the field in the logging resource if defined 
+Overrides the default logging level configCheck setup. This field is not used directly, just copied over the field in the logging resource if defined. 
 
 
 ### configCheckPod (*typeoverride.PodSpec, optional) {#syslogngspec-configcheckpod}
