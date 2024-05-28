@@ -8,7 +8,7 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: '1.21'
+  GO_VERSION: '1.22'
   KUBECTL_VERSION: 'v1.24.1'
 
 jobs:
@@ -96,7 +96,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kube: ["1.22", "1.23", "1.24", "1.25", "1.26", "1.27"]
+        kube: ["1.25", "1.26", "1.27", "1.28", "1.29", "1.30"]
 
     steps:
       - name: Set up Docker Buildx
@@ -126,18 +126,18 @@ jobs:
         id: node_image
         run: |
           case ${{ matrix.kube }} in
-            1.22)
-              NODE_IMAGE=kindest/node:v1.22.17@sha256:f5b2e5698c6c9d6d0adc419c0deae21a425c07d81bbf3b6a6834042f25d4fba2 ;;
-            1.23)
-              NODE_IMAGE=kindest/node:v1.23.17@sha256:59c989ff8a517a93127d4a536e7014d28e235fb3529d9fba91b3951d461edfdb ;;
-            1.24)
-              NODE_IMAGE=kindest/node:v1.24.15@sha256:7db4f8bea3e14b82d12e044e25e34bd53754b7f2b0e9d56df21774e6f66a70ab ;;
             1.25)
               NODE_IMAGE=kindest/node:v1.25.11@sha256:227fa11ce74ea76a0474eeefb84cb75d8dad1b08638371ecf0e86259b35be0c8 ;;
             1.26)
               NODE_IMAGE=kindest/node:v1.26.6@sha256:6e2d8b28a5b601defe327b98bd1c2d1930b49e5d8c512e1895099e4504007adb ;;
             1.27)
               NODE_IMAGE=kindest/node:v1.27.3@sha256:3966ac761ae0136263ffdb6cfd4db23ef8a83cba8a463690e98317add2c9ba72 ;;
+            1.28)
+              NODE_IMAGE=kindest/node:v1.28.9@sha256:9ba4d311e7861d27b210e5960e5ce921a7c53d3c67e0545fd8a1cb9a76dfa2cb ;;
+            1.29)
+              NODE_IMAGE=kindest/node:v1.29.4@sha256:ea40a6bd365a17f71fd3883a1d34a0791d7d6b0eb75832c6d85b6f2326827f1e ;;
+            1.30)
+              NODE_IMAGE=kindest/node:v1.30.0@sha256:2af5d1b382926abcd6336312d652cd045b7cc47475844a608669c71b1fefcfbc ;;
             esac
 
             echo "image=$NODE_IMAGE" >> $GITHUB_OUTPUT

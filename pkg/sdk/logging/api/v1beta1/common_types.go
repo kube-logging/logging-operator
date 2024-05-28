@@ -72,12 +72,12 @@ type BufferMetrics struct {
 
 // ServiceMonitorConfig defines the ServiceMonitor properties
 type ServiceMonitorConfig struct {
-	AdditionalLabels   map[string]string   `json:"additionalLabels,omitempty"`
-	HonorLabels        bool                `json:"honorLabels,omitempty"`
-	Relabelings        []*v1.RelabelConfig `json:"relabelings,omitempty"`
-	MetricsRelabelings []*v1.RelabelConfig `json:"metricRelabelings,omitempty"`
-	Scheme             string              `json:"scheme,omitempty"`
-	TLSConfig          *v1.TLSConfig       `json:"tlsConfig,omitempty"`
+	AdditionalLabels   map[string]string  `json:"additionalLabels,omitempty"`
+	HonorLabels        bool               `json:"honorLabels,omitempty"`
+	Relabelings        []v1.RelabelConfig `json:"relabelings,omitempty"`
+	MetricsRelabelings []v1.RelabelConfig `json:"metricRelabelings,omitempty"`
+	Scheme             string             `json:"scheme,omitempty"`
+	TLSConfig          *v1.TLSConfig      `json:"tlsConfig,omitempty"`
 }
 
 // Security defines Fluentd, FluentbitAgent deployment security properties
