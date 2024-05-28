@@ -61,12 +61,10 @@ func (l LoggingResources) getSyslogNG() *v1beta1.SyslogNGConfig {
 }
 
 func (l LoggingResources) GetSyslogNGSpec() (*v1beta1.SyslogNGConfig, *v1beta1.SyslogNGSpec) {
-
 	if detachedSyslogNG := l.getSyslogNG(); detachedSyslogNG != nil {
 		return detachedSyslogNG, &detachedSyslogNG.Spec
 	}
 	return nil, l.Logging.Spec.SyslogNGSpec
-
 }
 
 type SyslogNGLoggingResources struct {

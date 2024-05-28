@@ -55,6 +55,12 @@ Fallback option for source field.
 Fallback option for sourcetype field. 
 
 
+### disk_buffer (*DiskBuffer, optional) {#splunkhecoutput-disk_buffer}
+
+This option enables putting outgoing messages into the disk buffer of the destination to avoid message loss in case of a system failure on the destination side. For details, see the [Syslog-ng DiskBuffer options](../disk_buffer/).
+
+Default: false
+
 ### event (string, optional) {#splunkhecoutput-event}
 
 event() accepts a template, which declares the content of the log message sent to Splunk. Default value: `${MSG}` 

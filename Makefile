@@ -15,7 +15,7 @@ IMG ?= controller:local
 IMG_DEBUG ?= controller:debug
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false,maxDescLen=0"
+CRD_OPTIONS ?= crd:maxDescLen=0
 
 DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
 DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
@@ -26,10 +26,10 @@ E2E_TEST_TIMEOUT ?= 20m
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION := v0.6.0
+CONTROLLER_GEN_VERSION := v0.15.0
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
-ENVTEST_K8S_VERSION := 1.24.1
+ENVTEST_K8S_VERSION := 1.27.1
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
@@ -109,9 +109,9 @@ fmt: ## Run go fmt against code
 
 .PHONY: codegen
 codegen: ${CONTROLLER_GEN} tidy ## Generate code
-	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/api/...
-	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/model/...
-	cd pkg/sdk && $(CONTROLLER_GEN) object:headerFile=./../../hack/boilerplate.go.txt paths=./extensions/api/...
+	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) output:crd:artifacts:config=../../config/crd/bases object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/api/...
+	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) output:crd:artifacts:config=../../config/crd/bases object:headerFile=./../../hack/boilerplate.go.txt paths=./logging/model/...
+	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) output:crd:artifacts:config=../../config/crd/bases object:headerFile=./../../hack/boilerplate.go.txt paths=./extensions/api/...
 
 .PHONY: install
 install: manifests ## Install CRDs into the cluster in ~/.kube/config
@@ -146,7 +146,7 @@ manager: codegen fmt vet ## Build manager binary
 
 .PHONY: manifests
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
-	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS) webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
+	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS)  webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./controllers/..." output:rbac:artifacts:config=./config/rbac
 	cp config/crd/bases/* charts/logging-operator/crds/
 	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml

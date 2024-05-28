@@ -11,6 +11,11 @@ generated_file: true
 ## Configuration
 ## Output Config
 
+### buffer (*Buffer, optional) {#output config-buffer}
+
+Available since ghcr.io/kube-logging/fluentd:v1.16-full-build.139 [Buffer](../buffer/) 
+
+
 ### host (string, required) {#output config-host}
 
 Destination host 

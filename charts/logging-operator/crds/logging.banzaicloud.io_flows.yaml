@@ -1,11 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: flows.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
@@ -149,12 +147,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -165,12 +165,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         cache_refresh:
@@ -190,12 +192,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -206,12 +210,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         client_key:
@@ -223,12 +229,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -239,12 +247,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         core_api_versions:
@@ -404,12 +414,14 @@ spec:
                                         key:
                                           type: string
                                         name:
+                                          default: ""
                                           type: string
                                         optional:
                                           type: boolean
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 value:
                                   type: string
@@ -420,12 +432,14 @@ spec:
                                         key:
                                           type: string
                                         name:
+                                          default: ""
                                           type: string
                                         optional:
                                           type: boolean
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                               type: object
                             delimiter:
@@ -495,12 +509,14 @@ spec:
                                               key:
                                                 type: string
                                               name:
+                                                default: ""
                                                 type: string
                                               optional:
                                                 type: boolean
                                             required:
                                             - key
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                         type: object
                                       value:
                                         type: string
@@ -511,12 +527,14 @@ spec:
                                               key:
                                                 type: string
                                               name:
+                                                default: ""
                                                 type: string
                                               optional:
                                                 type: boolean
                                             required:
                                             - key
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                         type: object
                                     type: object
                                   estimate_current_event:
@@ -603,12 +621,14 @@ spec:
                                           key:
                                             type: string
                                           name:
+                                            default: ""
                                             type: string
                                           optional:
                                             type: boolean
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   value:
                                     type: string
@@ -619,12 +639,14 @@ spec:
                                           key:
                                             type: string
                                           name:
+                                            default: ""
                                             type: string
                                           optional:
                                             type: boolean
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                 type: object
                               delimiter:
@@ -694,12 +716,14 @@ spec:
                                                 key:
                                                   type: string
                                                 name:
+                                                  default: ""
                                                   type: string
                                                 optional:
                                                   type: boolean
                                               required:
                                               - key
                                               type: object
+                                              x-kubernetes-map-type: atomic
                                           type: object
                                         value:
                                           type: string
@@ -710,12 +734,14 @@ spec:
                                                 key:
                                                   type: string
                                                 name:
+                                                  default: ""
                                                   type: string
                                                 optional:
                                                   type: boolean
                                               required:
                                               - key
                                               type: object
+                                              x-kubernetes-map-type: atomic
                                           type: object
                                       type: object
                                     estimate_current_event:
@@ -1183,12 +1209,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -1199,12 +1227,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         cache_refresh:
@@ -1224,12 +1254,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -1240,12 +1272,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         client_key:
@@ -1257,12 +1291,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             value:
                               type: string
@@ -1273,12 +1309,14 @@ spec:
                                     key:
                                       type: string
                                     name:
+                                      default: ""
                                       type: string
                                     optional:
                                       type: boolean
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           type: object
                         core_api_versions:
@@ -1438,12 +1476,14 @@ spec:
                                         key:
                                           type: string
                                         name:
+                                          default: ""
                                           type: string
                                         optional:
                                           type: boolean
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 value:
                                   type: string
@@ -1454,12 +1494,14 @@ spec:
                                         key:
                                           type: string
                                         name:
+                                          default: ""
                                           type: string
                                         optional:
                                           type: boolean
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                               type: object
                             delimiter:
@@ -1529,12 +1571,14 @@ spec:
                                               key:
                                                 type: string
                                               name:
+                                                default: ""
                                                 type: string
                                               optional:
                                                 type: boolean
                                             required:
                                             - key
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                         type: object
                                       value:
                                         type: string
@@ -1545,12 +1589,14 @@ spec:
                                               key:
                                                 type: string
                                               name:
+                                                default: ""
                                                 type: string
                                               optional:
                                                 type: boolean
                                             required:
                                             - key
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                         type: object
                                     type: object
                                   estimate_current_event:
@@ -1637,12 +1683,14 @@ spec:
                                           key:
                                             type: string
                                           name:
+                                            default: ""
                                             type: string
                                           optional:
                                             type: boolean
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   value:
                                     type: string
@@ -1653,12 +1701,14 @@ spec:
                                           key:
                                             type: string
                                           name:
+                                            default: ""
                                             type: string
                                           optional:
                                             type: boolean
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                 type: object
                               delimiter:
@@ -1728,12 +1778,14 @@ spec:
                                                 key:
                                                   type: string
                                                 name:
+                                                  default: ""
                                                   type: string
                                                 optional:
                                                   type: boolean
                                               required:
                                               - key
                                               type: object
+                                              x-kubernetes-map-type: atomic
                                           type: object
                                         value:
                                           type: string
@@ -1744,12 +1796,14 @@ spec:
                                                 key:
                                                   type: string
                                                 name:
+                                                  default: ""
                                                   type: string
                                                 optional:
                                                   type: boolean
                                               required:
                                               - key
                                               type: object
+                                              x-kubernetes-map-type: atomic
                                           type: object
                                       type: object
                                     estimate_current_event:
@@ -2086,9 +2140,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

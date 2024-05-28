@@ -86,7 +86,6 @@ shorten_keys:
 	ssl_verify false
 	<buffer tag,time>
       @type file
-      chunk_limit_size 8MB
       path /buffers/test.*.buffer
       retry_forever true
       timekey 10m

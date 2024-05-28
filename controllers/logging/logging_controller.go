@@ -185,6 +185,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	fluentdExternal, fluentdSpec := loggingResources.GetFluentd()
 	if fluentdSpec != nil {
+		logging.AggregatorLevelConfigCheck(fluentdSpec.ConfigCheck)
 		fluentdConfig, secretList, err := r.clusterConfigurationFluentd(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Fluentd reconciler
@@ -203,6 +204,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	syslogNGExternal, syslogNGSpec := loggingResources.GetSyslogNGSpec()
 	if syslogNGSpec != nil {
+		logging.AggregatorLevelConfigCheck(syslogNGSPec.ConfigCheck)
 		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler

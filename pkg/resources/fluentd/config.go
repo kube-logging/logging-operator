@@ -33,6 +33,9 @@ var fluentdInputTemplate = `
 # Enable RPC endpoint (this allows to trigger config reload without restart)
 <system>
   rpc_endpoint 127.0.0.1:24444
+  {{- if .LogFormat }}
+  format {{ .LogFormat }}
+  {{- end }}
   log_level {{ .LogLevel }}
   workers {{ .Workers }}
 {{- if .RootDir }}
