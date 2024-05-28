@@ -185,6 +185,9 @@ var fluentbitNetworkTemplate = `
     {{- if .Network.SourceAddress }}
     net.source_address {{ .Network.SourceAddress }}
     {{- end }}
+    {{- if .Network.MaxWorkerConnections }}
+    net.max_worker_connections {{ .Network.MaxWorkerConnections }}
+    {{- end }}
     {{- end }}
 `
 

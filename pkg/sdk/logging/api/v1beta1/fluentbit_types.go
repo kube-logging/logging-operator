@@ -175,6 +175,8 @@ type FluentbitNetwork struct {
 	KeepaliveMaxRecycle *uint32 `json:"keepaliveMaxRecycle,omitempty"`
 	// Specify network address (interface) to use for connection and data traffic. (default: disabled)
 	SourceAddress string `json:"sourceAddress,omitempty"`
+	// Set maximum number of TCP connections that can be established per worker. (default: 0, unlimited)
+	MaxWorkerConnections int `json:"maxWorkerConnections,omitempty"`
 }
 
 // GetPrometheusPortFromAnnotation gets the port value from annotation

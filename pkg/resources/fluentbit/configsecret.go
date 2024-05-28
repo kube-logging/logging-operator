@@ -125,6 +125,7 @@ type FluentbitNetwork struct {
 	KeepaliveMaxRecycleSet    bool
 	KeepaliveMaxRecycle       uint32
 	SourceAddress             string
+	MaxWorkerConnections      int
 }
 
 // https://docs.fluentbit.io/manual/pipeline/outputs/tcp-and-tls
@@ -186,6 +187,10 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 
 	if network.SourceAddress != "" {
 		result.SourceAddress = network.SourceAddress
+	}
+
+	if network.MaxWorkerConnections != 0 {
+		result.MaxWorkerConnections = network.MaxWorkerConnections
 	}
 	return
 }
