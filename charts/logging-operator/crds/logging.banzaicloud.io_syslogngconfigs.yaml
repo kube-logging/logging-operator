@@ -335,6 +335,17 @@ spec:
                         type: string
                     type: object
                 type: object
+              configCheck:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  strategy:
+                    type: string
+                  timeoutSeconds:
+                    type: integer
+                type: object
               configCheckPod:
                 properties:
                   activeDeadlineSeconds:

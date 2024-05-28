@@ -3,11 +3,21 @@ kind: Logging
 metadata:
   name: all-to-file
 spec:
+# Default configcheck settings can be defined on the logging level
   configCheck:
     strategy: StartWithTimeout
     timeoutSeconds: 5
-  fluentd: {}
   controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentdConfig
+metadata:
+  name: all-to-file
+spec:
+# overrides default settings in logging resource
+  configCheck:
+    strategy: StartWithTimeout
+    timeoutSeconds: 3
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
