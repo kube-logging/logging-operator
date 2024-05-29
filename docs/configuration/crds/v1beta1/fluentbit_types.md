@@ -313,6 +313,12 @@ How many times a TCP keepalive connection can be used before being recycled
 
 Default: 0, disabled
 
+### maxWorkerConnections (int, optional) {#fluentbitnetwork-maxworkerconnections}
+
+Set maximum number of TCP connections that can be established per worker.
+
+Default: 0, unlimited
+
 ### sourceAddress (string, optional) {#fluentbitnetwork-sourceaddress}
 
 Specify network address (interface) to use for connection and data traffic.
