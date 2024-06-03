@@ -4335,6 +4335,8 @@ spec:
                       keepaliveMaxRecycle:
                         format: int32
                         type: integer
+                      maxWorkerConnections:
+                        type: integer
                       sourceAddress:
                         type: string
                     type: object

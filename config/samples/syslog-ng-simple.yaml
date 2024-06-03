@@ -5,6 +5,10 @@ metadata:
 spec:
   controlNamespace: default
   fluentbit: {}
+#    network:
+#      maxWorkerConnections: 2
+#    syslogng_output:
+#      Workers: 5
   syslogNG:
     globalOptions:
       log_level: trace
