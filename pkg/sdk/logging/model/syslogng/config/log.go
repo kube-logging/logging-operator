@@ -34,11 +34,11 @@ const (
 )
 
 type destination struct {
-	logging          string
+	Logging          string
 	renderedDestName string
 	Namespace        string
 	Name             string
-	scope            refScope
+	Scope            refScope
 	metricsProbes    []filter.MetricsProbe
 }
 
@@ -72,10 +72,23 @@ func destinationLogPath(dest destination) render.Renderer {
 		if m.Labels == nil {
 			m.Labels = make(filter.ArrowMap)
 		}
-		m.Labels["output_name"] = dest.Name
-		m.Labels["output_namespace"] = dest.Namespace
-		m.Labels["output_scope"] = string(dest.scope)
-		m.Labels["logging"] = dest.logging
+		if v, ok := m.Labels["destination"]; !ok || v != "" {
+			// syslog-ng terminology for output
+			m.Labels["destination"] = dest.Name
+		}
+		if v, ok := m.Labels["output_name"]; !ok || v != "" {
+			// logging-operator terminology for output
+			m.Labels["output_name"] = dest.Name
+		}
+		if v, ok := m.Labels["output_namespace"]; !ok || v != "" {
+			m.Labels["output_namespace"] = dest.Namespace
+		}
+		if v, ok := m.Labels["output_scope"]; !ok || v != "" {
+			m.Labels["output_scope"] = string(dest.Scope)
+		}
+		if v, ok := m.Labels["logging"]; !ok || v != "" {
+			m.Labels["logging"] = dest.Logging
+		}
 		metricsProbesRenderer = append(metricsProbesRenderer, renderDriver(Field{
 			Value: reflect.ValueOf(m),
 		}, nil))

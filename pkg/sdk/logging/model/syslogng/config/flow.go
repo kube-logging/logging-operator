@@ -62,11 +62,11 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 			)),
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 				return destination{
-					logging:          logging,
+					Logging:          logging,
 					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
 					Namespace:        clusterOutputRefs[ref].Namespace,
 					Name:             ref,
-					scope:            Global,
+					Scope:            Global,
 					metricsProbes:    f.Spec.OutputMetrics,
 				}
 			})),
@@ -103,21 +103,21 @@ func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedNam
 			seqs.ToSlice(seqs.Concat(
 				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 					return destination{
-						logging:          logging,
+						Logging:          logging,
 						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
 						Namespace:        clusterOutputRefs[ref].Namespace,
 						Name:             ref,
-						scope:            Global,
+						Scope:            Global,
 						metricsProbes:    f.Spec.OutputMetrics,
 					}
 				}),
 				seqs.Map(seqs.FromSlice(f.Spec.LocalOutputRefs), func(ref string) destination {
 					return destination{
-						logging:          logging,
+						Logging:          logging,
 						renderedDestName: outputDestName(f.Namespace, ref),
 						Namespace:        f.Namespace,
 						Name:             ref,
-						scope:            Local,
+						Scope:            Local,
 						metricsProbes:    f.Spec.OutputMetrics,
 					}
 				}),
