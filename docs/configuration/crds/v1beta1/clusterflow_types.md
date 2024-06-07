@@ -43,6 +43,9 @@ Name of the logging cluster to be attached
 ### labels (map[string]string, optional) {#clusterselect-labels}
 
 
+### namespace_labels (map[string]string, optional) {#clusterselect-namespace_labels}
+
+
 ### namespaces ([]string, optional) {#clusterselect-namespaces}
 
 
@@ -56,6 +59,9 @@ Name of the logging cluster to be attached
 
 
 ### labels (map[string]string, optional) {#clusterexclude-labels}
+
+
+### namespace_labels (map[string]string, optional) {#clusterexclude-namespace_labels}
 
 
 ### namespaces ([]string, optional) {#clusterexclude-namespaces}
