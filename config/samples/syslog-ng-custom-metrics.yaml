@@ -19,6 +19,7 @@ spec:
   outputMetrics:
     - key: custom_output
       labels:
+        destination: "{{.Destination.Name}}"
         flow: all1
   localOutputRefs:
     - http
@@ -34,6 +35,7 @@ spec:
   outputMetrics:
     - key: custom_output
       labels:
+        destination: "{{.Destination.Name}}"
         flow: all2
   globalOutputRefs:
     - http2

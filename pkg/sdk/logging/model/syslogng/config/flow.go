@@ -64,8 +64,8 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 				return destination{
 					logging:          logging,
 					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-					namespace:        clusterOutputRefs[ref].Namespace,
-					name:             ref,
+					Namespace:        clusterOutputRefs[ref].Namespace,
+					Name:             ref,
 					scope:            Global,
 					metricsProbes:    f.Spec.OutputMetrics,
 				}
@@ -105,8 +105,8 @@ func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedNam
 					return destination{
 						logging:          logging,
 						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-						namespace:        clusterOutputRefs[ref].Namespace,
-						name:             ref,
+						Namespace:        clusterOutputRefs[ref].Namespace,
+						Name:             ref,
 						scope:            Global,
 						metricsProbes:    f.Spec.OutputMetrics,
 					}
@@ -115,8 +115,8 @@ func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedNam
 					return destination{
 						logging:          logging,
 						renderedDestName: outputDestName(f.Namespace, ref),
-						namespace:        f.Namespace,
-						name:             ref,
+						Namespace:        f.Namespace,
+						Name:             ref,
 						scope:            Local,
 						metricsProbes:    f.Spec.OutputMetrics,
 					}

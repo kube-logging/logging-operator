@@ -15,9 +15,12 @@
 package config
 
 import (
+	"bytes"
 	"reflect"
+	"text/template"
 
 	"github.com/siliconbrain/go-seqs/seqs"
+	"golang.org/x/exp/maps"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
@@ -33,8 +36,8 @@ const (
 type destination struct {
 	logging          string
 	renderedDestName string
-	namespace        string
-	name             string
+	Namespace        string
+	Name             string
 	scope            refScope
 	metricsProbes    []filter.MetricsProbe
 }
@@ -63,11 +66,14 @@ func destinationLogPath(dest destination) render.Renderer {
 	}
 	metricsProbesRenderer := make([]render.Renderer, len(dest.metricsProbes))
 	for _, m := range dest.metricsProbes {
+		m.Labels = renderLabelGoTemplates(m.Labels, struct {
+			Destination destination
+		}{dest})
 		if m.Labels == nil {
 			m.Labels = make(filter.ArrowMap)
 		}
-		m.Labels["output_name"] = dest.name
-		m.Labels["output_namespace"] = dest.namespace
+		m.Labels["output_name"] = dest.Name
+		m.Labels["output_namespace"] = dest.Namespace
 		m.Labels["output_scope"] = string(dest.scope)
 		m.Labels["logging"] = dest.logging
 		metricsProbesRenderer = append(metricsProbesRenderer, renderDriver(Field{
@@ -79,4 +85,21 @@ func destinationLogPath(dest destination) render.Renderer {
 		parserDefStmt("", render.AllOf(metricsProbesRenderer...)),
 		parenDefStmt("destination", render.Literal(dest.renderedDestName))),
 	)
+}
+
+func renderLabelGoTemplates(labels filter.ArrowMap, values any) filter.ArrowMap {
+	for k, v := range maps.Clone(labels) {
+		tpl, err := template.New("label").Parse(v)
+		if err != nil {
+			continue
+		}
+
+		output := new(bytes.Buffer)
+		err = tpl.Execute(output, values)
+		if err != nil {
+			continue
+		}
+		labels[k] = output.String()
+	}
+	return labels
 }
