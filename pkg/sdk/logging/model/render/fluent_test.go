@@ -23,6 +23,7 @@ import (
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
@@ -388,10 +389,16 @@ func TestRenderFullFluentConfig(t *testing.T) {
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
-			{Labels: map[string]string{
-				"key1": "val1",
-				"key2": "val2"},
-				Namespaces: []string{"ns-test"}},
+			{
+				Labels: map[string]string{
+					"key1": "val1",
+					"key2": "val2",
+				},
+				Namespaces: []string{"ns-test"},
+				NamespaceLabels: map[string]string{
+					"ns_label_key": "ns_label_value",
+				},
+			},
 		}, "", "", "", "", util.BoolPointer(true))
 	if err != nil {
 		t.Fatal(err)
@@ -430,15 +437,16 @@ func TestRenderFullFluentConfig(t *testing.T) {
           @type label_router
           @id test
           <route>
-            @label @901f778f9602a78e8fd702c1973d8d8d
+            @label @a468ed882333533c5db78fb53f3bd185
 			  <match>
 			    labels key1:val1,key2:val2
+				namespace_labels ns_label_key:ns_label_value
 			    namespaces ns-test
 			    negate false
 			  </match>
           </route>
         </match>
-        <label @901f778f9602a78e8fd702c1973d8d8d>
+        <label @a468ed882333533c5db78fb53f3bd185>
           <filter **>
             @type stdout
             @id test

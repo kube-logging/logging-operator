@@ -231,20 +231,22 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 
 			if match.Select != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.Select.Labels,
-					ContainerNames: match.Select.ContainerNames,
-					Hosts:          match.Select.Hosts,
-					Namespaces:     []string{flow.Namespace},
-					Negate:         false,
+					Labels:          match.Select.Labels,
+					NamespaceLabels: match.Select.NamespaceLabels,
+					ContainerNames:  match.Select.ContainerNames,
+					Hosts:           match.Select.Hosts,
+					Namespaces:      []string{flow.Namespace},
+					Negate:          false,
 				})
 			}
 			if match.Exclude != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.Exclude.Labels,
-					ContainerNames: match.Exclude.ContainerNames,
-					Hosts:          match.Exclude.Hosts,
-					Namespaces:     []string{flow.Namespace},
-					Negate:         true,
+					Labels:          match.Exclude.Labels,
+					NamespaceLabels: match.Exclude.NamespaceLabels,
+					ContainerNames:  match.Exclude.ContainerNames,
+					Hosts:           match.Exclude.Hosts,
+					Namespaces:      []string{flow.Namespace},
+					Negate:          true,
 				})
 			}
 		}
@@ -323,20 +325,22 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 
 			if match.ClusterSelect != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.ClusterSelect.Labels,
-					ContainerNames: match.ClusterSelect.ContainerNames,
-					Hosts:          match.ClusterSelect.Hosts,
-					Namespaces:     match.ClusterSelect.Namespaces,
-					Negate:         false,
+					Labels:          match.ClusterSelect.Labels,
+					NamespaceLabels: match.ClusterSelect.NamespaceLabels,
+					ContainerNames:  match.ClusterSelect.ContainerNames,
+					Hosts:           match.ClusterSelect.Hosts,
+					Namespaces:      match.ClusterSelect.Namespaces,
+					Negate:          false,
 				})
 			}
 			if match.ClusterExclude != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.ClusterExclude.Labels,
-					ContainerNames: match.ClusterExclude.ContainerNames,
-					Hosts:          match.ClusterExclude.Hosts,
-					Namespaces:     match.ClusterExclude.Namespaces,
-					Negate:         true,
+					Labels:          match.ClusterExclude.Labels,
+					NamespaceLabels: match.ClusterExclude.NamespaceLabels,
+					ContainerNames:  match.ClusterExclude.ContainerNames,
+					Hosts:           match.ClusterExclude.Hosts,
+					Namespaces:      match.ClusterExclude.Namespaces,
+					Negate:          true,
 				})
 			}
 		}

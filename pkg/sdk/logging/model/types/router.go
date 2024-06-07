@@ -45,6 +45,8 @@ func (r *Router) GetSections() []Directive {
 type FlowMatch struct {
 	// Optional set of kubernetes labels
 	Labels map[string]string `json:"labels,omitempty"`
+	// Optional set of kubernetes namespace labels
+	NamespaceLabels map[string]string `json:"namespace_labels,omitempty"`
 	// Optional namespace
 	Namespaces []string `json:"namespaces,omitempty"`
 	// ContainerNames
@@ -81,6 +83,15 @@ func (f FlowMatch) GetParams() Params {
 			sb = append(sb, key+":"+f.Labels[key])
 		}
 		params["labels"] = strings.Join(sb, ",")
+	}
+	if len(f.NamespaceLabels) > 0 {
+		var sb []string
+		keys := mapstrstr.Keys(f.NamespaceLabels)
+		sort.Strings(keys)
+		for _, key := range keys {
+			sb = append(sb, key+":"+f.NamespaceLabels[key])
+		}
+		params["namespace_labels"] = strings.Join(sb, ",")
 	}
 	return params
 }
