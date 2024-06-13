@@ -34,7 +34,9 @@ var fluentdInputTemplate = `
 <system>
   rpc_endpoint 127.0.0.1:24444
   {{- if .LogFormat }}
-  format {{ .LogFormat }}
+  <log>
+    format {{ .LogFormat }}
+  </log>
   {{- end }}
   log_level {{ .LogLevel }}
   workers {{ .Workers }}
