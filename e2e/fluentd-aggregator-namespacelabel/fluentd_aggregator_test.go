@@ -70,7 +70,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 
 	labeledNamespaceName := "labeled-namespace"
 
-	common.WithCluster("fluentd-3", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-aggregator", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride

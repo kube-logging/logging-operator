@@ -68,7 +68,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 	testTag := "test.fluentd_aggregator_multiworker"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-1", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-multiworker", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -224,7 +224,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-2", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-configcheck", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -412,7 +412,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 
 	labeledNamespaceName := "labeled-namespace"
 
-	common.WithCluster("fluentd-3", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-ns-label", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride

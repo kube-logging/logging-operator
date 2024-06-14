@@ -67,7 +67,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	common.Initialize(t)
 	ns := "test"
 	releaseNameOverride := "e2e"
-	common.WithCluster("syslog-ng-1", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("syslog-ng-forwarding", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -108,7 +108,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 											},
 											VolumeMounts: []corev1.VolumeMount{
 												{
-													Name: "buffers",
+													Name:      "buffers",
 													MountPath: "/buffers",
 												},
 											},
@@ -209,8 +209,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride,
-				)), c)
+				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)
