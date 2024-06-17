@@ -296,6 +296,8 @@ spec:
                       type: array
                   type: object
                 type: array
+              filterx:
+                type: string
               globalOutputRefs:
                 items:
                   type: string

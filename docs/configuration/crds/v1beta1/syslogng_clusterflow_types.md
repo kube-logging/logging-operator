@@ -25,6 +25,9 @@ SyslogNGClusterFlow is the Schema for the syslog-ng clusterflows API
 
 SyslogNGClusterFlowSpec is the Kubernetes spec for Flows
 
+### filterx (string, optional) {#syslogngclusterflowspec-filterx}
+
+
 ### filters ([]SyslogNGFilter, optional) {#syslogngclusterflowspec-filters}
 
 

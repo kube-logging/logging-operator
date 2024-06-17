@@ -17,13 +17,18 @@ package config
 import (
 	"fmt"
 
+	"github.com/siliconbrain/go-seqs/seqs"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
-	"github.com/siliconbrain/go-seqs/seqs"
 )
 
 func filterDefStmt(name string, body render.Renderer) render.Renderer {
 	return braceDefStmt("filter", name, body)
+}
+
+func filterxDefStmt(name string, body render.Renderer) render.Renderer {
+	return braceDefStmt("filterx", "", body)
 }
 
 func filterExprStmt(expr model.FilterExpr) render.Renderer {

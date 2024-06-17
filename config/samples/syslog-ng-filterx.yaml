@@ -1,0 +1,27 @@
+kind: Logging
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: logging
+spec:
+  controlNamespace: default
+  fluentbit: {}
+  syslogNG: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGClusterFlow
+metadata:
+  name: all1
+spec:
+  match: {}
+  filterx: |
+    $a = "a";
+  globalOutputRefs:
+    - http
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGClusterOutput
+metadata:
+  name: http
+spec:
+  file:
+    path: "/tmp/log"

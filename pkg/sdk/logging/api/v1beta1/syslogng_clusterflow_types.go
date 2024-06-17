@@ -49,6 +49,7 @@ type SyslogNGClusterFlow struct {
 type SyslogNGClusterFlowSpec struct {
 	Match            *SyslogNGMatch   `json:"match,omitempty"`
 	Filters          []SyslogNGFilter `json:"filters,omitempty"`
+	FilterX          string           `json:"filterx,omitempty"`
 	LoggingRef       string           `json:"loggingRef,omitempty"`
 	GlobalOutputRefs []string         `json:"globalOutputRefs,omitempty"`
 	// Output metrics are applied before the log reaches the destination and contain output metadata like: `name,` `namespace` and `scope`. Scope shows whether the output is a local or global one.

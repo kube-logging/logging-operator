@@ -47,6 +47,10 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 	filterDefs := seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
 		return renderFlowFilter(flt, &f, idx, baseName, secretLoaderFactory.SecretLoaderForNamespace(f.Namespace))
 	})
+	var filterX render.Renderer
+	if f.Spec.FilterX != "" {
+		filterX = filterxDefStmt(baseName, render.Line(render.String(f.Spec.FilterX)))
+	}
 	return render.AllOf(
 		renderFlowMatch(matchName, f.Spec.Match),
 		render.AllFrom(filterDefs),
@@ -59,6 +63,7 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 				seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
 					return parenDefStmt(filterKind(flt), render.Literal(filterID(flt, idx, baseName)))
 				}),
+				seqs.FromValues(filterX),
 			)),
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 				return destination{
