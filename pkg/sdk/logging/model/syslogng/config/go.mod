@@ -10,9 +10,9 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/siliconbrain/go-seqs v0.12.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
-	k8s.io/api v0.30.1
-	k8s.io/apimachinery v0.30.1
+	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
+	k8s.io/api v0.30.2
+	k8s.io/apimachinery v0.30.2
 	sigs.k8s.io/controller-runtime v0.18.4
 )
 
@@ -66,7 +66,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.30.1 // indirect
-	k8s.io/client-go v0.30.1 // indirect
+	k8s.io/client-go v0.30.2 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57 // indirect
