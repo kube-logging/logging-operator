@@ -4,8 +4,6 @@ metadata:
   name: all-to-file
 spec:
   fluentd:
-#    image:
-#      tag: v1.16-ruby3.2-full
     disablePvc: true
     bufferStorageVolume:
       pvc:
