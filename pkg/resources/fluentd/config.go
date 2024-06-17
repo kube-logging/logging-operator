@@ -36,7 +36,7 @@ var fluentdInputTemplate = `
   {{- if .LogFormat }}  
   <log>
     format {{ .LogFormat }}
-  </log>format {{ .LogFormat }}
+  </log>
   {{- end }}
   log_level {{ .LogLevel }}
   workers {{ .Workers }}
