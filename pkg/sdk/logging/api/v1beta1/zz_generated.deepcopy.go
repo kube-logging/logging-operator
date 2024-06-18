@@ -2683,13 +2683,6 @@ func (in *Select) DeepCopyInto(out *Select) {
 			(*out)[key] = val
 		}
 	}
-	if in.NamespaceLabels != nil {
-		in, out := &in.NamespaceLabels, &out.NamespaceLabels
-		*out = make(map[string]string, len(*in))
-		for key, val := range *in {
-			(*out)[key] = val
-		}
-	}
 	if in.Hosts != nil {
 		in, out := &in.Hosts, &out.Hosts
 		*out = make([]string, len(*in))

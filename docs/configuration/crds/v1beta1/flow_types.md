@@ -60,9 +60,6 @@ Deprecated
 ### labels (map[string]string, optional) {#select-labels}
 
 
-### namespace_labels (map[string]string, optional) {#select-namespace_labels}
-
-
 
 ## Exclude
 
