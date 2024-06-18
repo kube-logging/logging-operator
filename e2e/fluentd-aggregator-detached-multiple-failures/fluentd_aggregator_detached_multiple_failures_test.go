@@ -64,7 +64,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 	testTag := "test.fluentd_aggregator_multiworker_multiple_detached_failure"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-1-detached-unnamed", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-detached-unnamed", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride

@@ -1,0 +1,37 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: all-to-file
+spec:
+  fluentd: {}
+  controlNamespace: default
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: all-to-file
+spec:
+  filterKubernetes:
+    namespace_labels: "On"
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterFlow
+metadata:
+  name: all
+spec:
+  filters:
+    - stdout: {}
+  match:
+    - select:
+        namespace_labels:
+          # add this label to one or more of the desired namespaces
+          kube-logging.dev: test
+  globalOutputRefs:
+    - nullout
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: nullout
+spec:
+  nullout: {}

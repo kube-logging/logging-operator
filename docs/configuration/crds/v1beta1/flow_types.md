@@ -72,6 +72,9 @@ Deprecated
 ### labels (map[string]string, optional) {#exclude-labels}
 
 
+### namespace_labels (map[string]string, optional) {#exclude-namespace_labels}
+
+
 
 ## Filter
 

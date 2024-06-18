@@ -153,11 +153,11 @@ run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube
 
 .PHONY: test
 test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
-	cd pkg/sdk/extensions && GOEXPERIMENT=loopvar go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
-	cd pkg/sdk/logging/model/syslogng/config && GOEXPERIMENT=loopvar go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} GOEXPERIMENT=loopvar go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
+	cd pkg/sdk/extensions && go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
+	cd pkg/sdk/logging/model/syslogng/config && go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
 
 .PHONY: install-go-test-coverage
 install-go-test-coverage:
@@ -192,7 +192,7 @@ test-e2e-nodeps:
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
-		GOEXPERIMENT=loopvar go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
+		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

@@ -80,6 +80,13 @@ func (in *ClusterExclude) DeepCopyInto(out *ClusterExclude) {
 			(*out)[key] = val
 		}
 	}
+	if in.NamespaceLabels != nil {
+		in, out := &in.NamespaceLabels, &out.NamespaceLabels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.Hosts != nil {
 		in, out := &in.Hosts, &out.Hosts
 		*out = make([]string, len(*in))
@@ -332,6 +339,13 @@ func (in *ClusterSelect) DeepCopyInto(out *ClusterSelect) {
 			(*out)[key] = val
 		}
 	}
+	if in.NamespaceLabels != nil {
+		in, out := &in.NamespaceLabels, &out.NamespaceLabels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.Hosts != nil {
 		in, out := &in.Hosts, &out.Hosts
 		*out = make([]string, len(*in))
@@ -418,6 +432,13 @@ func (in *Exclude) DeepCopyInto(out *Exclude) {
 	*out = *in
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.NamespaceLabels != nil {
+		in, out := &in.NamespaceLabels, &out.NamespaceLabels
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val

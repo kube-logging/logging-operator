@@ -27,6 +27,7 @@ spec:
         # value can be a go template which can access .Destination.Name, .Destination.Namespace. .Destination.Scope, .Destination.Logging:
         # destination: "{{ .Destination.Name }}"
         flow: all1
+        output_namespace: ""
   localOutputRefs:
     - http
   globalOutputRefs:
