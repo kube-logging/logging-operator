@@ -92,14 +92,9 @@ metadata:
   name: ops
 spec:
   loggingRef: ops
-  forwardOptions:
-    Workers: 0
-  syslogng_output:
-    Workers: 0
 ```
 > Note: 
 > - `loggingRef`s are required here
-> - `Workers: 0` is a workaround so that the processing of all tenants (outputs) don't block if one or more tenant is unavailable
 
 And finally the logging route with a populated status:
 ```

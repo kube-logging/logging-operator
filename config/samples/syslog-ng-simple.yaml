@@ -5,10 +5,14 @@ metadata:
 spec:
   controlNamespace: default
   fluentbit: {}
+# The below network configurations allow fluentbit to retry indefinitely on a limited number of connections
+# to avoid overloading the aggregator (syslog-ng in this case)
 #    network:
 #      maxWorkerConnections: 2
 #    syslogng_output:
-#      Workers: 5
+#      Workers: 2
+#    forwardOptions:
+#      Retry_Limit: "no_limits"
   syslogNG:
     globalOptions:
       log_level: trace
