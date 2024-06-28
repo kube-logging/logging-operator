@@ -200,8 +200,9 @@ test-e2e-nodeps:
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
 		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
-	  @echo "--- E2E test coverage report"
-	  go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
+	    go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o .${TEST_COV_DIR}/coverage_e2e.out
+	@echo "--- E2E test coverage report"
+	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

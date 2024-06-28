@@ -84,6 +84,11 @@ jobs:
 #          SHARD: ${{ matrix.SHARD }}
 #          SHARDS: ${{ matrix.SHARDS }}
 
+      - name: Test Coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          profile: ./build/_test_coverage/coverage_e2e.out
+
       - name: Archive Test Results
         if: always()
         uses: actions/upload-artifact@v3
