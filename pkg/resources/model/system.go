@@ -323,20 +323,22 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 
 			if match.ClusterSelect != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.ClusterSelect.Labels,
-					ContainerNames: match.ClusterSelect.ContainerNames,
-					Hosts:          match.ClusterSelect.Hosts,
-					Namespaces:     match.ClusterSelect.Namespaces,
-					Negate:         false,
+					Labels:          match.ClusterSelect.Labels,
+					NamespaceLabels: match.ClusterSelect.NamespaceLabels,
+					ContainerNames:  match.ClusterSelect.ContainerNames,
+					Hosts:           match.ClusterSelect.Hosts,
+					Namespaces:      match.ClusterSelect.Namespaces,
+					Negate:          false,
 				})
 			}
 			if match.ClusterExclude != nil {
 				matches = append(matches, types.FlowMatch{
-					Labels:         match.ClusterExclude.Labels,
-					ContainerNames: match.ClusterExclude.ContainerNames,
-					Hosts:          match.ClusterExclude.Hosts,
-					Namespaces:     match.ClusterExclude.Namespaces,
-					Negate:         true,
+					Labels:          match.ClusterExclude.Labels,
+					NamespaceLabels: match.ClusterExclude.NamespaceLabels,
+					ContainerNames:  match.ClusterExclude.ContainerNames,
+					Hosts:           match.ClusterExclude.Hosts,
+					Namespaces:      match.ClusterExclude.Namespaces,
+					Negate:          true,
 				})
 			}
 		}

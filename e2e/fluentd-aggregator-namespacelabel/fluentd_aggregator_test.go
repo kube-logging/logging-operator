@@ -60,14 +60,17 @@ func init() {
 	}
 }
 
-func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
+func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-1"
 	releaseNameOverride := "e2e"
-	testTag := "test.fluentd_aggregator_multiworker_detached"
+	testTag := "test.fluentd_aggregator_nslabel"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-detached", t, func(t *testing.T, c common.Cluster) {
+
+	labeledNamespaceName := "labeled-namespace"
+
+	common.WithCluster("fluentd-aggregator", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -75,10 +78,16 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 
 		ctx := context.Background()
 
+		labeledNamespace := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: labeledNamespaceName,
+			},
+		}
+		common.RequireNoError(t, c.GetClient().Create(ctx, &labeledNamespace))
+
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-multiworker-test",
-				Namespace: ns,
+				Name: "fluentd-aggregator-nslabel-test",
 			},
 			Spec: v1beta1.LoggingSpec{
 				EnableRecreateWorkloadOnImmutableFieldChange: true,
@@ -87,105 +96,68 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 					Network: &v1beta1.FluentbitNetwork{
 						Keepalive: utils.BoolPointer(false),
 					},
+					FilterKubernetes: v1beta1.FilterKubernetes{
+						// Namespace labels enrichment must be enabled explicitly for now
+						NamespaceLabels: "On",
+					},
+				},
+				FluentdSpec: &v1beta1.FluentdSpec{
+					Image: v1beta1.ImageSpec{
+						Tag: "v1.16-4.8-base",
+					},
+					Resources: corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							corev1.ResourceCPU:    resource.MustParse("500m"),
+							corev1.ResourceMemory: resource.MustParse("200M"),
+						},
+						Requests: corev1.ResourceList{
+							corev1.ResourceCPU:    resource.MustParse("250m"),
+							corev1.ResourceMemory: resource.MustParse("50M"),
+						},
+					},
 				},
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-
-		fluentd := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "detached-fluentd",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-					},
-				},
-				Workers: 2,
-			},
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
-		t.Logf("fluentd is: %v", fluentd)
-
-		excessFluentd := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "excess-fluentd",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-					},
-				},
-			},
-		}
 		tags := "time"
-		output := v1beta1.Output{
+		output := v1beta1.ClusterOutput{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      outputName,
-				Namespace: ns,
+				Namespace: logging.Spec.ControlNamespace,
 			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "1s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
-
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
+			Spec: v1beta1.ClusterOutputSpec{
+				OutputSpec: v1beta1.OutputSpec{
+					HTTPOutput: &output.HTTPOutputConfig{
+						Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+						ContentType: "application/json",
+						Buffer: &output.Buffer{
+							Type:        "file",
+							Tags:        &tags,
+							Timekey:     "1s",
+							TimekeyWait: "0s",
 						},
 					},
 				},
-				LocalOutputRefs: []string{output.Name},
+			},
+		}
+
+		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
+		flow := v1beta1.ClusterFlow{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      flowName,
+				Namespace: logging.Spec.ControlNamespace,
+			},
+			Spec: v1beta1.ClusterFlowSpec{
+				Match: []v1beta1.ClusterMatch{
+					{
+						ClusterSelect: &v1beta1.ClusterSelect{
+							NamespaceLabels: map[string]string{
+								"kubernetes.io/metadata.name": labeledNamespaceName,
+							},
+						},
+					},
+				},
+				GlobalOutputRefs: []string{output.Name},
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
@@ -197,9 +169,13 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 		operatorLabels := map[string]string{
 			"app.kubernetes.io/name": releaseNameOverride,
 		}
+		// used to find the producer only, not used to filter logs
+		producerLabels := map[string]string{
+			"my-unique-label": "log-producer",
+		}
 
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
+			options.Namespace = labeledNamespaceName
 			options.Labels = producerLabels
 		}))
 
@@ -214,27 +190,6 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 			}
 			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
-				return false
-			}
-			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
-				return false
-			}
-			if isValid := cond.CheckFluentdStatus(t, &c, &ctx, &fluentd, logging.Name); !isValid {
-				t.Log("checking detached fluentd status")
-				return false
-			}
-			var detachedFluentds v1beta1.FluentdConfigList
-			common.RequireNoError(t, c.GetClient().List(ctx, &detachedFluentds))
-			if len(detachedFluentds.Items) != 2 {
-				// Add a new detached fluentd that is not going to be used
-				common.RequireNoError(t, c.GetClient().Create(ctx, &excessFluentd))
-				t.Log("creating excess detached fluentd")
-				return false
-			} else if isValid := cond.CheckExcessFluentdStatus(t, &c, &ctx, &excessFluentd); !isValid && len(detachedFluentds.Items) == 2 {
-				t.Log("checking excess detached fluentd status")
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessFluentd), &excessFluentd))
 				return false
 			}
 
@@ -254,23 +209,11 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
+		return c.PrintLogs(common.PrintLogConfig{
 			Namespaces: []string{ns, "default"},
 			FilePath:   path,
 			Limit:      100 * 1000,
 		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			return err
-		}
-
-		return nil
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

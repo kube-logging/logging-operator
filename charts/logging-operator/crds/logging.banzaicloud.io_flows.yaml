@@ -1035,6 +1035,10 @@ spec:
                           additionalProperties:
                             type: string
                           type: object
+                        namespace_labels:
+                          additionalProperties:
+                            type: string
+                          type: object
                       type: object
                     select:
                       properties:
@@ -2094,6 +2098,10 @@ spec:
                             type: string
                           type: array
                         labels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        namespace_labels:
                           additionalProperties:
                             type: string
                           type: object

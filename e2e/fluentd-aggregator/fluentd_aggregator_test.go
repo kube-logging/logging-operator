@@ -68,7 +68,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 	testTag := "test.fluentd_aggregator_multiworker"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-1", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-multiworker", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -91,7 +91,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: "v1.16-base",
+						Tag: "v1.16-4.8-base",
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
@@ -236,7 +236,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-2", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-configcheck", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -259,7 +259,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: "v1.16-base",
+						Tag: "v1.16-4.8-base",
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
