@@ -8,16 +8,16 @@ metadata:
 spec:
   {{- with .fileTailers }}
   fileTailers:
-    {{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .systemdTailers }}
   systemdTailers:
-    {{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
   {{- with .workloadMetaOverrides }}
   workloadMetaOverrides:
-    {{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .workloadOverrides }}
   workloadOverrides:
