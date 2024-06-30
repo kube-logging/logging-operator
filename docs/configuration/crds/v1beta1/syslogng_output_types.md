@@ -40,6 +40,11 @@ Available in Logging operator version 4.4 and later.
 ### mongodb (*output.MongoDB, optional) {#syslogngoutputspec-mongodb}
 
 
+### opentelemetry (*output.OpenTelemetryOutput, optional) {#syslogngoutputspec-opentelemetry}
+
+Available in Logging operator version 4.8 and later 
+
+
 ### openobserve (*output.OpenobserveOutput, optional) {#syslogngoutputspec-openobserve}
 
 Available in Logging operator version 4.5 and later. 

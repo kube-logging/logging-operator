@@ -1878,6 +1878,177 @@ spec:
                   workers:
                     type: integer
                 type: object
+              opentelemetry:
+                properties:
+                  auth:
+                    properties:
+                      adc:
+                        type: object
+                      alts:
+                        properties:
+                          target-service-accounts:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      insecure:
+                        type: object
+                      tls:
+                        properties:
+                          ca_file:
+                            properties:
+                              mountFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                            type: object
+                          cert_file:
+                            properties:
+                              mountFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                            type: object
+                          key_file:
+                            properties:
+                              mountFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                            type: object
+                        type: object
+                    type: object
+                  batch-bytes:
+                    type: integer
+                  batch-lines:
+                    type: integer
+                  batch-timeout:
+                    type: integer
+                  channel_args:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  compression:
+                    type: boolean
+                  disk_buffer:
+                    properties:
+                      compaction:
+                        type: boolean
+                      dir:
+                        type: string
+                      disk_buf_size:
+                        format: int64
+                        type: integer
+                      mem_buf_length:
+                        format: int64
+                        type: integer
+                      mem_buf_size:
+                        format: int64
+                        type: integer
+                      q_out_size:
+                        format: int64
+                        type: integer
+                      reliable:
+                        type: boolean
+                    required:
+                    - disk_buf_size
+                    - reliable
+                    type: object
+                  url:
+                    type: string
+                required:
+                - url
+                type: object
               redis:
                 properties:
                   auth:
