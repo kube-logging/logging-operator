@@ -6,6 +6,7 @@ toolchain go1.22.5
 
 require (
 	emperror.dev/errors v0.8.1
+	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.36.0
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/siliconbrain/go-seqs v0.12.0

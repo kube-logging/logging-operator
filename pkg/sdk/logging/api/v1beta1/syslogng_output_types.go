@@ -50,6 +50,8 @@ type SyslogNGOutputSpec struct {
 	S3 *output.S3Output `json:"s3,omitempty" syslog-ng:"dest-drv"`
 	// Available in Logging operator version 4.5 and later.
 	Openobserve *output.OpenobserveOutput `json:"openobserve,omitempty" syslog-ng:"dest-drv,name=openobserve-log"`
+	// Available in Logging operator version 4.8 and later
+	OTLP *output.OTLPOutput `json:"otlp,omitempty" syslog-ng:"dest-drv,name=opentelemetry"`
 }
 
 type SyslogNGOutputStatus OutputStatus
