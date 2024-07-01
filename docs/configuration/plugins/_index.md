@@ -73,6 +73,7 @@ For more information please click on the plugin name
 | **[MongoDB Destination](syslogng-outputs/mongodb/)** | syslogng-outputs | Sending messages into MongoDB Server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/) |
 | **[MQTT Destination](syslogng-outputs/mqtt/)** | syslogng-outputs | Sending messages over MQTT Protocol | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/) |
 | **[OpenObserve](syslogng-outputs/openobserve/)** | syslogng-outputs | Sending messages over OpenObserve | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/) |
+| **[OTLP](syslogng-outputs/otlp/)** | syslogng-outputs | Sending non OTLP messages over OTLP GRPC | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/opentelemetry/) |
 | **[Redis Server Destination](syslogng-outputs/redis/)** | syslogng-outputs | Sending messages from local network to the Redis server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/) |
 | **[S3 Destination](syslogng-outputs/s3/)** | syslogng-outputs | Sending messages from a local network to a S3 (compatible) server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/) |
 | **[SplunkHEC](syslogng-outputs/splunk_hec/)** | syslogng-outputs | Sending messages over Splunk HEC | Testing | []() |
