@@ -255,6 +255,11 @@ Default: iso8601
 
 Default: ts
 
+### Retry_Limit (string, optional) {#fluentbittcpoutput-retry_limit}
+
+Available in Logging operator version 4.8 and later. 
+
+
 ### Workers (*int, optional) {#fluentbittcpoutput-workers}
 
 Available in Logging operator version 4.4 and later. 

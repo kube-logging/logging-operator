@@ -3427,6 +3427,8 @@ spec:
                     type: object
                   syslogng_output:
                     properties:
+                      Retry_Limit:
+                        type: string
                       Workers:
                         type: integer
                       json_date_format:

@@ -151,6 +151,9 @@ var fluentBitConfigTemplate = `
     {{- with $out.Workers }}
     Workers {{ . }}
     {{- end }}
+    {{- with $out.RetryLimit }}
+    Retry_Limit {{ . }}
+    {{- end }}
     {{- template "network" $out }}
 {{- end }}
 {{- end }}

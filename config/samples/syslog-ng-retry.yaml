@@ -4,10 +4,28 @@ metadata:
   name: logging
 spec:
   controlNamespace: default
-  fluentbit: {}
+  fluentbit:
+# The below network configurations allow fluentbit to retry indefinitely on a limited number of connections
+# to avoid overloading the aggregator (syslog-ng in this case)
+    network:
+      maxWorkerConnections: 2
+    syslogng_output:
+      Workers: 2
+      Retry_Limit: "no_limits"
   syslogNG:
     globalOptions:
       log_level: trace
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: syslog-ng
+                resources:
+                  limits:
+                    cpu: 50m
+                  requests:
+                    cpu: 50m
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGFlow

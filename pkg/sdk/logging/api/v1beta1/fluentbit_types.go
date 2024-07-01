@@ -153,6 +153,8 @@ type FluentbitTCPOutput struct {
 	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
 	// Available in Logging operator version 4.4 and later.
 	Workers *int `json:"Workers,omitempty"`
+	// Available in Logging operator version 4.8 and later.
+	RetryLimit string `json:"Retry_Limit,omitempty"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit
