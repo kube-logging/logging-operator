@@ -270,3 +270,13 @@ testReceiver:
     requests:
       cpu: 20m
       memory: 25Mi
+
+# -- Extra manifests to deploy as an array
+extraManifests: []
+  # - apiVersion: v1
+  #   kind: ConfigMap
+  #   metadata:
+  #   labels:
+  #     name: extra-manifest
+  #   data:
+  #     extra-data: "value"

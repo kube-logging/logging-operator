@@ -104,6 +104,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | testReceiver.resources.limits.memory | string | `"50Mi"` |  |
 | testReceiver.resources.requests.cpu | string | `"20m"` |  |
 | testReceiver.resources.requests.memory | string | `"25Mi"` |  |
+| extraManifests | list | `[]` | Extra manifests to deploy as an array |
 
 ## Installing Fluentd and Fluent-bit via logging
 
