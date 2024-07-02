@@ -13,8 +13,8 @@ spec:
       Workers: 2
       Retry_Limit: "no_limits"
   syslogNG:
-    globalOptions:
-      log_level: trace
+#    globalOptions:
+#      log_level: trace
     statefulSet:
       spec:
         template:
