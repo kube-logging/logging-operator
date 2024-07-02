@@ -5,9 +5,7 @@ metadata:
 spec:
   controlNamespace: default
   fluentbit: {}
-  syslogNG:
-    globalOptions:
-      log_level: trace
+  syslogNG: {}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: SyslogNGFlow
