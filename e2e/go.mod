@@ -2,13 +2,13 @@ module github.com/kube-logging/logging-operator/e2e
 
 go 1.22.0
 
-toolchain go1.22.4
+toolchain go1.22.5
 
 require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.36.0
-	github.com/kube-logging/logging-operator v0.0.0-20240701100510-f93273c9346d
+	github.com/kube-logging/logging-operator v0.0.0-20240702114322-f8081b7bdbd2
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.9.0
