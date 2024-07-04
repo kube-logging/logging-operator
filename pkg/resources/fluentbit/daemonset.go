@@ -171,7 +171,7 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 	}
 
 	if spec.Security != nil {
-		c.SecurityContext = r.fluentbitSpec.Security.SecurityContext
+		c.SecurityContext = spec.Security.SecurityContext
 	}
 
 	return c
