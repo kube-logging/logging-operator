@@ -2,7 +2,7 @@ module github.com/kube-logging/logging-operator
 
 go 1.22.0
 
-toolchain go1.22.4
+toolchain go1.22.5
 
 require (
 	emperror.dev/errors v0.8.1
@@ -15,7 +15,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.33.1
 	github.com/pborman/uuid v1.2.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/siliconbrain/go-seqs v0.12.0
 	github.com/spf13/cast v1.6.0
