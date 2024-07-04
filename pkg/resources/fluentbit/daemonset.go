@@ -188,6 +188,8 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 			Privileged:               spec.Security.SecurityContext.Privileged,
 			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
 			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
+			SeccompProfile:           spec.Security.SecurityContext.SeccompProfile,
+			Capabilities:             spec.Security.SecurityContext.Capabilities,
 		}
 	}
 
