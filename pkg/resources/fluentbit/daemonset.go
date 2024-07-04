@@ -46,6 +46,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		Labels:      labels,
 		Annotations: r.fluentbitSpec.Annotations,
 	}
+	imagePullSecrets := r.fluentbitSpec.Image.ImagePullSecrets
 
 	if r.fluentbitSpec.ConfigHotReload == nil && r.configs != nil {
 		for key, config := range r.configs {
@@ -60,6 +61,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	}
 	if r.fluentbitSpec.ConfigHotReload != nil {
 		containers = append(containers, newConfigMapReloader(r.fluentbitSpec))
+		imagePullSecrets = append(imagePullSecrets, r.fluentbitSpec.ConfigHotReload.Image.ImagePullSecrets...)
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -85,7 +87,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 						RunAsGroup:     r.fluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 						SeccompProfile: r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
 					},
-					ImagePullSecrets: r.fluentbitSpec.Image.ImagePullSecrets,
+					ImagePullSecrets: imagePullSecrets,
 					DNSPolicy:        r.fluentbitSpec.DNSPolicy,
 					DNSConfig:        r.fluentbitSpec.DNSConfig,
 					HostNetwork:      r.fluentbitSpec.HostNetwork,
