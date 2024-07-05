@@ -62,6 +62,7 @@ type Metrics struct {
 	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
+	Severity              string               `json:"severity,omitempty"`
 }
 
 // BufferMetrics defines the service monitor endpoints

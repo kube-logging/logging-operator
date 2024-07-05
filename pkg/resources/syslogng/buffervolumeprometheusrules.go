@@ -45,7 +45,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "warning",
+						"severity":  r.syslogNGSpec.BufferVolumeMetrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG buffer free capacity less than 10%.`,
@@ -59,7 +59,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "critical",
+						"severity":  r.syslogNGSpec.BufferVolumeMetrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG buffer free capacity less than 5%.`,
