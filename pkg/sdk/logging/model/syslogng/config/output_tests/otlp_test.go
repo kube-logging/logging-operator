@@ -1,4 +1,4 @@
-// Copyright © 2019 Banzai Cloud
+// Copyright © 2024 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package test
 import (
 	"testing"
 
-	"github.com/MakeNowJust/heredoc"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -46,11 +45,11 @@ func TestOpenTelemetryOutputTable(t *testing.T) {
 					},
 				},
 			},
-			config: heredoc.Doc(`
-				destination "output_default_test-otlp-out" {
-					opentelemetry(url("otlp-server"));
-				};
-			`),
+			config: `
+destination "output_default_test-otlp-out" {
+	opentelemetry(url("otlp-server"));
+};
+`,
 		},
 		{
 			name: "test_full",
@@ -78,13 +77,13 @@ func TestOpenTelemetryOutputTable(t *testing.T) {
 					},
 				},
 			},
-			config: heredoc.Doc(`
-				destination "output_default_test-otlp-out" {
-					opentelemetry(url("otlp-server") auth(insecure()) disk_buffer(disk_buf_size(0) reliable(yes)) batch-lines(1) compression(yes) channel_args(
-						"a" => "b"
-					));
-				};
-			`),
+			config: `
+destination "output_default_test-otlp-out" {
+	opentelemetry(url("otlp-server") auth(insecure()) disk_buffer(disk_buf_size(0) reliable(yes)) batch-lines(1) compression(yes) channel_args(
+		"a" => "b"
+	));
+};
+`,
 		},
 	}
 	for _, tt := range tests {
