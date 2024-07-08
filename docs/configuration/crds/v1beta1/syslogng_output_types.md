@@ -11,6 +11,9 @@ SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 ### elasticsearch (*output.ElasticsearchOutput, optional) {#syslogngoutputspec-elasticsearch}
 
 
+### elasticsearch-datastream (*output.ElasticsearchDatastreamOutput, optional) {#syslogngoutputspec-elasticsearch-datastream}
+
+
 ### file (*output.FileOutput, optional) {#syslogngoutputspec-file}
 
 

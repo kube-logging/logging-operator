@@ -65,6 +65,7 @@ For more information please click on the plugin name
 | **[Authentication config for syslog-ng outputs](syslogng-outputs/auth/)** | syslogng-outputs | Authentication config for syslog-ng outputs | Testing | []() |
 | **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/) |
 | **[Elasticsearch](syslogng-outputs/elasticsearch/)** | syslogng-outputs | Sending messages over Elasticsearch | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/) |
+| **[Elasticsearch datastream](syslogng-outputs/elasticsearch_datastream/)** | syslogng-outputs | Sending messages over Elasticsearch datastreams | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/) |
 | **[File](syslogng-outputs/file/)** | syslogng-outputs | SStoring messages in plain-text files | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/) |
 | **[HTTP](syslogng-outputs/http/)** | syslogng-outputs | Sending messages over HTTP | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/) |
 | **[Loggly](syslogng-outputs/loggly/)** | syslogng-outputs | Send your logs to loggly | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/) |
