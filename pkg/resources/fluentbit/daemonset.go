@@ -168,10 +168,7 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 		Resources:       spec.ConfigHotReload.Resources,
 		Args:            args,
 		VolumeMounts:    vm,
-	}
-
-	if spec.Security != nil {
-		c.SecurityContext = spec.Security.SecurityContext
+		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
