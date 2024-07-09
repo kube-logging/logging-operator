@@ -331,7 +331,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: r.fluentbitSpec.BufferStorage.StoragePath,
 				},
 			},
-			Resources: r.fluentbitSpec.BufferVolumeResources,
+			Resources:       r.fluentbitSpec.BufferVolumeResources,
 			SecurityContext: r.fluentbitSpec.Security.SecurityContext,
 		}
 	}
