@@ -33,7 +33,9 @@ spec:
 ## Configuration
 ## Kafka
 
-Send your logs to Kafka
+Send your logs to Kafka.
+Setting use_rdkafka to true opts for rdkafka2, which offers higher performance compared to ruby-kafka.
+-[more info](https://github.com/fluent/fluent-plugin-kafka#output-plugin)
 
 ### ack_timeout (int, optional) {#kafka-ack_timeout}
 
@@ -212,7 +214,7 @@ Client certificate key
 Verify certificate hostname 
 
 
-### sasl_over_ssl (bool, required) {#kafka-sasl_over_ssl}
+### sasl_over_ssl (*bool, optional) {#kafka-sasl_over_ssl}
 
 SASL over SSL
 
@@ -239,6 +241,11 @@ Default: "topic"
 Use default for unknown topics
 
 Default: false
+
+### use_rdkafka (bool, optional) {#kafka-use_rdkafka}
+
+Use rdkafka of the output plugin. 
+
 
 ### username (*secret.Secret, optional) {#kafka-username}
 

@@ -58,9 +58,12 @@ type _metaKafka interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Kafka"
-// Send your logs to Kafka
+// Send your logs to Kafka.
+// Setting use_rdkafka to true opts for rdkafka2, which offers higher performance compared to ruby-kafka.
+// -[more info](https://github.com/fluent/fluent-plugin-kafka#output-plugin)
 type KafkaOutputConfig struct {
-
+	// Use rdkafka of the output plugin.
+	UseRdkafka bool `json:"use_rdkafka,omitempty"`
 	// The list of all seed brokers, with their host and port information.
 	Brokers string `json:"brokers"`
 	// Topic Key (default: "topic")
@@ -95,7 +98,7 @@ type KafkaOutputConfig struct {
 	Idempotent bool `json:"idempotent,omitempty"`
 	// SASL over SSL (default: true)
 	// +kubebuilder:validation:Optional
-	SaslOverSSL bool           `json:"sasl_over_ssl"`
+	SaslOverSSL *bool          `json:"sasl_over_ssl,omitempty"`
 	Principal   string         `json:"principal,omitempty"`
 	Keytab      *secret.Secret `json:"keytab,omitempty"`
 	// Username when using PLAIN/SCRAM SASL authentication
@@ -141,7 +144,10 @@ type KafkaOutputConfig struct {
 }
 
 func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	const pluginType = "kafka2"
+	pluginType := "kafka2"
+	if e.UseRdkafka {
+		pluginType = "rdkafka2"
+	}
 	kafka := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
@@ -171,5 +177,8 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 			kafka.SubDirectives = append(kafka.SubDirectives, format)
 		}
 	}
+
+	// remove use_rdkafka from params, it is not a valid parameter for plugin config
+	delete(kafka.Params, "use_rdkafka")
 	return kafka, nil
 }
