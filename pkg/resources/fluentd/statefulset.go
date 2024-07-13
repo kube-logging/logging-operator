@@ -50,10 +50,12 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		}
 	}
 	for _, n := range r.fluentdSpec.ExtraVolumes {
-		if n.Volume == nil || n.Volume.PersistentVolumeClaim == nil {
+		if n.Volume == nil {
+			// technically this should not be possible due to setting sane defaults
+			r.Log.Info("volume definition missing from extraVolume, ignoring", "path", n.Path, "containerName", n.ContainerName, "volumeName", n.VolumeName)
 			continue
 		}
-		if isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
+		if n.Volume.PersistentVolumeClaim == nil || isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
 			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 				return nil, reconciler.StatePresent, err
 			}

@@ -136,6 +136,7 @@ type syslogNGOutputConfig struct {
 	JSONDateKey    string
 	JSONDateFormat string
 	Workers        *int
+	RetryLimit     string
 	Network        FluentbitNetwork
 }
 
@@ -413,6 +414,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.SyslogNGOutput.JSONDateKey = r.fluentbitSpec.SyslogNGOutput.JsonDateKey
 		input.SyslogNGOutput.JSONDateFormat = r.fluentbitSpec.SyslogNGOutput.JsonDateFormat
 		input.SyslogNGOutput.Workers = r.fluentbitSpec.SyslogNGOutput.Workers
+		input.SyslogNGOutput.RetryLimit = r.fluentbitSpec.SyslogNGOutput.RetryLimit
 	}
 
 	r.applyNetworkSettings(input)

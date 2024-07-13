@@ -490,6 +490,34 @@ spec:
                 type: object
               bufferStorageVolume:
                 properties:
+                  configMap:
+                    properties:
+                      defaultMode:
+                        format: int32
+                        type: integer
+                      items:
+                        items:
+                          properties:
+                            key:
+                              type: string
+                            mode:
+                              format: int32
+                              type: integer
+                            path:
+                              type: string
+                          required:
+                          - key
+                          - path
+                          type: object
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      name:
+                        default: ""
+                        type: string
+                      optional:
+                        type: boolean
+                    type: object
+                    x-kubernetes-map-type: atomic
                   emptyDir:
                     properties:
                       medium:
@@ -1754,6 +1782,34 @@ spec:
                 type: string
               position_db:
                 properties:
+                  configMap:
+                    properties:
+                      defaultMode:
+                        format: int32
+                        type: integer
+                      items:
+                        items:
+                          properties:
+                            key:
+                              type: string
+                            mode:
+                              format: int32
+                              type: integer
+                            path:
+                              type: string
+                          required:
+                          - key
+                          - path
+                          type: object
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      name:
+                        default: ""
+                        type: string
+                      optional:
+                        type: boolean
+                    type: object
+                    x-kubernetes-map-type: atomic
                   emptyDir:
                     properties:
                       medium:
@@ -1912,6 +1968,34 @@ spec:
                 type: object
               positiondb:
                 properties:
+                  configMap:
+                    properties:
+                      defaultMode:
+                        format: int32
+                        type: integer
+                      items:
+                        items:
+                          properties:
+                            key:
+                              type: string
+                            mode:
+                              format: int32
+                              type: integer
+                            path:
+                              type: string
+                          required:
+                          - key
+                          - path
+                          type: object
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      name:
+                        default: ""
+                        type: string
+                      optional:
+                        type: boolean
+                    type: object
+                    x-kubernetes-map-type: atomic
                   emptyDir:
                     properties:
                       medium:
@@ -2382,6 +2466,8 @@ spec:
                 type: object
               syslogng_output:
                 properties:
+                  Retry_Limit:
+                    type: string
                   Workers:
                     type: integer
                   json_date_format:

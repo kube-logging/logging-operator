@@ -46,6 +46,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 		Labels:      labels,
 		Annotations: r.fluentbitSpec.Annotations,
 	}
+	imagePullSecrets := r.fluentbitSpec.Image.ImagePullSecrets
 
 	if r.fluentbitSpec.ConfigHotReload == nil && r.configs != nil {
 		for key, config := range r.configs {
@@ -60,6 +61,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	}
 	if r.fluentbitSpec.ConfigHotReload != nil {
 		containers = append(containers, newConfigMapReloader(r.fluentbitSpec))
+		imagePullSecrets = append(imagePullSecrets, r.fluentbitSpec.ConfigHotReload.Image.ImagePullSecrets...)
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -85,7 +87,7 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 						RunAsGroup:     r.fluentbitSpec.Security.PodSecurityContext.RunAsGroup,
 						SeccompProfile: r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
 					},
-					ImagePullSecrets: r.fluentbitSpec.Image.ImagePullSecrets,
+					ImagePullSecrets: imagePullSecrets,
 					DNSPolicy:        r.fluentbitSpec.DNSPolicy,
 					DNSConfig:        r.fluentbitSpec.DNSConfig,
 					HostNetwork:      r.fluentbitSpec.HostNetwork,
@@ -126,20 +128,11 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 		Ports:           r.generatePortsMetrics(),
 		Resources:       r.fluentbitSpec.Resources,
 		VolumeMounts:    r.generateVolumeMounts(),
-		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:                r.fluentbitSpec.Security.SecurityContext.RunAsUser,
-			RunAsNonRoot:             r.fluentbitSpec.Security.SecurityContext.RunAsNonRoot,
-			ReadOnlyRootFilesystem:   r.fluentbitSpec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: r.fluentbitSpec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               r.fluentbitSpec.Security.SecurityContext.Privileged,
-			SELinuxOptions:           r.fluentbitSpec.Security.SecurityContext.SELinuxOptions,
-			SeccompProfile:           r.fluentbitSpec.Security.SecurityContext.SeccompProfile,
-			Capabilities:             r.fluentbitSpec.Security.SecurityContext.Capabilities,
-		},
-		Command:        args,
-		Env:            r.fluentbitSpec.EnvVars,
-		LivenessProbe:  r.fluentbitSpec.LivenessProbe,
-		ReadinessProbe: r.fluentbitSpec.ReadinessProbe,
+		SecurityContext: r.fluentbitSpec.Security.SecurityContext,
+		Command:         args,
+		Env:             r.fluentbitSpec.EnvVars,
+		LivenessProbe:   r.fluentbitSpec.LivenessProbe,
+		ReadinessProbe:  r.fluentbitSpec.ReadinessProbe,
 	}
 }
 
@@ -175,18 +168,7 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 		Resources:       spec.ConfigHotReload.Resources,
 		Args:            args,
 		VolumeMounts:    vm,
-	}
-
-	if spec.Security != nil && spec.Security.SecurityContext != nil {
-		c.SecurityContext = &corev1.SecurityContext{
-			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
-			RunAsGroup:               spec.Security.SecurityContext.RunAsGroup,
-			ReadOnlyRootFilesystem:   spec.Security.SecurityContext.ReadOnlyRootFilesystem,
-			AllowPrivilegeEscalation: spec.Security.SecurityContext.AllowPrivilegeEscalation,
-			Privileged:               spec.Security.SecurityContext.Privileged,
-			RunAsNonRoot:             spec.Security.SecurityContext.RunAsNonRoot,
-			SELinuxOptions:           spec.Security.SecurityContext.SELinuxOptions,
-		}
+		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
@@ -346,7 +328,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: r.fluentbitSpec.BufferStorage.StoragePath,
 				},
 			},
-			Resources: r.fluentbitSpec.BufferVolumeResources,
+			Resources:       r.fluentbitSpec.BufferVolumeResources,
+			SecurityContext: r.fluentbitSpec.Security.SecurityContext,
 		}
 	}
 	return nil

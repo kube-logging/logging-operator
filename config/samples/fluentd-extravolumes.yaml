@@ -3,6 +3,7 @@ kind: Logging
 metadata:
   name: all-to-file
 spec:
+  controlNamespace: default
   fluentd:
     disablePvc: true
     bufferStorageVolume:
@@ -19,7 +20,14 @@ spec:
               claimName: manual
               readOnly: false
         volumeName: manual
-  controlNamespace: default
+      - path: /hostpath
+        volume:
+          hostPath:
+            path: /var/log
+      - path: /configmap
+        volume:
+          configMap:
+            name: asdf
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -72,3 +80,11 @@ spec:
     storage: 1Gi
   hostPath:
     path: /tmp/asd2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asdf
+data:
+  asdf.conf: |
+    asdf

@@ -64,7 +64,6 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | tolerations | list | `[]` | Node Tolerations |
 | affinity | object | `{}` | Node Affinity |
 | podLabels | object | `{}` | Define which Nodes the Pods are scheduled on. |
-| logging | object | `{"allowClusterResourcesFromAllNamespaces":false,"clusterDomain":"cluster.local.","clusterFlows":[],"clusterOutputs":[],"configCheck":{},"controlNamespace":"","defaultFlow":{},"enableRecreateWorkloadOnImmutableFieldChange":false,"enabled":false,"errorOutputRef":"","eventTailer":{},"flowConfigCheckDisabled":false,"flowConfigOverride":"","fluentbit":{},"fluentbitDisabled":false,"fluentd":{},"fluentdDisabled":false,"globalFilters":[],"hostTailer":{},"loggingRef":"","nodeAgents":{},"skipInvalidResources":false,"syslogNG":{},"watchNamespaceSelector":{},"watchNamespaces":[]}` | Logging resources configuration. |
 | logging.enabled | bool | `false` | Logging resources are disabled by default |
 | logging.loggingRef | string | `""` | Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset. |
 | logging.flowConfigCheckDisabled | bool | `false` | Disable configuration check before applying new fluentd configuration. |
@@ -88,8 +87,30 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.enableRecreateWorkloadOnImmutableFieldChange | bool | `false` | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update. |
 | logging.clusterFlows | list | `[]` | ClusterFlows to deploy |
 | logging.clusterOutputs | list | `[]` | ClusterOutputs to deploy |
-| logging.eventTailer | object | `{}` | EventTailer config |
-| logging.hostTailer | object | `{}` | HostTailer config |
+| logging.eventTailer.enabled | bool | `false` |  |
+| logging.eventTailer.name | string | `"event-tailer"` |  |
+| logging.eventTailer.image.repository | string | `nil` | repository of eventTailer image |
+| logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |
+| logging.eventTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
+| logging.eventTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
+| logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for  |
+| logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | storage class for event tailer pvc |
+| logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | storage class for event tailer pvc |
+| logging.eventTailer.pvc.storage | string | `"1Gi"` | storage for event tailer pvc |
+| logging.eventTailer.pvc.storageClassName | string | `nil` | storage class for event tailer pvc |
+| logging.eventTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides |
+| logging.eventTailer.workloadOverrides | string | `nil` | workloadOverrides |
+| logging.eventTailer.containerOverrides | string | `nil` | containerOverrides |
+| logging.hostTailer.enabled | bool | `false` | HostTailer |
+| logging.hostTailer.name | string | `"hosttailer"` | name of HostTailer |
+| logging.hostTailer.image.repository | string | `nil` | repository of eventTailer image |
+| logging.hostTailer.image.tag | string | `nil` | tag of eventTailer image |
+| logging.hostTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
+| logging.hostTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
+| logging.hostTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides of HostTailer |
+| logging.hostTailer.workloadOverrides | string | `nil` | workloadOverrides of HostTailer |
+| logging.hostTailer.fileTailers | list | `[]` | configure fileTailers of HostTailer example:   - name: sample-file     path: /var/log/sample-file     disabled: false     buffer_max_size:     buffer_chunk_size:     skip_long_lines:     read_from_head: false     containerOverrides:     image: |
+| logging.hostTailer.systemdTailers | list | `[]` | configure systemdTailers of HostTailer example:   - name: system-sample     disabled: false     systemdFilter: kubelet.service     maxEntries: 20     containerOverrides:     image: |
 | testReceiver.enabled | bool | `false` |  |
 | testReceiver.image | string | `"fluent/fluent-bit"` |  |
 | testReceiver.pullPolicy | string | `"IfNotPresent"` |  |
@@ -104,6 +125,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | testReceiver.resources.limits.memory | string | `"50Mi"` |  |
 | testReceiver.resources.requests.cpu | string | `"20m"` |  |
 | testReceiver.resources.requests.memory | string | `"25Mi"` |  |
+| extraManifests | list | `[]` | Extra manifests to deploy as an array |
 
 ## Installing Fluentd and Fluent-bit via logging
 
