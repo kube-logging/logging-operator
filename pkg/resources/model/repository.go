@@ -301,8 +301,8 @@ func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Con
 }
 
 func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.NodeAgent, error) {
+	// Deprecated: Node agents are deprecated and no longer maintained actively
 	if os.Getenv("ENABLE_NODEAGENT_CRD") == "" {
-		r.Logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		return nil, nil
 	}
 

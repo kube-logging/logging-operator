@@ -573,9 +573,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGConfig{}, requestMapper)
 
-	// TODO remove with the next major release
+	// Deprecated: Node agents are deprecated and no longer maintained actively
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
-		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
 	}
 
