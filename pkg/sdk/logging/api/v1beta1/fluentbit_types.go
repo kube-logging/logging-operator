@@ -291,7 +291,7 @@ type FilterKubernetes struct {
 	// Match filtered records (default:kube.*)
 	Match string `json:"Match,omitempty" plugin:"default:kubernetes.*"`
 	// Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs. If this value is empty we will set it "0". (default:"0")
-	BufferSize string `json:"Buffer_Size,omitempty"`
+	BufferSize string `json:"Buffer_Size,omitempty" plugin:"default:0"`
 	// API Server end-point.
 	KubeURL string `json:"Kube_URL,omitempty" plugin:"default:https://kubernetes.default.svc:443"`
 	//	CA certificate file (default:/var/run/secrets/kubernetes.io/serviceaccount/ca.crt)

@@ -577,9 +577,9 @@ Default: On
 
 ### Buffer_Size (string, optional) {#filterkubernetes-buffer_size}
 
-Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs. If this value is empty we will set it "0".
+Set the buffer size for HTTP client when reading responses from Kubernetes API server. The value must be according to the Unit Size specification. A value of 0 results in no limit, and the buffer will expand as-needed. Note that if pod specifications exceed the buffer limit, the API response will be discarded when retrieving metadata, and some kubernetes metadata will fail to be injected to the logs. If this value is empty we will set it "0". (default:"0") 
 
-Default: "0"
+Default: 0
 
 ### Cache_Use_Docker_Id (string, optional) {#filterkubernetes-cache_use_docker_id}
 
