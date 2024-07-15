@@ -221,6 +221,7 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+
 }
 
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {
