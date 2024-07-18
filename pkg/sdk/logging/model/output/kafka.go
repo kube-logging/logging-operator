@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -60,9 +61,10 @@ type _metaKafka interface{} //nolint:deadcode,unused
 // +docName:"Kafka"
 // Send your logs to Kafka.
 // Setting use_rdkafka to true opts for rdkafka2, which offers higher performance compared to ruby-kafka.
+// (Note: requires fluentd image version v1.16-4.9-full or higher)
 // -[more info](https://github.com/fluent/fluent-plugin-kafka#output-plugin)
 type KafkaOutputConfig struct {
-	// Use rdkafka of the output plugin.
+	// Use rdkafka2 instead of the legacy kafka2 output plugin. This plugin requires fluentd image version v1.16-4.9-full or higher.
 	UseRdkafka bool `json:"use_rdkafka,omitempty"`
 	// The list of all seed brokers, with their host and port information.
 	Brokers string `json:"brokers"`
