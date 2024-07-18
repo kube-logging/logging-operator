@@ -3408,6 +3408,11 @@ func (in *SyslogNGOutputSpec) DeepCopyInto(out *SyslogNGOutputSpec) {
 		*out = new(syslogngoutput.ElasticsearchOutput)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ElasticsearchDatastream != nil {
+		in, out := &in.ElasticsearchDatastream, &out.ElasticsearchDatastream
+		*out = new(syslogngoutput.ElasticsearchDatastreamOutput)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LogScale != nil {
 		in, out := &in.LogScale, &out.LogScale
 		*out = new(syslogngoutput.LogScaleOutput)
