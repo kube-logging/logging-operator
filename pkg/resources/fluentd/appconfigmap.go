@@ -272,7 +272,7 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 	}
 	if fluentdSpec.Affinity != nil && fluentdSpec.Affinity.PodAntiAffinity != nil {
 		r.Log.Info("pod anti-affinity has been disabled to avoid blocking configcheck pods accidentally")
-		fluentdSpec.Affinity.PodAntiAffinity = nil
+		pod.Spec.Affinity.PodAntiAffinity = nil
 	}
 	if fluentdSpec.ConfigCheckAnnotations != nil {
 		pod.Annotations = fluentdSpec.ConfigCheckAnnotations
