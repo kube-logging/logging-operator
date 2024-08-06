@@ -40,6 +40,7 @@ type Cluster interface {
 	Cleanup() error
 	PrintLogs(config PrintLogConfig) error
 	KubeConfigFilePath() string
+	CollectTestCoverageFiles(string, string) error
 }
 
 type PrintLogConfig struct {
@@ -121,6 +122,26 @@ func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {
 	cmd.Env = append(os.Environ(), fmt.Sprintf("KUBECONFIG=%s", c.KubeConfigFilePath()))
 	cmd.Stderr = os.Stderr
 	return cmd
+}
+
+// Collects test coverage data files from logging-operator
+func (c kindCluster) CollectTestCoverageFiles(ns string, loggingOperatorName string) error {
+	cmd := CmdEnv(exec.Command("kubectl", "-n", ns,
+		"exec", fmt.Sprintf("deployment/%s", loggingOperatorName), "--",
+		"kill", "-USR1", "1"), c)
+	cmdOut, err := cmd.Output()
+	if err != nil {
+		return errors.WrapIfWithDetails(err, "Error in sending signal to logging-operator", cmdOut)
+	}
+	testCovDir := os.Getenv("E2E_TEST_COV_DIR")
+	cmd = exec.Command("sh", "-c", fmt.Sprintf(
+		"kubectl --kubeconfig %s -n %s exec deployment/%s -- tar -cf - /covdatafiles | tar -xf - -C %s",
+		c.KubeConfigFilePath(), ns, loggingOperatorName, testCovDir))
+	cmdOut, err = cmd.Output()
+	if err != nil {
+		return errors.WrapIfWithDetails(err, "Error in collecting test coverage files", cmdOut)
+	}
+	return nil
 }
 
 type kindCluster struct {
