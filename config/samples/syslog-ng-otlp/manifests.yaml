@@ -1,0 +1,29 @@
+kind: Logging
+apiVersion: logging.banzaicloud.io/v1beta1
+metadata:
+  name: logging
+spec:
+  controlNamespace: default
+  fluentbit: {}
+  syslogNG: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGFlow
+metadata:
+  name: all
+  namespace: log-generator
+spec:
+  match: {}
+  localOutputRefs:
+    - otlp
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: SyslogNGOutput
+metadata:
+  name: otlp
+  namespace: log-generator
+spec:
+  opentelemetry:
+    url: otel-collector:4317
+    auth:
+      insecure: {}
