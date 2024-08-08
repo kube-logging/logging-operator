@@ -17,6 +17,7 @@ package v1beta1
 import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // +name:"Common"
@@ -54,14 +55,66 @@ func RepositoryWithTag(repository, tag string) string {
 
 // Metrics defines the service monitor endpoints
 type Metrics struct {
-	Interval              string               `json:"interval,omitempty"`
-	Timeout               string               `json:"timeout,omitempty"`
-	Port                  int32                `json:"port,omitempty"`
-	Path                  string               `json:"path,omitempty"`
-	ServiceMonitor        bool                 `json:"serviceMonitor,omitempty"`
-	ServiceMonitorConfig  ServiceMonitorConfig `json:"serviceMonitorConfig,omitempty"`
-	PrometheusAnnotations bool                 `json:"prometheusAnnotations,omitempty"`
-	PrometheusRules       bool                 `json:"prometheusRules,omitempty"`
+	Interval                string                    `json:"interval,omitempty"`
+	Timeout                 string                    `json:"timeout,omitempty"`
+	Port                    int32                     `json:"port,omitempty"`
+	Path                    string                    `json:"path,omitempty"`
+	ServiceMonitor          bool                      `json:"serviceMonitor,omitempty"`
+	ServiceMonitorConfig    ServiceMonitorConfig      `json:"serviceMonitorConfig,omitempty"`
+	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
+	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
+	PrometheusRulesOverride []PrometheusRulesOverride `json:"prometheusRulesOverride,omitempty"`
+}
+
+type PrometheusRulesOverride struct {
+	// Name of the time series to output to. Must be a valid metric name.
+	// Only one of `record` and `alert` must be set.
+	Record string `json:"record,omitempty"`
+	// Name of the alert. Must be a valid label value.
+	// Only one of `record` and `alert` must be set.
+	Alert string `json:"alert,omitempty"`
+	// PromQL expression to evaluate.
+	Expr intstr.IntOrString `json:"expr,omitempty"`
+	// Alerts are considered firing once they have been returned for this long.
+	// +optional
+	For *v1.Duration `json:"for,omitempty"`
+	// KeepFiringFor defines how long an alert will continue firing after the condition that triggered it has cleared.
+	// +optional
+	KeepFiringFor *v1.NonEmptyDuration `json:"keep_firing_for,omitempty"`
+	// Labels to add or overwrite.
+	Labels map[string]string `json:"labels,omitempty"`
+	// Annotations to add to each alert.
+	// Only valid for alerting rules.
+	Annotations map[string]string `json:"annotations,omitempty"`
+}
+
+func (o PrometheusRulesOverride) ListOverride(l []v1.Rule) []v1.Rule {
+	var rules []v1.Rule
+	for _, i := range l {
+		rules = append(rules, *(o.Override(&i)))
+	}
+	return rules
+}
+
+func (o PrometheusRulesOverride) Override(r *v1.Rule) *v1.Rule {
+	mergedRule := r.DeepCopy()
+	// TODO check Expr
+	if (o.Record != "" && o.Record == r.Record) || (o.Alert != "" && o.Alert == r.Alert) {
+		// if Expr is nil
+		if o.For != nil {
+			mergedRule.For = o.For
+		}
+		if o.KeepFiringFor != nil {
+			mergedRule.KeepFiringFor = o.KeepFiringFor
+		}
+		if o.Labels != nil {
+			mergedRule.Labels = o.Labels
+		}
+		if o.Annotations != nil {
+			mergedRule.Annotations = o.Annotations
+		}
+	}
+	return mergedRule
 }
 
 // BufferMetrics defines the service monitor endpoints
