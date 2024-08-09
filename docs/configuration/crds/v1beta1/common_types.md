@@ -65,7 +65,7 @@ Name of the alert. Must be a valid label value. Only one of `record` and `alert`
 Annotations to add to each alert. Only valid for alerting rules. 
 
 
-### expr (intstr.IntOrString, optional) {#prometheusrulesoverride-expr}
+### expr (*intstr.IntOrString, optional) {#prometheusrulesoverride-expr}
 
 PromQL expression to evaluate. 
 
