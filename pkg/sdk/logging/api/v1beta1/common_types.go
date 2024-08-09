@@ -74,7 +74,7 @@ type PrometheusRulesOverride struct {
 	// Only one of `record` and `alert` must be set.
 	Alert string `json:"alert,omitempty"`
 	// PromQL expression to evaluate.
-	Expr intstr.IntOrString `json:"expr,omitempty"`
+	Expr *intstr.IntOrString `json:"expr,omitempty"`
 	// Alerts are considered firing once they have been returned for this long.
 	// +optional
 	For *v1.Duration `json:"for,omitempty"`
@@ -98,9 +98,10 @@ func (o PrometheusRulesOverride) ListOverride(l []v1.Rule) []v1.Rule {
 
 func (o PrometheusRulesOverride) Override(r *v1.Rule) *v1.Rule {
 	mergedRule := r.DeepCopy()
-	// TODO check Expr
 	if (o.Record != "" && o.Record == r.Record) || (o.Alert != "" && o.Alert == r.Alert) {
-		// if Expr is nil
+		if o.Expr != nil {
+			mergedRule.Expr = *o.Expr
+		}
 		if o.For != nil {
 			mergedRule.For = o.For
 		}
