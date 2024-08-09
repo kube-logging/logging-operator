@@ -40,6 +40,9 @@ Metrics defines the service monitor endpoints
 ### prometheusRules (bool, optional) {#metrics-prometheusrules}
 
 
+### prometheusRulesOverride ([]PrometheusRulesOverride, optional) {#metrics-prometheusrulesoverride}
+
+
 ### serviceMonitor (bool, optional) {#metrics-servicemonitor}
 
 
@@ -47,6 +50,44 @@ Metrics defines the service monitor endpoints
 
 
 ### timeout (string, optional) {#metrics-timeout}
+
+
+
+## PrometheusRulesOverride
+
+### alert (string, optional) {#prometheusrulesoverride-alert}
+
+Name of the alert. Must be a valid label value. Only one of `record` and `alert` must be set. 
+
+
+### annotations (map[string]string, optional) {#prometheusrulesoverride-annotations}
+
+Annotations to add to each alert. Only valid for alerting rules. 
+
+
+### expr (*intstr.IntOrString, optional) {#prometheusrulesoverride-expr}
+
+PromQL expression to evaluate. 
+
+
+### for (*v1.Duration, optional) {#prometheusrulesoverride-for}
+
+Alerts are considered firing once they have been returned for this long. +optional 
+
+
+### keep_firing_for (*v1.NonEmptyDuration, optional) {#prometheusrulesoverride-keep_firing_for}
+
+KeepFiringFor defines how long an alert will continue firing after the condition that triggered it has cleared. +optional 
+
+
+### labels (map[string]string, optional) {#prometheusrulesoverride-labels}
+
+Labels to add or overwrite. 
+
+
+### record (string, optional) {#prometheusrulesoverride-record}
+
+Name of the time series to output to. Must be a valid metric name. Only one of `record` and `alert` must be set. 
 
 
 

@@ -709,6 +709,35 @@ spec:
                     type: boolean
                   prometheusRules:
                     type: boolean
+                  prometheusRulesOverride:
+                    items:
+                      properties:
+                        alert:
+                          type: string
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        expr:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        for:
+                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          type: string
+                        keep_firing_for:
+                          minLength: 1
+                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        record:
+                          type: string
+                      type: object
+                    type: array
                   serviceMonitor:
                     type: boolean
                   serviceMonitorConfig:
@@ -1550,6 +1579,35 @@ spec:
                     type: boolean
                   prometheusRules:
                     type: boolean
+                  prometheusRulesOverride:
+                    items:
+                      properties:
+                        alert:
+                          type: string
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        expr:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        for:
+                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          type: string
+                        keep_firing_for:
+                          minLength: 1
+                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        record:
+                          type: string
+                      type: object
+                    type: array
                   serviceMonitor:
                     type: boolean
                   serviceMonitorConfig:
