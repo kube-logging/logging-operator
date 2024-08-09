@@ -44,7 +44,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "critical",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd cannot be scraped`,
@@ -58,7 +58,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "warning",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd node are failing`,
@@ -72,7 +72,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "critical",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd nodes buffer queue length are critical`,
@@ -86,7 +86,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "critical",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `fluentd records count are critical`,
@@ -100,7 +100,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "warning",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd retry count has been "{{ $value }}" for the last 10 minutes.`,
@@ -114,7 +114,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "warning",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `There have been Fluentd output error(s) for the last 10 minutes.`,
@@ -128,7 +128,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "warning",
+						"severity":  r.fluentdSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer size is predicted to increase more than 50% in the next 10 minutes.`,

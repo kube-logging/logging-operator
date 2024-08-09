@@ -45,7 +45,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "warning",
+						"severity":  r.fluentdSpec.BufferVolumeMetrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer free capacity less than 10%.`,
@@ -59,7 +59,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "fluentd",
-						"severity":  "critical",
+						"severity":  r.fluentdSpec.BufferVolumeMetrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentd buffer free capacity less than 5%.`,

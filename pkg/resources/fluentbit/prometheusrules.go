@@ -43,7 +43,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					For:   prometheus_operator.Duration("10m"),
 					Labels: map[string]string{
 						"service":  "fluentbit",
-						"severity": "warning",
+						"severity": r.fluentbitSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Fluentbit too many errors.`,

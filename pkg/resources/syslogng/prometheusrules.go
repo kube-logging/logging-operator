@@ -45,7 +45,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "critical",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG cannot be scraped`,
@@ -59,7 +59,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "warning",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `syslog-ng node are failing`,
@@ -73,7 +73,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "critical",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG nodes buffer queue length are critical`,
@@ -87,7 +87,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "critical",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `syslog-ng records count are critical`,
@@ -101,7 +101,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "warning",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG retry count has been "{{ $value }}" for the last 10 minutes.`,
@@ -115,7 +115,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "warning",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `There have been syslog-ng output error(s) for the last 10 minutes.`,
@@ -129,7 +129,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 					Labels: map[string]string{
 						"rulegroup": ruleGroupName,
 						"service":   "syslog-ng",
-						"severity":  "warning",
+						"severity":  r.syslogNGSpec.Metrics.Severity,
 					},
 					Annotations: map[string]string{
 						"summary":     `Syslog-NG buffer size prediction warning.`,
