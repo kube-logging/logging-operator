@@ -30,27 +30,33 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
 	}
 	state := reconciler.StateAbsent
-
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
-		state = reconciler.StatePresent
-		obj.Spec.Groups = []v1.RuleGroup{{
-			Name: "fluentbit",
-			Rules: []v1.Rule{
-				{
-					Alert: "FluentbitTooManyErrors",
-					Expr:  intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
-					For:   prometheus_operator.Duration("10m"),
-					Labels: map[string]string{
-						"service":  "fluentbit",
-						"severity": "warning",
-					},
-					Annotations: map[string]string{
-						"summary":     `Fluentbit too many errors.`,
-						"description": `Fluentbit ({{ $labels.instance }}) is erroring.`,
-					},
+		builtInRules := []v1.Rule{
+			{
+				Alert: "FluentbitTooManyErrors",
+				Expr:  intstr.FromString(fmt.Sprintf("rate(fluentbit_output_retries_failed_total{%s}[10m]) > 0", nsJobLabel)),
+				For:   prometheus_operator.Duration("10m"),
+				Labels: map[string]string{
+					"service":  "fluentbit",
+					"severity": "warning",
+				},
+				Annotations: map[string]string{
+					"summary":     `Fluentbit too many errors.`,
+					"description": `Fluentbit ({{ $labels.instance }}) is erroring.`,
 				},
 			},
+		}
+		rules := builtInRules
+		if r.fluentbitSpec.Metrics.PrometheusRulesOverride != nil {
+			for _, o := range r.fluentbitSpec.Metrics.PrometheusRulesOverride {
+				rules = o.ListOverride(builtInRules)
+			}
+		}
+		state = reconciler.StatePresent
+		obj.Spec.Groups = []v1.RuleGroup{{
+			Name:  "fluentbit",
+			Rules: rules,
 		},
 		}
 	}
