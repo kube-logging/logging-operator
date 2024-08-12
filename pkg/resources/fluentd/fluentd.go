@@ -286,8 +286,11 @@ func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, r
 }
 
 func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, error) {
-	if r.fluentdSpec.DisablePvc || !r.fluentdSpec.Scaling.Drain.Enabled {
-		r.Log.Info("fluentd buffer draining is disabled")
+	if !r.fluentdSpec.Scaling.Drain.Enabled {
+		return nil, nil
+	}
+	if r.fluentdSpec.DisablePvc && r.fluentdSpec.Scaling.Drain.Enabled {
+		r.Log.Info("fluentd buffer draining cannot be enabled because PVC for the statefulSet is disabled")
 		return nil, nil
 	}
 
