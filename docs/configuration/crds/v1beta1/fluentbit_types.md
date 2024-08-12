@@ -723,6 +723,7 @@ Configurable TTL for K8s cached namespace metadata. (15m)
 
 Include Kubernetes namespace labels on every record 
 
+Default: On
 
 ### Regex_Parser (string, optional) {#filterkubernetes-regex_parser}
 

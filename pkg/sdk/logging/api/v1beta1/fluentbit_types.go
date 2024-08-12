@@ -333,7 +333,7 @@ type FilterKubernetes struct {
 	// Include Kubernetes resource annotations in the extra metadata. (default:On)
 	Annotations string `json:"Annotations,omitempty"`
 	// Include Kubernetes namespace labels on every record
-	NamespaceLabels string `json:"namespace_labels,omitempty"`
+	NamespaceLabels string `json:"namespace_labels,omitempty" plugin:"default:On"`
 	// Include Kubernetes namespace annotations on every record
 	NamespaceAnnotations string `json:"namespace_annotations,omitempty"`
 	// Configurable TTL for K8s cached namespace metadata. (15m)
