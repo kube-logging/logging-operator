@@ -88,6 +88,7 @@ type LoggingSpec struct {
 	// This has the following benefits:
 	// - automatic json log parsing using the Merge_Log feature
 	// - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime
+	// - the `concat` and `parser` filters are automatically set back to use the `log` field
 	EnableDockerParserCompatibilityForCRI bool `json:"enableDockerParserCompatibilityForCRI,omitempty"`
 }
 

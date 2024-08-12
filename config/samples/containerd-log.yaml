@@ -22,12 +22,12 @@ spec:
   filters:
     # for debugging
     - stdout: {}
-    # automatic configuration should be overridden
-    - concat:
-        key: "log"
-    - parser:
-        key_name: "log"
-
+    # With `enableDockerParserCompatibilityForCRI: true` key and key_name are
+    # set to "log" otherwise these are set to "message" if the runtime is CRI
+    #- concat:
+    #    key: log
+    #- parser:
+    #    key_name: log
   match:
     - select: {}
   localOutputRefs:
