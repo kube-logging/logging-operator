@@ -84,6 +84,11 @@ type LoggingSpec struct {
 	// in case there is a change in an immutable field
 	// that otherwise couldn't be managed with a simple update.
 	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
+	// EnableDockerParserCompatibilityForCRI enables a log parser that is compatible with the docker parser.
+	// This has the following benefits:
+	// - automatic json log parsing using the Merge_Log feature
+	// - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime
+	EnableDockerParserCompatibilityForCRI bool `json:"enableDockerParserCompatibilityForCRI,omitempty"`
 }
 
 type ConfigCheckStrategy string

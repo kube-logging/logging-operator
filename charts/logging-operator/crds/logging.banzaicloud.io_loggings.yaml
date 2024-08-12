@@ -1063,6 +1063,8 @@ spec:
                       type: string
                     type: array
                 type: object
+              enableDockerParserCompatibilityForCRI:
+                type: boolean
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
               errorOutputRef:
