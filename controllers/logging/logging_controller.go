@@ -49,6 +49,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -189,7 +190,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		model.NewValidationReconciler(
 			r.Client,
 			loggingResources,
-			&secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath},
+			&secretLoaderFactory{
+				Client:  r.Client,
+				Path:    fluentd.OutputSecretPath,
+				Logging: loggingResources.Logging,
+			},
 			log.WithName("validation"),
 		),
 	}
@@ -436,8 +441,9 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	}
 
 	slf := secretLoaderFactory{
-		Client: r.Client,
-		Path:   fluentd.OutputSecretPath,
+		Client:  r.Client,
+		Path:    fluentd.OutputSecretPath,
+		Logging: resources.Logging,
 	}
 
 	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
@@ -463,8 +469,9 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	}
 
 	slf := secretLoaderFactory{
-		Client: r.Client,
-		Path:   syslogng.OutputSecretPath,
+		Client:  r.Client,
+		Path:    syslogng.OutputSecretPath,
+		Logging: resources.Logging,
 	}
 
 	_, syslogngSpec := resources.GetSyslogNGSpec()
@@ -487,10 +494,27 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	return b.String(), &slf.Secrets, nil
 }
 
+type SecretLoaderWithLogKeyProvider struct {
+	SecretLoader secret.SecretLoader
+	Logging      loggingv1beta1.Logging
+}
+
+func (s *SecretLoaderWithLogKeyProvider) Load(secret *secret.Secret) (string, error) {
+	return s.SecretLoader.Load(secret)
+}
+
+func (s *SecretLoaderWithLogKeyProvider) GetLogKey() string {
+	if s.Logging.Spec.EnableDockerParserCompatibilityForCRI {
+		return "log"
+	}
+	return loggingmodeltypes.GetLogKey()
+}
+
 type secretLoaderFactory struct {
 	Client  client.Client
 	Secrets secret.MountSecrets
 	Path    string
+	Logging loggingv1beta1.Logging
 }
 
 // Deprecated: use SecretLoaderForNamespace instead
@@ -499,7 +523,10 @@ func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) s
 }
 
 func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets)
+	return &SecretLoaderWithLogKeyProvider{
+		SecretLoader: secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets),
+		Logging:      f.Logging,
+	}
 }
 
 // SetupLoggingWithManager setup logging manager
