@@ -9,27 +9,10 @@ kind: Logging
 metadata:
   name: containerd
 spec:
+  enableDockerParserCompatibilityForCRI: true
   fluentd: {}
   controlNamespace: default
-  fluentbit:
-    inputTail:
-      Parser: cri-log-key
-    # Parser that populates `log` instead of `message` to enable the kubernetes filter's Merge_Log feature to parse json automatically
-    # Indentation is important
-    customParsers: |
-                    [PARSER]
-                        Name cri-log-key
-                        Format regex
-                        Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
-                        Time_Key    time
-                        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
-    # Required key remap if one wants to rely on the existing auto-detected log key in the fluentd parser and concat filter
-    # otherwise should be omitted
-    filterModify:
-      - rules:
-        - Rename:
-            key: log
-            value: message
+  fluentbit: {}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
@@ -37,7 +20,14 @@ metadata:
   name: all
 spec:
   filters:
+    # for debugging
     - stdout: {}
+    # With `enableDockerParserCompatibilityForCRI: true` key and key_name are
+    # set to "log" otherwise these are set to "message" if the runtime is CRI
+    #- concat:
+    #    key: log
+    #- parser:
+    #    key_name: log
   match:
     - select: {}
   localOutputRefs:

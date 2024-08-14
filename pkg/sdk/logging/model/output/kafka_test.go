@@ -62,3 +62,42 @@ buffer:
 	test := render.NewOutputPluginTest(t, kafka)
 	test.DiffResult(expected)
 }
+
+func TestRdkafka(t *testing.T) {
+	CONFIG := []byte(`
+brokers: kafka-headless.kafka.svc.cluster.local:29092
+default_topic: topic
+use_rdkafka: true
+ssl_verify_hostname: false
+format:
+  type: json
+buffer:
+  timekey: 1m
+  timekey_wait: 30s
+  timekey_use_utc: true
+`)
+	expected := `
+  <match **>
+    @type rdkafka2
+    @id test
+    brokers kafka-headless.kafka.svc.cluster.local:29092
+    default_topic topic
+    ssl_verify_hostname false
+    <buffer tag,time>
+      @type file
+      path /buffers/test.*.buffer
+      retry_forever true
+      timekey 1m
+      timekey_use_utc true
+      timekey_wait 30s
+    </buffer>
+    <format>
+      @type json
+    </format>
+  </match>
+`
+	kafka := &output.KafkaOutputConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, kafka))
+	test := render.NewOutputPluginTest(t, kafka)
+	test.DiffResult(expected)
+}

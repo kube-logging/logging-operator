@@ -17,6 +17,7 @@ package fluentbit
 const BaseConfigName = "fluent-bit.conf"
 const UpstreamConfigName = "upstream.conf"
 const CustomParsersConfigName = "custom-parsers.conf"
+const CRIParserConfigName = "cri-log-parser.conf"
 const StockConfigPath = "/fluent-bit/etc"
 const StockBinPath = "/fluent-bit/bin/fluent-bit"
 const OperatorConfigPath = "/fluent-bit/etc-operator"
@@ -223,4 +224,13 @@ var upstreamConfigTemplate = `
     Host {{.Host}}
     Port {{.Port}}
 {{- end}}
+`
+
+var criParserConfig = `
+[PARSER]
+    Name cri-log-compatibility
+    Format regex
+    Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
+    Time_Key    time
+    Time_Format %Y-%m-%dT%H:%M:%S.%L%z
 `

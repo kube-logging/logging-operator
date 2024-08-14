@@ -706,6 +706,11 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.SaslOverSSL != nil {
+		in, out := &in.SaslOverSSL, &out.SaslOverSSL
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Keytab != nil {
 		in, out := &in.Keytab, &out.Keytab
 		*out = new(secret.Secret)

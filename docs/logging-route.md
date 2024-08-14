@@ -1,7 +1,5 @@
 ## Logging Route
 
-> Warning: Experimental feature
-
 A _Logging Route_ is responsible to define a global rule that instructs `FluentbitAgent` resources that belongs to the same
 `Logging` resource to route logs to different target `Logging` aggregators (fluentd or syslog-ng).
 

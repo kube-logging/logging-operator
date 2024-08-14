@@ -3420,6 +3420,8 @@ spec:
                     type: string
                   use_default_for_unknown_topic:
                     type: boolean
+                  use_rdkafka:
+                    type: boolean
                   username:
                     properties:
                       mountFrom:
@@ -10090,6 +10092,8 @@ spec:
                   topic_key:
                     type: string
                   use_default_for_unknown_topic:
+                    type: boolean
+                  use_rdkafka:
                     type: boolean
                   username:
                     properties:

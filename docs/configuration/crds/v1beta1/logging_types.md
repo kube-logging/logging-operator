@@ -34,6 +34,11 @@ Namespace for cluster wide configuration resources like ClusterFlow and ClusterO
 Default flow for unmatched logs. This Flow configuration collects all logs that didn't matched any other Flow. 
 
 
+### enableDockerParserCompatibilityForCRI (bool, optional) {#loggingspec-enabledockerparsercompatibilityforcri}
+
+EnableDockerParserCompatibilityForCRI enables a log parser that is compatible with the docker parser. This has the following benefits: - automatic json log parsing using the Merge_Log feature - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime - the `concat` and `parser` filters are automatically set back to use the `log` field 
+
+
 ### enableRecreateWorkloadOnImmutableFieldChange (bool, optional) {#loggingspec-enablerecreateworkloadonimmutablefieldchange}
 
 EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 

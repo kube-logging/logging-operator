@@ -13,7 +13,7 @@ generated_file: true
 
 ### buffer (*Buffer, optional) {#output config-buffer}
 
-Available since ghcr.io/kube-logging/fluentd:v1.16-full-build.139 [Buffer](../buffer/) 
+Available since ghcr.io/kube-logging/fluentd:v1.16-4.8-full [Buffer](../buffer/) 
 
 
 ### host (string, required) {#output config-host}

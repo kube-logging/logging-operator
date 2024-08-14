@@ -21,6 +21,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -48,10 +49,19 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
+	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
+
+var fluentbitWarning sync.Once
+var promCrdWarning sync.Once
+
+func init() {
+	fluentbitWarning = sync.Once{}
+	promCrdWarning = sync.Once{}
+}
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
 func NewLoggingReconciler(client client.Client, eventRecorder record.EventRecorder, log logr.Logger) *LoggingReconciler {
@@ -100,18 +110,26 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
+	var missingCRDs []string
+
 	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
 	} else {
-		log.Info("WARNING ServiceMonitor is not supported in the cluster")
+		missingCRDs = append(missingCRDs, "ServiceMonitor")
 	}
 
 	if err := r.Client.List(ctx, &v1.PrometheusRuleList{}); err == nil {
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
 	} else {
-		log.Info("WARNING PrometheusRule is not supported in the cluster")
+		missingCRDs = append(missingCRDs, "PrometheusRule")
+	}
+
+	if len(missingCRDs) > 0 {
+		promCrdWarning.Do(func() {
+			log.Info(fmt.Sprintf("WARNING Prometheus Operator CRDs (%s) are not supported in the cluster", strings.Join(missingCRDs, ",")))
+		})
 	}
 
 	if err := logging.SetDefaults(); err != nil {
@@ -172,7 +190,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		model.NewValidationReconciler(
 			r.Client,
 			loggingResources,
-			&secretLoaderFactory{Client: r.Client, Path: fluentd.OutputSecretPath},
+			&secretLoaderFactory{
+				Client:  r.Client,
+				Path:    fluentd.OutputSecretPath,
+				Logging: loggingResources.Logging,
+			},
 			log.WithName("validation"),
 		),
 	}
@@ -225,7 +247,9 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	case 0:
 		// check for legacy definition
 		if logging.Spec.FluentbitSpec != nil {
-			log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
+			fluentbitWarning.Do(func() {
+				log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
+			})
 			nameProvider := fluentbit.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
@@ -417,8 +441,9 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	}
 
 	slf := secretLoaderFactory{
-		Client: r.Client,
-		Path:   fluentd.OutputSecretPath,
+		Client:  r.Client,
+		Path:    fluentd.OutputSecretPath,
+		Logging: resources.Logging,
 	}
 
 	fluentConfig, err := model.CreateSystem(resources, &slf, r.Log)
@@ -444,8 +469,9 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	}
 
 	slf := secretLoaderFactory{
-		Client: r.Client,
-		Path:   syslogng.OutputSecretPath,
+		Client:  r.Client,
+		Path:    syslogng.OutputSecretPath,
+		Logging: resources.Logging,
 	}
 
 	_, syslogngSpec := resources.GetSyslogNGSpec()
@@ -468,10 +494,27 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	return b.String(), &slf.Secrets, nil
 }
 
+type SecretLoaderWithLogKeyProvider struct {
+	SecretLoader secret.SecretLoader
+	Logging      loggingv1beta1.Logging
+}
+
+func (s *SecretLoaderWithLogKeyProvider) Load(secret *secret.Secret) (string, error) {
+	return s.SecretLoader.Load(secret)
+}
+
+func (s *SecretLoaderWithLogKeyProvider) GetLogKey() string {
+	if s.Logging.Spec.EnableDockerParserCompatibilityForCRI {
+		return "log"
+	}
+	return loggingmodeltypes.GetLogKey()
+}
+
 type secretLoaderFactory struct {
 	Client  client.Client
 	Secrets secret.MountSecrets
 	Path    string
+	Logging loggingv1beta1.Logging
 }
 
 // Deprecated: use SecretLoaderForNamespace instead
@@ -480,7 +523,10 @@ func (f *secretLoaderFactory) OutputSecretLoaderForNamespace(namespace string) s
 }
 
 func (f *secretLoaderFactory) SecretLoaderForNamespace(namespace string) secret.SecretLoader {
-	return secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets)
+	return &SecretLoaderWithLogKeyProvider{
+		SecretLoader: secret.NewSecretLoader(f.Client, namespace, f.Path, &f.Secrets),
+		Logging:      f.Logging,
+	}
 }
 
 // SetupLoggingWithManager setup logging manager
@@ -573,9 +619,8 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGConfig{}, requestMapper)
 
-	// TODO remove with the next major release
+	// Deprecated: Node agents are deprecated and no longer maintained actively
 	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
-		logger.Info("processing NodeAgent CRDs is explicitly disabled (enable: ENABLE_NODEAGENT_CRD=1)")
 		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
 	}
 

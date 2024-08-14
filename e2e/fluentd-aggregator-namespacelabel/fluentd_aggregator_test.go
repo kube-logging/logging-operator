@@ -97,13 +97,13 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 						Keepalive: utils.BoolPointer(false),
 					},
 					FilterKubernetes: v1beta1.FilterKubernetes{
-						// Namespace labels enrichment must be enabled explicitly for now
-						NamespaceLabels: "On",
+						// Namespace labels enrichment is enabled by default starting with version 4.9
+						// NamespaceLabels: "On",
 					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: "v1.16-4.8-base",
+						Tag: "v1.16-4.9-base",
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{

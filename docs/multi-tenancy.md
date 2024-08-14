@@ -112,8 +112,6 @@ Cons:
 
 ### Hard multi-tenancy with a logging route
 
-> Warning: Experimental feature
-
 With the introduction of a `LoggingRoute` resource, it is now possible to route logs based on namespaces to different aggregators.
 
 A _logging route_ connects a collector (fluentbit) of one logging resource with the aggregators of other logging resources.

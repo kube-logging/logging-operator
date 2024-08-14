@@ -84,6 +84,12 @@ type LoggingSpec struct {
 	// in case there is a change in an immutable field
 	// that otherwise couldn't be managed with a simple update.
 	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
+	// EnableDockerParserCompatibilityForCRI enables a log parser that is compatible with the docker parser.
+	// This has the following benefits:
+	// - automatic json log parsing using the Merge_Log feature
+	// - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime
+	// - the `concat` and `parser` filters are automatically set back to use the `log` field
+	EnableDockerParserCompatibilityForCRI bool `json:"enableDockerParserCompatibilityForCRI,omitempty"`
 }
 
 type ConfigCheckStrategy string
@@ -172,7 +178,7 @@ const (
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "v0.0.5"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                        = "v1.16-4.8-full"
+	DefaultFluentdImageTag                        = "v1.16-4.9-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "v0.2.1"

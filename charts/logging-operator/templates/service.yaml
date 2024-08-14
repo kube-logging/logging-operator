@@ -6,7 +6,7 @@ metadata:
   labels:
 {{ include "logging-operator.labels" . | indent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.http.service.type }}
   {{- with  .Values.http.service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}

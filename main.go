@@ -224,6 +224,7 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+
 }
 
 // Extends sigs.k8s.io/controller-runtime@v0.17.2/pkg/manager/signals/signal.go with

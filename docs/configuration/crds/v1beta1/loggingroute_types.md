@@ -60,7 +60,7 @@ Enumerate all loggings with all the destination namespaces expanded
 
 ## LoggingRoute
 
-LoggingRoute (experimental)
+LoggingRoute
 Connects a log collector with log aggregators from other logging domains and routes relevant logs based on watch namespaces
 
 ###  (metav1.TypeMeta, required) {#loggingroute-}

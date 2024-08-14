@@ -65,6 +65,7 @@ For more information please click on the plugin name
 | **[Authentication config for syslog-ng outputs](syslogng-outputs/auth/)** | syslogng-outputs | Authentication config for syslog-ng outputs | Testing | []() |
 | **[disk-buffer configuration](syslogng-outputs/disk_buffer/)** | syslogng-outputs | disk-buffer configuration | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/) |
 | **[Elasticsearch](syslogng-outputs/elasticsearch/)** | syslogng-outputs | Sending messages over Elasticsearch | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/) |
+| **[Elasticsearch datastream](syslogng-outputs/elasticsearch_datastream/)** | syslogng-outputs | Sending messages over Elasticsearch datastreams | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/) |
 | **[File](syslogng-outputs/file/)** | syslogng-outputs | SStoring messages in plain-text files | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/) |
 | **[HTTP](syslogng-outputs/http/)** | syslogng-outputs | Sending messages over HTTP | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/) |
 | **[Loggly](syslogng-outputs/loggly/)** | syslogng-outputs | Send your logs to loggly | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/) |
@@ -73,6 +74,7 @@ For more information please click on the plugin name
 | **[MongoDB Destination](syslogng-outputs/mongodb/)** | syslogng-outputs | Sending messages into MongoDB Server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/) |
 | **[MQTT Destination](syslogng-outputs/mqtt/)** | syslogng-outputs | Sending messages over MQTT Protocol | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/) |
 | **[OpenObserve](syslogng-outputs/openobserve/)** | syslogng-outputs | Sending messages over OpenObserve | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/) |
+| **[OpenTelemetry](syslogng-outputs/opentelemetry/)** | syslogng-outputs | Sending messages over OpenTelemetry GRPC | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/opentelemetry/) |
 | **[Redis Server Destination](syslogng-outputs/redis/)** | syslogng-outputs | Sending messages from local network to the Redis server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/) |
 | **[S3 Destination](syslogng-outputs/s3/)** | syslogng-outputs | Sending messages from a local network to a S3 (compatible) server | Testing | [](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/) |
 | **[SplunkHEC](syslogng-outputs/splunk_hec/)** | syslogng-outputs | Sending messages over Splunk HEC | Testing | []() |

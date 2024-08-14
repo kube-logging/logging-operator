@@ -19,6 +19,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -341,7 +342,11 @@ func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) 
 	parserConfig := p.DeepCopy()
 
 	if parserConfig.KeyName == "" {
-		parserConfig.KeyName = types.GetLogKey()
+		if logKeyProvider, ok := secretLoader.(types.LogKeyProvider); ok {
+			parserConfig.KeyName = logKeyProvider.GetLogKey()
+		} else {
+			parserConfig.KeyName = types.GetLogKey()
+		}
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(parserConfig); err != nil {
 		return nil, err
