@@ -143,11 +143,23 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
-		return c.PrintLogs(common.PrintLogConfig{
+		err := c.PrintLogs(common.PrintLogConfig{
 			Namespaces: []string{nsInfra, nsTenant, "default"},
 			FilePath:   path,
 			Limit:      100 * 1000,
 		})
+		if err != nil {
+			return err
+		}
+
+		loggingOperatorName := "logging-operator-" + release
+		t.Logf("Collecting coverage files from logging-operator: %s/%s", nsInfra, loggingOperatorName)
+		err = c.CollectTestCoverageFiles(nsInfra, loggingOperatorName)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

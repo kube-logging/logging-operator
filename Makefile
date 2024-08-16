@@ -34,6 +34,7 @@ ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
 GOLANGCI_LINT_VERSION := v1.51.2
+LINTER_FLAGS := --timeout 5m
 
 HELM_DOCS := ${BIN}/helm-docs
 HELM_DOCS_VERSION = 1.11.0
@@ -83,6 +84,11 @@ docker-build: ## Build the docker image
 .PHONY: docker-build-debug
 docker-build-debug: ## Build the debug docker image
 	${DOCKER} build --target debug -t ${IMG_DEBUG} .
+
+.PHONY: docker-build-e2e-test
+docker-build-e2e-test: ## Build the coverage docker image
+	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover -covermode=atomic" -t ${IMG} --target e2e-test .
+	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
@@ -174,7 +180,7 @@ check-coverage: install-go-test-coverage generate-test-coverage
 	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
 
 .PHONY: test-e2e
-test-e2e: ${KIND} codegen manifests docker-build stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
@@ -192,7 +198,11 @@ test-e2e-nodeps:
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
+		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
 		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
+	    go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
+	@echo "--- E2E test coverage report"
+	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
 
 .PHONY: tidy
 tidy: ## Tidy Go modules

@@ -30,6 +30,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/controller.tar
+          target: e2e-test
+          build-args: |
+            GO_BUILD_FLAGS=-cover -covermode=atomic
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -80,6 +83,11 @@ jobs:
 #        env:
 #          SHARD: ${{ matrix.SHARD }}
 #          SHARDS: ${{ matrix.SHARDS }}
+
+      - name: Test Coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          profile: ./build/_test_coverage/coverage_e2e.out
 
       - name: Archive Test Results
         if: always()

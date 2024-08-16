@@ -94,6 +94,24 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		"testReceiver": map[string]interface{}{
 			"enabled": true,
 		},
+		"volumes": []map[string]interface{}{
+			{
+				"name":     "coverage-data",
+				"emptyDir": map[string]string{},
+			},
+		},
+		"volumeMounts": []map[string]interface{}{
+			{
+				"mountPath": "/covdatafiles",
+				"name":      "coverage-data",
+			},
+		},
+		"env": []map[string]interface{}{
+			{
+				"name":  "GOCOVERDIR",
+				"value": "/covdatafiles",
+			},
+		},
 	})
 	if err != nil {
 		t.Fatalf("helm chart install: %s", err)
