@@ -207,6 +207,9 @@ logging:
   # -- EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update.
   enableRecreateWorkloadOnImmutableFieldChange: false
 
+  # -- EnableDockerParserCompatibilityForCRI enables Docker log format compatibility for CRI workloads.
+  enableDockerParserCompatibilityForCRI: false
+
   # -- ClusterFlows to deploy
   clusterFlows: []
 
@@ -243,7 +246,7 @@ logging:
       # -- imagePullSecrets of eventTailer image
       imagePullSecrets: []
     pvc:
-      # -- enable pvc for 
+      # -- enable pvc for
       enabled: true
       # -- storage class for event tailer pvc
       accessModes:

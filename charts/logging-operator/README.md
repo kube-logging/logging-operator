@@ -85,6 +85,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.nodeAgents | object | `{}` | NodeAgent Configuration |
 | logging.configCheck | object | `{}` | configCheck provides possibility for timeout-based configuration checks https://kube-logging.dev/docs/whats-new/#timeout-based-configuration-checks |
 | logging.enableRecreateWorkloadOnImmutableFieldChange | bool | `false` | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update. |
+| logging.enableDockerParserCompatibilityForCRI | bool | `false` | EnableDockerParserCompatibilityForCRI enables Docker log format compatibility for CRI workloads. |
 | logging.clusterFlows | list | `[]` | ClusterFlows to deploy |
 | logging.clusterOutputs | list | `[]` | ClusterOutputs to deploy |
 | logging.eventTailer.enabled | bool | `false` |  |
@@ -93,7 +94,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |
 | logging.eventTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
 | logging.eventTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
-| logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for  |
+| logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for |
 | logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | storage class for event tailer pvc |
 | logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | storage class for event tailer pvc |
 | logging.eventTailer.pvc.storage | string | `"1Gi"` | storage for event tailer pvc |
