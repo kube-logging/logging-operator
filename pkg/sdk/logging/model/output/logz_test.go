@@ -18,9 +18,10 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/stretchr/testify/require"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLogZ(t *testing.T) {
@@ -30,7 +31,7 @@ endpoint:
   token:
     value: 1234
 http_idle_timeout: 10
-output_include_tags: true
+output_include_tags: false
 output_include_time: true
 retry_count: 4
 retry_sleep: 2
@@ -49,7 +50,7 @@ buffer:
 	endpoint_url https://listener.logz.io:8071?token=1234
 	gzip true
 	http_idle_timeout 10
-	output_include_tags true
+	output_include_tags false
 	output_include_time true
 	retry_count 4
 	retry_sleep 2
