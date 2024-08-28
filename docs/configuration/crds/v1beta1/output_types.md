@@ -32,7 +32,7 @@ OutputSpec defines the desired state of Output
 ### gcs (*output.GCSOutput, optional) {#outputspec-gcs}
 
 
-### gelf (*output.GELFOutputConfig, optional) {#outputspec-gelf}
+### gelf (*output.GelfOutputConfig, optional) {#outputspec-gelf}
 
 
 ### http (*output.HTTPOutputConfig, optional) {#outputspec-http}

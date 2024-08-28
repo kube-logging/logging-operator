@@ -2538,9 +2538,9 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.SyslogOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.GELFOutputConfig != nil {
-		in, out := &in.GELFOutputConfig, &out.GELFOutputConfig
-		*out = new(output.GELFOutputConfig)
+	if in.GelfOutputConfig != nil {
+		in, out := &in.GelfOutputConfig, &out.GelfOutputConfig
+		*out = new(output.GelfOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.SQSOutputConfig != nil {

@@ -54,7 +54,7 @@ type OutputSpec struct {
 	AwsElasticsearchOutputConfig *output.AwsElasticsearchOutputConfig `json:"awsElasticsearch,omitempty"`
 	RedisOutputConfig            *output.RedisOutputConfig            `json:"redis,omitempty"`
 	SyslogOutputConfig           *output.SyslogOutputConfig           `json:"syslog,omitempty"`
-	GELFOutputConfig             *output.GELFOutputConfig             `json:"gelf,omitempty"`
+	GelfOutputConfig             *output.GelfOutputConfig             `json:"gelf,omitempty"`
 	SQSOutputConfig              *output.SQSOutputConfig              `json:"sqs,omitempty"`
 	RelabelOutputConfig          *output.RelabelOutputConfig          `json:"relabel,omitempty"`
 }
