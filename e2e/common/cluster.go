@@ -135,8 +135,8 @@ func (c kindCluster) CollectTestCoverageFiles(ns string, loggingOperatorName str
 	}
 	testCovDir := os.Getenv("E2E_TEST_COV_DIR")
 	cmd = exec.Command("sh", "-c", fmt.Sprintf(
-		"kubectl --kubeconfig %s -n %s exec deployment/%s -- tar -cf - /covdatafiles | tar -xf - -C %s",
-		c.KubeConfigFilePath(), ns, loggingOperatorName, testCovDir))
+		"kubectl -n %s cp deployment/%s:/covdatafiles %s",
+		ns, loggingOperatorName, testCovDir))
 	cmdOut, err = cmd.Output()
 	if err != nil {
 		return errors.WrapIfWithDetails(err, "Error in collecting test coverage files", cmdOut)
