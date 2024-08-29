@@ -26,7 +26,7 @@ E2E_TEST_TIMEOUT ?= 20m
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION := v0.15.0
+CONTROLLER_GEN_VERSION := v0.16.1
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
 ENVTEST_K8S_VERSION := 1.27.1
