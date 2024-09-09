@@ -69,12 +69,12 @@ Should the plugin ship the logs in gzip compression. Default is false.
 Timeout in seconds that the http persistent connection will stay open without traffic. 
 
 
-### output_include_tags (bool, optional) {#logzio-output_include_tags}
+### output_include_tags (*bool, optional) {#logzio-output_include_tags}
 
 Should the appender add the fluentd tag to the document, called "fluentd_tag" 
 
 
-### output_include_time (bool, optional) {#logzio-output_include_time}
+### output_include_time (*bool, optional) {#logzio-output_include_time}
 
 Should the appender add a timestamp to your logs on their process time (recommended). 
 

@@ -991,6 +991,16 @@ func (in *LogZOutput) DeepCopyInto(out *LogZOutput) {
 		*out = new(Endpoint)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.OutputIncludeTime != nil {
+		in, out := &in.OutputIncludeTime, &out.OutputIncludeTime
+		*out = new(bool)
+		**out = **in
+	}
+	if in.OutputIncludeTags != nil {
+		in, out := &in.OutputIncludeTags, &out.OutputIncludeTags
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Buffer != nil {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)
