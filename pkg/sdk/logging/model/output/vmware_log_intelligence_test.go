@@ -17,9 +17,9 @@ package output_test
 import (
 	"testing"
 
-	"github.com/ghodss/yaml"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	"sigs.k8s.io/yaml"
 
 	"github.com/stretchr/testify/require"
 )
