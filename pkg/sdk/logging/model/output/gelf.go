@@ -60,7 +60,8 @@ type GelfOutputConfig struct {
 	// For details, see [https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12](https://github.com/graylog-labs/gelf-rb/blob/72916932b789f7a6768c3cdd6ab69a3c942dbcef/lib/gelf/transport/tcp_tls.rb#L7-L12). (default: {})
 	TLSOptions map[string]string `json:"tls_options,omitempty"`
 	// MaxBytes specifies the maximum size, in bytes, of each individual log message.
-	// For details, see [https://github.com/Graylog2/graylog2-server/issues/873](https://github.com/Graylog2/graylog2-server/issues/873) (default: 3200)
+	// For details, see [https://github.com/Graylog2/graylog2-server/issues/873](https://github.com/Graylog2/graylog2-server/issues/873)
+  // Available since ghcr.io/kube-logging/fluentd:v1.16-4.10-full (default: 3200)
 	MaxBytes int `json:"max_bytes,omitempty"`
 	// Available since ghcr.io/kube-logging/fluentd:v1.16-4.8-full
 	// +docLink:"Buffer,../buffer/"
