@@ -1528,6 +1528,8 @@ spec:
                         type: string
                       storage.delete_irrecoverable_chunks:
                         type: string
+                      storage.max_chunks_up:
+                        type: integer
                       storage.metrics:
                         type: string
                       storage.path:
@@ -7954,6 +7956,8 @@ spec:
                               type: string
                             storage.delete_irrecoverable_chunks:
                               type: string
+                            storage.max_chunks_up:
+                              type: integer
                             storage.metrics:
                               type: string
                             storage.path:

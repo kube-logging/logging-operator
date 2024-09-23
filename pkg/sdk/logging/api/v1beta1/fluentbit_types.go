@@ -208,6 +208,8 @@ type BufferStorage struct {
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
 	// Available in Logging operator version 4.4 and later. If the `http_server` option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed. (default:Off)
 	StorageMetrics string `json:"storage.metrics,omitempty"`
+	// If the input plugin has enabled filesystem storage type, this property sets the maximum number of Chunks that can be up in memory. This is the setting to use to control memory usage when you enable storage.type filesystem. (default: 128)
+	StorageMaxChunksUp int `json:"storage.max_chunks_up,omitempty"`
 }
 
 // HealthCheck configuration. Available in Logging operator version 4.4 and later.
