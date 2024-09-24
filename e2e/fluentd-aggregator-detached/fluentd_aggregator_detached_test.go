@@ -267,7 +267,7 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
 		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
 		if err != nil {
-			return err
+			t.Logf("Failed collecting coverage files: %s", err)
 		}
 
 		return nil

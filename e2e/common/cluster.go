@@ -139,7 +139,7 @@ func (c kindCluster) CollectTestCoverageFiles(ns string, loggingOperatorName str
 		ns, loggingOperatorName, testCovDir))
 	cmdOut, err = cmd.Output()
 	if err != nil {
-		return errors.WrapIfWithDetails(err, "Error in collecting test coverage files", cmdOut)
+		return errors.WrapIff(err, "Error in collecting test coverage files. Cmdout: %s", cmdOut)
 	}
 	return nil
 }
