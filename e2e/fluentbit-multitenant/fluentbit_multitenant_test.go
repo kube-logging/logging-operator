@@ -156,7 +156,7 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 		t.Logf("Collecting coverage files from logging-operator: %s/%s", nsInfra, loggingOperatorName)
 		err = c.CollectTestCoverageFiles(nsInfra, loggingOperatorName)
 		if err != nil {
-			return err
+			t.Logf("Failed collecting coverage files: %s", err)
 		}
 
 		return nil

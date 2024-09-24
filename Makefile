@@ -26,7 +26,7 @@ E2E_TEST_TIMEOUT ?= 20m
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION := v0.15.0
+CONTROLLER_GEN_VERSION := v0.16.1
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
 ENVTEST_K8S_VERSION := 1.27.1
@@ -200,7 +200,7 @@ test-e2e-nodeps:
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
 		go test -v -timeout ${E2E_TEST_TIMEOUT} ./${E2E_TEST}/...
-	    go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
+		go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
 	@echo "--- E2E test coverage report"
 	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
 
