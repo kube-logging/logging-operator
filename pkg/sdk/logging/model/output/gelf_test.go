@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func TestGELFOutputConfig(t *testing.T) {
+func TestGelfOutputConfig(t *testing.T) {
 	CONFIG := []byte(`
 host: gelf-host
 port: 12201
@@ -43,7 +43,7 @@ port: 12201
     </buffer>
   </match>
 `
-	s := &output.GELFOutputConfig{}
+	s := &output.GelfOutputConfig{}
 	require.NoError(t, yaml.Unmarshal(CONFIG, s))
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)

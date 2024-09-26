@@ -2681,6 +2681,8 @@ spec:
                     type: object
                   host:
                     type: string
+                  max_bytes:
+                    type: integer
                   port:
                     type: integer
                   protocol:
@@ -9354,6 +9356,8 @@ spec:
                     type: object
                   host:
                     type: string
+                  max_bytes:
+                    type: integer
                   port:
                     type: integer
                   protocol:

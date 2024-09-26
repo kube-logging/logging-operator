@@ -38,7 +38,7 @@ For more information please click on the plugin name
 | **[Format rfc5424](outputs/format_rfc5424/)** | outputs | Specify how to format output record. | GA | [more info](https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424#format-section) |
 | **[Forward](outputs/forward/)** | outputs | Forwards events to other fluentd nodes. | GA | [more info](https://docs.fluentd.org/output/forward) |
 | **[Google Cloud Storage](outputs/gcs/)** | outputs | Store logs in Google Cloud Storage | GA | [0.4.0](https://github.com/kube-logging/fluent-plugin-gcs) |
-| **[Gelf](outputs/gelf/)** | outputs | Output plugin writes events to GELF | Testing | [1.0.8](https://github.com/hotschedules/fluent-plugin-gelf-hs) |
+| **[Gelf](outputs/gelf/)** | outputs | Output plugin writes logs to Graylog | Testing | [1.3.4](https://github.com/bmichalkiewicz/fluent-plugin-gelf-best) |
 | **[Http](outputs/http/)** | outputs | Sends logs to HTTP/HTTPS endpoints. | GA | [more info](https://docs.fluentd.org/output/http) |
 | **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.17.5](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.17.5) |
 | **[Amazon Kinesis Firehose](outputs/kinesis_firehose/)** | outputs | Fluent plugin for Amazon Kinesis | Testing | [3.4.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.4.2) |
