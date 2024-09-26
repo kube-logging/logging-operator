@@ -17,9 +17,10 @@ package output_test
 import (
 	"testing"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
-	"sigs.k8s.io/yaml"
 )
 
 func TestLogDNAOutput(t *testing.T) {
@@ -60,7 +61,7 @@ buffer:
 	logdna := &output.LogDNAOutput{}
 	err := yaml.Unmarshal(CONFIG, logdna)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 	test := render.NewOutputPluginTest(t, logdna)
 	test.DiffResult(expected)

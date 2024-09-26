@@ -1,18 +1,15 @@
-run:
-    skip-dirs:
-        - .gen
-        - client
-
 linters-settings:
     revive:
         min-confidence: 0.9
     gocyclo:
         min-complexity: 15
 
-linters:
 
 issues:
-    exclude:
+  exclude-dirs:
+    - .gen
+    - client
+  exclude:
         - if block ends with a return statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)
         - "`if` block ends with a `return` statement, so drop this `else` and outdent its block"
         - "missing the call to method parallel"

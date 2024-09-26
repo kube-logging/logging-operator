@@ -34,7 +34,7 @@ ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
 GOLANGCI_LINT_VERSION := v1.61.0
-LINTER_FLAGS := --timeout 5m
+LINTER_FLAGS := --timeout 10m
 
 HELM_DOCS := ${BIN}/helm-docs
 HELM_DOCS_VERSION = 1.11.0
