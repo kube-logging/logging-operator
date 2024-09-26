@@ -171,25 +171,25 @@ type DefaultFlowSpec struct {
 
 const (
 	DefaultFluentbitImageRepository               = "fluent/fluent-bit"
-	DefaultFluentbitImageTag                      = "3.0.4"
+	DefaultFluentbitImageTag                      = "3.1.8"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag          = "v0.7.1"
+	DefaultFluentbitBufferVolumeImageTag          = "v0.8.0"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentbitConfigReloaderImageTag        = "v0.0.5"
+	DefaultFluentbitConfigReloaderImageTag        = "v0.0.6"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                        = "v1.16-4.9-full"
+	DefaultFluentdImageTag                        = "v1.16-4.10-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
-	DefaultFluentdDrainWatchImageTag              = "v0.2.1"
+	DefaultFluentdDrainWatchImageTag              = "v0.2.3"
 	DefaultFluentdDrainPauseImageRepository       = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag              = "3.2"
 	DefaultFluentdVolumeModeImageRepository       = "busybox"
 	DefaultFluentdVolumeModeImageTag              = "latest"
 	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag          = "v0.0.5"
+	DefaultFluentdConfigReloaderImageTag          = "v0.0.6"
 	DefaultFluentdBufferVolumeImageRepository     = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag            = "v0.7.1"
+	DefaultFluentdBufferVolumeImageTag            = "v0.8.0"
 )
 
 // SetDefaults fills empty attributes
