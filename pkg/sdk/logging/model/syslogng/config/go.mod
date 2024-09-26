@@ -2,7 +2,7 @@ module github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/c
 
 go 1.22.0
 
-toolchain go1.23.0
+toolchain go1.23.1
 
 require (
 	emperror.dev/errors v0.8.1
@@ -10,9 +10,9 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/siliconbrain/go-seqs v0.13.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
-	k8s.io/api v0.31.0
-	k8s.io/apimachinery v0.31.0
+	golang.org/x/exp 701f63a606c0
+	k8s.io/api v0.31.1
+	k8s.io/apimachinery v0.31.1
 	sigs.k8s.io/controller-runtime v0.19.0
 )
 
