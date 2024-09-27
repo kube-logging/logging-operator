@@ -33,6 +33,16 @@ const (
 	HostPath = "/opt/logging-operator/%s/%s"
 )
 
+// BasicImageSpec struct hold basic information about image specification
+type BasicImageSpec struct {
+	Repository string `json:"repository,omitempty"`
+	Tag        string `json:"tag,omitempty"`
+}
+
+func (s BasicImageSpec) RepositoryWithTag() string {
+	return RepositoryWithTag(s.Repository, s.Tag)
+}
+
 // ImageSpec struct hold information about image specification
 type ImageSpec struct {
 	Repository       string                        `json:"repository,omitempty"`

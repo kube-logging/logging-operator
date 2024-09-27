@@ -29,10 +29,25 @@ type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
 // +description:"SyslogNGSpec defines the desired state of SyslogNG"
 type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
+const (
+	defaultSyslogngImageRepository    = "ghcr.io/axoflow/axosyslog"
+	defaultSyslogngImageTag           = "4.8.1-1"
+	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
+	configReloaderImageTag            = "v1.5.0"
+	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	prometheusExporterImageTag        = "0.0.7"
+	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
+	bufferVolumeImageTag              = "v0.8.0"
+)
+
 // +kubebuilder:object:generate=true
 
 // SyslogNGSpec defines the desired state of SyslogNG
 type SyslogNGSpec struct {
+	SyslogNGImage                       *BasicImageSpec              `json:"syslogNGImage,omitempty"`
+	ConfigReloadImage                   *BasicImageSpec              `json:"configReloadImage,omitempty"`
+	MetricsExporterImage                *BasicImageSpec              `json:"metricsExporterImage,omitempty"`
+	BufferVolumeMetricsImage            *BasicImageSpec              `json:"bufferVolumeMetricsImage,omitempty"`
 	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
 	ReadinessDefaultCheck               ReadinessDefaultCheck        `json:"readinessDefaultCheck,omitempty"`
 	SkipRBACCreate                      bool                         `json:"skipRBACCreate,omitempty"`
@@ -120,6 +135,30 @@ func (s *SyslogNGSpec) SetDefaults() {
 			}
 			if s.Metrics.Interval == "" {
 				s.Metrics.Interval = "15s"
+			}
+		}
+		if s.SyslogNGImage == nil {
+			s.SyslogNGImage = &BasicImageSpec{
+				Repository: defaultSyslogngImageRepository,
+				Tag:        defaultSyslogngImageTag,
+			}
+		}
+		if s.ConfigReloadImage == nil {
+			s.ConfigReloadImage = &BasicImageSpec{
+				Repository: configReloaderImageRepository,
+				Tag:        configReloaderImageTag,
+			}
+		}
+		if s.MetricsExporterImage == nil {
+			s.MetricsExporterImage = &BasicImageSpec{
+				Repository: prometheusExporterImageRepository,
+				Tag:        prometheusExporterImageTag,
+			}
+		}
+		if s.BufferVolumeMetricsImage == nil {
+			s.BufferVolumeMetricsImage = &BasicImageSpec{
+				Repository: bufferVolumeImageRepository,
+				Tag:        bufferVolumeImageTag,
 			}
 		}
 	}

@@ -4,6 +4,17 @@ weight: 200
 generated_file: true
 ---
 
+## BasicImageSpec
+
+BasicImageSpec struct hold basic information about image specification
+
+### repository (string, optional) {#basicimagespec-repository}
+
+
+### tag (string, optional) {#basicimagespec-tag}
+
+
+
 ## ImageSpec
 
 ImageSpec struct hold information about image specification

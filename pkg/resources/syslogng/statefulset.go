@@ -101,7 +101,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	return corev1.Container{
 		Name:            ContainerName,
-		Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
+		Image:           spec.SyslogNGImage.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{{
 			Name:          "syslog-ng-tcp",
@@ -232,7 +232,7 @@ func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 		return &corev1.Container{
 			Name:            "exporter",
 			ImagePullPolicy: corev1.PullIfNotPresent,
-			Image:           v1beta1.RepositoryWithTag(prometheusExporterImageRepository, prometheusExporterImageTag),
+			Image:           r.syslogNGSpec.MetricsExporterImage.RepositoryWithTag(),
 			Ports: []corev1.ContainerPort{
 				{
 					Name:          metricsPortName,
@@ -269,7 +269,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
-			Image:           v1beta1.RepositoryWithTag(bufferVolumeImageRepository, bufferVolumeImageTag),
+			Image:           r.syslogNGSpec.BufferVolumeMetricsImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullIfNotPresent,
 			Args: []string{
 				"--port", "7358",
@@ -366,7 +366,7 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	// TODO: ADD TLS reload watch
 	container := corev1.Container{
 		Name:            "config-reloader",
-		Image:           v1beta1.RepositoryWithTag(configReloaderImageRepository, configReloaderImageTag),
+		Image:           spec.ConfigReloadImage.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Args: []string{
 			"-cfgjson",

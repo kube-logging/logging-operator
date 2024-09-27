@@ -280,6 +280,13 @@ spec:
                   timeout:
                     type: string
                 type: object
+              bufferVolumeMetricsImage:
+                properties:
+                  repository:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               bufferVolumeMetricsService:
                 properties:
                   metadata:
@@ -3924,6 +3931,13 @@ spec:
                       type: object
                     type: array
                 type: object
+              configReloadImage:
+                properties:
+                  repository:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               globalOptions:
                 properties:
                   log_level:
@@ -4196,6 +4210,13 @@ spec:
                         type: object
                     type: object
                   timeout:
+                    type: string
+                type: object
+              metricsExporterImage:
+                properties:
+                  repository:
+                    type: string
+                  tag:
                     type: string
                 type: object
               metricsService:
@@ -8221,6 +8242,13 @@ spec:
                           type: object
                         type: array
                     type: object
+                type: object
+              syslogNGImage:
+                properties:
+                  repository:
+                    type: string
+                  tag:
+                    type: string
                 type: object
               tls:
                 properties:

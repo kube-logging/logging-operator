@@ -36,36 +36,28 @@ import (
 )
 
 const (
-	ServiceName                       = "syslog-ng"
-	ServicePort                       = 601
-	configSecretName                  = "syslog-ng"
-	configKey                         = "syslog-ng.conf"
-	StatefulSetName                   = "syslog-ng"
-	outputSecretName                  = "syslog-ng-output"
-	OutputSecretPath                  = "/etc/syslog-ng/secret"
-	BufferPath                        = "/buffers"
-	serviceAccountName                = "syslog-ng"
-	roleBindingName                   = "syslog-ng"
-	roleName                          = "syslog-ng"
-	clusterRoleBindingName            = "syslog-ng"
-	clusterRoleName                   = "syslog-ng"
-	ContainerName                     = "syslog-ng"
-	defaultBufferVolumeMetricsPort    = 9200
-	syslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
-	syslogngImageTag                  = "4.8.1-1"
-	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
-	prometheusExporterImageTag        = "0.0.7"
-	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.8.0"
-	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
-	configReloaderImageTag            = "v1.5.0"
-	socketVolumeName                  = "socket"
-	socketPath                        = "/tmp/syslog-ng/syslog-ng.ctl"
-	configDir                         = "/etc/syslog-ng/config"
-	configVolumeName                  = "config"
-	tlsVolumeName                     = "tls"
-	metricsPortNumber                 = 9577
-	metricsPortName                   = "exporter"
+	ServiceName                    = "syslog-ng"
+	ServicePort                    = 601
+	configSecretName               = "syslog-ng"
+	configKey                      = "syslog-ng.conf"
+	StatefulSetName                = "syslog-ng"
+	outputSecretName               = "syslog-ng-output"
+	OutputSecretPath               = "/etc/syslog-ng/secret"
+	BufferPath                     = "/buffers"
+	serviceAccountName             = "syslog-ng"
+	roleBindingName                = "syslog-ng"
+	roleName                       = "syslog-ng"
+	clusterRoleBindingName         = "syslog-ng"
+	clusterRoleName                = "syslog-ng"
+	ContainerName                  = "syslog-ng"
+	defaultBufferVolumeMetricsPort = 9200
+	socketVolumeName               = "socket"
+	socketPath                     = "/tmp/syslog-ng/syslog-ng.ctl"
+	configDir                      = "/etc/syslog-ng/config"
+	configVolumeName               = "config"
+	tlsVolumeName                  = "tls"
+	metricsPortNumber              = 9577
+	metricsPortName                = "exporter"
 )
 
 // Reconciler holds info what resource to reconcile
