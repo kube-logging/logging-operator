@@ -146,6 +146,12 @@ Default: nil
 ### keytab (*secret.Secret, optional) {#kafka-keytab}
 
 
+### max_send_limit_bytes (int, optional) {#kafka-max_send_limit_bytes}
+
+Max byte size to send message to avoid MessageSizeTooLarge. Messages over the limit will be dropped
+
+Default: no limit
+
 ### max_send_retries (int, optional) {#kafka-max_send_retries}
 
 Number of times to retry sending of messages to a leader
