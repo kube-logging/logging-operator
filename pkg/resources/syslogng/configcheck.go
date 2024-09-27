@@ -235,7 +235,7 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 			Containers: []corev1.Container{
 				{
 					Name:            "syslog-ng",
-					Image:           v1beta1.RepositoryWithTag(syslogngImageRepository, syslogngImageTag),
+					Image:           r.syslogNGSpec.SyslogNGImage.RepositoryWithTag(),
 					ImagePullPolicy: corev1.PullIfNotPresent,
 					Command:         containerCommand,
 					Args:            containerArgs,

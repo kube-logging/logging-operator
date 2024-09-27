@@ -11,6 +11,9 @@ SyslogNGSpec defines the desired state of SyslogNG
 ### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
 
 
+### bufferVolumeMetricsImage (*BasicImageSpec, optional) {#syslogngspec-buffervolumemetricsimage}
+
+
 ### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
 
 
@@ -20,6 +23,9 @@ Overrides the default logging level configCheck setup. This field is not used di
 
 
 ### configCheckPod (*typeoverride.PodSpec, optional) {#syslogngspec-configcheckpod}
+
+
+### configReloadImage (*BasicImageSpec, optional) {#syslogngspec-configreloadimage}
 
 
 ### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
@@ -40,6 +46,9 @@ Available in Logging operator version 4.5 and later. Set the maximum number of c
 
 
 ### metrics (*Metrics, optional) {#syslogngspec-metrics}
+
+
+### metricsExporterImage (*BasicImageSpec, optional) {#syslogngspec-metricsexporterimage}
 
 
 ### metricsService (*typeoverride.Service, optional) {#syslogngspec-metricsservice}
@@ -68,6 +77,9 @@ Available in Logging operator version 4.5 and later. Create [custom log metrics 
 
 
 ### statefulSet (*typeoverride.StatefulSet, optional) {#syslogngspec-statefulset}
+
+
+### syslogNGImage (*BasicImageSpec, optional) {#syslogngspec-syslogngimage}
 
 
 ### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
