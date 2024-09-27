@@ -3215,6 +3215,8 @@ spec:
                             x-kubernetes-map-type: atomic
                         type: object
                     type: object
+                  max_send_limit_bytes:
+                    type: integer
                   max_send_retries:
                     type: integer
                   message_key_key:
@@ -10616,6 +10618,8 @@ spec:
                             x-kubernetes-map-type: atomic
                         type: object
                     type: object
+                  max_send_limit_bytes:
+                    type: integer
                   max_send_retries:
                     type: integer
                   message_key_key:

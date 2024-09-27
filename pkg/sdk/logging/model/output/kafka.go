@@ -111,6 +111,8 @@ type KafkaOutputConfig struct {
 	ScramMechanism string `json:"scram_mechanism,omitempty"`
 	// Number of times to retry sending of messages to a leader (default: 1)
 	MaxSendRetries int `json:"max_send_retries,omitempty"`
+	// Max byte size to send message to avoid MessageSizeTooLarge. Messages over the limit will be dropped (default: no limit)
+	MaxSendLimitBytes int `json:"max_send_limit_bytes,omitempty"`
 	// The number of acks required per request (default: -1).
 	RequiredAcks int `json:"required_acks,omitempty"`
 	// How long the producer waits for acks. The unit is seconds (default: nil => Uses default of ruby-kafka library)
