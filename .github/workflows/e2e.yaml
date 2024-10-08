@@ -168,6 +168,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: script-e2e-test-cluster-logs
+          name: script-e2e-test-cluster-logs-${{ matrix.kube }}
           path: build/_test
           retention-days: 5
