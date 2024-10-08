@@ -66,6 +66,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4c0219f9ac95b02789c1075625400b2acbff50b1 # v2.9.1
 
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
+
       - name: Set image name
         id: image-name
         run: echo "value=ghcr.io/${{ github.repository }}" >> "$GITHUB_OUTPUT"
@@ -87,7 +90,6 @@ jobs:
             org.opencontainers.image.title=Logging operator
             org.opencontainers.image.authors=Kube logging authors
             org.opencontainers.image.documentation=https://kube-logging.dev/docs/
-
 
       # Multiple exporters are not supported yet
       # See https://github.com/moby/buildkit/pull/2760
@@ -119,6 +121,19 @@ jobs:
           cache-to: type=gha,mode=max
           outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
           # push: ${{ inputs.publish }}
+
+      - name: Sign image with GitHub OIDC Token
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          images=""
+          for tag in ${TAGS}; do
+            images+="${tag}@${DIGEST} "
+          done
+          
+          cosign sign --yes ${images}
 
       - name: Set image ref
         id: image-ref
@@ -176,6 +191,9 @@ jobs:
         with:
           version: v3.12.0
 
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
+
       - name: Set chart name
         id: chart-name
         run: echo "value=${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT"
@@ -204,6 +222,12 @@ jobs:
         run: |
           helm package charts/${{ steps.chart-name.outputs.value }} --version ${{ steps.version.outputs.value }} --app-version ${{ steps.version.outputs.value }}
           echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
+
+      - name: Sign chart with GitHub OIDC Token
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          PACKAGE: ${{ steps.build.outputs.package }}
+        run: cosign sign-blob --yes $PACKAGE
 
       - name: Upload chart as artifact
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
