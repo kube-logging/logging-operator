@@ -135,6 +135,13 @@ jobs:
           
           cosign sign --yes ${images}
 
+      - name: Verify signed image with cosign
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        run: |
+          cosign verify "${{ steps.image-name.outputs.value }}@${{ steps.build.outputs.digest }}" \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+
       - name: Set image ref
         id: image-ref
         run: echo "value=${{ steps.image-name.outputs.value }}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
@@ -227,7 +234,19 @@ jobs:
         if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
         env:
           PACKAGE: ${{ steps.build.outputs.package }}
-        run: cosign sign-blob --yes $PACKAGE
+        run: |
+          cosign sign-blob --yes $PACKAGE \
+            --bundle "$PACKAGE.cosign.bundle"
+
+      - name: Verify signed chart with cosign
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          PACKAGE: ${{ steps.build.outputs.package }}
+        run: |
+          cosign verify-blob $PACKAGE \
+            --bundle "$PACKAGE.cosign.bundle" \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 
       - name: Upload chart as artifact
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
