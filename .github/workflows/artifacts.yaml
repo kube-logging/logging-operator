@@ -137,10 +137,15 @@ jobs:
 
       - name: Verify signed image with cosign
         if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
         run: |
-          cosign verify "${{ steps.image-name.outputs.value }}@${{ steps.build.outputs.digest }}" \
+          for tag in ${TAGS}; do
+            cosign verify "${tag}@${DIGEST}" \
             --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+          done
 
       - name: Set image ref
         id: image-ref
@@ -230,31 +235,6 @@ jobs:
           helm package charts/${{ steps.chart-name.outputs.value }} --version ${{ steps.version.outputs.value }} --app-version ${{ steps.version.outputs.value }}
           echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
 
-      - name: Sign chart with GitHub OIDC Token
-        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
-        env:
-          PACKAGE: ${{ steps.build.outputs.package }}
-        run: |
-          cosign sign-blob --yes $PACKAGE \
-            --bundle "$PACKAGE.cosign.bundle"
-
-      - name: Verify signed chart with cosign
-        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
-        env:
-          PACKAGE: ${{ steps.build.outputs.package }}
-        run: |
-          cosign verify-blob $PACKAGE \
-            --bundle "$PACKAGE.cosign.bundle" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
-
-      - name: Upload bundle as artifact
-        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-        with:
-          name: "[${{ github.job }}] Cosign bundle"
-          path: ${{ steps.build.outputs.package }}.cosign.bundle
-
       - name: Upload chart as artifact
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
         with:
@@ -270,10 +250,28 @@ jobs:
         if: inputs.publish && inputs.release
 
       - name: Helm push
-        run: helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }}
+        id: push
+        run: |
+          helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }} &> push-metadata.txt
+          echo "digest=$(awk '/Digest: /{print $2}' push-metadata.txt)" >> "$GITHUB_OUTPUT"
         env:
           HELM_REGISTRY_CONFIG: ~/.docker/config.json
         if: inputs.publish && inputs.release
+
+      - name: Sign chart with GitHub OIDC Token
+        if: ${{ inputs.publish && inputs.release && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: cosign sign --yes "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}"
+
+      - name: Verify signed chart with cosign
+        if: ${{ inputs.publish && inputs.release && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
