@@ -22,23 +22,23 @@ resources:
 
 patches:
 # [WEBHOOK] patches here are for enabling the conversion webhook for each CRD
-#- patches/webhook_in_fluentbits.yaml
-#- patches/webhook_in_flows.yaml
-#- patches/webhook_in_clusterflows.yaml
-#- patches/webhook_in_outputs.yaml
-#- patches/webhook_in_clusteroutputs.yaml
-#- patches/webhook_in_fluentds.yaml
-#- patches/webhook_in_loggings.yaml
+# - path: patches/webhook_in_fluentbits.yaml
+# - path: patches/webhook_in_flows.yaml
+# - path: patches/webhook_in_clusterflows.yaml
+# - path: patches/webhook_in_outputs.yaml
+# - path: patches/webhook_in_clusteroutputs.yaml
+# - path: patches/webhook_in_fluentds.yaml
+# - path: patches/webhook_in_loggings.yaml
 # +kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CAINJECTION] patches here are for enabling the CA injection for each CRD
-#- patches/cainjection_in_fluentbits.yaml
-#- patches/cainjection_in_flows.yaml
-#- patches/cainjection_in_clusterflows.yaml
-#- patches/cainjection_in_outputs.yaml
-#- patches/cainjection_in_clusteroutputs.yaml
-#- patches/cainjection_in_fluentds.yaml
-#- patches/cainjection_in_loggings.yaml
+# - path: patches/cainjection_in_fluentbits.yaml
+# - path: patches/cainjection_in_flows.yaml
+# - path: patches/cainjection_in_clusterflows.yaml
+# - path: patches/cainjection_in_outputs.yaml
+# - path: patches/cainjection_in_clusteroutputs.yaml
+# - path: patches/cainjection_in_fluentds.yaml
+# - path: patches/cainjection_in_loggings.yaml
 # +kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.
