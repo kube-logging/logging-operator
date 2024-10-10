@@ -2,7 +2,7 @@ module github.com/kube-logging/logging-operator
 
 go 1.23
 
-toolchain go1.23.1
+toolchain go1.23.2
 
 require (
 	emperror.dev/errors v0.8.1
@@ -20,7 +20,7 @@ require (
 	github.com/siliconbrain/go-seqs v0.13.0
 	github.com/spf13/cast v1.7.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
+	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 	k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver v0.31.1
 	k8s.io/apimachinery v0.31.1
