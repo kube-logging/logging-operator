@@ -433,6 +433,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			},
 			Resources:       r.fluentdSpec.BufferVolumeResources,
 			SecurityContext: r.fluentdSpec.Security.SecurityContext,
+			LivenessProbe:   r.fluentdSpec.BufferVolumeLivenessProbe,
 		}
 	}
 	return nil

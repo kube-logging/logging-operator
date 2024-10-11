@@ -1231,6 +1231,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		copy(*out, *in)
 	}
 	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
+	if in.BufferVolumeLivenessProbe != nil {
+		in, out := &in.BufferVolumeLivenessProbe, &out.BufferVolumeLivenessProbe
+		*out = new(v1.Probe)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)
@@ -1597,6 +1602,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		copy(*out, *in)
 	}
 	in.BufferVolumeResources.DeepCopyInto(&out.BufferVolumeResources)
+	if in.BufferVolumeLivenessProbe != nil {
+		in, out := &in.BufferVolumeLivenessProbe, &out.BufferVolumeLivenessProbe
+		*out = new(v1.Probe)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Security != nil {
 		in, out := &in.Security, &out.Security
 		*out = new(Security)
@@ -3609,6 +3619,12 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 	if in.BufferVolumeMetricsServiceOverrides != nil {
 		in, out := &in.BufferVolumeMetricsServiceOverrides, &out.BufferVolumeMetricsServiceOverrides
 		*out = new(typeoverride.Service)
+		(*in).DeepCopyInto(*out)
+	}
+	in.BufferVolumeMetricsResources.DeepCopyInto(&out.BufferVolumeMetricsResources)
+	if in.BufferVolumeMetricsLivenessProbe != nil {
+		in, out := &in.BufferVolumeMetricsLivenessProbe, &out.BufferVolumeMetricsLivenessProbe
+		*out = new(v1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.GlobalOptions != nil {

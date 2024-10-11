@@ -25,6 +25,9 @@ BufferStorageVolume is by default configured as PVC using FluentdPvcSpec [volume
 ### bufferVolumeImage (ImageSpec, optional) {#fluentdspec-buffervolumeimage}
 
 
+### bufferVolumeLivenessProbe (*corev1.Probe, optional) {#fluentdspec-buffervolumelivenessprobe}
+
+
 ### bufferVolumeMetrics (*Metrics, optional) {#fluentdspec-buffervolumemetrics}
 
 

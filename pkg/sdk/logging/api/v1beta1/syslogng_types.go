@@ -16,6 +16,9 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
@@ -59,6 +62,8 @@ type SyslogNGSpec struct {
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
+	BufferVolumeMetricsResources        corev1.ResourceRequirements  `json:"bufferVolumeMetricsResources,omitempty"`
+	BufferVolumeMetricsLivenessProbe    *corev1.Probe                `json:"bufferVolumeMetricsLivenessProbe,omitempty"`
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
@@ -159,6 +164,32 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.BufferVolumeMetricsImage = &BasicImageSpec{
 				Repository: bufferVolumeImageRepository,
 				Tag:        bufferVolumeImageTag,
+			}
+		}
+		if s.BufferVolumeMetricsResources.Limits == nil {
+			s.BufferVolumeMetricsResources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("100m"),
+			}
+		}
+		if s.BufferVolumeMetricsResources.Requests == nil {
+			s.BufferVolumeMetricsResources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("20M"),
+				corev1.ResourceCPU:    resource.MustParse("2m"),
+			}
+		}
+		if s.BufferVolumeMetricsLivenessProbe == nil {
+			s.BufferVolumeMetricsLivenessProbe = &corev1.Probe{
+				ProbeHandler: corev1.ProbeHandler{
+					HTTPGet: &corev1.HTTPGetAction{
+						Port:   intstr.FromString("buffer-metrics"),
+						Scheme: corev1.URISchemeHTTP,
+					},
+				},
+				InitialDelaySeconds: 600,
+				TimeoutSeconds:      5,
+				PeriodSeconds:       30,
+				SuccessThreshold:    1,
 			}
 		}
 	}

@@ -14,6 +14,12 @@ SyslogNGSpec defines the desired state of SyslogNG
 ### bufferVolumeMetricsImage (*BasicImageSpec, optional) {#syslogngspec-buffervolumemetricsimage}
 
 
+### bufferVolumeMetricsLivenessProbe (*corev1.Probe, optional) {#syslogngspec-buffervolumemetricslivenessprobe}
+
+
+### bufferVolumeMetricsResources (corev1.ResourceRequirements, optional) {#syslogngspec-buffervolumemetricsresources}
+
+
 ### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}
 
 
