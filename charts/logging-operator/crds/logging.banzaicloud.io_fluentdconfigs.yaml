@@ -541,6 +541,14 @@ spec:
                     type: object
                   pvc:
                     properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       source:
                         properties:
                           claimName:
@@ -1239,6 +1247,14 @@ spec:
                           type: object
                         pvc:
                           properties:
+                            annotations:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            labels:
+                              additionalProperties:
+                                type: string
+                              type: object
                             source:
                               properties:
                                 claimName:
@@ -1444,6 +1460,14 @@ spec:
                     type: object
                   pvc:
                     properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       source:
                         properties:
                           claimName:
