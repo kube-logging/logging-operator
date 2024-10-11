@@ -314,14 +314,14 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 		if fluentbitSpec.BufferVolumeResources.Limits == nil {
 			fluentbitSpec.BufferVolumeResources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("10M"),
-				v1.ResourceCPU:    resource.MustParse("50m"),
+				v1.ResourceMemory: resource.MustParse("100M"),
+				v1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
 		if fluentbitSpec.BufferVolumeResources.Requests == nil {
 			fluentbitSpec.BufferVolumeResources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("10M"),
-				v1.ResourceCPU:    resource.MustParse("1m"),
+				v1.ResourceMemory: resource.MustParse("20M"),
+				v1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
 		if fluentbitSpec.Security.SecurityContext == nil {

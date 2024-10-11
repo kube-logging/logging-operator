@@ -59,6 +59,9 @@ FluentbitSpec defines the desired state of FluentbitAgent
 ### bufferVolumeImage (ImageSpec, optional) {#fluentbitspec-buffervolumeimage}
 
 
+### bufferVolumeLivenessProbe (*corev1.Probe, optional) {#fluentbitspec-buffervolumelivenessprobe}
+
+
 ### bufferVolumeMetrics (*Metrics, optional) {#fluentbitspec-buffervolumemetrics}
 
 

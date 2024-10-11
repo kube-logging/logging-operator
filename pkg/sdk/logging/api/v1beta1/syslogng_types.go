@@ -16,6 +16,8 @@ package v1beta1
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
@@ -59,6 +61,8 @@ type SyslogNGSpec struct {
 	MetricsServiceOverrides             *typeoverride.Service        `json:"metricsService,omitempty"`
 	BufferVolumeMetrics                 *BufferMetrics               `json:"bufferVolumeMetrics,omitempty"`
 	BufferVolumeMetricsServiceOverrides *typeoverride.Service        `json:"bufferVolumeMetricsService,omitempty"`
+	BufferMetricsResources              corev1.ResourceRequirements  `json:"bufferMetricsResources,omitempty"`
+	BufferVolumeMetricsLivenessProbe    *corev1.Probe                `json:"bufferVolumeMetricsLivenessProbe,omitempty"`
 	GlobalOptions                       *GlobalOptions               `json:"globalOptions,omitempty"`
 	JSONKeyPrefix                       string                       `json:"jsonKeyPrefix,omitempty"`
 	JSONKeyDelimiter                    string                       `json:"jsonKeyDelim,omitempty"`
@@ -159,6 +163,18 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.BufferVolumeMetricsImage = &BasicImageSpec{
 				Repository: bufferVolumeImageRepository,
 				Tag:        bufferVolumeImageTag,
+			}
+		}
+		if s.BufferMetricsResources.Limits == nil {
+			s.BufferMetricsResources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("100m"),
+			}
+		}
+		if s.BufferMetricsResources.Requests == nil {
+			s.BufferMetricsResources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("20M"),
+				corev1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
 	}

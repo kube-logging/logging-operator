@@ -80,6 +80,7 @@ type FluentdSpec struct {
 	BufferVolumeImage         ImageSpec                         `json:"bufferVolumeImage,omitempty"`
 	BufferVolumeArgs          []string                          `json:"bufferVolumeArgs,omitempty"`
 	BufferVolumeResources     corev1.ResourceRequirements       `json:"bufferVolumeResources,omitempty"`
+	BufferVolumeLivenessProbe *corev1.Probe                     `json:"bufferVolumeLivenessProbe,omitempty"`
 	Security                  *Security                         `json:"security,omitempty"`
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
 	Workers                   int32                             `json:"workers,omitempty"`
@@ -245,14 +246,14 @@ func (f *FluentdSpec) SetDefaults() error {
 		}
 		if f.BufferVolumeResources.Limits == nil {
 			f.BufferVolumeResources.Limits = corev1.ResourceList{
-				corev1.ResourceMemory: resource.MustParse("10M"),
-				corev1.ResourceCPU:    resource.MustParse("50m"),
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
 		if f.BufferVolumeResources.Requests == nil {
 			f.BufferVolumeResources.Requests = corev1.ResourceList{
-				corev1.ResourceMemory: resource.MustParse("10M"),
-				corev1.ResourceCPU:    resource.MustParse("1m"),
+				corev1.ResourceMemory: resource.MustParse("20M"),
+				corev1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
 		if f.Resources.Limits == nil {
