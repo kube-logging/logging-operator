@@ -256,6 +256,22 @@ func (f *FluentdSpec) SetDefaults() error {
 				corev1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
+		if f.BufferVolumeLivenessProbe == nil {
+			f.BufferVolumeLivenessProbe = &corev1.Probe{
+				ProbeHandler: corev1.ProbeHandler{
+					HTTPGet: &corev1.HTTPGetAction{
+						Port:   intstr.FromString("buffer-metrics"),
+						Scheme: corev1.URISchemeHTTP,
+					},
+				},
+				InitialDelaySeconds: 600,
+				TimeoutSeconds:      5,
+				PeriodSeconds:       30,
+				SuccessThreshold:    1,
+				FailureThreshold:    3,
+			}
+		}
+
 		if f.Resources.Limits == nil {
 			f.Resources.Limits = corev1.ResourceList{
 				corev1.ResourceMemory: resource.MustParse("400M"),

@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -324,6 +325,21 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 				v1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
+		if fluentbitSpec.BufferVolumeLivenessProbe == nil {
+			fluentbitSpec.BufferVolumeLivenessProbe = &corev1.Probe{
+				ProbeHandler: corev1.ProbeHandler{
+					HTTPGet: &corev1.HTTPGetAction{
+						Port:   intstr.FromString("buffer-metrics"),
+						Scheme: corev1.URISchemeHTTP,
+					},
+				},
+				InitialDelaySeconds: 600,
+				TimeoutSeconds:      5,
+				PeriodSeconds:       30,
+				SuccessThreshold:    1,
+			}
+		}
+
 		if fluentbitSpec.Security.SecurityContext == nil {
 			fluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
 		}

@@ -8,9 +8,6 @@ generated_file: true
 
 SyslogNGSpec defines the desired state of SyslogNG
 
-### bufferMetricsResources (corev1.ResourceRequirements, optional) {#syslogngspec-buffermetricsresources}
-
-
 ### bufferVolumeMetrics (*BufferMetrics, optional) {#syslogngspec-buffervolumemetrics}
 
 
@@ -18,6 +15,9 @@ SyslogNGSpec defines the desired state of SyslogNG
 
 
 ### bufferVolumeMetricsLivenessProbe (*corev1.Probe, optional) {#syslogngspec-buffervolumemetricslivenessprobe}
+
+
+### bufferVolumeMetricsResources (corev1.ResourceRequirements, optional) {#syslogngspec-buffervolumemetricsresources}
 
 
 ### bufferVolumeMetricsService (*typeoverride.Service, optional) {#syslogngspec-buffervolumemetricsservice}

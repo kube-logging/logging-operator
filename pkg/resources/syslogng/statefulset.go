@@ -289,7 +289,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: BufferPath,
 				},
 			},
-			Resources:     r.syslogNGSpec.BufferMetricsResources,
+			Resources:     r.syslogNGSpec.BufferVolumeMetricsResources,
 			LivenessProbe: r.syslogNGSpec.BufferVolumeMetricsLivenessProbe,
 		}
 	}

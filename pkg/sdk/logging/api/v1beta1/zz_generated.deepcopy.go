@@ -3621,7 +3621,7 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 		*out = new(typeoverride.Service)
 		(*in).DeepCopyInto(*out)
 	}
-	in.BufferMetricsResources.DeepCopyInto(&out.BufferMetricsResources)
+	in.BufferVolumeMetricsResources.DeepCopyInto(&out.BufferVolumeMetricsResources)
 	if in.BufferVolumeMetricsLivenessProbe != nil {
 		in, out := &in.BufferVolumeMetricsLivenessProbe, &out.BufferVolumeMetricsLivenessProbe
 		*out = new(v1.Probe)
