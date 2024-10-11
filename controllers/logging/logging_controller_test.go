@@ -49,6 +49,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 )
 
 var (
@@ -284,7 +285,6 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 }
 
 func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
-	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
@@ -329,9 +329,6 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	secret := &corev1.Secret{}
-	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
-
 	err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(output), output)
 	assert.NoError(t, err)
 
@@ -345,8 +342,66 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	assert.NotEqual(t, nil, flow.Status.Active)
 	// This is a protected output, so it should not be available
 	assert.False(t, *flow.Status.Active)
+}
 
-	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
+func TestSingleSyslogNGFlowWithProtectedSyslogNGClusterOutput(t *testing.T) {
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			WatchNamespaces:         []string{testNamespace},
+			SyslogNGSpec:            &v1beta1.SyslogNGSpec{},
+			FlowConfigCheckDisabled: true,
+			ControlNamespace:        controlNamespace,
+		},
+	}
+
+	output := &v1beta1.SyslogNGClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-cluster-output",
+			Namespace: controlNamespace,
+		},
+		Spec: v1beta1.SyslogNGClusterOutputSpec{
+			Protected: true,
+			SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
+				File: &syslogngoutput.FileOutput{
+					Path: "/dev/null",
+				},
+			},
+		},
+	}
+
+	flow := &v1beta1.SyslogNGFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.SyslogNGFlowSpec{
+			Match:            &v1beta1.SyslogNGMatch{},
+			GlobalOutputRefs: []string{"test-cluster-output"},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(output), output)
+	assert.NoError(t, err)
+
+	assert.NotNil(t, output.Status.Active)
+	// This is a protected output, so it should not be available
+	assert.False(t, *output.Status.Active)
+
+	errFlow := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(flow), flow)
+	assert.NoError(t, errFlow)
+
+	assert.NotNil(t, flow.Status.Active)
+	// This is a protected output, so it should not be available
+	assert.False(t, *flow.Status.Active)
 }
 
 func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {

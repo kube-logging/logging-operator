@@ -2053,6 +2053,8 @@ spec:
                 required:
                 - url
                 type: object
+              protected:
+                type: boolean
               redis:
                 properties:
                   auth:

@@ -51,7 +51,7 @@ GlobalOutput name to flush ERROR events to
 
 ### flowConfigCheckDisabled (bool, optional) {#loggingspec-flowconfigcheckdisabled}
 
-Disable configuration check before applying new fluentd configuration. 
+Disable configuration check before applying new fluentd or syslogng configuration. 
 
 
 ### flowConfigOverride (string, optional) {#loggingspec-flowconfigoverride}
