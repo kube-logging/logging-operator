@@ -271,7 +271,7 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 	for _, outputRef := range flow.Spec.GlobalOutputRefs {
 		if clusterOutput := clusterOutputs.FindByName(outputRef); clusterOutput != nil {
 			if clusterOutput.Spec.Protected {
-				errs = errors.Append(errs, errors.WrapIff(err, "referenced clusteroutput is protected %s", outputRef))
+				errs = errors.Append(errs, errors.Errorf("referenced clusteroutput is protected: %s", outputRef))
 				continue
 			}
 			outputID := fmt.Sprintf("%s:clusteroutput:%s:%s", flowID, clusterOutput.Namespace, clusterOutput.Name)

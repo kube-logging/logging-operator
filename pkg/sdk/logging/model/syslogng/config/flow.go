@@ -24,7 +24,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/siliconbrain/go-seqs/seqs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/model"
@@ -32,16 +31,23 @@ import (
 	filter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 )
 
-func validateClusterOutputs(clusterOutputRefs map[string]types.NamespacedName, flow string, globalOutputRefs []string) error {
+const (
+	syslogNGFlowKind = "SyslogNGFlow"
+)
+
+func validateClusterOutputs(clusterOutputRefs map[string]clusterOutputInfo, flow string, globalOutputRefs []string, flowKind string) error {
 	return seqs.SeededReduce(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
 		if _, ok := clusterOutputRefs[ref]; !ok {
 			return errors.Append(err, errors.Errorf("cluster output reference %s for flow %s cannot be found", ref, flow))
+		}
+		if flowKind == syslogNGFlowKind && clusterOutputRefs[ref].protected {
+			return errors.Append(err, errors.Errorf("referenced clusteroutput is protected: %s", ref))
 		}
 		return err
 	})
 }
 
-func renderClusterFlow(logging string, clusterOutputRefs map[string]types.NamespacedName, sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderClusterFlow(logging string, clusterOutputRefs map[string]clusterOutputInfo, sourceName string, f v1beta1.SyslogNGClusterFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("clusterflow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	filterDefs := seqs.MapWithIndex(seqs.FromSlice(f.Spec.Filters), func(idx int, flt v1beta1.SyslogNGFilter) render.Renderer {
@@ -63,8 +69,8 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 			seqs.ToSlice(seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 				return destination{
 					Logging:          logging,
-					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-					Namespace:        clusterOutputRefs[ref].Namespace,
+					renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].ref.Namespace, ref),
+					Namespace:        clusterOutputRefs[ref].ref.Namespace,
 					Name:             ref,
 					Scope:            Global,
 					metricsProbes:    f.Spec.OutputMetrics,
@@ -74,7 +80,7 @@ func renderClusterFlow(logging string, clusterOutputRefs map[string]types.Namesp
 	)
 }
 
-func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedName, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
+func renderFlow(logging string, clusterOutputRefs map[string]clusterOutputInfo, sourceName string, keyDelim string, f v1beta1.SyslogNGFlow, secretLoaderFactory SecretLoaderFactory) render.Renderer {
 	baseName := fmt.Sprintf("flow_%s_%s", f.Namespace, f.Name)
 	matchName := fmt.Sprintf("%s_match", baseName)
 	nsFilterName := fmt.Sprintf("%s_ns_filter", baseName)
@@ -104,8 +110,8 @@ func renderFlow(logging string, clusterOutputRefs map[string]types.NamespacedNam
 				seqs.Map(seqs.FromSlice(f.Spec.GlobalOutputRefs), func(ref string) destination {
 					return destination{
 						Logging:          logging,
-						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].Namespace, ref),
-						Namespace:        clusterOutputRefs[ref].Namespace,
+						renderedDestName: clusterOutputDestName(clusterOutputRefs[ref].ref.Namespace, ref),
+						Namespace:        clusterOutputRefs[ref].ref.Namespace,
 						Name:             ref,
 						Scope:            Global,
 						metricsProbes:    f.Spec.OutputMetrics,

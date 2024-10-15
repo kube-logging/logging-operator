@@ -48,6 +48,7 @@ type SyslogNGClusterOutput struct {
 // SyslogNGClusterOutputSpec contains Kubernetes spec for SyslogNGClusterOutput
 type SyslogNGClusterOutputSpec struct {
 	SyslogNGOutputSpec `json:",inline"`
+	Protected          bool     `json:"protected,omitempty"`
 	EnabledNamespaces  []string `json:"enabledNamespaces,omitempty"`
 }
 

@@ -56,6 +56,11 @@ type Input struct {
 	SourcePort          int
 }
 
+type clusterOutputInfo struct {
+	ref       types.NamespacedName
+	protected bool
+}
+
 type SecretLoaderFactory interface {
 	SecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
@@ -86,11 +91,11 @@ func configRenderer(in Input) (render.Renderer, error) {
 	globalOptions := renderAny(in.SyslogNGSpec.GlobalOptions, in.SecretLoaderFactory.SecretLoaderForNamespace(in.Namespace))
 
 	destinationDefs := make([]render.Renderer, 0, len(in.ClusterOutputs)+len(in.Outputs))
-	clusterOutputRefs := make(map[string]types.NamespacedName, len(in.ClusterOutputs))
+	clusterOutputRefs := make(map[string]clusterOutputInfo, len(in.ClusterOutputs))
 	for _, co := range in.ClusterOutputs {
-		clusterOutputRefs[co.Name] = types.NamespacedName{
-			Namespace: co.Namespace,
-			Name:      co.Name,
+		clusterOutputRefs[co.Name] = clusterOutputInfo{
+			ref:       types.NamespacedName{Namespace: co.Namespace, Name: co.Name},
+			protected: co.Spec.Protected,
 		}
 		destinationDefs = append(destinationDefs, renderClusterOutput(co, in.SecretLoaderFactory))
 	}
@@ -100,13 +105,13 @@ func configRenderer(in Input) (render.Renderer, error) {
 
 	logDefs := make([]render.Renderer, 0, len(in.ClusterFlows)+len(in.Flows))
 	for _, cf := range in.ClusterFlows {
-		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs); err != nil {
+		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs, cf.Kind); err != nil {
 			errs = errors.Append(errs, err)
 		}
 		logDefs = append(logDefs, renderClusterFlow(in.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
-		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs); err != nil {
+		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs, f.Kind); err != nil {
 			errs = errors.Append(errs, err)
 		}
 		logDefs = append(logDefs, renderFlow(in.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))

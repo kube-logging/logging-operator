@@ -31,6 +31,9 @@ SyslogNGClusterOutputSpec contains Kubernetes spec for SyslogNGClusterOutput
 ### enabledNamespaces ([]string, optional) {#syslogngclusteroutputspec-enablednamespaces}
 
 
+### protected (bool, optional) {#syslogngclusteroutputspec-protected}
+
+
 
 ## SyslogNGClusterOutputList
 

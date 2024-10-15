@@ -42,7 +42,7 @@ type _metaLoggingSpec interface{} //nolint:deadcode,unused
 type LoggingSpec struct {
 	// Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset.
 	LoggingRef string `json:"loggingRef,omitempty"`
-	// Disable configuration check before applying new fluentd configuration.
+	// Disable configuration check before applying new fluentd or syslogng configuration.
 	FlowConfigCheckDisabled bool `json:"flowConfigCheckDisabled,omitempty"`
 	// Whether to skip invalid Flow and ClusterFlow resources
 	SkipInvalidResources bool `json:"skipInvalidResources,omitempty"`

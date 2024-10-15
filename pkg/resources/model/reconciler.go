@@ -141,23 +141,39 @@ func NewValidationReconciler(
 				flow.Status.Problems = append(flow.Status.Problems, "\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead")
 			}
 
+			hasValidOutput := false
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil && !output.Spec.Protected {
-					flow.Status.Active = utils.BoolPointer(true)
-					output.Status.Active = utils.BoolPointer(true)
-				} else {
+				switch output := resources.Fluentd.ClusterOutputs.FindByName(ref); {
+				case output == nil:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+					continue
+
+				case output.Spec.Protected:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference is protected: %s", ref))
+					continue
+
+				default:
+					output.Status.Active = utils.BoolPointer(true)
+					hasValidOutput = true
 				}
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
 				if output := resources.Fluentd.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
-					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
+					hasValidOutput = true
 				} else {
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
 			}
+
+			// Check if the flow has become dangling with no valid outputs
+			if hasValidOutput {
+				flow.Status.Active = utils.BoolPointer(true)
+			} else {
+				flow.Status.Problems = append(flow.Status.Problems, "flow has become dangling with no valid outputs")
+			}
+
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
@@ -186,23 +202,39 @@ func NewValidationReconciler(
 			flow.Status.Active = utils.BoolPointer(false)
 			flow.Status.Problems = nil
 
+			hasValidOutput := false
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.SyslogNG.ClusterOutputs.FindByName(ref); output != nil {
-					flow.Status.Active = utils.BoolPointer(true)
-					output.Status.Active = utils.BoolPointer(true)
-				} else {
+				switch output := resources.SyslogNG.ClusterOutputs.FindByName(ref); {
+				case output == nil:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+					continue
+
+				case output.Spec.Protected:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference is protected: %s", ref))
+					continue
+
+				default:
+					output.Status.Active = utils.BoolPointer(true)
+					hasValidOutput = true
 				}
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
 				if output := resources.SyslogNG.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
-					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
+					hasValidOutput = true
 				} else {
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
 			}
+
+			// Check if the flow has become dangling with no valid outputs
+			if hasValidOutput {
+				flow.Status.Active = utils.BoolPointer(true)
+			} else {
+				flow.Status.Problems = append(flow.Status.Problems, "flow has become dangling with no valid outputs")
+			}
+
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 

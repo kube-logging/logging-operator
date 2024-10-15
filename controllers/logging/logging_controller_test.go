@@ -29,7 +29,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
 	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/slices"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -49,6 +48,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 )
 
 var (
@@ -267,25 +267,12 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	secret := &corev1.Secret{}
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
 
-	err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(output), output)
-	assert.NoError(t, err)
-
-	assert.NotEqual(t, nil, output.Status.Active)
-	assert.True(t, *output.Status.Active)
-
-	errFlow := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(flow), flow)
-	assert.NoError(t, errFlow)
-
-	assert.NotEqual(t, nil, flow.Status.Active)
-	// This is a protected output, so it should not be available
-	assert.True(t, *flow.Status.Active)
-
 	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
 }
 
 func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
-	g := gomega.NewGomegaWithT(t)
-	defer beforeEach(t)()
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
 		ObjectMeta: v1.ObjectMeta{
@@ -318,9 +305,6 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: v1beta1.FlowSpec{
-			Selectors: map[string]string{
-				"a": "b",
-			},
 			GlobalOutputRefs: []string{"test-cluster-output"},
 		},
 	}
@@ -329,24 +313,56 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	defer ensureCreated(t, output)()
 	defer ensureCreated(t, flow)()
 
-	secret := &corev1.Secret{}
-	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+	expectError(t, fmt.Sprintf("failed to build model: referenced clusteroutput is protected: %s", flow.Spec.GlobalOutputRefs[0]), errors)
+}
 
-	err := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(output), output)
-	assert.NoError(t, err)
+func TestSingleSyslogNGFlowWithProtectedSyslogNGClusterOutput(t *testing.T) {
+	errors := make(chan error)
+	defer beforeEachWithError(t, errors)()
 
-	assert.NotEqual(t, nil, output.Status.Active)
-	// This is a protected output, so it should not be available
-	assert.False(t, *output.Status.Active)
+	logging := &v1beta1.Logging{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "test-" + uuid.New()[:8],
+		},
+		Spec: v1beta1.LoggingSpec{
+			WatchNamespaces:         []string{testNamespace},
+			SyslogNGSpec:            &v1beta1.SyslogNGSpec{},
+			FlowConfigCheckDisabled: true,
+			ControlNamespace:        controlNamespace,
+		},
+	}
 
-	errFlow := mgr.GetClient().Get(context.TODO(), client.ObjectKeyFromObject(flow), flow)
-	assert.NoError(t, errFlow)
+	output := &v1beta1.SyslogNGClusterOutput{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-cluster-output",
+			Namespace: controlNamespace,
+		},
+		Spec: v1beta1.SyslogNGClusterOutputSpec{
+			Protected: true,
+			SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
+				File: &syslogngoutput.FileOutput{
+					Path: "/dev/null",
+				},
+			},
+		},
+	}
 
-	assert.NotEqual(t, nil, flow.Status.Active)
-	// This is a protected output, so it should not be available
-	assert.False(t, *flow.Status.Active)
+	flow := &v1beta1.SyslogNGFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: testNamespace,
+		},
+		Spec: v1beta1.SyslogNGFlowSpec{
+			Match:            &v1beta1.SyslogNGMatch{},
+			GlobalOutputRefs: []string{"test-cluster-output"},
+		},
+	}
 
-	g.Expect(string(secret.Data[fluentd.AppConfigKey])).Should(gomega.ContainSubstring("a:b"))
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	expectError(t, fmt.Sprintf("failed to render syslog-ng config: referenced clusteroutput is protected: %s", flow.Spec.GlobalOutputRefs[0]), errors)
 }
 
 func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
@@ -1094,7 +1110,9 @@ func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, timeout).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead"))
+	}, timeout).Should(gomega.ConsistOf(
+		"\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead",
+	))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
@@ -1163,7 +1181,10 @@ func TestFlowWithLegacyOutputRef(t *testing.T) {
 	g.Eventually(func() ([]string, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.Problems, err
-	}, timeout).Should(gomega.ConsistOf("\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead"))
+	}, timeout).Should(gomega.ConsistOf(
+		"\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead",
+		"flow has become dangling with no valid outputs",
+	))
 
 	g.Eventually(func() (bool, error) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
