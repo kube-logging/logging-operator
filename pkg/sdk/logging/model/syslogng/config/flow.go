@@ -41,7 +41,7 @@ func validateClusterOutputs(clusterOutputRefs map[string]clusterOutputInfo, flow
 			return errors.Append(err, errors.Errorf("cluster output reference %s for flow %s cannot be found", ref, flow))
 		}
 		if flowKind == syslogNGFlowKind && clusterOutputRefs[ref].protected {
-			return errors.Append(err, errors.Errorf("referenced clusteroutput is protected %s", ref))
+			return errors.Append(err, errors.Errorf("referenced clusteroutput is protected: %s", ref))
 		}
 		return err
 	})
