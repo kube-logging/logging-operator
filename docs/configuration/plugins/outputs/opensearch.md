@@ -302,6 +302,11 @@ Indicates that the OpenSearch-transport will try to reload the nodes addresses i
 
 Default: false
 
+### remove_keys (string, optional) {#opensearch-remove_keys}
+
+https://github.com/fluent/fluent-plugin-opensearch#remove_keys 
+
+
 ### remove_keys_on_update (string, optional) {#opensearch-remove_keys_on_update}
 
 Remove keys on update will not update the configured keys in OpenSearch when a record is being updated. This setting only has any effect if the write operation is update or upsert. 
