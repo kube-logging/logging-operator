@@ -101,9 +101,9 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				PodTargetLabels: nil,
 				Endpoints: []v1.Endpoint{{
 					Port:           "http-metrics",
-					Path:           "/metrics",
-					Interval:       "15s",
-					ScrapeTimeout:  "5s",
+					Path:           r.syslogNGSpec.Metrics.Path,
+					Interval:       v1.Duration(r.syslogNGSpec.Metrics.Interval),
+					ScrapeTimeout:  v1.Duration(r.syslogNGSpec.Metrics.Timeout),
 					HonorLabels:    r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					TLSConfig:      r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
