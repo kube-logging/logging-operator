@@ -15,9 +15,11 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
-  {{- with .workloadMetaOverrides }}
+  {{- if .workloadMetaOverrides }}
   workloadMetaOverrides:
-    {{- toYaml . | nindent 4 }}
+    {{- toYaml .workloadMetaOverrides | nindent 4 }}
+  {{- else }}
+  workloadMetaOverrides: {}
   {{- end }}
   {{- with .workloadOverrides }}
   workloadOverrides:
