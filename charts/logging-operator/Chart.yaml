@@ -13,3 +13,7 @@ home: https://kube-logging.github.io
 sources:
   - https://github.com/kube-logging/logging-operator
   - https://github.com/kube-logging/helm-charts/tree/main/charts/logging-operator
+dependencies:
+  - name: crds
+    version: 0.0.0
+    condition: crds.install

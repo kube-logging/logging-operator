@@ -48,6 +48,8 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | namespaceOverride | string | `""` | A namespace override for the app. |
 | annotations | object | `{}` | Define annotations for logging-operator pods. |
 | createCustomResource | bool | `false` | Deploy CRDs used by Logging Operator. |
+| crds.install | bool | `false` | Toggle to install and upgrade CRDs from a subchart. Make sure to use it with `--skip-crds` to avoid conflicts. [More info about limitations on CRDs in Helm 3](https://helm.sh/docs/topics/charts/#limitations-on-crds) |
+| crds.annotations | object | `{}` | Annotations to be added to all CRDs |
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
