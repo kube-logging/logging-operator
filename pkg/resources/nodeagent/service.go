@@ -29,7 +29,7 @@ import (
 func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if n.nodeAgent.FluentbitSpec.Metrics != nil {
 		desired := &corev1.Service{
-			ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-monitor"),
+			ObjectMeta: n.NodeAgentObjectMeta(fluentbitServiceName + "-metrics"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{

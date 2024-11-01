@@ -27,7 +27,7 @@ import (
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.fluentbitSpec.Metrics != nil {
 		return &corev1.Service{
-			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
+			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
