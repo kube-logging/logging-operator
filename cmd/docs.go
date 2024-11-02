@@ -43,7 +43,6 @@ func plugins() {
 		logger.WithName("pluginlister"))
 
 	lister.IgnoredSources = []string{
-		"null",
 		".*.deepcopy",
 		".*_test",
 	}
