@@ -117,6 +117,12 @@ tolerations: []
 # -- Node Affinity
 affinity: {}
 
+# -- Pod Topology Spread Constraints
+topologySpreadConstraints: []
+
+# -- Deployment Strategy
+strategy: {}
+
 # -- Define which Nodes the Pods are scheduled on.
 podLabels: {}
 
