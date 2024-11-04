@@ -4392,6 +4392,9 @@ spec:
                     type: object
                 type: object
               nullout:
+                properties:
+                  never_flush:
+                    type: boolean
                 type: object
               opensearch:
                 properties:
@@ -11401,6 +11404,9 @@ spec:
                     type: object
                 type: object
               nullout:
+                properties:
+                  never_flush:
+                    type: boolean
                 type: object
               opensearch:
                 properties:

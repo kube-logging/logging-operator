@@ -2506,7 +2506,7 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.NullOutputConfig != nil {
 		in, out := &in.NullOutputConfig, &out.NullOutputConfig
 		*out = new(output.NullOutputConfig)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.KafkaOutputConfig != nil {
 		in, out := &in.KafkaOutputConfig, &out.KafkaOutputConfig

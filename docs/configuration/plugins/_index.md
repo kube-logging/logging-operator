@@ -48,6 +48,7 @@ For more information please click on the plugin name
 | **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.19](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
 | **[Mattermost](outputs/mattermost/)** | outputs | Sends logs to Mattermost via webhooks. | GA | [0.2.2](https://github.com/levigo-systems/fluent-plugin-mattermost) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.2.1](https://github.com/newrelic/newrelic-fluentd-output) |
+| **[Null](outputs/null/)** | outputs | Null output plugin just throws away events. | GA | [more info](https://docs.fluentd.org/output/null) |
 | **[OpenSearch](outputs/opensearch/)** | outputs | Send your logs to OpenSearch | GA | [1.0.5](https://github.com/fluent/fluent-plugin-opensearch/releases/tag/v1.0.5) |
 | **[Alibaba Cloud Storage](outputs/oss/)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
 | **[Redis](outputs/redis/)** | outputs | Sends logs to Redis endpoints. | GA | [0.3.5](https://github.com/fluent-plugins-nursery/fluent-plugin-redis) |
