@@ -82,6 +82,6 @@ spec:
       serviceAccountName: {{ include "logging-operator.fullname" . }}
     {{- end }}
     {{- if .Values.topologySpreadConstraints }}
-      strategy:
+      topologySpreadConstraints:
         {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
     {{- end }}
