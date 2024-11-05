@@ -65,6 +65,8 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | nodeSelector | object | `{}` |  |
 | tolerations | list | `[]` | Node Tolerations |
 | affinity | object | `{}` | Node Affinity |
+| topologySpreadConstraints | list | `[]` | Pod Topology Spread Constraints |
+| strategy | object | `{}` | Deployment Strategy |
 | podLabels | object | `{}` | Define which Nodes the Pods are scheduled on. |
 | logging.enabled | bool | `false` | Logging resources are disabled by default |
 | logging.loggingRef | string | `""` | Reference to the logging system. Each of the loggingRefs can manage a fluentbit daemonset and a fluentd statefulset. |

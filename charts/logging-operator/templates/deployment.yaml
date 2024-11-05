@@ -11,6 +11,10 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "logging-operator.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+{{- if .Values.strategy }}
+  strategy:
+    {{- toYaml .Values.strategy | nindent 4 }}
+{{- end }}
   template:
     metadata:
       labels:
@@ -76,4 +80,8 @@ spec:
       serviceAccountName: {{ .Values.rbac.serviceAccountName }}
     {{- else if .Values.rbac.enabled }}
       serviceAccountName: {{ include "logging-operator.fullname" . }}
+    {{- end }}
+    {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
     {{- end }}
