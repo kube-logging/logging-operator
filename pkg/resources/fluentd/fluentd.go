@@ -168,7 +168,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		}
 
 		if result, ok := r.Logging.Status.ConfigCheckResults[hash]; ok {
-			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck, r.Logging.GetName())
+			cleaner := configcheck.NewConfigCheckCleaner(r.Client, ComponentConfigCheck)
 
 			var cleanupErrs error
 			cleanupErrs = errors.Append(cleanupErrs, cleaner.SecretCleanup(ctx, hash))
