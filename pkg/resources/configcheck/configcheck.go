@@ -46,11 +46,12 @@ type ConfigCheckCleaner struct {
 	labels client.MatchingLabels
 }
 
-func NewConfigCheckCleaner(c client.Client, component string) *ConfigCheckCleaner {
+func NewConfigCheckCleaner(c client.Client, component string, logging string) *ConfigCheckCleaner {
 	return &ConfigCheckCleaner{
 		client: c,
 		labels: client.MatchingLabels{
-			"app.kubernetes.io/component": component,
+			"app.kubernetes.io/component":  component,
+			"app.kubernetes.io/managed-by": logging,
 		},
 	}
 }
