@@ -125,7 +125,7 @@ func LoggingInfra(
 			ControlNamespace: nsInfra,
 			FluentdSpec: &v1beta1.FluentdSpec{
 				Image: v1beta1.ImageSpec{
-					Tag: "v1.16-4.9-base",
+					Tag: "v1.16-4.11-base",
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{
