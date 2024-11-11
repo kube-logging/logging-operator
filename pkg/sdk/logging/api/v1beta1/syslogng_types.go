@@ -34,7 +34,7 @@ type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
 const (
 	defaultSyslogngImageRepository    = "ghcr.io/axoflow/axosyslog"
-	defaultSyslogngImageTag           = "4.8.1"
+	defaultSyslogngImageTag           = "4.9.0"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
 	configReloaderImageTag            = "v1.5.0"
 	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
