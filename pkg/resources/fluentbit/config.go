@@ -35,7 +35,7 @@ var fluentBitConfigTemplate = `
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
-    HTTP_Listen  ${POD_IP}
+    HTTP_Listen  [::]
     HTTP_Port    {{ .Monitor.Port }}
     {{- end }}
     {{- range $key, $value := .BufferStorage }}

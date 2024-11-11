@@ -121,16 +121,6 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 	if r.fluentbitSpec.ConfigHotReload != nil {
 		args = append(args, "--enable-hot-reload")
 	}
-	r.fluentbitSpec.EnvVars = append(r.fluentbitSpec.EnvVars, []corev1.EnvVar{
-		{
-			Name: "POD_IP",
-			ValueFrom: &corev1.EnvVarSource{
-				FieldRef: &corev1.ObjectFieldSelector{
-					FieldPath: "status.podIP",
-				},
-			},
-		},
-	}...)
 	return &corev1.Container{
 		Name:            containerName,
 		Image:           r.fluentbitSpec.Image.RepositoryWithTag(),
