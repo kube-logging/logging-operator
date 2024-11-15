@@ -129,7 +129,7 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
         run: |
           images=""
-          for tag in ${TAGS}; do
+          for tag in ${TAGS[@]}; do
             images+="${tag}@${DIGEST} "
           done
           
@@ -141,11 +141,22 @@ jobs:
           DIGEST: ${{ steps.build.outputs.digest }}
           TAGS: ${{ steps.meta.outputs.tags }}
         run: |
-          for tag in ${TAGS}; do
-            cosign verify "${tag}@${DIGEST}" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
-          done
+          if [ "${{ github.repository }}" == "kube-logging/logging-operator" ]; then
+            for tag in ${TAGS[@]}; do
+              cosign verify "${tag}@${DIGEST}" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+            done
+          else
+            versions=$(curl -s https://api.github.com/repos/kube-logging/logging-operator/releases | jq -r '.[].tag_name')
+            for tag in "${TAGS[@]}"; do
+              for version in ${versions}; do
+                cosign verify "${tag}@${DIGEST}" \
+                --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq && break
+              done
+            done
+          fi
 
       - name: Set image ref
         id: image-ref
@@ -272,9 +283,18 @@ jobs:
         env:
           DIGEST: ${{ steps.push.outputs.digest }}
         run: |
-          cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+          if [ "${{ github.repository }}" == "kube-logging/logging-operator" ]; then
+            cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
             --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+          else
+            versions=$(curl -s https://api.github.com/repos/kube-logging/logging-operator/releases | jq -r '.[].tag_name')
+            for version in ${versions}; do
+              cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+              --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq && break
+            done
+          fi
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
