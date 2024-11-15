@@ -144,20 +144,47 @@ jobs:
           if [ "${{ github.repository }}" == "kube-logging/logging-operator" ]; then
             for tag in ${TAGS[@]}; do
               cosign verify "${tag}@${DIGEST}" \
-              --rekor-url "https://rekor.sigstore.dev/" \
-              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
-              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+                --rekor-url "https://rekor.sigstore.dev/" \
+                --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+                --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
             done
           else
             versions=$(curl -s https://api.github.com/repos/kube-logging/logging-operator/releases | jq -r '.[].tag_name')
-            for tag in "${TAGS[@]}"; do
-              for version in ${versions}; do
-                cosign verify "${tag}@${DIGEST}" \
-                --rekor-url "https://rekor.sigstore.dev/" \
-                --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
-                --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq && break
+            version_array=($versions)
+            
+            echo "Checking versions:"
+            printf '%s\n' "${version_array[@]}"
+            echo "-------------------"
+            
+            verification_succeeded=false
+            for tag in ${TAGS[@]}; do
+              echo "Checking tag: ${tag}"
+              
+              for version in "${version_array[@]}"; do
+                [[ -z "$version" ]] && continue
+                
+                echo "Attempting verification with version ${version}"
+                if cosign verify "${tag}@${DIGEST}" \
+                    --rekor-url "https://rekor.sigstore.dev/" \
+                    --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                    --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
+                  echo "✓ Verification succeeded for ${tag} with version ${version}"
+                  verification_succeeded=true
+                  break
+                else
+                  echo "✗ Verification failed for version ${version}"
+                fi
               done
+              
+              if ! $verification_succeeded; then
+                echo "❌ No valid signature found for ${tag}"
+                exit 1
+              fi
             done
+      
+            if $verification_succeeded; then
+              echo "✅ All verifications completed successfully"
+            fi
           fi
 
       - name: Set image ref
@@ -287,17 +314,41 @@ jobs:
         run: |
           if [ "${{ github.repository }}" == "kube-logging/logging-operator" ]; then
             cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
-            --rekor-url "https://rekor.sigstore.dev/" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+              --rekor-url "https://rekor.sigstore.dev/" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
           else
             versions=$(curl -s https://api.github.com/repos/kube-logging/logging-operator/releases | jq -r '.[].tag_name')
-            for version in ${versions}; do
-              cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
-              --rekor-url "https://rekor.sigstore.dev/" \
-              --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
-              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq && break
+            version_array=($versions)
+            
+            echo "Checking versions:"
+            printf '%s\n' "${version_array[@]}"
+            echo "-------------------"
+            
+            echo "Checking chart: ${{ steps.oci-chart-name.outputs.value }}"
+            verification_succeeded=false
+            for version in "${version_array[@]}"; do
+              [[ -z "$version" ]] && continue
+              
+              echo "Attempting verification with version ${version}"
+              if cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+                  --rekor-url "https://rekor.sigstore.dev/" \
+                  --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
+                echo "✓ Verification succeeded with version ${version}"
+                verification_succeeded=true
+                break
+              else
+                echo "✗ Verification failed for version ${version}"
+              fi
             done
+            
+            if ! $verification_succeeded; then
+              echo "❌ No valid signature found for chart"
+              exit 1
+            else
+              echo "✅ Chart verification completed successfully"
+            fi
           fi
 
       - name: Run Trivy vulnerability scanner
