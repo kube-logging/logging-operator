@@ -1,4 +1,6 @@
-```
+# Logging Operator multi-tenant routing
+
+```bash
 make generate install
 kubectl apply -f config/samples/multitenant-routing-tc/logging
 helm upgrade --install --namespace customer-a log-generator oci://ghcr.io/kube-logging/helm-charts/log-generator
