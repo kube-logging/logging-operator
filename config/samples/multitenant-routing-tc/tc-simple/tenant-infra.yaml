@@ -13,10 +13,9 @@ metadata:
     collector: cluster
 spec:
   logSourceNamespaceSelectors:
-    - matchLabels:
-        tenant: customer-a
-    - matchLabels:
-        tenant: customer-b
+    - matchExpression:
+        key: tenant
+        operator: Exists
   subscriptionNamespaceSelectors:
     - matchLabels:
         tenant: infra
