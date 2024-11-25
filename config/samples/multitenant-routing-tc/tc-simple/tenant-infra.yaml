@@ -13,8 +13,8 @@ metadata:
     collector: cluster
 spec:
   logSourceNamespaceSelectors:
-    - matchExpression:
-        key: tenant
+    - matchExpressions:
+      - key: tenant
         operator: Exists
   subscriptionNamespaceSelectors:
     - matchLabels:
