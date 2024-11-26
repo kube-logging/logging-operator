@@ -74,7 +74,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				},
 				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
+				ClusterIP: corev1.ClusterIPNone,
 			},
 		}, reconciler.StatePresent, nil
 	}
@@ -142,7 +142,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				},
 				Selector:  r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
 				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
+				ClusterIP: corev1.ClusterIPNone,
 			},
 		}, reconciler.StatePresent, nil
 	}
