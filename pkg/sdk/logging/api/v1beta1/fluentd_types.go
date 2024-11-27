@@ -172,6 +172,9 @@ func (f *FluentdSpec) SetDefaults() error {
 		if f.Security.PodSecurityContext.FSGroup == nil {
 			f.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
 		}
+		if f.Security.CreateOpenShiftSCC == nil {
+			f.Security.CreateOpenShiftSCC = util.BoolPointer(false)
+		}
 		if f.Workers <= 0 {
 			f.Workers = 1
 		}

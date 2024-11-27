@@ -23,6 +23,48 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+func (r *Reconciler) sccRole() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.fluentbitSpec.Security.CreateOpenShiftSCC {
+		return &rbacv1.Role{
+			ObjectMeta: r.FluentbitObjectMeta(sccRoleName),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups:     []string{"security.openshift.io"},
+					ResourceNames: []string{"privileged"},
+					Resources:     []string{"securitycontextconstraints"},
+					Verbs:         []string{"use"},
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.Role{
+		ObjectMeta: r.FluentbitObjectMeta(sccRoleName),
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.fluentbitSpec.Security.CreateOpenShiftSCC {
+		return &rbacv1.RoleBinding{
+			ObjectMeta: r.FluentbitObjectMeta(sccRoleName),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "Role",
+				APIGroup: rbacv1.GroupName,
+				Name:     r.nameProvider.ComponentName(sccRoleName),
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      rbacv1.ServiceAccountKind,
+					Name:      r.getServiceAccount(),
+					Namespace: r.Logging.Spec.ControlNamespace,
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.RoleBinding{
+		ObjectMeta: r.FluentbitObjectMeta(sccRoleName),
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+}
+
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate {
 		clusterRoleResources := []string{"pods", "namespaces"}
@@ -51,12 +93,12 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleBindingName),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
-				APIGroup: "rbac.authorization.k8s.io",
+				APIGroup: rbacv1.GroupName,
 				Name:     r.nameProvider.ComponentName(clusterRoleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{
-					Kind:      "ServiceAccount",
+					Kind:      rbacv1.ServiceAccountKind,
 					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},

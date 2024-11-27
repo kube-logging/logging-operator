@@ -152,6 +152,7 @@ type Security struct {
 	PodSecurityPolicyCreate bool                       `json:"podSecurityPolicyCreate,omitempty"`
 	SecurityContext         *corev1.SecurityContext    `json:"securityContext,omitempty"`
 	PodSecurityContext      *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
+	CreateOpenShiftSCC      *bool                      `json:"createOpenShiftSCC,omitempty"`
 }
 
 // ReadinessDefaultCheck Enable default readiness checks
