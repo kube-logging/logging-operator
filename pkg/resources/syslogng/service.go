@@ -74,7 +74,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				},
 				Selector:  r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
 				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
+				ClusterIP: corev1.ClusterIPNone,
 			},
 		}, reconciler.StatePresent, nil
 	}
@@ -141,7 +141,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				},
 				Selector:  r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
 				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
+				ClusterIP: corev1.ClusterIPNone,
 			},
 		}, reconciler.StatePresent, nil
 	}

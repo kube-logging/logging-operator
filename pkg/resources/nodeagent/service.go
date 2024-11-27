@@ -41,7 +41,7 @@ func (n *nodeAgentInstance) serviceMetrics() (runtime.Object, reconciler.Desired
 				},
 				Selector:  n.getFluentBitLabels(),
 				Type:      corev1.ServiceTypeClusterIP,
-				ClusterIP: "None",
+				ClusterIP: corev1.ClusterIPNone,
 			},
 		}
 		err := merge.Merge(desired, n.nodeAgent.FluentbitSpec.MetricsService)

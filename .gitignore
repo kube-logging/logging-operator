@@ -99,3 +99,7 @@ example/tls-cluster-forward/*.key
 .DS_Store
 
 go.work.sum
+
+# Ignore DevSpace cache and log folder and DevSpace configuration file
+.devspace/
+devspace.yaml
