@@ -137,7 +137,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 		rules := builtInRules
 		if r.fluentdSpec.Metrics.PrometheusRulesOverride != nil {
 			for _, o := range r.fluentdSpec.Metrics.PrometheusRulesOverride {
-				rules = o.ListOverride(builtInRules)
+				rules = o.ListOverride(rules)
 			}
 		}
 		obj.Spec.Groups = []v1.RuleGroup{

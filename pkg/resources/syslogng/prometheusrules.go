@@ -140,10 +140,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 		rules := builtInRules
 		if r.syslogNGSpec.Metrics.PrometheusRulesOverride != nil {
 			for _, o := range r.syslogNGSpec.Metrics.PrometheusRulesOverride {
-				rules = o.ListOverride(builtInRules)
+				rules = o.ListOverride(rules)
 			}
 		}
-
 		obj.Spec.Groups = []v1.RuleGroup{
 			{
 				Name:  ruleGroupName,
