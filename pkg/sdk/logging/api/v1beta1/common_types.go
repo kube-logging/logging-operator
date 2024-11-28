@@ -70,6 +70,7 @@ type Metrics struct {
 	Port                    int32                     `json:"port,omitempty"`
 	Path                    string                    `json:"path,omitempty"`
 	ServiceMonitor          bool                      `json:"serviceMonitor,omitempty"`
+	EnabledIPv6              bool                     `json:"enabledIPv6,omitempty"`
 	ServiceMonitorConfig    ServiceMonitorConfig      `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
