@@ -180,7 +180,7 @@ const (
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "v0.0.6"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                        = "v1.16-4.11-full"
+	DefaultFluentdImageTag                        = "v1.17-5.0-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "v0.2.3"
