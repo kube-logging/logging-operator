@@ -43,6 +43,7 @@ const (
 	defaultServiceAccountName      = "fluentbit"
 	clusterRoleBindingName         = "fluentbit"
 	clusterRoleName                = "fluentbit"
+	sccRoleName                    = "scc-privileged"
 	fluentBitSecretConfigName      = "fluentbit"
 	fluentbitDaemonSetName         = "fluentbit"
 	fluentbitServiceName           = "fluentbit"
@@ -132,6 +133,10 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.serviceMetrics,
 		r.serviceBufferMetrics,
 	}
+	if r.fluentbitSpec.Security.CreateOpenShiftSCC != nil && *r.fluentbitSpec.Security.CreateOpenShiftSCC {
+		objects = append(objects, r.sccRole, r.sccRoleBinding)
+	}
+
 	if resources.IsSupported(ctx, resources.ServiceMonitorKey) {
 		objects = append(objects, r.monitorServiceMetrics, r.monitorBufferServiceMetrics)
 	}

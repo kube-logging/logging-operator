@@ -58,6 +58,7 @@ const (
 	defaultServiceAccountName      = "fluentd"
 	roleBindingName                = "fluentd"
 	roleName                       = "fluentd"
+	sccRoleName                    = "scc-anyuid"
 	clusterRoleBindingName         = "fluentd"
 	clusterRoleName                = "fluentd"
 	containerName                  = "fluentd"
@@ -131,6 +132,8 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.role,
 		r.roleBinding,
+		r.sccRole,
+		r.sccRoleBinding,
 		r.clusterRole,
 		r.clusterRoleBinding,
 	}

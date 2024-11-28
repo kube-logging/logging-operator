@@ -42,6 +42,7 @@ const (
 	defaultServiceAccountName = "fluentbit"
 	clusterRoleBindingName    = "fluentbit"
 	clusterRoleName           = "fluentbit"
+	sccRoleName               = "scc-privileged"
 	fluentBitSecretConfigName = "fluentbit"
 	fluentbitDaemonSetName    = "fluentbit"
 	fluentbitServiceName      = "fluentbit"
@@ -96,6 +97,7 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 				RoleBasedAccessControlCreate: util.BoolPointer(true),
 				SecurityContext:              &corev1.SecurityContext{},
 				PodSecurityContext:           &corev1.PodSecurityContext{},
+				CreateOpenShiftSCC:           util.BoolPointer(false),
 			},
 			ContainersPath: "/var/lib/docker/containers",
 			VarLogsPath:    "/var/log",
@@ -352,6 +354,8 @@ func (r *Reconciler) processAgent(ctx context.Context, name string, userDefinedA
 func (n *nodeAgentInstance) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 	objects := []resources.Resource{
 		n.serviceAccount,
+		n.sccRole,
+		n.sccRoleBinding,
 		n.clusterRole,
 		n.clusterRoleBinding,
 		n.configSecret,
