@@ -98,34 +98,38 @@ type PrometheusRulesOverride struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-func (o PrometheusRulesOverride) ListOverride(l []v1.Rule) []v1.Rule {
-	var rules []v1.Rule
-	for _, i := range l {
-		rules = append(rules, *(o.Override(&i)))
+func (o PrometheusRulesOverride) ListOverride(listOfRules []v1.Rule) []v1.Rule {
+	var updatedRules []v1.Rule
+	for _, rule := range listOfRules {
+		if (o.Record != "" && o.Record == rule.Record) || (o.Alert != "" && o.Alert == rule.Alert) {
+			updatedRule := o.Override(&rule)
+			updatedRules = append(updatedRules, *updatedRule)
+		} else {
+			updatedRules = append(updatedRules, rule)
+		}
 	}
-	return rules
+
+	return updatedRules
 }
 
-func (o PrometheusRulesOverride) Override(r *v1.Rule) *v1.Rule {
-	mergedRule := r.DeepCopy()
-	if (o.Record != "" && o.Record == r.Record) || (o.Alert != "" && o.Alert == r.Alert) {
-		if o.Expr != nil {
-			mergedRule.Expr = *o.Expr
-		}
-		if o.For != nil {
-			mergedRule.For = o.For
-		}
-		if o.KeepFiringFor != nil {
-			mergedRule.KeepFiringFor = o.KeepFiringFor
-		}
-		if o.Labels != nil {
-			mergedRule.Labels = o.Labels
-		}
-		if o.Annotations != nil {
-			mergedRule.Annotations = o.Annotations
-		}
+func (o PrometheusRulesOverride) Override(rule *v1.Rule) *v1.Rule {
+	updatedRule := rule.DeepCopy()
+	if o.Expr != nil {
+		updatedRule.Expr = *o.Expr
 	}
-	return mergedRule
+	if o.For != nil {
+		updatedRule.For = o.For
+	}
+	if o.KeepFiringFor != nil {
+		updatedRule.KeepFiringFor = o.KeepFiringFor
+	}
+	if o.Labels != nil {
+		updatedRule.Labels = o.Labels
+	}
+	if o.Annotations != nil {
+		updatedRule.Annotations = o.Annotations
+	}
+	return updatedRule
 }
 
 // BufferMetrics defines the service monitor endpoints

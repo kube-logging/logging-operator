@@ -50,7 +50,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 		rules := builtInRules
 		if r.fluentbitSpec.Metrics.PrometheusRulesOverride != nil {
 			for _, o := range r.fluentbitSpec.Metrics.PrometheusRulesOverride {
-				rules = o.ListOverride(builtInRules)
+				rules = o.ListOverride(rules)
 			}
 		}
 		state = reconciler.StatePresent
