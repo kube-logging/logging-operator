@@ -2469,6 +2469,8 @@ spec:
                 type: object
               security:
                 properties:
+                  createOpenShiftSCC:
+                    type: boolean
                   podSecurityContext:
                     properties:
                       appArmorProfile:

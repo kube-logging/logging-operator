@@ -49,12 +49,12 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 	}
 	binding.RoleRef = rbacv1.RoleRef{
 		Kind:     "Role",
-		APIGroup: "rbac.authorization.k8s.io",
+		APIGroup: rbacv1.GroupName,
 		Name:     r.Logging.QualifiedName(roleName),
 	}
 	binding.Subjects = []rbacv1.Subject{
 		{
-			Kind:      "ServiceAccount",
+			Kind:      rbacv1.ServiceAccountKind,
 			Name:      r.getServiceAccountName(),
 			Namespace: r.Logging.Spec.ControlNamespace,
 		},
@@ -121,12 +121,12 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 	}
 	binding.RoleRef = rbacv1.RoleRef{
 		Kind:     "ClusterRole",
-		APIGroup: "rbac.authorization.k8s.io",
+		APIGroup: rbacv1.GroupName,
 		Name:     r.Logging.QualifiedName(roleName),
 	}
 	binding.Subjects = []rbacv1.Subject{
 		{
-			Kind:      "ServiceAccount",
+			Kind:      rbacv1.ServiceAccountKind,
 			Name:      r.getServiceAccountName(),
 			Namespace: r.Logging.Spec.ControlNamespace,
 		},

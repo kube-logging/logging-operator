@@ -47,12 +47,12 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 			ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "Role",
-				APIGroup: "rbac.authorization.k8s.io",
+				APIGroup: rbacv1.GroupName,
 				Name:     r.Logging.QualifiedName(roleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{
-					Kind:      "ServiceAccount",
+					Kind:      rbacv1.ServiceAccountKind,
 					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
@@ -61,6 +61,49 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
+		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) sccRole() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.fluentdSpec.Security.CreateOpenShiftSCC {
+		return &rbacv1.Role{
+			ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
+			Rules: []rbacv1.PolicyRule{
+				{
+					APIGroups:     []string{"security.openshift.io"},
+					ResourceNames: []string{"anyuid"},
+					Resources:     []string{"securitycontextconstraints"},
+					Verbs:         []string{"use"},
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+
+	return &rbacv1.Role{
+		ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
+		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+}
+
+func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
+	if *r.fluentdSpec.Security.CreateOpenShiftSCC {
+		return &rbacv1.RoleBinding{
+			ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
+			RoleRef: rbacv1.RoleRef{
+				Kind:     "Role",
+				APIGroup: rbacv1.GroupName,
+				Name:     r.Logging.QualifiedName(sccRoleName),
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      rbacv1.ServiceAccountKind,
+					Name:      r.getServiceAccount(),
+					Namespace: r.Logging.Spec.ControlNamespace,
+				},
+			},
+		}, reconciler.StatePresent, nil
+	}
+	return &rbacv1.RoleBinding{
+		ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
@@ -120,12 +163,12 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{
 				Kind:     "ClusterRole",
-				APIGroup: "rbac.authorization.k8s.io",
+				APIGroup: rbacv1.GroupName,
 				Name:     r.Logging.QualifiedName(roleName),
 			},
 			Subjects: []rbacv1.Subject{
 				{
-					Kind:      "ServiceAccount",
+					Kind:      rbacv1.ServiceAccountKind,
 					Name:      r.getServiceAccount(),
 					Namespace: r.Logging.Spec.ControlNamespace,
 				},
