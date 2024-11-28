@@ -1588,6 +1588,8 @@ spec:
                   storage.type:
                     type: string
                 type: object
+              ipFamilies:
+                type: string
               labels:
                 additionalProperties:
                   type: string

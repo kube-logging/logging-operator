@@ -39,7 +39,7 @@ var fluentBitConfigTemplate = `
     Listen 0.0.0.0
     {{- else if eq .IPFamily "IPv6" }}
     Listen ::
-	{{- end }}
+    {{- end }}
     HTTP_Port    {{ .Monitor.Port }}
     {{- end }}
     {{- range $key, $value := .BufferStorage }}
