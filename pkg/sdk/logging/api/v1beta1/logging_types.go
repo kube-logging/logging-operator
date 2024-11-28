@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -473,7 +474,8 @@ func (l *Logging) SetDefaultsOnCopy() (*Logging, error) {
 
 // QualifiedName is the "logging-resource" name combined
 func (l *Logging) QualifiedName(name string) string {
-	return fmt.Sprintf("%s-%s", l.Name, name)
+	baseName := fmt.Sprintf("%s-%s", l.Name, name)
+	return kubetool.FixQualifiedNameIfInvalid(baseName)
 }
 
 // ClusterDomainAsSuffix formats the cluster domain as a suffix, e.g.:

@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -397,10 +398,12 @@ func RegisterWatches(builder *builder.Builder) *builder.Builder {
 
 // nodeAgent QualifiedName
 func (n *nodeAgentInstance) QualifiedName(name string) string {
-	return fmt.Sprintf("%s-%s-%s", n.logging.Name, n.name, name)
+	baseName := fmt.Sprintf("%s-%s-%s", n.logging.Name, n.name, name)
+	return kubetool.FixQualifiedNameIfInvalid(baseName)
 }
 
 // nodeAgent FluentdQualifiedName
 func (n *nodeAgentInstance) FluentdQualifiedName(name string) string {
-	return fmt.Sprintf("%s-%s", n.logging.Name, name)
+	baseName := fmt.Sprintf("%s-%s", n.logging.Name, name)
+	return kubetool.FixQualifiedNameIfInvalid(baseName)
 }
