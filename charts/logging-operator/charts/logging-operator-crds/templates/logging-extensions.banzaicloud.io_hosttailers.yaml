@@ -2679,8 +2679,6 @@ spec:
                       type: object
                     type: array
                 type: object
-            required:
-            - workloadMetaOverrides
             type: object
           status:
             type: object

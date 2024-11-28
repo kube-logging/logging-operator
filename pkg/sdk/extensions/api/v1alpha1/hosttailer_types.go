@@ -42,7 +42,6 @@ type HostTailerSpec struct {
 	// daemonset (and possibly other resource in the future) in case there is a change in an immutable field
 	// that otherwise couldn't be managed with a simple update.
 	EnableRecreateWorkloadOnImmutableFieldChange bool `json:"enableRecreateWorkloadOnImmutableFieldChange,omitempty"`
-	//+kubebuilder:validation:Required
 	// Override metadata of the created resources
 	WorkloadMetaBase *types.MetaBase `json:"workloadMetaOverrides,omitempty"`
 	// Override podSpec fields for the given daemonset

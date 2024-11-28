@@ -35,10 +35,8 @@ type _metaEventTailer = interface{} //nolint:deadcode,unused
 
 // EventTailerSpec defines the desired state of EventTailer
 type EventTailerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	//+kubebuilder:validation:Required
+
 	// The resources of EventTailer will be placed into this namespace
 	ControlNamespace string `json:"controlNamespace"`
 	// Volume definition for tracking fluentbit file positions (optional)
