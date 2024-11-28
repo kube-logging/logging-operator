@@ -78,8 +78,6 @@ type Filter struct {
 	Grep                *filter.GrepConfig                `json:"grep,omitempty"`
 	Prometheus          *filter.PrometheusConfig          `json:"prometheus,omitempty"`
 	Throttle            *filter.Throttle                  `json:"throttle,omitempty"`
-	SumoLogic           *filter.SumoLogic                 `json:"sumologic,omitempty"`
-	EnhanceK8s          *filter.EnhanceK8s                `json:"enhanceK8s,omitempty"`
 	KubeEventsTimestamp *filter.KubeEventsTimestampConfig `json:"kube_events_timestamp,omitempty"`
 }
 

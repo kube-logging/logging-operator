@@ -107,17 +107,8 @@ func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, 
 		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
 }
 
-func (r *Reconciler) isEnhanceK8sFilter() bool {
-	for _, f := range r.Logging.Spec.GlobalFilters {
-		if f.EnhanceK8s != nil {
-			return true
-		}
-	}
-	return false
-}
-
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
 			Rules: []rbacv1.PolicyRule{
@@ -158,7 +149,7 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate && r.isEnhanceK8sFilter() {
+	if *r.fluentdSpec.Security.RoleBasedAccessControlCreate {
 		return &rbacv1.ClusterRoleBinding{
 			ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
 			RoleRef: rbacv1.RoleRef{

@@ -574,16 +574,6 @@ func (in *Filter) DeepCopyInto(out *Filter) {
 		*out = new(filter.Throttle)
 		**out = **in
 	}
-	if in.SumoLogic != nil {
-		in, out := &in.SumoLogic, &out.SumoLogic
-		*out = new(filter.SumoLogic)
-		(*in).DeepCopyInto(*out)
-	}
-	if in.EnhanceK8s != nil {
-		in, out := &in.EnhanceK8s, &out.EnhanceK8s
-		*out = new(filter.EnhanceK8s)
-		(*in).DeepCopyInto(*out)
-	}
 	if in.KubeEventsTimestamp != nil {
 		in, out := &in.KubeEventsTimestamp, &out.KubeEventsTimestamp
 		*out = new(filter.KubeEventsTimestampConfig)
@@ -2481,11 +2471,6 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.LokiOutput != nil {
 		in, out := &in.LokiOutput, &out.LokiOutput
 		*out = new(output.LokiOutput)
-		(*in).DeepCopyInto(*out)
-	}
-	if in.SumologicOutput != nil {
-		in, out := &in.SumologicOutput, &out.SumologicOutput
-		*out = new(output.SumologicOutput)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.DatadogOutput != nil {

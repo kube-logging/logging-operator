@@ -89,9 +89,6 @@ OutputSpec defines the desired state of Output
 ### splunkHec (*output.SplunkHecOutput, optional) {#outputspec-splunkhec}
 
 
-### sumologic (*output.SumologicOutput, optional) {#outputspec-sumologic}
-
-
 ### syslog (*output.SyslogOutputConfig, optional) {#outputspec-syslog}
 
 

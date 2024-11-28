@@ -14,7 +14,6 @@ For more information please click on the plugin name
 | **[Dedot](filters/dedot/)** | filters | Concatenate multiline log separated in multiple events | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](filters/detect_exceptions/)** | filters | Exception Detector | GA | [0.0.14](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[ElasticSearch GenId](filters/elasticsearch_genid/)** | filters |  |  | [](TODO) |
-| **[Enhance K8s Metadata](filters/enhance_k8s/)** | filters | Fluentd output plugin to add extra Kubernetes metadata to the events. | GA | [2.0.0](https://github.com/SumoLogic/sumologic-kubernetes-fluentd/tree/main/fluent-plugin-enhance-k8s-metadata) |
 | **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.2](https://github.com/y-ken/fluent-plugin-geoip) |
 | **[Grep](filters/grep/)** | filters | Grep events by the values | GA | [more info](https://docs.fluentd.org/filter/grep) |
 | **[Kubernetes Events Timestamp](filters/kube_events_timestamp/)** | filters | Fluentd Filter plugin to select particular timestamp into an additional field | GA | [0.1.4](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp) |
@@ -23,7 +22,6 @@ For more information please click on the plugin name
 | **[Record Modifier](filters/record_modifier/)** | filters | Modify each event record. | GA | [2.1.0](https://github.com/repeatedly/fluent-plugin-record-modifier) |
 | **[Record Transformer](filters/record_transformer/)** | filters | Mutates/transforms incoming event streams. | GA | [more info](https://docs.fluentd.org/filter/record_transformer) |
 | **[Stdout](filters/stdout/)** | filters | Prints events to stdout | GA | [more info](https://docs.fluentd.org/filter/stdout) |
-| **[SumoLogic](filters/sumologic/)** | filters | Sumo Logic collection solution for Kubernetes | GA | [2.3.1](https://github.com/SumoLogic/sumologic-kubernetes-collection) |
 | **[Tag Normaliser](filters/tagnormaliser/)** | filters | Re-tag based on log metadata | GA | [0.1.1](https://github.com/kube-logging/fluent-plugin-tag-normaliser) |
 | **[Throttle](filters/throttle/)** | filters | A sentry plugin to throttle logs. Logs are grouped by a configurable key. When a group exceeds a configuration rate, logs are dropped for this group. | GA | [0.0.5](https://github.com/rubrikinc/fluent-plugin-throttle) |
 | **[UserAgent](filters/useragent/)** | filters | Fluentd UserAgent filter | GA | [1.2.0](https://github.com/bungoume/fluent-plugin-ua-parser) |
@@ -56,7 +54,6 @@ For more information please click on the plugin name
 | **[Amazon S3](outputs/s3/)** | outputs | Store logs in Amazon S3 | GA | [1.6.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.6.1) |
 | **[Splunk Hec](outputs/splunk_hec/)** | outputs | Fluent Plugin Splunk Hec Release | GA | [1.2.9]() |
 | **[SQS](outputs/sqs/)** | outputs | Output plugin writes fluent-events as queue messages to Amazon SQS | Testing | [v2.1.0](https://github.com/ixixi/fluent-plugin-sqs) |
-| **[SumoLogic](outputs/sumologic/)** | outputs | Send your logs to Sumologic | GA | [1.8.0](https://github.com/SumoLogic/fluentd-output-sumologic/releases/tag/1.8.0) |
 | **[Syslog](outputs/syslog/)** | outputs | Output plugin writes events to syslog | GA | [0.9.0.rc.8](https://github.com/cloudfoundry/fluent-plugin-syslog_rfc5424) |
 | **[VMwareLogIntelligence](outputs/vmware_log_intelligence/)** | outputs | Send your logs to VMware Log Intelligence | GA | [v2.0.8](https://github.com/vmware/fluent-plugin-vmware-log-intelligence/releases/tag/v2.0.8) |
 | **[VMware LogInsight](outputs/vmware_loginsight/)** | outputs | Store logs in VMware LogInsight | GA | [1.4.2](https://github.com/vmware/fluent-plugin-vmware-loginsight/releases/tag/v1.4.2) |

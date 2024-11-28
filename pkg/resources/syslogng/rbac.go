@@ -62,20 +62,11 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 	return binding, reconciler.StatePresent, nil
 }
 
-func (r *Reconciler) isEnhanceK8sFilter() bool {
-	for _, f := range r.Logging.Spec.GlobalFilters {
-		if f.EnhanceK8s != nil {
-			return true
-		}
-	}
-	return false
-}
-
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
 	role := &rbacv1.ClusterRole{
 		ObjectMeta: r.SyslogNGObjectMetaClusterScope(clusterRoleName, ComponentSyslogNG),
 	}
-	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate {
 		return role, reconciler.StateAbsent, nil
 	}
 	role.Rules = []rbacv1.PolicyRule{
@@ -116,7 +107,7 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 	binding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: r.SyslogNGObjectMetaClusterScope(clusterRoleBindingName, ComponentSyslogNG),
 	}
-	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate || !r.isEnhanceK8sFilter() {
+	if r.syslogNGSpec == nil || r.syslogNGSpec.SkipRBACCreate {
 		return binding, reconciler.StateAbsent, nil
 	}
 	binding.RoleRef = rbacv1.RoleRef{

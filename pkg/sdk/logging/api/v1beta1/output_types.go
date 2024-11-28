@@ -40,7 +40,6 @@ type OutputSpec struct {
 	OpenSearchOutput                  *output.OpenSearchOutput                  `json:"opensearch,omitempty"`
 	LogZOutput                        *output.LogZOutput                        `json:"logz,omitempty"`
 	LokiOutput                        *output.LokiOutput                        `json:"loki,omitempty"`
-	SumologicOutput                   *output.SumologicOutput                   `json:"sumologic,omitempty"`
 	DatadogOutput                     *output.DatadogOutput                     `json:"datadog,omitempty"`
 	ForwardOutput                     *output.ForwardOutput                     `json:"forward,omitempty"`
 	FileOutput                        *output.FileOutputConfig                  `json:"file,omitempty"`
