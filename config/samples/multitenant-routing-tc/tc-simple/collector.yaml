@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: collector
+---
+apiVersion: telemetry.kube-logging.dev/v1alpha1
+kind: Collector
+metadata:
+  name: cluster
+spec:
+  controlNamespace: collector
+  tenantSelector:
+    matchLabels:
+      collector: cluster
