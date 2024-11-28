@@ -14,6 +14,6 @@ sources:
   - https://github.com/kube-logging/logging-operator
   - https://github.com/kube-logging/helm-charts/tree/main/charts/logging-operator
 dependencies:
-  - name: crds
+  - name: logging-operator-crds
     version: 0.0.0
-    condition: crds.install
+    condition: logging-operator-crds.install

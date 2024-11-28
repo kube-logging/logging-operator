@@ -38,7 +38,7 @@ annotations: {}
 createCustomResource: false
 
 ## Custom resource configuration defined as a dependency chart
-crds:
+logging-operator-crds:
   # -- Toggle to install and upgrade CRDs from a subchart. Make sure to use it with `--skip-crds` to avoid conflicts. [More info about limitations on CRDs in Helm 3](https://helm.sh/docs/topics/charts/#limitations-on-crds)
   install: false
   # -- Annotations to be added to all CRDs
