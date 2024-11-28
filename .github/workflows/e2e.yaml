@@ -20,10 +20,10 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
       - name: Build and export
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
         with:
           context: .
           tags: controller:local
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
       - name: Download artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -85,7 +85,7 @@ jobs:
 #          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Test Coverage
-        uses: vladopajic/go-test-coverage@v2
+        uses: vladopajic/go-test-coverage@72cd73a57f1fc4c77c41952f0f1c81c3a69e3c17 # v2.10.5
         with:
           profile: ./build/_test_coverage/coverage_e2e.out
 
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
       - name: Download artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -122,7 +122,7 @@ jobs:
           docker image ls -a
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f # v4.0.0
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
