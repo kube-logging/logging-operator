@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-pre-delete-hook
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    helm.sh/hook: pre-delete
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+    {{- if .Values.rbac.serviceAccountName }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName }}
+    {{- else if .Values.rbac.enabled }}
+      serviceAccountName: {{ include "logging-operator.fullname" . }}
+    {{- end }}
+      containers:
+      - name: delete-logging
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - -c
+        - kubectl delete logging --all
+
+      - name: delete-syslogngconfig
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          namespaces=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name")
+          for ns in $namespaces; do
+            echo "Deleting syslogngconfig resources in namespace: $ns"
+            kubectl delete syslogngconfig --all --namespace="$ns" || echo "Failed to delete syslogngconfig in $ns"
+          done
+
+      - name: delete-fluentdconfig
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          namespaces=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name")
+          for ns in $namespaces; do
+            echo "Deleting fluentdconfig resources in namespace: $ns"
+            kubectl delete fluentdconfig --all --namespace="$ns" || echo "Failed to delete fluentdconfig in $ns"
+          done
