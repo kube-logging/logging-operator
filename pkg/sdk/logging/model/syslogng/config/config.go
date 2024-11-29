@@ -56,6 +56,10 @@ type Input struct {
 	SourcePort          int
 }
 
+type outputInfo struct {
+	ref types.NamespacedName
+}
+
 type clusterOutputInfo struct {
 	ref       types.NamespacedName
 	protected bool
@@ -99,7 +103,11 @@ func configRenderer(in Input) (render.Renderer, error) {
 		}
 		destinationDefs = append(destinationDefs, renderClusterOutput(co, in.SecretLoaderFactory))
 	}
+	outputRefs := make(map[string]outputInfo, len(in.Outputs))
 	for _, o := range in.Outputs {
+		outputRefs[o.Name] = outputInfo{
+			ref: types.NamespacedName{Namespace: o.Namespace, Name: o.Name},
+		}
 		destinationDefs = append(destinationDefs, renderOutput(o, in.SecretLoaderFactory))
 	}
 
@@ -112,6 +120,9 @@ func configRenderer(in Input) (render.Renderer, error) {
 	}
 	for _, f := range in.Flows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs, f.Kind); err != nil {
+			errs = errors.Append(errs, err)
+		}
+		if err := validateOutputs(outputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.LocalOutputRefs); err != nil {
 			errs = errors.Append(errs, err)
 		}
 		logDefs = append(logDefs, renderFlow(in.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
