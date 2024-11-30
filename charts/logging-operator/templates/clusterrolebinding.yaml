@@ -4,6 +4,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ template "logging-operator.fullname" . }}
+  annotations:
+  {{- if .Values.rbac.retainOnDelete }}
+    "helm.sh/resource-policy": keep
+  {{- end }}
   labels:
 {{ include "logging-operator.labels" . | indent 4 }}
 subjects:
@@ -14,5 +18,4 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: {{ template "logging-operator.fullname" . }}
-
-  {{- end }}
+{{- end }}

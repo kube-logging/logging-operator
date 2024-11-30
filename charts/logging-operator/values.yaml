@@ -60,6 +60,8 @@ http:
 rbac:
   # -- Create rbac service account and roles.
   enabled: true
+  # -- Keep the operators RBAC resources after the operator is deleted to allow removing pending finalizers.
+  retainOnDelete: false
 
   # specify service account manually
   # serviceAccountName: custom

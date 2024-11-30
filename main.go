@@ -25,6 +25,7 @@ import (
 	"runtime/coverage"
 	"strings"
 	"syscall"
+	"time"
 
 	"emperror.dev/errors"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -41,6 +42,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -80,6 +82,7 @@ func main() {
 	var enableprofile bool
 	var namespace string
 	var loggingRef string
+	var finalizerCleanup bool
 	var klogLevel int
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
@@ -91,6 +94,7 @@ func main() {
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
+	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -220,7 +224,7 @@ func main() {
 	// +kubebuilder:scaffold:builder
 	setupLog.Info("starting manager")
 
-	if err := mgr.Start(setupSignalHandler()); err != nil {
+	if err := mgr.Start(setupSignalHandler(mgr, finalizerCleanup)); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
@@ -231,7 +235,7 @@ func main() {
 // SIGUSR1 handler for saving test coverage files
 var onlyOneSignalHandler = make(chan struct{})
 
-func setupSignalHandler() context.Context {
+func setupSignalHandler(mgr ctrl.Manager, finalizerCleanup bool) context.Context {
 	close(onlyOneSignalHandler) // panics when called twice
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -241,7 +245,16 @@ func setupSignalHandler() context.Context {
 	go func() {
 		<-c
 		cancel()
-		<-c
+
+		// Due to the way Helm handles uninstallation,
+		// the operator might be terminated before the finalizers are removed.
+		if finalizerCleanup {
+			cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 60*time.Second)
+			defer cleanupCancel()
+
+			cleanupFinalizers(cleanupCtx, mgr.GetClient())
+		}
+
 		os.Exit(1) // second signal. Exit directly.
 	}()
 
@@ -267,6 +280,7 @@ func setupSignalHandler() context.Context {
 
 	return ctx
 }
+
 func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 	var nodeList corev1.NodeList
 	if err := c.List(ctx, &nodeList, client.Limit(1)); err != nil {
@@ -325,4 +339,39 @@ func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef str
 	}
 
 	return mgrOptions, nil
+}
+
+func cleanupFinalizers(ctx context.Context, client client.Client) {
+	log := ctrl.Log.WithName("finalizer-cleanup")
+	log.Info("Removing finalizers during operator shutdown")
+
+	// List all Logging resources
+	loggingList := &loggingv1beta1.LoggingList{}
+	if err := client.List(ctx, loggingList); err != nil {
+		log.Error(err, "Failed to list Logging resources")
+		return
+	}
+
+	finalizers := []string{
+		"fluentdconfig.logging.banzaicloud.io/finalizer",
+		"syslogngconfig.logging.banzaicloud.io/finalizer",
+	}
+	for _, logging := range loggingList.Items {
+		for _, finalizer := range finalizers {
+			if controllerutil.ContainsFinalizer(&logging, finalizer) {
+				log.Info(fmt.Sprintf("Removing finalizer: %s from: %s during operator shutdown",
+					finalizer,
+					logging.Name))
+
+				controllerutil.RemoveFinalizer(&logging, finalizer)
+				if err := client.Update(ctx, &logging); err != nil {
+					log.Error(err, fmt.Sprintf("Failed to remove finalizer: %s from: %s during operator shutdown",
+						finalizer,
+						logging.Name))
+					// continue trying to remove finalizers for other resources
+					continue
+				}
+			}
+		}
+	}
 }
