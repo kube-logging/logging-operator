@@ -102,6 +102,9 @@ Disable Kubernetes metadata filter
 ### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
 
 
+### enabledIPv6 (bool, optional) {#fluentbitspec-enabledipv6}
+
+
 ### envVars ([]corev1.EnvVar, optional) {#fluentbitspec-envvars}
 
 

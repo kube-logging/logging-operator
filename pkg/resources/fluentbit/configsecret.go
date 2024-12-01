@@ -67,7 +67,7 @@ type fluentBitConfig struct {
 	Flush                   int32
 	Grace                   int32
 	LogLevel                string
-	EnabledIPv6             bool      
+	EnabledIPv6             bool
 	CoroStackSize           int32
 	Output                  map[string]string
 	Input                   fluentbitInputConfig
