@@ -27,9 +27,10 @@ import (
 )
 
 type fluentdConfig struct {
-	LogFormat string
-	LogLevel  string
-	Monitor   struct {
+	LogFormat   string
+	LogLevel    string
+	EnabledIPv6 bool
+	Monitor     struct {
 		Enabled     bool
 		EnabledIPv6 bool
 		Port        int32
@@ -72,7 +73,6 @@ func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[
 
 	if fluentdSpec.Metrics != nil {
 		input.Monitor.Enabled = true
-		input.Monitor.EnabledIPv6 = fluentdSpec.EnabledIPv6
 		input.Monitor.Port = fluentdSpec.Metrics.Port
 		input.Monitor.Path = fluentdSpec.Metrics.Path
 	}

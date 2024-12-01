@@ -63,7 +63,7 @@ var fluentdInputTemplate = `
     metrics_path {{ .Monitor.Path }}
 {{- end }}
 </source>
-{{- if .Monitor.EnabledIPv6 }}
+{{- if .EnabledIPv6 }}
 <source>
     @type prometheus
     @id in_prometheus6
