@@ -67,7 +67,7 @@ type fluentBitConfig struct {
 	Flush                   int32
 	Grace                   int32
 	LogLevel                string
-	IPFamily                string 
+	EnabledIPv6             bool      
 	CoroStackSize           int32
 	Output                  map[string]string
 	Input                   fluentbitInputConfig
@@ -217,7 +217,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Flush:                   r.fluentbitSpec.Flush,
 		Grace:                   r.fluentbitSpec.Grace,
 		LogLevel:                r.fluentbitSpec.LogLevel,
-		IPFamily:                r.fluentbitSpec.IPFamily,
+		EnabledIPv6:             r.fluentbitSpec.EnabledIPv6,
 		CoroStackSize:           r.fluentbitSpec.CoroStackSize,
 		Namespace:               r.Logging.Spec.ControlNamespace,
 		DisableKubernetesFilter: disableKubernetesFilter,

@@ -35,10 +35,10 @@ var fluentBitConfigTemplate = `
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
-    {{- if eq .IPFamily "IPv4" }}
+    {{- if .Monitor.EnabledIPv6 }}
+    HTTP_Listen  [::]
+    {{- else }}
     Listen 0.0.0.0
-    {{- else if eq .IPFamily "IPv6" }}
-    Listen ::
     {{- end }}
     HTTP_Port    {{ .Monitor.Port }}
     {{- end }}

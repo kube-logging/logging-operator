@@ -2214,6 +2214,8 @@ spec:
                     type: string
                   enableUpstream:
                     type: boolean
+                  enabledIPv6:
+                    type: boolean
                   envVars:
                     items:
                       properties:
@@ -2635,8 +2637,6 @@ spec:
                       storage.type:
                         type: string
                     type: object
-                  ipFamilies:
-                    type: string
                   labels:
                     additionalProperties:
                       type: string
