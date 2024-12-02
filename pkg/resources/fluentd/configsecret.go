@@ -32,7 +32,6 @@ type fluentdConfig struct {
 	EnabledIPv6 bool
 	Monitor     struct {
 		Enabled     bool
-		EnabledIPv6 bool
 		Port        int32
 		Path        string
 	}
