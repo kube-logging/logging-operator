@@ -31,9 +31,9 @@ type fluentdConfig struct {
 	LogLevel    string
 	EnabledIPv6 bool
 	Monitor     struct {
-		Enabled     bool
-		Port        int32
-		Path        string
+		Enabled bool
+		Port    int32
+		Path    string
 	}
 	IgnoreSameLogInterval     string
 	IgnoreRepeatedLogInterval string
