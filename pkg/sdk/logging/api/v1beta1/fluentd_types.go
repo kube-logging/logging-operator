@@ -51,6 +51,7 @@ type FluentdSpec struct {
 	TLS                    FluentdTLS        `json:"tls,omitempty"`
 	Image                  ImageSpec         `json:"image,omitempty"`
 	DisablePvc             bool              `json:"disablePvc,omitempty"`
+	EnabledIPv6            bool              `json:"enabledIPv6,omitempty"`
 	// BufferStorageVolume is by default configured as PVC using FluentdPvcSpec
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`

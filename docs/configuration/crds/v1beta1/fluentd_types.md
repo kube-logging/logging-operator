@@ -68,6 +68,9 @@ Overrides the default logging level configCheck setup This field is not used dir
 Allows Time object in buffer's MessagePack serde [more info]( https://docs.fluentd.org/deployment/system-config#enable_msgpack_time_support) 
 
 
+### enabledIPv6 (bool, optional) {#fluentdspec-enabledipv6}
+
+
 ### envVars ([]corev1.EnvVar, optional) {#fluentdspec-envvars}
 
 

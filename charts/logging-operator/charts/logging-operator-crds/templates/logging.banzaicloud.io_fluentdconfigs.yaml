@@ -1193,6 +1193,8 @@ spec:
                 type: string
               enableMsgpackTimeSupport:
                 type: boolean
+              enabledIPv6:
+                type: boolean
               envVars:
                 items:
                   properties:

@@ -27,9 +27,10 @@ import (
 )
 
 type fluentdConfig struct {
-	LogFormat string
-	LogLevel  string
-	Monitor   struct {
+	LogFormat   string
+	LogLevel    string
+	EnabledIPv6 bool
+	Monitor     struct {
 		Enabled bool
 		Port    int32
 		Path    string

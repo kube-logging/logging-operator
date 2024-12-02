@@ -2214,6 +2214,8 @@ spec:
                     type: string
                   enableUpstream:
                     type: boolean
+                  enabledIPv6:
+                    type: boolean
                   envVars:
                     items:
                       properties:
@@ -4935,6 +4937,8 @@ spec:
                   dnsPolicy:
                     type: string
                   enableMsgpackTimeSupport:
+                    type: boolean
+                  enabledIPv6:
                     type: boolean
                   envVars:
                     items:
