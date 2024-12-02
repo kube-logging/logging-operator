@@ -3264,6 +3264,193 @@ spec:
                     type: object
                   principal:
                     type: string
+                  rdkafka_options:
+                    properties:
+                      allow.auto.create.topics:
+                        type: boolean
+                      api.version.fallback.ms:
+                        type: integer
+                      api.version.request:
+                        type: boolean
+                      api.version.request.timeout.ms:
+                        type: integer
+                      background_event_cb:
+                        type: string
+                      bootstrap.servers:
+                        type: string
+                      broker.address.family:
+                        type: string
+                      broker.address.ttl:
+                        type: integer
+                      broker.version.fallback:
+                        type: string
+                      builtin.features:
+                        type: string
+                      client.id:
+                        type: string
+                      closesocket_cb:
+                        type: string
+                      connect_cb:
+                        type: string
+                      connections.max.idle.ms:
+                        type: integer
+                      debug:
+                        type: string
+                      default_topic_conf:
+                        type: string
+                      enable.random.seed:
+                        type: boolean
+                      enable.sasl.oauthbearer.unsecure.jwt:
+                        type: boolean
+                      enable.ssl.certificate.verification:
+                        type: boolean
+                      enabled_events:
+                        type: integer
+                      error_cb:
+                        type: string
+                      interceptors:
+                        type: string
+                      internal.termination.signal:
+                        type: integer
+                      log.connection.close:
+                        type: boolean
+                      log.queue:
+                        type: boolean
+                      log.thread.name:
+                        type: boolean
+                      log_cb:
+                        type: string
+                      log_level:
+                        type: integer
+                      max.in.flight:
+                        type: integer
+                      max.in.flight.requests.per.connection:
+                        type: integer
+                      message.copy.max.bytes:
+                        type: integer
+                      message.max.bytes:
+                        type: integer
+                      metadata.broker.list:
+                        type: string
+                      metadata.max.age.ms:
+                        type: integer
+                      oauthbearer_token_refresh_cb:
+                        type: string
+                      opaque:
+                        type: string
+                      open_cb:
+                        type: string
+                      plugin.library.paths:
+                        type: string
+                      receive.message.max.bytes:
+                        type: integer
+                      reconnect.backoff.max.ms:
+                        type: integer
+                      reconnect.backoff.ms:
+                        type: integer
+                      resolve_cb:
+                        type: string
+                      sasl.kerberos.keytab:
+                        type: string
+                      sasl.kerberos.kinit.cmd:
+                        type: string
+                      sasl.kerberos.min.time.before.relogin:
+                        type: integer
+                      sasl.kerberos.principal:
+                        type: string
+                      sasl.kerberos.service.name:
+                        type: string
+                      sasl.mechanisms:
+                        type: string
+                      sasl.oauthbearer.client.id:
+                        type: string
+                      sasl.oauthbearer.client.secret:
+                        type: string
+                      sasl.oauthbearer.config:
+                        type: string
+                      sasl.oauthbearer.extensions:
+                        type: string
+                      sasl.oauthbearer.method:
+                        type: string
+                      sasl.oauthbearer.scope:
+                        type: string
+                      sasl.oauthbearer.token.endpoint.url:
+                        type: string
+                      sasl.password:
+                        type: string
+                      sasl.username:
+                        type: string
+                      security.protocol:
+                        type: string
+                      socket.blocking.max.ms:
+                        type: integer
+                      socket.connection.setup.timeout.ms:
+                        type: integer
+                      socket.keepalive.enable:
+                        type: boolean
+                      socket.max.fails:
+                        type: integer
+                      socket.nagle.disable:
+                        type: boolean
+                      socket.receive.buffer.bytes:
+                        type: integer
+                      socket.send.buffer.bytes:
+                        type: integer
+                      socket.timeout.ms:
+                        type: integer
+                      socket_cb:
+                        type: string
+                      ssl.ca.location:
+                        type: string
+                      ssl.ca.pem:
+                        type: string
+                      ssl.certificate.location:
+                        type: string
+                      ssl.certificate.pem:
+                        type: string
+                      ssl.cipher.suites:
+                        type: string
+                      ssl.crl.location:
+                        type: string
+                      ssl.curves.list:
+                        type: string
+                      ssl.endpoint.identification.algorithm:
+                        type: string
+                      ssl.engine.id:
+                        type: string
+                      ssl.engine.location:
+                        type: string
+                      ssl.key.location:
+                        type: string
+                      ssl.key.password:
+                        type: string
+                      ssl.key.pem:
+                        type: string
+                      ssl.keystore.location:
+                        type: string
+                      ssl.keystore.password:
+                        type: string
+                      ssl.providers:
+                        type: string
+                      ssl.sigalgs.list:
+                        type: string
+                      statistics.interval.ms:
+                        type: integer
+                      stats_cb:
+                        type: string
+                      throttle_cb:
+                        type: string
+                      topic.blacklist:
+                        type: string
+                      topic.metadata.propagation.max.ms:
+                        type: integer
+                      topic.metadata.refresh.fast.interval.ms:
+                        type: integer
+                      topic.metadata.refresh.interval.ms:
+                        type: integer
+                      topic.metadata.refresh.sparse:
+                        type: boolean
+                    type: object
                   required_acks:
                     type: integer
                   sasl_over_ssl:
@@ -10516,6 +10703,193 @@ spec:
                     type: object
                   principal:
                     type: string
+                  rdkafka_options:
+                    properties:
+                      allow.auto.create.topics:
+                        type: boolean
+                      api.version.fallback.ms:
+                        type: integer
+                      api.version.request:
+                        type: boolean
+                      api.version.request.timeout.ms:
+                        type: integer
+                      background_event_cb:
+                        type: string
+                      bootstrap.servers:
+                        type: string
+                      broker.address.family:
+                        type: string
+                      broker.address.ttl:
+                        type: integer
+                      broker.version.fallback:
+                        type: string
+                      builtin.features:
+                        type: string
+                      client.id:
+                        type: string
+                      closesocket_cb:
+                        type: string
+                      connect_cb:
+                        type: string
+                      connections.max.idle.ms:
+                        type: integer
+                      debug:
+                        type: string
+                      default_topic_conf:
+                        type: string
+                      enable.random.seed:
+                        type: boolean
+                      enable.sasl.oauthbearer.unsecure.jwt:
+                        type: boolean
+                      enable.ssl.certificate.verification:
+                        type: boolean
+                      enabled_events:
+                        type: integer
+                      error_cb:
+                        type: string
+                      interceptors:
+                        type: string
+                      internal.termination.signal:
+                        type: integer
+                      log.connection.close:
+                        type: boolean
+                      log.queue:
+                        type: boolean
+                      log.thread.name:
+                        type: boolean
+                      log_cb:
+                        type: string
+                      log_level:
+                        type: integer
+                      max.in.flight:
+                        type: integer
+                      max.in.flight.requests.per.connection:
+                        type: integer
+                      message.copy.max.bytes:
+                        type: integer
+                      message.max.bytes:
+                        type: integer
+                      metadata.broker.list:
+                        type: string
+                      metadata.max.age.ms:
+                        type: integer
+                      oauthbearer_token_refresh_cb:
+                        type: string
+                      opaque:
+                        type: string
+                      open_cb:
+                        type: string
+                      plugin.library.paths:
+                        type: string
+                      receive.message.max.bytes:
+                        type: integer
+                      reconnect.backoff.max.ms:
+                        type: integer
+                      reconnect.backoff.ms:
+                        type: integer
+                      resolve_cb:
+                        type: string
+                      sasl.kerberos.keytab:
+                        type: string
+                      sasl.kerberos.kinit.cmd:
+                        type: string
+                      sasl.kerberos.min.time.before.relogin:
+                        type: integer
+                      sasl.kerberos.principal:
+                        type: string
+                      sasl.kerberos.service.name:
+                        type: string
+                      sasl.mechanisms:
+                        type: string
+                      sasl.oauthbearer.client.id:
+                        type: string
+                      sasl.oauthbearer.client.secret:
+                        type: string
+                      sasl.oauthbearer.config:
+                        type: string
+                      sasl.oauthbearer.extensions:
+                        type: string
+                      sasl.oauthbearer.method:
+                        type: string
+                      sasl.oauthbearer.scope:
+                        type: string
+                      sasl.oauthbearer.token.endpoint.url:
+                        type: string
+                      sasl.password:
+                        type: string
+                      sasl.username:
+                        type: string
+                      security.protocol:
+                        type: string
+                      socket.blocking.max.ms:
+                        type: integer
+                      socket.connection.setup.timeout.ms:
+                        type: integer
+                      socket.keepalive.enable:
+                        type: boolean
+                      socket.max.fails:
+                        type: integer
+                      socket.nagle.disable:
+                        type: boolean
+                      socket.receive.buffer.bytes:
+                        type: integer
+                      socket.send.buffer.bytes:
+                        type: integer
+                      socket.timeout.ms:
+                        type: integer
+                      socket_cb:
+                        type: string
+                      ssl.ca.location:
+                        type: string
+                      ssl.ca.pem:
+                        type: string
+                      ssl.certificate.location:
+                        type: string
+                      ssl.certificate.pem:
+                        type: string
+                      ssl.cipher.suites:
+                        type: string
+                      ssl.crl.location:
+                        type: string
+                      ssl.curves.list:
+                        type: string
+                      ssl.endpoint.identification.algorithm:
+                        type: string
+                      ssl.engine.id:
+                        type: string
+                      ssl.engine.location:
+                        type: string
+                      ssl.key.location:
+                        type: string
+                      ssl.key.password:
+                        type: string
+                      ssl.key.pem:
+                        type: string
+                      ssl.keystore.location:
+                        type: string
+                      ssl.keystore.password:
+                        type: string
+                      ssl.providers:
+                        type: string
+                      ssl.sigalgs.list:
+                        type: string
+                      statistics.interval.ms:
+                        type: integer
+                      stats_cb:
+                        type: string
+                      throttle_cb:
+                        type: string
+                      topic.blacklist:
+                        type: string
+                      topic.metadata.propagation.max.ms:
+                        type: integer
+                      topic.metadata.refresh.fast.interval.ms:
+                        type: integer
+                      topic.metadata.refresh.interval.ms:
+                        type: integer
+                      topic.metadata.refresh.sparse:
+                        type: boolean
+                    type: object
                   required_acks:
                     type: integer
                   sasl_over_ssl:
