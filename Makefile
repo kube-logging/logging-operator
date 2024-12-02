@@ -144,6 +144,8 @@ list: ## List all make targets
 manager: codegen fmt vet ## Build manager binary
 	go build -o bin/manager main.go
 
+HELM_MANIFEST_OVERRIDE='s@manager-role@{{ template "logging-operator.fullname" . }}\n  annotations:\n  {{- if .Values.rbac.retainOnDelete }}\n    "helm.sh/resource-policy": keep\n  {{- end }}@'
+
 .PHONY: manifests
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cd pkg/sdk && $(CONTROLLER_GEN) $(CRD_OPTIONS)  webhook paths="./..." output:crd:artifacts:config=../../config/crd/bases output:webhook:artifacts:config=../../config/webhook
@@ -151,7 +153,7 @@ manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
 	cp config/crd/bases/* charts/logging-operator/crds/
 	for f in config/crd/bases/*.yaml; do sed '/controller-gen.kubebuilder.io\/version/ r hack/crds.annotations.snippet.txt' $${f} > charts/logging-operator/charts/logging-operator-crds/templates/$${f##*/}; done
 	echo "{{- if .Values.rbac.enabled }}" > ./charts/logging-operator/templates/clusterrole.yaml
-	cat config/rbac/role.yaml | sed -e 's@manager-role@{{ template "logging-operator.fullname" . }}@' | sed -e '/creationTimestamp/d' | cat >> ./charts/logging-operator/templates/clusterrole.yaml
+	cat config/rbac/role.yaml | sed -e $(HELM_MANIFEST_OVERRIDE) | cat >> ./charts/logging-operator/templates/clusterrole.yaml
 	echo "{{- end }}" >> ./charts/logging-operator/templates/clusterrole.yaml
 
 .PHONY: run

@@ -51,8 +51,12 @@ import (
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+)
+
+const (
+	SyslogNGConfigFinalizer = "syslogngconfig.logging.banzaicloud.io/finalizer"
+	FluentdConfigFinalizer  = "fluentdconfig.logging.banzaicloud.io/finalizer"
 )
 
 var fluentbitWarning sync.Once
@@ -323,12 +327,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalFluentd *loggingv1beta1.FluentdConfig) (bool, error) {
-	fluentdConfigFinalizer := "fluentdconfig.logging.banzaicloud.io/finalizer"
-
 	if logging.DeletionTimestamp.IsZero() {
-		if externalFluentd != nil && !controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) {
+		if externalFluentd != nil && !controllerutil.ContainsFinalizer(logging, FluentdConfigFinalizer) {
 			r.Log.Info("adding fluentdconfig finalizer")
-			controllerutil.AddFinalizer(logging, fluentdConfigFinalizer)
+			controllerutil.AddFinalizer(logging, FluentdConfigFinalizer)
 			if err := r.Update(ctx, logging); err != nil {
 				return true, err
 			}
@@ -339,9 +341,9 @@ func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging 
 		return false, errors.New(msg)
 	}
 
-	if controllerutil.ContainsFinalizer(logging, fluentdConfigFinalizer) && externalFluentd == nil {
+	if controllerutil.ContainsFinalizer(logging, FluentdConfigFinalizer) && externalFluentd == nil {
 		r.Log.Info("removing fluentdconfig finalizer")
-		controllerutil.RemoveFinalizer(logging, fluentdConfigFinalizer)
+		controllerutil.RemoveFinalizer(logging, FluentdConfigFinalizer)
 		if err := r.Update(ctx, logging); err != nil {
 			return true, err
 		}
@@ -351,12 +353,10 @@ func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging 
 }
 
 func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging *loggingv1beta1.Logging, externalSyslogNG *loggingv1beta1.SyslogNGConfig) (bool, error) {
-	syslogNGConfigFinalizer := "syslogngconfig.logging.banzaicloud.io/finalizer"
-
 	if logging.DeletionTimestamp.IsZero() {
-		if externalSyslogNG != nil && !controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) {
+		if externalSyslogNG != nil && !controllerutil.ContainsFinalizer(logging, SyslogNGConfigFinalizer) {
 			r.Log.Info("adding syslogngconfig finalizer")
-			controllerutil.AddFinalizer(logging, syslogNGConfigFinalizer)
+			controllerutil.AddFinalizer(logging, SyslogNGConfigFinalizer)
 			if err := r.Update(ctx, logging); err != nil {
 				return true, err
 			}
@@ -367,9 +367,9 @@ func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging
 		return false, errors.New(msg)
 	}
 
-	if controllerutil.ContainsFinalizer(logging, syslogNGConfigFinalizer) && externalSyslogNG == nil {
+	if controllerutil.ContainsFinalizer(logging, SyslogNGConfigFinalizer) && externalSyslogNG == nil {
 		r.Log.Info("removing syslogngconfig finalizer")
-		controllerutil.RemoveFinalizer(logging, syslogNGConfigFinalizer)
+		controllerutil.RemoveFinalizer(logging, SyslogNGConfigFinalizer)
 		if err := r.Update(ctx, logging); err != nil {
 			return true, err
 		}
@@ -378,7 +378,7 @@ func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging
 	return false, nil
 }
 
-func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *v1beta1.SyslogNGSpec) {
+func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *loggingv1beta1.SyslogNGSpec) {
 	nodes := corev1.NodeList{}
 	if err := r.Client.List(ctx, &nodes); err != nil {
 		log.Error(err, "listing nodes")

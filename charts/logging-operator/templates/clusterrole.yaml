@@ -4,6 +4,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ template "logging-operator.fullname" . }}
+  annotations:
+  {{- if .Values.rbac.retainOnDelete }}
+    "helm.sh/resource-policy": keep
+  {{- end }}
 rules:
 - apiGroups:
   - ""

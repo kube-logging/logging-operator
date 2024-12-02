@@ -53,6 +53,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
+| rbac.retainOnDelete | bool | `false` | Keep the operators RBAC resources after the operator is deleted to allow removing pending finalizers. |
 | monitoring.serviceMonitor.enabled | bool | `false` | Create a Prometheus Operator ServiceMonitor object. |
 | monitoring.serviceMonitor.additionalLabels | object | `{}` |  |
 | monitoring.serviceMonitor.metricRelabelings | list | `[]` |  |
