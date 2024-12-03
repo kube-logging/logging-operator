@@ -17,3 +17,7 @@ dependencies:
   - name: logging-operator-crds
     version: 0.0.0
     condition: logging-operator-crds.install
+  - name: telemetry-controller
+    version: 0.0.13
+    repository: oci://ghcr.io/kube-logging/helm-charts
+    condition: telemetry-controller.install

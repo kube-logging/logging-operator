@@ -44,6 +44,11 @@ logging-operator-crds:
   # -- Annotations to be added to all CRDs
   annotations: {}
 
+## Telemetry Controller defined as a dependency chart
+telemetry-controller:
+  # -- Toggle to install and upgrade Telemetry Controller from a subchart.
+  install: false
+
 http:
   # -- HTTP listen port number.
   port: 8080
