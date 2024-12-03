@@ -238,3 +238,19 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - telemetry.kube-logging.dev
+  resources:
+  - bridges
+  - collectors
+  - outputs
+  - subscriptions
+  - tenants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
