@@ -84,6 +84,11 @@ Reference to the logging system. Each of the `loggingRef`s can manage a fluentbi
 InlineNodeAgent Configuration Deprecated, will be removed with next major version 
 
 
+### routeConfig (*RouteConfig, optional) {#loggingspec-routeconfig}
+
+RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource that can be managed by the Telemetry Controller. 
+
+
 ### skipInvalidResources (bool, optional) {#loggingspec-skipinvalidresources}
 
 Whether to skip invalid Flow and ClusterFlow resources 
@@ -120,6 +125,24 @@ Select the config check strategy to use. `DryRun`: Parse and validate configurat
 ### timeoutSeconds (int, optional) {#configcheck-timeoutseconds}
 
 Configure timeout in seconds if strategy is StartWithTimeout 
+
+
+
+## RouteConfig
+
+### disableLoggingRoute (bool, optional) {#routeconfig-disableloggingroute}
+
+If DisableLoggingRoute is set to true, the logging route controller should remove the given tenant from the status of the logging resource. 
+
+
+### enableTelemetryControllerRoute (bool, optional) {#routeconfig-enabletelemetrycontrollerroute}
+
+If EnableTelemtryControllerRoute set to true, the operator will create the corresponding Tenant, Subscription, Output based on the logging resource. 
+
+
+### tenantLabels (map[string]string, optional) {#routeconfig-tenantlabels}
+
+TenantLabels is a map of labels that will be added to the tenant object so it can be matched with TelemetryController's TenantSelector ref: https://github.com/kube-logging/telemetry-controller/blob/main/api/telemetry/v1alpha1/collector_types.go 
 
 
 

@@ -84,6 +84,9 @@ spec:
                 type: object
               controlNamespace:
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable, please recreate the resource
+                  rule: self == oldSelf
               defaultFlow:
                 properties:
                   filters:
@@ -12597,6 +12600,17 @@ spec:
                       type: string
                   type: object
                 type: array
+              routeConfig:
+                properties:
+                  disableLoggingRoute:
+                    type: boolean
+                  enableTelemetryControllerRoute:
+                    type: boolean
+                  tenantLabels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                type: object
               skipInvalidResources:
                 type: boolean
               syslogNG:

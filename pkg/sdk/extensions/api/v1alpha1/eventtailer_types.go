@@ -35,7 +35,8 @@ type _metaEventTailer = interface{} //nolint:deadcode,unused
 
 // EventTailerSpec defines the desired state of EventTailer
 type EventTailerSpec struct {
-	//+kubebuilder:validation:Required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
 
 	// The resources of EventTailer will be placed into this namespace
 	ControlNamespace string `json:"controlNamespace"`
