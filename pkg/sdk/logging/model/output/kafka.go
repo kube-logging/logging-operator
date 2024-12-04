@@ -148,7 +148,7 @@ type KafkaOutputConfig struct {
 	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
-// GlobalConfig represents the global configuration properties for librdkafka.
+// RdkafkaOptions represents the global configuration properties for librdkafka.
 type RdkafkaOptions struct {
 	// Indicates the builtin features for this build of librdkafka. An application can either query this value or attempt to set it with its list of required features to check for library support.
 	BuiltinFeatures string `json:"builtin.features,omitempty"`
@@ -197,7 +197,7 @@ type RdkafkaOptions struct {
 	// Disconnect from broker when this number of send failures (e.g., timed out requests) is reached. Disable with 0. WARNING: It is highly recommended to leave this setting at its default value of 1 to avoid the client and broker to become desynchronized in case of request timeouts. NOTE: The connection is automatically re-established.
 	SocketMaxFails int `json:"socket.max.fails,omitempty"`
 	// How long to cache the broker address resolving results (milliseconds).
-	BrokerAddressTtl int `json:"broker.address.ttl,omitempty"`
+	BrokerAddressTTl int `json:"broker.address.ttl,omitempty"`
 	// Allowed broker IP address families: any, v4, v6
 	BrokerAddressFamily string `json:"broker.address.family,omitempty"`
 	// Maximum time allowed for broker connection setup (TCP connection setup as well SSL and SASL handshake). If the connection to the broker is not fully functional after this the connection will be closed and retried.
@@ -237,7 +237,7 @@ type RdkafkaOptions struct {
 	// Socket connect callback
 	ConnectCb string `json:"connect_cb,omitempty"`
 	// Socket close callback
-	ClosesocketCb string `json:"closesocket_cb,omitempty"`
+	CloseSocketCb string `json:"closesocket_cb,omitempty"`
 	// File open callback to provide race-free CLOEXEC
 	OpenCb string `json:"open_cb,omitempty"`
 	// Address resolution callback (set with rd_kafka_conf_set_resolve_cb())
@@ -261,41 +261,41 @@ type RdkafkaOptions struct {
 	// Protocol used to communicate with brokers.
 	SecurityProtocol string `json:"security.protocol,omitempty"`
 	// A cipher suite is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. See manual page for `ciphers(1)` and `SSL_CTX_set_cipher_list(3).
-	SslCipherSuites string `json:"ssl.cipher.suites,omitempty"`
+	SSLCipherSuites string `json:"ssl.cipher.suites,omitempty"`
 	// The supported-curves extension in the TLS ClientHello message specifies the curves (standard/named, or 'explicit' GF(2^k) or GF(p)) the client is willing to have the server use. See manual page for `SSL_CTX_set1_curves_list(3)`. OpenSSL >= 1.0.2 required.
-	SslCurvesList string `json:"ssl.curves.list,omitempty"`
+	SSLCurvesList string `json:"ssl.curves.list,omitempty"`
 	// The client uses the TLS ClientHello signature_algorithms extension to indicate to the server which signature/hash algorithm pairs may be used in digital signatures. See manual page for `SSL_CTX_set1_sigalgs_list(3)`. OpenSSL >= 1.0.2 required.
-	SslSigalgsList string `json:"ssl.sigalgs.list,omitempty"`
+	SSLSigalgsList string `json:"ssl.sigalgs.list,omitempty"`
 	// Path to client's private key (PEM) used for authentication.
-	SslKeyLocation string `json:"ssl.key.location,omitempty"`
+	SSLKeyLocation string `json:"ssl.key.location,omitempty"`
 	// Private key passphrase (for use with `ssl.key.location` and `set_ssl_cert()`).
-	SslKeyPassword string `json:"ssl.key.password,omitempty"`
+	SSLKeyPassword string `json:"ssl.key.password,omitempty"`
 	// Client's private key string (PEM format) used for authentication.
-	SslKeyPem string `json:"ssl.key.pem,omitempty"`
+	SSLKeyPem string `json:"ssl.key.pem,omitempty"`
 	// Path to client's public key (PEM) used for authentication.
-	SslCertificateLocation string `json:"ssl.certificate.location,omitempty"`
+	SSLCertificateLocation string `json:"ssl.certificate.location,omitempty"`
 	// Client's public key string (PEM format) used for authentication.
-	SslCertificatePem string `json:"ssl.certificate.pem,omitempty"`
+	SSLCertificatePem string `json:"ssl.certificate.pem,omitempty"`
 	// File or directory path to CA certificate(s) for verifying the broker's key. Defaults: On Windows the system's CA certificates are automatically looked up in the Windows Root certificate store. On Mac OSX this configuration defaults to `probe`. It is recommended to install openssl using Homebrew, to provide CA certificates. On Linux install the distribution's ca-certificates package. If OpenSSL is statically linked or `ssl.ca.location` is set to `probe` a list of standard paths will be probed and the first one found will be used as the default CA certificate location path. If OpenSSL is dynamically linked the OpenSSL library's default path will be used (see `OPENSSLDIR` in `openssl version -a`).
-	SslCaLocation string `json:"ssl.ca.location,omitempty"`
+	SSLCaLocation string `json:"ssl.ca.location,omitempty"`
 	// CA certificate string (PEM format) for verifying the broker's key.
-	SslCaPem string `json:"ssl.ca.pem,omitempty"`
+	SSLCaPem string `json:"ssl.ca.pem,omitempty"`
 	// Path to CRL for verifying broker's certificate validity.
-	SslCrlLocation string `json:"ssl.crl.location,omitempty"`
+	SSLCrlLocation string `json:"ssl.crl.location,omitempty"`
 	// Path to client's keystore (PKCS#12) used for authentication.
-	SslKeystoreLocation string `json:"ssl.keystore.location,omitempty"`
+	SSLKeystoreLocation string `json:"ssl.keystore.location,omitempty"`
 	// Client's keystore (PKCS#12) password.
-	SslKeystorePassword string `json:"ssl.keystore.password,omitempty"`
+	SSLKeystorePassword string `json:"ssl.keystore.password,omitempty"`
 	// Comma-separated list of OpenSSL 3.0.x implementation providers. E.g., "default,legacy".
-	SslProviders string `json:"ssl.providers,omitempty"`
+	SSLProviders string `json:"ssl.providers,omitempty"`
 	// **DEPRECATED** Path to OpenSSL engine library. OpenSSL >= 1.1.x required. DEPRECATED: OpenSSL engine support is deprecated and should be replaced by OpenSSL 3 providers.
-	SslEngineLocation string `json:"ssl.engine.location,omitempty"`
+	SSLEngineLocation string `json:"ssl.engine.location,omitempty"`
 	// OpenSSL engine id is the name used for loading engine.
-	SslEngineId string `json:"ssl.engine.id,omitempty"`
+	SSLEngineId string `json:"ssl.engine.id,omitempty"`
 	// Enable OpenSSL's builtin broker (server) certificate verification. This verification can be extended by the application by implementing a certificate_verify_cb.
-	EnableSslCertificateVerification bool `json:"enable.ssl.certificate.verification,omitempty"`
+	EnableSSLCertificateVerification bool `json:"enable.ssl.certificate.verification,omitempty"`
 	// Endpoint identification algorithm to validate broker hostname using broker certificate. https - Server (broker) hostname verification as specified in RFC2818. none - No endpoint verification. OpenSSL >= 1.0.2 required.
-	SslEndpointIdentificationAlgorithm string `json:"ssl.endpoint.identification.algorithm,omitempty"`
+	SSLEndpointIdentificationAlgorithm string `json:"ssl.endpoint.identification.algorithm,omitempty"`
 	// SASL mechanism to use for authentication. Supported: GSSAPI, PLAIN, SCRAM-SHA-256, SCRAM-SHA-512, OAUTHBEARER. NOTE: Despite the name only one mechanism must be configured.
 	SaslMechanisms string `json:"sasl.mechanisms,omitempty" `
 	// Kerberos principal name that Kafka runs as, not including /hostname@REALM.
