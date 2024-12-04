@@ -265,7 +265,7 @@ Username when using PLAIN/SCRAM SASL authentication
 
 ## RdkafkaOptions
 
-GlobalConfig represents the global configuration properties for librdkafka.
+RdkafkaOptions represents the global configuration properties for librdkafka.
 
 ### allow.auto.create.topics (bool, optional) {#rdkafkaoptions-allow.auto.create.topics}
 
@@ -352,14 +352,14 @@ Default topic configuration for automatically subscribed topics
 If enabled librdkafka will initialize the PRNG with srand(current_time.milliseconds) on the first invocation of rd_kafka_new() (required only if rand_r() is not available on your platform). If disabled the application must call srand() prior to calling rd_kafka_new(). 
 
 
-### enable.sasl.oauthbearer.unsecure.jwt (bool, optional) {#rdkafkaoptions-enable.sasl.oauthbearer.unsecure.jwt}
-
-Enable the builtin unsecure JWT OAUTHBEARER token handler if no oauthbearer_refresh_cb has been set. This builtin handler should only be used for development or testing, and not in production. 
-
-
 ### enable.ssl.certificate.verification (bool, optional) {#rdkafkaoptions-enable.ssl.certificate.verification}
 
 Enable OpenSSL's builtin broker (server) certificate verification. This verification can be extended by the application by implementing a certificate_verify_cb. 
+
+
+### enable.sasl.oauthbearer.unsecure.jwt (bool, optional) {#rdkafkaoptions-enable.sasl.oauthbearer.unsecure.jwt}
+
+Enable the builtin unsecure JWT OAUTHBEARER token handler if no oauthbearer_refresh_cb has been set. This builtin handler should only be used for development or testing, and not in production. 
 
 
 ### enabled_events (int, optional) {#rdkafkaoptions-enabled_events}
@@ -475,6 +475,91 @@ The initial time to wait before reconnecting to a broker after the connection ha
 ### resolve_cb (string, optional) {#rdkafkaoptions-resolve_cb}
 
 Address resolution callback (set with rd_kafka_conf_set_resolve_cb()) 
+
+
+### ssl.ca.location (string, optional) {#rdkafkaoptions-ssl.ca.location}
+
+File or directory path to CA certificate(s) for verifying the broker's key. Defaults: On Windows the system's CA certificates are automatically looked up in the Windows Root certificate store. On Mac OSX this configuration defaults to `probe`. It is recommended to install openssl using Homebrew, to provide CA certificates. On Linux install the distribution's ca-certificates package. If OpenSSL is statically linked or `ssl.ca.location` is set to `probe` a list of standard paths will be probed and the first one found will be used as the default CA certificate location path. If OpenSSL is dynamically linked the OpenSSL library's default path will be used (see `OPENSSLDIR` in `openssl version -a`). 
+
+
+### ssl.ca.pem (string, optional) {#rdkafkaoptions-ssl.ca.pem}
+
+CA certificate string (PEM format) for verifying the broker's key. 
+
+
+### ssl.certificate.location (string, optional) {#rdkafkaoptions-ssl.certificate.location}
+
+Path to client's public key (PEM) used for authentication. 
+
+
+### ssl.certificate.pem (string, optional) {#rdkafkaoptions-ssl.certificate.pem}
+
+Client's public key string (PEM format) used for authentication. 
+
+
+### ssl.cipher.suites (string, optional) {#rdkafkaoptions-ssl.cipher.suites}
+
+A cipher suite is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. See manual page for `ciphers(1)` and `SSL_CTX_set_cipher_list(3). 
+
+
+### ssl.crl.location (string, optional) {#rdkafkaoptions-ssl.crl.location}
+
+Path to CRL for verifying broker's certificate validity. 
+
+
+### ssl.curves.list (string, optional) {#rdkafkaoptions-ssl.curves.list}
+
+The supported-curves extension in the TLS ClientHello message specifies the curves (standard/named, or 'explicit' GF(2^k) or GF(p)) the client is willing to have the server use. See manual page for `SSL_CTX_set1_curves_list(3)`. OpenSSL >= 1.0.2 required. 
+
+
+### ssl.endpoint.identification.algorithm (string, optional) {#rdkafkaoptions-ssl.endpoint.identification.algorithm}
+
+Endpoint identification algorithm to validate broker hostname using broker certificate. https - Server (broker) hostname verification as specified in RFC2818. none - No endpoint verification. OpenSSL >= 1.0.2 required. 
+
+
+### ssl.engine.id (string, optional) {#rdkafkaoptions-ssl.engine.id}
+
+OpenSSL engine id is the name used for loading engine. 
+
+
+### ssl.engine.location (string, optional) {#rdkafkaoptions-ssl.engine.location}
+
+**DEPRECATED** Path to OpenSSL engine library. OpenSSL >= 1.1.x required. DEPRECATED: OpenSSL engine support is deprecated and should be replaced by OpenSSL 3 providers. 
+
+
+### ssl.key.location (string, optional) {#rdkafkaoptions-ssl.key.location}
+
+Path to client's private key (PEM) used for authentication. 
+
+
+### ssl.key.password (string, optional) {#rdkafkaoptions-ssl.key.password}
+
+Private key passphrase (for use with `ssl.key.location` and `set_ssl_cert()`). 
+
+
+### ssl.key.pem (string, optional) {#rdkafkaoptions-ssl.key.pem}
+
+Client's private key string (PEM format) used for authentication. 
+
+
+### ssl.keystore.location (string, optional) {#rdkafkaoptions-ssl.keystore.location}
+
+Path to client's keystore (PKCS#12) used for authentication. 
+
+
+### ssl.keystore.password (string, optional) {#rdkafkaoptions-ssl.keystore.password}
+
+Client's keystore (PKCS#12) password. 
+
+
+### ssl.providers (string, optional) {#rdkafkaoptions-ssl.providers}
+
+Comma-separated list of OpenSSL 3.0.x implementation providers. E.g., "default,legacy". 
+
+
+### ssl.sigalgs.list (string, optional) {#rdkafkaoptions-ssl.sigalgs.list}
+
+The client uses the TLS ClientHello signature_algorithms extension to indicate to the server which signature/hash algorithm pairs may be used in digital signatures. See manual page for `SSL_CTX_set1_sigalgs_list(3)`. OpenSSL >= 1.0.2 required. 
 
 
 ### sasl.kerberos.keytab (string, optional) {#rdkafkaoptions-sasl.kerberos.keytab}
@@ -600,91 +685,6 @@ Broker socket send buffer size. System default is used if 0.
 ### socket.timeout.ms (int, optional) {#rdkafkaoptions-socket.timeout.ms}
 
 Default timeout for network requests. Producer: ProduceRequests will use the lesser value of `socket.timeout.ms` and remaining `message.timeout.ms` for the first message in the batch. Consumer: FetchRequests will use `fetch.wait.max.ms` + `socket.timeout.ms`. Admin: Admin requests will use `socket.timeout.ms` or explicitly set `rd_kafka_AdminOptions_set_operation_timeout()` value. 
-
-
-### ssl.ca.location (string, optional) {#rdkafkaoptions-ssl.ca.location}
-
-File or directory path to CA certificate(s) for verifying the broker's key. Defaults: On Windows the system's CA certificates are automatically looked up in the Windows Root certificate store. On Mac OSX this configuration defaults to `probe`. It is recommended to install openssl using Homebrew, to provide CA certificates. On Linux install the distribution's ca-certificates package. If OpenSSL is statically linked or `ssl.ca.location` is set to `probe` a list of standard paths will be probed and the first one found will be used as the default CA certificate location path. If OpenSSL is dynamically linked the OpenSSL library's default path will be used (see `OPENSSLDIR` in `openssl version -a`). 
-
-
-### ssl.ca.pem (string, optional) {#rdkafkaoptions-ssl.ca.pem}
-
-CA certificate string (PEM format) for verifying the broker's key. 
-
-
-### ssl.certificate.location (string, optional) {#rdkafkaoptions-ssl.certificate.location}
-
-Path to client's public key (PEM) used for authentication. 
-
-
-### ssl.certificate.pem (string, optional) {#rdkafkaoptions-ssl.certificate.pem}
-
-Client's public key string (PEM format) used for authentication. 
-
-
-### ssl.cipher.suites (string, optional) {#rdkafkaoptions-ssl.cipher.suites}
-
-A cipher suite is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. See manual page for `ciphers(1)` and `SSL_CTX_set_cipher_list(3). 
-
-
-### ssl.crl.location (string, optional) {#rdkafkaoptions-ssl.crl.location}
-
-Path to CRL for verifying broker's certificate validity. 
-
-
-### ssl.curves.list (string, optional) {#rdkafkaoptions-ssl.curves.list}
-
-The supported-curves extension in the TLS ClientHello message specifies the curves (standard/named, or 'explicit' GF(2^k) or GF(p)) the client is willing to have the server use. See manual page for `SSL_CTX_set1_curves_list(3)`. OpenSSL >= 1.0.2 required. 
-
-
-### ssl.endpoint.identification.algorithm (string, optional) {#rdkafkaoptions-ssl.endpoint.identification.algorithm}
-
-Endpoint identification algorithm to validate broker hostname using broker certificate. https - Server (broker) hostname verification as specified in RFC2818. none - No endpoint verification. OpenSSL >= 1.0.2 required. 
-
-
-### ssl.engine.id (string, optional) {#rdkafkaoptions-ssl.engine.id}
-
-OpenSSL engine id is the name used for loading engine. 
-
-
-### ssl.engine.location (string, optional) {#rdkafkaoptions-ssl.engine.location}
-
-**DEPRECATED** Path to OpenSSL engine library. OpenSSL >= 1.1.x required. DEPRECATED: OpenSSL engine support is deprecated and should be replaced by OpenSSL 3 providers. 
-
-
-### ssl.key.location (string, optional) {#rdkafkaoptions-ssl.key.location}
-
-Path to client's private key (PEM) used for authentication. 
-
-
-### ssl.key.password (string, optional) {#rdkafkaoptions-ssl.key.password}
-
-Private key passphrase (for use with `ssl.key.location` and `set_ssl_cert()`). 
-
-
-### ssl.key.pem (string, optional) {#rdkafkaoptions-ssl.key.pem}
-
-Client's private key string (PEM format) used for authentication. 
-
-
-### ssl.keystore.location (string, optional) {#rdkafkaoptions-ssl.keystore.location}
-
-Path to client's keystore (PKCS#12) used for authentication. 
-
-
-### ssl.keystore.password (string, optional) {#rdkafkaoptions-ssl.keystore.password}
-
-Client's keystore (PKCS#12) password. 
-
-
-### ssl.providers (string, optional) {#rdkafkaoptions-ssl.providers}
-
-Comma-separated list of OpenSSL 3.0.x implementation providers. E.g., "default,legacy". 
-
-
-### ssl.sigalgs.list (string, optional) {#rdkafkaoptions-ssl.sigalgs.list}
-
-The client uses the TLS ClientHello signature_algorithms extension to indicate to the server which signature/hash algorithm pairs may be used in digital signatures. See manual page for `SSL_CTX_set1_sigalgs_list(3)`. OpenSSL >= 1.0.2 required. 
 
 
 ### statistics.interval.ms (int, optional) {#rdkafkaoptions-statistics.interval.ms}
