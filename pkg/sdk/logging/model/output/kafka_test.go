@@ -69,6 +69,14 @@ brokers: kafka-headless.kafka.svc.cluster.local:29092
 default_topic: topic
 use_rdkafka: true
 ssl_verify_hostname: false
+rdkafka_options:
+  sasl.mechanisms: PLAIN
+  sasl.username: user
+  security.protocol: SASL_SSL
+  ssl.ca.location: /etc/ssl/certs/ca-certificates.crt
+  ssl.certificate.location: /etc/ssl/certs/tls.crt
+  ssl.key.location: /etc/ssl/certs/tls.key
+  ssl.key.password: password 
 format:
   type: json
 buffer:
