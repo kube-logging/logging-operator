@@ -26,11 +26,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+)
+
+const (
+	FluentdImageTag = "v1.17-5.0-base"
 )
 
 var sequence uint32
@@ -125,7 +129,7 @@ func LoggingInfra(
 			ControlNamespace: nsInfra,
 			FluentdSpec: &v1beta1.FluentdSpec{
 				Image: v1beta1.ImageSpec{
-					Tag: "v1.16-4.11-base",
+					Tag: FluentdImageTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{

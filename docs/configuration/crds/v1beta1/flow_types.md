@@ -92,9 +92,6 @@ Filter definition for FlowSpec
 ### elasticsearch_genid (*filter.ElasticsearchGenId, optional) {#filter-elasticsearch_genid}
 
 
-### enhanceK8s (*filter.EnhanceK8s, optional) {#filter-enhancek8s}
-
-
 ### geoip (*filter.GeoIP, optional) {#filter-geoip}
 
 
@@ -117,9 +114,6 @@ Filter definition for FlowSpec
 
 
 ### stdout (*filter.StdOutFilterConfig, optional) {#filter-stdout}
-
-
-### sumologic (*filter.SumoLogic, optional) {#filter-sumologic}
 
 
 ### tag_normaliser (*filter.TagNormaliser, optional) {#filter-tag_normaliser}
