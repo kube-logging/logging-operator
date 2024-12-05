@@ -23,7 +23,7 @@ jobs:
         uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
       - name: Build and export
-        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6.10.0
         with:
           context: .
           tags: controller:local
@@ -85,7 +85,7 @@ jobs:
 #          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Test Coverage
-        uses: vladopajic/go-test-coverage@72cd73a57f1fc4c77c41952f0f1c81c3a69e3c17 # v2.10.5
+        uses: vladopajic/go-test-coverage@661e46779fd602ce29d4a4e32fb3a27bce71903c # v2.11.0
         with:
           profile: ./build/_test_coverage/coverage_e2e.out
 
