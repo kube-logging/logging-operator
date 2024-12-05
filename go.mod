@@ -2,7 +2,7 @@ module github.com/kube-logging/logging-operator
 
 go 1.23
 
-toolchain go1.23.3
+toolchain go1.23.4
 
 require (
 	emperror.dev/errors v0.8.1
@@ -13,20 +13,20 @@ require (
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.35.1
+	github.com/onsi/gomega v1.36.0
 	github.com/pborman/uuid v1.2.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.78.1
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.78.2
 	github.com/prometheus/client_golang v1.20.5
 	github.com/siliconbrain/go-seqs v0.13.0
 	github.com/spf13/cast v1.7.0
-	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
-	k8s.io/api v0.31.2
-	k8s.io/apiextensions-apiserver v0.31.2
-	k8s.io/apimachinery v0.31.2
-	k8s.io/client-go v0.31.2
+	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d
+	k8s.io/api v0.31.3
+	k8s.io/apiextensions-apiserver v0.31.3
+	k8s.io/apimachinery v0.31.3
+	k8s.io/client-go v0.31.3
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/controller-runtime v0.19.1
+	sigs.k8s.io/controller-runtime v0.19.3
 )
 
 require (
