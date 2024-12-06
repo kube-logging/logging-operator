@@ -50,6 +50,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | createCustomResource | bool | `false` | Deploy CRDs used by Logging Operator. |
 | logging-operator-crds.install | bool | `false` | Toggle to install and upgrade CRDs from a subchart. Make sure to use it with `--skip-crds` to avoid conflicts. [More info about limitations on CRDs in Helm 3](https://helm.sh/docs/topics/charts/#limitations-on-crds) |
 | logging-operator-crds.annotations | object | `{}` | Annotations to be added to all CRDs |
+| telemetry-controller.install | bool | `false` | Toggle to install and upgrade Telemetry Controller from a subchart. |
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |

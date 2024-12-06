@@ -330,6 +330,9 @@ spec:
                 type: object
               controlNamespace:
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable, please recreate the resource
+                  rule: self == oldSelf
               image:
                 properties:
                   imagePullSecrets:

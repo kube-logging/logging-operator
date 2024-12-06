@@ -56,6 +56,7 @@ import (
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
+	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -72,6 +73,7 @@ func init() {
 	// +kubebuilder:scaffold:scheme
 	_ = prometheusOperator.AddToScheme(scheme)
 	_ = apiextensions.AddToScheme(scheme)
+	_ = telemetryv1alpha1.AddToScheme(scheme)
 }
 
 func main() {
@@ -83,6 +85,7 @@ func main() {
 	var namespace string
 	var loggingRef string
 	var finalizerCleanup bool
+	var enableTelemetryControllerRoute bool
 	var klogLevel int
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
@@ -95,6 +98,7 @@ func main() {
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
 	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
+	flag.BoolVar(&enableTelemetryControllerRoute, "enable-telemetry-controller-route", false, "Enable the Telemetry Controller route for Logging resources")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -199,6 +203,13 @@ func main() {
 	if err := loggingControllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
 		os.Exit(1)
+	}
+
+	if enableTelemetryControllerRoute {
+		if err := loggingControllers.SetupTelemetryControllerWithManager(mgr, ctrl.Log.WithName("telemetry-controller")); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "TelemetryController")
+			os.Exit(1)
+		}
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
@@ -353,8 +364,9 @@ func cleanupFinalizers(ctx context.Context, client client.Client) {
 	}
 
 	finalizers := []string{
-		"fluentdconfig.logging.banzaicloud.io/finalizer",
-		"syslogngconfig.logging.banzaicloud.io/finalizer",
+		loggingControllers.FluentdConfigFinalizer,
+		loggingControllers.SyslogNGConfigFinalizer,
+		loggingControllers.TelemetryControllerFinalizer,
 	}
 	for _, logging := range loggingList.Items {
 		for _, finalizer := range finalizers {

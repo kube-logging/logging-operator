@@ -28,13 +28,15 @@ function load_images()
 
 function helm_deploy_logging_operator()
 {
+    local chart_dir="charts/logging-operator"
+    helm dependency update "${chart_dir}"
     helm upgrade --install \
         --debug \
         --wait \
         --create-namespace \
         -f hack/values.yaml \
         logging-operator \
-        "charts/logging-operator"
+        "${chart_dir}"
 }
 
 function get_test_pod_name()

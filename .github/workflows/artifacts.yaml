@@ -270,6 +270,9 @@ jobs:
         id: oci-chart-name
         run: echo "value=${{ steps.oci-registry-name.outputs.value }}/${{ steps.chart-name.outputs.value }}" >> "$GITHUB_OUTPUT"
 
+      - name: Helm dependency update
+        run: helm dependency update charts/${{ steps.chart-name.outputs.value }}
+
       - name: Helm lint
         run: helm lint charts/${{ steps.chart-name.outputs.value }}
 
