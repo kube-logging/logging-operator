@@ -93,7 +93,7 @@ testbin
 example/tls-cluster-forward/*.pem
 example/tls-cluster-forward/*.csr
 example/tls-cluster-forward/*.key
-
+charts/logging-operator/charts/*.tgz
 .licensei.cache
 
 .DS_Store
