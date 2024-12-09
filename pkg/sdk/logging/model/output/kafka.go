@@ -65,8 +65,9 @@ type _metaKafka interface{} //nolint:deadcode,unused
 // -[more info](https://github.com/fluent/fluent-plugin-kafka#output-plugin)
 type KafkaOutputConfig struct {
 	// Use rdkafka2 instead of the legacy kafka2 output plugin. This plugin requires fluentd image version v1.16-4.9-full or higher.
-	UseRdkafka     bool           `json:"use_rdkafka,omitempty"`
-	RdkafkaOptions RdkafkaOptions `json:"rdkafka_options,omitempty"`
+	UseRdkafka bool `json:"use_rdkafka,omitempty"`
+	// RdkafkaOptions represents the global configuration properties for librdkafka.
+	RdkafkaOptions *RdkafkaOptions `json:"rdkafka_options,omitempty"`
 	// The list of all seed brokers, with their host and port information.
 	Brokers string `json:"brokers"`
 	// Topic Key (default: "topic")
