@@ -31,7 +31,7 @@ jobs:
         run: make generate-test-coverage
 
       - name: Test Coverage
-        uses: vladopajic/go-test-coverage@72cd73a57f1fc4c77c41952f0f1c81c3a69e3c17 # v2.10.5
+        uses: vladopajic/go-test-coverage@661e46779fd602ce29d4a4e32fb3a27bce71903c # v2.11.0
         with:
           config: ./.testcoverage.yml
 
@@ -67,7 +67,7 @@ jobs:
           go-version: '1.23'
 
       - name: Cache licenses
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           key: licensei-v2-${{ hashFiles('go.sum') }}
           path: |
