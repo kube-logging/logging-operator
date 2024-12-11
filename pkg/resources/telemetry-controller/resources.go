@@ -49,14 +49,18 @@ func CreateTenant(logging *v1beta1.Logging) *telemetryv1alpha1.Tenant {
 					},
 				},
 			},
-			LogSourceNamespaceSelectors: []metav1.LabelSelector{},
+			PersistenceConfig: telemetryv1alpha1.PersistenceConfig{
+				EnableFileStorage: true,
+			},
 		},
 	}
 
+	// If no watchNamespaces are specified, the tenant should watch all namespaces
 	LogSourceNamespaceSelectors := convertToLabelSelectors(logging.Spec.WatchNamespaces, logging.Spec.WatchNamespaceSelector)
 	if LogSourceNamespaceSelectors != nil {
 		tenantBase.Spec.LogSourceNamespaceSelectors = LogSourceNamespaceSelectors
-		return tenantBase
+	} else {
+		tenantBase.Spec.SelectFromAllNamespaces = true
 	}
 
 	return tenantBase
@@ -97,17 +101,19 @@ func CreateOutput(logging *v1beta1.Logging) *telemetryv1alpha1.Output {
 		Spec: telemetryv1alpha1.OutputSpec{
 			Fluentforward: &telemetryv1alpha1.Fluentforward{
 				TCPClientSettings: telemetryv1alpha1.TCPClientSettings{
-					Endpoint: aggregatorEndpoint(logging),
+					Endpoint: &telemetryv1alpha1.Endpoint{
+						TCPAddr:               aggregatorEndpoint(logging),
+						ValidateTCPResolution: false,
+					},
 					TLSSetting: &telemetryv1alpha1.TLSClientSetting{
 						Insecure: true,
 					},
 				},
 				Tag: utils.StringPointer("otelcol"),
-				// Will be available once the fluentforwardexporter is released
-				// Kubernetes: &telemetryv1alpha1.KubernetesMetadata{
-				// 	Key:              "kubernetes",
-				// 	IncludePodLabels: true,
-				// },
+				Kubernetes: &telemetryv1alpha1.KubernetesMetadata{
+					Key:              "kubernetes",
+					IncludePodLabels: true,
+				},
 			},
 		},
 	}
@@ -124,8 +130,6 @@ func convertToLabelSelectors(watchNamespaces []string, watchNamespaceSelector *m
 	}
 
 	var labelSelectors []metav1.LabelSelector
-
-	// Convert WatchNamespaces to LabelSelectors
 	for _, ns := range watchNamespaces {
 		labelSelectors = append(labelSelectors, metav1.LabelSelector{
 			MatchExpressions: []metav1.LabelSelectorRequirement{
@@ -138,7 +142,6 @@ func convertToLabelSelectors(watchNamespaces []string, watchNamespaceSelector *m
 		})
 	}
 
-	// Append WatchNamespaceSelector if it exists
 	if watchNamespaceSelector != nil {
 		labelSelectors = append(labelSelectors, *watchNamespaceSelector)
 	}
