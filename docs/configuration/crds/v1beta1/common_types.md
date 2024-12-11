@@ -140,6 +140,9 @@ ServiceMonitorConfig defines the ServiceMonitor properties
 
 Security defines Fluentd, FluentbitAgent deployment security properties
 
+### createOpenShiftSCC (*bool, optional) {#security-createopenshiftscc}
+
+
 ### podSecurityContext (*corev1.PodSecurityContext, optional) {#security-podsecuritycontext}
 
 
