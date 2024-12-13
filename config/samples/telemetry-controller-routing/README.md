@@ -7,6 +7,7 @@ make kind-cluster
 make docker-build
 kind load docker-image controller:local
 
+helm dependency update charts/logging-operator
 helm upgrade --install \
     --wait \
     --create-namespace \
