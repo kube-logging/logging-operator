@@ -2,6 +2,11 @@
 
 ## Setup
 
+In this setup customer-a sends logs over the traditional path (fluentbit -> fluentd) while
+customer-b sends over the telemetry-controller path (opentelemetry collector -> fluentd).
+
+In both cases, flows and outputs should work and behave the same.
+
 ```shell
 make kind-cluster
 make docker-build

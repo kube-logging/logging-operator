@@ -50,7 +50,7 @@ metadata:
   namespace: customer-b
 spec:
   http:
-    endpoint: http://logging-operator-test-receiver.logging:8080
+    endpoint: http://logging-operator-test-receiver.logging:8080/customer-b
     content_type: application/json
     buffer:
       type: memory

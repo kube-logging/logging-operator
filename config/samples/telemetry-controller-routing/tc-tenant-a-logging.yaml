@@ -25,8 +25,8 @@ spec:
     matchLabels:
       tenant: customer-a
   routeConfig:
-    enableTelemetryControllerRoute: true
-    disableLoggingRoute: true
+    enableTelemetryControllerRoute: false
+    disableLoggingRoute: false
     tenantLabels:
       tenant: customer-a
 ---
@@ -50,7 +50,7 @@ metadata:
   namespace: customer-a
 spec:
   http:
-    endpoint: http://logging-operator-test-receiver.logging:8080
+    endpoint: http://logging-operator-test-receiver.logging:8080/customer-a
     content_type: application/json
     buffer:
       type: memory
