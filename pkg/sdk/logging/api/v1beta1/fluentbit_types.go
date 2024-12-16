@@ -286,6 +286,9 @@ type InputTail struct {
 	DockerModeFlush string `json:"Docker_Mode_Flush,omitempty"`
 	// Specify one or multiple parser definitions to apply to the content. Part of the new Multiline Core support in 1.8 (default: "")
 	MultilineParser []string `json:"multiline.parser,omitempty"`
+	// Specifies whether to pause or drop data when the buffer is full. (default:on)
+	// This helps to make sure we apply backpressure on the input if enabled, see https://docs.fluentbit.io/manual/administration/backpressure
+	StoragePauseOnChunksOverlimit string `json:"storage.pause_on_chunks_overlimit,omitempty"`
 }
 
 // FilterKubernetes Fluent Bit Kubernetes Filter allows to enrich your log files with Kubernetes metadata.
