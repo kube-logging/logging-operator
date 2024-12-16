@@ -1584,6 +1584,8 @@ spec:
                     items:
                       type: string
                     type: array
+                  storage.pause_on_chunks_overlimit:
+                    type: string
                   storage.type:
                     type: string
                 type: object

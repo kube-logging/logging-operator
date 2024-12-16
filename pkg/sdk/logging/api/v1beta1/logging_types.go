@@ -296,6 +296,9 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		if fluentbitSpec.InputTail.Tag == "" {
 			fluentbitSpec.InputTail.Tag = "kubernetes.*"
 		}
+		if fluentbitSpec.InputTail.StoragePauseOnChunksOverlimit == "" {
+			fluentbitSpec.InputTail.StoragePauseOnChunksOverlimit = "on"
+		}
 		if fluentbitSpec.Annotations == nil {
 			fluentbitSpec.Annotations = make(map[string]string)
 		}
