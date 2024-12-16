@@ -554,6 +554,12 @@ When a monitored file reach it buffer capacity due to a very long line (Buffer_M
 
 Default: Off
 
+### storage.pause_on_chunks_overlimit (string, optional) {#inputtail-storage.pause_on_chunks_overlimit}
+
+Specifies whether to pause or drop data when the buffer is full.  This helps to make sure we apply backpressure on the input if enabled, see https://docs.fluentbit.io/manual/administration/backpressure
+
+Default: on
+
 ### storage.type (string, optional) {#inputtail-storage.type}
 
 Specify the buffering mechanism to use. It can be memory or filesystem.
