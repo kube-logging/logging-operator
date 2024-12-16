@@ -65,8 +65,9 @@ type _metaKafka interface{} //nolint:deadcode,unused
 // -[more info](https://github.com/fluent/fluent-plugin-kafka#output-plugin)
 type KafkaOutputConfig struct {
 	// Use rdkafka2 instead of the legacy kafka2 output plugin. This plugin requires fluentd image version v1.16-4.9-full or higher.
-	UseRdkafka     bool           `json:"use_rdkafka,omitempty"`
-	RdkafkaOptions RdkafkaOptions `json:"rdkafka_options,omitempty"`
+	UseRdkafka bool `json:"use_rdkafka,omitempty"`
+	// RdkafkaOptions represents the global configuration properties for librdkafka.
+	RdkafkaOptions *RdkafkaOptions `json:"rdkafka_options,omitempty"`
 	// The list of all seed brokers, with their host and port information.
 	Brokers string `json:"brokers"`
 	// Topic Key (default: "topic")
@@ -362,6 +363,13 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 	} else {
 		kafka.SubDirectives = append(kafka.SubDirectives, buffer)
 	}
+	if e.RdkafkaOptions != nil {
+		if rdkafkaOptions, err := e.RdkafkaOptions.ToDirective(secretLoader, id); err != nil {
+			return nil, err
+		} else {
+			kafka.SubDirectives = append(kafka.SubDirectives, rdkafkaOptions)
+		}
+	}
 
 	if e.Format != nil {
 		if format, err := e.Format.ToDirective(secretLoader, ""); err != nil {
@@ -374,4 +382,10 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 	// remove use_rdkafka from params, it is not a valid parameter for plugin config
 	delete(kafka.Params, "use_rdkafka")
 	return kafka, nil
+}
+
+func (o *RdkafkaOptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
+	return types.NewFlatDirective(types.PluginMeta{
+		Directive: "rdkafka_options",
+	}, o, secretLoader)
 }

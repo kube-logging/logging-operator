@@ -17,10 +17,11 @@ package output_test
 import (
 	"testing"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 )
 
 func TestKafka(t *testing.T) {
@@ -99,6 +100,15 @@ buffer:
       timekey_use_utc true
       timekey_wait 30s
     </buffer>
+    <rdkafka_options>
+      sasl.mechanisms PLAIN
+      sasl.username user
+      security.protocol SASL_SSL
+      ssl.ca.location /etc/ssl/certs/ca-certificates.crt
+      ssl.certificate.location /etc/ssl/certs/tls.crt
+      ssl.key.location /etc/ssl/certs/tls.key
+      ssl.key.password password
+    </rdkafka_options>
     <format>
       @type json
     </format>

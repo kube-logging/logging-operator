@@ -184,7 +184,9 @@ Password when using PLAIN/SCRAM SASL authentication
 ### principal (string, optional) {#kafka-principal}
 
 
-### rdkafka_options (RdkafkaOptions, optional) {#kafka-rdkafka_options}
+### rdkafka_options (*RdkafkaOptions, optional) {#kafka-rdkafka_options}
+
+RdkafkaOptions represents the global configuration properties for librdkafka. 
 
 
 ### required_acks (int, optional) {#kafka-required_acks}
