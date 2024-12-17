@@ -72,6 +72,10 @@ type LoggingSpec struct {
 	WatchNamespaceSelector *metav1.LabelSelector `json:"watchNamespaceSelector,omitempty"`
 	// Cluster domain name to be used when templating URLs to services (default: "cluster.local.").
 	ClusterDomain *string `json:"clusterDomain,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
+
 	// Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
@@ -92,6 +96,9 @@ type LoggingSpec struct {
 	// - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime
 	// - the `concat` and `parser` filters are automatically set back to use the `log` field
 	EnableDockerParserCompatibilityForCRI bool `json:"enableDockerParserCompatibilityForCRI,omitempty"`
+	// RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource
+	// that can be managed by the Telemetry Controller.
+	RouteConfig *RouteConfig `json:"routeConfig,omitempty"`
 }
 
 type ConfigCheckStrategy string
@@ -112,6 +119,19 @@ type ConfigCheck struct {
 	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
 	// Labels to use for the configcheck pods on top of labels added by the operator by default. Default values can be overwritten.
 	Labels map[string]string `json:"labels,omitempty"`
+}
+
+type RouteConfig struct {
+	// If DisableLoggingRoute is set to true, the logging route controller
+	// should remove the given tenant from the status of the logging resource.
+	DisableLoggingRoute bool `json:"disableLoggingRoute,omitempty"`
+	// If EnableTelemtryControllerRoute set to true, the operator will create
+	// the corresponding Tenant, Subscription, Output based on the logging resource.
+	EnableTelemetryControllerRoute bool `json:"enableTelemetryControllerRoute,omitempty"`
+	// TenantLabels is a map of labels that will be added to the tenant object
+	// so it can be matched with TelemetryController's TenantSelector
+	// ref: https://github.com/kube-logging/telemetry-controller/blob/main/api/telemetry/v1alpha1/collector_types.go
+	TenantLabels map[string]string `json:"tenantLabels,omitempty"`
 }
 
 // LoggingStatus defines the observed state of Logging
@@ -207,6 +227,10 @@ func (l *Logging) SetDefaults() error {
 			return err
 		}
 	}
+	if l.Spec.RouteConfig == nil {
+		l.Spec.RouteConfig = &RouteConfig{}
+	}
+
 	l.configCheckDefaults()
 	if len(l.Status.SyslogNGConfigName) == 0 {
 		l.Spec.SyslogNGSpec.SetDefaults()

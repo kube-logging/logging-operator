@@ -1,0 +1,9 @@
+dependencies:
+- name: logging-operator-crds
+  repository: ""
+  version: 0.0.0
+- name: telemetry-controller
+  repository: oci://ghcr.io/kube-logging/helm-charts
+  version: 0.0.15
+digest: sha256:8ff43abc414a65d3069a1c6b697826e639134c1791bb84b1fbde054ff7de450c
+generated: "2024-12-16T17:13:49.863948+01:00"

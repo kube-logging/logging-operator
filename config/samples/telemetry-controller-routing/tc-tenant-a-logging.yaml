@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: customer-a
+  labels:
+    tenant: customer-a
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: customer-a-infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: customer-a
+  labels:
+    tenant: customer-a
+spec:
+  fluentd:
+    disablePvc: true
+    logLevel: trace
+  controlNamespace: customer-a-infra
+  watchNamespaceSelector:
+    matchLabels:
+      tenant: customer-a
+  routeConfig:
+    enableTelemetryControllerRoute: false
+    disableLoggingRoute: false
+    tenantLabels:
+      tenant: customer-a
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: all
+  namespace: customer-a
+spec:
+  match:
+  - select:
+      labels:
+        app.kubernetes.io/name: log-generator
+  localOutputRefs:
+    - http-a
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: http-a
+  namespace: customer-a
+spec:
+  http:
+    endpoint: http://logging-operator-test-receiver.logging:8080/customer-a
+    content_type: application/json
+    buffer:
+      type: memory
+      tags: time
+      timekey: 1s
+      timekey_wait: 0s

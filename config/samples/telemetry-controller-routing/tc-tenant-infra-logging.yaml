@@ -1,0 +1,97 @@
+apiVersion: telemetry.kube-logging.dev/v1alpha1
+kind: Collector
+metadata:
+  name: cluster
+spec:
+  controlNamespace: infra
+  debug: true
+  tenantSelector:
+    matchExpressions:
+      - key: tenant
+        operator: Exists
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra
+  labels:
+    tenant: infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: infra
+  labels:
+    tenant: infra
+spec:
+  loggingRef: infra
+  fluentd:
+    disablePvc: true
+    logLevel: trace
+  controlNamespace: infra
+  watchNamespaceSelector:
+    matchLabels:
+      tenant: infra
+  routeConfig:
+    enableTelemetryControllerRoute: true
+    disableLoggingRoute: true
+    tenantLabels:
+      tenant: infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterFlow
+metadata:
+  name: all
+  namespace: infra
+spec:
+  loggingRef: infra
+  match:
+  - select:
+      labels:
+        app.kubernetes.io/name: log-generator
+  globalOutputRefs:
+    - http-infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterOutput
+metadata:
+  name: http-infra
+  namespace: infra
+spec:
+  loggingRef: infra
+  http:
+    endpoint: http://test-receiver.infra:8080/infra
+    content_type: application/json
+    buffer:
+      type: memory
+      timekey: 1s
+      timekey_wait: 0s
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: infra
+spec:
+  loggingRef: infra
+  inputTail:
+    storage.type: filesystem
+  positiondb:
+    hostPath:
+      path: ""
+  bufferStorageVolume:
+    hostPath:
+      path: ""
+  network:
+    connectTimeout: 2
+  metrics: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: LoggingRoute
+metadata:
+  name: tenants
+spec:
+  source: infra
+  targets:
+    matchExpressions:
+      - key: tenant
+        operator: Exists

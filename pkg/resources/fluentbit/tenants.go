@@ -56,6 +56,9 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 	}
 	for _, l := range loggingList.Items {
 		l := l
+		if l.Spec.RouteConfig != nil && l.Spec.RouteConfig.DisableLoggingRoute {
+			continue
+		}
 		targetNamespaces, err := model.UniqueWatchNamespaces(ctx, reader, &l)
 		if err != nil {
 			return nil, err
