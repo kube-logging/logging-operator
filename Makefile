@@ -1,5 +1,30 @@
 # A Self-Documenting Makefile: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
+####
+##  Dependency versions
+####
+
+# renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools versioning=semver
+CONTROLLER_GEN_VERSION := v0.16.3
+
+# renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
+GOLANGCI_LINT_VERSION := v1.61.0
+
+# renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
+HELM_DOCS_VERSION = 1.11.0
+
+# renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
+KIND_VERSION ?= v0.24.0
+
+# renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
+KUBEBUILDER_VERSION = v3.1.0
+
+# renovate: datasource=go depName=github.com/goph/licensei versioning=semver
+LICENSEI_VERSION = v0.9.0
+
+# renovate: datasource=go depName=github.com/stern/stern versioning=semver
+STERN_VERSION := 1.25.0
+
 BIN := ${PWD}/bin
 
 export PATH := $(BIN):$(PATH)
@@ -26,31 +51,23 @@ E2E_TEST_TIMEOUT ?= 20m
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
-CONTROLLER_GEN_VERSION := v0.16.3
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
 ENVTEST_K8S_VERSION := 1.31.0
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
-GOLANGCI_LINT_VERSION := v1.61.0
 LINTER_FLAGS := --timeout 10m
 
 HELM_DOCS := ${BIN}/helm-docs
-HELM_DOCS_VERSION = 1.11.0
 
 KIND := ${BIN}/kind
-KIND_VERSION ?= v0.24.0
 KIND_IMAGE ?= kindest/node:v1.31.0@sha256:53df588e04085fd41ae12de0c3fe4c72f7013bba32a20e7325357a1ac94ba865
 KIND_CLUSTER := kind
 
 KUBEBUILDER := ${BIN}/kubebuilder
-KUBEBUILDER_VERSION = v3.1.0
 
 LICENSEI := ${BIN}/licensei
-LICENSEI_VERSION = v0.9.0
-
-STERN_VERSION := 1.25.0
 
 SETUP_ENVTEST := ${BIN}/setup-envtest
 

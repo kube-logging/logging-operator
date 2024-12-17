@@ -1,36 +1,86 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    ":semanticCommitTypeAll(chore)",
     "schedule:daily",
     "group:all"
   ],
-  "automerge": true,
-  "major": {
-    "automerge": false
-  },
-  "gomodTidy": true,
-  "requiredStatusChecks": null,
-  "postUpdateOptions": [
-    "gomodTidy"
-  ],
+  "configMigration": true,
   "constraints": {
     "go": "1.23"
   },
-  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Makefile$"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?( registryUrl=(?<registryUrl>.*?))?\\s.*?_VERSION\\s?:?=\\s?(?<currentValue>.*)\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "description": [
+        "Custom dependency manager for updating tools defined in Makefiles."
+      ]
+    }
+  ],
+  "enabled": true,
+  "enabledManagers": [
+    "custom.regex",
+    "dockerfile",
+    "github-actions",
+    "gomod",
+    "helm-values",
+    "helmv3",
+    "kubernetes",
+    "kustomize",
+    "asdf"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
-      "matchPackageNames": ["k8s.io/client-go"],
+      "matchPackageNames": [
+        "k8s.io/client-go"
+      ],
       "allowedVersions": "/^v[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
     },
     {
-      "matchUpdateTypes": ["major"],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "enabled": false
     },
     {
-      "matchUpdateTypes": ["minor"],
-      "matchPackagePrefixes": ["k8s.io"],
-      "stabilityDays": 60
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "60 days",
+      "matchPackageNames": [
+        "k8s.io{/,}**"
+      ]
+    },
+    {
+      "matchFileNames": [
+        "Makefile"
+      ],
+      "extractVersion": "^v(?<version>.*)$",
+      "description": [
+        "Add build label to PRs which are related to build tools defined in Makefiles.",
+        "Group Makefile dependency updates in single PR."
+      ]
     }
-  ]
+  ],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
+  ],
+  "printConfig": false,
+  "rebaseWhen": "behind-base-branch",
+  "semanticCommits": "enabled",
+  "timezone": "Etc/UTC"
 }
