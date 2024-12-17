@@ -26,6 +26,9 @@ var fluentBitConfigTemplate = `
 [SERVICE]
     Flush        {{ .Flush }}
     Grace        {{ .Grace }}
+    {{- if .ForceHotReloadAfterGrace }}
+    Hot_Reload.Ensure_Thread_Safety off
+    {{- end }}
     Daemon       Off
     Log_Level    {{ .LogLevel }}
     Parsers_File {{ .DefaultParsers }}
