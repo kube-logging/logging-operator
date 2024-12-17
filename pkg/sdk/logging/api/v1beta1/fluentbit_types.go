@@ -77,6 +77,11 @@ type FluentbitSpec struct {
 	Flush int32 `json:"flush,omitempty"  plugin:"default:1"`
 	// Set the grace time in seconds as Integer value. The engine loop uses a Grace timeout to define wait time on exit.
 	Grace int32 `json:"grace,omitempty" plugin:"default:5"`
+	// HotReload pauses all inputs and waits until they finish. In certain situations this is unacceptable, for example if an output is down for a longer time.
+	// An undocumented option called "Hot_Reload.Ensure_Thread_Safety Off" can be used at the [SERVICE] config to force hotreload after the grace period.
+	// Please note that it might result in a SIGSEGV, but worst case kubelet will restart the container.
+	// See https://github.com/fluent/fluent-bit/pull/7509
+	ForceHotReloadAfterGrace bool `json:"forceHotReloadAfterGrace,omitempty"`
 	// Set the logging verbosity level. Allowed values are: error, warn, info, debug and trace. Values are accumulative, e.g: if 'debug' is set, it will include error, warning, info and debug.  Note that trace mode is only available if Fluent Bit was built with the WITH_TRACE option enabled.
 	LogLevel string `json:"logLevel,omitempty" plugin:"default:info"`
 	// Set the coroutines stack size in bytes. The value must be greater than the page size of the running system. Don't set too small value (say 4096), or coroutine threads can overrun the stack buffer.
