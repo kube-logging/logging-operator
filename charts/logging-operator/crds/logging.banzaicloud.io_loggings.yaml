@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.3
+    controller-gen.kubebuilder.io/version: v0.16.5
   name: loggings.logging.banzaicloud.io
 spec:
   group: logging.banzaicloud.io
@@ -3341,6 +3341,8 @@ spec:
                           runAsUser:
                             format: int64
                             type: integer
+                          seLinuxChangePolicy:
+                            type: string
                           seLinuxOptions:
                             properties:
                               level:
@@ -6013,6 +6015,8 @@ spec:
                           runAsUser:
                             format: int64
                             type: integer
+                          seLinuxChangePolicy:
+                            type: string
                           seLinuxOptions:
                             properties:
                               level:
@@ -10645,6 +10649,8 @@ spec:
                                             runAsUser:
                                               format: int64
                                               type: integer
+                                            seLinuxChangePolicy:
+                                              type: string
                                             seLinuxOptions:
                                               properties:
                                                 level:
@@ -12397,6 +12403,8 @@ spec:
                                 runAsUser:
                                   format: int64
                                   type: integer
+                                seLinuxChangePolicy:
+                                  type: string
                                 seLinuxOptions:
                                   properties:
                                     level:
@@ -15709,6 +15717,8 @@ spec:
                           runAsUser:
                             format: int64
                             type: integer
+                          seLinuxChangePolicy:
+                            type: string
                           seLinuxOptions:
                             properties:
                               level:
@@ -19896,6 +19906,8 @@ spec:
                                       runAsUser:
                                         format: int64
                                         type: integer
+                                      seLinuxChangePolicy:
+                                        type: string
                                       seLinuxOptions:
                                         properties:
                                           level:
