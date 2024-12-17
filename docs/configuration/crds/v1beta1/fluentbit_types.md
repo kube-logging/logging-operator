@@ -128,6 +128,11 @@ Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout 
 
 Default: 1
 
+### forceHotReloadAfterGrace (bool, optional) {#fluentbitspec-forcehotreloadaftergrace}
+
+HotReload pauses all inputs and waits until they finish. In certain situations this is unacceptable, for example if an output is down for a longer time. An undocumented option called "Hot_Reload.Ensure_Thread_Safety Off" can be used at the [SERVICE] config to force hotreload after the grace period. Please note that it might result in a SIGSEGV, but worst case kubelet will restart the container. See https://github.com/fluent/fluent-bit/pull/7509 
+
+
 ### forwardOptions (*ForwardOptions, optional) {#fluentbitspec-forwardoptions}
 
 

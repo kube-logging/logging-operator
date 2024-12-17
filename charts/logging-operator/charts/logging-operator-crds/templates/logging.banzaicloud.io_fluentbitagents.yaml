@@ -1480,6 +1480,8 @@ spec:
               flush:
                 format: int32
                 type: integer
+              forceHotReloadAfterGrace:
+                type: boolean
               forwardOptions:
                 properties:
                   Require_ack_response:
