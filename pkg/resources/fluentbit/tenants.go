@@ -138,8 +138,6 @@ func (r *Reconciler) configureInputsForTenants(tenants []v1beta1.Tenant, input *
 
 		tenantValues["DB"] = fmt.Sprintf("/tail-db/tail-containers-state-%s.db", t.Name)
 		tenantValues["Tag"] = fmt.Sprintf("kubernetes.%s.*", hashFromTenantName(t.Name))
-		// This helps to make sure we apply backpressure on the input, see https://docs.fluentbit.io/manual/administration/backpressure
-		tenantValues["storage.pause_on_chunks_overlimit"] = "on"
 		input.Inputs = append(input.Inputs, fluentbitInputConfigWithTenant{
 			Tenant:          t.Name,
 			Values:          tenantValues,

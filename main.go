@@ -25,6 +25,7 @@ import (
 	"runtime/coverage"
 	"strings"
 	"syscall"
+	"time"
 
 	"emperror.dev/errors"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -81,6 +82,7 @@ func main() {
 	var namespace string
 	var loggingRef string
 	var klogLevel int
+	var syncPeriod string
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
@@ -91,6 +93,7 @@ func main() {
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
+	flag.StringVar(&syncPeriod, "sync-period", "", "SyncPeriod determines the minimum frequency at which watched resources are reconciled. Defaults to 10 hours. Parsed using time.ParseDuration.")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -142,7 +145,7 @@ func main() {
 		mgrOptions.WebhookServer = webhookServer
 	}
 
-	customMgrOptions, err := setupCustomCache(&mgrOptions, namespace, loggingRef)
+	customMgrOptions, err := setupCustomCache(&mgrOptions, syncPeriod, namespace, loggingRef)
 	if err != nil {
 		setupLog.Error(err, "unable to set up custom cache settings")
 		os.Exit(1)
@@ -285,7 +288,15 @@ func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 	return nil
 }
 
-func setupCustomCache(mgrOptions *ctrl.Options, namespace string, loggingRef string) (*ctrl.Options, error) {
+func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace string, loggingRef string) (*ctrl.Options, error) {
+	if syncPeriod != "" {
+		duration, err := time.ParseDuration(syncPeriod)
+		if err != nil {
+			return mgrOptions, err
+		}
+		mgrOptions.Cache.SyncPeriod = &duration
+	}
+
 	if namespace == "" && loggingRef == "" {
 		return mgrOptions, nil
 	}
