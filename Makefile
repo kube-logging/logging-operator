@@ -5,25 +5,27 @@
 ####
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools versioning=semver
-CONTROLLER_GEN_VERSION := v0.16.3
+CONTROLLER_GEN_VERSION := 0.16.3
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := v1.61.0
+GOLANGCI_LINT_VERSION := 1.61.0
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.11.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
-KIND_VERSION ?= v0.24.0
+KIND_VERSION ?= 0.24.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
-KUBEBUILDER_VERSION = v3.1.0
+KUBEBUILDER_VERSION = 3.1.0
 
 # renovate: datasource=go depName=github.com/goph/licensei versioning=semver
-LICENSEI_VERSION = v0.9.0
+LICENSEI_VERSION = 0.9.0
 
 # renovate: datasource=go depName=github.com/stern/stern versioning=semver
 STERN_VERSION := 1.25.0
+
+ENVTEST_K8S_VERSION := 1.31.0
 
 BIN := ${PWD}/bin
 
@@ -53,7 +55,6 @@ TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_co
 CONTROLLER_GEN := ${BIN}/controller-gen
 
 ENVTEST_BIN_DIR := ${BIN}/envtest
-ENVTEST_K8S_VERSION := 1.31.0
 ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
@@ -205,7 +206,7 @@ test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
 
 .PHONY: test-e2e-ci
 test-e2e-ci: ${BIN}
-	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64
+	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
 	chmod +x ./bin/kind
 	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
 	chmod +x ./bin/stern
@@ -249,7 +250,7 @@ ${CONTROLLER_GEN}: ${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION} | ${
 	ln -sf $(notdir $<) $@
 
 ${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: IMPORT_PATH := sigs.k8s.io/controller-tools/cmd/controller-gen
-${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: VERSION := ${CONTROLLER_GEN_VERSION}
+${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: VERSION := v${CONTROLLER_GEN_VERSION}
 ${CONTROLLER_GEN}_${CONTROLLER_GEN_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}
 
@@ -263,7 +264,7 @@ ${GOLANGCI_LINT}: ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION} | ${BIN
 	ln -sf $(notdir $<) $@
 
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/golangci/golangci-lint/cmd/golangci-lint
-${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: VERSION := ${GOLANGCI_LINT_VERSION}
+${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: VERSION := v${GOLANGCI_LINT_VERSION}
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}
 
@@ -271,7 +272,7 @@ ${KIND}: ${KIND}_${KIND_VERSION}_${GOVERSION} | ${BIN}
 	ln -sf $(notdir $<) $@
 
 ${KIND}_${KIND_VERSION}_${GOVERSION}: IMPORT_PATH := sigs.k8s.io/kind
-${KIND}_${KIND_VERSION}_${GOVERSION}: VERSION := ${KIND_VERSION}
+${KIND}_${KIND_VERSION}_${GOVERSION}: VERSION := v${KIND_VERSION}
 ${KIND}_${KIND_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}
 
@@ -279,14 +280,14 @@ ${KUBEBUILDER}: ${KUBEBUILDER}_$(KUBEBUILDER_VERSION) | ${BIN}
 	ln -sf $(notdir $<) $@
 
 ${KUBEBUILDER}_$(KUBEBUILDER_VERSION): | ${BIN}
-	curl -sL https://github.com/kubernetes-sigs/kubebuilder/releases/download/${KUBEBUILDER_VERSION}/kubebuilder_${OS}_${ARCH} -o $@
+	curl -sL https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${OS}_${ARCH} -o $@
 	chmod +x $@
 
 ${LICENSEI}: ${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION} | ${BIN}
 	ln -sf $(notdir $<) $@
 
 ${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/goph/licensei/cmd/licensei
-${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: VERSION := ${LICENSEI_VERSION}
+${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: VERSION := v${LICENSEI_VERSION}
 ${LICENSEI}_${LICENSEI_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}
 
