@@ -125,6 +125,11 @@ Set the flush time in seconds.nanoseconds. The engine loop uses a Flush timeout 
 
 Default: 1
 
+### forceHotReloadAfterGrace (bool, optional) {#fluentbitspec-forcehotreloadaftergrace}
+
+HotReload pauses all inputs and waits until they finish. In certain situations this is unacceptable, for example if an output is down for a longer time. An undocumented option called "Hot_Reload.Ensure_Thread_Safety Off" can be used at the [SERVICE] config to force hotreload after the grace period. Please note that it might result in a SIGSEGV, but worst case kubelet will restart the container. See https://github.com/fluent/fluent-bit/pull/7509 
+
+
 ### forwardOptions (*ForwardOptions, optional) {#fluentbitspec-forwardoptions}
 
 
@@ -556,6 +561,12 @@ Default: 5
 When a monitored file reach it buffer capacity due to a very long line (Buffer_Max_Size), the default behavior is to stop monitoring that file. Skip_Long_Lines alter that behavior and instruct Fluent Bit to skip long lines and continue processing other lines that fits into the buffer size.
 
 Default: Off
+
+### storage.pause_on_chunks_overlimit (string, optional) {#inputtail-storage.pause_on_chunks_overlimit}
+
+Specifies whether to pause or drop data when the buffer is full.  This helps to make sure we apply backpressure on the input if enabled, see https://docs.fluentbit.io/manual/administration/backpressure
+
+Default: on
 
 ### storage.type (string, optional) {#inputtail-storage.type}
 
