@@ -11,7 +11,8 @@ metadata:
     tenant: infra
 spec:
   loggingRef: infra
-  fluentd: {}
+  fluentd:
+    metrics: {}
   controlNamespace: infra
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
@@ -49,8 +50,12 @@ metadata:
   name: infra
 spec:
   loggingRef: infra
+  # this is required to reload even if there are pending tasks in one of the queues
+  # requires grace to be set, which is 5 by default
+  forceHotReloadAfterGrace: true
   inputTail:
     storage.type: filesystem
+    storage.pause_on_chunks_overlimit: "off"
   positiondb:
     hostPath:
       path: ""
@@ -59,9 +64,15 @@ spec:
       path: ""
   network:
     connectTimeout: 2
+    keepaliveMaxRecycle: 20
   metrics: {}
+  bufferStorage:
+    storage.max_chunks_up: 10
+  forwardOptions:
+    storage.total_limit_size: 50MB
   image:
-    tag: 2.2.2-debug
+    tag: 3.1.10-debug
+  configHotReload: {}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: LoggingRoute

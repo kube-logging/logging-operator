@@ -64,23 +64,24 @@ type fluentBitConfig struct {
 		Port    int32
 		Path    string
 	}
-	Flush                   int32
-	Grace                   int32
-	LogLevel                string
-	CoroStackSize           int32
-	Output                  map[string]string
-	Input                   fluentbitInputConfig
-	Inputs                  []fluentbitInputConfigWithTenant
-	DisableKubernetesFilter bool
-	KubernetesFilter        map[string]string
-	AwsFilter               map[string]string
-	BufferStorage           map[string]string
-	FilterModify            []v1beta1.FilterModify
-	FluentForwardOutput     *fluentForwardOutputConfig
-	SyslogNGOutput          *syslogNGOutputConfig
-	DefaultParsers          string
-	CustomParsers           string
-	HealthCheck             *v1beta1.HealthCheck
+	Flush                    int32
+	Grace                    int32
+	LogLevel                 string
+	CoroStackSize            int32
+	Output                   map[string]string
+	ForceHotReloadAfterGrace bool
+	Input                    fluentbitInputConfig
+	Inputs                   []fluentbitInputConfigWithTenant
+	DisableKubernetesFilter  bool
+	KubernetesFilter         map[string]string
+	AwsFilter                map[string]string
+	BufferStorage            map[string]string
+	FilterModify             []v1beta1.FilterModify
+	FluentForwardOutput      *fluentForwardOutputConfig
+	SyslogNGOutput           *syslogNGOutputConfig
+	DefaultParsers           string
+	CustomParsers            string
+	HealthCheck              *v1beta1.HealthCheck
 }
 
 type fluentForwardOutputConfig struct {
@@ -213,14 +214,15 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	input := fluentBitConfig{
-		Flush:                   r.fluentbitSpec.Flush,
-		Grace:                   r.fluentbitSpec.Grace,
-		LogLevel:                r.fluentbitSpec.LogLevel,
-		CoroStackSize:           r.fluentbitSpec.CoroStackSize,
-		Namespace:               r.Logging.Spec.ControlNamespace,
-		DisableKubernetesFilter: disableKubernetesFilter,
-		FilterModify:            r.fluentbitSpec.FilterModify,
-		HealthCheck:             r.fluentbitSpec.HealthCheck,
+		Flush:                    r.fluentbitSpec.Flush,
+		Grace:                    r.fluentbitSpec.Grace,
+		ForceHotReloadAfterGrace: r.fluentbitSpec.ForceHotReloadAfterGrace,
+		LogLevel:                 r.fluentbitSpec.LogLevel,
+		CoroStackSize:            r.fluentbitSpec.CoroStackSize,
+		Namespace:                r.Logging.Spec.ControlNamespace,
+		DisableKubernetesFilter:  disableKubernetesFilter,
+		FilterModify:             r.fluentbitSpec.FilterModify,
+		HealthCheck:              r.fluentbitSpec.HealthCheck,
 	}
 
 	input.DefaultParsers = fmt.Sprintf("%s/%s", StockConfigPath, "parsers.conf")
