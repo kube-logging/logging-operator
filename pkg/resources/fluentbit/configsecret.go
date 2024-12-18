@@ -60,14 +60,14 @@ type upstream struct {
 type fluentBitConfig struct {
 	Namespace string
 	Monitor   struct {
-		Enabled bool
-		Port    int32
-		Path    string
+		Enabled     bool
+		Port        int32
+		EnabledIPv6 bool
+		Path        string
 	}
 	Flush                    int32
 	Grace                    int32
 	LogLevel                 string
-	EnabledIPv6              bool
 	CoroStackSize            int32
 	Output                   map[string]string
 	ForceHotReloadAfterGrace bool
@@ -219,7 +219,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Grace:                    r.fluentbitSpec.Grace,
 		ForceHotReloadAfterGrace: r.fluentbitSpec.ForceHotReloadAfterGrace,
 		LogLevel:                 r.fluentbitSpec.LogLevel,
-		EnabledIPv6:              r.fluentbitSpec.EnabledIPv6,
 		CoroStackSize:            r.fluentbitSpec.CoroStackSize,
 		Namespace:                r.Logging.Spec.ControlNamespace,
 		DisableKubernetesFilter:  disableKubernetesFilter,
@@ -236,6 +235,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if r.fluentbitSpec.Metrics != nil {
 		input.Monitor.Enabled = true
 		input.Monitor.Port = r.fluentbitSpec.Metrics.Port
+		input.Monitor.EnabledIPv6 = r.fluentbitSpec.EnabledIPv6
 		input.Monitor.Path = r.fluentbitSpec.Metrics.Path
 	}
 
