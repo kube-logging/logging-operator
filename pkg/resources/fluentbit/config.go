@@ -38,7 +38,7 @@ var fluentBitConfigTemplate = `
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On
-    {{- if .EnabledIPv6 }}
+    {{- if .Monitor.EnabledIPv6 }}
     HTTP_Listen  [::]
     {{- else }}
     Listen 0.0.0.0
