@@ -63,6 +63,7 @@ func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[
 		Workers:                   fluentdSpec.Workers,
 		LogFormat:                 fluentdSpec.LogFormat,
 		LogLevel:                  fluentdSpec.LogLevel,
+		EnabledIPv6:               fluentdSpec.EnabledIPv6,
 	}
 
 	input.RootDir = fluentdSpec.RootDir
