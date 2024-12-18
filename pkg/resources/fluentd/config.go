@@ -64,15 +64,6 @@ var fluentdInputTemplate = `
 {{- end }}
 </source>
 <source>
-    @type prometheus
-    @id in_prometheus6
-    bind "::"
-    port {{ .Monitor.Port }}
-{{- if .Monitor.Path }}
-    metrics_path {{ .Monitor.Path }}
-{{- end }}
-</source>
-<source>
     @type prometheus_monitor
 </source>
 <source>
