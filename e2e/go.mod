@@ -8,10 +8,10 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.37.0
-	github.com/kube-logging/logging-operator v0.0.0-20241217115247-7855f88f78cf
+	github.com/kube-logging/logging-operator v0.0.0-20241219162731-d5be9a48f7c2
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.79.1
-	github.com/spf13/cast v1.7.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.79.2
+	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
 	helm.sh/helm/v3 v3.16.4
 	k8s.io/api v0.32.0
@@ -138,7 +138,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d // indirect
+	golang.org/x/exp v0.0.0-20241215155358-4a5509556b9e // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
