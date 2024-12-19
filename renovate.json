@@ -42,6 +42,9 @@
     "dependencies"
   ],
   "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "matchPackageNames": [
