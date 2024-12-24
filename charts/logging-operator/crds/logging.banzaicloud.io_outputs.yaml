@@ -2848,6 +2848,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   content_type:
                     type: string
                   endpoint:
@@ -2875,6 +2877,10 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  headers_from_placeholders:
+                    additionalProperties:
+                      type: string
+                    type: object
                   http_method:
                     type: string
                   json_array:
@@ -2889,6 +2895,8 @@ spec:
                     items:
                       type: integer
                     type: array
+                  reuse_connection:
+                    type: boolean
                   slow_flush_log_threshold:
                     type: string
                   ssl_timeout:
@@ -9561,6 +9569,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   content_type:
                     type: string
                   endpoint:
@@ -9588,6 +9598,10 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  headers_from_placeholders:
+                    additionalProperties:
+                      type: string
+                    type: object
                   http_method:
                     type: string
                   json_array:
@@ -9602,6 +9616,8 @@ spec:
                     items:
                       type: integer
                     type: array
+                  reuse_connection:
+                    type: boolean
                   slow_flush_log_threshold:
                     type: string
                   ssl_timeout:
