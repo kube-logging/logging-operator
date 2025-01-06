@@ -104,7 +104,7 @@ List of retryable response codes. If the response code is included in this list,
 
 Default: [503]
 
-### reuse_connection (bool, optional) {#output config-reuse_connection}
+### reuse_connections (bool, optional) {#output config-reuse_connections}
 
 Try to reuse connection. This will improve performance.
 

@@ -2902,7 +2902,7 @@ spec:
                     items:
                       type: integer
                     type: array
-                  reuse_connection:
+                  reuse_connections:
                     type: boolean
                   slow_flush_log_threshold:
                     type: string
@@ -10349,7 +10349,7 @@ spec:
                     items:
                       type: integer
                     type: array
-                  reuse_connection:
+                  reuse_connections:
                     type: boolean
                   slow_flush_log_threshold:
                     type: string

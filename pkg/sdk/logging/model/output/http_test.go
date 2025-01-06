@@ -25,8 +25,11 @@ import (
 
 func TestHTTP(t *testing.T) {
 	CONFIG := []byte(`
+compress: gzip
 endpoint: http://logserver.com:9000/api
+headers_from_placeholders: {"x-foo-bar":"${$.foo.bar}","x-tag":"app-${tag}"}
 retryable_response_codes: [503,504]
+reuse_connections: true
 format:
   type: json
 buffer:
@@ -44,8 +47,11 @@ auth:
   <match **>
     @type http
     @id test
+    compress gzip
     endpoint http://logserver.com:9000/api
-	retryable_response_codes [503,504]
+    headers_from_placeholders {"x-foo-bar":"${$.foo.bar}","x-tag":"app-${tag}"}
+    retryable_response_codes [503,504]
+    reuse_connections true
     <buffer tag,time>
       @type file
       path /buffers/test.*.buffer

@@ -76,7 +76,7 @@ type HTTPOutputConfig struct {
 	// TLS timeout in seconds.
 	SSLTimeout int `json:"ssl_timeout,omitempty"`
 	// Try to reuse connection. This will improve performance. (default: false)
-	ReuseConnection bool `json:"reuse_connection,omitempty"`
+	ReuseConnections bool `json:"reuse_connections,omitempty"`
 	// The default version of TLS transport. [TLSv1_1, TLSv1_2] (default: TLSv1_2)
 	TlsVersion string `json:"tls_version,omitempty"`
 	// The cipher configuration of TLS transport. (default: ALL:!aNULL:!eNULL:!SSLv2)
