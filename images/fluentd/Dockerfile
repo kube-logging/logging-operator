@@ -1,9 +1,9 @@
-FROM ruby:3.3.6-alpine3.20 as base
+FROM ruby:3.3.6-alpine3.20 AS base
 
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
       wget bzip2 zlib-dev git linux-headers \
-      automake autoconf libtool build-base \
+      automake autoconf libtool build-base \    
       ruby-dev libc6-compat geoip-dev \
       snappy-dev gnupg bash openssl-dev \
       "
@@ -62,7 +62,7 @@ RUN apk add --no-cache $BUILD_DEPS \
 USER fluent
 
 ### Image with all the filters and outputs
-FROM filters as full
+FROM filters AS full
 
 ADD ./outputs/Gemfile /Gemfile.outputs
 ADD ./outputs/Gemfile.lock /Gemfile.outputs.lock
