@@ -192,7 +192,7 @@ type DefaultFlowSpec struct {
 }
 
 const (
-	DefaultFluentbitImageRepository               = "fluent/fluent-bit"
+	DefaultFluentbitImageRepository               = "docker.io/fluent/fluent-bit"
 	DefaultFluentbitImageTag                      = "3.1.8"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "v0.8.0"
@@ -206,7 +206,7 @@ const (
 	DefaultFluentdDrainWatchImageTag              = "v0.2.3"
 	DefaultFluentdDrainPauseImageRepository       = "k8s.gcr.io/pause"
 	DefaultFluentdDrainPauseImageTag              = "3.2"
-	DefaultFluentdVolumeModeImageRepository       = "busybox"
+	DefaultFluentdVolumeModeImageRepository       = "docker.io/library/busybox"
 	DefaultFluentdVolumeModeImageTag              = "latest"
 	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentdConfigReloaderImageTag          = "v0.0.6"
