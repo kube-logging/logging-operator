@@ -78,15 +78,7 @@
       ]
     },
     {
-      "matchPaths": ["images/fluentd/v1.16-4.10/**"],
-      "additionalBranchPrefix": "v1.16-4.10-",
-      "commitMessagePrefix": "v1.16-4.10:",
-      "enabled": false
-    },
-    {
-      "matchPaths": ["images/fluentd/v1.17-5.0/**"],
-      "additionalBranchPrefix": "v1.17-5.0-",
-      "commitMessagePrefix": "v1.17-5.0:",
+      "matchPaths": ["images/fluentd/**"],
       "enabled": false
     }
   ],
