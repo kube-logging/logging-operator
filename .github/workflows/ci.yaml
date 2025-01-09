@@ -95,12 +95,3 @@ jobs:
       packages: write
       id-token: write
       security-events: write
-
-  dependency-images:
-    name: Dependency images
-    uses: ./.github/workflows/dependency-images.yaml
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      security-events: write
