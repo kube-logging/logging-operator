@@ -637,6 +637,13 @@ func (in *HTTPOutputConfig) DeepCopyInto(out *HTTPOutputConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.HeadersFromPlaceholders != nil {
+		in, out := &in.HeadersFromPlaceholders, &out.HeadersFromPlaceholders
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.TlsCACertPath != nil {
 		in, out := &in.TlsCACertPath, &out.TlsCACertPath
 		*out = new(secret.Secret)

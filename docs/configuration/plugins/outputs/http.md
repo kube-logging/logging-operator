@@ -34,6 +34,12 @@ spec:
 [Buffer](../buffer/) 
 
 
+### compress (string, optional) {#output config-compress}
+
+The option to compress HTTP request body. [text,gzip]
+
+Default: text
+
 ### content_type (string, optional) {#output config-content_type}
 
 Content-Profile for HTTP request. 
@@ -66,6 +72,11 @@ Default: post
 Additional headers for HTTP request. 
 
 
+### headers_from_placeholders (map[string]string, optional) {#output config-headers_from_placeholders}
+
+Additional headers from placeholders for HTTP request. 
+
+
 ### json_array (bool, optional) {#output config-json_array}
 
 Using array format of JSON. This parameter is used and valid only for json format. When json_array as true, Content-Profile should be application/json and be able to use JSON data for the HTTP request body.
@@ -92,6 +103,12 @@ Read timeout in seconds.
 List of retryable response codes. If the response code is included in this list, the plugin retries the buffer flush. Since Fluentd v2 the Status code 503 is going to be removed from default.
 
 Default: [503]
+
+### reuse_connections (bool, optional) {#output config-reuse_connections}
+
+Try to reuse connection. This will improve performance.
+
+Default: false
 
 ### ssl_timeout (int, optional) {#output config-ssl_timeout}
 
