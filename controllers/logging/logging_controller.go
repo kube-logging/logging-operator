@@ -106,6 +106,8 @@ type LoggingReconciler struct {
 func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("logging", req.Name)
 
+	log.V(1).Info("reconciling")
+
 	var logging loggingv1beta1.Logging
 	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
 		// If object is not found, return without error.
