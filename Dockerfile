@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.23.4-alpine3.20@sha256:9a31ef0803e6afdf564edc8ba4b4e17caed22a0b1ecd2c55e3c8fdd8d8f68f98 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.23.5-alpine3.20@sha256:def59a601e724ddac5139d447e8e9f7d0aeec25db287a9ee1615134bcda266e2 AS builder
 
 RUN apk add --update --no-cache ca-certificates make git curl
 
@@ -45,7 +45,7 @@ COPY --from=builder /usr/local/bin/manager /manager
 ENTRYPOINT ["/manager"]
 
 
-FROM gcr.io/distroless/static:latest@sha256:5c7e2b465ac6a2a4e5f4f7f722ce43b147dabe87cb21ac6c4007ae5178a1fa58
+FROM gcr.io/distroless/static:latest@sha256:3f2b64ef97bd285e36132c684e6b2ae8f2723293d09aae046196cca64251acac
 
 COPY --from=builder /usr/local/bin/manager /manager
 
