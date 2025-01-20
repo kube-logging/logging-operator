@@ -600,10 +600,6 @@ spec:
                   workers:
                     type: integer
                 type: object
-              enabledNamespaces:
-                items:
-                  type: string
-                type: array
               file:
                 properties:
                   create_dirs:

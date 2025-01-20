@@ -1913,10 +1913,6 @@ spec:
                   write_operation:
                     type: string
                 type: object
-              enabledNamespaces:
-                items:
-                  type: string
-                type: array
               file:
                 properties:
                   add_path_suffix:
@@ -9360,10 +9356,6 @@ spec:
                   write_operation:
                     type: string
                 type: object
-              enabledNamespaces:
-                items:
-                  type: string
-                type: array
               file:
                 properties:
                   add_path_suffix:
