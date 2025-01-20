@@ -195,7 +195,8 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		args = append(args,
 			"--volume-dir-archive=/tmp/archive",
 			"--dir-for-unarchive=/fluentd/app-config",
-			"--webhook-url=http://127.0.0.1:24444/api/config.reload",
+			fmt.Sprintf("-webhook-url=http://127.0.0.1:24444/api/config.%s",
+				map[bool]string{true: "gracefulReload", false: "reload"}[spec.ConfigReloaderUseGracefulReloadWebhook]),
 		)
 		vm = append(vm, corev1.VolumeMount{
 			Name:      "app-config-compress",
@@ -205,7 +206,8 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		args = append(args,
 			"--volume-dir=/fluentd/etc",
 			"--volume-dir=/fluentd/app-config",
-			"--webhook-url=http://127.0.0.1:24444/api/config.reload",
+			fmt.Sprintf("-webhook-url=http://127.0.0.1:24444/api/config.%s",
+				map[bool]string{true: "gracefulReload", false: "reload"}[spec.ConfigReloaderUseGracefulReloadWebhook]),
 		)
 		vm = append(vm, corev1.VolumeMount{
 			Name:      "config",

@@ -4713,6 +4713,8 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: object
                     type: object
+                  configReloaderUseGracefulReloadWebhook:
+                    type: boolean
                   disablePvc:
                     type: boolean
                   dnsConfig:
