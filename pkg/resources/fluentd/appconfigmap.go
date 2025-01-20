@@ -415,7 +415,8 @@ func (r *Reconciler) initContainerCheckPod(fluentdSpec v1beta1.FluentdSpec) []co
 					"--init-mode=true",
 					"--volume-dir-archive=/tmp/archive",
 					"--dir-for-unarchive=/fluentd/app-config",
-					"-webhook-url=http://127.0.0.1:24444/api/config.reload",
+					fmt.Sprintf("-webhook-url=http://127.0.0.1:24444/api/config.%s",
+						map[bool]string{true: "gracefulReload", false: "reload"}[fluentdSpec.ConfigReloaderUseGracefulReloadWebhook]),
 				},
 				VolumeMounts: []corev1.VolumeMount{
 					{

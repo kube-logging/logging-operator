@@ -54,6 +54,9 @@ Overrides the default logging level configCheck setup This field is not used dir
 ### configReloaderResources (corev1.ResourceRequirements, optional) {#fluentdspec-configreloaderresources}
 
 
+### configReloaderUseGracefulReloadWebhook (bool, optional) {#fluentdspec-configreloaderusegracefulreloadwebhook}
+
+
 ### dnsConfig (*corev1.PodDNSConfig, optional) {#fluentdspec-dnsconfig}
 
 
