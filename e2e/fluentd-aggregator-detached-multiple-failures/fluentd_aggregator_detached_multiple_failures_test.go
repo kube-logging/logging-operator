@@ -95,6 +95,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.FluentdSpec{
+				Image: v1beta1.ImageSpec{
+					Repository: common.FluentdImageRepo,
+					Tag:        common.FluentdImageTag,
+				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -123,6 +127,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.FluentdSpec{
+				Image: v1beta1.ImageSpec{
+					Repository: common.FluentdImageRepo,
+					Tag:        common.FluentdImageTag,
+				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("500m"),

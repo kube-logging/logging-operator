@@ -34,7 +34,8 @@ import (
 )
 
 const (
-	FluentdImageTag = "v1.17-5.0-base"
+	FluentdImageRepo = "fluentd-full"
+	FluentdImageTag  = "local"
 )
 
 var sequence uint32
@@ -129,7 +130,8 @@ func LoggingInfra(
 			ControlNamespace: nsInfra,
 			FluentdSpec: &v1beta1.FluentdSpec{
 				Image: v1beta1.ImageSpec{
-					Tag: FluentdImageTag,
+					Repository: FluentdImageRepo,
+					Tag:        FluentdImageTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{
@@ -201,6 +203,10 @@ func LoggingTenant(
 			ControlNamespace: nsTenant,
 			WatchNamespaces:  []string{"tenant"},
 			FluentdSpec: &v1beta1.FluentdSpec{
+				Image: v1beta1.ImageSpec{
+					Repository: FluentdImageRepo,
+					Tag:        FluentdImageTag,
+				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{
 					Requests: v12.ResourceList{

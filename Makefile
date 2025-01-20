@@ -38,8 +38,9 @@ DOCKER ?= docker
 GOVERSION := $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
-IMG ?= controller:local
-IMG_DEBUG ?= controller:debug
+FLUENTD_IMG ?= fluentd-full:local
+OPERATOR_IMG ?= controller:local
+OPERATOR_IMG_DEBUG ?= controller:debug
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= crd:maxDescLen=0
@@ -95,18 +96,19 @@ debug: manager ## Remote debug
 
 .PHONY: docker-build
 docker-build: ## Build the docker image
-	${DOCKER} build . -t ${IMG}
+	${DOCKER} build . -t ${OPERATOR_IMG}
 	@echo "updating kustomize image patch file for manager resource"
-	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+	sed -i'' -e 's@image: .*@image: '"${OPERATOR_IMG}"'@' ./config/default/manager_image_patch.yaml
 
 .PHONY: docker-build-debug
 docker-build-debug: ## Build the debug docker image
-	${DOCKER} build --target debug -t ${IMG_DEBUG} .
+	${DOCKER} build --target debug -t ${OPERATOR_IMG_DEBUG} .
 
 .PHONY: docker-build-e2e-test
 docker-build-e2e-test: ## Build the coverage docker image
-	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover -covermode=atomic" -t ${IMG} --target e2e-test .
-	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover -covermode=atomic" -t ${OPERATOR_IMG} --target e2e-test .
+	sed -i'' -e 's@image: .*@image: '"${OPERATOR_IMG}"'@' ./config/default/manager_image_patch.yaml
+	${DOCKER} build -t ${FLUENTD_IMG} --target full images/fluentd
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
@@ -114,7 +116,7 @@ docker-build-drain-watch: ## Build the drain-watch docker image
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
-	${DOCKER} push ${IMG}
+	${DOCKER} push ${OPERATOR_IMG}
 
 .PHONY: docs
 docs: ## Generate docs
@@ -215,7 +217,8 @@ test-e2e-ci: ${BIN}
 .PHONY: test-e2e-nodeps
 test-e2e-nodeps:
 	cd e2e && \
-		LOGGING_OPERATOR_IMAGE="${IMG}" \
+		LOGGING_OPERATOR_IMAGE="${OPERATOR_IMG}" \
+		FLUENTD_IMAGE="${FLUENTD_IMG}" \
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \

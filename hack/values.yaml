@@ -9,6 +9,10 @@ testReceiver:
 
 logging:
   enabled: true
+  fluentd:
+    image:
+      repository: fluentd-full
+      tag: local
   clusterFlows:
     - name: all
       spec:

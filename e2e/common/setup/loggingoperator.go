@@ -29,6 +29,31 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
+var (
+	defaultImages = []e2eImage{
+		{
+			lookupEnv:  "LOGGING_OPERATOR_IMAGE",
+			repository: "controller",
+			tag:        "local",
+		},
+		{
+			lookupEnv:  "FLUENTD_IMAGE",
+			repository: "fluentd-full",
+			tag:        "local",
+		},
+	}
+)
+
+type e2eImage struct {
+	lookupEnv  string
+	repository string
+	tag        string
+}
+
+func (i e2eImage) Format() string {
+	return fmt.Sprintf("%s:%s", i.repository, i.tag)
+}
+
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
 
 	opt := &LoggingOperatorOptions{
@@ -72,23 +97,23 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		t.Fatalf("helm load chart: %s", err)
 	}
 
-	image := strings.Split(os.Getenv("LOGGING_OPERATOR_IMAGE"), ":")
-	if len(image) < 2 {
-		t.Log("LOGGING_OPERATOR_IMAGE (<repository>:<tag>) is undefined. Defaulting to controller:local")
-		image = []string{
-			"controller", "local",
+	var loggingOperatorImage e2eImage
+	for _, image := range defaultImages {
+		if image.lookupEnv == "LOGGING_OPERATOR_IMAGE" {
+			loggingOperatorImage = image
 		}
-	}
-	err = c.LoadImages(strings.Join(image, ":"))
-	if err != nil {
-		t.Fatalf("kind load image: %s", err)
+
+		err := c.LoadImages(processImage(t, image))
+		if err != nil {
+			t.Fatalf("kind load image: %s", err)
+		}
 	}
 
 	_, err = installer.Run(chartReq, map[string]interface{}{
 		"nameOverride": opt.NameOverride,
 		"image": map[string]interface{}{
-			"repository": image[0],
-			"tag":        image[1],
+			"repository": loggingOperatorImage.repository,
+			"tag":        loggingOperatorImage.tag,
 			"pullPolicy": corev1.PullNever,
 		},
 		"testReceiver": map[string]interface{}{
@@ -116,6 +141,21 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	if err != nil {
 		t.Fatalf("helm chart install: %s", err)
 	}
+}
+
+func processImage(t *testing.T, image e2eImage) string {
+	imageFromEnv, ok := os.LookupEnv(image.lookupEnv)
+	if ok {
+		if len(strings.Split(imageFromEnv, ":")) < 2 {
+			t.Logf("%s: (%s) is invalid. Using default %s", image.lookupEnv, imageFromEnv, image.Format())
+			return image.Format()
+		}
+
+		return imageFromEnv
+	}
+	t.Logf("%s is undefined. Using default %s", image.lookupEnv, image.Format())
+
+	return image.Format()
 }
 
 type LoggingOperatorOption interface {
