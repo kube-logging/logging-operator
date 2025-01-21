@@ -118,6 +118,8 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.hostTailer.workloadOverrides | string | `nil` | workloadOverrides of HostTailer |
 | logging.hostTailer.fileTailers | list | `[]` | configure fileTailers of HostTailer example:   - name: sample-file     path: /var/log/sample-file     disabled: false     buffer_max_size:     buffer_chunk_size:     skip_long_lines:     read_from_head: false     containerOverrides:     image: |
 | logging.hostTailer.systemdTailers | list | `[]` | configure systemdTailers of HostTailer example:   - name: system-sample     disabled: false     systemdFilter: kubelet.service     maxEntries: 20     containerOverrides:     image: |
+| logging.hostTailers.enabled | bool | `false` | Enable all hostTailers |
+| logging.hostTailers.instances | list | `[]` | List of hostTailers configurations |
 | testReceiver.enabled | bool | `false` |  |
 | testReceiver.image | string | `"fluent/fluent-bit"` |  |
 | testReceiver.pullPolicy | string | `"IfNotPresent"` |  |
