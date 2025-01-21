@@ -78,7 +78,9 @@
       ]
     },
     {
-      "matchPaths": ["images/fluentd/**"],
+      "matchFileNames": [
+        "images/fluentd/**"
+      ],
       "enabled": false
     }
   ],
