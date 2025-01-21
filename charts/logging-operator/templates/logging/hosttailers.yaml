@@ -1,5 +1,6 @@
-{{- with .Values.logging.hostTailer }}
-{{- if and $.Values.logging.enabled .enabled }}
+{{- if and $.Values.logging.enabled $.Values.logging.hostTailers.enabled }}
+{{- range .Values.logging.hostTailers.instances }}
+{{- if .enabled }}
 ---
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: HostTailer
@@ -27,5 +28,6 @@ spec:
   image:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -284,6 +284,47 @@ logging:
     # -- containerOverrides
     containerOverrides:
 
+  # DEPRECATED: HostTailer config will be removed, use hostTailers instead
+  hostTailer:
+    # -- HostTailer
+    enabled: false
+    # -- name of HostTailer
+    name: hosttailer
+    image:
+      # -- repository of eventTailer image
+      repository:
+      # -- tag of eventTailer image
+      tag:
+      # -- pullPolicy of eventTailer image
+      pullPolicy:
+      # -- imagePullSecrets of eventTailer image
+      imagePullSecrets: []
+    # -- workloadMetaOverrides of HostTailer
+    workloadMetaOverrides:
+    # -- workloadOverrides of HostTailer
+    workloadOverrides:
+    # -- configure fileTailers of HostTailer
+    # example:
+    #   - name: sample-file
+    #     path: /var/log/sample-file
+    #     disabled: false
+    #     buffer_max_size:
+    #     buffer_chunk_size:
+    #     skip_long_lines:
+    #     read_from_head: false
+    #     containerOverrides:
+    #     image:
+    fileTailers: []
+    # -- configure systemdTailers of HostTailer
+    # example:
+    #   - name: system-sample
+    #     disabled: false
+    #     systemdFilter: kubelet.service
+    #     maxEntries: 20
+    #     containerOverrides:
+    #     image:
+    systemdTailers: []
+
   hostTailers:
     # -- Enable all hostTailers
     enabled: false
