@@ -10,7 +10,7 @@ LoggingSpec defines the desired state of Logging
 
 ### allowClusterResourcesFromAllNamespaces (bool, optional) {#loggingspec-allowclusterresourcesfromallnamespaces}
 
-Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources 
+Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources WARNING: Becareful when turning this on and off as it can result in some resources being orphaned. 
 
 
 ### clusterDomain (*string, optional) {#loggingspec-clusterdomain}

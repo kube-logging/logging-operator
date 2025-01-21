@@ -80,7 +80,11 @@ type LoggingSpec struct {
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
+
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
+
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
+	// WARNING: Becareful when turning this on and off as it can result in some resources being orphaned.
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
 	// InlineNodeAgent Configuration
 	// Deprecated, will be removed with next major version

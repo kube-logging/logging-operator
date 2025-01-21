@@ -113,6 +113,8 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	return
 }
 
+// UniqueWatchNamespaces returns the unique list of namespaces to watch for a logging resource.
+// if both watchNamespaces and watchNamespaceSelector are empty, it returns all namespaces.
 func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v1beta1.Logging) ([]string, error) {
 	watchNamespaces := logging.Spec.WatchNamespaces
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector

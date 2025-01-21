@@ -120,13 +120,19 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.Fluentd.ClusterOutputs.FindByName(ref); output != nil {
+				switch output := resources.Fluentd.ClusterOutputs.FindByName(ref); {
+				case output == nil:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
+
+				default:
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
-				} else {
-					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
 				}
 			}
+
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
@@ -146,11 +152,12 @@ func NewValidationReconciler(
 				switch output := resources.Fluentd.ClusterOutputs.FindByName(ref); {
 				case output == nil:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
-					continue
 
 				case output.Spec.Protected:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference is protected: %s", ref))
-					continue
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
 					output.Status.Active = utils.BoolPointer(true)
@@ -159,11 +166,16 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
-				if output := resources.Fluentd.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
+				switch output := resources.Fluentd.Outputs.FindByNamespacedName(flow.Namespace, ref); {
+				case output == nil:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("local output reference: %s has problems", output.Name))
+
+				default:
 					output.Status.Active = utils.BoolPointer(true)
 					hasValidOutput = true
-				} else {
-					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
 			}
 
@@ -185,13 +197,19 @@ func NewValidationReconciler(
 			flow.Status.Problems = nil
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
-				if output := resources.SyslogNG.ClusterOutputs.FindByName(ref); output != nil {
+				switch output := resources.SyslogNG.ClusterOutputs.FindByName(ref); {
+				case output == nil:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
+
+				default:
 					flow.Status.Active = utils.BoolPointer(true)
 					output.Status.Active = utils.BoolPointer(true)
-				} else {
-					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
 				}
 			}
+
 			flow.Status.ProblemsCount = len(flow.Status.Problems)
 		}
 
@@ -207,11 +225,12 @@ func NewValidationReconciler(
 				switch output := resources.SyslogNG.ClusterOutputs.FindByName(ref); {
 				case output == nil:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling global output reference: %s", ref))
-					continue
 
 				case output.Spec.Protected:
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference is protected: %s", ref))
-					continue
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
 					output.Status.Active = utils.BoolPointer(true)
@@ -220,11 +239,16 @@ func NewValidationReconciler(
 			}
 
 			for _, ref := range flow.Spec.LocalOutputRefs {
-				if output := resources.SyslogNG.Outputs.FindByNamespacedName(flow.Namespace, ref); output != nil {
+				switch output := resources.SyslogNG.Outputs.FindByNamespacedName(flow.Namespace, ref); {
+				case output == nil:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
+
+				case output.Status.ProblemsCount > 0:
+					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("local output reference: %s has problems", output.Name))
+
+				default:
 					output.Status.Active = utils.BoolPointer(true)
 					hasValidOutput = true
-				} else {
-					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("dangling local output reference: %s", ref))
 				}
 			}
 
@@ -313,6 +337,8 @@ func NewValidationReconciler(
 
 		if !resources.Logging.WatchAllNamespaces() {
 			resources.Logging.Status.WatchNamespaces = resources.WatchNamespaces
+		} else {
+			resources.Logging.Status.WatchNamespaces = []string{"*"}
 		}
 
 		if resources.Logging.Spec.WatchNamespaceSelector != nil &&

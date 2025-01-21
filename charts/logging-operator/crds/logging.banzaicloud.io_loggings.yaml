@@ -66,6 +66,9 @@ spec:
             properties:
               allowClusterResourcesFromAllNamespaces:
                 type: boolean
+                x-kubernetes-validations:
+                - message: Value is immutable, please recreate the resource
+                  rule: self == oldSelf
               clusterDomain:
                 type: string
               configCheck:
