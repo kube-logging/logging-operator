@@ -185,6 +185,10 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
+					Image: v1beta1.ImageSpec{
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
+					},
 					Metrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},

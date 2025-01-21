@@ -89,7 +89,8 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: common.FluentdImageTag,
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
@@ -310,6 +311,10 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
+					Image: v1beta1.ImageSpec{
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
+					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),

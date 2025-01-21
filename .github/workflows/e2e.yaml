@@ -22,23 +22,33 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
 
-      - name: Build and export
+      - name: Build and export fluentd-full image
+        uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6.10.0
+        with:
+          context: images/fluentd
+          tags: fluentd-full:local
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: full
+          outputs: type=docker,dest=/tmp/fluentd-full.tar
+
+      - name: Build and export operator image
         uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6.10.0
         with:
           context: .
           tags: controller:local
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/controller.tar
           target: e2e-test
           build-args: |
             GO_BUILD_FLAGS=-cover -covermode=atomic
+          outputs: type=docker,dest=/tmp/controller.tar
 
       - name: Upload artifact
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
-          name: controller
-          path: /tmp/controller.tar
+          name: e2e-images
+          path: /tmp/*.tar
 
   go:
     name: Go end2end tests
@@ -57,11 +67,12 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: controller
+          name: e2e-images
           path: /tmp
 
       - name: Load image
         run: |
+          docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
@@ -113,11 +124,12 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: controller
+          name: e2e-images
           path: /tmp
 
       - name: Load image
         run: |
+          docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 

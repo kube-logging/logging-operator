@@ -91,7 +91,8 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: common.FluentdImageTag,
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
@@ -259,7 +260,8 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
-						Tag: common.FluentdImageTag,
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{

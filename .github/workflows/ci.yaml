@@ -89,7 +89,20 @@ jobs:
     name: Artifacts
     uses: ./.github/workflows/artifacts.yaml
     with:
+      version: "latest"
       publish: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+  dependency-images:
+    name: Dependency images
+    uses: ./.github/workflows/dependency-images.yaml
+    with:
+      publish: ${{ github.event_name == 'push' }}
+      image-types: "full"
     permissions:
       contents: read
       packages: write

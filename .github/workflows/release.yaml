@@ -12,8 +12,21 @@ jobs:
     name: Artifacts
     uses: ./.github/workflows/artifacts.yaml
     with:
+      version: ${{ github.event.release.tag_name}}
       publish: true
       release: true
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+  dependency-images:
+    name: Dependency images
+    uses: ./.github/workflows/dependency-images.yaml
+    with:
+      image-types: "base,filters,full"
+      publish: true
     permissions:
       contents: read
       packages: write

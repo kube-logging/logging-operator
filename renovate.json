@@ -76,6 +76,10 @@
         "Add build label to PRs which are related to build tools defined in Makefiles.",
         "Group Makefile dependency updates in single PR."
       ]
+    },
+    {
+      "matchPaths": ["images/fluentd/**"],
+      "enabled": false
     }
   ],
   "postUpdateOptions": [
