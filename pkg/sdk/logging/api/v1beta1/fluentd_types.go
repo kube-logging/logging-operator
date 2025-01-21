@@ -151,7 +151,11 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.Image.Repository = DefaultFluentdImageRepository
 		}
 		if f.Image.Tag == "" {
-			f.Image.Tag = DefaultFluentdImageTag
+			if Version == "" {
+				f.Image.Tag = DefaultFluentdImageTag
+			} else {
+				f.Image.Tag = Version
+			}
 		}
 		if f.Image.PullPolicy == "" {
 			f.Image.PullPolicy = "IfNotPresent"

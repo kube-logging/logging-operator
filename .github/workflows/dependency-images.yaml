@@ -2,6 +2,17 @@ name: Dependency images
 
 on:
   workflow_call:
+    inputs:
+      publish:
+        description: Publish artifacts to the artifact store
+        default: false
+        required: false
+        type: boolean
+      image-types:
+        description: 'Types of images to build (comma-separated: base,filters,full)'
+        type: string
+        default: 'base,filters,full'
+        required: false
     outputs:
       fluentd-image-name:
         description: Container image name
@@ -20,8 +31,23 @@ permissions:
   contents: read
 
 jobs:
+  prepare-matrix:
+    name: Prepare matrix
+    runs-on: ubuntu-latest
+
+    outputs:
+      image-types: ${{ steps.set-matrix.outputs.image-types }}
+
+    steps:
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          IMAGE_TYPES=$(echo '${{ inputs.image-types }}' | jq -R -c 'split(",")')
+          echo "image-types=${IMAGE_TYPES}" >> $GITHUB_OUTPUT
+
   fluentd-image:
     name: Fluentd image
+    needs: prepare-matrix
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'linux-arm64' || 'ubuntu-latest' }}
 
     permissions:
@@ -40,10 +66,7 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm64
-        image-type:
-          - base
-          - filters
-          - full
+        image-type: ${{ fromJson(needs.prepare-matrix.outputs.image-types) }}
 
     steps:
       - name: Prepare arm64 environment
@@ -95,7 +118,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Build and push fluentd-${{ matrix.platform }}-${{ matrix.image-type }}
+      - name: Build and push fluentd-${{ matrix.image-type }}-${{ matrix.platform }} image
         id: build
         uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6.10.0
         with:
@@ -153,7 +176,7 @@ jobs:
   merge-fluentd-image:
     name: Merge Fluentd image
     runs-on: ubuntu-latest
-    needs: fluentd-image
+    needs: [prepare-matrix, fluentd-image]
 
     permissions:
       contents: read
@@ -163,10 +186,7 @@ jobs:
 
     strategy:
       matrix:
-        image-type:
-          - base
-          - filters
-          - full
+        image-type: ${{ fromJson(needs.prepare-matrix.outputs.image-types) }}
 
     steps:
       - name: Set up Docker Buildx
@@ -181,6 +201,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
+        if: inputs.publish
 
       - name: Download digests
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -202,11 +223,16 @@ jobs:
             type=semver,pattern={{raw}},suffix=-${{ matrix.image-type }}
             type=raw,value=latest,enable={{is_default_branch}},suffix=-${{ matrix.image-type }}
 
-      - name: Create multi-arch manifest list and push
+      - name: Create multi-arch manifest list
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ needs.fluentd-image.outputs.name }}@sha256:%s ' *)
+          if [[ "${{ inputs.publish }}" == "true" ]]; then
+            docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+              $(printf '${{ needs.fluentd-image.outputs.name }}@sha256:%s ' *)
+          else
+            docker buildx imagetools create --dry-run $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+              $(printf '${{ needs.fluentd-image.outputs.name }}@sha256:%s ' *)
+          fi
 
       - name: Export digest
         run: |
@@ -214,7 +240,7 @@ jobs:
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Sign image with GitHub OIDC Token
-        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
         env:
           DIGEST: ${{ env.DIGEST }}
           TAGS: ${{ steps.meta.outputs.tags }}
@@ -227,7 +253,7 @@ jobs:
           cosign sign --yes --rekor-url "https://rekor.sigstore.dev/" ${images}
 
       - name: Verify signed image with cosign
-        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
         env:
           DIGEST: ${{ env.DIGEST }}
           TAGS: ${{ steps.meta.outputs.tags }}

@@ -191,6 +191,8 @@ type DefaultFlowSpec struct {
 	IncludeLabelInRouter *bool    `json:"includeLabelInRouter,omitempty"`
 }
 
+var Version string
+
 const (
 	DefaultFluentbitImageRepository               = "docker.io/fluent/fluent-bit"
 	DefaultFluentbitImageTag                      = "3.1.8"
@@ -199,8 +201,8 @@ const (
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "v0.0.6"
-	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/fluentd"
-	DefaultFluentdImageTag                        = "v1.17-5.0-full"
+	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/logging-operator/fluentd"
+	DefaultFluentdImageTag                        = "latest"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "v0.2.3"

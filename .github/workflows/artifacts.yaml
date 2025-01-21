@@ -3,6 +3,11 @@ name: Artifacts
 on:
   workflow_call:
     inputs:
+      version:
+        description: Version to build
+        default: latest
+        required: true
+        type: string
       publish:
         description: Publish artifacts to the artifact store
         default: false
@@ -26,6 +31,18 @@ on:
       container-image-ref:
         description: Container image ref
         value: ${{ jobs.container-image.outputs.ref }}
+      fluentd-full-image-name:
+        description: Fluentd-full container image name
+        value: ${{ jobs.fluentd-full-image.outputs.name }}
+      fluentd-full-image-digest:
+        description: Fluentd-full container image digest
+        value: ${{ jobs.fluentd-full-image.outputs.digest }}
+      fluentd-full-image-tag:
+        description: Fluentd-full container image tag
+        value: ${{ jobs.fluentd-full-image.outputs.tag }}
+      fluentd-full-image-ref:
+        description: Fluentd-full container image ref
+        value: ${{ jobs.fluentd-full-image.outputs.ref }}
       helm-chart-name:
         description: Helm chart OCI name
         value: ${{ jobs.helm-chart.outputs.name }}
@@ -128,6 +145,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: GO_BUILD_FLAGS=-ldflags=-X=github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1.Version=${{ inputs.version }}
           outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
           # push: ${{ inputs.publish }}
 
