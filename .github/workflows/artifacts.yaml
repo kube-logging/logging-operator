@@ -28,21 +28,6 @@ on:
       container-image-tag:
         description: Container image tag
         value: ${{ jobs.container-image.outputs.tag }}
-      container-image-ref:
-        description: Container image ref
-        value: ${{ jobs.container-image.outputs.ref }}
-      fluentd-full-image-name:
-        description: Fluentd-full container image name
-        value: ${{ jobs.fluentd-full-image.outputs.name }}
-      fluentd-full-image-digest:
-        description: Fluentd-full container image digest
-        value: ${{ jobs.fluentd-full-image.outputs.digest }}
-      fluentd-full-image-tag:
-        description: Fluentd-full container image tag
-        value: ${{ jobs.fluentd-full-image.outputs.tag }}
-      fluentd-full-image-ref:
-        description: Fluentd-full container image ref
-        value: ${{ jobs.fluentd-full-image.outputs.ref }}
       helm-chart-name:
         description: Helm chart OCI name
         value: ${{ jobs.helm-chart.outputs.name }}
@@ -80,7 +65,6 @@ jobs:
       name: ${{ steps.image-name.outputs.value }}
       digest: ${{ steps.build.outputs.digest }}
       tag: ${{ steps.meta.outputs.version }}
-      ref: ${{ steps.image-ref.outputs.value }}
 
     steps:
       - name: Checkout repository
@@ -214,10 +198,6 @@ jobs:
               echo "✅ All verifications completed successfully"
             fi
           fi
-
-      - name: Set image ref
-        id: image-ref
-        run: echo "value=${{ steps.image-name.outputs.value }}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
 
       - name: Fetch image
         run: skopeo --insecure-policy copy docker://${{ steps.image-name.outputs.value }}:${{ steps.meta.outputs.version }} oci-archive:image.tar
