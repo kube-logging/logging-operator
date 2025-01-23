@@ -36,7 +36,8 @@
     "helmv3",
     "kubernetes",
     "kustomize",
-    "asdf"
+    "asdf",
+    "bundler"
   ],
   "labels": [
     "dependencies"
@@ -76,12 +77,6 @@
         "Add build label to PRs which are related to build tools defined in Makefiles.",
         "Group Makefile dependency updates in single PR."
       ]
-    },
-    {
-      "matchFileNames": [
-        "images/fluentd/**"
-      ],
-      "enabled": false
     }
   ],
   "postUpdateOptions": [
