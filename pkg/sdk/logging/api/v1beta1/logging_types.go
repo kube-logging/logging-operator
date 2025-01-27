@@ -19,12 +19,13 @@ import (
 	"fmt"
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 )
 
 // +name:"LoggingSpec"
@@ -80,7 +81,11 @@ type LoggingSpec struct {
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
+
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
+
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
+	// WARNING: Becareful when turning this on and off as it can result in some resources being orphaned.
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
 	// InlineNodeAgent Configuration
 	// Deprecated, will be removed with next major version
@@ -202,7 +207,7 @@ const (
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "v0.0.6"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/logging-operator/fluentd"
-	DefaultFluentdImageTag                        = "latest"
+	DefaultFluentdImageTag                        = "latest-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "v0.2.3"
