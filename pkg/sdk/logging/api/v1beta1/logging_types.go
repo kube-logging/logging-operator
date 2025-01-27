@@ -19,12 +19,13 @@ import (
 	"fmt"
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 )
 
 // +name:"LoggingSpec"
@@ -206,7 +207,7 @@ const (
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "v0.0.6"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/logging-operator/fluentd"
-	DefaultFluentdImageTag                        = "latest"
+	DefaultFluentdImageTag                        = "latest-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "v0.2.3"
