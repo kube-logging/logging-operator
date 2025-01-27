@@ -12,7 +12,7 @@ jobs:
     name: Artifacts
     uses: ./.github/workflows/artifacts.yaml
     with:
-      version: ${{ github.event.release.tag_name}}
+      version: ${{ github.ref_name }}
       publish: true
       release: true
     permissions:
