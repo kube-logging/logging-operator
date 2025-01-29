@@ -84,7 +84,7 @@ GEM
     faraday_middleware-aws-sigv4 (1.0.1)
       aws-sigv4 (~> 1.0)
       faraday (>= 2.0, < 3)
-    ffi (1.16.3)
+    ffi (1.17.1)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -264,7 +264,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.1003)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.7)
+    mini_portile2 (2.8.8)
     minitest (5.22.2)
     msgpack (1.7.5)
     multi_json (1.15.0)
@@ -309,8 +309,8 @@ GEM
       httpclient
       json-jwt (>= 1.11.0)
       rack (>= 2.1.0)
-    rake (13.0.6)
-    rdkafka (0.19.0)
+    rake (13.2.1)
+    rdkafka (0.20.0)
       ffi (~> 1.15)
       mini_portile2 (~> 2.6)
       rake (> 12)
@@ -394,7 +394,7 @@ DEPENDENCIES
   fluent-plugin-vmware-log-intelligence (= 2.0.8)
   fluent-plugin-vmware-loginsight (= 1.4.2)
   fluent-plugin-webhdfs (= 1.6.0)
-  rdkafka (= 0.19.0)
+  rdkafka (= 0.20.0)
 
 BUNDLED WITH
    2.5.23
