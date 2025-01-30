@@ -8,8 +8,7 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: '1.23'
-  KUBECTL_VERSION: 'v1.26.6'
+  KUBECTL_VERSION: 'v1.32.0'
 
 jobs:
   build:
@@ -85,7 +84,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: '.go-version'
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8 # v3
@@ -121,7 +120,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kube: ["1.26", "1.27", "1.28", "1.29", "1.30", "1.31"]
+        kube: ["1.30", "1.31", "1.32"]
 
     steps:
       - name: Set up Docker Buildx
@@ -153,18 +152,12 @@ jobs:
         id: node_image
         run: |
           case ${{ matrix.kube }} in
-            1.26)
-              NODE_IMAGE=kindest/node:v1.26.6@sha256:6e2d8b28a5b601defe327b98bd1c2d1930b49e5d8c512e1895099e4504007adb ;;
-            1.27)
-              NODE_IMAGE=kindest/node:v1.27.3@sha256:3966ac761ae0136263ffdb6cfd4db23ef8a83cba8a463690e98317add2c9ba72 ;;
-            1.28)
-              NODE_IMAGE=kindest/node:v1.28.9@sha256:9ba4d311e7861d27b210e5960e5ce921a7c53d3c67e0545fd8a1cb9a76dfa2cb ;;
-            1.29)
-              NODE_IMAGE=kindest/node:v1.29.4@sha256:ea40a6bd365a17f71fd3883a1d34a0791d7d6b0eb75832c6d85b6f2326827f1e ;;
             1.30)
               NODE_IMAGE=kindest/node:v1.30.0@sha256:2af5d1b382926abcd6336312d652cd045b7cc47475844a608669c71b1fefcfbc ;;
             1.31)
               NODE_IMAGE=kindest/node:v1.31.0@sha256:53df588e04085fd41ae12de0c3fe4c72f7013bba32a20e7325357a1ac94ba865 ;;
+            1.32)
+              NODE_IMAGE=kindest/node:v1.32.0@sha256:c48c62eac5da28cdadcf560d1d8616cfa6783b58f0d94cf63ad1bf49600cb027
             esac
 
             echo "image=$NODE_IMAGE" >> $GITHUB_OUTPUT

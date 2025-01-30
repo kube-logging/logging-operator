@@ -14,7 +14,7 @@ GOLANGCI_LINT_VERSION := 1.63.4
 HELM_DOCS_VERSION = 1.14.2
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
-KIND_VERSION ?= 0.24.0
+KIND_VERSION ?= 0.26.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
 KUBEBUILDER_VERSION = 3.1.0
