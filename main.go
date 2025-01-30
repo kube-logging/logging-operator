@@ -161,14 +161,17 @@ func main() {
 	}
 
 	customMgrOptions, err := setupCustomCache(&mgrOptions, syncPeriod, namespace, loggingRef, watchLabeledChildren)
-	if watchLabeledSecrets {
-		customMgrOptions.Cache.ByObject[&corev1.Secret{}] = cache.ByObject{
-			Label: labels.Set{"logging.banzaicloud.io/watch": "enabled"}.AsSelector(),
-		}
-	}
 	if err != nil {
 		setupLog.Error(err, "unable to set up custom cache settings")
 		os.Exit(1)
+	}
+	if watchLabeledSecrets {
+		if customMgrOptions.Cache.ByObject == nil {
+			customMgrOptions.Cache.ByObject = make(map[client.Object]cache.ByObject)
+		}
+		customMgrOptions.Cache.ByObject[&corev1.Secret{}] = cache.ByObject{
+			Label: labels.Set{"logging.banzaicloud.io/watch": "enabled"}.AsSelector(),
+		}
 	}
 
 	if enableprofile {
