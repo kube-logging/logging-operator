@@ -21,6 +21,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -49,9 +50,11 @@ func (r *Reconciler) appConfigSecret() (runtime.Object, reconciler.DesiredState,
 	} else {
 		data[AppConfigKey] = []byte(*r.config)
 	}
+	meta := r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd)
+	meta.Labels = utils.MergeLabels(meta.Labels, map[string]string{"logging.banzaicloud.io/watch": "enabled"})
 
 	return &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(AppSecretConfigName, ComponentFluentd),
+		ObjectMeta: meta,
 		Data:       data,
 	}, reconciler.StatePresent, nil
 }
@@ -214,8 +217,11 @@ func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdS
 		data[ConfigCheckKey] = []byte(*r.config)
 	}
 	data["fluent.conf"] = []byte(fluentdConfigCheckTemplate)
+	meta := r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck)
+	meta.Labels = utils.MergeLabels(meta.Labels, map[string]string{"logging.banzaicloud.io/watch": "enabled"})
+
 	return &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-%s", hashKey), ComponentConfigCheck),
+		ObjectMeta: meta,
 		Data:       data,
 	}, nil
 }
@@ -229,8 +235,11 @@ func (r *Reconciler) newCheckSecretAppConfig(hashKey string, fluentdSpec v1beta1
 	} else {
 		data[ConfigCheckKey] = []byte(*r.config)
 	}
+	meta := r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey), ComponentConfigCheck)
+	meta.Labels = utils.MergeLabels(meta.Labels, map[string]string{"logging.banzaicloud.io/watch": "enabled"})
+
 	return &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey), ComponentConfigCheck),
+		ObjectMeta: meta,
 		Data:       data,
 	}, nil
 }
@@ -242,6 +251,10 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 	}
 	if secret, ok := obj.(*corev1.Secret); ok {
 		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey), ComponentConfigCheck)
+		secret.ObjectMeta.Labels = utils.MergeLabels(
+			secret.ObjectMeta.Labels,
+			map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+		)
 		return secret, nil
 	}
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")

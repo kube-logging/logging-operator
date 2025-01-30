@@ -448,9 +448,13 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 
 	r.configs = confs
-
+	meta := r.FluentbitObjectMeta(fluentBitSecretConfigName)
+	meta.Labels = utils.MergeLabels(
+		meta.Labels,
+		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+	)
 	return &corev1.Secret{
-		ObjectMeta: r.FluentbitObjectMeta(fluentBitSecretConfigName),
+		ObjectMeta: meta,
 		Data:       confs,
 	}, reconciler.StatePresent, nil
 }
