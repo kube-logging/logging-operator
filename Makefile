@@ -5,16 +5,16 @@
 ####
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools versioning=semver
-CONTROLLER_GEN_VERSION := 0.16.5
+CONTROLLER_GEN_VERSION := 0.17.1
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := 1.62.2
+GOLANGCI_LINT_VERSION := 1.63.4
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.14.2
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
-KIND_VERSION ?= 0.24.0
+KIND_VERSION ?= 0.26.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
 KUBEBUILDER_VERSION = 3.1.0
@@ -23,7 +23,7 @@ KUBEBUILDER_VERSION = 3.1.0
 LICENSEI_VERSION = 0.9.0
 
 # renovate: datasource=go depName=github.com/stern/stern versioning=semver
-STERN_VERSION := 1.31.0
+STERN_VERSION := 1.32.0
 
 ENVTEST_K8S_VERSION := 1.31.0
 
