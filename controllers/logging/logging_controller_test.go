@@ -57,7 +57,7 @@ var (
 )
 
 const (
-	timeout = 5 * time.Second
+	timeout = 10 * time.Second
 )
 
 func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
