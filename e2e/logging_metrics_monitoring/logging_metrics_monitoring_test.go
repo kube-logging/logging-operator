@@ -252,12 +252,11 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 func installPrometheusOperator(c common.Cluster) error {
 	manager := helm.New(c.KubeConfigFilePath())
 
-	err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts"))
-	if err != nil {
-		return fmt.Errorf("failed to add prometheus-community repo: %w", err)
+	if err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts")); err != nil {
+		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
 	}
 
-	err = manager.RunInstall(
+	if err := manager.RunInstall(
 		helm.WithName("prometheus"),
 		helm.WithChart("prometheus-community/kube-prometheus-stack"),
 		helm.WithArgs("--create-namespace"),
@@ -265,9 +264,8 @@ func installPrometheusOperator(c common.Cluster) error {
 		helm.WithArgs("--set", "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false"),
 		helm.WithArgs("--set", "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false"),
 		helm.WithWait(),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to install prometheus-operator: %w", err)
+	); err != nil {
+		return fmt.Errorf("failed to install prometheus: %v", err)
 	}
 
 	return nil
