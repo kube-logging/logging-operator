@@ -137,6 +137,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 				"value": "/covdatafiles",
 			},
 		},
+		"extraArgs": opt.Args,
 	})
 	if err != nil {
 		t.Fatalf("helm chart install: %s", err)
@@ -173,4 +174,5 @@ type LoggingOperatorOptions struct {
 	NameOverride string
 	PollInterval time.Duration
 	Timeout      time.Duration
+	Args         []string
 }
