@@ -337,89 +337,92 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 		mgrOptions.Cache.SyncPeriod = &duration
 	}
 
-	if namespace == "" && loggingRef == "" && !watchLabeledChildren {
-		return mgrOptions, nil
-	}
-
-	var namespaceSelector fields.Selector
-	var labelSelector labels.Selector
-	if namespace != "" {
-		namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
-	}
-	if loggingRef != "" {
-		labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
-	}
-	if watchLabeledChildren {
-		if labelSelector == nil {
-			labelSelector = labels.NewSelector()
+	if namespace != "" || loggingRef != "" || watchLabeledChildren {
+		var namespaceSelector fields.Selector
+		var labelSelector labels.Selector
+		if namespace != "" {
+			namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
+			mgrOptions.Cache.DefaultNamespaces = map[string]cache.Config{
+				namespace: {
+					FieldSelector: namespaceSelector,
+				},
+			}
 		}
-		// It would be much better to watch for a common label, but we don't have that yet.
-		// Adding a new label would recreate statefulsets and daemonsets which would be undesirable.
-		// Let's see how this works in the wild. We can optimize in a subsequent iteration.
-		req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{
-			"fluentd", "syslog-ng", "fluentbit",
-		})
-		if err != nil {
-			return nil, err
+		if loggingRef != "" {
+			labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
 		}
-		labelSelector = labelSelector.Add(*req)
-	}
+		if watchLabeledChildren {
+			if labelSelector == nil {
+				labelSelector = labels.NewSelector()
+			}
+			// It would be much better to watch for a common label, but we don't have that yet.
+			// Adding a new label would recreate statefulsets and daemonsets which would be undesirable.
+			// Let's see how this works in the wild. We can optimize in a subsequent iteration.
+			req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{
+				"fluentd", "syslog-ng", "fluentbit",
+			})
+			if err != nil {
+				return nil, err
+			}
+			labelSelector = labelSelector.Add(*req)
+		}
 
-	mgrOptions.Cache = cache.Options{
-		ByObject: map[client.Object]cache.ByObject{
-			&corev1.Pod{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
+		mgrOptions.Cache = cache.Options{
+			ByObject: map[client.Object]cache.ByObject{
+				&corev1.Pod{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&batchv1.Job{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.Service{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.Role{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.ClusterRole{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.RoleBinding{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.ClusterRoleBinding{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.ServiceAccount{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.DaemonSet{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.StatefulSet{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.Deployment{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.PersistentVolumeClaim{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.ConfigMap{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
 			},
-			&batchv1.Job{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&corev1.Service{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&rbacv1.Role{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&rbacv1.ClusterRole{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&rbacv1.RoleBinding{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&rbacv1.ClusterRoleBinding{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&corev1.ServiceAccount{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&appsv1.DaemonSet{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&appsv1.StatefulSet{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&appsv1.Deployment{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&corev1.PersistentVolumeClaim{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&corev1.ConfigMap{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-		},
+		}
 	}
 
 	return mgrOptions, nil
