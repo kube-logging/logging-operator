@@ -200,7 +200,7 @@ var Version string
 
 const (
 	DefaultFluentbitImageRepository               = "docker.io/fluent/fluent-bit"
-	DefaultFluentbitImageTag                      = "3.1.8"
+	DefaultFluentbitImageTag                      = "3.2.5"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "v0.8.0"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
