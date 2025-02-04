@@ -1,8 +1,6 @@
 module github.com/kube-logging/logging-operator/pkg/sdk
 
-go 1.23.3
-
-toolchain go1.23.5
+go 1.23.5
 
 require (
 	emperror.dev/errors v0.8.1
@@ -11,10 +9,10 @@ require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/cisco-open/operator-tools v0.37.0
 	github.com/go-logr/zapr v1.3.0
-	github.com/kube-logging/logging-operator v0.0.0-20250127152226-1410004007d0
+	github.com/kube-logging/logging-operator v0.0.0-20250204114012-5c5cda7a590a
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.36.2
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.79.2
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.80.0
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -76,7 +74,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.32.0 // indirect
+	k8s.io/apiextensions-apiserver v0.32.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20241127205056-99599406b04f // indirect
 	k8s.io/utils v0.0.0-20241210054802-24370beab758 // indirect
