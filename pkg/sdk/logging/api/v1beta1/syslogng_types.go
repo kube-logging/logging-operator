@@ -36,11 +36,11 @@ const (
 	defaultSyslogngImageRepository    = "ghcr.io/axoflow/axosyslog"
 	defaultSyslogngImageTag           = "4.9.0"
 	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
-	configReloaderImageTag            = "v1.5.0"
+	configReloaderImageTag            = "v1.6.0"
 	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
-	prometheusExporterImageTag        = "0.0.7"
+	prometheusExporterImageTag        = "0.0.9"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.8.0"
+	bufferVolumeImageTag              = "v0.9.0"
 )
 
 // +kubebuilder:object:generate=true
