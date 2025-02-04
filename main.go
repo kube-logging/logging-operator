@@ -31,11 +31,14 @@ import (
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/selection"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/klog/v2"
@@ -48,6 +51,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
+	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
+
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
 	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
 	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
@@ -56,7 +61,6 @@ import (
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
-	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -84,6 +88,8 @@ func main() {
 	var enableprofile bool
 	var namespace string
 	var loggingRef string
+	var watchLabeledChildren bool
+	var watchLabeledSecrets bool
 	var finalizerCleanup bool
 	var enableTelemetryControllerRoute bool
 	var klogLevel int
@@ -98,6 +104,8 @@ func main() {
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
+	flag.BoolVar(&watchLabeledChildren, "watch-labeled-children", false, "Only watch child resources with logging operator's name label selector: app.kubernetes.io/name: fluentd|fluentbit|syslog-ng")
+	flag.BoolVar(&watchLabeledSecrets, "watch-labeled-secrets", false, "Only watch secrets with the following label selector: logging.banzaicloud.io/watch: enabled")
 	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
 	flag.BoolVar(&enableTelemetryControllerRoute, "enable-telemetry-controller-route", false, "Enable the Telemetry Controller route for Logging resources")
 	flag.StringVar(&syncPeriod, "sync-period", "", "SyncPeriod determines the minimum frequency at which watched resources are reconciled. Defaults to 10 hours. Parsed using time.ParseDuration.")
@@ -152,10 +160,18 @@ func main() {
 		mgrOptions.WebhookServer = webhookServer
 	}
 
-	customMgrOptions, err := setupCustomCache(&mgrOptions, syncPeriod, namespace, loggingRef)
+	customMgrOptions, err := setupCustomCache(&mgrOptions, syncPeriod, namespace, loggingRef, watchLabeledChildren)
 	if err != nil {
 		setupLog.Error(err, "unable to set up custom cache settings")
 		os.Exit(1)
+	}
+	if watchLabeledSecrets {
+		if customMgrOptions.Cache.ByObject == nil {
+			customMgrOptions.Cache.ByObject = make(map[client.Object]cache.ByObject)
+		}
+		customMgrOptions.Cache.ByObject[&corev1.Secret{}] = cache.ByObject{
+			Label: labels.Set{"logging.banzaicloud.io/watch": "enabled"}.AsSelector(),
+		}
 	}
 
 	if enableprofile {
@@ -312,7 +328,7 @@ func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 	return nil
 }
 
-func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace string, loggingRef string) (*ctrl.Options, error) {
+func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace string, loggingRef string, watchLabeledChildren bool) (*ctrl.Options, error) {
 	if syncPeriod != "" {
 		duration, err := time.ParseDuration(syncPeriod)
 		if err != nil {
@@ -321,42 +337,92 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 		mgrOptions.Cache.SyncPeriod = &duration
 	}
 
-	if namespace == "" && loggingRef == "" {
-		return mgrOptions, nil
-	}
+	if namespace != "" || loggingRef != "" || watchLabeledChildren {
+		var namespaceSelector fields.Selector
+		var labelSelector labels.Selector
+		if namespace != "" {
+			namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
+			mgrOptions.Cache.DefaultNamespaces = map[string]cache.Config{
+				namespace: {
+					FieldSelector: namespaceSelector,
+				},
+			}
+		}
+		if loggingRef != "" {
+			labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
+		}
+		if watchLabeledChildren {
+			if labelSelector == nil {
+				labelSelector = labels.NewSelector()
+			}
+			// It would be much better to watch for a common label, but we don't have that yet.
+			// Adding a new label would recreate statefulsets and daemonsets which would be undesirable.
+			// Let's see how this works in the wild. We can optimize in a subsequent iteration.
+			req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{
+				"fluentd", "syslog-ng", "fluentbit",
+			})
+			if err != nil {
+				return nil, err
+			}
+			labelSelector = labelSelector.Add(*req)
+		}
 
-	var namespaceSelector fields.Selector
-	var labelSelector labels.Selector
-	if namespace != "" {
-		namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
-	}
-	if loggingRef != "" {
-		labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
-	}
-
-	mgrOptions.Cache = cache.Options{
-		ByObject: map[client.Object]cache.ByObject{
-			&corev1.Pod{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
+		mgrOptions.Cache = cache.Options{
+			ByObject: map[client.Object]cache.ByObject{
+				&corev1.Pod{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&batchv1.Job{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.Service{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.Role{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.ClusterRole{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.RoleBinding{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&rbacv1.ClusterRoleBinding{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.ServiceAccount{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.DaemonSet{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.StatefulSet{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&appsv1.Deployment{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.PersistentVolumeClaim{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
+				&corev1.ConfigMap{}: {
+					Field: namespaceSelector,
+					Label: labelSelector,
+				},
 			},
-			&appsv1.DaemonSet{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&appsv1.StatefulSet{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&appsv1.Deployment{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-			&corev1.PersistentVolumeClaim{}: {
-				Field: namespaceSelector,
-				Label: labelSelector,
-			},
-		},
+		}
 	}
 
 	return mgrOptions, nil

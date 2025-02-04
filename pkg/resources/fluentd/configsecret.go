@@ -21,9 +21,11 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 type fluentdConfig struct {
@@ -96,10 +98,14 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 		return nil, nil, err
 	}
 	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.fluentdSpec.FluentLogDestination))
+	meta := r.FluentdObjectMeta(SecretConfigName, ComponentFluentd)
+	meta.Labels = utils.MergeLabels(
+		meta.Labels,
+		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+	)
 	configs := &corev1.Secret{
-		ObjectMeta: r.FluentdObjectMeta(SecretConfigName, ComponentFluentd),
+		ObjectMeta: meta,
 		Data:       configMap,
 	}
-
 	return configs, reconciler.StatePresent, nil
 }

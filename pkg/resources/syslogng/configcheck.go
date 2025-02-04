@@ -22,6 +22,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -163,8 +164,13 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
+	meta := r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck)
+	meta.Labels = utils.MergeLabels(
+		meta.Labels,
+		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+	)
 	return &corev1.Secret{
-		ObjectMeta: r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck),
+		ObjectMeta: meta,
 		Data: map[string][]byte{
 			configKey: []byte(r.config),
 		},
@@ -178,6 +184,11 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 	}
 	if secret, ok := obj.(*corev1.Secret); ok {
 		secret.ObjectMeta = r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-output-%s", hashKey), ComponentConfigCheck)
+		secret.ObjectMeta.Labels = utils.MergeLabels(
+			secret.ObjectMeta.Labels,
+			map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+		)
+
 		return secret, nil
 	}
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")

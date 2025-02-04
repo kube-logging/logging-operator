@@ -21,6 +21,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -62,6 +63,10 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 			Namespace: r.Logging.Spec.ControlNamespace,
 		},
 	}
+	syslogNGOutputSecret.ObjectMeta.Labels = utils.MergeLabels(
+		syslogNGOutputSecret.ObjectMeta.Labels,
+		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+	)
 	if syslogNGOutputSecret.Data == nil {
 		syslogNGOutputSecret.Data = make(map[string][]byte)
 	}

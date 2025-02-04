@@ -16,6 +16,7 @@ package syslogng
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -27,6 +28,10 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			configKey: []byte(r.config),
 		},
 	}
+	secret.ObjectMeta.Labels = utils.MergeLabels(
+		secret.ObjectMeta.Labels,
+		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
+	)
 
 	return secret, reconciler.StatePresent, nil
 }
