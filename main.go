@@ -342,10 +342,11 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 		var labelSelector labels.Selector
 		if namespace != "" {
 			namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
-			mgrOptions.Cache.DefaultNamespaces = map[string]cache.Config{
-				namespace: {
-					FieldSelector: namespaceSelector,
-				},
+			if mgrOptions.Cache.DefaultNamespaces == nil {
+				mgrOptions.Cache.DefaultNamespaces = make(map[string]cache.Config)
+			}
+			mgrOptions.Cache.DefaultNamespaces[namespace] = cache.Config{
+				FieldSelector: namespaceSelector,
 			}
 		}
 		if loggingRef != "" {
@@ -358,70 +359,34 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 			// It would be much better to watch for a common label, but we don't have that yet.
 			// Adding a new label would recreate statefulsets and daemonsets which would be undesirable.
 			// Let's see how this works in the wild. We can optimize in a subsequent iteration.
-			req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{
-				"fluentd", "syslog-ng", "fluentbit",
-			})
+			req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{"fluentd", "syslog-ng", "fluentbit"})
 			if err != nil {
 				return nil, err
 			}
 			labelSelector = labelSelector.Add(*req)
 		}
 
-		mgrOptions.Cache = cache.Options{
-			ByObject: map[client.Object]cache.ByObject{
-				&corev1.Pod{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&batchv1.Job{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&corev1.Service{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&rbacv1.Role{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&rbacv1.ClusterRole{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&rbacv1.RoleBinding{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&rbacv1.ClusterRoleBinding{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&corev1.ServiceAccount{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&appsv1.DaemonSet{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&appsv1.StatefulSet{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&appsv1.Deployment{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&corev1.PersistentVolumeClaim{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-				&corev1.ConfigMap{}: {
-					Field: namespaceSelector,
-					Label: labelSelector,
-				},
-			},
+		if mgrOptions.Cache.ByObject == nil {
+			mgrOptions.Cache.ByObject = make(map[client.Object]cache.ByObject)
+		}
+		objectsToWatch := map[client.Object]cache.ByObject{
+			&corev1.Pod{}:                   {Field: namespaceSelector, Label: labelSelector},
+			&batchv1.Job{}:                  {Field: namespaceSelector, Label: labelSelector},
+			&corev1.Service{}:               {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.Role{}:                  {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.ClusterRole{}:           {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.RoleBinding{}:           {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.ClusterRoleBinding{}:    {Field: namespaceSelector, Label: labelSelector},
+			&corev1.ServiceAccount{}:        {Field: namespaceSelector, Label: labelSelector},
+			&appsv1.DaemonSet{}:             {Field: namespaceSelector, Label: labelSelector},
+			&appsv1.StatefulSet{}:           {Field: namespaceSelector, Label: labelSelector},
+			&appsv1.Deployment{}:            {Field: namespaceSelector, Label: labelSelector},
+			&corev1.PersistentVolumeClaim{}: {Field: namespaceSelector, Label: labelSelector},
+			&corev1.ConfigMap{}:             {Field: namespaceSelector, Label: labelSelector},
+		}
+
+		for obj, config := range objectsToWatch {
+			mgrOptions.Cache.ByObject[obj] = config
 		}
 	}
 
