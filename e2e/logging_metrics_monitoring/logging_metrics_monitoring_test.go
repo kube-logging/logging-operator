@@ -289,7 +289,7 @@ func waitForPodReady(ctx context.Context, c client.Client, pod *corev1.Pod) erro
 	}))
 }
 
-func checkServiceMonitorAvailability(serviceMonitors []*v1.ServiceMonitor) error {
+func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
 	if len(serviceMonitors) == 0 {
 		return errors.New("no service monitors found")
 	}
