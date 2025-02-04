@@ -1,16 +1,14 @@
 module github.com/kube-logging/logging-operator/e2e
 
-go 1.23.3
-
-toolchain go1.23.5
+go 1.23.5
 
 require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.37.0
-	github.com/kube-logging/logging-operator v0.0.0-20250127152226-1410004007d0
+	github.com/kube-logging/logging-operator v0.0.0-20250204114012-5c5cda7a590a
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.79.2
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.80.0
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
 	helm.sh/helm/v3 v3.17.0
