@@ -342,12 +342,6 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 		var labelSelector labels.Selector
 		if namespace != "" {
 			namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
-			if mgrOptions.Cache.DefaultNamespaces == nil {
-				mgrOptions.Cache.DefaultNamespaces = make(map[string]cache.Config)
-			}
-			mgrOptions.Cache.DefaultNamespaces[namespace] = cache.Config{
-				FieldSelector: namespaceSelector,
-			}
 		}
 		if loggingRef != "" {
 			labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
@@ -373,10 +367,11 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 			&corev1.Pod{}:                   {Field: namespaceSelector, Label: labelSelector},
 			&batchv1.Job{}:                  {Field: namespaceSelector, Label: labelSelector},
 			&corev1.Service{}:               {Field: namespaceSelector, Label: labelSelector},
+			&corev1.Secret{}:                {Field: namespaceSelector, Label: labelSelector},
 			&rbacv1.Role{}:                  {Field: namespaceSelector, Label: labelSelector},
-			&rbacv1.ClusterRole{}:           {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.ClusterRole{}:           {Label: labelSelector},
 			&rbacv1.RoleBinding{}:           {Field: namespaceSelector, Label: labelSelector},
-			&rbacv1.ClusterRoleBinding{}:    {Field: namespaceSelector, Label: labelSelector},
+			&rbacv1.ClusterRoleBinding{}:    {Label: labelSelector},
 			&corev1.ServiceAccount{}:        {Field: namespaceSelector, Label: labelSelector},
 			&appsv1.DaemonSet{}:             {Field: namespaceSelector, Label: labelSelector},
 			&appsv1.StatefulSet{}:           {Field: namespaceSelector, Label: labelSelector},
