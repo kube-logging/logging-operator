@@ -164,7 +164,7 @@ list: ## List all make targets
 manager: codegen fmt vet ## Build manager binary
 	go build -o bin/manager main.go
 
-HELM_MANIFEST_OVERRIDE='s@manager-role@{{ template "logging-operator.fullname" . }}\n  annotations:\n  {{- if .Values.rbac.retainOnDelete }}\n    "helm.sh/resource-policy": keep\n  {{- end }}@'
+HELM_MANIFEST_OVERRIDE='s@manager-role@{{ template "logging-operator.fullname" . }}\n  annotations:\n  {{- if .Values.rbac.retainOnDelete }}\n    "helm.sh/resource-policy": keep\n  {{- end }}\n  labels:\n{{ include "logging-operator.labels" . | indent 4 }}@'
 
 .PHONY: manifests
 manifests: ${CONTROLLER_GEN} ## Generate manifests e.g. CRD, RBAC etc.
