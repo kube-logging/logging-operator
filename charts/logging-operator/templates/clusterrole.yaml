@@ -8,6 +8,8 @@ metadata:
   {{- if .Values.rbac.retainOnDelete }}
     "helm.sh/resource-policy": keep
   {{- end }}
+  labels:
+{{ include "logging-operator.labels" . | indent 4 }}
 rules:
 - apiGroups:
   - ""
