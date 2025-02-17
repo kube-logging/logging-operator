@@ -19,13 +19,13 @@ require (
 	github.com/siliconbrain/go-seqs v0.14.0
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c
-	k8s.io/api v0.32.1
-	k8s.io/apiextensions-apiserver v0.32.1
-	k8s.io/apimachinery v0.32.1
-	k8s.io/client-go v0.32.1
+	golang.org/x/exp v0.0.0-20250215185904-eff6e970281f
+	k8s.io/api v0.32.2
+	k8s.io/apiextensions-apiserver v0.32.2
+	k8s.io/apimachinery v0.32.2
+	k8s.io/client-go v0.32.2
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/controller-runtime v0.20.1
+	sigs.k8s.io/controller-runtime v0.20.2
 )
 
 require (
@@ -39,7 +39,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.12.1 // indirect
 	github.com/evanphx/json-patch v5.9.0+incompatible // indirect
-	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
+	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
@@ -93,7 +93,7 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
