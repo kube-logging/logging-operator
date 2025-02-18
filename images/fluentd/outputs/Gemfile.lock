@@ -302,7 +302,7 @@ GEM
     prometheus-client (4.2.1)
     public_suffix (5.0.3)
     racc (1.8.0)
-    rack (3.0.9.1)
+    rack (3.0.12)
     rack-oauth2 (1.21.3)
       activesupport
       attr_required
