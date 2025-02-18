@@ -40,7 +40,7 @@ const (
 	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
 	prometheusExporterImageTag        = "0.0.9"
 	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.9.0"
+	bufferVolumeImageTag              = "v0.10.0"
 )
 
 // +kubebuilder:object:generate=true
