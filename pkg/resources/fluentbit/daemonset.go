@@ -175,22 +175,27 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
-	v = []corev1.VolumeMount{
-		{
+	v = []corev1.VolumeMount{}
+
+	if r.fluentbitSpec.EnableVarLibContainers == nil || *r.fluentbitSpec.EnableVarLibContainers {
+		v = append(v, corev1.VolumeMount{
 			Name:      "varlibcontainers",
 			ReadOnly:  true,
 			MountPath: "/var/lib/docker/containers",
-		},
-		{
+		})
+	}
+
+	v = append(v,
+		corev1.VolumeMount{
 			Name:      "varlogs",
 			ReadOnly:  true,
 			MountPath: "/var/log/",
 		},
-		{
+		corev1.VolumeMount{
 			Name:      "config",
 			MountPath: OperatorConfigPath,
 		},
-	}
+	)
 
 	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.VolumeMount{
@@ -201,28 +206,31 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 	}
 
 	if *r.fluentbitSpec.TLS.Enabled {
-		tlsRelatedVolume := []corev1.VolumeMount{
-			{
-				Name:      "fluent-bit-tls",
-				MountPath: "/fluent-bit/tls/",
-			},
-		}
-		v = append(v, tlsRelatedVolume...)
+		v = append(v, corev1.VolumeMount{
+			Name:      "fluent-bit-tls",
+			MountPath: "/fluent-bit/tls/",
+		})
 	}
+
 	return
 }
 
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
-	v = []corev1.Volume{
-		{
+	v = []corev1.Volume{}
+
+	if r.fluentbitSpec.EnableVarLibContainers == nil || *r.fluentbitSpec.EnableVarLibContainers {
+		v = append(v, corev1.Volume{
 			Name: "varlibcontainers",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
 					Path: r.fluentbitSpec.MountPath,
 				},
 			},
-		},
-		{
+		})
+	}
+
+	v = append(v,
+		corev1.Volume{
 			Name: "varlogs",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
@@ -230,7 +238,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		},
-	}
+	)
 
 	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.Volume{
@@ -243,15 +251,14 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	}
 
 	if r.fluentbitSpec.CustomConfigSecret == "" {
-		volume := corev1.Volume{
+		v = append(v, corev1.Volume{
 			Name: "config",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.nameProvider.ComponentName(fluentBitSecretConfigName),
 				},
 			},
-		}
-		v = append(v, volume)
+		})
 	} else {
 		v = append(v, corev1.Volume{
 			Name: "config",
@@ -262,19 +269,21 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 			},
 		})
 	}
+
 	if *r.fluentbitSpec.TLS.Enabled {
-		tlsRelatedVolume := corev1.Volume{
+		v = append(v, corev1.Volume{
 			Name: "fluent-bit-tls",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: r.fluentbitSpec.TLS.SecretName,
 				},
 			},
-		}
-		v = append(v, tlsRelatedVolume)
+		})
 	}
+
 	return
 }
+
 
 func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
 	port := int32(defaultBufferVolumeMetricsPort)

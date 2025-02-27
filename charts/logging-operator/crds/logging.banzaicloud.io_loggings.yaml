@@ -876,6 +876,10 @@ spec:
                 type: string
               fluentbit:
                 properties:
+                  enableVarLibContainers:
+                    type: boolean
+                    description: "Enable or disable mounting /var/lib/docker/containers"
+                    default: true
                   HostNetwork:
                     type: boolean
                   affinity:

@@ -108,6 +108,7 @@ type FluentbitSpec struct {
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
 	// Disable Kubernetes metadata filter
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
+	EnableVarLibContainers  *bool         `json:"enableVarLibContainers,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume       volume.KubernetesVolume        `json:"bufferStorageVolume,omitempty"`
