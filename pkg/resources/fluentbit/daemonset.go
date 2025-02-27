@@ -177,11 +177,6 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 	v = []corev1.VolumeMount{
 		{
-			Name:      "varlibcontainers",
-			ReadOnly:  true,
-			MountPath: "/var/lib/docker/containers",
-		},
-		{
 			Name:      "varlogs",
 			ReadOnly:  true,
 			MountPath: "/var/log/",
@@ -190,6 +185,14 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 			Name:      "config",
 			MountPath: OperatorConfigPath,
 		},
+	}
+
+	if !*r.fluentbitSpec.DisableVarLibDockerContainers {
+		v = append(v, corev1.VolumeMount{
+			Name:      "varlibcontainers",
+			ReadOnly:  true,
+			MountPath: "/var/lib/docker/containers",
+		})
 	}
 
 	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
@@ -215,14 +218,6 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
-			Name: "varlibcontainers",
-			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: r.fluentbitSpec.MountPath,
-				},
-			},
-		},
-		{
 			Name: "varlogs",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
@@ -230,6 +225,17 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				},
 			},
 		},
+	}
+
+	if !*r.fluentbitSpec.DisableVarLibDockerContainers {
+		v = append(v, corev1.Volume{
+			Name: "varlibcontainers",
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: r.fluentbitSpec.MountPath,
+				},
+			},
+		})
 	}
 
 	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
