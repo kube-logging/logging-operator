@@ -99,6 +99,11 @@ Available in Logging operator version 4.2 and later. Specify a custom parser fil
 Disable Kubernetes metadata filter 
 
 
+### disableVarLibDockerContainers (*bool, optional) {#fluentbitspec-disablevarlibdockercontainers}
+
+DisableVarLibDockerContainers controls whether the /var/lib/docker/containers volume is mounted. If true, the volume is NOT mounted. If false (default), the volume is mounted. 
+
+
 ### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
 
 

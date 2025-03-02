@@ -1136,6 +1136,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = new(FluentbitTLS)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.DisableVarLibDockerContainers != nil {
+		in, out := &in.DisableVarLibDockerContainers, &out.DisableVarLibDockerContainers
+		*out = new(bool)
+		**out = **in
+	}
 	in.Resources.DeepCopyInto(&out.Resources)
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
