@@ -267,6 +267,10 @@ func (logging *Logging) WatchAllNamespaces() bool {
 
 func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 	if fluentbitSpec != nil { // nolint:nestif
+		// Set default value for DisableVarLibDockerContainers to false (meaning volume is mounted by default)
+		if fluentbitSpec.DisableVarLibDockerContainers == nil {
+			fluentbitSpec.DisableVarLibDockerContainers = util.BoolPointer(false)
+		}
 		if fluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
 		}

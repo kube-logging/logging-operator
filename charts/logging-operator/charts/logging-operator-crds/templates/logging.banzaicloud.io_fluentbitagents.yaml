@@ -1140,6 +1140,8 @@ spec:
                 type: object
               disableKubernetesFilter:
                 type: boolean
+              disableVarLibDockerContainers:
+                type: boolean
               dnsConfig:
                 properties:
                   nameservers:
