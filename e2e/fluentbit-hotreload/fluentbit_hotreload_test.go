@@ -92,7 +92,7 @@ func TestFluentbitHotReload(t *testing.T) {
 			},
 		}))
 
-		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels, &v1beta1.HotReload{})
+		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels)
 		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
 
 		aggregatorLabels := map[string]string{

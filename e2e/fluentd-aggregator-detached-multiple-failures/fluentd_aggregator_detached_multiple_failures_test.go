@@ -84,6 +84,12 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 					Network: &v1beta1.FluentbitNetwork{
 						Keepalive: utils.BoolPointer(false),
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 			},
 		}
@@ -98,6 +104,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				Image: v1beta1.ImageSpec{
 					Repository: common.FluentdImageRepo,
 					Tag:        common.FluentdImageTag,
+				},
+				ConfigReloaderImage: v1beta1.ImageSpec{
+					Repository: common.ConfigReloaderRepo,
+					Tag:        common.ConfigReloaderTag,
 				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
@@ -130,6 +140,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				Image: v1beta1.ImageSpec{
 					Repository: common.FluentdImageRepo,
 					Tag:        common.FluentdImageTag,
+				},
+				ConfigReloaderImage: v1beta1.ImageSpec{
+					Repository: common.ConfigReloaderRepo,
+					Tag:        common.ConfigReloaderTag,
 				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{

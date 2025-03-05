@@ -154,7 +154,7 @@ func (f *FluentdSpec) SetDefaults() error {
 			if Version == "" {
 				f.Image.Tag = DefaultFluentdImageTag
 			} else {
-				f.Image.Tag = Version
+				f.Image.Tag = fmt.Sprintf("%s-%s", Version, "full")
 			}
 		}
 		if f.Image.PullPolicy == "" {
@@ -239,7 +239,13 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.ConfigReloaderImage.Repository = DefaultFluentdConfigReloaderImageRepository
 		}
 		if f.ConfigReloaderImage.Tag == "" {
-			f.ConfigReloaderImage.Tag = DefaultFluentdConfigReloaderImageTag
+			if f.ConfigReloaderImage.Tag == "" {
+				if Version == "" {
+					f.ConfigReloaderImage.Tag = DefaultFluentdConfigReloaderImageTag
+				} else {
+					f.ConfigReloaderImage.Tag = Version
+				}
+			}
 		}
 		if f.ConfigReloaderImage.PullPolicy == "" {
 			f.ConfigReloaderImage.PullPolicy = "IfNotPresent"

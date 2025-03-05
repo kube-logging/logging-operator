@@ -133,6 +133,12 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					BufferVolumeMetrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
 					Metrics: &v1beta1.Metrics{
@@ -183,11 +189,21 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					BufferVolumeMetrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
 						Repository: common.FluentdImageRepo,
 						Tag:        common.FluentdImageTag,
+					},
+					ConfigReloaderImage: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
 					},
 					Metrics: &v1beta1.Metrics{
 						ServiceMonitor: true,

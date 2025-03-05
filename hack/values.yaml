@@ -13,6 +13,14 @@ logging:
     image:
       repository: fluentd-full
       tag: local
+    configReloaderImage:
+      repository: config-reloader
+      tag: local
+  fluentbit:
+    configHotReload:
+      image:
+        repository: config-reloader
+        tag: local
   clusterFlows:
     - name: all
       spec:

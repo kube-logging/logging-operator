@@ -90,7 +90,7 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 			},
 		}))
 
-		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels, nil)
+		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels)
 		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
 		common.LoggingRoute(ctx, t, c.GetClient())
 

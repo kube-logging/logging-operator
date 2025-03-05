@@ -102,7 +102,7 @@ jobs:
     uses: ./.github/workflows/dependency-images.yaml
     with:
       publish: ${{ github.event_name == 'push' }}
-      image-types: "full"
+      fluentd-image-types: "full"
     permissions:
       contents: read
       packages: write

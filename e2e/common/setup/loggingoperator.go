@@ -37,6 +37,11 @@ var (
 			tag:        "local",
 		},
 		{
+			lookupEnv:  "CONFIG_RELOADER_IMAGE",
+			repository: "config-reloader",
+			tag:        "local",
+		},
+		{
 			lookupEnv:  "FLUENTD_IMAGE",
 			repository: "fluentd-full",
 			tag:        "local",

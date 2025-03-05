@@ -29,6 +29,10 @@ jobs:
             target: e2e-test
             build_args: GO_BUILD_FLAGS=-cover -covermode=atomic
             output: controller.tar
+          - image: config-reloader
+            context: images/config-reloader
+            tags: config-reloader:local
+            output: config-reloader.tar
 
     steps:
       - name: Checkout
@@ -81,6 +85,7 @@ jobs:
       - name: Load image
         run: |
           docker load --input /tmp/fluentd-full.tar
+          docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
@@ -136,6 +141,7 @@ jobs:
       - name: Load image
         run: |
           docker load --input /tmp/fluentd-full.tar
+          docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 

@@ -8,7 +8,7 @@ This directory is a fork of @zvlb's repository you can find the origin here -> <
 
 # Kubernetes Config (ConfigMap and Secret) Reloader
 
-This progect - based on <https://github.com/jimmidyson/configmap-reload> and <https://github.com/prometheus-operator/prometheus-operator/pkgs/container/prometheus-config-reloader>
+This project - based on <https://github.com/jimmidyson/configmap-reload> and <https://github.com/prometheus-operator/prometheus-operator/pkgs/container/prometheus-config-reloader>
 
 **config-reloader** is a simple binary to trigger a reload when Kubernetes ConfigMaps or Secrets are updated.
 It watches mounted volume dirs and notifies the target process changed files on dirs.
@@ -22,7 +22,7 @@ If changes exist - send webhook.
 - Init mode (stop after unarchive)
 - Prometheus metrics
 
-It is available as a Docker image at ghcr.io/banzaicloud/config-reloader:latest
+It is available as a Docker image at `ghcr.io/kube-logging/logging-operator/config-reloader`
 
 ### Usage
 

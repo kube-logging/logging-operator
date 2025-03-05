@@ -39,6 +39,7 @@ GOVERSION := $(shell go env GOVERSION)
 
 # Image name to use for building/pushing image targets
 FLUENTD_IMG ?= fluentd-full:local
+CONFIG_RELOADER_IMG ?= config-reloader:local
 OPERATOR_IMG ?= controller:local
 OPERATOR_IMG_DEBUG ?= controller:debug
 
@@ -108,6 +109,7 @@ docker-build-debug: ## Build the debug docker image
 docker-build-e2e-test: ## Build the coverage docker image
 	${DOCKER} build --build-arg GO_BUILD_FLAGS="-cover -covermode=atomic" -t ${OPERATOR_IMG} --target e2e-test .
 	sed -i'' -e 's@image: .*@image: '"${OPERATOR_IMG}"'@' ./config/default/manager_image_patch.yaml
+	${DOCKER} build -t ${CONFIG_RELOADER_IMG} images/config-reloader
 	${DOCKER} build -t ${FLUENTD_IMG} --target full images/fluentd
 
 .PHONY: docker-build-drain-watch
@@ -218,6 +220,7 @@ test-e2e-ci: ${BIN}
 test-e2e-nodeps:
 	cd e2e && \
 		LOGGING_OPERATOR_IMAGE="${OPERATOR_IMG}" \
+		CONFIG_RELOADER_IMAGE="${CONFIG_RELOADER_IMG}" \
 		FLUENTD_IMAGE="${FLUENTD_IMG}" \
 		KIND_PATH="$(KIND)" \
 		KIND_IMAGE="$(KIND_IMAGE)" \

@@ -130,7 +130,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: GO_BUILD_FLAGS=-ldflags=-X=github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1.Version=${{ inputs.version }}-full
+          build-args: GO_BUILD_FLAGS=-ldflags=-X=github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1.Version=${{ inputs.version }}
           outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
           # push: ${{ inputs.publish }}
 
