@@ -104,6 +104,10 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
+				ConfigReloadImage: &v1beta1.BasicImageSpec{
+					Repository: common.SyslogNGReloaderRepo,
+					Tag:        common.SyslogNGReloaderTag,
+				},
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{
@@ -157,6 +161,10 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
+				ConfigReloadImage: &v1beta1.BasicImageSpec{
+					Repository: common.SyslogNGReloaderRepo,
+					Tag:        common.SyslogNGReloaderTag,
+				},
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{

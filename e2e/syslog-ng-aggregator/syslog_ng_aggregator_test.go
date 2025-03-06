@@ -95,6 +95,10 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					ConfigReloadImage: &v1beta1.BasicImageSpec{
+						Repository: common.SyslogNGReloaderRepo,
+						Tag:        common.SyslogNGReloaderTag,
+					},
 					StatefulSetOverrides: &typeoverride.StatefulSet{
 						Spec: typeoverride.StatefulSetSpec{
 							Template: typeoverride.PodTemplateSpec{

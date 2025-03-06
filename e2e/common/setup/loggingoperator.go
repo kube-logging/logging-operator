@@ -42,6 +42,11 @@ var (
 			tag:        "local",
 		},
 		{
+			lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
+			repository: "syslogng-reload",
+			tag:        "local",
+		},
+		{
 			lookupEnv:  "FLUENTD_IMAGE",
 			repository: "fluentd-full",
 			tag:        "local",

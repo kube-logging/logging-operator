@@ -141,6 +141,10 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					ConfigReloadImage: &v1beta1.BasicImageSpec{
+						Repository: common.SyslogNGReloaderRepo,
+						Tag:        common.SyslogNGReloaderTag,
+					},
 					Metrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},

@@ -38,6 +38,8 @@ const (
 	FluentdImageTag    = "local"
 	ConfigReloaderRepo = "config-reloader"
 	ConfigReloaderTag  = "local"
+	SyslogNGReloaderRepo = "syslog-ng-reloader"
+	SyslogNGReloaderTag  = "local"
 )
 
 var sequence uint32

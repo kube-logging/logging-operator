@@ -33,6 +33,10 @@ jobs:
             context: images/config-reloader
             tags: config-reloader:local
             output: config-reloader.tar
+          - image: syslog-ng-reloader
+            context: images/syslog-ng-reloader
+            tags: syslog-ng-reloader:local
+            output: syslog-ng-reloader.tar
 
     steps:
       - name: Checkout
@@ -86,6 +90,7 @@ jobs:
         run: |
           docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/config-reloader.tar
+          docker load --input /tmp/syslog-ng-reloader.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
@@ -142,6 +147,7 @@ jobs:
         run: |
           docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/config-reloader.tar
+          docker load --input /tmp/syslog-ng-reloader.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 

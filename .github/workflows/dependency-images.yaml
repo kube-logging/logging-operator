@@ -40,3 +40,14 @@ jobs:
       packages: write
       id-token: write
       security-events: write
+
+  syslog-ng-reloader:
+    name: Syslog-ng reloader
+    uses: ./.github/workflows/syslog-ng-reloader.yaml
+    with:
+      publish: ${{ inputs.publish }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
