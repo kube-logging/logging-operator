@@ -1,0 +1,398 @@
+name: Fluentd images
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: Publish artifacts to the artifact store
+        default: false
+        required: false
+        type: boolean
+      fluentd-image-types:
+        description: 'Types of images to build (comma-separated: base,filters,full)'
+        type: string
+        default: 'base,filters,full'
+        required: false
+    outputs:
+      fluentd-image-name:
+        description: Container image name
+        value: ${{ jobs.fluentd.outputs.name }}
+      fluentd-image-digest:
+        description: Container image digest
+        value: ${{ jobs.fluentd.outputs.digest }}
+      fluentd-image-tag:
+        description: Container image tag
+        value: ${{ jobs.fluentd.outputs.tag }}
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-matrix:
+    name: Prepare matrix
+    runs-on: ubuntu-latest
+
+    outputs:
+      image-types: ${{ steps.set-matrix.outputs.image-types }}
+
+    steps:
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          IMAGE_TYPES=$(echo '${{ inputs.fluentd-image-types }}' | jq -R -c 'split(",")')
+          echo "image-types=${IMAGE_TYPES}" >> $GITHUB_OUTPUT
+
+  fluentd-image-export:
+    name: Fluentd image export
+    needs: prepare-matrix
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'linux-arm64' || 'ubuntu-latest' }}
+    if: ${{ !inputs.publish }}
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    outputs:
+      name: ${{ steps.image-name.outputs.value }}
+      digest: ${{ steps.build.outputs.digest }}
+      tag: ${{ steps.meta.outputs.version }}
+
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+        image-type: ${{ fromJson(needs.prepare-matrix.outputs.image-types) }}
+
+    steps:
+      - name: Prepare arm64 environment
+        if: matrix.platform == 'linux/arm64'
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update && sudo apt-get install -y acl docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+          USERID=$(id -u)
+          sudo setfacl --modify user:${USERID}:rw /var/run/docker.sock
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3.3.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+
+      - name: Set image name
+        id: image-name
+        run: echo "value=ghcr.io/${{ github.repository }}/fluentd" >> "$GITHUB_OUTPUT"
+
+      - name: Set platform
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Gather build metadata
+        id: meta
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
+        with:
+          images: ${{ steps.image-name.outputs.value }}
+          flavor: |
+            latest = false
+          tags: |
+            type=ref,event=branch,suffix=-${{ matrix.image-type }}
+            type=ref,event=pr,prefix=pr-,suffix=-${{ matrix.image-type }}
+            type=semver,pattern={{raw}},suffix=-${{ matrix.image-type }}
+            type=raw,value=latest,enable={{is_default_branch}},suffix=-${{ matrix.image-type }}
+          labels: |
+            org.opencontainers.image.description=Custom Fluentd image for the Logging operator.
+            org.opencontainers.image.title=Logging operator Fluentd image
+            org.opencontainers.image.authors=Kube logging authors
+            org.opencontainers.image.documentation=https://kube-logging.dev/docs/
+
+      - name: Build and push fluentd-${{ matrix.image-type }}-${{ matrix.platform }} image
+        id: build
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
+        with:
+          context: images/fluentd
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: ${{ matrix.image-type }}
+          outputs: type=oci,dest=image.tar,name=${{ steps.image-name.outputs.value }},annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+
+      - name: Extract OCI tarball
+        run: |
+          mkdir -p image
+          tar -xf image.tar -C image
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
+        with:
+          input: image
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: "[${{ github.job }}-${{ matrix.image-type }}-${{ env.PLATFORM }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@dd746615b3b9d728a6a37ca2045b68ca76d4841a # v3.28.8
+        with:
+          sarif_file: trivy-results.sarif
+
+  fluentd-image-push:
+    name: Fluentd image push
+    needs: prepare-matrix
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'linux-arm64' || 'ubuntu-latest' }}
+    if: inputs.publish
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    outputs:
+      name: ${{ steps.image-name.outputs.value }}
+      digest: ${{ steps.build.outputs.digest }}
+      tag: ${{ steps.meta.outputs.version }}
+
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+        image-type: ${{ fromJson(needs.prepare-matrix.outputs.image-types) }}
+
+    steps:
+      - name: Prepare arm64 environment
+        if: matrix.platform == 'linux/arm64'
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update && sudo apt-get install -y acl docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+          USERID=$(id -u)
+          sudo setfacl --modify user:${USERID}:rw /var/run/docker.sock
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3.3.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
+
+      - name: Set image name
+        id: image-name
+        run: echo "value=ghcr.io/${{ github.repository }}/fluentd" >> "$GITHUB_OUTPUT"
+
+      - name: Gather build metadata
+        id: meta
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
+        with:
+          images: ${{ steps.image-name.outputs.value }}
+          labels: |
+            org.opencontainers.image.description=Custom Fluentd image for the Logging operator.
+            org.opencontainers.image.title=Logging operator Fluentd image
+            org.opencontainers.image.authors=Kube logging authors
+            org.opencontainers.image.documentation=https://kube-logging.dev/docs/
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push fluentd-${{ matrix.image-type }}-${{ matrix.platform }} image
+        id: build
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
+        with:
+          context: images/fluentd
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: ${{ matrix.image-type }}
+          outputs: type=image,push=true,push-by-digest=true,name=${{ steps.image-name.outputs.value }},annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+          platform=${{ matrix.platform }}
+          echo "PLATFORM=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Upload digest
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: digests-${{ matrix.image-type }}-${{ env.PLATFORM }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign image with GitHub OIDC Token
+        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          images=""
+          for tag in ${TAGS[@]}; do
+            images+="${tag}@${DIGEST} "
+          done
+          
+          cosign sign --yes --rekor-url "https://rekor.sigstore.dev/" ${images}
+
+      - name: Verify signed image with cosign
+        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          for tag in ${TAGS[@]}; do
+            cosign verify "${tag}@${DIGEST}" \
+              --rekor-url "https://rekor.sigstore.dev/" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/fluentd-images.yaml@${{ github.ref }}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+          done
+
+  merge-fluentd-image:
+    name: Merge Fluentd image
+    runs-on: ubuntu-latest
+    needs: [prepare-matrix, fluentd-image-push]
+    if: inputs.publish
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+    strategy:
+      matrix:
+        image-type: ${{ fromJson(needs.prepare-matrix.outputs.image-types) }}
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Download digests
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.image-type }}-*
+          merge-multiple: true
+
+      - name: Gather build metadata
+        id: meta
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
+        with:
+          images: ${{ needs.fluentd-image-push.outputs.name }}
+          flavor: |
+            latest = false
+          tags: |
+            type=ref,event=branch,suffix=-${{ matrix.image-type }}
+            type=ref,event=pr,prefix=pr-,suffix=-${{ matrix.image-type }}
+            type=semver,pattern={{raw}},suffix=-${{ matrix.image-type }}
+            type=raw,value=latest,enable={{is_default_branch}},suffix=-${{ matrix.image-type }}
+
+      - name: Create multi-arch manifest list
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ needs.fluentd-image-push.outputs.name }}@sha256:%s ' *)
+
+      - name: Export digest
+        run: |
+          DIGEST=$(docker buildx imagetools inspect ${{ needs.fluentd-image-push.outputs.name }}:${{ steps.meta.outputs.version }} --format '{{json .}}' | jq -r '.manifest.digest')
+          echo "DIGEST=$DIGEST" >> $GITHUB_ENV
+
+      - name: Sign image with GitHub OIDC Token
+        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ env.DIGEST }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          images=""
+          for tag in ${TAGS[@]}; do
+            images+="${tag}@${DIGEST} "
+          done
+          
+          cosign sign --yes --rekor-url "https://rekor.sigstore.dev/" ${images}
+
+      - name: Verify signed image with cosign
+        if: ${{ github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ env.DIGEST }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          for tag in ${TAGS[@]}; do
+            cosign verify "${tag}@${DIGEST}" \
+              --rekor-url "https://rekor.sigstore.dev/" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/fluentd-images.yaml@${{ github.ref }}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+          done
+
+      - name: Fetch image
+        run: skopeo --insecure-policy copy docker://${{ needs.fluentd-image-push.outputs.name }}:${{ steps.meta.outputs.version }} oci-archive:image.tar
+
+      - name: Extract OCI tarball
+        run: |
+          mkdir -p image
+          tar -xf image.tar -C image
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
+        with:
+          input: image
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: "[${{ github.job }}-${{ matrix.image-type }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@dd746615b3b9d728a6a37ca2045b68ca76d4841a # v3.28.8
+        with:
+          sarif_file: trivy-results.sarif

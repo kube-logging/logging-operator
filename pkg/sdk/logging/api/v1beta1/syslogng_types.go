@@ -33,14 +33,14 @@ type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
 type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
 const (
-	defaultSyslogngImageRepository    = "ghcr.io/axoflow/axosyslog"
-	defaultSyslogngImageTag           = "4.10.1"
-	configReloaderImageRepository     = "ghcr.io/kube-logging/syslogng-reload"
-	configReloaderImageTag            = "v1.6.0"
-	prometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
-	prometheusExporterImageTag        = "0.0.9"
-	bufferVolumeImageRepository       = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag              = "v0.10.0"
+	defaultSyslogngImageRepository       = "ghcr.io/axoflow/axosyslog"
+	defaultSyslogngImageTag              = "4.10.1"
+	defaultConfigReloaderImageRepository = "ghcr.io/kube-logging/logging-operator/syslog-ng-reloader"
+	defaultConfigReloaderImageTag        = "latest"
+	prometheusExporterImageRepository    = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	prometheusExporterImageTag           = "0.0.9"
+	bufferVolumeImageRepository          = "ghcr.io/kube-logging/node-exporter"
+	bufferVolumeImageTag                 = "v0.10.0"
 )
 
 // +kubebuilder:object:generate=true
@@ -149,9 +149,16 @@ func (s *SyslogNGSpec) SetDefaults() {
 			}
 		}
 		if s.ConfigReloadImage == nil {
-			s.ConfigReloadImage = &BasicImageSpec{
-				Repository: configReloaderImageRepository,
-				Tag:        configReloaderImageTag,
+			s.ConfigReloadImage = &BasicImageSpec{}
+		}
+		if s.ConfigReloadImage.Repository == "" {
+			s.ConfigReloadImage.Repository = defaultConfigReloaderImageRepository
+		}
+		if s.ConfigReloadImage.Tag == "" {
+			if Version == "" {
+				s.ConfigReloadImage.Tag = defaultConfigReloaderImageTag
+			} else {
+				s.ConfigReloadImage.Tag = Version
 			}
 		}
 		if s.MetricsExporterImage == nil {

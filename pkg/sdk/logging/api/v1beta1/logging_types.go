@@ -204,8 +204,8 @@ const (
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "v0.10.0"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
-	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentbitConfigReloaderImageTag        = "v0.0.7"
+	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/logging-operator/config-reloader"
+	DefaultFluentbitConfigReloaderImageTag        = "latest"
 	DefaultFluentdImageRepository                 = "ghcr.io/kube-logging/logging-operator/fluentd"
 	DefaultFluentdImageTag                        = "latest-full"
 	DefaultFluentdBufferStorageVolumeName         = "fluentd-buffer"
@@ -215,8 +215,8 @@ const (
 	DefaultFluentdDrainPauseImageTag              = "3.9"
 	DefaultFluentdVolumeModeImageRepository       = "docker.io/library/busybox"
 	DefaultFluentdVolumeModeImageTag              = "latest"
-	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/config-reloader"
-	DefaultFluentdConfigReloaderImageTag          = "v0.0.7"
+	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/logging-operator/config-reloader"
+	DefaultFluentdConfigReloaderImageTag          = "latest"
 	DefaultFluentdBufferVolumeImageRepository     = "ghcr.io/kube-logging/node-exporter"
 	DefaultFluentdBufferVolumeImageTag            = "v0.10.0"
 )
@@ -487,7 +487,11 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 				fluentbitSpec.ConfigHotReload.Image.Repository = DefaultFluentbitConfigReloaderImageRepository
 			}
 			if fluentbitSpec.ConfigHotReload.Image.Tag == "" {
-				fluentbitSpec.ConfigHotReload.Image.Tag = DefaultFluentbitConfigReloaderImageTag
+				if Version == "" {
+					fluentbitSpec.ConfigHotReload.Image.Tag = DefaultFluentbitConfigReloaderImageTag
+				} else {
+					fluentbitSpec.ConfigHotReload.Image.Tag = Version
+				}
 			}
 			if fluentbitSpec.ConfigHotReload.Image.PullPolicy == "" {
 				fluentbitSpec.ConfigHotReload.Image.PullPolicy = "IfNotPresent"

@@ -34,8 +34,12 @@ import (
 )
 
 const (
-	FluentdImageRepo = "fluentd-full"
-	FluentdImageTag  = "local"
+	FluentdImageRepo   = "fluentd-full"
+	FluentdImageTag    = "local"
+	ConfigReloaderRepo = "config-reloader"
+	ConfigReloaderTag  = "local"
+	SyslogNGReloaderRepo = "syslog-ng-reloader"
+	SyslogNGReloaderTag  = "local"
 )
 
 var sequence uint32
@@ -67,8 +71,7 @@ func LoggingInfra(
 	release string,
 	tag string,
 	buffer *output.Buffer,
-	producerLabels map[string]string,
-	hotReload *v1beta1.HotReload) {
+	producerLabels map[string]string) {
 
 	output := v1beta1.ClusterOutput{
 		ObjectMeta: v1.ObjectMeta{
@@ -112,8 +115,13 @@ func LoggingInfra(
 			Name: "infra",
 		},
 		Spec: v1beta1.FluentbitSpec{
-			LoggingRef:      "infra",
-			ConfigHotReload: hotReload,
+			LoggingRef: "infra",
+			ConfigHotReload: &v1beta1.HotReload{
+				Image: v1beta1.ImageSpec{
+					Repository: ConfigReloaderRepo,
+					Tag:        ConfigReloaderTag,
+				},
+			},
 		},
 	}
 	RequireNoError(t, c.Create(ctx, &agent))
@@ -132,6 +140,10 @@ func LoggingInfra(
 				Image: v1beta1.ImageSpec{
 					Repository: FluentdImageRepo,
 					Tag:        FluentdImageTag,
+				},
+				ConfigReloaderImage: v1beta1.ImageSpec{
+					Repository: ConfigReloaderRepo,
+					Tag:        ConfigReloaderTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{
@@ -206,6 +218,10 @@ func LoggingTenant(
 				Image: v1beta1.ImageSpec{
 					Repository: FluentdImageRepo,
 					Tag:        FluentdImageTag,
+				},
+				ConfigReloaderImage: v1beta1.ImageSpec{
+					Repository: ConfigReloaderRepo,
+					Tag:        ConfigReloaderTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{

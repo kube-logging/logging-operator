@@ -25,7 +25,7 @@ jobs:
     name: Dependency images
     uses: ./.github/workflows/dependency-images.yaml
     with:
-      image-types: "base,filters,full"
+      fluentd-image-types: "base,filters,full"
       publish: true
     permissions:
       contents: read

@@ -76,11 +76,22 @@ func TestWatchSelectors(t *testing.T) {
 			},
 			Spec: v1beta1.LoggingSpec{
 				ControlNamespace: ns,
-				FluentbitSpec:    &v1beta1.FluentbitSpec{},
+				FluentbitSpec: &v1beta1.FluentbitSpec{
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
+				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
 						Repository: common.FluentdImageRepo,
 						Tag:        common.FluentdImageTag,
+					},
+					ConfigReloaderImage: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
 					},
 				},
 			},

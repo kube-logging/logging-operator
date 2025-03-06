@@ -37,6 +37,16 @@ var (
 			tag:        "local",
 		},
 		{
+			lookupEnv:  "CONFIG_RELOADER_IMAGE",
+			repository: "config-reloader",
+			tag:        "local",
+		},
+		{
+			lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
+			repository: "syslogng-reload",
+			tag:        "local",
+		},
+		{
 			lookupEnv:  "FLUENTD_IMAGE",
 			repository: "fluentd-full",
 			tag:        "local",

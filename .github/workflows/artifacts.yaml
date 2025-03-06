@@ -78,7 +78,7 @@ jobs:
 
       - name: Set up Cosign
         uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
-        if: inputs.publish
+        if: ${{ inputs.publish }}
 
       - name: Set image name
         id: image-name
@@ -102,37 +102,28 @@ jobs:
             org.opencontainers.image.authors=Kube logging authors
             org.opencontainers.image.documentation=https://kube-logging.dev/docs/
 
-      # Multiple exporters are not supported yet
-      # See https://github.com/moby/buildkit/pull/2760
-      - name: Determine build output
-        uses: haya14busa/action-cond@94f77f7a80cd666cb3155084e428254fea4281fd # v1.2.1
-        id: build-output
-        with:
-          cond: ${{ inputs.publish }}
-          if_true: type=image,push=true
-          if_false: type=oci,dest=image.tar
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-        if: inputs.publish
+        if: ${{ inputs.publish }}
 
       - name: Build and push image
         id: build
         uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: GO_BUILD_FLAGS=-ldflags=-X=github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1.Version=${{ inputs.version }}-full
-          outputs: ${{ steps.build-output.outputs.value }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
-          # push: ${{ inputs.publish }}
+          build-args: GO_BUILD_FLAGS=-ldflags=-X=github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1.Version=${{ inputs.version }}
+          outputs: |
+            type=image,push=${{ inputs.publish }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+            type=oci,dest=image.tar,name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
 
       - name: Sign image with GitHub OIDC Token
         if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
@@ -198,10 +189,6 @@ jobs:
               echo "✅ All verifications completed successfully"
             fi
           fi
-
-      - name: Fetch image
-        run: skopeo --insecure-policy copy docker://${{ steps.image-name.outputs.value }}:${{ steps.meta.outputs.version }} oci-archive:image.tar
-        if: inputs.publish
 
       - name: Extract OCI tarball
         run: |

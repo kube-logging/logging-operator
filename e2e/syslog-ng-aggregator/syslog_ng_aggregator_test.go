@@ -87,8 +87,18 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 					Network: &v1beta1.FluentbitNetwork{
 						Keepalive: utils.BoolPointer(false),
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					ConfigReloadImage: &v1beta1.BasicImageSpec{
+						Repository: common.SyslogNGReloaderRepo,
+						Tag:        common.SyslogNGReloaderTag,
+					},
 					StatefulSetOverrides: &typeoverride.StatefulSet{
 						Spec: typeoverride.StatefulSetSpec{
 							Template: typeoverride.PodTemplateSpec{

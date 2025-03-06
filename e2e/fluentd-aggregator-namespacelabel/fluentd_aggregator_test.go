@@ -96,6 +96,12 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 					Network: &v1beta1.FluentbitNetwork{
 						Keepalive: utils.BoolPointer(false),
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 					FilterKubernetes: v1beta1.FilterKubernetes{
 						// Namespace labels enrichment is enabled by default starting with version 4.9
 						// NamespaceLabels: "On",
@@ -105,6 +111,10 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 					Image: v1beta1.ImageSpec{
 						Repository: common.FluentdImageRepo,
 						Tag:        common.FluentdImageTag,
+					},
+					ConfigReloaderImage: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{

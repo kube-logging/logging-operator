@@ -26,6 +26,7 @@ import (
 	"time"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -37,10 +38,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"sigs.k8s.io/e2e-framework/third_party/helm"
 )
 
@@ -133,8 +133,18 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					BufferVolumeMetrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					ConfigReloadImage: &v1beta1.BasicImageSpec{
+						Repository: common.SyslogNGReloaderRepo,
+						Tag:        common.SyslogNGReloaderTag,
+					},
 					Metrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},
@@ -159,13 +169,31 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 		mt, err := setupMetricsTester(ctx, c, ns)
 		common.RequireNoError(t, err)
 
-		rawOut, err := mt.getMetrics(metricServices[fluentbit], c, ns)
-		common.RequireNoError(t, err)
-		common.RequireNoError(t, mt.validateMetrics(rawOut, fluentbit))
+		require.Eventually(t, func() bool {
+			rawOut, err := mt.getMetrics(metricServices[fluentbit], c, ns)
+			if err != nil {
+				t.Log(err)
+				return false
+			}
+			if err := mt.validateMetrics(rawOut, fluentbit); err != nil {
+				t.Log(err)
+				return false
+			}
+			return true
+		}, pollTimeout, pollInterval)
 
-		rawOut, err = mt.getMetrics(metricServices[syslogNG], c, ns)
-		common.RequireNoError(t, err)
-		common.RequireNoError(t, mt.validateMetrics(rawOut, syslogNG))
+		require.Eventually(t, func() bool {
+			rawOut, err := mt.getMetrics(metricServices[syslogNG], c, ns)
+			if err != nil {
+				t.Log(err)
+				return false
+			}
+			if err := mt.validateMetrics(rawOut, syslogNG); err != nil {
+				t.Log(err)
+				return false
+			}
+			return true
+		}, pollTimeout, pollInterval)
 
 		common.RequireNoError(t, c.GetClient().Delete(ctx, &logging))
 
@@ -183,11 +211,21 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 					BufferVolumeMetrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
 					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
 						Repository: common.FluentdImageRepo,
 						Tag:        common.FluentdImageTag,
+					},
+					ConfigReloaderImage: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
 					},
 					Metrics: &v1beta1.Metrics{
 						ServiceMonitor: true,
@@ -208,9 +246,18 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 		serviceMonitorsFluentd := &v1.ServiceMonitorList{}
 		common.RequireNoError(t, c.GetClient().List(ctx, serviceMonitorsFluentd))
 
-		rawOut, err = mt.getMetrics(metricServices[fluentd], c, ns)
-		common.RequireNoError(t, err)
-		common.RequireNoError(t, mt.validateMetrics(rawOut, fluentd))
+		require.Eventually(t, func() bool {
+			rawOut, err := mt.getMetrics(metricServices[fluentd], c, ns)
+			if err != nil {
+				t.Log(err)
+				return false
+			}
+			if err := mt.validateMetrics(rawOut, fluentd); err != nil {
+				t.Log(err)
+				return false
+			}
+			return true
+		}, pollTimeout, pollInterval)
 
 		serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
 		common.RequireNoError(t, checkServiceMonitorAvailability(serviceMonitors))
@@ -362,10 +409,8 @@ func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, c common.Cluster, 
 }
 
 func (mt *metricsTester) validateMetrics(rawOut []byte, subject loggingResourceName) error {
-	metrics := getKeyMetricsFor(subject)
 	var missingMetrics []string
-
-	for _, metric := range metrics {
+	for _, metric := range getKeyMetricsFor(subject) {
 		if !strings.Contains(string(rawOut), metric) {
 			missingMetrics = append(missingMetrics, metric)
 		}
