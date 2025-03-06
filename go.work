@@ -3,6 +3,7 @@ go 1.23.5
 use (
 	.
 	./e2e
+	./images/config-reloader
 	./pkg/sdk
 	./pkg/sdk/logging/model/syslogng/config
 )
