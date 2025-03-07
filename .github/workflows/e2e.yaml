@@ -112,7 +112,7 @@ jobs:
 
       # This is a workaround as the action does not support setting working directory
       - name: Run coverage report
-        run: go run github.com/vladopajic/go-test-coverage/v2@v2.12.0 --profile=./build/_test_coverage/coverage_e2e.out --config=./.testcoverage.yml
+        run: make test-e2e-coverage-report-ci
 
       - name: Archive Test Results
         if: always()

@@ -10,6 +10,9 @@ CONTROLLER_GEN_VERSION := 0.17.2
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
 GOLANGCI_LINT_VERSION := 1.64.6
 
+# renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
+GO_TEST_COVERAGE_VERSION := 2.12.1
+
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.14.2
 
@@ -62,6 +65,8 @@ ENVTEST_BINARY_ASSETS := ${ENVTEST_BIN_DIR}/bin
 
 GOLANGCI_LINT := ${BIN}/golangci-lint
 LINTER_FLAGS := --timeout 10m
+
+GO_TEST_COVERAGE := ${BIN}/go-test-coverage
 
 HELM_DOCS := ${BIN}/helm-docs
 
@@ -192,19 +197,23 @@ test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run t
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
 
-.PHONY: install-go-test-coverage
-install-go-test-coverage:
-	GOBIN=${BIN} go install github.com/vladopajic/go-test-coverage/v2@latest
-
 .PHONY: generate-test-coverage
-generate-test-coverage: install-go-test-coverage test
+generate-test-coverage: test
 	rm -f ${TEST_COV_DIR}/coverage_all.out
 	echo "mode: set" > ${TEST_COV_DIR}/coverage_all.out
 	find -name 'cover_*.out' | xargs cat | grep -v "mode: set" >> ${TEST_COV_DIR}/coverage_all.out
 
 .PHONY: check-coverage
-check-coverage: install-go-test-coverage generate-test-coverage
-	GOBIN=${BIN} go-test-coverage --config=./.testcoverage.yml
+check-coverage: generate-test-coverage
+	go-test-coverage --config=./.testcoverage.yml
+
+.PHONY: test-e2e-coverage-report-ci
+test-e2e-coverage-report-ci: ${GO_TEST_COVERAGE}
+	$(MAKE) test-e2e-coverage-report-no-deps
+
+.PHONY: test-e2e-coverage-report-no-deps
+test-e2e-coverage-report-no-deps:
+	${GO_TEST_COVERAGE} --profile=${TEST_COV_DIR}/coverage_e2e.out
 
 .PHONY: test-e2e
 test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
@@ -276,6 +285,13 @@ ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: IMPORT_PATH := github.co
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: VERSION := v${GOLANGCI_LINT_VERSION}
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}
+
+${GO_TEST_COVERAGE}: ${GO_TEST_COVERAGE}_${GO_TEST_COVERAGE_VERSION}_${GOVERSION} | ${BIN}
+
+${GO_TEST_COVERAGE}_${GO_TEST_COVERAGE_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/vladopajic/go-test-coverage/v2
+${GO_TEST_COVERAGE}_${GO_TEST_COVERAGE_VERSION}_${GOVERSION}: VERSION := v${GO_TEST_COVERAGE_VERSION}
+${GO_TEST_COVERAGE}_${GO_TEST_COVERAGE_VERSION}_${GOVERSION}: | ${BIN}
+	GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 
 ${KIND}: ${KIND}_${KIND_VERSION}_${GOVERSION} | ${BIN}
 	ln -sf $(notdir $<) $@
