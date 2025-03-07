@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.37.0
-	github.com/kube-logging/logging-operator v0.0.0-20250204114012-5c5cda7a590a
+	github.com/kube-logging/logging-operator v0.0.0-20250304164135-9ab3bc475e51
 	github.com/kube-logging/logging-operator/pkg/sdk v0.11.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.80.1
 	github.com/spf13/cast v1.7.1
@@ -129,10 +129,11 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
-	go.opentelemetry.io/otel v1.32.0 // indirect
-	go.opentelemetry.io/otel/metric v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0 // indirect
+	go.opentelemetry.io/otel v1.34.0 // indirect
+	go.opentelemetry.io/otel/metric v1.34.0 // indirect
+	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect

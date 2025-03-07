@@ -37,7 +37,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
-	github.com/kube-logging/logging-operator v0.0.0-20250204114012-5c5cda7a590a // indirect
+	github.com/kube-logging/logging-operator v0.0.0-20250304164135-9ab3bc475e51 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

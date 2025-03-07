@@ -9,7 +9,7 @@ require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/cisco-open/operator-tools v0.37.0
 	github.com/go-logr/zapr v1.3.0
-	github.com/kube-logging/logging-operator v0.0.0-20250204114012-5c5cda7a590a
+	github.com/kube-logging/logging-operator v0.0.0-20250304164135-9ab3bc475e51
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.36.2
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.80.1
