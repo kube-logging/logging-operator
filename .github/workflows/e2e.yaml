@@ -110,9 +110,11 @@ jobs:
 #          SHARD: ${{ matrix.SHARD }}
 #          SHARDS: ${{ matrix.SHARDS }}
 
-      # This is a workaround as the action does not support setting working directory
       - name: Run coverage report
-        run: make test-e2e-coverage-report-ci
+        uses: vladopajic/go-test-coverage@992aa9921a42c39d1fe0015d32593f0820589586 # v2.13.0
+        with:
+          profile: ./build/_test_coverage/coverage_e2e.out
+          source-dir: ./
 
       - name: Archive Test Results
         if: always()
