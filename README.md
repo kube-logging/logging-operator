@@ -10,7 +10,7 @@
   </a>
 
   <a href="https://www.bestpractices.dev/projects/7941">
-    <img src="https://www.bestpractices.dev/projects/7941/badge?cache=20231206">
+    <img src="https://www.bestpractices.dev/projects/7941/badge?cache=20250318">
   </a>
 
 </p>
