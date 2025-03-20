@@ -60,4 +60,10 @@ TLS Options. For details, see [https://github.com/graylog-labs/gelf-rb/blob/7291
 
 Default: {}
 
+### udp_transport_type (string, optional) {#output config-udp_transport_type}
+
+UdpTransportType specifies the UDP chunk size by choosing either WAN or LAN mode. The choice between WAN and LAN affects the UDP chunk size depending on whether you are sending logs within your local network (LAN) or over a longer route (e.g., through the internet). Set this option accordingly. For more details, see: [https://github.com/manet-marketing/gelf_redux/blob/9db64353b6672805152c17642ea8ad39eafb5875/lib/gelf/notifier.rb#L22](https://github.com/manet-marketing/gelf_redux/blob/9db64353b6672805152c17642ea8ad39eafb5875/lib/gelf/notifier.rb#L22) Available since ghcr.io/kube-logging/logging-operator/fluentd:5.3.0-full
+
+Default: WAN
+
 
