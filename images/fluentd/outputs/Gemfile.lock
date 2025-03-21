@@ -378,7 +378,7 @@ DEPENDENCIES
   fluent-plugin-datadog (= 0.14.4)
   fluent-plugin-elasticsearch (= 5.4.3)
   fluent-plugin-gcs (= 0.4.4)
-  fluent-plugin-gelf-best (= 1.3.4)
+  fluent-plugin-gelf-best (= 1.4.1)
   fluent-plugin-grafana-loki (= 1.2.20)
   fluent-plugin-kafka (= 0.19.3)
   fluent-plugin-kinesis (= 3.5.0)
