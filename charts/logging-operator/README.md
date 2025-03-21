@@ -55,6 +55,9 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
 | rbac.retainOnDelete | bool | `false` | Keep the operators RBAC resources after the operator is deleted to allow removing pending finalizers. |
+| rbac.createAggregatedViewClusterRole | bool | `false` | Create ClusterRole that extend the existing view ClusterRole to interact with logging-operator CRDs # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles |
+| rbac.createAggregatedEditClusterRole | bool | `true` | Create ClusterRole that extend the existing edit ClusterRole to interact with logging-operator CRDs # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles |
+| rbac.createAggregatedAdminClusterRole | bool | `true` | Create ClusterRole that extend the existing admin ClusterRole to interact with logging-operator CRDs # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles |
 | monitoring.serviceMonitor.enabled | bool | `false` | Create a Prometheus Operator ServiceMonitor object. |
 | monitoring.serviceMonitor.additionalLabels | object | `{}` |  |
 | monitoring.serviceMonitor.metricRelabelings | list | `[]` |  |
