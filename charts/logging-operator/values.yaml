@@ -67,9 +67,17 @@ rbac:
   enabled: true
   # -- Keep the operators RBAC resources after the operator is deleted to allow removing pending finalizers.
   retainOnDelete: false
-
   # specify service account manually
   # serviceAccountName: custom
+  # -- Create ClusterRole that extend the existing view ClusterRole to interact with logging-operator CRDs
+  ## Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles
+  createAggregatedViewClusterRole: false
+  # -- Create ClusterRole that extend the existing edit ClusterRole to interact with logging-operator CRDs
+  ## Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles
+  createAggregatedEditClusterRole: true
+  # -- Create ClusterRole that extend the existing admin ClusterRole to interact with logging-operator CRDs
+  ## Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles
+  createAggregatedAdminClusterRole: true
 
 monitoring:
   serviceMonitor:
