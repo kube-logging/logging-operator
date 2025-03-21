@@ -2696,6 +2696,8 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  udp_transport_type:
+                    type: string
                 required:
                 - host
                 - port
@@ -9417,6 +9419,8 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  udp_transport_type:
+                    type: string
                 required:
                 - host
                 - port
