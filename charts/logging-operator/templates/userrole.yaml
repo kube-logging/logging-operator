@@ -1,12 +1,17 @@
 {{- if .Values.rbac.enabled }}
+{{- if or .Values.rbac.createAggregatedEditClusterRole .Values.rbac.createAggregatedAdminClusterRole }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ template "logging-operator.fullname" . }}-edit
   labels:
-    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    {{- if .Values.rbac.createAggregatedEditClusterRole }}
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    {{- end }}
+    {{- if .Values.rbac.createAggregatedAdminClusterRole }}
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    {{- end }}
 {{ include "logging-operator.labels" . | indent 4 }}
 rules:
 - apiGroups:
@@ -37,4 +42,34 @@ rules:
   - patch
   - update
   - watch
+{{- end }}
+{{- if .Values.rbac.createAggregatedViewClusterRole }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "logging-operator.fullname" . }}-view
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+{{ include "logging-operator.labels" . | indent 4 }}
+rules:
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - flows
+  - outputs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - logging.banzaicloud.io
+  resources:
+  - syslogngflows
+  - syslogngoutputs
+  verbs:
+  - get
+  - list
+  - watch
+{{- end }}
 {{- end }}
