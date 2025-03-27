@@ -63,6 +63,12 @@ type GelfOutputConfig struct {
 	// For details, see [https://github.com/Graylog2/graylog2-server/issues/873](https://github.com/Graylog2/graylog2-server/issues/873)
 	// Available since ghcr.io/kube-logging/fluentd:v1.16-4.10-full (default: 3200)
 	MaxBytes int `json:"max_bytes,omitempty"`
+	// UdpTransportType specifies the UDP chunk size by choosing either WAN or LAN mode.
+	// The choice between WAN and LAN affects the UDP chunk size depending on whether you are sending logs within your local network (LAN) or over a longer route (e.g., through the internet). Set this option accordingly.
+	// For more details, see:
+	// [https://github.com/manet-marketing/gelf_redux/blob/9db64353b6672805152c17642ea8ad39eafb5875/lib/gelf/notifier.rb#L22](https://github.com/manet-marketing/gelf_redux/blob/9db64353b6672805152c17642ea8ad39eafb5875/lib/gelf/notifier.rb#L22)
+	// Available since ghcr.io/kube-logging/logging-operator/fluentd:5.3.0-full (default: WAN)
+	UdpTransportType string `json:"udp_transport_type,omitempty"`
 	// Available since ghcr.io/kube-logging/fluentd:v1.16-4.8-full
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
