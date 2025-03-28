@@ -11,7 +11,7 @@ CONTROLLER_GEN_VERSION := 0.17.2
 GOLANGCI_LINT_VERSION := 1.64.8
 
 # renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
-GO_TEST_COVERAGE_VERSION := 2.13.0
+GO_TEST_COVERAGE_VERSION := 2.13.1
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.14.2

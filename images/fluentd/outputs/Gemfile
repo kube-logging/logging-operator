@@ -1,7 +1,7 @@
 source 'https://index.rubygems.org'
 
 gem 'fluent-plugin-aliyun-oss', '0.0.1'
-gem 'fluent-plugin-kafka', '0.19.3'
+gem 'fluent-plugin-kafka', '0.19.4'
 gem 'fluent-plugin-grafana-loki', '1.2.20'
 gem 'fluent-plugin-kinesis', '3.5.0'
 gem 'fluent-plugin-splunk-hec', '1.3.3'
