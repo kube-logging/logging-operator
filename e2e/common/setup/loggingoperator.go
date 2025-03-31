@@ -52,6 +52,11 @@ var (
 			tag:        "local",
 		},
 		{
+			lookupEnv:  "NODE_EXPORTER_IMAGE",
+			repository: "node-exporter",
+			tag:        "local",
+		},
+		{
 			lookupEnv:  "FLUENTD_IMAGE",
 			repository: "fluentd-full",
 			tag:        "local",

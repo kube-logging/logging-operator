@@ -41,6 +41,10 @@ jobs:
             context: images/fluentd-drain-watch
             tags: fluentd-drain-watch:local
             output: fluentd-drain-watch.tar
+          - image: node-exporter
+            context: images/node-exporter
+            tags: node-exporter:local
+            output: node-exporter.tar
 
     steps:
       - name: Checkout
@@ -96,6 +100,7 @@ jobs:
           docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/syslog-ng-reloader.tar
           docker load --input /tmp/fluentd-drain-watch.tar
+          docker load --input /tmp/node-exporter.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
@@ -155,6 +160,7 @@ jobs:
           docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/syslog-ng-reloader.tar
           docker load --input /tmp/fluentd-drain-watch.tar
+          docker load --input /tmp/node-exporter.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
