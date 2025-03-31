@@ -42,7 +42,9 @@ func (f FileTailer) defaults() FileTailer {
 func (f FileTailer) Command(Name string) []string {
 	f = f.defaults()
 	command := []string{
-		"/fluent-bit/bin/fluent-bit", "-i", "tail",
+		"/fluent-bit/bin/fluent-bit",
+		"-qq",
+		"-i", "tail",
 		"-p", fmt.Sprintf("path=%s", f.Path),
 		"-p", fmt.Sprintf("db=/var/pos/%s.db", Name),
 		"-p", fmt.Sprintf("buffer_chunk_size=%s", f.BufferChunkSize),
