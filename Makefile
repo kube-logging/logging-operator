@@ -44,14 +44,12 @@ GOVERSION := $(shell go env GOVERSION)
 FLUENTD_IMG ?= fluentd-full:local
 CONFIG_RELOADER_IMG ?= config-reloader:local
 SYSLOG_NG_RELOADER_IMG ?= syslog-ng-reloader:local
+FLUENTD_DRAIN_WATCH_IMG ?= fluentd-drain-watch:local
 OPERATOR_IMG ?= controller:local
 OPERATOR_IMG_DEBUG ?= controller:debug
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= crd:maxDescLen=0
-
-DRAIN_WATCH_IMAGE_TAG_NAME ?= ghcr.io/kube-logging/fluentd-drain-watch
-DRAIN_WATCH_IMAGE_TAG_VERSION ?= latest
 
 VERSION := $(shell git describe --abbrev=0 --tags)
 
@@ -117,11 +115,12 @@ docker-build-e2e-test: ## Build the coverage docker image
 	sed -i'' -e 's@image: .*@image: '"${OPERATOR_IMG}"'@' ./config/default/manager_image_patch.yaml
 	${DOCKER} build -t ${CONFIG_RELOADER_IMG} images/config-reloader
 	${DOCKER} build -t ${SYSLOG_NG_RELOADER_IMG} images/syslog-ng-reloader
+	${DOCKER} build -t ${FLUENTD_DRAIN_WATCH_IMG} images/fluentd-drain-watch
 	${DOCKER} build -t ${FLUENTD_IMG} --target full images/fluentd
 
 .PHONY: docker-build-drain-watch
 docker-build-drain-watch: ## Build the drain-watch docker image
-	${DOCKER} build drain-watch-image -t ${DRAIN_WATCH_IMAGE_TAG_NAME}:${DRAIN_WATCH_IMAGE_TAG_VERSION}
+	${DOCKER} build drain-watch-image -t ${FLUENTD_DRAIN_WATCH_IMG} images/fluentd-drain-watch
 
 .PHONY: docker-push
 docker-push: ## Push the docker image
