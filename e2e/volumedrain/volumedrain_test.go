@@ -117,6 +117,10 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 						Replicas: 2,
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled: true,
+							Image: v1beta1.ImageSpec{
+								Repository: common.FluentdDrainWatchRepo,
+								Tag:        common.FluentdDrainWatchTag,
+							},
 						},
 					},
 				},
@@ -351,6 +355,10 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled:      true,
 							DeleteVolume: true,
+							Image: v1beta1.ImageSpec{
+								Repository: common.FluentdDrainWatchRepo,
+								Tag:        common.FluentdDrainWatchTag,
+							},
 						},
 					},
 				},

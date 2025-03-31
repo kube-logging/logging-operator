@@ -20,7 +20,7 @@ function main()
 
 function load_images()
 {
-    local images=( "controller:local" "fluentd-full:local" "config-reloader:local" )
+    local images=( "controller:local" "fluentd-full:local" "config-reloader:local" "syslog-ng-reloader:local" "fluentd-drain-watch:local" )
     for image in ${images[@]}; do
         kind load docker-image "${image}"
     done

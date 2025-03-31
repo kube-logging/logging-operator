@@ -34,12 +34,14 @@ import (
 )
 
 const (
-	FluentdImageRepo   = "fluentd-full"
-	FluentdImageTag    = "local"
-	ConfigReloaderRepo = "config-reloader"
-	ConfigReloaderTag  = "local"
-	SyslogNGReloaderRepo = "syslog-ng-reloader"
-	SyslogNGReloaderTag  = "local"
+	FluentdImageRepo      = "fluentd-full"
+	FluentdImageTag       = "local"
+	ConfigReloaderRepo    = "config-reloader"
+	ConfigReloaderTag     = "local"
+	SyslogNGReloaderRepo  = "syslog-ng-reloader"
+	SyslogNGReloaderTag   = "local"
+	FluentdDrainWatchRepo = "fluentd-drain-watch"
+	FluentdDrainWatchTag  = "local"
 )
 
 var sequence uint32

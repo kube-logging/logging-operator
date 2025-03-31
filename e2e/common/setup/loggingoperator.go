@@ -47,6 +47,11 @@ var (
 			tag:        "local",
 		},
 		{
+			lookupEnv:  "FLUENTD_DRAIN_WATCH_IMAGE",
+			repository: "fluentd-drain-watch",
+			tag:        "local",
+		},
+		{
 			lookupEnv:  "FLUENTD_IMAGE",
 			repository: "fluentd-full",
 			tag:        "local",
