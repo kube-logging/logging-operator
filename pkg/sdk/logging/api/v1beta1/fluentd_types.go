@@ -252,7 +252,11 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.BufferVolumeImage.Repository = DefaultFluentdBufferVolumeImageRepository
 		}
 		if f.BufferVolumeImage.Tag == "" {
-			f.BufferVolumeImage.Tag = DefaultFluentdBufferVolumeImageTag
+			if Version == "" {
+				f.BufferVolumeImage.Tag = DefaultFluentdBufferVolumeImageTag
+			} else {
+				f.BufferVolumeImage.Tag = Version
+			}
 		}
 		if f.BufferVolumeImage.PullPolicy == "" {
 			f.BufferVolumeImage.PullPolicy = "IfNotPresent"

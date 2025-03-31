@@ -1,4 +1,4 @@
-name: Config reloader
+name: Node exporter
 
 on:
   workflow_call:
@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  config-reloader-image:
-    name: Config reloader image
+  node-exporter-image:
+    name: Node exporter image
     runs-on: ubuntu-latest
 
     permissions:
@@ -39,7 +39,7 @@ jobs:
 
       - name: Set image name
         id: image-name
-        run: echo "value=ghcr.io/${{ github.repository }}/config-reloader" >> "$GITHUB_OUTPUT"
+        run: echo "value=ghcr.io/${{ github.repository }}/node-exporter" >> "$GITHUB_OUTPUT"
 
       - name: Gather build metadata
         id: meta
@@ -54,8 +54,8 @@ jobs:
             type=semver,pattern={{raw}}
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.description=Config reloader image for the Logging operator.
-            org.opencontainers.image.title=Logging operator Config reloader image
+            org.opencontainers.image.description=Node exporter image for the Logging operator.
+            org.opencontainers.image.title=Logging operator Node exporter image
             org.opencontainers.image.authors=Kube logging authors
             org.opencontainers.image.documentation=https://kube-logging.dev/docs/
 
@@ -67,11 +67,11 @@ jobs:
           password: ${{ github.token }}
         if: ${{ inputs.publish }}
 
-      - name: Build and push config-reloader image
+      - name: Build and push Node exporter image
         id: build
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
         with:
-          context: images/config-reloader
+          context: images/node-exporter
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -103,7 +103,7 @@ jobs:
           for tag in ${TAGS[@]}; do
             cosign verify "${tag}@${DIGEST}" \
               --rekor-url "https://rekor.sigstore.dev/" \
-              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/config-reloader.yaml@${{ github.ref }}" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/node-exporter.yaml@${{ github.ref }}" \
               --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
           done
 

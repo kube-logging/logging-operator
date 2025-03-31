@@ -33,14 +33,14 @@ type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
 type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
 const (
-	defaultSyslogngImageRepository       = "ghcr.io/axoflow/axosyslog"
-	defaultSyslogngImageTag              = "4.10.1"
-	defaultConfigReloaderImageRepository = "ghcr.io/kube-logging/logging-operator/syslog-ng-reloader"
-	defaultConfigReloaderImageTag        = "latest"
-	prometheusExporterImageRepository    = "ghcr.io/axoflow/axosyslog-metrics-exporter"
-	prometheusExporterImageTag           = "0.0.9"
-	bufferVolumeImageRepository          = "ghcr.io/kube-logging/node-exporter"
-	bufferVolumeImageTag                 = "v0.10.0"
+	defaultSyslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
+	defaultSyslogngImageTag                  = "4.10.1"
+	defaultPrometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
+	defaultPrometheusExporterImageTag        = "0.0.9"
+	defaultConfigReloaderImageRepository     = "ghcr.io/kube-logging/logging-operator/syslog-ng-reloader"
+	defaultConfigReloaderImageTag            = "latest"
+	defaultBufferVolumeImageRepository       = "ghcr.io/kube-logging/logging-operator/node-exporter"
+	defaultBufferVolumeImageTag              = "latest"
 )
 
 // +kubebuilder:object:generate=true
@@ -163,14 +163,21 @@ func (s *SyslogNGSpec) SetDefaults() {
 		}
 		if s.MetricsExporterImage == nil {
 			s.MetricsExporterImage = &BasicImageSpec{
-				Repository: prometheusExporterImageRepository,
-				Tag:        prometheusExporterImageTag,
+				Repository: defaultPrometheusExporterImageRepository,
+				Tag:        defaultPrometheusExporterImageTag,
 			}
 		}
 		if s.BufferVolumeMetricsImage == nil {
-			s.BufferVolumeMetricsImage = &BasicImageSpec{
-				Repository: bufferVolumeImageRepository,
-				Tag:        bufferVolumeImageTag,
+			s.BufferVolumeMetricsImage = &BasicImageSpec{}
+		}
+		if s.BufferVolumeMetricsImage.Repository == "" {
+			s.BufferVolumeMetricsImage.Repository = defaultBufferVolumeImageRepository
+		}
+		if s.BufferVolumeMetricsImage.Tag == "" {
+			if Version == "" {
+				s.BufferVolumeMetricsImage.Tag = defaultBufferVolumeImageTag
+			} else {
+				s.BufferVolumeMetricsImage.Tag = Version
 			}
 		}
 		if s.BufferVolumeMetricsResources.Limits == nil {

@@ -201,8 +201,8 @@ var Version string
 const (
 	DefaultFluentbitImageRepository               = "docker.io/fluent/fluent-bit"
 	DefaultFluentbitImageTag                      = "3.2.5"
-	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentbitBufferVolumeImageTag          = "v0.10.0"
+	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/logging-operator/node-exporter"
+	DefaultFluentbitBufferVolumeImageTag          = "latest"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
 	DefaultFluentbitConfigReloaderImageRepository = "ghcr.io/kube-logging/logging-operator/config-reloader"
 	DefaultFluentbitConfigReloaderImageTag        = "latest"
@@ -217,8 +217,8 @@ const (
 	DefaultFluentdVolumeModeImageTag              = "latest"
 	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/logging-operator/config-reloader"
 	DefaultFluentdConfigReloaderImageTag          = "latest"
-	DefaultFluentdBufferVolumeImageRepository     = "ghcr.io/kube-logging/node-exporter"
-	DefaultFluentdBufferVolumeImageTag            = "v0.10.0"
+	DefaultFluentdBufferVolumeImageRepository     = "ghcr.io/kube-logging/logging-operator/node-exporter"
+	DefaultFluentdBufferVolumeImageTag            = "latest"
 )
 
 // SetDefaults fills empty attributes
@@ -347,7 +347,11 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 			fluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
 		}
 		if fluentbitSpec.BufferVolumeImage.Tag == "" {
-			fluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
+			if Version == "" {
+				fluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
+			} else {
+				fluentbitSpec.BufferVolumeImage.Tag = Version
+			}
 		}
 		if fluentbitSpec.BufferVolumeImage.PullPolicy == "" {
 			fluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
