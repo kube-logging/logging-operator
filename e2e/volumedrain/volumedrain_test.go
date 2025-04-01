@@ -92,6 +92,10 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
@@ -101,6 +105,10 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 					ConfigReloaderImage: v1beta1.ImageSpec{
 						Repository: common.ConfigReloaderRepo,
 						Tag:        common.ConfigReloaderTag,
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
@@ -329,6 +337,10 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
@@ -338,6 +350,10 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 					ConfigReloaderImage: v1beta1.ImageSpec{
 						Repository: common.ConfigReloaderRepo,
 						Tag:        common.ConfigReloaderTag,
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{

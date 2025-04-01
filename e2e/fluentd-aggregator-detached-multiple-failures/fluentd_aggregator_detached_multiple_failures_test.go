@@ -90,6 +90,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 			},
 		}
@@ -108,6 +112,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				ConfigReloaderImage: v1beta1.ImageSpec{
 					Repository: common.ConfigReloaderRepo,
 					Tag:        common.ConfigReloaderTag,
+				},
+				BufferVolumeImage: v1beta1.ImageSpec{
+					Repository: common.NodeExporterRepo,
+					Tag:        common.NodeExporterTag,
 				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
@@ -148,6 +156,10 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				ConfigReloaderImage: v1beta1.ImageSpec{
 					Repository: common.ConfigReloaderRepo,
 					Tag:        common.ConfigReloaderTag,
+				},
+				BufferVolumeImage: v1beta1.ImageSpec{
+					Repository: common.NodeExporterRepo,
+					Tag:        common.NodeExporterTag,
 				},
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{

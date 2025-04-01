@@ -94,6 +94,10 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
@@ -103,6 +107,10 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 					ConfigReloaderImage: v1beta1.ImageSpec{
 						Repository: common.ConfigReloaderRepo,
 						Tag:        common.ConfigReloaderTag,
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
@@ -277,6 +285,10 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image: v1beta1.ImageSpec{
@@ -286,6 +298,10 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 					ConfigReloaderImage: v1beta1.ImageSpec{
 						Repository: common.ConfigReloaderRepo,
 						Tag:        common.ConfigReloaderTag,
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
 					},
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{

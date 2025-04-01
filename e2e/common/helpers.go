@@ -42,6 +42,8 @@ const (
 	SyslogNGReloaderTag   = "local"
 	FluentdDrainWatchRepo = "fluentd-drain-watch"
 	FluentdDrainWatchTag  = "local"
+	NodeExporterRepo      = "node-exporter"
+	NodeExporterTag       = "local"
 )
 
 var sequence uint32
@@ -124,6 +126,10 @@ func LoggingInfra(
 					Tag:        ConfigReloaderTag,
 				},
 			},
+			BufferVolumeImage: v1beta1.ImageSpec{
+				Repository: NodeExporterRepo,
+				Tag:        NodeExporterTag,
+			},
 		},
 	}
 	RequireNoError(t, c.Create(ctx, &agent))
@@ -146,6 +152,10 @@ func LoggingInfra(
 				ConfigReloaderImage: v1beta1.ImageSpec{
 					Repository: ConfigReloaderRepo,
 					Tag:        ConfigReloaderTag,
+				},
+				BufferVolumeImage: v1beta1.ImageSpec{
+					Repository: NodeExporterRepo,
+					Tag:        NodeExporterTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{
@@ -224,6 +234,10 @@ func LoggingTenant(
 				ConfigReloaderImage: v1beta1.ImageSpec{
 					Repository: ConfigReloaderRepo,
 					Tag:        ConfigReloaderTag,
+				},
+				BufferVolumeImage: v1beta1.ImageSpec{
+					Repository: NodeExporterRepo,
+					Tag:        NodeExporterTag,
 				},
 				DisablePvc: true,
 				Resources: v12.ResourceRequirements{

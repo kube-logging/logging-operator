@@ -93,11 +93,19 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 							Tag:        common.ConfigReloaderTag,
 						},
 					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
 					ConfigReloadImage: &v1beta1.BasicImageSpec{
 						Repository: common.SyslogNGReloaderRepo,
 						Tag:        common.SyslogNGReloaderTag,
+					},
+					BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
 					},
 					StatefulSetOverrides: &typeoverride.StatefulSet{
 						Spec: typeoverride.StatefulSetSpec{

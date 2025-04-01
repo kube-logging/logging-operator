@@ -62,3 +62,14 @@ jobs:
       packages: write
       id-token: write
       security-events: write
+
+  node-exporter:
+    name: Node exporter
+    uses: ./.github/workflows/node-exporter.yaml
+    with:
+      publish: ${{ inputs.publish }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write

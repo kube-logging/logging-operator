@@ -11,7 +11,7 @@ spec:
   enableRecreateWorkloadOnImmutableFieldChange: true
   fluentd:
     bufferVolumeImage:
-      repository: ghcr.io/kube-logging/node-exporter
+      repository: ghcr.io/kube-logging/logging-operator/node-exporter
     bufferVolumeMetrics: 
       prometheusRules: true
       serviceMonitor: true
