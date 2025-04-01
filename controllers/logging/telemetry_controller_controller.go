@@ -27,7 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	telemetry_controller "github.com/kube-logging/logging-operator/pkg/resources/telemetry-controller"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -160,7 +159,7 @@ func (r *TelemetryControllerReconciler) deleteTelemetryControllerResources(ctx c
 	return nil
 }
 
-func (r *TelemetryControllerReconciler) isAggregatorReady(ctx context.Context, logger logr.Logger, logging v1beta1.Logging) error {
+func (r *TelemetryControllerReconciler) isAggregatorReady(ctx context.Context, logger logr.Logger, logging loggingv1beta1.Logging) error {
 	logger.Info("Waiting for aggregator pod to be ready")
 
 	podName := fmt.Sprintf("%s-fluentd-0", logging.Name)
