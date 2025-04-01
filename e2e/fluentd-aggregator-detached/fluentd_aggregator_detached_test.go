@@ -127,6 +127,10 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 					Replicas: 1,
 					Drain: v1beta1.FluentdDrainConfig{
 						Enabled: true,
+						Image: v1beta1.ImageSpec{
+							Repository: common.FluentdDrainWatchRepo,
+							Tag:        common.FluentdDrainWatchTag,
+						},
 					},
 				},
 				Workers: 2,
@@ -165,6 +169,10 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 					Replicas: 1,
 					Drain: v1beta1.FluentdDrainConfig{
 						Enabled: true,
+						Image: v1beta1.ImageSpec{
+							Repository: common.FluentdDrainWatchRepo,
+							Tag:        common.FluentdDrainWatchTag,
+						},
 					},
 				},
 			},

@@ -1,0 +1,136 @@
+name: Fluentd drain watch
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: Publish artifacts to the artifact store
+        default: false
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+
+jobs:
+  fluentd-drain-watch-image:
+    name: Fluentd drain watch image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # v3.8.1
+        if: ${{ inputs.publish }}
+
+      - name: Set image name
+        id: image-name
+        run: echo "value=ghcr.io/${{ github.repository }}/fluentd-drain-watch" >> "$GITHUB_OUTPUT"
+
+      - name: Gather build metadata
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        with:
+          images: ${{ steps.image-name.outputs.value }}
+          flavor: |
+            latest = false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{raw}}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.description=Fluentd drain watch image for the Logging operator.
+            org.opencontainers.image.title=Logging operator Fluentd drain watch image
+            org.opencontainers.image.authors=Kube logging authors
+            org.opencontainers.image.documentation=https://kube-logging.dev/docs/
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+        if: ${{ inputs.publish }}
+
+      - name: Build and push fluentd-drain-watch image
+        id: build
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: images/fluentd-drain-watch
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: |
+            type=image,push=${{ inputs.publish }},name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+            type=oci,dest=image.tar,name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+
+      - name: Sign image with GitHub OIDC Token
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          images=""
+          for tag in ${TAGS[@]}; do
+            images+="${tag}@${DIGEST} "
+          done
+          
+          cosign sign --yes --rekor-url "https://rekor.sigstore.dev/" ${images}
+
+      - name: Verify signed image with cosign
+        if: ${{ inputs.publish && github.repository_owner == 'kube-logging' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          for tag in ${TAGS[@]}; do
+            cosign verify "${tag}@${DIGEST}" \
+              --rekor-url "https://rekor.sigstore.dev/" \
+              --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/fluentd-drain-watch.yaml@${{ github.ref }}" \
+              --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
+          done
+
+      - name: Extract OCI tarball
+        run: |
+          mkdir -p image
+          tar -xf image.tar -C image
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
+        with:
+          input: image
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: "[${{ github.job }}] Trivy scan results"
+          path: trivy-results.sarif
+          retention-days: 5
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@6bb031afdd8eb862ea3fc1848194185e076637e5 # v3.28.11
+        with:
+          sarif_file: trivy-results.sarif

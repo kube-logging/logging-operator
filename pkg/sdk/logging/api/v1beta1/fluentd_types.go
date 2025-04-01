@@ -239,12 +239,10 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.ConfigReloaderImage.Repository = DefaultFluentdConfigReloaderImageRepository
 		}
 		if f.ConfigReloaderImage.Tag == "" {
-			if f.ConfigReloaderImage.Tag == "" {
-				if Version == "" {
-					f.ConfigReloaderImage.Tag = DefaultFluentdConfigReloaderImageTag
-				} else {
-					f.ConfigReloaderImage.Tag = Version
-				}
+			if Version == "" {
+				f.ConfigReloaderImage.Tag = DefaultFluentdConfigReloaderImageTag
+			} else {
+				f.ConfigReloaderImage.Tag = Version
 			}
 		}
 		if f.ConfigReloaderImage.PullPolicy == "" {
@@ -312,7 +310,11 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.Scaling.Drain.Image.Repository = DefaultFluentdDrainWatchImageRepository
 		}
 		if f.Scaling.Drain.Image.Tag == "" {
-			f.Scaling.Drain.Image.Tag = DefaultFluentdDrainWatchImageTag
+			if Version == "" {
+				f.Scaling.Drain.Image.Tag = DefaultFluentdDrainWatchImageTag
+			} else {
+				f.Scaling.Drain.Image.Tag = Version
+			}
 		}
 		if f.Scaling.Drain.Image.PullPolicy == "" {
 			f.Scaling.Drain.Image.PullPolicy = "IfNotPresent"

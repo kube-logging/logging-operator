@@ -37,6 +37,10 @@ jobs:
             context: images/syslog-ng-reloader
             tags: syslog-ng-reloader:local
             output: syslog-ng-reloader.tar
+          - image: fluentd-drain-watch
+            context: images/fluentd-drain-watch
+            tags: fluentd-drain-watch:local
+            output: fluentd-drain-watch.tar
 
     steps:
       - name: Checkout
@@ -91,6 +95,7 @@ jobs:
           docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/syslog-ng-reloader.tar
+          docker load --input /tmp/fluentd-drain-watch.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 
@@ -149,6 +154,7 @@ jobs:
           docker load --input /tmp/fluentd-full.tar
           docker load --input /tmp/config-reloader.tar
           docker load --input /tmp/syslog-ng-reloader.tar
+          docker load --input /tmp/fluentd-drain-watch.tar
           docker load --input /tmp/controller.tar
           docker image ls -a
 

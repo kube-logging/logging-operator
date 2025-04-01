@@ -51,3 +51,14 @@ jobs:
       packages: write
       id-token: write
       security-events: write
+
+  fluentd-drain-watch:
+    name: Fluentd drain watch
+    uses: ./.github/workflows/fluentd-drain-watch.yaml
+    with:
+      publish: ${{ inputs.publish }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
