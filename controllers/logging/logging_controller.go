@@ -31,6 +31,7 @@ import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -540,6 +541,38 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
 			logger.Error(err, "failed to list logging resources")
 			return nil
+		}
+
+		for _, ref := range obj.GetOwnerReferences() {
+			refGV, err := schema.ParseGroupVersion(ref.APIVersion)
+			if err != nil {
+				logger.Error(err, "failed to parse group version", "apiVersion", ref.APIVersion)
+				continue
+			}
+
+			const (
+				FluentbitAgentKind = "FluentbitAgent"
+				FluentdConfigKind  = "FluentdConfig"
+				SyslogNGConfigKind = "SyslogNGConfig"
+			)
+
+			// Check if this is owned by FluentbitAgent, FluentdConfig, or SyslogNGConfig
+			// and then map back to the relevant Logging resource
+			if refGV.Group == loggingv1beta1.GroupVersion.Group {
+				switch ref.Kind {
+				case FluentbitAgentKind:
+					var agent loggingv1beta1.FluentbitAgent
+					if err := mgr.GetClient().Get(ctx, types.NamespacedName{
+						Name:      ref.Name,
+						Namespace: obj.GetNamespace(),
+					}, &agent); err == nil {
+						return reconcileRequestsForLoggingRef(loggingList.Items, agent.Spec.LoggingRef)
+					}
+
+				case FluentdConfigKind, SyslogNGConfigKind:
+					return reconcileRequestsForMatchingControlNamespace(loggingList.Items, obj.GetNamespace())
+				}
+			}
 		}
 
 		switch o := obj.(type) {
