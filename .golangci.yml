@@ -1,15 +1,39 @@
-linters-settings:
+version: "2"
+run:
+  timeout: 10m
+  allow-parallel-runners: true
+
+formatters:
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/kube-logging/logging-operator)
+    goimports:
+      local-prefixes:
+        - github.com/kube-logging/logging-operator
+    gofmt:
+      simplify: true
+    gofumpt:
+      extra-rules: false
+
+linters:
+  settings:
+    misspell:
+      locale: US
     revive:
-        min-confidence: 0.9
+      confidence: 0.9
     gocyclo:
-        min-complexity: 15
-
-
-issues:
-  exclude-dirs:
-    - .gen
-    - client
-  exclude:
-        - if block ends with a return statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)
-        - "`if` block ends with a `return` statement, so drop this `else` and outdent its block"
-        - "missing the call to method parallel"
+      min-complexity: 15
+  enable:
+    - bodyclose
+    - errcheck
+    - ineffassign
+    - misspell
+    - nolintlint
+    - revive
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
