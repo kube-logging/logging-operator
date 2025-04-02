@@ -226,7 +226,7 @@ func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdS
 	}, nil
 }
 
-func (r *Reconciler) newCheckSecretAppConfig(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
+func (r *Reconciler) newCheckSecretAppConfig(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) { //nolint: unparam
 	data := make(map[string][]byte)
 
 	if fluentdSpec.CompressConfigFile {
@@ -245,14 +245,14 @@ func (r *Reconciler) newCheckSecretAppConfig(hashKey string, fluentdSpec v1beta1
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error) {
-	obj, _, err := r.outputSecret(r.secrets, OutputSecretPath)
+	obj, _, err := r.outputSecret(r.secrets)
 	if err != nil {
 		return nil, err
 	}
 	if secret, ok := obj.(*corev1.Secret); ok {
 		secret.ObjectMeta = r.FluentdObjectMeta(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey), ComponentConfigCheck)
-		secret.ObjectMeta.Labels = utils.MergeLabels(
-			secret.ObjectMeta.Labels,
+		secret.Labels = utils.MergeLabels(
+			secret.Labels,
 			map[string]string{"logging.banzaicloud.io/watch": "enabled"},
 		)
 		return secret, nil
@@ -261,9 +261,8 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 }
 
 func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) *corev1.Pod {
-
 	volumes := r.volumesCheckPod(hashKey, fluentdSpec)
-	container := r.containerCheckPod(hashKey, fluentdSpec)
+	container := r.containerCheckPod(fluentdSpec)
 	initContainer := r.initContainerCheckPod(fluentdSpec)
 
 	pod := &corev1.Pod{
@@ -364,7 +363,7 @@ func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.Fluentd
 	return v
 }
 
-func (r *Reconciler) containerCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) []corev1.Container {
+func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1.Container {
 	var containerArgs []string
 
 	switch r.Logging.Spec.ConfigCheck.Strategy {

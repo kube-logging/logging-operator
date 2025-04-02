@@ -250,7 +250,6 @@ func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 				},
 			},
 		}
-
 	}
 	return nil
 }
@@ -297,7 +296,6 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 }
 
 func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
-
 	if spec.ReadinessDefaultCheck.BufferFreeSpace || spec.ReadinessDefaultCheck.BufferFileNumber {
 		check := []string{"/bin/sh", "-c"}
 		bash := []string{}

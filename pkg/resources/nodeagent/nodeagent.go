@@ -138,7 +138,6 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 		if err != nil {
 			return nil, err
 		}
-
 	}
 	if userDefined.FluentbitSpec.LivenessDefaultCheck == nil || *userDefined.FluentbitSpec.LivenessDefaultCheck {
 		if userDefined.Profile != "windows" {
@@ -150,7 +149,6 @@ func NodeAgentFluentbitDefaults(userDefined v1beta1.NodeAgentConfig) (*v1beta1.N
 	}
 
 	if userDefined.FluentbitSpec.Metrics != nil {
-
 		programDefault.FluentbitSpec.Metrics = &v1beta1.Metrics{
 			Interval: "15s",
 			Timeout:  "5s",
@@ -256,7 +254,7 @@ func (n *nodeAgentInstance) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(n.nodeAgent.Metadata.Labels, map[string]string{
 		"app.kubernetes.io/name":     "fluentbit",
 		"app.kubernetes.io/instance": n.name,
-	}, generateLoggingRefLabels(n.logging.ObjectMeta.GetName()))
+	}, generateLoggingRefLabels(n.logging.GetName()))
 }
 
 func (n *nodeAgentInstance) getServiceAccount() string {
@@ -276,7 +274,6 @@ type Reconciler struct {
 	Logging     *v1beta1.Logging
 	fluentdSpec *v1beta1.FluentdSpec
 	*reconciler.GenericResourceReconciler
-	configs             map[string][]byte
 	agents              map[string]v1beta1.NodeAgentConfig
 	fluentdDataProvider loggingdataprovider.LoggingDataProvider
 }
@@ -285,10 +282,10 @@ type Reconciler struct {
 func New(client client.Client, logger logr.Logger, logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, agents map[string]v1beta1.NodeAgentConfig, opts reconciler.ReconcilerOpts, fluentdDataProvider loggingdataprovider.LoggingDataProvider) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
+		fluentdSpec:               fluentdSpec,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, logger, opts),
 		agents:                    agents,
 		fluentdDataProvider:       fluentdDataProvider,
-		fluentdSpec:               fluentdSpec,
 	}
 }
 
@@ -334,7 +331,6 @@ func (r *Reconciler) processAgent(ctx context.Context, name string, userDefinedA
 		if err != nil {
 			return nil, err
 		}
-
 	}
 	err = merge.Merge(NodeAgentFluentbitDefaults, &userDefinedAgent)
 	if err != nil {

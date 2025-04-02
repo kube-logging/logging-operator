@@ -85,7 +85,7 @@ func (h *HostTailer) RegisterWatches(*builder.Builder) {
 
 // Name returns generated name string
 func (h *HostTailer) Name(suffix string) string {
-	strs := []string{h.customResource.ObjectMeta.Name, config.HostTailer.TailerAffix}
+	strs := []string{h.customResource.Name, config.HostTailer.TailerAffix}
 	if suffix != "" {
 		strs = append(strs, suffix)
 	}

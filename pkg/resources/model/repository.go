@@ -343,7 +343,6 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	return res, nil
 }
 func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list []v1beta1.FluentdConfig, logging v1beta1.Logging) []v1beta1.FluentdConfig {
-
 	r.Logger.Info("multiple detached Fluentd CRDs found")
 
 	var excessFluentds []v1beta1.FluentdConfig
@@ -384,7 +383,6 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 	}
 }
 func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list []v1beta1.SyslogNGConfig, logging v1beta1.Logging) []v1beta1.SyslogNGConfig {
-
 	r.Logger.Info("multiple detached SyslogNG CRDs found")
 
 	var excessSyslogNGs []v1beta1.SyslogNGConfig

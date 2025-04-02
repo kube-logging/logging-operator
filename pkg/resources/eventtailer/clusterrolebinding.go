@@ -17,22 +17,21 @@ package eventtailer
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	rbacv1 "k8s.io/api/rbac/v1"
-	v1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // ClusterRoleBinding resource for reconciler
 func (e *EventTailer) ClusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
-	clusterRoleBinding := v1.ClusterRoleBinding{
+	clusterRoleBinding := rbacv1.ClusterRoleBinding{
 		ObjectMeta: e.clusterObjectMeta(),
-		Subjects: []v1.Subject{
+		Subjects: []rbacv1.Subject{
 			{
 				Kind:      rbacv1.ServiceAccountKind,
 				Name:      e.Name(),
 				Namespace: e.customResource.Spec.ControlNamespace,
 			},
 		},
-		RoleRef: v1.RoleRef{
+		RoleRef: rbacv1.RoleRef{
 			APIGroup: rbacv1.GroupName,
 			Kind:     "ClusterRole",
 			Name:     e.Name(),

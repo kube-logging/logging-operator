@@ -72,7 +72,7 @@ type ParseSection struct {
 	Expression string `json:"expression,omitempty"`
 	// Specify time field for event time. If the event doesn't have this field, current time is used.
 	TimeKey string `json:"time_key,omitempty"`
-	// Names for fields on each line. (seperated by coma)
+	// Names for fields on each line. (separated by coma)
 	Keys string `json:"keys,omitempty"`
 	//  Specify null value pattern.
 	NullValuePattern string `json:"null_value_pattern,omitempty"`

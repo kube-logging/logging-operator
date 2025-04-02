@@ -143,7 +143,7 @@ func (f *FluentdSpec) GetFluentdMetricsPath() string {
 }
 
 func (f *FluentdSpec) SetDefaults() error {
-	if f != nil { // nolint:nestif
+	if f != nil { //nolint:nestif
 		if f.FluentdPvcSpec != nil {
 			return errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")
 		}
@@ -444,7 +444,7 @@ func (e *ExtraVolume) ApplyVolumeForPodSpec(spec *corev1.PodSpec) error {
 
 // +kubebuilder:object:generate=true
 
-// FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
+// FluentdScaling enables configuring the scaling behavior of the fluentd statefulset
 type FluentdScaling struct {
 	Replicas            int                `json:"replicas,omitempty"`
 	PodManagementPolicy string             `json:"podManagementPolicy,omitempty"`

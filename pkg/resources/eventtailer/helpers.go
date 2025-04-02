@@ -20,16 +20,16 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Name .
 func (e *EventTailer) Name() string {
-	return fmt.Sprintf("%v-%v", e.customResource.ObjectMeta.Name, config.EventTailer.TailerAffix)
+	return fmt.Sprintf("%v-%v", e.customResource.Name, config.EventTailer.TailerAffix)
 }
 
-func (e *EventTailer) objectMeta() v1.ObjectMeta {
-	meta := v1.ObjectMeta{
+func (e *EventTailer) objectMeta() metav1.ObjectMeta {
+	meta := metav1.ObjectMeta{
 		Name:            e.Name(),
 		Namespace:       e.customResource.Spec.ControlNamespace,
 		Labels:          e.selectorLabels(),
@@ -38,8 +38,8 @@ func (e *EventTailer) objectMeta() v1.ObjectMeta {
 	return meta
 }
 
-func (e *EventTailer) clusterObjectMeta() v1.ObjectMeta {
-	meta := v1.ObjectMeta{
+func (e *EventTailer) clusterObjectMeta() metav1.ObjectMeta {
+	meta := metav1.ObjectMeta{
 		Name:            e.Name(),
 		Labels:          e.selectorLabels(),
 		OwnerReferences: e.ownerReferences(),
@@ -47,13 +47,13 @@ func (e *EventTailer) clusterObjectMeta() v1.ObjectMeta {
 	return meta
 }
 
-func (e *EventTailer) ownerReferences() []v1.OwnerReference {
-	ownerReferences := []v1.OwnerReference{
+func (e *EventTailer) ownerReferences() []metav1.OwnerReference {
+	ownerReferences := []metav1.OwnerReference{
 		{
-			APIVersion: e.customResource.TypeMeta.APIVersion,
-			Kind:       e.customResource.TypeMeta.Kind,
-			Name:       e.customResource.ObjectMeta.Name,
-			UID:        e.customResource.ObjectMeta.UID,
+			APIVersion: e.customResource.APIVersion,
+			Kind:       e.customResource.Kind,
+			Name:       e.customResource.Name,
+			UID:        e.customResource.UID,
 			Controller: utils.BoolPointer(true),
 		},
 	}

@@ -89,7 +89,7 @@ type LogIntelligenceHeaders struct {
 
 // logIntelligenceHeadersOut is used to convert the input LogIntelligenceHeaders to a fluentd
 // output that uses the correct key names for the VMware Log Intelligence plugin. This allows the
-// Ouput to accept the config is snake_case (as other output plugins do) but output the fluentd
+// Output to accept the config is snake_case (as other output plugins do) but output the fluentd
 // <headers> config with the proper key names (ie. content_type -> Content-Type)
 type logIntelligenceHeadersOut struct {
 	// Authorization Bearer token for http request to VMware Log Intelligence

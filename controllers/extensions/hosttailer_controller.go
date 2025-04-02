@@ -54,7 +54,7 @@ func (r *HostTailerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	hosttailer := loggingextensionsv1alpha1.HostTailer{}
 
-	if err := r.Client.Get(ctx, req.NamespacedName, &hosttailer); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &hosttailer); err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}

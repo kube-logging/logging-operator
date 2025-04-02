@@ -38,7 +38,6 @@ const (
 )
 
 func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error) {
-
 	labels := util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels())
 	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
 	meta.Annotations = util.MergeLabels(meta.Annotations, r.fluentbitSpec.DaemonSetAnnotations)

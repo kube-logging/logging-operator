@@ -124,8 +124,7 @@ func (r *Reconciler) configureOutputsForTenants(ctx context.Context, tenants []v
 	return errs
 }
 
-func (r *Reconciler) configureInputsForTenants(tenants []v1beta1.Tenant, input *fluentBitConfig) error {
-	var errs error
+func (r *Reconciler) configureInputsForTenants(tenants []v1beta1.Tenant, input *fluentBitConfig) error { //nolint: unparam
 	for _, t := range tenants {
 		allNamespaces := len(t.Namespaces) == 0
 		tenantValues := maps.Clone(input.Input.Values)
@@ -150,7 +149,7 @@ func (r *Reconciler) configureInputsForTenants(tenants []v1beta1.Tenant, input *
 	}
 	// the regex will work only if we cut the prefix off. fluentbit doesn't care about the content, just the length
 	input.KubernetesFilter["Kube_Tag_Prefix"] = `kubernetes.0000000000.var.log.containers.`
-	return errs
+	return nil
 }
 
 func hashFromTenantName(input string) string {

@@ -306,7 +306,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		inputTail.DockerMode = ""
 		inputTail.DockerModeFlush = ""
 		inputTail.DockerModeParser = ""
-
 	} else if len(inputTail.ParserN) > 0 {
 		input.Input.ParserN = inputTail.ParserN
 		inputTail.ParserN = nil

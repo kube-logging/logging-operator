@@ -111,7 +111,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	log.V(1).Info("reconciling")
 
 	var logging loggingv1beta1.Logging
-	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &logging); err != nil {
 		// If object is not found, return without error.
 		// Created objects are automatically garbage collected.
 		// For additional cleanup logic use finalizers.
@@ -120,14 +120,14 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	var missingCRDs []string
 
-	if err := r.Client.List(ctx, &v1.ServiceMonitorList{}); err == nil {
+	if err := r.List(ctx, &v1.ServiceMonitorList{}); err == nil {
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.ServiceMonitorKey, true)
 	} else {
 		missingCRDs = append(missingCRDs, "ServiceMonitor")
 	}
 
-	if err := r.Client.List(ctx, &v1.PrometheusRuleList{}); err == nil {
+	if err := r.List(ctx, &v1.PrometheusRuleList{}); err == nil {
 		//nolint:staticcheck
 		ctx = context.WithValue(ctx, resources.PrometheusRuleKey, true)
 	} else {
@@ -384,7 +384,7 @@ func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging
 
 func (r *LoggingReconciler) dynamicDefaults(ctx context.Context, log logr.Logger, syslogNGSpec *loggingv1beta1.SyslogNGSpec) {
 	nodes := corev1.NodeList{}
-	if err := r.Client.List(ctx, &nodes); err != nil {
+	if err := r.List(ctx, &nodes); err != nil {
 		log.Error(err, "listing nodes")
 	}
 	if syslogNGSpec != nil && syslogNGSpec.MaxConnections == 0 {

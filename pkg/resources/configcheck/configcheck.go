@@ -34,7 +34,7 @@ func WithHashLabel(accessor v1.Object, hash string) {
 	accessor.SetLabels(l)
 }
 
-func hasHashLabel(accessor v1.Object, hash string) (has bool, match bool) {
+func hasHashLabel(accessor v1.Object, hash string) (has bool, match bool) { //nolint: unparam
 	l := accessor.GetLabels()
 	var val string
 	val, has = l[HashLabel]

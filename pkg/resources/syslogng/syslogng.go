@@ -183,7 +183,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 		}
 	}
 	// Prepare output secret
-	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets, OutputSecretPath)
+	outputSecret, outputSecretDesiredState, err := r.outputSecret(r.secrets)
 	if err != nil {
 		return nil, errors.WrapIf(err, "failed to create output secret")
 	}

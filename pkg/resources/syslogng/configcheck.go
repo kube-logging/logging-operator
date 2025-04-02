@@ -163,7 +163,7 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	return &ConfigCheckResult{}, nil
 }
 
-func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
+func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) { //nolint: unparam
 	meta := r.SyslogNGObjectMeta(configCheckResourceName(hashKey), ComponentConfigCheck)
 	meta.Labels = utils.MergeLabels(
 		meta.Labels,
@@ -178,14 +178,14 @@ func (r *Reconciler) newCheckSecret(hashKey string) (*corev1.Secret, error) {
 }
 
 func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error) {
-	obj, _, err := r.outputSecret(r.secrets, OutputSecretPath)
+	obj, _, err := r.outputSecret(r.secrets)
 	if err != nil {
 		return nil, err
 	}
 	if secret, ok := obj.(*corev1.Secret); ok {
 		secret.ObjectMeta = r.SyslogNGObjectMeta(fmt.Sprintf("syslog-ng-configcheck-output-%s", hashKey), ComponentConfigCheck)
-		secret.ObjectMeta.Labels = utils.MergeLabels(
-			secret.ObjectMeta.Labels,
+		secret.Labels = utils.MergeLabels(
+			secret.Labels,
 			map[string]string{"logging.banzaicloud.io/watch": "enabled"},
 		)
 

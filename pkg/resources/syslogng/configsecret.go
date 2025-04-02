@@ -28,8 +28,8 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			configKey: []byte(r.config),
 		},
 	}
-	secret.ObjectMeta.Labels = utils.MergeLabels(
-		secret.ObjectMeta.Labels,
+	secret.Labels = utils.MergeLabels(
+		secret.Labels,
 		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
 	)
 
