@@ -64,7 +64,7 @@ You can specify keys which are record in events for hash generation seed. This p
 
 ### separator (string, optional) {#elasticsearchgenid-separator}
 
-You can specify separator charactor to creating seed for hash generation. 
+You can specify separator character to creating seed for hash generation. 
 
 
 ### use_entire_record (bool, optional) {#elasticsearchgenid-use_entire_record}

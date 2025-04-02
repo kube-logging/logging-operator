@@ -228,7 +228,7 @@ ExtraVolume defines the fluentd extra volumes
 
 ## FluentdScaling
 
-FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
+FluentdScaling enables configuring the scaling behavior of the fluentd statefulset
 
 ### drain (FluentdDrainConfig, optional) {#fluentdscaling-drain}
 
