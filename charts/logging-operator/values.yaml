@@ -207,7 +207,8 @@ logging:
   allowClusterResourcesFromAllNamespaces: false
 
   # -- NodeAgent Configuration
-  nodeAgents: {}
+  # DEPRECATED: This field will be removed in a future release.
+  nodeAgents: []
   #  - name: win-agent
   #    profile: windows
   #    nodeAgentFluentbit:
