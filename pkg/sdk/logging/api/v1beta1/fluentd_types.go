@@ -170,10 +170,19 @@ func (f *FluentdSpec) SetDefaults() error {
 			f.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
 		}
 		if f.Security.SecurityContext == nil {
-			f.Security.SecurityContext = &corev1.SecurityContext{}
+			f.Security.SecurityContext = &corev1.SecurityContext{
+				RunAsUser:    util.IntPointer64(100),
+				RunAsGroup:   util.IntPointer64(101),
+				RunAsNonRoot: util.BoolPointer(true),
+			}
 		}
 		if f.Security.PodSecurityContext == nil {
-			f.Security.PodSecurityContext = &corev1.PodSecurityContext{}
+			f.Security.PodSecurityContext = &corev1.PodSecurityContext{
+				RunAsUser:    util.IntPointer64(100),
+				RunAsGroup:   util.IntPointer64(101),
+				RunAsNonRoot: util.BoolPointer(true),
+				FSGroup:      util.IntPointer64(101),
+			}
 		}
 		if f.Security.PodSecurityContext.FSGroup == nil {
 			f.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
