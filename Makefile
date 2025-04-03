@@ -8,7 +8,7 @@
 CONTROLLER_GEN_VERSION := 0.17.2
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := 1.64.8
+GOLANGCI_LINT_VERSION := 2.0.2
 
 # renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
 GO_TEST_COVERAGE_VERSION := 2.13.0
@@ -284,7 +284,7 @@ ${ENVTEST_BINARY_ASSETS}_${ENVTEST_K8S_VERSION}: | ${SETUP_ENVTEST} ${ENVTEST_BI
 ${GOLANGCI_LINT}: ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION} | ${BIN}
 	ln -sf $(notdir $<) $@
 
-${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/golangci/golangci-lint/cmd/golangci-lint
+${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: IMPORT_PATH := github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: VERSION := v${GOLANGCI_LINT_VERSION}
 ${GOLANGCI_LINT}_${GOLANGCI_LINT_VERSION}_${GOVERSION}: | ${BIN}
 	${go_install_binary}

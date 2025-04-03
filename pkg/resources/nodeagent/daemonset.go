@@ -214,7 +214,7 @@ func (n *nodeAgentInstance) generateVolume() (v []corev1.Volume) {
 			},
 		}
 		if util.PointerToBool(n.nodeAgent.FluentbitSpec.EnableUpstream) {
-			volume.VolumeSource.Secret.Items = append(volume.VolumeSource.Secret.Items, corev1.KeyToPath{
+			volume.Secret.Items = append(volume.Secret.Items, corev1.KeyToPath{
 				Key:  UpstreamConfigName,
 				Path: UpstreamConfigName,
 			})

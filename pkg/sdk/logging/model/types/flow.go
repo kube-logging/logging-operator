@@ -108,7 +108,7 @@ func (f *Flow) WithOutputs(output ...Output) *Flow {
 }
 
 func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, includeLabelInRouter *bool) (*Flow, error) {
-	var addRoute bool = true
+	addRoute := true
 	if flowLabel == "" {
 		var err error
 		flowLabel, err = calculateFlowLabel(matches, name, namespace)

@@ -53,7 +53,7 @@ func (r *TelemetryControllerReconciler) Reconcile(ctx context.Context, req ctrl.
 	log := r.Log.WithValues("telemetry-controller", req.Name)
 
 	var logging loggingv1beta1.Logging
-	if err := r.Client.Get(ctx, req.NamespacedName, &logging); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &logging); err != nil {
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -100,11 +100,11 @@ func (r *TelemetryControllerReconciler) createTelemetryControllerResources(logge
 func (r *TelemetryControllerReconciler) finalizeLoggingForTelemetryController(ctx context.Context, logger logr.Logger, logging *loggingv1beta1.Logging, objectsToCreate *[]client.Object) error {
 	logger.Info("Finalizing Telemetry controller resources")
 
-	if logging.ObjectMeta.DeletionTimestamp.IsZero() {
+	if logging.DeletionTimestamp.IsZero() {
 		if !controllerutil.ContainsFinalizer(logging, TelemetryControllerFinalizer) {
 			r.Log.Info("adding telemetrycontroller finalizer")
 			controllerutil.AddFinalizer(logging, TelemetryControllerFinalizer)
-			if err := r.Client.Update(ctx, logging); err != nil {
+			if err := r.Update(ctx, logging); err != nil {
 				return err
 			}
 		}
@@ -117,7 +117,7 @@ func (r *TelemetryControllerReconciler) finalizeLoggingForTelemetryController(ct
 
 			r.Log.Info("removing telemetrycontroller finalizer")
 			controllerutil.RemoveFinalizer(logging, TelemetryControllerFinalizer)
-			if err := r.Client.Update(ctx, logging); err != nil {
+			if err := r.Update(ctx, logging); err != nil {
 				return err
 			}
 		}
@@ -130,11 +130,11 @@ func (r *TelemetryControllerReconciler) deployTelemetryControllerResources(ctx c
 	logger.Info("Deploying Telemetry controller resources")
 
 	for _, objectToCreate := range *objectsToCreate {
-		if err := r.Client.Get(ctx, client.ObjectKeyFromObject(objectToCreate), objectToCreate); err != nil {
+		if err := r.Get(ctx, client.ObjectKeyFromObject(objectToCreate), objectToCreate); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return err
 			}
-			if err := r.Client.Create(ctx, objectToCreate); err != nil {
+			if err := r.Create(ctx, objectToCreate); err != nil {
 				return err
 			}
 			logger.Info("Created object", "object", objectToCreate.GetName())
@@ -150,7 +150,7 @@ func (r *TelemetryControllerReconciler) deleteTelemetryControllerResources(ctx c
 	logger.Info("Logging resource is being deleted, deleting Telemetry controller resources")
 
 	for _, obj := range *objectsToCreate {
-		if err := r.Client.Delete(ctx, obj); err != nil {
+		if err := r.Delete(ctx, obj); err != nil {
 			return client.IgnoreNotFound(err)
 		}
 		logger.Info("Deleted object", "object", obj.GetName())
@@ -164,7 +164,7 @@ func (r *TelemetryControllerReconciler) isAggregatorReady(ctx context.Context, l
 
 	podName := fmt.Sprintf("%s-fluentd-0", logging.Name)
 	pod := &corev1.Pod{}
-	err := r.Client.Get(ctx, client.ObjectKey{Name: podName, Namespace: logging.Spec.ControlNamespace}, pod)
+	err := r.Get(ctx, client.ObjectKey{Name: podName, Namespace: logging.Spec.ControlNamespace}, pod)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return fmt.Errorf("aggregator pod: %s not found", podName)

@@ -42,7 +42,7 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 		}
 		meta := d.GetPluginMeta()
 		if meta.Directive == "" {
-			return fmt.Errorf("Directive must have a name %s", meta)
+			return fmt.Errorf("directive must have a name %s", meta)
 		}
 		f.indentedf(indent, "<%s%s>", meta.Directive, tag(meta.Tag))
 		if meta.Type != "" {
@@ -79,9 +79,9 @@ func (f *FluentRender) indentedf(indent int, format string, values ...interface{
 	in := fmt.Sprintf(format, values...)
 	for _, line := range strings.Split(in, "\n") {
 		if line != "" {
-			fmt.Fprint(f.Out, indentString+line+"\n")
+			fmt.Fprint(f.Out, indentString+line+"\n") //nolint: errcheck
 		} else {
-			fmt.Fprintln(f.Out, "")
+			fmt.Fprintln(f.Out, "") //nolint: errcheck
 		}
 	}
 }

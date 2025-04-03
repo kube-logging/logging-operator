@@ -84,5 +84,4 @@ func (o *OpenobserveOutput) BeforeRender() {
 	if o.Stream == "" {
 		o.Stream = "default"
 	}
-
 }

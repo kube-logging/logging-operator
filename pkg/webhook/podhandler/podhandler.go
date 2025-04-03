@@ -140,11 +140,9 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1
 			p.Log.Info(duplicateValuesMsg)
 			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
-
 		} else {
 			podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
 			podToModify.Spec.Containers[idx].VolumeMounts = append(podToModify.Spec.Containers[idx].VolumeMounts, volumeMounts...)
-
 		}
 	}
 
@@ -158,8 +156,8 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1
 			return &rv
 		} else {
 			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
-
 		}
 	}
+
 	return nil
 }

@@ -50,18 +50,18 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 			return nil, reconciler.StatePresent, errors.WrapIfWithDetails(
 				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)
 		}
-		if secretItem.ObjectMeta.Annotations == nil {
-			secretItem.ObjectMeta.Annotations = make(map[string]string)
+		if secretItem.Annotations == nil {
+			secretItem.Annotations = make(map[string]string)
 		}
-		secretItem.ObjectMeta.Annotations[annotationKey] = "watched"
+		secretItem.Annotations[annotationKey] = "watched"
 		markedSecrets = append(markedSecrets, secretItem)
 	}
 
 	return markedSecrets, reconciler.StatePresent, nil
 }
 
-func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string) (runtime.Object, reconciler.DesiredState, error) {
-	// Initialise output secret
+func (r *Reconciler) outputSecret(secrets *secret.MountSecrets) (runtime.Object, reconciler.DesiredState, error) { //nolint: unparam
+	// Initialize output secret
 	fluentOutputSecret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      r.Logging.QualifiedName(OutputSecretName),
@@ -77,8 +77,8 @@ func (r *Reconciler) outputSecret(secrets *secret.MountSecrets, mountPath string
 			fluentOutputSecret.Data[secret.MappedKey] = secret.Value
 		}
 	}
-	fluentOutputSecret.ObjectMeta.Labels = utils.MergeLabels(
-		fluentOutputSecret.ObjectMeta.Labels,
+	fluentOutputSecret.Labels = utils.MergeLabels(
+		fluentOutputSecret.Labels,
 		map[string]string{"logging.banzaicloud.io/watch": "enabled"},
 	)
 

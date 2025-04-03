@@ -128,7 +128,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			Id:        id,
 		},
 	}
-	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels { // nolint:nestif
+	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels { //nolint:nestif
 		if l.Labels == nil {
 			l.Labels = Label{}
 		}
@@ -154,7 +154,7 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 		if l.IncludeThreadLabel == nil {
 			l.IncludeThreadLabel = util.BoolPointer(true)
 		}
-		// Prevent meta configuration from marshalling
+		// Prevent meta configuration from marshaling
 		l.ConfigureKubernetesLabels = nil
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(l); err != nil {

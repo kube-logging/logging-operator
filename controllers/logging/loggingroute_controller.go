@@ -49,7 +49,7 @@ type LoggingRouteReconciler struct {
 // Reconcile routes between logging domains
 func (r *LoggingRouteReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	var loggingRoute loggingv1beta1.LoggingRoute
-	if err := r.Client.Get(ctx, req.NamespacedName, &loggingRoute); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &loggingRoute); err != nil {
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 

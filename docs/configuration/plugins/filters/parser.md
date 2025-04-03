@@ -127,7 +127,7 @@ If true, keep time field in the record.
 
 ### keys (string, optional) {#parse section-keys}
 
-Names for fields on each line. (seperated by coma) 
+Names for fields on each line. (separated by coma) 
 
 
 ### label_delimiter (string, optional) {#parse section-label_delimiter}

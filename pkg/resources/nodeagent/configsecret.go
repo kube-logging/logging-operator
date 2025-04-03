@@ -138,7 +138,6 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 		inputTail.DockerMode = ""
 		inputTail.DockerModeFlush = ""
 		inputTail.DockerModeParser = ""
-
 	} else if len(inputTail.ParserN) > 0 {
 		fluentbitInput.ParserN = inputTail.ParserN
 		inputTail.ParserN = nil
@@ -150,7 +149,7 @@ func (n *nodeAgentInstance) configSecret() (runtime.Object, reconciler.DesiredSt
 	}
 	fluentbitInput.Values = fluentbitInputValues
 
-	disableKubernetesFilter := n.nodeAgent.FluentbitSpec.DisableKubernetesFilter != nil && *n.nodeAgent.FluentbitSpec.DisableKubernetesFilter == true
+	disableKubernetesFilter := n.nodeAgent.FluentbitSpec.DisableKubernetesFilter != nil && *n.nodeAgent.FluentbitSpec.DisableKubernetesFilter
 
 	if !disableKubernetesFilter {
 		if n.nodeAgent.FluentbitSpec.FilterKubernetes.BufferSize == "" {

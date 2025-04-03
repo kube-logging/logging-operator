@@ -28,10 +28,10 @@ import (
 func (h *HostTailer) ownerReferences() []v1.OwnerReference {
 	ownerReferences := []v1.OwnerReference{
 		{
-			APIVersion: h.customResource.TypeMeta.APIVersion,
-			Kind:       h.customResource.TypeMeta.Kind,
-			Name:       h.customResource.ObjectMeta.Name,
-			UID:        h.customResource.ObjectMeta.UID,
+			APIVersion: h.customResource.APIVersion,
+			Kind:       h.customResource.Kind,
+			Name:       h.customResource.Name,
+			UID:        h.customResource.UID,
 			Controller: utils.BoolPointer(true),
 		},
 	}
@@ -54,7 +54,7 @@ func (h *HostTailer) selectorLabels() map[string]string {
 func (h *HostTailer) objectMeta() v1.ObjectMeta {
 	meta := v1.ObjectMeta{
 		Name:            h.Name(""),
-		Namespace:       h.customResource.ObjectMeta.Namespace,
+		Namespace:       h.customResource.Namespace,
 		Labels:          h.selectorLabels(),
 		OwnerReferences: h.ownerReferences(),
 	}

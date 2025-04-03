@@ -47,7 +47,6 @@ func (e *EventTailer) StatefulSet() (runtime.Object, reconciler.DesiredState, er
 }
 
 func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
-
 	if e.customResource.Spec.Image != nil {
 		if repositoryWithTag := e.customResource.Spec.Image.RepositoryWithTag(); repositoryWithTag != "" {
 			if e.customResource.Spec.ContainerBase == nil {
@@ -60,7 +59,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 		if e.customResource.Spec.ContainerBase == nil {
 			e.customResource.Spec.ContainerBase = &types.ContainerBase{}
 		}
-		e.customResource.Spec.ContainerBase.PullPolicy = corev1.PullPolicy(e.customResource.Spec.ContainerBase.PullPolicy)
+		e.customResource.Spec.ContainerBase.PullPolicy = corev1.PullPolicy(e.customResource.Spec.ContainerBase.PullPolicy) //nolint: unconvert
 	}
 
 	var imagePullSecrets []corev1.LocalObjectReference

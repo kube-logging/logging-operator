@@ -56,7 +56,7 @@ func (r *EventTailerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	eventTailer := loggingextensionsv1alpha1.EventTailer{}
 
-	if err := r.Client.Get(ctx, req.NamespacedName, &eventTailer); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &eventTailer); err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}

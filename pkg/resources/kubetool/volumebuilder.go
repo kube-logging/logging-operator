@@ -47,7 +47,7 @@ func (v *VolumeBuilder) WithVolumeSource(volumeSource corev1.VolumeSource) *Volu
 // WithEmptyDir .
 func (v *VolumeBuilder) WithEmptyDir(emptyDir corev1.EmptyDirVolumeSource) *VolumeBuilder {
 	if v != nil {
-		v.VolumeSource.EmptyDir = &emptyDir
+		v.EmptyDir = &emptyDir
 	}
 	return v
 }
@@ -55,7 +55,7 @@ func (v *VolumeBuilder) WithEmptyDir(emptyDir corev1.EmptyDirVolumeSource) *Volu
 // WithHostPath .
 func (v *VolumeBuilder) WithHostPath(hostPath corev1.HostPathVolumeSource) *VolumeBuilder {
 	if v != nil {
-		v.VolumeSource.HostPath = &hostPath
+		v.HostPath = &hostPath
 	}
 	return v
 }

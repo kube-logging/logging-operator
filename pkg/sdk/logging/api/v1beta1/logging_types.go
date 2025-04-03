@@ -20,7 +20,6 @@ import (
 
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -266,7 +265,7 @@ func (logging *Logging) WatchAllNamespaces() bool {
 }
 
 func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
-	if fluentbitSpec != nil { // nolint:nestif
+	if fluentbitSpec != nil { //nolint:nestif
 		// Set default value for DisableVarLibDockerContainers to false (meaning volume is mounted by default)
 		if fluentbitSpec.DisableVarLibDockerContainers == nil {
 			fluentbitSpec.DisableVarLibDockerContainers = util.BoolPointer(false)
@@ -299,15 +298,15 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 			fluentbitSpec.CoroStackSize = 24576
 		}
 		if fluentbitSpec.Resources.Limits == nil {
-			fluentbitSpec.Resources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("100M"),
-				v1.ResourceCPU:    resource.MustParse("200m"),
+			fluentbitSpec.Resources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("200m"),
 			}
 		}
 		if fluentbitSpec.Resources.Requests == nil {
-			fluentbitSpec.Resources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("50M"),
-				v1.ResourceCPU:    resource.MustParse("100m"),
+			fluentbitSpec.Resources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("50M"),
+				corev1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
 		if fluentbitSpec.InputTail.Path == "" {
@@ -357,15 +356,15 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 			fluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
 		if fluentbitSpec.BufferVolumeResources.Limits == nil {
-			fluentbitSpec.BufferVolumeResources.Limits = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("100M"),
-				v1.ResourceCPU:    resource.MustParse("100m"),
+			fluentbitSpec.BufferVolumeResources.Limits = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("100M"),
+				corev1.ResourceCPU:    resource.MustParse("100m"),
 			}
 		}
 		if fluentbitSpec.BufferVolumeResources.Requests == nil {
-			fluentbitSpec.BufferVolumeResources.Requests = v1.ResourceList{
-				v1.ResourceMemory: resource.MustParse("20M"),
-				v1.ResourceCPU:    resource.MustParse("2m"),
+			fluentbitSpec.BufferVolumeResources.Requests = corev1.ResourceList{
+				corev1.ResourceMemory: resource.MustParse("20M"),
+				corev1.ResourceCPU:    resource.MustParse("2m"),
 			}
 		}
 		if fluentbitSpec.BufferVolumeLivenessProbe == nil {
@@ -384,10 +383,10 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 
 		if fluentbitSpec.Security.SecurityContext == nil {
-			fluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
+			fluentbitSpec.Security.SecurityContext = &corev1.SecurityContext{}
 		}
 		if fluentbitSpec.Security.PodSecurityContext == nil {
-			fluentbitSpec.Security.PodSecurityContext = &v1.PodSecurityContext{}
+			fluentbitSpec.Security.PodSecurityContext = &corev1.PodSecurityContext{}
 		}
 		if fluentbitSpec.Metrics != nil {
 			if fluentbitSpec.Metrics.Path == "" {
@@ -415,9 +414,9 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		}
 		if fluentbitSpec.LivenessProbe == nil {
 			if fluentbitSpec.LivenessDefaultCheck {
-				fluentbitSpec.LivenessProbe = &v1.Probe{
-					ProbeHandler: v1.ProbeHandler{
-						HTTPGet: &v1.HTTPGetAction{
+				fluentbitSpec.LivenessProbe = &corev1.Probe{
+					ProbeHandler: corev1.ProbeHandler{
+						HTTPGet: &corev1.HTTPGetAction{
 							Path: fluentbitSpec.Metrics.Path,
 							Port: intstr.IntOrString{
 								IntVal: fluentbitSpec.Metrics.Port,
@@ -538,7 +537,7 @@ func init() {
 	SchemeBuilder.Register(&Logging{}, &LoggingList{})
 }
 
-func persistentVolumeModePointer(mode v1.PersistentVolumeMode) *v1.PersistentVolumeMode {
+func persistentVolumeModePointer(mode corev1.PersistentVolumeMode) *corev1.PersistentVolumeMode {
 	return &mode
 }
 
@@ -577,7 +576,7 @@ func (l *Logging) GetFluentdLabels(component string, f FluentdSpec) map[string]s
 			"app.kubernetes.io/name":      "fluentd",
 			"app.kubernetes.io/component": component,
 		},
-		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+		GenerateLoggingRefLabels(l.GetName()),
 	)
 }
 
@@ -614,7 +613,7 @@ func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 			"app.kubernetes.io/name":      "syslog-ng",
 			"app.kubernetes.io/component": component,
 		},
-		GenerateLoggingRefLabels(l.ObjectMeta.GetName()),
+		GenerateLoggingRefLabels(l.GetName()),
 	)
 }
 
