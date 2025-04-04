@@ -1,16 +1,16 @@
-# Logging Operator Syslog-ng quickstart
+# Logging operator Syslog-ng quickstart
 
-This document describes how to get started with the preview version of the Logging Operator using syslog-ng as the forward agent.
+This document describes how to get started with the preview version of the Logging operator using syslog-ng as the forward agent.
 
 ## What is new?
 
-There are 4 new CRDs to manage Logging Operator with syslog-ng:
+There are 4 new CRDs to manage Logging operator with syslog-ng:
 - SyslogNGFlow
 - SyslogNGClusterFlow
 - SyslogNGOutput
 - SyslogNGClusterOutput
 
-These resources works identical to their counterparts used to manage Logging Operator with Fluentd, but are tailored to features available via syslog-ng.
+These resources works identical to their counterparts used to manage Logging operator with Fluentd, but are tailored to features available via syslog-ng.
 
 Also, the Logging CRD has been extended with a section for configuring syslog-ng under `logging.spec.syslogNG`.
 
@@ -189,7 +189,7 @@ The `regexp` field can have the following fields
 
 ### Filters
 
-Logging Operator currently supports the following filters for syslog-ng:
+Logging operator currently supports the following filters for syslog-ng:
 - match
 - parser
 - rewrite
@@ -214,7 +214,7 @@ These filters have the same options and syntax as syslog-ng flow match expressio
 
 #### Parser filter
 Parser filters can be used to extract key-value pairs from message data.
-Logging Operator currently supports the following parsers:
+Logging operator currently supports the following parsers:
 - regexp
 - syslog-parser
 
@@ -244,7 +244,7 @@ filters:
 
 #### Rewrite filter
 Rewrite filters can be used to modify record contents.
-Logging Operator currently supports the following rewrite functions:
+Logging operator currently supports the following rewrite functions:
 - rename
 - set
 - substitute
@@ -303,7 +303,7 @@ The `group_unset` function removes keys based on a patterns. If an object have m
 
 SyslogNGOutput and SyslogNGClusterOutput resources have almost the same structure as Output and ClusterOutput resources with the main difference being the number and kind of supported destinations.
 
-Logging Operator currently supports the following kinds of outputs for syslog-ng:
+Logging operator currently supports the following kinds of outputs for syslog-ng:
 - [file](#file-output)
 - [http](#http-output)
 - [loggly](#loggly-output)

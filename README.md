@@ -3,7 +3,7 @@
 
 # Logging operator
 
-The Logging Operator is now a [CNCF Sandbox](https://www.cncf.io/sandbox-projects/) project.
+The Logging operator is now a [CNCF Sandbox](https://www.cncf.io/sandbox-projects/) project.
 
 The Logging operator solves your logging-related problems in Kubernetes environments by automating the deployment and configuration of a Kubernetes logging pipeline.
 
@@ -67,7 +67,7 @@ Follow these [quickstart guides](https://kube-logging.github.io/docs/quickstarts
 
 ### Install
 
-Deploy Logging Operator with our [Helm chart](https://kube-logging.github.io/docs/install/#deploy-logging-operator-with-helm).
+Deploy Logging operator with our [Helm chart](https://kube-logging.github.io/docs/install/#deploy-logging-operator-with-helm).
 
 > Caution: The **master branch** is under heavy development. Use [releases](https://github.com/kube-logging/logging-operator/releases) instead of the master branch to get stable software.
 

@@ -10,7 +10,7 @@ generated_file: true
 
 For details, see [https://github.com/fluent/fluent-plugin-kafka](https://github.com/fluent/fluent-plugin-kafka).
 
-For an example deployment, see [Transport Nginx Access Logs into Kafka with Logging Operator](../../../../quickstarts/kafka-nginx/).
+For an example deployment, see [Transport Nginx Access Logs into Kafka with Logging operator](../../../../quickstarts/kafka-nginx/).
 
 ## Example output configurations
 
