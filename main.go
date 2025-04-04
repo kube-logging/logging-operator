@@ -104,7 +104,7 @@ func main() {
 	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
-	flag.BoolVar(&watchLabeledChildren, "watch-labeled-children", false, "Only watch child resources with logging operator's name label selector: app.kubernetes.io/name: fluentd|fluentbit|syslog-ng")
+	flag.BoolVar(&watchLabeledChildren, "watch-labeled-children", false, "Only watch child resources with Logging operator's name label selector: app.kubernetes.io/name: fluentd|fluentbit|syslog-ng")
 	flag.BoolVar(&watchLabeledSecrets, "watch-labeled-secrets", false, "Only watch secrets with the following label selector: logging.banzaicloud.io/watch: enabled")
 	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
 	flag.BoolVar(&enableTelemetryControllerRoute, "enable-telemetry-controller-route", false, "Enable the Telemetry Controller route for Logging resources")

@@ -11,7 +11,7 @@ There are multiple ways you can help with the project.
 
 ### Questions
 
-The following channels are available for logging operator related discussions:
+The following channels are available for Logging operator related discussions:
 
 - [Github discussions](https://github.com/orgs/kube-logging/discussions)
 - [#logging-operator Discord channel](https://discord.gg/eAcqmAVU2u)

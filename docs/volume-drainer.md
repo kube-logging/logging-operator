@@ -141,7 +141,7 @@ Downscale fluentd
 kubectl patch logging drainer --type merge -p '{"spec":{"fluentd":{"scaling":{"replicas":1}}}}'
 ```
 
-Wait for the logging operator to reconcile and start the drain job.
+Wait for the Logging operator to reconcile and start the drain job.
 
 In a new terminal, start a watch to examine how buffers change
 ```sh
@@ -163,7 +163,7 @@ Downscale fluentd
 kubectl patch logging drainer --type merge -p '{"spec":{"fluentd":{"scaling":{"replicas":1}}}}'
 ```
 
-Wait for the logging operator to reconcile and start the drain job.
+Wait for the Logging operator to reconcile and start the drain job.
 A placeholder pod should also appear with the same name as the deleted statefulset pod (`drainer-fluentd-1`).
 
 Upscale fluentd

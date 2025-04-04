@@ -34,7 +34,7 @@ namespaceOverride: ""
 # -- Define annotations for logging-operator pods.
 annotations: {}
 
-# -- Deploy CRDs used by Logging Operator.
+# -- Deploy CRDs used by Logging operator.
 createCustomResource: false
 
 ## Custom resource configuration defined as a dependency chart

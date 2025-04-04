@@ -39,7 +39,7 @@ kubectl get --raw '/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*
 
 The replica count of the stateful set is enforced by the logging-operator only if it is explicitly set in the logging resource's replica count.
 
-If it's not set explicitly in the logging resource, then the logging operator allows managing it from the outside.
+If it's not set explicitly in the logging resource, then the Logging operator allows managing it from the outside.
 
 To allow for HPA to control the replica count of the statefulset simply avoid setting the replica count through the logging resource.
 

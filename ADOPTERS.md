@@ -1,22 +1,22 @@
-# Logging Operator Adopters
+# Logging operator Adopters
 
-This is a list of production adopters of Logging Operator:
+This is a list of production adopters of Logging operator:
 
 | Company                                                                | Industry                                                                                                                                                                |
 | :--------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Acquia](https://www.acquia.com)                                       | Drupal site hosting as a service                                                                                                                                        |
-| [amazee.io](https://www.amazee.io)                                     | Developer-first application delivery and hosting - includes the Logging Operator in the fully open source [Lagoon](https://github.com/uselagoon) platform               |
+| [amazee.io](https://www.amazee.io)                                     | Developer-first application delivery and hosting - includes the Logging operator in the fully open source [Lagoon](https://github.com/uselagoon) platform               |
 | [Carrefour](https://carrefour.com)                                     | Retail                                                                                                                                                                  |
 | [Cisco](https://www.cisco.com)                                         | Digital communications technology                                                                                                                                       |
 | [Code Factory](https://codefactory.hu)                                 | Software Development/Consultancy                                                                                                                                        |
 | [Dailymotion](https://dailymotion.com)                                 | Video streaming, Adtech                                                                                                                                                 |
 | [DISH](https://www.dish.com/)                                          | Video streaming and satellite broadcasting.                                                                                                                             |
-| [D2IQ](https://d2iq.com)                                               | Kubernetes management tool. D2IQ's logging offering is based on the Logging Operator https://docs.d2iq.com/dkp/2.5/logging                                              |
+| [D2IQ](https://d2iq.com)                                               | Kubernetes management tool. D2IQ's logging offering is based on the Logging operator https://docs.d2iq.com/dkp/2.5/logging                                              |
 | [Flexera](https://www.flexera.com)                                     | Optimizing your IT assets from on-premises to the cloud                                                                                                                 |
 | [Fulcrum](https://www.fulcrumapp.com/)                                 | Organizations worldwide trust Fulcrum to help them capture and share reliable data about any field activity, much faster than paper or other digital solutions.         |
 | [hipages](https://hipages.com.au)                                      | E-commerce                                                                                                                                                              |
 | [KubeGems](https://kubegems.io)                                        | KubeGems observability/logging is powerd by Banzai Cloud Logging operator                                                                                               |
 | [Liquid Reply](https://liquidreply.net)                                | AWS Premier Consulting Partner for professional cloud computing services https://liquidreply.net/monitor-your-multi-cluster-environments                                |
-| [NAIS](https://nais.io)                                                | The Norwegian Labour and Welfare Administration (NAV) uses the Logging Operator in the NAIS application platform                                                        |
+| [NAIS](https://nais.io)                                                | The Norwegian Labour and Welfare Administration (NAV) uses the Logging operator in the NAIS application platform                                                        |
 | [PITS Global Data Recovery Services](https://www.pitsdatarecovery.net) | Data Recovery Services                                                                                                                                                  |
-| [Rancher](https://rancher.com)                                         | Kubernetes management tool. RKE’s default logging solution is based on the Logging Operator   https://ranchermanager.docs.rancher.com/v2.5/pages-for-subheaders/logging |
+| [Rancher](https://rancher.com)                                         | Kubernetes management tool. RKE’s default logging solution is based on the Logging operator   https://ranchermanager.docs.rancher.com/v2.5/pages-for-subheaders/logging |
