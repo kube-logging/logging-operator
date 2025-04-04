@@ -304,6 +304,8 @@ spec:
                               type: string
                             format_firstline:
                               type: string
+                            format_key:
+                              type: string
                             grok_failure_key:
                               type: string
                             grok_name_key:
@@ -392,6 +394,8 @@ spec:
                                   expression:
                                     type: string
                                   format:
+                                    type: string
+                                  format_name:
                                     type: string
                                   grok_failure_key:
                                     type: string
@@ -511,6 +515,8 @@ spec:
                                 type: string
                               format_firstline:
                                 type: string
+                              format_key:
+                                type: string
                               grok_failure_key:
                                 type: string
                               grok_name_key:
@@ -599,6 +605,8 @@ spec:
                                     expression:
                                       type: string
                                     format:
+                                      type: string
+                                    format_name:
                                       type: string
                                     grok_failure_key:
                                       type: string
@@ -1165,6 +1173,8 @@ spec:
                               type: string
                             format_firstline:
                               type: string
+                            format_key:
+                              type: string
                             grok_failure_key:
                               type: string
                             grok_name_key:
@@ -1253,6 +1263,8 @@ spec:
                                   expression:
                                     type: string
                                   format:
+                                    type: string
+                                  format_name:
                                     type: string
                                   grok_failure_key:
                                     type: string
@@ -1372,6 +1384,8 @@ spec:
                                 type: string
                               format_firstline:
                                 type: string
+                              format_key:
+                                type: string
                               grok_failure_key:
                                 type: string
                               grok_name_key:
@@ -1460,6 +1474,8 @@ spec:
                                     expression:
                                       type: string
                                     format:
+                                      type: string
+                                    format_name:
                                       type: string
                                     grok_failure_key:
                                       type: string

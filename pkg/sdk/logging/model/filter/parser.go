@@ -68,6 +68,8 @@ type ParserConfig struct {
 type ParseSection struct {
 	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
 	Type string `json:"type,omitempty"`
+	// If set, add this key to record with value being pattern format_name
+	FormatKey string `json:"format_key,omitempty"`
 	// Regexp expression to evaluate
 	Expression string `json:"expression,omitempty"`
 	// Specify time field for event time. If the event doesn't have this field, current time is used.
@@ -161,6 +163,9 @@ type SingleParseSection struct {
 	Timezone string `json:"timezone,omitempty"`
 	// Only available when using type: multi_format
 	Format string `json:"format,omitempty"`
+	// Only available when using type: multi_format
+	// Value added to format key entry
+	FormatName string `json:"format_name,omitempty"`
 	// Only available when using format: grok, multiline_grok.
 	// The pattern of grok. You cannot specify multiple grok pattern with this.
 	GrokPattern string `json:"grok_pattern,omitempty"`

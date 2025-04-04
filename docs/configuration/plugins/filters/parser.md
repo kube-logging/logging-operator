@@ -100,6 +100,11 @@ Only available when using type: multi_format
 Only available when using type: multi_format 
 
 
+### format_key (string, optional) {#parse section-format_key}
+
+If set, add this key to record with value being pattern format_name 
+
+
 ### grok_failure_key (string, optional) {#parse section-grok_failure_key}
 
 Only available when using type: grok, multiline_grok. The key has grok failure reason. 
@@ -226,6 +231,11 @@ Regexp expression to evaluate
 ### format (string, optional) {#parse section (single)-format}
 
 Only available when using type: multi_format 
+
+
+### format_name (string, optional) {#parse section (single)-format_name}
+
+Only available when using type: multi_format Value added to format key entry 
 
 
 ### grok_failure_key (string, optional) {#parse section (single)-grok_failure_key}
