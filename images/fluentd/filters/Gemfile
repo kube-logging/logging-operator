@@ -1,7 +1,7 @@
 source 'https://index.rubygems.org'
 
 gem 'fluent-plugin-detect-exceptions', '0.0.16'
-gem 'fluent-plugin-prometheus', '2.2.0'
+gem 'fluent-plugin-prometheus', '2.2.1'
 gem 'fluent-plugin-dedot_filter', '1.0.0'
 gem 'fluent-plugin-geoip', '1.3.2'
 gem 'fluent-plugin-tag-normaliser', '0.1.3'
