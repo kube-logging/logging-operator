@@ -9,7 +9,7 @@ generated_file: true
 
 Fluentd output plugin to ship logs to a Loki server. For details, see [https://grafana.com/docs/loki/latest/clients/fluentd/](https://grafana.com/docs/loki/latest/clients/fluentd/).
 
-For a detailed example, see [Store Nginx Access Logs in Grafana Loki with Logging Operator](../../../../quickstarts/loki-nginx/).
+For a detailed example, see [Store Nginx Access Logs in Grafana Loki with Logging operator](../../../../quickstarts/loki-nginx/).
 
 ## Example output configurations
 
