@@ -56,11 +56,14 @@ remove_key_name_field: true
 reserve_data: true
 parse:
   type: multi_format
+  format_key: format
   patterns:
   - format: nginx
+    format_name: nginx
   - format: regexp
     expression: /asdsada/
   - format: none
+    format_name: none
 `)
 	expected := `
 <filter **>
@@ -71,8 +74,10 @@ parse:
   reserve_data true
   <parse>
     @type multi_format
+    format_key format
     <pattern>
       format nginx
+      format_name nginx
     </pattern>
     <pattern>
       expression /asdsada/
@@ -80,6 +85,7 @@ parse:
     </pattern>
     <pattern>
       format none
+      format_name none
     </pattern>
   </parse>
 </filter>
