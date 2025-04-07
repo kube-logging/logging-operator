@@ -68,6 +68,7 @@ type ParserConfig struct {
 type ParseSection struct {
 	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
 	Type string `json:"type,omitempty"`
+	// Only available when using type: multi_format
 	// If set, add this key to record with value being pattern format_name
 	FormatKey string `json:"format_key,omitempty"`
 	// Regexp expression to evaluate
