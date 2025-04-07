@@ -102,7 +102,7 @@ Only available when using type: multi_format
 
 ### format_key (string, optional) {#parse section-format_key}
 
-If set, add this key to record with value being pattern format_name 
+Only available when using type: multi_format If set, add this key to record with value being pattern format_name 
 
 
 ### grok_failure_key (string, optional) {#parse section-grok_failure_key}
