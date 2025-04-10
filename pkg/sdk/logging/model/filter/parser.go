@@ -136,7 +136,7 @@ type ParseSection struct {
 // +kubebuilder:object:generate=true
 // +docName:"Parse Section (single)"
 type SingleParseSection struct {
-	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
+	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok, multi_format
 	Type string `json:"type,omitempty"`
 	// Regexp expression to evaluate
 	Expression string `json:"expression,omitempty"`

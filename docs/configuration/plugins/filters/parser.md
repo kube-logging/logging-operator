@@ -196,7 +196,7 @@ Default: nil
 
 ### type (string, optional) {#parse section-type}
 
-Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok 
+Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok, multi_format 
 
 
 ### types (string, optional) {#parse section-types}
@@ -308,7 +308,7 @@ Default: nil
 
 ### type (string, optional) {#parse section (single)-type}
 
-Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok 
+Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok, multi_format 
 
 
 ### types (string, optional) {#parse section (single)-types}
