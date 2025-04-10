@@ -66,7 +66,7 @@ type ParserConfig struct {
 // +kubebuilder:object:generate=true
 // +docName:"Parse Section"
 type ParseSection struct {
-	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok
+	// Parse type: apache2, apache_error, nginx, syslog, csv, tsv, ltsv, json, multiline, none, logfmt, grok, multiline_grok, multi_format
 	Type string `json:"type,omitempty"`
 	// Only available when using type: multi_format
 	// If set, add this key to record with value being pattern format_name
