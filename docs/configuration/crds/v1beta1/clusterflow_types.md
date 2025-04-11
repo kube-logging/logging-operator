@@ -49,6 +49,9 @@ Name of the logging cluster to be attached
 ### namespaces ([]string, optional) {#clusterselect-namespaces}
 
 
+### namespaces_regex ([]string, optional) {#clusterselect-namespaces_regex}
+
+
 
 ## ClusterExclude
 
@@ -65,6 +68,9 @@ Name of the logging cluster to be attached
 
 
 ### namespaces ([]string, optional) {#clusterexclude-namespaces}
+
+
+### namespaces_regex ([]string, optional) {#clusterexclude-namespaces_regex}
 
 
 

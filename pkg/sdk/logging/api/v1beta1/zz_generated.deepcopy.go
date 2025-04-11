@@ -88,6 +88,11 @@ func (in *ClusterExclude) DeepCopyInto(out *ClusterExclude) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.NamespacesRegex != nil {
+		in, out := &in.NamespacesRegex, &out.NamespacesRegex
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
 		*out = make(map[string]string, len(*in))
@@ -339,6 +344,11 @@ func (in *ClusterSelect) DeepCopyInto(out *ClusterSelect) {
 	*out = *in
 	if in.Namespaces != nil {
 		in, out := &in.Namespaces, &out.Namespaces
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.NamespacesRegex != nil {
+		in, out := &in.NamespacesRegex, &out.NamespacesRegex
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}

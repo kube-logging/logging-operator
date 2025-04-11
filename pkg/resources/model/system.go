@@ -328,6 +328,7 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 					ContainerNames:  match.ClusterSelect.ContainerNames,
 					Hosts:           match.ClusterSelect.Hosts,
 					Namespaces:      match.ClusterSelect.Namespaces,
+					NamespacesRegex: match.ClusterSelect.NamespacesRegex,
 					Negate:          false,
 				})
 			}
@@ -338,6 +339,7 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 					ContainerNames:  match.ClusterExclude.ContainerNames,
 					Hosts:           match.ClusterExclude.Hosts,
 					Namespaces:      match.ClusterExclude.Namespaces,
+					NamespacesRegex: match.ClusterSelect.NamespacesRegex,
 					Negate:          true,
 				})
 			}
