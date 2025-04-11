@@ -20,7 +20,7 @@ helm install --generate-name --wait oci://ghcr.io/kube-logging/helm-charts/loggi
 
 ## Introduction
 
-This chart bootstraps a [Logging Operator](https://github.com/kube-logging/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Logging operator](https://github.com/kube-logging/logging-operator) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -47,7 +47,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | fullnameOverride | string | `""` | A name to substitute for the full names of resources. |
 | namespaceOverride | string | `""` | A namespace override for the app. |
 | annotations | object | `{}` | Define annotations for logging-operator pods. |
-| createCustomResource | bool | `false` | Deploy CRDs used by Logging Operator. |
+| createCustomResource | bool | `false` | Deploy CRDs used by Logging operator. |
 | logging-operator-crds.install | bool | `false` | Toggle to install and upgrade CRDs from a subchart. Make sure to use it with `--skip-crds` to avoid conflicts. [More info about limitations on CRDs in Helm 3](https://helm.sh/docs/topics/charts/#limitations-on-crds) |
 | logging-operator-crds.annotations | object | `{}` | Annotations to be added to all CRDs |
 | telemetry-controller.install | bool | `false` | Toggle to install and upgrade Telemetry Controller from a subchart. |
