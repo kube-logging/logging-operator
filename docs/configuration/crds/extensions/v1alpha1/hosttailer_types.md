@@ -122,6 +122,11 @@ Start reading from the head of new log files
 Skip long line when exceeding Buffer_Max_Size 
 
 
+### verbose (bool, optional) {#filetailer-verbose}
+
+Verbose mode 
+
+
 
 ## SystemdTailer
 
@@ -160,6 +165,11 @@ Override systemd log path
 ### systemdFilter (string, optional) {#systemdtailer-systemdfilter}
 
 Filter to select systemd unit example: kubelet.service 
+
+
+### verbose (bool, optional) {#systemdtailer-verbose}
+
+Verbose mode 
 
 
 

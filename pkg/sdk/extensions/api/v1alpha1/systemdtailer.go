@@ -54,6 +54,9 @@ func (s SystemdTailer) Command(Name string) []string {
 		"-o", "file",
 		"-p", "format=plain",
 	)
+	if !s.Verbose {
+		command = append(command, "-qq")
+	}
 	command = append(command, config.HostTailer.VersionedFluentBitPathArgs("/dev/stdout")...)
 	return command
 }

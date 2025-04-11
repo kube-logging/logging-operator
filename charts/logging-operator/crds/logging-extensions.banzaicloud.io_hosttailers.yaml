@@ -365,6 +365,8 @@ spec:
                       type: boolean
                     skip_long_lines:
                       type: string
+                    verbose:
+                      type: boolean
                   required:
                   - name
                   type: object
@@ -720,6 +722,8 @@ spec:
                       type: string
                     systemdFilter:
                       type: string
+                    verbose:
+                      type: boolean
                   required:
                   - name
                   type: object
