@@ -49,6 +49,8 @@ type FlowMatch struct {
 	NamespaceLabels map[string]string `json:"namespace_labels,omitempty"`
 	// Optional namespace
 	Namespaces []string `json:"namespaces,omitempty"`
+	// Optional regex list for matching namespace
+	NamespacesRegex []string `json:"namespaces_regex,omitempty"`
 	// ContainerNames
 	ContainerNames []string `json:"container_names,omitempty"`
 	// Hosts
@@ -68,6 +70,9 @@ func (f FlowMatch) GetParams() Params {
 	}
 	if len(f.Namespaces) > 0 {
 		params["namespaces"] = strings.Join(f.Namespaces, ",")
+	}
+	if len(f.NamespacesRegex) > 0 {
+		params["namespaces_regex"] = strings.Join(f.NamespacesRegex, ",")
 	}
 	if len(f.ContainerNames) > 0 {
 		params["container_names"] = strings.Join(f.ContainerNames, ",")

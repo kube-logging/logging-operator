@@ -51,6 +51,7 @@ type ClusterMatch struct {
 
 type ClusterSelect struct {
 	Namespaces      []string          `json:"namespaces,omitempty"`
+	NamespacesRegex []string          `json:"namespaces_regex,omitempty"`
 	Labels          map[string]string `json:"labels,omitempty"`
 	NamespaceLabels map[string]string `json:"namespace_labels,omitempty"`
 	Hosts           []string          `json:"hosts,omitempty"`
@@ -59,6 +60,7 @@ type ClusterSelect struct {
 
 type ClusterExclude struct {
 	Namespaces      []string          `json:"namespaces,omitempty"`
+	NamespacesRegex []string          `json:"namespaces_regex,omitempty"`
 	Labels          map[string]string `json:"labels,omitempty"`
 	NamespaceLabels map[string]string `json:"namespace_labels,omitempty"`
 	Hosts           []string          `json:"hosts,omitempty"`
