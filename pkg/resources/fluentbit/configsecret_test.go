@@ -49,6 +49,6 @@ func TestValidFilterGrepConfig(t *testing.T) {
 
 	parserFluentdFilterGrep, err := toFluentdFilterGrep(filterGrep)
 
-	assert.EqualValues(t, err, nil)
+	assert.NoError(t, err)
 	assert.EqualValues(t, parserFluentdfilterGrep, expectedFluentFilterGrep)
 }
