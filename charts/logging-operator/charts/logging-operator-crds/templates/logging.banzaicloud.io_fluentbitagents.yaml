@@ -1282,7 +1282,7 @@ spec:
                     items:
                       type: string
                     type: array
-                  Logical_Op:
+                  LogicalOp:
                     default: legacy
                     enum:
                     - legacy

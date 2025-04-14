@@ -77,8 +77,8 @@ var fluentBitConfigTemplate = `
     Name        grep
     Match       {{ .FluentdFilterGrep.Match }}
 
-    {{- if .FluentdFilterGrep.Logical_Op }}
-    Logical_Op  {{ .FluentdFilterGrep.Logical_Op }}
+    {{- if .FluentdFilterGrep.LogicalOp }}
+    Logical_Op  {{ .FluentdFilterGrep.LogicalOp }}
     {{- end }}
 
     {{- range $value := .FluentdFilterGrep.Regex }}

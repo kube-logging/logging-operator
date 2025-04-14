@@ -860,7 +860,7 @@ FilterGrep The Grep Filter plugin
 Exclude records where the content of KEY matches the regular expression. 
 
 
-### Logical_Op (string, optional) {#filtergrep-logical_op}
+### LogicalOp (string, optional) {#filtergrep-logicalop}
 
 Specify a logical operator: AND, OR or legacy (default). In legacy mode the behavior is either AND or OR depending on whether the grep is including (uses AND) or excluding (uses OR). Available from 2.1 or higher. Default: "legacy"  
 

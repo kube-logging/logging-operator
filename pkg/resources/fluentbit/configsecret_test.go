@@ -23,32 +23,32 @@ import (
 
 func TestInvalidFilterGrepConfig(t *testing.T) {
 	invalidFilterGrep := &v1beta1.FilterGrep{
-		Match:      "*",
-		Regex:      []string{"regex", "reg2"},
-		Exclude:    []string{"exclude"},
-		Logical_Op: "AND",
+		Match:     "*",
+		Regex:     []string{"regex", "reg2"},
+		Exclude:   []string{"exclude"},
+		LogicalOp: "AND",
 	}
 
 	_, err := toFluentdFilterGrep(invalidFilterGrep)
 
-	assert.EqualError(t, err, "failed to parse grep filter for fluentbit, Logical_Op is set, it's not possible to set both Regex and Exclude")
+	assert.EqualError(t, err, "failed to parse grep filter for fluentbit, LogicalOp is set, it's not possible to set both Regex and Exclude")
 }
 
 func TestValidFilterGrepConfig(t *testing.T) {
 	filterGrep := &v1beta1.FilterGrep{
-		Match:      "*",
-		Regex:      []string{"regex1", "regex2"},
-		Logical_Op: "AND",
+		Match:     "*",
+		Regex:     []string{"regex1", "regex2"},
+		LogicalOp: "AND",
 	}
 
 	expectedFluentFilterGrep := &FluentdFilterGrep{
-		Match:      "*",
-		Regex:      []string{"regex1", "regex2"},
-		Logical_Op: "AND",
+		Match:     "*",
+		Regex:     []string{"regex1", "regex2"},
+		LogicalOp: "AND",
 	}
 
 	parserFluentdFilterGrep, err := toFluentdFilterGrep(filterGrep)
 
 	assert.NoError(t, err)
-	assert.EqualValues(t, parserFluentdfilterGrep, expectedFluentFilterGrep)
+	assert.EqualValues(t, parserFluentdFilterGrep, expectedFluentFilterGrep)
 }

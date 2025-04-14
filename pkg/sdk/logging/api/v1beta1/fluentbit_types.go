@@ -411,7 +411,7 @@ type FilterGrep struct {
 	//
 	// +kubebuilder:validation:Enum=legacy;AND;OR
 	// +kubebuilder:default=legacy
-	Logical_Op string `json:"Logical_Op,omitempty"`
+	LogicalOp string `json:"LogicalOp,omitempty"`
 }
 
 // FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
