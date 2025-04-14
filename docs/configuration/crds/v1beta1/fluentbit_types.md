@@ -119,6 +119,9 @@ DisableVarLibDockerContainers controls whether the /var/lib/docker/containers vo
 ### filterAws (*FilterAws, optional) {#fluentbitspec-filteraws}
 
 
+### filterGrep (*FilterGrep, optional) {#fluentbitspec-filtergrep}
+
+
 ### filterKubernetes (FilterKubernetes, optional) {#fluentbitspec-filterkubernetes}
 
 Parameters for Kubernetes metadata filter 
@@ -846,6 +849,32 @@ Default: false
 The VPC ID for current EC2 instance. (default:false) 
 
 Default: false
+
+
+## FilterGrep
+
+FilterGrep The Grep Filter plugin
+
+### Exclude ([]string, optional) {#filtergrep-exclude}
+
+Exclude records where the content of KEY matches the regular expression. 
+
+
+### Logical_Op (string, optional) {#filtergrep-logical_op}
+
+Specify a logical operator: AND, OR or legacy (default). In legacy mode the behavior is either AND or OR depending on whether the grep is including (uses AND) or excluding (uses OR). Available from 2.1 or higher. Default: "legacy"  
+
+
+### Match (string, optional) {#filtergrep-match}
+
+Match filtered records (default:*) 
+
+Default: *
+
+### Regex ([]string, optional) {#filtergrep-regex}
+
+Keep records where the content of KEY matches the regular expression. 
+
 
 
 ## FilterModify

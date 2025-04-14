@@ -405,7 +405,7 @@ type FilterGrep struct {
 
 	// Specify a logical operator:
 	// AND, OR or legacy (default).
-	// In legacy mode the behaviour is either AND or OR depending on whether the grep is including (uses AND) or excluding (uses OR).
+	// In legacy mode the behavior is either AND or OR depending on whether the grep is including (uses AND) or excluding (uses OR).
 	// Available from 2.1 or higher.
 	// Default: "legacy"
 	//
