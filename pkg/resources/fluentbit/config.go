@@ -72,6 +72,24 @@ var fluentBitConfigTemplate = `
 {{- template "input" .Input }}
 {{- end }}
 
+{{- if .FluentdFilterGrep }}
+[FILTER]
+    Name        grep
+    Match       {{ .FluentdFilterGrep.Match }}
+
+    {{- if .FluentdFilterGrep.Logical_Op }}
+    Logical_Op  {{ .FluentdFilterGrep.Logical_Op }}
+    {{- end }}
+
+    {{- range $value := .FluentdFilterGrep.Regex }}
+    Regex       {{ $value }}
+    {{- end }}
+
+    {{- range $value := .FluentdFilterGrep.Exclude }}
+    Exclude     {{ $value }}
+    {{- end }}
+{{- end}}
+
 {{- if not .DisableKubernetesFilter }}
 [FILTER]
     Name        kubernetes

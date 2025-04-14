@@ -76,6 +76,7 @@ type fluentBitConfig struct {
 	DisableKubernetesFilter  bool
 	KubernetesFilter         map[string]string
 	AwsFilter                map[string]string
+	FluentdFilterGrep        *FluentdFilterGrep
 	BufferStorage            map[string]string
 	FilterModify             []v1beta1.FilterModify
 	FluentForwardOutput      *fluentForwardOutputConfig
@@ -83,6 +84,13 @@ type fluentBitConfig struct {
 	DefaultParsers           string
 	CustomParsers            string
 	HealthCheck              *v1beta1.HealthCheck
+}
+
+type FluentdFilterGrep struct {
+	Match      string
+	Regex      []string
+	Exclude    []string
+	Logical_Op string
 }
 
 type fluentForwardOutputConfig struct {
@@ -317,6 +325,14 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	}
 	input.Input.Values = fluentbitInputValues
 
+	if r.fluentbitSpec.FilterGrep != nil {
+		input.FluentdFilterGrep, err = toFluentdFilterGrep(r.fluentbitSpec.FilterGrep)
+
+		if err != nil {
+			return nil, reconciler.StatePresent, err
+		}
+	}
+
 	input.KubernetesFilter, err = mapper.StringsMap(r.fluentbitSpec.FilterKubernetes)
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map kubernetes filter for fluentbit")
@@ -456,6 +472,21 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		ObjectMeta: meta,
 		Data:       confs,
 	}, reconciler.StatePresent, nil
+}
+
+func toFluentdFilterGrep(filterGrep *v1beta1.FilterGrep) (*FluentdFilterGrep, error) {
+	if filterGrep.Logical_Op != "legacy" && len(filterGrep.Regex) > 0 && len(filterGrep.Exclude) > 0 {
+		return nil, errors.New("failed to parse grep filter for fluentbit, Logical_Op is set, it's not posible to set both Regex and Exclude")
+	}
+
+	fluentdFilterGrep := &FluentdFilterGrep{
+		Match:      filterGrep.Match,
+		Regex:      filterGrep.Regex,
+		Exclude:    filterGrep.Exclude,
+		Logical_Op: filterGrep.Logical_Op,
+	}
+
+	return fluentdFilterGrep, nil
 }
 
 func (r *Reconciler) applyNetworkSettings(input fluentBitConfig) {

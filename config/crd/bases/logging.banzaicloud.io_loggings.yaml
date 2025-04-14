@@ -2129,6 +2129,26 @@ spec:
                       vpc_id:
                         type: boolean
                     type: object
+                  filterGrep:
+                    properties:
+                      Exclude:
+                        items:
+                          type: string
+                        type: array
+                      Logical_Op:
+                        default: legacy
+                        enum:
+                        - legacy
+                        - AND
+                        - OR
+                        type: string
+                      Match:
+                        type: string
+                      Regex:
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   filterKubernetes:
                     properties:
                       Annotations:
