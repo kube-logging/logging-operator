@@ -327,7 +327,6 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 	if r.fluentbitSpec.FilterGrep != nil {
 		input.FluentdFilterGrep, err = toFluentdFilterGrep(r.fluentbitSpec.FilterGrep)
-
 		if err != nil {
 			return nil, reconciler.StatePresent, err
 		}
