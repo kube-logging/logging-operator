@@ -476,7 +476,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 
 func toFluentdFilterGrep(filterGrep *v1beta1.FilterGrep) (*FluentdFilterGrep, error) {
 	if filterGrep.Logical_Op != "legacy" && len(filterGrep.Regex) > 0 && len(filterGrep.Exclude) > 0 {
-		return nil, errors.New("failed to parse grep filter for fluentbit, Logical_Op is set, it's not posible to set both Regex and Exclude")
+		return nil, errors.New("failed to parse grep filter for fluentbit, Logical_Op is set, it's not possible to set both Regex and Exclude")
 	}
 
 	fluentdFilterGrep := &FluentdFilterGrep{
