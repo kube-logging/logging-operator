@@ -47,7 +47,7 @@ func TestValidFilterGrepConfig(t *testing.T) {
 		Logical_Op: "AND",
 	}
 
-	parserFluentdfilterGrep, err := toFluentdFilterGrep(filterGrep)
+	parserFluentdFilterGrep, err := toFluentdFilterGrep(filterGrep)
 
 	assert.EqualValues(t, err, nil)
 	assert.EqualValues(t, parserFluentdfilterGrep, expectedFluentFilterGrep)
