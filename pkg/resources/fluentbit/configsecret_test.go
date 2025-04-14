@@ -31,7 +31,7 @@ func TestInvalidFilterGrepConfig(t *testing.T) {
 
 	_, err := toFluentdFilterGrep(invalidFilterGrep)
 
-	assert.EqualError(t, err, "failed to parse grep filter for fluentbit, Logical_Op is set, it's not posible to set both Regex and Exclude")
+	assert.EqualError(t, err, "failed to parse grep filter for fluentbit, Logical_Op is set, it's not possible to set both Regex and Exclude")
 }
 
 func TestValidFilterGrepConfig(t *testing.T) {
