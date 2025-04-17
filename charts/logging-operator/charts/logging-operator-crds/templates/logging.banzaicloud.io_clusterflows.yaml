@@ -845,6 +845,10 @@ spec:
                           items:
                             type: string
                           type: array
+                        namespaces_regex:
+                          items:
+                            type: string
+                          type: array
                       type: object
                     select:
                       properties:
@@ -865,6 +869,10 @@ spec:
                             type: string
                           type: object
                         namespaces:
+                          items:
+                            type: string
+                          type: array
+                        namespaces_regex:
                           items:
                             type: string
                           type: array
@@ -1722,6 +1730,10 @@ spec:
                           items:
                             type: string
                           type: array
+                        namespaces_regex:
+                          items:
+                            type: string
+                          type: array
                       type: object
                     select:
                       properties:
@@ -1742,6 +1754,10 @@ spec:
                             type: string
                           type: object
                         namespaces:
+                          items:
+                            type: string
+                          type: array
+                        namespaces_regex:
                           items:
                             type: string
                           type: array

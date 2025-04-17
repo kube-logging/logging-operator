@@ -394,7 +394,8 @@ func TestRenderFullFluentConfig(t *testing.T) {
 					"key1": "val1",
 					"key2": "val2",
 				},
-				Namespaces: []string{"ns-test"},
+				Namespaces:      []string{"ns-test"},
+				NamespacesRegex: []string{".*-system$"},
 				NamespaceLabels: map[string]string{
 					"ns_label_key": "ns_label_value",
 				},
@@ -442,6 +443,7 @@ func TestRenderFullFluentConfig(t *testing.T) {
 			    labels key1:val1,key2:val2
 				namespace_labels ns_label_key:ns_label_value
 			    namespaces ns-test
+				namespaces_regex .*-system$
 			    negate false
 			  </match>
           </route>

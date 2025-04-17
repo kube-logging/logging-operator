@@ -3,7 +3,7 @@ FROM ruby:3.4.2-alpine3.20 AS base
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
       wget bzip2 zlib-dev git linux-headers \
-      automake autoconf libtool build-base \    
+      automake autoconf libtool build-base \
       ruby-dev libc6-compat geoip-dev \
       snappy-dev gnupg bash openssl-dev \
       ruby-bigdecimal \
@@ -25,7 +25,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install fluentd -v 1.17.1 \
  && fluent-gem install specific_install -v 0.3.8 \
- && fluent-gem install fluent-plugin-label-router -v 0.4.0 \
+ && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
  && apk del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
