@@ -54,7 +54,7 @@ GEM
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     cool.io (1.8.1)
-    csv (3.3.2)
+    csv (3.3.4)
     date (3.4.1)
     declarative (0.0.20)
     digest-crc (0.6.5)
@@ -115,7 +115,8 @@ GEM
       oj
     fluent-plugin-grafana-loki (1.2.20)
       fluentd (>= 1.9.3, < 2)
-    fluent-plugin-kafka (0.19.3)
+    fluent-plugin-kafka (0.19.4)
+      bigdecimal (~> 3.1)
       fluentd (>= 0.10.58, < 2)
       ltsv
       ruby-kafka (>= 1.5.0, < 2)
@@ -385,7 +386,7 @@ DEPENDENCIES
   fluent-plugin-gcs (= 0.4.4)
   fluent-plugin-gelf-best (= 1.4.1)
   fluent-plugin-grafana-loki (= 1.2.20)
-  fluent-plugin-kafka (= 0.19.3)
+  fluent-plugin-kafka (= 0.19.4)
   fluent-plugin-kinesis (= 3.5.0)
   fluent-plugin-logzio (= 0.2.2)
   fluent-plugin-mattermost (= 0.2.2)
