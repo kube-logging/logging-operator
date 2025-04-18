@@ -53,6 +53,9 @@ func (f FileTailer) Command(Name string) []string {
 		"-p", "format=template",
 		"-p", "template={log}",
 	}
+	if !f.Verbose {
+		command = append(command, "-qq")
+	}
 	command = append(command, config.HostTailer.VersionedFluentBitPathArgs("/dev/stdout")...)
 	return command
 }
