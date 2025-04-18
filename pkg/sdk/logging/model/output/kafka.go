@@ -15,6 +15,8 @@
 package output
 
 import (
+	"encoding/json"
+
 	"github.com/cisco-open/operator-tools/pkg/secret"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
@@ -355,6 +357,21 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 	} else {
 		kafka.Params = params
 	}
+
+	if e.RdkafkaOptions != nil {
+		if rdkafkaOptions, err := types.NewStructToStringMapper(secretLoader).StringsMap(e.RdkafkaOptions); err != nil {
+			return nil, err
+		} else {
+			if len(rdkafkaOptions) > 0 {
+				marshaledRdkafkaOptions, err := json.Marshal(rdkafkaOptions)
+				if err != nil {
+					return nil, err
+				}
+				kafka.Params["rdkafka_options"] = string(marshaledRdkafkaOptions)
+			}
+		}
+	}
+
 	if e.Buffer == nil {
 		e.Buffer = &Buffer{}
 	}
@@ -362,13 +379,6 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 		return nil, err
 	} else {
 		kafka.SubDirectives = append(kafka.SubDirectives, buffer)
-	}
-	if e.RdkafkaOptions != nil {
-		if rdkafkaOptions, err := e.RdkafkaOptions.ToDirective(secretLoader, id); err != nil {
-			return nil, err
-		} else {
-			kafka.SubDirectives = append(kafka.SubDirectives, rdkafkaOptions)
-		}
 	}
 
 	if e.Format != nil {
@@ -382,10 +392,4 @@ func (e *KafkaOutputConfig) ToDirective(secretLoader secret.SecretLoader, id str
 	// remove use_rdkafka from params, it is not a valid parameter for plugin config
 	delete(kafka.Params, "use_rdkafka")
 	return kafka, nil
-}
-
-func (o *RdkafkaOptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	return types.NewFlatDirective(types.PluginMeta{
-		Directive: "rdkafka_options",
-	}, o, secretLoader)
 }
