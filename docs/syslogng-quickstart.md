@@ -505,7 +505,7 @@ All syslog-ng outputs support buffering to disk.
   disk_buf_size:   # required; the maximum size of the disk-buffer in bytes
   mem_buf_length:  # the number of messages stored in overflow queue
   mem_buf_size:    # the size of messages in bytes that is used in the memory part of the disk buffer
-  q_out_size:      # the number of messages stored in the output buffer of the destination
+  qout_size:      # the number of messages stored in the output buffer of the destination
 ```
 
 For more details, see [the official docs](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/disk-buffer).

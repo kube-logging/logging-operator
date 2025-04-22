@@ -73,7 +73,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -357,7 +357,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -625,7 +625,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -674,7 +674,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -936,7 +936,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -1206,7 +1206,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -1447,7 +1447,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -1514,7 +1514,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -1632,7 +1632,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2038,7 +2038,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2125,7 +2125,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2215,7 +2215,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2329,7 +2329,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2693,7 +2693,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -2933,7 +2933,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:
@@ -3136,7 +3136,7 @@ spec:
                       mem_buf_size:
                         format: int64
                         type: integer
-                      q_out_size:
+                      qout_size:
                         format: int64
                         type: integer
                       reliable:

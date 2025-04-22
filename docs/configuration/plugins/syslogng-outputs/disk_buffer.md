@@ -39,7 +39,7 @@ Use this option if the option reliable() is set to no. This option contains the 
 Use this option if the option reliable() is set to yes. This option contains the size of the messages in bytes that is used in the memory part of the disk buffer. 
 
 
-### q_out_size (*int64, optional) {#diskbuffer-q_out_size}
+### qout_size (*int64, optional) {#diskbuffer-qout_size}
 
 The number of messages stored in the output buffer of the destination. 
 
