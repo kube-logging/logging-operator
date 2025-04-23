@@ -88,7 +88,7 @@ Template for customizing the log message format.
 
 ### tenant-id (string, optional) {#lokioutput-tenant-id}
 
-Sets the tenant ID for multi-tenant scenarios. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 
+Sets the tenant ID for multi-tenant scenarios. See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#tenant-id) for more information. 
 
 
 ### time_reopen (int, optional) {#lokioutput-time_reopen}

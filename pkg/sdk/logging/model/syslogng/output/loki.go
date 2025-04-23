@@ -94,6 +94,6 @@ type LokiOutput struct {
 	// Template for customizing the log message format.
 	Template string `json:"template,omitempty"`
 	// Sets the tenant ID for multi-tenant scenarios.
-	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information.
+	// See [syslog-ng docs](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#tenant-id) for more information.
 	TenantID string `json:"tenant-id,omitempty"`
 }
