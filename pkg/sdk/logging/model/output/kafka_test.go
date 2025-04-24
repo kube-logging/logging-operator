@@ -77,7 +77,7 @@ rdkafka_options:
   ssl.ca.location: /etc/ssl/certs/ca-certificates.crt
   ssl.certificate.location: /etc/ssl/certs/tls.crt
   ssl.key.location: /etc/ssl/certs/tls.key
-  ssl.key.password: password 
+  ssl.key.password: password
 format:
   type: json
 buffer:
@@ -91,6 +91,7 @@ buffer:
     @id test
     brokers kafka-headless.kafka.svc.cluster.local:29092
     default_topic topic
+    rdkafka_options {"sasl.mechanisms":"PLAIN","sasl.username":"user","security.protocol":"SASL_SSL","ssl.ca.location":"/etc/ssl/certs/ca-certificates.crt","ssl.certificate.location":"/etc/ssl/certs/tls.crt","ssl.key.location":"/etc/ssl/certs/tls.key","ssl.key.password":"password"}
     ssl_verify_hostname false
     <buffer tag,time>
       @type file
@@ -100,15 +101,6 @@ buffer:
       timekey_use_utc true
       timekey_wait 30s
     </buffer>
-    <rdkafka_options>
-      sasl.mechanisms PLAIN
-      sasl.username user
-      security.protocol SASL_SSL
-      ssl.ca.location /etc/ssl/certs/ca-certificates.crt
-      ssl.certificate.location /etc/ssl/certs/tls.crt
-      ssl.key.location /etc/ssl/certs/tls.key
-      ssl.key.password password
-    </rdkafka_options>
     <format>
       @type json
     </format>
