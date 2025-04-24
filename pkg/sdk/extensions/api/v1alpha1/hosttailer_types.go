@@ -93,6 +93,8 @@ type FileTailer struct {
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
 	// Override image field for the given trailer
 	Image *tailer.ImageSpec `json:"image,omitempty"`
+	// Verbose mode
+	Verbose bool `json:"verbose,omitempty"`
 }
 
 // SystemdTailer configuration options
@@ -111,6 +113,8 @@ type SystemdTailer struct {
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
 	// Override image field for the given trailer
 	Image *tailer.ImageSpec `json:"image,omitempty"`
+	// Verbose mode
+	Verbose bool `json:"verbose,omitempty"`
 }
 
 func init() {
