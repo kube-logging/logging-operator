@@ -154,6 +154,49 @@ func TestClusterFlowMatchWithNamespaces(t *testing.T) {
 	`))))
 }
 
+func TestClusterFlowMatchWithNamespacesRegex(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := testLogging()
+	output := testClusterOutput()
+
+	flow := &v1beta1.ClusterFlow{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: logging.Spec.ControlNamespace,
+		},
+		Spec: v1beta1.ClusterFlowSpec{
+			Match: []v1beta1.ClusterMatch{
+				{
+					ClusterSelect: &v1beta1.ClusterSelect{
+						Labels: map[string]string{
+							"c": "d",
+						},
+						NamespacesRegex: []string{".*-system$", "^kube-.*"},
+					},
+				},
+			},
+			GlobalOutputRefs: []string{output.Name},
+		},
+	}
+
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(diff.TrimLinesInString(string(secret.Data[fluentd.AppConfigKey]))).Should(gomega.ContainSubstring(diff.TrimLinesInString(heredoc.Docf(`
+		<match>
+		  labels c:d
+		  namespaces_regex .*-system$,^kube-.*
+		  negate false
+		</match>
+	`))))
+}
+
 func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	errors := make(chan error)
 	defer beforeEachWithError(t, errors)()
