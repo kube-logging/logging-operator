@@ -35,6 +35,9 @@ var fluentBitConfigTemplate = `
     {{- if .CustomParsers }}
     Parsers_File {{ .CustomParsers }}
     {{- end }}
+    {{- if .CRIParser }}
+    Parsers_File {{ .CRIParser }}
+    {{- end }}
     Coro_Stack_Size    {{ .CoroStackSize }}
     {{- if .Monitor.Enabled }}
     HTTP_Server  On

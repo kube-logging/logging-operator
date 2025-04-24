@@ -82,6 +82,7 @@ type fluentBitConfig struct {
 	SyslogNGOutput           *syslogNGOutputConfig
 	DefaultParsers           string
 	CustomParsers            string
+	CRIParser                string
 	HealthCheck              *v1beta1.HealthCheck
 }
 
@@ -246,6 +247,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		default:
 			if r.Logging.Spec.EnableDockerParserCompatibilityForCRI {
 				r.fluentbitSpec.InputTail.Parser = "cri-log-compatibility"
+				input.CRIParser = fmt.Sprintf("%s/%s", OperatorConfigPath, CRIParserConfigName)
 			} else {
 				r.fluentbitSpec.InputTail.Parser = "cri"
 			}
