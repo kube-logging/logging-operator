@@ -1465,6 +1465,8 @@ spec:
                     type: integer
                   template:
                     type: string
+                  tenant-id:
+                    type: string
                   time_reopen:
                     type: integer
                   timestamp:
