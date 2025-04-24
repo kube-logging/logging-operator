@@ -24,6 +24,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func PtrBool(b bool) *bool {
+    return &b
+}
+
+func PtrInt64(i int64) *int64 {
+    return &i
+}
+
 func TestLokiOutputTable(t *testing.T) {
 	var tests = []struct {
 		name   string
@@ -149,6 +157,37 @@ func TestLokiOutputTable(t *testing.T) {
 			},
 			config: `destination "output_default_test-loki-out" {
 	loki(auth(insecure()) url("test.local") batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-out") log-fifo-size(1000));
+};
+`,
+		},
+		{
+			name: "test_buffer",
+			output: v1beta1.SyslogNGOutput{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test-loki-buffer-out",
+				},
+				Spec: v1beta1.SyslogNGOutputSpec{
+					Loki: &output.LokiOutput{
+						URL:          "test.local",
+						BatchLines:   2000,
+						BatchTimeout: 10,
+						Workers:      3,
+						LogFIFOSize:  1000,
+						DiskBuffer: &output.DiskBuffer{
+							Dir:          "/buffers",
+							DiskBufSize:  1000,
+							Reliable:     true,
+							Compaction:   PtrBool(true),
+							QOutSize:     PtrInt64(1000),
+							MemBufLength: PtrInt64(1000),
+							MemBufSize:   PtrInt64(1000),
+						},
+					},
+				},
+			},
+			config: `destination "output_default_test-loki-buffer-out" {
+	loki(url("test.local") disk_buffer(disk_buf_size(1000) reliable(yes) compaction(yes) dir("/buffers") mem_buf_length(1000) mem_buf_size(1000) qout_size(1000)) batch-lines(2000) batch-timeout(10) workers(3) persist_name("output_default_test-loki-buffer-out") log-fifo-size(1000));
 };
 `,
 		},
