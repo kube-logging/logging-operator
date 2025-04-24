@@ -105,6 +105,7 @@ type FluentbitSpec struct {
 	InputTail         InputTail                `json:"inputTail,omitempty"`
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	FilterModify      []FilterModify           `json:"filterModify,omitempty"`
+	FilterGrep        *FilterGrep              `json:"filterGrep,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser string `json:"parser,omitempty"`
 	// Parameters for Kubernetes metadata filter
@@ -391,6 +392,26 @@ type FilterAws struct {
 	VpcID *bool `json:"vpc_id,omitempty" plugin:"default:false"`
 	// Match filtered records (default:*)
 	Match string `json:"Match,omitempty" plugin:"default:*"`
+}
+
+// FilterGrep The Grep Filter plugin
+type FilterGrep struct {
+	// Match filtered records (default:*)
+	Match string `json:"Match,omitempty" plugin:"default:*"`
+	// Keep records where the content of KEY matches the regular expression.
+	Regex []string `json:"Regex,omitempty"`
+	// Exclude records where the content of KEY matches the regular expression.
+	Exclude []string `json:"Exclude,omitempty"`
+
+	// Specify a logical operator:
+	// AND, OR or legacy (default).
+	// In legacy mode the behavior is either AND or OR depending on whether the grep is including (uses AND) or excluding (uses OR).
+	// Available from 2.1 or higher.
+	// Default: "legacy"
+	//
+	// +kubebuilder:validation:Enum=legacy;AND;OR
+	// +kubebuilder:default=legacy
+	LogicalOp string `json:"LogicalOp,omitempty"`
 }
 
 // FilterModify The Modify Filter plugin allows you to change records using rules and conditions.
