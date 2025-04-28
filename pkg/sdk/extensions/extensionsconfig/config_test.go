@@ -46,7 +46,7 @@ func TestFluentBitConfigFilePath(t *testing.T) {
 		},
 		{
 			name: "imageVersionInvalid",
-			args: args{image: "docker.io/fluent/fluent-bit@x.Arg!unset", filePath: "/dev/stdout"},
+			args: args{image: "ghcr.io/fluent/fluent-bit@x.Arg!unset", filePath: "/dev/stdout"},
 			want: []string{"-p", "path=/dev/stdout"},
 		},
 		{
@@ -56,7 +56,7 @@ func TestFluentBitConfigFilePath(t *testing.T) {
 		},
 		{
 			name: "imageVersionLongVersionLess",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.5", filePath: "/dev/stdout"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.5", filePath: "/dev/stdout"},
 			want: []string{"-p", "path=/dev/stdout"},
 		},
 		{
@@ -66,7 +66,7 @@ func TestFluentBitConfigFilePath(t *testing.T) {
 		},
 		{
 			name: "imageVersionLongversionEquals",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.6", filePath: "/dev/stdout"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.6", filePath: "/dev/stdout"},
 			want: []string{"-p", "path=/dev/", "-p", "file=stdout"},
 		},
 		{
@@ -76,22 +76,22 @@ func TestFluentBitConfigFilePath(t *testing.T) {
 		},
 		{
 			name: "imageVersionLongversionGreater",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.7", filePath: "/dev/stdout"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.7", filePath: "/dev/stdout"},
 			want: []string{"-p", "path=/dev/", "-p", "file=stdout"},
 		},
 		{
 			name: "longPath",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.7", filePath: "/var/log/nginx/myaccess.log"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.7", filePath: "/var/log/nginx/myaccess.log"},
 			want: []string{"-p", "path=/var/log/nginx/", "-p", "file=myaccess.log"},
 		},
 		{
 			name: "relativeFilePath",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.7", filePath: "./myaccess.log"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.7", filePath: "./myaccess.log"},
 			want: []string{"-p", "path=./", "-p", "file=myaccess.log"},
 		},
 		{
 			name: "noPathGiven",
-			args: args{image: "docker.io/fluent/fluent-bit:1.4.7", filePath: "myaccess.log"},
+			args: args{image: "ghcr.io/fluent/fluent-bit:1.4.7", filePath: "myaccess.log"},
 			want: []string{"-p", "path=myaccess.log"},
 		},
 	}

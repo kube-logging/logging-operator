@@ -198,7 +198,7 @@ type DefaultFlowSpec struct {
 var Version string
 
 const (
-	DefaultFluentbitImageRepository               = "docker.io/fluent/fluent-bit"
+	DefaultFluentbitImageRepository               = "ghcr.io/fluent/fluent-bit"
 	DefaultFluentbitImageTag                      = "3.2.5"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/logging-operator/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "latest"

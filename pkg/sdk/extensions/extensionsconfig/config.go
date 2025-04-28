@@ -71,7 +71,7 @@ var Global = GlobalConfig{
 
 // HostTailer configuration
 var HostTailer = HostTailerConfig{
-	FluentBitImage: "docker.io/fluent/fluent-bit:3.2.5",
+	FluentBitImage: "ghcr.io/fluent/fluent-bit:3.2.5",
 	TailerAffix:    "host-tailer",
 }
 
@@ -85,7 +85,7 @@ var EventTailer = EventTailerConfig{
 
 // TailerWebhook configuration
 var TailerWebhook = TailerWebhookConfig{
-	FluentBitImage:    "docker.io/fluent/fluent-bit:3.2.5",
+	FluentBitImage:    "ghcr.io/fluent/fluent-bit:3.2.5",
 	AnnotationKey:     "sidecar.logging-extensions.banzaicloud.io/tail",
 	ServerPath:        "/tailer-webhook",
 	ServerPort:        9443,
