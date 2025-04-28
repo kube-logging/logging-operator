@@ -17,10 +17,10 @@ GO_TEST_COVERAGE_VERSION := 2.14.1
 HELM_DOCS_VERSION = 1.14.2
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
-KIND_VERSION ?= 0.26.0
+KIND_VERSION ?= 0.27.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
-KUBEBUILDER_VERSION = 3.1.0
+KUBEBUILDER_VERSION = 4.5.2
 
 # renovate: datasource=go depName=github.com/goph/licensei versioning=semver
 LICENSEI_VERSION = 0.9.0
@@ -28,7 +28,7 @@ LICENSEI_VERSION = 0.9.0
 # renovate: datasource=go depName=github.com/stern/stern versioning=semver
 STERN_VERSION := 1.32.0
 
-ENVTEST_K8S_VERSION := 1.31.0
+ENVTEST_K8S_VERSION := 1.32.0
 
 BIN := ${PWD}/bin
 
@@ -70,7 +70,7 @@ GO_TEST_COVERAGE := ${BIN}/go-test-coverage
 HELM_DOCS := ${BIN}/helm-docs
 
 KIND := ${BIN}/kind
-KIND_IMAGE ?= kindest/node:v1.31.0@sha256:53df588e04085fd41ae12de0c3fe4c72f7013bba32a20e7325357a1ac94ba865
+KIND_IMAGE ?= kindest/node:v1.33.0@sha256:02f73d6ae3f11ad5d543f16736a2cb2a63a300ad60e81dac22099b0b04784a4e
 KIND_CLUSTER := kind
 
 KUBEBUILDER := ${BIN}/kubebuilder

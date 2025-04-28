@@ -8,7 +8,7 @@ on:
   pull_request:
 
 env:
-  KUBECTL_VERSION: 'v1.32.0'
+  KUBECTL_VERSION: 'v1.33.0'
 
 jobs:
   build:
@@ -141,7 +141,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kube: ["1.30", "1.31", "1.32"]
+        kube: ["1.31", "1.32", "1.33"]
 
     steps:
       - name: Set up Docker Buildx
@@ -177,12 +177,12 @@ jobs:
         id: node_image
         run: |
           case ${{ matrix.kube }} in
-            1.30)
-              NODE_IMAGE=kindest/node:v1.30.0@sha256:2af5d1b382926abcd6336312d652cd045b7cc47475844a608669c71b1fefcfbc ;;
             1.31)
               NODE_IMAGE=kindest/node:v1.31.0@sha256:53df588e04085fd41ae12de0c3fe4c72f7013bba32a20e7325357a1ac94ba865 ;;
             1.32)
-              NODE_IMAGE=kindest/node:v1.32.0@sha256:c48c62eac5da28cdadcf560d1d8616cfa6783b58f0d94cf63ad1bf49600cb027
+              NODE_IMAGE=kindest/node:v1.32.0@sha256:c48c62eac5da28cdadcf560d1d8616cfa6783b58f0d94cf63ad1bf49600cb027 ;;
+            1.33)
+              NODE_IMAGE=kindest/node:v1.33.0@sha256:02f73d6ae3f11ad5d543f16736a2cb2a63a300ad60e81dac22099b0b04784a4e
             esac
 
             echo "image=$NODE_IMAGE" >> $GITHUB_OUTPUT
