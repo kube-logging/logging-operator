@@ -61,7 +61,6 @@ func (r *TelemetryControllerReconciler) Reconcile(ctx context.Context, req ctrl.
 		log.Info("Reconciling Logging resource for Telemetry controller", "name", logging.Name)
 
 		objectsToCreate := r.createTelemetryControllerResources(log, &logging)
-
 		if err := r.finalizeLoggingForTelemetryController(ctx, log, &logging, &objectsToCreate); err != nil {
 			return ctrl.Result{}, err
 		}
