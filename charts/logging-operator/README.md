@@ -64,7 +64,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | monitoring.serviceMonitor.relabelings | list | `[]` |  |
 | podSecurityContext | object | `{}` | Pod SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/) # SecurityContext holds pod-level security attributes and common container settings. # This defaults to non root user with uid 1000 and gid 2000.	*v1.PodSecurityContext	false # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | securityContext | object | `{}` | Container SecurityContext for Logging operator. [More info](https://kubernetes.io/docs/concepts/policy/security-context/) |
-| priorityClassName | object | `{}` | Operator priorityClassName. |
+| priorityClassName | string | `nil` | Operator priorityClassName. |
 | serviceAccount.annotations | object | `{}` | Define annotations for logging-operator ServiceAccount. |
 | resources | object | `{}` | CPU/Memory resource requests/limits |
 | nodeSelector | object | `{}` |  |

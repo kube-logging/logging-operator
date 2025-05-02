@@ -105,7 +105,7 @@ securityContext: {}
   #   drop: ["ALL"]
 
 # -- Operator priorityClassName.
-priorityClassName: {}
+priorityClassName: ~
 
 serviceAccount:
   # -- Define annotations for logging-operator ServiceAccount.
