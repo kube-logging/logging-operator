@@ -1,0 +1,87 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.3
+{{- with .Values.annotations }}
+{{- toYaml . | nindent 4 }}
+{{- end }}
+  name: axosyslogs.logging.banzaicloud.io
+spec:
+  group: logging.banzaicloud.io
+  names:
+    categories:
+    - logging-all
+    kind: AxoSyslog
+    listKind: AxoSyslogList
+    plural: axosyslogs
+    singular: axosyslog
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Control namespace
+      jsonPath: .spec.controlNamespace
+      name: ControlNamespace
+      type: string
+    - description: Number of problems
+      jsonPath: .status.problemsCount
+      name: Problems
+      type: integer
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              controlNamespace:
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable, please recreate the resource
+                  rule: self == oldSelf
+              destinations:
+                items:
+                  type: string
+                type: array
+              logPaths:
+                items:
+                  properties:
+                    destination:
+                      type: string
+                    filterx:
+                      type: string
+                  type: object
+                type: array
+            required:
+            - controlNamespace
+            type: object
+          status:
+            properties:
+              problems:
+                items:
+                  type: string
+                type: array
+              problemsCount:
+                type: integer
+              sources:
+                items:
+                  properties:
+                    otlp:
+                      properties:
+                        endpoint:
+                          type: string
+                      type: object
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
