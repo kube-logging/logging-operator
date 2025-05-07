@@ -20,7 +20,6 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=axosyslogs,scope=Namespaced,categories=logging-all
 // +kubebuilder:storageversion
-// +kubebuilder:printcolumn:name="ControlNamespace",type="string",JSONPath=".spec.controlNamespace",description="Control namespace"
 // +kubebuilder:printcolumn:name="Problems",type="integer",JSONPath=".status.problemsCount",description="Number of problems"
 
 // AxoSyslog is the Schema for the AxoSyslogs API
@@ -34,24 +33,18 @@ type AxoSyslog struct {
 
 // AxoSyslogSpec defines the desired state of AxoSyslog
 type AxoSyslogSpec struct {
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
-
-	// ControlNamespace is the namespace where the AxoSyslog StatefulSet and related components will be deployed
-	ControlNamespace string `json:"controlNamespace"`
-
 	// LogPaths is a list of log paths to be rendered in the AxoSyslog configuration
 	LogPaths []LogPath `json:"logPaths,omitempty"`
 
 	// Destinations is a list of destinations to be rendered in the AxoSyslog configuration
-	Destinations []string `json:"destinations,omitempty"`
+	Destinations []Destination `json:"destinations,omitempty"`
 }
 
 // LogPath defines a single log path that will be rendered in the AxoSyslog configuration
 type LogPath struct {
 	// filterx block to be rendered within the log path
 	Filterx string `json:"filterx,omitempty"`
-	// name of a destionation to be used in the log path
+	// name of a destination to be used in the log path
 	Destination string `json:"destination,omitempty"`
 }
 
@@ -90,10 +83,21 @@ type OTLPSource struct {
 // AxoSyslogList contains a list of AxoSyslog
 type AxoSyslogList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitzero"`
+	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AxoSyslog `json:"items"`
 }
 
 func init() {
 	SchemeBuilder.Register(&AxoSyslog{}, &AxoSyslogList{})
+}
+
+func (a *AxoSyslog) SetDefaults() error {
+	if a.Spec.LogPaths == nil {
+		a.Spec.LogPaths = []LogPath{}
+	}
+	if a.Spec.Destinations == nil {
+		a.Spec.Destinations = []Destination{}
+	}
+
+	return nil
 }

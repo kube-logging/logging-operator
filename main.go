@@ -51,16 +51,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
-	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
-
 	extensionsControllers "github.com/kube-logging/logging-operator/controllers/extensions"
-	loggingControllers "github.com/kube-logging/logging-operator/controllers/logging"
+	controllers "github.com/kube-logging/logging-operator/controllers/logging"
 	extensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
+	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -194,7 +193,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	loggingReconciler := loggingControllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorderFor("logging-operator"), ctrl.Log.WithName("logging"))
+	loggingReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorderFor("logging-operator"), ctrl.Log.WithName("logging"))
 
 	if err := (&extensionsControllers.EventTailerReconciler{
 		Client: mgr.GetClient(),
@@ -213,21 +212,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := loggingControllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
+	if err := controllers.SetupLoggingWithManager(mgr, ctrl.Log.WithName("manager")).Complete(loggingReconciler); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Logging")
 		os.Exit(1)
 	}
 
-	if err := loggingControllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
+	if err := controllers.SetupLoggingRouteWithManager(mgr, ctrl.Log.WithName("logging-route")); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LoggingRoute")
 		os.Exit(1)
 	}
 
 	if enableTelemetryControllerRoute {
-		if err := loggingControllers.SetupTelemetryControllerWithManager(mgr, ctrl.Log.WithName("telemetry-controller")); err != nil {
+		if err := controllers.SetupTelemetryControllerWithManager(mgr, ctrl.Log.WithName("telemetry-controller")); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "TelemetryController")
 			os.Exit(1)
 		}
+	}
+
+	if err := controllers.SetupAxoSyslogWithManager(mgr, ctrl.Log.WithName("axosyslog")); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "AxoSyslog")
+		os.Exit(1)
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
@@ -399,9 +403,9 @@ func cleanupFinalizers(ctx context.Context, client client.Client) {
 	}
 
 	finalizers := []string{
-		loggingControllers.FluentdConfigFinalizer,
-		loggingControllers.SyslogNGConfigFinalizer,
-		loggingControllers.TelemetryControllerFinalizer,
+		controllers.FluentdConfigFinalizer,
+		controllers.SyslogNGConfigFinalizer,
+		controllers.TelemetryControllerFinalizer,
 	}
 	for _, logging := range loggingList.Items {
 		for _, finalizer := range finalizers {

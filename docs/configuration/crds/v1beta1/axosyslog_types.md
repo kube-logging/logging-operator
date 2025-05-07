@@ -19,12 +19,7 @@ AxoSyslog is the Schema for the AxoSyslogs API
 
 AxoSyslogSpec defines the desired state of AxoSyslog
 
-### controlNamespace (string, required) {#axosyslogspec-controlnamespace}
-
-ControlNamespace is the namespace where the AxoSyslog StatefulSet and related components will be deployed 
-
-
-### destinations ([]string, optional) {#axosyslogspec-destinations}
+### destinations ([]Destination, optional) {#axosyslogspec-destinations}
 
 Destinations is a list of destinations to be rendered in the AxoSyslog configuration 
 
@@ -41,7 +36,7 @@ LogPath defines a single log path that will be rendered in the AxoSyslog configu
 
 ### destination (string, optional) {#logpath-destination}
 
-name of a destionation to be used in the log path 
+name of a destination to be used in the log path 
 
 
 ### filterx (string, optional) {#logpath-filterx}
@@ -112,7 +107,7 @@ AxoSyslogList contains a list of AxoSyslog
 ###  (metav1.TypeMeta, required) {#axosysloglist-}
 
 
-### metadata (metav1.ListMeta, required) {#axosysloglist-metadata}
+### metadata (metav1.ListMeta, optional) {#axosysloglist-metadata}
 
 
 ### items ([]AxoSyslog, required) {#axosysloglist-items}

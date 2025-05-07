@@ -103,7 +103,7 @@ func (in *AxoSyslogSpec) DeepCopyInto(out *AxoSyslogSpec) {
 	}
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
-		*out = make([]string, len(*in))
+		*out = make([]Destination, len(*in))
 		copy(*out, *in)
 	}
 }

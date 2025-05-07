@@ -17,10 +17,6 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - description: Control namespace
-      jsonPath: .spec.controlNamespace
-      name: ControlNamespace
-      type: string
     - description: Number of problems
       jsonPath: .status.problemsCount
       name: Problems
@@ -37,14 +33,14 @@ spec:
             type: object
           spec:
             properties:
-              controlNamespace:
-                type: string
-                x-kubernetes-validations:
-                - message: Value is immutable, please recreate the resource
-                  rule: self == oldSelf
               destinations:
                 items:
-                  type: string
+                  properties:
+                    config:
+                      type: string
+                    name:
+                      type: string
+                  type: object
                 type: array
               logPaths:
                 items:
@@ -55,8 +51,6 @@ spec:
                       type: string
                   type: object
                 type: array
-            required:
-            - controlNamespace
             type: object
           status:
             properties:
