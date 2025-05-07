@@ -149,6 +149,7 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
+  - axosyslogs
   - clusterflows
   - clusteroutputs
   - flows
@@ -174,6 +175,7 @@ rules:
 - apiGroups:
   - logging.banzaicloud.io
   resources:
+  - axosyslogs/status
   - clusterflows/status
   - clusteroutputs/status
   - flows/status
