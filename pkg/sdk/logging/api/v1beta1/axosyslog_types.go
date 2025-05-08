@@ -36,6 +36,12 @@ type AxoSyslogSpec struct {
 	// LogPaths is a list of log paths to be rendered in the AxoSyslog configuration
 	LogPaths []LogPath `json:"logPaths,omitempty"`
 
+	// Image is the image specification for AxoSyslog
+	Image *BasicImageSpec `json:"image,omitempty"`
+
+	// ConfigReloadImage is the image specification for the config reload
+	ConfigReloadImage *BasicImageSpec `json:"configReloadImage,omitempty"`
+
 	// Destinations is a list of destinations to be rendered in the AxoSyslog configuration
 	Destinations []Destination `json:"destinations,omitempty"`
 }
@@ -92,11 +98,33 @@ func init() {
 }
 
 func (a *AxoSyslog) SetDefaults() error {
-	if a.Spec.LogPaths == nil {
-		a.Spec.LogPaths = []LogPath{}
-	}
-	if a.Spec.Destinations == nil {
-		a.Spec.Destinations = []Destination{}
+	if a != nil {
+		if a.Spec.LogPaths == nil {
+			a.Spec.LogPaths = []LogPath{}
+		}
+		if a.Spec.Destinations == nil {
+			a.Spec.Destinations = []Destination{}
+		}
+
+		if a.Spec.Image == nil {
+			a.Spec.Image = &BasicImageSpec{
+				Repository: defaultAxoSyslogImageRepository,
+				Tag:        defaultAxoSyslogImageTag,
+			}
+		}
+		if a.Spec.ConfigReloadImage == nil {
+			a.Spec.ConfigReloadImage = &BasicImageSpec{}
+		}
+		if a.Spec.ConfigReloadImage.Repository == "" {
+			a.Spec.ConfigReloadImage.Repository = defaultConfigReloaderImageRepository
+		}
+		if a.Spec.ConfigReloadImage.Tag == "" {
+			if Version == "" {
+				a.Spec.ConfigReloadImage.Tag = defaultConfigReloaderImageTag
+			} else {
+				a.Spec.ConfigReloadImage.Tag = Version
+			}
+		}
 	}
 
 	return nil
