@@ -101,6 +101,16 @@ func (in *AxoSyslogSpec) DeepCopyInto(out *AxoSyslogSpec) {
 		*out = make([]LogPath, len(*in))
 		copy(*out, *in)
 	}
+	if in.Image != nil {
+		in, out := &in.Image, &out.Image
+		*out = new(BasicImageSpec)
+		**out = **in
+	}
+	if in.ConfigReloadImage != nil {
+		in, out := &in.ConfigReloadImage, &out.ConfigReloadImage
+		*out = new(BasicImageSpec)
+		**out = **in
+	}
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
 		*out = make([]Destination, len(*in))

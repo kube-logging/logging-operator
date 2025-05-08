@@ -33,3 +33,7 @@ type Resource func() (runtime.Object, reconciler.DesiredState, error)
 
 // ResourceWithLog redeclaration of function with logging parameter and return type kubernetes Object
 type ResourceWithLog func(log logr.Logger) runtime.Object
+
+type ResourceWithNamespace func(namespace string) (runtime.Object, reconciler.DesiredState, error)
+
+type ResourceWithSpec func(spec any) (runtime.Object, reconciler.DesiredState, error)

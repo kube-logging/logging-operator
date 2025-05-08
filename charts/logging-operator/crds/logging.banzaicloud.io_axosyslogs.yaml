@@ -33,6 +33,13 @@ spec:
             type: object
           spec:
             properties:
+              configReloadImage:
+                properties:
+                  repository:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               destinations:
                 items:
                   properties:
@@ -42,6 +49,13 @@ spec:
                       type: string
                   type: object
                 type: array
+              image:
+                properties:
+                  repository:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               logPaths:
                 items:
                   properties:
