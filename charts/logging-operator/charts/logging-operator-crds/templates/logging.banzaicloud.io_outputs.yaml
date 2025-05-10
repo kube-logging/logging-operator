@@ -320,6 +320,8 @@ spec:
                     type: string
                   data_stream_template_name:
                     type: string
+                  data_stream_template_use_index_patterns_wildcard:
+                    type: boolean
                   default_elasticsearch_version:
                     type: string
                   deflector_alias:
@@ -1692,6 +1694,8 @@ spec:
                     type: string
                   data_stream_template_name:
                     type: string
+                  data_stream_template_use_index_patterns_wildcard:
+                    type: boolean
                   default_elasticsearch_version:
                     type: string
                   deflector_alias:
@@ -7043,6 +7047,8 @@ spec:
                     type: string
                   data_stream_template_name:
                     type: string
+                  data_stream_template_use_index_patterns_wildcard:
+                    type: boolean
                   default_elasticsearch_version:
                     type: string
                   deflector_alias:
@@ -8415,6 +8421,8 @@ spec:
                     type: string
                   data_stream_template_name:
                     type: string
+                  data_stream_template_use_index_patterns_wildcard:
+                    type: boolean
                   default_elasticsearch_version:
                     type: string
                   deflector_alias:

@@ -260,6 +260,8 @@ type ElasticsearchOutput struct {
 	DataStreamIlmPolicy string `json:"data_stream_ilm_policy,omitempty"`
 	// Specify whether overwriting data stream ilm policy or not.
 	DataStreamIlmPolicyOverwrite bool `json:"data_stream_ilm_policy_overwrite,omitempty"`
+	// https://github.com/uken/fluent-plugin-elasticsearch?tab=readme-ov-file#data_stream_template_use_index_patterns_wildcard
+	DataStreamTemplateNameUseIndexPatternsWildcard *bool `json:"data_stream_template_use_index_patterns_wildcard,omitempty" plugin:"default:true"`
 	// If set to true, the output uses the [legacy index template format](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-templates-v1.html). Otherwise, it uses the [composable index template](https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-templates.html) format. (default: true)
 	// +kubebuilder:validation:Optional
 	UseLegacyTemplate *bool `json:"use_legacy_template,omitempty"`
