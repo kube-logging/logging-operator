@@ -104,6 +104,9 @@ type _metaSyslogOutput interface{} //nolint:deadcode,unused
 type SyslogOutput struct {
 	// Address of the destination host
 	Host string `json:"host,omitempty" syslog-ng:"pos=0"`
+	// IP protocol (default: 4)
+	// +kubebuilder:validation:Enum=4;6
+	IpProtocol *int `json:"ip-protocol,omitempty"`
 	// The port number to connect to. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/reference-destination-syslog-chapter/#port-or-destport).
 	Port int `json:"port,omitempty"`
 	// Specifies the protocol used to send messages to the destination server. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/reference-destination-syslog-chapter/#transport).

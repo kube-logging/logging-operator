@@ -109,6 +109,12 @@ Specifies how many lines are flushed to a destination at a time. For details, se
 Address of the destination host 
 
 
+### ip-protocol (*int, optional) {#syslogoutput-ip-protocol}
+
+IP protocol
+
+Default: 4
+
 ### persist_name (string, optional) {#syslogoutput-persist_name}
 
 Unique name for the syslog-ng driver. If you receive the following error message during syslog-ng startup, set the `persist-name()` option of the duplicate drivers: `Error checking the uniqueness of the persist names, please override it with persist-name option. Shutting down.` See the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/reference-destination-http-nonjava/#persist-name) for more information. 

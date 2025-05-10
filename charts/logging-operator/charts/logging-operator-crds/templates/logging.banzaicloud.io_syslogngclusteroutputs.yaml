@@ -953,6 +953,11 @@ spec:
                     type: integer
                   host:
                     type: string
+                  ip-protocol:
+                    enum:
+                    - 4
+                    - 6
+                    type: integer
                   persist_name:
                     type: string
                   port:
@@ -3155,6 +3160,11 @@ spec:
                     type: integer
                   host:
                     type: string
+                  ip-protocol:
+                    enum:
+                    - 4
+                    - 6
+                    type: integer
                   persist_name:
                     type: string
                   port:
