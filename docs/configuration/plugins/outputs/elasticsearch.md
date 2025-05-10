@@ -109,6 +109,12 @@ Specify an existing index template for the data stream. If not present, a new te
 
 Default: data_stream_name
 
+### data_stream_template_use_index_patterns_wildcard (*bool, optional) {#elasticsearch-data_stream_template_use_index_patterns_wildcard}
+
+https://github.com/uken/fluent-plugin-elasticsearch?tab=readme-ov-file#data_stream_template_use_index_patterns_wildcard 
+
+Default: true
+
 ### default_elasticsearch_version (string, optional) {#elasticsearch-default_elasticsearch_version}
 
 This parameter changes that ES plugin assumes default Elasticsearch version.
