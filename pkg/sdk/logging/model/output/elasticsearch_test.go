@@ -41,6 +41,7 @@ compression_level: default_compression
 	@type elasticsearch
 	@id test
 	compression_level default_compression
+	data_stream_template_use_index_patterns_wildcard true
 	exception_backup true
 	fail_on_detecting_es_version_retry_exceed true
 	fail_on_putting_template_retry_exceed true
@@ -88,6 +89,7 @@ buffer:
     @type elasticsearch_data_stream
     @id test
     data_stream_name test-ds
+    data_stream_template_use_index_patterns_wildcard true
     exception_backup true
     fail_on_detecting_es_version_retry_exceed true
     fail_on_putting_template_retry_exceed true

@@ -291,6 +291,11 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.DataStreamTemplateNameUseIndexPatternsWildcard != nil {
+		in, out := &in.DataStreamTemplateNameUseIndexPatternsWildcard, &out.DataStreamTemplateNameUseIndexPatternsWildcard
+		*out = new(bool)
+		**out = **in
+	}
 	if in.UseLegacyTemplate != nil {
 		in, out := &in.UseLegacyTemplate, &out.UseLegacyTemplate
 		*out = new(bool)
