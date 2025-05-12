@@ -82,6 +82,7 @@ func (r *AxoSyslogReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // reconcileWorkloadResources handles resources related to AxoSyslog and requires it's spec
 func (r *AxoSyslogReconciler) reconcileWorkloadResources(log logr.Logger, axoSyslog *v1beta1.AxoSyslog) (*ctrl.Result, error) {
 	resourceBuilders := []resources.ResourceWithSpec{
+		axosyslogresources.CreateAxoSyslogConfig,
 		axosyslogresources.StatefulSet,
 		axosyslogresources.Service,
 		axosyslogresources.HeadlessService,

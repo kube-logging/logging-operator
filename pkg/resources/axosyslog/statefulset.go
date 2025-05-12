@@ -77,21 +77,18 @@ func StatefulSet(object any) (runtime.Object, reconciler.DesiredState, error) {
 									ContainerPort: 4317,
 									Protocol:      corev1.ProtocolTCP,
 								},
-								{
-									Name:          "otlp-http",
-									ContainerPort: 4318,
-									Protocol:      corev1.ProtocolTCP,
-								},
 							},
-							// TODO: Check for changes in the args
 							Args: []string{
-								"--cfgfile=/etc/syslog-ng/config/syslog-ng.conf",
-								"--control=/tmp/syslog-ng/syslog-ng.ctl",
+								"--cfgfile=/etc/axosyslog/config/axosyslog.conf",
 								"--no-caps",
 								"-Fe",
 							},
-							// TODO: Add volume mounts
-							VolumeMounts: []corev1.VolumeMount{},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "config",
+									MountPath: "/etc/axosyslog/config",
+								},
+							},
 							Resources: corev1.ResourceRequirements{
 								Limits: corev1.ResourceList{
 									corev1.ResourceMemory: resource.MustParse("400M"),
@@ -106,7 +103,7 @@ func StatefulSet(object any) (runtime.Object, reconciler.DesiredState, error) {
 							LivenessProbe: &corev1.Probe{
 								ProbeHandler: corev1.ProbeHandler{
 									Exec: &corev1.ExecAction{
-										Command: []string{"/usr/sbin/syslog-ng-ctl", "--control=/tmp/syslog-ng/syslog-ng.ctl", "query", "get", "global.sdata_updates.processed"},
+										Command: []string{"/usr/sbin/syslog-ng-ctl", "query", "get", "global.sdata_updates.processed"},
 									},
 								},
 								InitialDelaySeconds: 30,
@@ -124,12 +121,27 @@ func StatefulSet(object any) (runtime.Object, reconciler.DesiredState, error) {
 								"-cfgjson",
 								generateConfigReloaderConfig(),
 							},
-							// TODO: Add volume mounts
-							VolumeMounts: []corev1.VolumeMount{},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "config",
+									MountPath: "/etc/axosyslog/config",
+								},
+							},
 						},
 						// TODO: Add syslog-ng-metrics sidecar
 					},
-					Volumes: []corev1.Volume{},
+					Volumes: []corev1.Volume{
+						{
+							Name: "config",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: axoSyslogConfigName,
+									},
+								},
+							},
+						},
+					},
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup: utils.IntPointer64(101),
 					},
