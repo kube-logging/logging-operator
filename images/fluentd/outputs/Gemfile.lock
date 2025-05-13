@@ -62,13 +62,13 @@ GEM
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     drb (2.2.1)
-    elastic-transport (8.3.0)
+    elastic-transport (8.4.0)
       faraday (< 3)
       multi_json
-    elasticsearch (8.11.0)
+    elasticsearch (9.0.2)
       elastic-transport (~> 8.3)
-      elasticsearch-api (= 8.11.0)
-    elasticsearch-api (8.11.0)
+      elasticsearch-api (= 9.0.2)
+    elasticsearch-api (9.0.2)
       multi_json
     excon (0.104.0)
     faraday (2.7.12)
@@ -100,7 +100,7 @@ GEM
     fluent-plugin-datadog (0.14.4)
       fluentd (>= 1, < 2)
       net-http-persistent (~> 4.0.1)
-    fluent-plugin-elasticsearch (5.4.3)
+    fluent-plugin-elasticsearch (6.0.0)
       elasticsearch
       excon
       faraday (>= 2.0.0)
@@ -382,7 +382,7 @@ DEPENDENCIES
   fluent-plugin-aliyun-oss (= 0.0.1)
   fluent-plugin-cloudwatch-logs (= 0.14.3)
   fluent-plugin-datadog (= 0.14.4)
-  fluent-plugin-elasticsearch (= 5.4.3)
+  fluent-plugin-elasticsearch (= 6.0.0)
   fluent-plugin-gcs (= 0.4.4)
   fluent-plugin-gelf-best (= 1.4.1)
   fluent-plugin-grafana-loki (= 1.2.20)
