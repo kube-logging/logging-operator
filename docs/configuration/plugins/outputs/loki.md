@@ -89,7 +89,7 @@ Set of labels to include with every Loki stream.
 
 ### line_format (string, optional) {#output config-line_format}
 
-Format to use when flattening the record to a log line: json, key_value (default: key_value) 
+Format to use when flattening the record to a log line: json, key_value (default: json) 
 
 Default: json
 

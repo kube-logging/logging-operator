@@ -79,7 +79,7 @@ type LokiOutput struct {
 	Labels Label `json:"labels,omitempty"`
 	// Set of extra labels to include with every Loki stream.
 	ExtraLabels map[string]string `json:"extra_labels,omitempty"`
-	// Format to use when flattening the record to a log line: json, key_value (default: key_value)
+	// Format to use when flattening the record to a log line: json, key_value (default: json)
 	LineFormat string `json:"line_format,omitempty" plugin:"default:json"`
 	// Extract kubernetes labels as loki labels (default: false)
 	ExtractKubernetesLabels *bool `json:"extract_kubernetes_labels,omitempty"`
