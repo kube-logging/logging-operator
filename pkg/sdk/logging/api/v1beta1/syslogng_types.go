@@ -33,8 +33,8 @@ type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
 type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
 
 const (
-	defaultSyslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
-	defaultSyslogngImageTag                  = "4.11.0"
+	defaultAxoSyslogImageRepository          = "ghcr.io/axoflow/axosyslog"
+	defaultAxoSyslogImageTag                 = "4.11.0"
 	defaultPrometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
 	defaultPrometheusExporterImageTag        = "0.0.9"
 	defaultConfigReloaderImageRepository     = "ghcr.io/kube-logging/logging-operator/syslog-ng-reloader"
@@ -144,8 +144,8 @@ func (s *SyslogNGSpec) SetDefaults() {
 		}
 		if s.SyslogNGImage == nil {
 			s.SyslogNGImage = &BasicImageSpec{
-				Repository: defaultSyslogngImageRepository,
-				Tag:        defaultSyslogngImageTag,
+				Repository: defaultAxoSyslogImageRepository,
+				Tag:        defaultAxoSyslogImageTag,
 			}
 		}
 		if s.ConfigReloadImage == nil {
