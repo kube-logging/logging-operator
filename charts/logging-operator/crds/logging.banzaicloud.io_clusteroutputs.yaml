@@ -2094,6 +2094,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   connect_timeout:
                     type: integer
                   dns_round_robin:
@@ -9543,6 +9545,8 @@ spec:
                       type:
                         type: string
                     type: object
+                  compress:
+                    type: string
                   connect_timeout:
                     type: integer
                   dns_round_robin:

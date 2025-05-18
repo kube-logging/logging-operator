@@ -38,6 +38,8 @@ type ForwardOutput struct {
 	FluentdServers []FluentdServer `json:"servers"`
 	// The transport protocol to use [ tcp, tls ]
 	Transport string `json:"transport,omitempty"`
+	// Fluentd supports transparent data compression, the only value accepted is "gzip"
+	Compress string `json:"compress,omitempty"`
 	// Change the protocol to at-least-once. The plugin waits the ack from destination's in_forward plugin.
 	RequireAckResponse bool `json:"require_ack_response,omitempty"`
 	// This option is used when require_ack_response is true. This default value is based on popular tcp_syn_retries. (default: 190)
