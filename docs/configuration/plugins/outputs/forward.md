@@ -17,6 +17,11 @@ Default: 190
 [Buffer](../buffer/) 
 
 
+### compress (string, optional) {#forwardoutput-compress}
+
+Fluentd supports transparent data compression, the only value accepted is "gzip" 
+
+
 ### connect_timeout (int, optional) {#forwardoutput-connect_timeout}
 
 The timeout time for socket connect. When the connection timed out during establishment, Errno::ETIMEDOUT is raised. 
