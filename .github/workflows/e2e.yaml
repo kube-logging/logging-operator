@@ -54,7 +54,7 @@ jobs:
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
 
       - name: Build and export ${{ matrix.image }}-image
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@1dc73863535b631f98b2378be8619f83b136f4a0 # v6.17.0
         with:
           context: ${{ matrix.context }}
           tags: ${{ matrix.tags }}
@@ -105,7 +105,7 @@ jobs:
           docker image ls -a
 
       - name: Set up Go
-        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
           go-version-file: '.go-version'
 
@@ -121,7 +121,7 @@ jobs:
 #          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Run coverage report
-        uses: vladopajic/go-test-coverage@937b863f06595080198d555b7ed3aa474ae5199c # v2.14.1
+        uses: vladopajic/go-test-coverage@7003e902e787e60375e1ce3ae5b85b19313dbff2 # v2.14.3
         with:
           profile: ./build/_test_coverage/coverage_e2e.out
           source-dir: ./
