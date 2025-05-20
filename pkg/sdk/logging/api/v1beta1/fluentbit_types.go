@@ -80,6 +80,9 @@ type FluentbitSpec struct {
 	// DisableVarLibDockerContainers controls whether the /var/lib/docker/containers volume is mounted.
 	// If true, the volume is NOT mounted. If false (default), the volume is mounted.
 	DisableVarLibDockerContainers *bool `json:"disableVarLibDockerContainers,omitempty"`
+	// DisableVarLog controls whether the /var/log volume is mounted.
+	// If true, the volume is NOT mounted. If false (default), the volume is mounted.
+	DisableVarLog *bool `json:"disableVarLog,omitempty"`
 	// HotReload pauses all inputs and waits until they finish. In certain situations this is unacceptable, for example if an output is down for a longer time.
 	// An undocumented option called "Hot_Reload.Ensure_Thread_Safety Off" can be used at the [SERVICE] config to force hotreload after the grace period.
 	// Please note that it might result in a SIGSEGV, but worst case kubelet will restart the container.

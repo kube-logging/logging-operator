@@ -104,6 +104,11 @@ Disable Kubernetes metadata filter
 DisableVarLibDockerContainers controls whether the /var/lib/docker/containers volume is mounted. If true, the volume is NOT mounted. If false (default), the volume is mounted. 
 
 
+### disableVarLog (*bool, optional) {#fluentbitspec-disablevarlog}
+
+DisableVarLog controls whether the /var/log volume is mounted. If true, the volume is NOT mounted. If false (default), the volume is mounted. 
+
+
 ### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
 
 

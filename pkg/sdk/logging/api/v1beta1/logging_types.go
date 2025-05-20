@@ -270,6 +270,10 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		if fluentbitSpec.DisableVarLibDockerContainers == nil {
 			fluentbitSpec.DisableVarLibDockerContainers = util.BoolPointer(false)
 		}
+		// Set default value for DisableVarLog to false (meaning volume is mounted by default)
+		if fluentbitSpec.DisableVarLog == nil {
+			fluentbitSpec.DisableVarLog = util.BoolPointer(false)
+		}
 		if fluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
 		}
