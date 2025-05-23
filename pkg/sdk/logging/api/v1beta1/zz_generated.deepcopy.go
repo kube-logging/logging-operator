@@ -1302,6 +1302,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.DisableVarLog != nil {
+		in, out := &in.DisableVarLog, &out.DisableVarLog
+		*out = new(bool)
+		**out = **in
+	}
 	in.Resources.DeepCopyInto(&out.Resources)
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations

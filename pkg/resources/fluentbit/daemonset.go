@@ -176,14 +176,17 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 	v = []corev1.VolumeMount{
 		{
-			Name:      "varlogs",
-			ReadOnly:  true,
-			MountPath: "/var/log/",
-		},
-		{
 			Name:      "config",
 			MountPath: OperatorConfigPath,
 		},
+	}
+
+	if !*r.fluentbitSpec.DisableVarLog {
+		v = append(v, corev1.VolumeMount{
+			Name:      "varlogs",
+			ReadOnly:  true,
+			MountPath: "/var/log/",
+		})
 	}
 
 	if !*r.fluentbitSpec.DisableVarLibDockerContainers {

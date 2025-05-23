@@ -1139,6 +1139,8 @@ spec:
                 type: boolean
               disableVarLibDockerContainers:
                 type: boolean
+              disableVarLog:
+                type: boolean
               dnsConfig:
                 properties:
                   nameservers:
