@@ -251,7 +251,7 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
-                "destination" => "test-syslog-out-global"
+                "destination_name" => "test-syslog-out-global"
 				"logging" => "test"
 				"output_name" => "test-syslog-out-global"
 				"output_namespace" => "config-test"
@@ -263,7 +263,7 @@ log {
     log {
         parser {
             metrics-probe(key("example") labels(
-				"destination" => "test-syslog-out"
+				"destination_name" => "test-syslog-out"
 				"logging" => "test"
                 "output_name" => "test-syslog-out"
 				"output_namespace" => "default"
