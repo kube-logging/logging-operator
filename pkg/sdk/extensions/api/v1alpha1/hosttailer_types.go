@@ -46,7 +46,6 @@ type HostTailerSpec struct {
 	WorkloadMetaBase *types.MetaBase `json:"workloadMetaOverrides,omitempty"`
 	// Override podSpec fields for the given daemonset
 	WorkloadBase *types.PodSpecBase `json:"workloadOverrides,omitempty"`
-	Image        tailer.ImageSpec   `json:"image,omitempty"`
 }
 
 // HostTailerStatus defines the observed state of [HostTailer](#hosttailer).

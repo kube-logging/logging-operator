@@ -374,24 +374,6 @@ spec:
                   - name
                   type: object
                 type: array
-              image:
-                properties:
-                  imagePullSecrets:
-                    items:
-                      properties:
-                        name:
-                          default: ""
-                          type: string
-                      type: object
-                      x-kubernetes-map-type: atomic
-                    type: array
-                  pullPolicy:
-                    type: string
-                  repository:
-                    type: string
-                  tag:
-                    type: string
-                type: object
               systemdTailers:
                 items:
                   properties:

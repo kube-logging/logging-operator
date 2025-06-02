@@ -18,9 +18,6 @@ EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate th
 List of [file tailers](#filetailer). 
 
 
-### image (tailer.ImageSpec, optional) {#hosttailerspec-image}
-
-
 ### systemdTailers ([]SystemdTailer, optional) {#hosttailerspec-systemdtailers}
 
 List of [systemd tailers](#systemdtailer). 
