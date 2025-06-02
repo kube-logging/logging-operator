@@ -72,9 +72,9 @@ func destinationLogPath(dest destination) render.Renderer {
 		if m.Labels == nil {
 			m.Labels = make(filter.ArrowMap)
 		}
-		if v, ok := m.Labels["destination"]; !ok || v != "" {
+		if v, ok := m.Labels["destination_name"]; !ok || v != "" {
 			// syslog-ng terminology for output
-			m.Labels["destination"] = dest.Name
+			m.Labels["destination_name"] = dest.Name
 		}
 		if v, ok := m.Labels["output_name"]; !ok || v != "" {
 			// logging-operator terminology for output
