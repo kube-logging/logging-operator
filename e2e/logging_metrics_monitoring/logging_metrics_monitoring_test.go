@@ -319,6 +319,10 @@ func installPrometheusOperator(c common.Cluster) error {
 		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
 	}
 
+	if err := manager.RunRepo(helm.WithArgs("update")); err != nil {
+		return fmt.Errorf("failed to update helm repos: %v", err)
+	}
+
 	if err := manager.RunInstall(
 		helm.WithName("prometheus"),
 		helm.WithChart("prometheus-community/kube-prometheus-stack"),
@@ -326,6 +330,7 @@ func installPrometheusOperator(c common.Cluster) error {
 		helm.WithNamespace("monitoring"),
 		helm.WithArgs("--set", "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false"),
 		helm.WithArgs("--set", "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false"),
+		helm.WithArgs("--set", "prometheus.prometheusSpec.maximumStartupDurationSeconds=900"),
 		helm.WithWait(),
 	); err != nil {
 		return fmt.Errorf("failed to install prometheus: %v", err)
