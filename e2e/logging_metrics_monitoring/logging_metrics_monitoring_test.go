@@ -330,6 +330,7 @@ func installPrometheusOperator(c common.Cluster) error {
 		helm.WithNamespace("monitoring"),
 		helm.WithArgs("--set", "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false"),
 		helm.WithArgs("--set", "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false"),
+		helm.WithArgs("--set", "prometheus.prometheusSpec.maximumStartupDurationSeconds=900"),
 		helm.WithWait(),
 	); err != nil {
 		return fmt.Errorf("failed to install prometheus: %v", err)
