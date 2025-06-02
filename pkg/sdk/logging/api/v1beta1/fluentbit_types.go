@@ -343,7 +343,36 @@ type FilterKubernetes struct {
 	CacheUseDockerId string `json:"Cache_Use_Docker_Id,omitempty"`
 	// Set an alternative Parser to process record Tag and extract pod_name, namespace_name, container_name and docker_id. The parser must be registered in a parsers file (refer to parser filter-kube-test as an example).
 	RegexParser string `json:"Regex_Parser,omitempty"`
-	// Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section) (default:Off)
+	/*
+	   Allow Kubernetes Pods to suggest a pre-defined Parser through annotations.
+	   (Read more about it in the Kubernetes Annotations section.)
+
+	   Default: Off
+
+	   Important: When enabling this setting, you must also configure
+	   `inputTail.multiline.parser` with appropriate parsers (typically including `cri` for
+	   Container Runtime Interface logs). Without this configuration, the annotation-based
+	   parsing will not work correctly.
+
+	   ### Example Configuration
+
+	   ```yaml
+	   apiVersion: logging.banzaicloud.io/v1beta1
+	   kind: FluentbitAgent
+	   metadata:
+	     name: example-fluentbit
+	   spec:
+	     inputTail:
+	       multiline.parser: [cri]  # Required when K8S-Logging.Parser is enabled
+	     filterKubernetes:
+	       K8S-Logging.Parser: "On"
+	       Merge_Log_Key: "parsed"  # Optional but recommended to prevent key conflicts
+
+	       # Once configured, you can use annotations on your pods:
+	       annotations:
+	         fluentbit.io/parser: "my-custom-parser"
+	   ```
+	*/
 	K8SLoggingParser string `json:"K8S-Logging.Parser,omitempty"`
 	// Allow Kubernetes Pods to exclude their logs from the log processor (read more about it in Kubernetes Annotations section). (default:On)
 	K8SLoggingExclude string `json:"K8S-Logging.Exclude,omitempty"`

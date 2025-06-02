@@ -649,9 +649,37 @@ Default: On
 
 ### K8S-Logging.Parser (string, optional) {#filterkubernetes-k8s-logging.parser}
 
-Allow Kubernetes Pods to suggest a pre-defined Parser (read more about it in Kubernetes Annotations section)
+/*
+	   Allow Kubernetes Pods to suggest a pre-defined Parser through annotations.
+	   (Read more about it in the Kubernetes Annotations section.)
 
-Default: Off
+	   Default: Off
+
+	   Important: When enabling this setting, you must also configure
+	   `inputTail.multiline.parser` with appropriate parsers (typically including `cri` for
+	   Container Runtime Interface logs). Without this configuration, the annotation-based
+	   parsing will not work correctly.
+
+	   ### Example Configuration
+
+	   ```yaml
+	   apiVersion: logging.banzaicloud.io/v1beta1
+	   kind: FluentbitAgent
+	   metadata:
+	     name: example-fluentbit
+	   spec:
+	     inputTail:
+	       multiline.parser: [cri]  # Required when K8S-Logging.Parser is enabled
+	     filterKubernetes:
+	       K8S-Logging.Parser: "On"
+	       Merge_Log_Key: "parsed"  # Optional but recommended to prevent key conflicts
+
+	       # Once configured, you can use annotations on your pods:
+	       annotations:
+	         fluentbit.io/parser: "my-custom-parser"
+	   ```
+	*/ 
+
 
 ### Keep_Log (string, optional) {#filterkubernetes-keep_log}
 
