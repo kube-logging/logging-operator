@@ -61,7 +61,7 @@ Override generated config. This is a *raw* configuration string for troubleshoot
 
 ### fluentbit (*FluentbitSpec, optional) {#loggingspec-fluentbit}
 
-FluentbitAgent daemonset configuration. Deprecated, will be removed with next major version Migrate to the standalone NodeAgent resource 
+FluentbitAgent daemonset configuration. DEPRECATED: Migrate to the standalone FluentBitAgent resource 
 
 
 ### fluentd (*FluentdSpec, optional) {#loggingspec-fluentd}

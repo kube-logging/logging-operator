@@ -53,8 +53,7 @@ type LoggingSpec struct {
 	// Can be overridden on the fluentd / syslog-ng level.
 	ConfigCheck ConfigCheck `json:"configCheck,omitempty"`
 	// FluentbitAgent daemonset configuration.
-	// Deprecated, will be removed with next major version
-	// Migrate to the standalone NodeAgent resource
+	// DEPRECATED: Migrate to the standalone FluentBitAgent resource
 	FluentbitSpec *FluentbitSpec `json:"fluentbit,omitempty"`
 	// Fluentd statefulset configuration
 	FluentdSpec *FluentdSpec `json:"fluentd,omitempty"`
