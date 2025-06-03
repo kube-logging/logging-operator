@@ -1,0 +1,13 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: AxoSyslog
+metadata:
+  name: axosyslog
+  namespace: axosyslog
+spec:
+  logPaths:
+  - filterx: "1==1;"
+    destination: "axosyslog-test"
+  destinations:
+  - name: "axosyslog-test"
+    config: |
+      file ("/tmp/log/axosyslog-test.log");

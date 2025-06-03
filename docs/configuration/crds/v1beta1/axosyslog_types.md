@@ -19,9 +19,19 @@ AxoSyslog is the Schema for the AxoSyslogs API
 
 AxoSyslogSpec defines the desired state of AxoSyslog
 
+### configReloadImage (*BasicImageSpec, optional) {#axosyslogspec-configreloadimage}
+
+ConfigReloadImage is the image specification for the config reload 
+
+
 ### destinations ([]Destination, optional) {#axosyslogspec-destinations}
 
 Destinations is a list of destinations to be rendered in the AxoSyslog configuration 
+
+
+### image (*BasicImageSpec, optional) {#axosyslogspec-image}
+
+Image is the image specification for AxoSyslog 
 
 
 ### logPaths ([]LogPath, optional) {#axosyslogspec-logpaths}
