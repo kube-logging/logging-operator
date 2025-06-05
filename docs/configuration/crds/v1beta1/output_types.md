@@ -47,6 +47,9 @@ OutputSpec defines the desired state of Output
 ### kinesisStream (*output.KinesisStreamOutputConfig, optional) {#outputspec-kinesisstream}
 
 
+### lmLogs (*output.LMLogsOutputConfig, optional) {#outputspec-lmlogs}
+
+
 ### logdna (*output.LogDNAOutput, optional) {#outputspec-logdna}
 
 

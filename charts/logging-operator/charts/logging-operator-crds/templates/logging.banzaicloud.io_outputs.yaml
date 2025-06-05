@@ -10888,6 +10888,227 @@ spec:
                 required:
                 - stream_name
                 type: object
+              lmLogs:
+                properties:
+                  access_id:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                    type: object
+                  access_key:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                    type: object
+                  bearer_token:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                    type: object
+                  buffer:
+                    properties:
+                      chunk_full_threshold:
+                        type: string
+                      chunk_limit_records:
+                        type: integer
+                      chunk_limit_size:
+                        type: string
+                      compress:
+                        type: string
+                      delayed_commit_timeout:
+                        type: string
+                      disable_chunk_backup:
+                        type: boolean
+                      disabled:
+                        type: boolean
+                      flush_at_shutdown:
+                        type: boolean
+                      flush_interval:
+                        type: string
+                      flush_mode:
+                        type: string
+                      flush_thread_burst_interval:
+                        type: string
+                      flush_thread_count:
+                        type: integer
+                      flush_thread_interval:
+                        type: string
+                      overflow_action:
+                        type: string
+                      path:
+                        type: string
+                      queue_limit_length:
+                        type: integer
+                      queued_chunks_limit_size:
+                        type: integer
+                      retry_exponential_backoff_base:
+                        type: string
+                      retry_forever:
+                        type: boolean
+                      retry_max_interval:
+                        type: string
+                      retry_max_times:
+                        type: integer
+                      retry_randomize:
+                        type: boolean
+                      retry_secondary_threshold:
+                        type: string
+                      retry_timeout:
+                        type: string
+                      retry_type:
+                        type: string
+                      retry_wait:
+                        type: string
+                      tags:
+                        type: string
+                      timekey:
+                        type: string
+                      timekey_use_utc:
+                        type: boolean
+                      timekey_wait:
+                        type: string
+                      timekey_zone:
+                        type: string
+                      total_limit_size:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  company_domain:
+                    type: string
+                  company_name:
+                    type: string
+                  debug:
+                    type: boolean
+                  device_less_logs:
+                    type: boolean
+                  flush_interval:
+                    type: string
+                  force_encoding:
+                    type: string
+                  format:
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
+                  http_proxy:
+                    type: string
+                  include_metadata:
+                    type: boolean
+                  resource_mapping:
+                    type: string
+                required:
+                - company_name
+                - resource_mapping
+                type: object
               logdna:
                 properties:
                   api_key:
