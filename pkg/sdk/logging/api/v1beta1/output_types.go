@@ -61,6 +61,7 @@ type OutputSpec struct {
 	RelabelOutputConfig               *output.RelabelOutputConfig               `json:"relabel,omitempty"`
 	VMwareLogInsightConfig            *output.VMwareLogInsightOutput            `json:"vmwareLogInsight,omitempty"`
 	VMwareLogIntelligenceOutputConfig *output.VMwareLogIntelligenceOutputConfig `json:"vmwareLogIntelligence,omitempty"`
+	LMLogsOutputConfig                *output.LMLogsOutputConfig                `json:"lmLogs,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

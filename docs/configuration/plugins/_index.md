@@ -41,6 +41,7 @@ For more information please click on the plugin name
 | **[Kafka](outputs/kafka/)** | outputs | Send your logs to Kafka | GA | [0.17.5](https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.17.5) |
 | **[Amazon Kinesis Firehose](outputs/kinesis_firehose/)** | outputs | Fluent plugin for Amazon Kinesis | Testing | [3.4.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.4.2) |
 | **[Amazon Kinesis Stream](outputs/kinesis_stream/)** | outputs | Fluent plugin for Amazon Kinesis | GA | [3.4.2](https://github.com/awslabs/aws-fluent-plugin-kinesis/releases/tag/v3.4.2) |
+| **[LogicMonitorLogs](outputs/lm_logs/)** | outputs | Send your logs to LogicMonitor Logs | GA | [v1.2.5](https://github.com/logicmonitor/lm-logs-fluentd/releases/tag/v.1.2.5) |
 | **[LogDNA](outputs/logdna/)** | outputs | Send your logs to LogDNA | GA | [0.4.0](https://github.com/logdna/fluent-plugin-logdna/releases/tag/v0.4.0) |
 | **[LogZ](outputs/logz/)** | outputs | Store logs in LogZ.io | GA | [0.0.21](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.21) |
 | **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.19](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
