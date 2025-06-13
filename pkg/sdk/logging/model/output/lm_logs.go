@@ -69,7 +69,7 @@ type LMLogsOutputConfig struct {
 	// LogicMonitor account domain. For eg. for url test.logicmonitor.com, company_domain is logicmonitor.com (default: logicmonitor.com)
 	CompanyDomain string `json:"company_domain,omitempty" plugin:"default:logicmonitor.com"`
 	// The mapping that defines the source of the log event to the LM resource. In this case, the <event_key> in the incoming event is mapped to the value of <lm_property>
-	ResourceMapping string `json:"resource_mapping"`
+	ResourceMapping string `json:"resource_mapping,omitempty"`
 	// LM API Token access ID
 	// +docLink:"Secret,../secret/"
 	AccessID *secret.Secret `json:"access_id,omitempty"`

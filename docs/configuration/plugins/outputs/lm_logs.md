@@ -107,7 +107,7 @@ When true, appends additional metadata to the log
 
 Default: false
 
-### resource_mapping (string, required) {#logicmonitorlogs-resource_mapping}
+### resource_mapping (string, optional) {#logicmonitorlogs-resource_mapping}
 
 The mapping that defines the source of the log event to the LM resource. In this case, the <event_key> in the incoming event is mapped to the value of <lm_property> 
 

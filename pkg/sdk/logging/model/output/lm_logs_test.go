@@ -144,3 +144,36 @@ force_encoding: "UTF-8"
 	test := render.NewOutputPluginTest(t, s)
 	test.DiffResult(expected)
 }
+
+func TestLMLogsOutputConfigWithoutResourceMapping(t *testing.T) {
+	CONFIG := []byte(`
+company_name: mycompany
+access_id:
+  value: "my_access_id"
+access_key:
+  value: "my_access_key"
+`)
+
+	expected := `
+  <match **>
+  @type lm
+  @id test
+  access_id my_access_id
+  access_key my_access_key
+  company_domain logicmonitor.com
+  company_name mycompany
+  flush_interval 60s
+  <buffer tag,time>
+	@type file
+	path /buffers/test.*.buffer
+	retry_forever true
+	timekey 10m
+	timekey_wait 1m
+  </buffer>
+</match>
+`
+	s := &output.LMLogsOutputConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, s))
+	test := render.NewOutputPluginTest(t, s)
+	test.DiffResult(expected)
+}
