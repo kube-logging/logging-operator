@@ -218,15 +218,16 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 }
 
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
-	v = []corev1.Volume{
-		{
+	if !*r.fluentbitSpec.DisableVarLog {
+		v = append(v, corev1.Volume{
+
 			Name: "varlogs",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
 					Path: "/var/log",
 				},
 			},
-		},
+		})
 	}
 
 	if !*r.fluentbitSpec.DisableVarLibDockerContainers {
