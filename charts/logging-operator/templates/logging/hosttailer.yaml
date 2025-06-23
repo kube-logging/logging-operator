@@ -23,9 +23,5 @@ spec:
   workloadOverrides:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .image }}
-  image:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 {{- end }}
 {{- end }}
