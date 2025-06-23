@@ -46,7 +46,6 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
-	"github.com/kube-logging/logging-operator/pkg/resources/nodeagent"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
@@ -84,8 +83,8 @@ type LoggingReconciler struct {
 	Log           logr.Logger
 }
 
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;nodeagents;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;nodeagents/status;fluentdconfigs/status;syslogngconfigs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/status;fluentbitagents/status;flows/status;clusterflows/status;outputs/status;clusteroutputs/status;fluentdconfigs/status;syslogngconfigs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows;syslogngclusterflows;syslogngoutputs;syslogngclusteroutputs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=syslogngflows/status;syslogngclusterflows/status;syslogngoutputs/status;syslogngclusteroutputs/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings/finalizers,verbs=update
@@ -288,24 +287,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				loggingResourceRepo,
 			).Reconcile)
 		}
-	}
-
-	if len(logging.Spec.NodeAgents) > 0 || len(loggingResources.NodeAgents) > 0 {
-		// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
-		// for compatibility reasons
-		agents := make(map[string]loggingv1beta1.NodeAgentConfig)
-		for _, a := range loggingResources.NodeAgents {
-			agents[a.Name] = a.Spec.NodeAgentConfig
-		}
-		for _, a := range logging.Spec.NodeAgents {
-			if _, exists := agents[a.Name]; !exists {
-				agents[a.Name] = a.NodeAgentConfig
-			} else {
-				problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition in logging resource %s", a.Name)
-				log.Error(errors.New("nodeagent definition conflict"), problem)
-			}
-		}
-		reconcilers = append(reconcilers, nodeagent.New(r.Client, r.Log, &logging, fluentdSpec, agents, reconcilerOpts, fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)).Reconcile)
 	}
 
 	for _, rec := range reconcilers {
@@ -592,8 +573,6 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.SyslogNGFlow:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
-		case *loggingv1beta1.NodeAgent:
-			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.FluentbitAgent:
 			return reconcileRequestsForLoggingRef(loggingList.Items, o.Spec.LoggingRef)
 		case *loggingv1beta1.LoggingRoute:
@@ -655,16 +634,10 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		Watches(&loggingv1beta1.FluentdConfig{}, requestMapper).
 		Watches(&loggingv1beta1.SyslogNGConfig{}, requestMapper)
 
-	// Deprecated: Node agents are deprecated and no longer maintained actively
-	if os.Getenv("ENABLE_NODEAGENT_CRD") != "" {
-		builder.Watches(&loggingv1beta1.NodeAgent{}, requestMapper)
-	}
-
 	builder.Watches(&loggingv1beta1.FluentbitAgent{}, requestMapper)
 
 	fluentd.RegisterWatches(builder)
 	fluentbit.RegisterWatches(builder)
-	nodeagent.RegisterWatches(builder)
 	syslogng.RegisterWatches(builder)
 
 	return builder

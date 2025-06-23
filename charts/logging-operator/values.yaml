@@ -206,30 +206,6 @@ logging:
   # -- Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
   allowClusterResourcesFromAllNamespaces: false
 
-  # -- NodeAgent Configuration
-  # DEPRECATED: This field will be removed in a future release.
-  nodeAgents: []
-  #  - name: win-agent
-  #    profile: windows
-  #    nodeAgentFluentbit:
-  #      daemonSet:
-  #        spec:
-  #          template:
-  #            spec:
-  #              containers:
-  #              - image: banzaicloud/fluentbit:1.9.5
-  #                name: fluent-bit
-  #      tls:
-  #        enabled: false
-  #  - name: linux-agent
-  #    profile: linux
-  #    nodeAgentFluentbit:
-  #      metrics:
-  #        prometheusAnnotations: true
-  #        serviceMonitor: false
-  #      tls:
-  #        enabled: false
-
   # -- configCheck provides possibility for timeout-based configuration checks https://kube-logging.dev/docs/whats-new/#timeout-based-configuration-checks
   configCheck: {}
 

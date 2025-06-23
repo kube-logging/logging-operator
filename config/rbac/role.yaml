@@ -157,7 +157,6 @@ rules:
   - fluentdconfigs
   - loggingroutes
   - loggings
-  - nodeagents
   - outputs
   - syslogngclusterflows
   - syslogngclusteroutputs
@@ -183,7 +182,6 @@ rules:
   - fluentdconfigs/status
   - loggingroutes/status
   - loggings/status
-  - nodeagents/status
   - outputs/status
   - syslogngclusterflows/status
   - syslogngclusteroutputs/status

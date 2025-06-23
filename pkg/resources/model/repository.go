@@ -16,7 +16,6 @@ package model
 
 import (
 	"context"
-	"os"
 	"sort"
 
 	"emperror.dev/errors"
@@ -67,9 +66,6 @@ func (r LoggingResourceRepository) LoggingResourcesFor(ctx context.Context, logg
 	errs = errors.Append(errs, err)
 
 	res.SyslogNG.ClusterOutputs, err = r.SyslogNGClusterOutputsFor(ctx, logging)
-	errs = errors.Append(errs, err)
-
-	res.NodeAgents, err = r.NodeAgentsFor(ctx, logging)
 	errs = errors.Append(errs, err)
 
 	res.Fluentbits, err = r.FluentbitsFor(ctx, logging)
@@ -291,29 +287,6 @@ func (r LoggingResourceRepository) SyslogNGOutputsInNamespaceFor(ctx context.Con
 	}
 
 	var res []v1beta1.SyslogNGOutput
-	for _, i := range list.Items {
-		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
-			res = append(res, i)
-		}
-	}
-	sort.Slice(res, func(i, j int) bool {
-		return lessByNamespacedName(&res[i], &res[j])
-	})
-	return res, nil
-}
-
-func (r LoggingResourceRepository) NodeAgentsFor(ctx context.Context, logging v1beta1.Logging) ([]v1beta1.NodeAgent, error) {
-	// Deprecated: Node agents are deprecated and no longer maintained actively
-	if os.Getenv("ENABLE_NODEAGENT_CRD") == "" {
-		return nil, nil
-	}
-
-	var list v1beta1.NodeAgentList
-	if err := r.Client.List(ctx, &list); err != nil {
-		return nil, err
-	}
-
-	var res []v1beta1.NodeAgent
 	for _, i := range list.Items {
 		if i.Spec.LoggingRef == logging.Spec.LoggingRef {
 			res = append(res, i)

@@ -85,9 +85,6 @@ type LoggingSpec struct {
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
 	// WARNING: Becareful when turning this on and off as it can result in some resources being orphaned.
 	AllowClusterResourcesFromAllNamespaces bool `json:"allowClusterResourcesFromAllNamespaces,omitempty"`
-	// InlineNodeAgent Configuration
-	// Deprecated, will be removed with next major version
-	NodeAgents []*InlineNodeAgent `json:"nodeAgents,omitempty"`
 	// EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the
 	// fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future)
 	// in case there is a change in an immutable field
