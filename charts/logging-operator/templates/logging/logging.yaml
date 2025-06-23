@@ -48,9 +48,6 @@ spec:
   {{- with .Values.logging.allowClusterResourcesFromAllNamespaces }}
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}
-  {{- with .Values.logging.nodeAgents }}
-  nodeAgents: {{- toYaml . | nindent 4 }}
-  {{- end }}
   {{- with .Values.logging.enableRecreateWorkloadOnImmutableFieldChange }}
   enableRecreateWorkloadOnImmutableFieldChange: {{ . }}
   {{- end }}
