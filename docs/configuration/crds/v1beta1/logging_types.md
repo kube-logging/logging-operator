@@ -79,11 +79,6 @@ Global filters to apply on logs before any match or filter mechanism.
 Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset. 
 
 
-### nodeAgents ([]*InlineNodeAgent, optional) {#loggingspec-nodeagents}
-
-InlineNodeAgent Configuration Deprecated, will be removed with next major version 
-
-
 ### routeConfig (*RouteConfig, optional) {#loggingspec-routeconfig}
 
 RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource that can be managed by the Telemetry Controller. 
