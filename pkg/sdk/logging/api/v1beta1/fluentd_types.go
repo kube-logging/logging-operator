@@ -187,6 +187,11 @@ func (f *FluentdSpec) SetDefaults() error {
 		if f.Security.PodSecurityContext.FSGroup == nil {
 			f.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
 		}
+		if f.Security.PodSecurityContext.SeccompProfile == nil {
+			f.Security.PodSecurityContext.SeccompProfile = &corev1.SeccompProfile{
+				Type: corev1.SeccompProfileTypeRuntimeDefault,
+			}
+		}
 		if f.Security.CreateOpenShiftSCC == nil {
 			f.Security.CreateOpenShiftSCC = util.BoolPointer(false)
 		}
