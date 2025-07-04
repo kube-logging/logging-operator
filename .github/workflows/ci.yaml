@@ -31,7 +31,7 @@ jobs:
         run: make generate-test-coverage
 
       - name: Test Coverage
-        uses: vladopajic/go-test-coverage@7003e902e787e60375e1ce3ae5b85b19313dbff2 # v2.14.3
+        uses: vladopajic/go-test-coverage@ebf1fb6f7267bd290a83cc16f535067b51fd1d0b # v2.15.0
         with:
           config: ./.testcoverage.yml
           source-dir: ./

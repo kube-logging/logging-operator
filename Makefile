@@ -8,10 +8,10 @@
 CONTROLLER_GEN_VERSION := 0.18.0
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := 2.1.6
+GOLANGCI_LINT_VERSION := 2.2.1
 
 # renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
-GO_TEST_COVERAGE_VERSION := 2.14.3
+GO_TEST_COVERAGE_VERSION := 2.15.0
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.14.2
