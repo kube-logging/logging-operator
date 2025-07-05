@@ -332,6 +332,12 @@ func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.Fluentd
 				},
 			},
 		},
+		{
+			Name: "tmp",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		},
 	}
 
 	if fluentdSpec.CompressConfigFile {
@@ -404,6 +410,10 @@ func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1
 				{
 					Name:      "output-secret",
 					MountPath: OutputSecretPath,
+				},
+				{
+					Name:      "tmp",
+					MountPath: "/tmp",
 				},
 			},
 			SecurityContext: fluentdSpec.Security.SecurityContext,
