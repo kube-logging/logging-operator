@@ -325,6 +325,11 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 						},
 					},
 					Workers: 1,
+					Security: &v1beta1.Security{
+						SecurityContext: &corev1.SecurityContext{
+							ReadOnlyRootFilesystem:   true,
+						},
+					}
 				},
 			},
 		}
