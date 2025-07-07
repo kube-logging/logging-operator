@@ -329,7 +329,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 						SecurityContext: &corev1.SecurityContext{
 							ReadOnlyRootFilesystem:   true,
 						},
-					}
+					},
 				},
 			},
 		}
