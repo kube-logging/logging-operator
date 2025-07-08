@@ -195,7 +195,7 @@ var Version string
 
 const (
 	DefaultFluentbitImageRepository               = "ghcr.io/fluent/fluent-bit"
-	DefaultFluentbitImageTag                      = "3.2.5"
+	DefaultFluentbitImageTag                      = "4.0.3"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/logging-operator/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "latest"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
