@@ -23,7 +23,6 @@ For more information please click on the name
 | **[FluentdSpec](fluentd_types/)** | FluentdSpec defines the desired state of Fluentd | v1beta1 |
 | **[Logging](logging_types/)** | Logging system configuration | v1beta1 |
 | **[LoggingRouteSpec](loggingroute_types/)** | LoggingRouteSpec defines the desired state of LoggingRoute | v1beta1 |
-| **[_hugoNodeAgent](node_agent_types/)** |  | v1beta1 |
 | **[OutputSpec](output_types/)** | OutputSpec defines the desired state of Output | v1beta1 |
 | **[SyslogNGClusterFlow](syslogng_clusterflow_types/)** | SyslogNGClusterFlow is the Schema for the syslog-ng clusterflows API | v1beta1 |
 | **[SyslogNGClusterOutput](syslogng_clusteroutput_types/)** | SyslogNGClusterOutput is the Schema for the syslog-ng clusteroutputs API | v1beta1 |

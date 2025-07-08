@@ -29,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
-	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
 	"github.com/kube-logging/logging-operator/pkg/mirror"
 )
@@ -372,25 +371,6 @@ func NewValidationReconciler(
 					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash,
 					resources.Logging.Spec.ControlNamespace, configcheck.HashLabel, hash)
 				resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
-			}
-		}
-
-		if len(resources.Logging.Spec.NodeAgents) > 0 || len(resources.NodeAgents) > 0 {
-			// load agents from standalone NodeAgent resources and additionally with inline nodeAgents from the logging resource
-			// for compatibility reasons
-			agents := make(map[string]loggingv1beta1.NodeAgentConfig)
-			for _, a := range resources.NodeAgents {
-				agents[a.Name] = a.Spec.NodeAgentConfig
-			}
-			for _, a := range resources.Logging.Spec.NodeAgents {
-				if _, exists := agents[a.Name]; !exists {
-					agents[a.Name] = a.NodeAgentConfig
-					problem := fmt.Sprintf("inline nodeAgent definition (%s) in Logging resource is deprecated, use standalone NodeAgent CRD instead!", a.Name)
-					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
-				} else {
-					problem := fmt.Sprintf("NodeAgent resource overrides inline nodeAgent definition (%s) in Logging resource", a.Name)
-					resources.Logging.Status.Problems = append(resources.Logging.Status.Problems, problem)
-				}
 			}
 		}
 

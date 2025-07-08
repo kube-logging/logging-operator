@@ -11,7 +11,6 @@ resources:
 - bases/logging.banzaicloud.io_fluentdconfigs.yaml
 - bases/logging.banzaicloud.io_loggingroutes.yaml
 - bases/logging.banzaicloud.io_loggings.yaml
-- bases/logging.banzaicloud.io_nodeagents.yaml
 - bases/logging.banzaicloud.io_outputs.yaml
 - bases/logging.banzaicloud.io_syslogngclusterflows.yaml
 - bases/logging.banzaicloud.io_syslogngclusteroutputs.yaml
@@ -20,7 +19,7 @@ resources:
 - bases/logging.banzaicloud.io_syslogngoutputs.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
-patches:
+patches: []
 # [WEBHOOK] patches here are for enabling the conversion webhook for each CRD
 # - path: patches/webhook_in_fluentbits.yaml
 # - path: patches/webhook_in_flows.yaml
