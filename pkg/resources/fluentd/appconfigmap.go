@@ -332,6 +332,8 @@ func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.Fluentd
 				},
 			},
 		},
+		// When deploying logging operator in secured k8s clusters (securityContext.readOnlyRootFilesystem)
+		// A emptyDir volume is needed to be able to check the configuration for using File out type.
 		{
 			Name: "tmp",
 			VolumeSource: corev1.VolumeSource{
@@ -411,6 +413,8 @@ func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1
 					Name:      "output-secret",
 					MountPath: OutputSecretPath,
 				},
+				// When deploying logging operator in secured k8s clusters (securityContext.readOnlyRootFilesystem)
+				// A emptyDir volume is needed to be able to check the configuration for using File out type.
 				{
 					Name:      "tmp",
 					MountPath: "/tmp",
