@@ -475,7 +475,7 @@ func TestFluentdAggregator_ConfigChecks_WhenReadOnlyRootFilesystemIsConfigured(t
 
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-configchecks-test",
+				Name:      "fluentd-aggregator-configchecks-ro-rootfs-test",
 				Namespace: ns,
 			},
 			Spec: v1beta1.LoggingSpec{
