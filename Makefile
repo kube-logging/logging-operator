@@ -28,7 +28,7 @@ LICENSEI_VERSION = 0.9.0
 # renovate: datasource=go depName=github.com/stern/stern versioning=semver
 STERN_VERSION := 1.32.0
 
-ENVTEST_K8S_VERSION := 1.32.0
+ENVTEST_K8S_VERSION := 1.33.0
 
 BIN := ${PWD}/bin
 

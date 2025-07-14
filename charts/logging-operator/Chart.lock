@@ -4,6 +4,6 @@ dependencies:
   version: 0.0.0
 - name: telemetry-controller
   repository: oci://ghcr.io/kube-logging/helm-charts
-  version: 0.0.19
-digest: sha256:2b1604895efcc2b27a2218cc0b06229f6e1fc65727aefe109b4a9ca728f3e101
-generated: "2025-06-06T14:48:14.734472+02:00"
+  version: 0.1.0
+digest: sha256:4cda06f5a29f44b374b97b4d2479b3947cba8908804378211942447da66668e5
+generated: "2025-07-14T15:34:41.868489+02:00"
