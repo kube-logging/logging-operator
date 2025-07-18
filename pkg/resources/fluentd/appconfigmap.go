@@ -414,9 +414,11 @@ func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1
 					MountPath: OutputSecretPath,
 				},
 				// When deploying logging operator in secured k8s clusters (securityContext.readOnlyRootFilesystem)
-				// A emptyDir volume is needed to be able to check the configuration for using File out type.
+				// A emptyDir volume is needed to be able to check the configuration for using File out type
+				// or when using the StartWithTimeout strategy.
 				{
 					Name:      "tmp",
+					SubPath:   "fluentd",
 					MountPath: "/tmp",
 				},
 			},
@@ -459,6 +461,21 @@ func (r *Reconciler) initContainerCheckPod(fluentdSpec v1beta1.FluentdSpec) []co
 	} else {
 		initContainer = []corev1.Container{}
 	}
+
+	// Create a dedicated tmp dir with the sticky bit set so fluentd accepts it when running in StartWithTimeout mode
+	initContainer = append(initContainer, corev1.Container{
+		Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
+		Image:           r.fluentdSpec.Image.RepositoryWithTag(),
+		ImagePullPolicy: corev1.PullPolicy(r.fluentdSpec.Image.PullPolicy),
+		Name:            "tmp-dir-hack",
+		Resources:       r.fluentdSpec.ConfigCheckResources,
+		SecurityContext: r.fluentdSpec.Security.SecurityContext,
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      "tmp",
+				MountPath: "/mnt/tmp"},
+		},
+	})
 
 	return initContainer
 }

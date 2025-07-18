@@ -60,6 +60,21 @@ func AnyPodShouldBeRunning(t *testing.T, cl client.Reader, opts ...client.ListOp
 	}
 }
 
+func AnyPodShouldBeFinished(t *testing.T, cl client.Reader, opts ...client.ListOption) func() bool {
+	return func() bool {
+		var podList corev1.PodList
+		if err := cl.List(context.Background(), &podList, opts...); err != nil {
+			t.Logf("an error occurred while listing pods: %v", err)
+		}
+		for _, pod := range podList.Items {
+			if pod.Status.Phase == corev1.PodSucceeded || pod.Status.Phase == corev1.PodFailed {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func ResourceShouldBeAbsent(t *testing.T, cl client.Reader, obj client.Object) func() bool {
 	return func() bool {
 		err := cl.Get(context.Background(), client.ObjectKeyFromObject(obj), obj)
