@@ -465,7 +465,7 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck-dry-run-readonly-root-filesystem", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-configcheck-dry-run-readonly-rootfs", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -652,7 +652,7 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck-start-timeout-readonly-root-filesystem", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-configcheck-start-timeout-readonly-rootfs", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
