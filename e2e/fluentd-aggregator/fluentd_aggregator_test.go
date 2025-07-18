@@ -459,13 +459,13 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }
-func TestFluentdAggregator_ConfigChecks_WhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
+func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-3"
 	releaseNameOverride := "e2e"
 	outputName := "test-output"
 	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck-readonly-root-filesystem", t, func(t *testing.T, c common.Cluster) {
+	common.WithCluster("fluentd-configcheck-dry-run-readonly-root-filesystem", t, func(t *testing.T, c common.Cluster) {
 		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
 			options.Namespace = ns
 			options.NameOverride = releaseNameOverride
@@ -473,9 +473,13 @@ func TestFluentdAggregator_ConfigChecks_WhenReadOnlyRootFilesystemIsConfigured(t
 
 		ctx := context.Background()
 
+		configCheckLabels := map[string]string{
+			"my-unique-label": "configcheck",
+		}
+
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-configchecks-ro-rootfs-test",
+				Name:      "fluentd-aggregator-configchecks-dry-run-ro-rootfs-test",
 				Namespace: ns,
 			},
 			Spec: v1beta1.LoggingSpec{
@@ -535,6 +539,10 @@ func TestFluentdAggregator_ConfigChecks_WhenReadOnlyRootFilesystemIsConfigured(t
 						SecurityContext: &corev1.SecurityContext{
 							ReadOnlyRootFilesystem: utils.BoolPointer(true),
 						},
+					},
+					ConfigCheck: &v1beta1.ConfigCheck{
+						Strategy: v1beta1.ConfigCheckStrategyDryRun,
+						Labels:   configCheckLabels,
 					},
 				},
 			},
@@ -603,13 +611,209 @@ func TestFluentdAggregator_ConfigChecks_WhenReadOnlyRootFilesystemIsConfigured(t
 				t.Log("waiting for the producer")
 				return false
 			}
+			if configCheckFinished := cond.AnyPodShouldBeFinished(t, c.GetClient(), client.MatchingLabels(configCheckLabels)); !configCheckFinished() {
+				t.Log("waiting for the config check")
+				return false
+			}
 			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
 				return false
 			}
 
-			return logging.Status.ProblemsCount == 0
+			return true
 		}, 5*time.Minute, 3*time.Second)
+
+		common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+
+		require.Equal(t, 0, logging.Status.ProblemsCount)
+	}, func(t *testing.T, c common.Cluster) error {
+		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
+		t.Logf("Printing cluster logs to %s", path)
+		return c.PrintLogs(common.PrintLogConfig{
+			Namespaces: []string{ns, "default"},
+			FilePath:   path,
+			Limit:      100 * 1000,
+		})
+	}, func(o *cluster.Options) {
+		if o.Scheme == nil {
+			o.Scheme = runtime.NewScheme()
+		}
+		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
+		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
+	})
+}
+func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
+	common.Initialize(t)
+	ns := "testing-3"
+	releaseNameOverride := "e2e"
+	outputName := "test-output"
+	flowName := "test-flow"
+	common.WithCluster("fluentd-configcheck-start-timeout-readonly-root-filesystem", t, func(t *testing.T, c common.Cluster) {
+		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
+			options.Namespace = ns
+			options.NameOverride = releaseNameOverride
+		}))
+
+		ctx := context.Background()
+
+		configCheckLabels := map[string]string{
+			"my-unique-label": "configcheck",
+		}
+
+		logging := v1beta1.Logging{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "fluentd-aggregator-configchecks-start-timeout-ro-rootfs-test",
+				Namespace: ns,
+			},
+			Spec: v1beta1.LoggingSpec{
+				EnableRecreateWorkloadOnImmutableFieldChange: true,
+				ControlNamespace: ns,
+				FluentbitSpec: &v1beta1.FluentbitSpec{
+					Network: &v1beta1.FluentbitNetwork{
+						Keepalive: utils.BoolPointer(false),
+					},
+					ConfigHotReload: &v1beta1.HotReload{
+						Image: v1beta1.ImageSpec{
+							Repository: common.ConfigReloaderRepo,
+							Tag:        common.ConfigReloaderTag,
+						},
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
+				},
+				FluentdSpec: &v1beta1.FluentdSpec{
+					Image: v1beta1.ImageSpec{
+						Repository: common.FluentdImageRepo,
+						Tag:        common.FluentdImageTag,
+					},
+					ConfigReloaderImage: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
+					},
+					BufferVolumeImage: v1beta1.ImageSpec{
+						Repository: common.NodeExporterRepo,
+						Tag:        common.NodeExporterTag,
+					},
+					Resources: corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							corev1.ResourceCPU:    resource.MustParse("500m"),
+							corev1.ResourceMemory: resource.MustParse("200M"),
+						},
+						Requests: corev1.ResourceList{
+							corev1.ResourceCPU:    resource.MustParse("250m"),
+							corev1.ResourceMemory: resource.MustParse("50M"),
+						},
+					},
+					BufferVolumeMetrics: &v1beta1.Metrics{},
+					Scaling: &v1beta1.FluentdScaling{
+						Replicas: 1,
+						Drain: v1beta1.FluentdDrainConfig{
+							Enabled: true,
+							Image: v1beta1.ImageSpec{
+								Repository: common.FluentdDrainWatchRepo,
+								Tag:        common.FluentdDrainWatchTag,
+							},
+						},
+					},
+					Workers: 1,
+					Security: &v1beta1.Security{
+						SecurityContext: &corev1.SecurityContext{
+							ReadOnlyRootFilesystem: utils.BoolPointer(true),
+						},
+					},
+					ConfigCheck: &v1beta1.ConfigCheck{
+						Strategy:       v1beta1.ConfigCheckStrategyTimeout,
+						TimeoutSeconds: 5,
+						Labels:         configCheckLabels,
+					},
+				},
+			},
+		}
+		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
+		output := v1beta1.Output{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      outputName,
+				Namespace: ns,
+			},
+			Spec: v1beta1.OutputSpec{
+				FileOutput: &output.FileOutputConfig{
+					Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
+					Append: true,
+					Buffer: &output.Buffer{
+						Type:        "file",
+						Timekey:     "1m",
+						TimekeyWait: "10s",
+					},
+				},
+			},
+		}
+
+		producerLabels := map[string]string{
+			"my-unique-label": "log-producer",
+		}
+
+		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
+		flow := v1beta1.Flow{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      flowName,
+				Namespace: ns,
+			},
+			Spec: v1beta1.FlowSpec{
+				Match: []v1beta1.Match{
+					{
+						Select: &v1beta1.Select{
+							Labels: producerLabels,
+						},
+					},
+				},
+				LocalOutputRefs: []string{output.Name},
+			},
+		}
+		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+
+		aggregatorLabels := map[string]string{
+			"app.kubernetes.io/name":      "fluentd",
+			"app.kubernetes.io/component": "fluentd",
+		}
+		operatorLabels := map[string]string{
+			"app.kubernetes.io/name": releaseNameOverride,
+		}
+
+		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+			options.Namespace = ns
+			options.Labels = producerLabels
+		}))
+
+		require.Eventually(t, func() bool {
+			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+				t.Log("waiting for the operator")
+				return false
+			}
+			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+				t.Log("waiting for the producer")
+				return false
+			}
+			if configCheckFinished := cond.AnyPodShouldBeFinished(t, c.GetClient(), client.MatchingLabels(configCheckLabels)); !configCheckFinished() {
+				t.Log("waiting for the config check")
+				return false
+			}
+			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
+				t.Log("waiting for the aggregator")
+				return false
+			}
+
+			return true
+		}, 5*time.Minute, 3*time.Second)
+
+		common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+
+		require.Equal(t, 0, logging.Status.ProblemsCount)
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
