@@ -8,7 +8,7 @@
 CONTROLLER_GEN_VERSION := 0.18.0
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := 2.2.2
+GOLANGCI_LINT_VERSION := 2.3.0
 
 # renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
 GO_TEST_COVERAGE_VERSION := 2.16.0
