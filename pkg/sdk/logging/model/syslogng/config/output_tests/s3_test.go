@@ -134,7 +134,7 @@ source "main_input" {
 };
 
 destination "output_default_test-s3-out" {
-	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") object_key("${HOST}/my-logs") object_key_timestamp("timestamp") template("${MESSAGE}\n") compression(no) compresslevel(9) chunk_size(5) max_object_size(5000) upload_threads(8) max_pending_uploads(32) flush_grace_period(60) region("s3region") storage_class("STANDARD") canned_acl("s3-canned-acl") persist_name("output_default_test-s3-out"));
+	s3(url("http://localhost:9000") bucket("s3bucket") access_key("access-key-secret-value") secret_key("secret-key-value") role("s3-role") object_key("${HOST}/my-logs") object_key_timestamp("timestamp") template("${MESSAGE}\n") compression(no) compresslevel(9) chunk_size(5) max_object_size(5000) upload_threads(8) max_pending_uploads(32) flush_grace_period(60) region("s3region") server_side_encryption("aws:kms") kms_key("kms-key") storage_class("STANDARD") canned_acl("s3-canned-acl") content_type("application/octet-stream") persist_name("output_default_test-s3-out"));
 };
 `)
 
@@ -193,19 +193,23 @@ destination "output_default_test-s3-out" {
 							},
 						},
 					},
-					ObjectKey:          "${HOST}/my-logs",
-					ObjectKeyTimestamp: "timestamp",
-					Template:           "${MESSAGE}\n",
-					Compression:        config.NewFalse(),
-					CompressLevel:      9,
-					ChunkSize:          5,
-					MaxObjectSize:      5000,
-					UploadThreads:      8,
-					MaxPendingUploads:  32,
-					FlushGracePeriod:   60,
-					Region:             "s3region",
-					StorageClass:       "STANDARD",
-					CannedAcl:          "s3-canned-acl",
+					Role:                 "s3-role",
+					ObjectKey:            "${HOST}/my-logs",
+					ObjectKeyTimestamp:   "timestamp",
+					Template:             "${MESSAGE}\n",
+					Compression:          config.NewFalse(),
+					CompressLevel:        9,
+					ChunkSize:            5,
+					MaxObjectSize:        5000,
+					UploadThreads:        8,
+					MaxPendingUploads:    32,
+					FlushGracePeriod:     60,
+					Region:               "s3region",
+					ServerSideEncryption: "aws:kms",
+					KmsKey:               "kms-key",
+					StorageClass:         "STANDARD",
+					CannedAcl:            "s3-canned-acl",
+					ContentType:          "application/octet-stream",
 				}},
 			},
 		},
