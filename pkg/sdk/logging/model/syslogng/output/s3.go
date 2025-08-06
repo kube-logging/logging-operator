@@ -71,6 +71,8 @@ type S3Output struct {
 	AccessKey *secret.Secret `json:"access_key,omitempty"`
 	// The secret_key for the S3 server.
 	SecretKey *secret.Secret `json:"secret_key,omitempty"`
+	// The role for the S3 server.
+	Role string `json:"role,omitempty"`
 	// The object_key for the S3 server.
 	ObjectKey string `json:"object_key,omitempty"`
 	// Set object_key_timestamp
@@ -93,10 +95,22 @@ type S3Output struct {
 	FlushGracePeriod int `json:"flush_grace_period,omitempty"`
 	// Set the region option.
 	Region string `json:"region,omitempty"`
+	// You can use the server-side-encryption() and kms-key() options to configure encryption. Currently only server-side-encryption("aws:kms") is supported.
+	// Available in AxoSyslog 4.8 and later.
+	ServerSideEncryption string `json:"server_side_encryption,omitempty"`
+	// The kms-key() used for server-side encryption. The value of the kms-key() parameter must be one of the following:
+	// The ID of a key.
+	// An alias of a key. In that case, make sure to add the alias/prefix, for example: kms-key("alias/log-archive")
+	// The ARN of a key.
+	// Available in AxoSyslog 4.8 and later.
+	KmsKey string `json:"kms_key,omitempty"`
 	// Set the storage_class option.
 	StorageClass string `json:"storage_class,omitempty"`
 	// Set the canned_acl option.
 	CannedAcl string `json:"canned_acl,omitempty"`
+	// The content-type of the HTTP request.
+	// Defaults to "application/octet-stream".
+	ContentType string `json:"content_type,omitempty"`
 	// The number of messages that the output queue can store.
 	LogFIFOSize int `json:"log-fifo-size,omitempty"`
 	// Persistname

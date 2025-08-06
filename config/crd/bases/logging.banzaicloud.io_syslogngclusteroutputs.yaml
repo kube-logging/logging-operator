@@ -2204,6 +2204,8 @@ spec:
                     type: boolean
                   compresslevel:
                     type: integer
+                  content_type:
+                    type: string
                   disk_buffer:
                     properties:
                       compaction:
@@ -2230,6 +2232,8 @@ spec:
                     type: object
                   flush_grace_period:
                     type: integer
+                  kms_key:
+                    type: string
                   log-fifo-size:
                     type: integer
                   max_object_size:
@@ -2246,6 +2250,8 @@ spec:
                     type: string
                   retries:
                     type: integer
+                  role:
+                    type: string
                   secret_key:
                     properties:
                       mountFrom:
@@ -2283,6 +2289,8 @@ spec:
                             x-kubernetes-map-type: atomic
                         type: object
                     type: object
+                  server_side_encryption:
+                    type: string
                   storage_class:
                     type: string
                   template:
