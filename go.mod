@@ -14,12 +14,12 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.38.0
 	github.com/pborman/uuid v1.2.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.84.0
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.84.1
+	github.com/prometheus/client_golang v1.23.0
 	github.com/siliconbrain/go-seqs v0.15.0
 	github.com/spf13/cast v1.9.2
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
 	k8s.io/api v0.33.3
 	k8s.io/apiextensions-apiserver v0.33.3
 	k8s.io/apimachinery v0.33.3
