@@ -35,7 +35,7 @@ GEM
     fluent-plugin-prometheus (2.2.1)
       fluentd (>= 1.9.1, < 2)
       prometheus-client (>= 2.1.0)
-    fluent-plugin-record-modifier (2.2.0)
+    fluent-plugin-record-modifier (2.2.1)
       fluentd (>= 1.1, < 2)
     fluent-plugin-rewrite-tag-filter (2.4.0)
       fluent-config-regexp-type
@@ -102,7 +102,7 @@ DEPENDENCIES
   fluent-plugin-mysqlslowquery (= 0.0.9)
   fluent-plugin-parser-logfmt (= 0.0.0)
   fluent-plugin-prometheus (= 2.2.1)
-  fluent-plugin-record-modifier (= 2.2.0)
+  fluent-plugin-record-modifier (= 2.2.1)
   fluent-plugin-rewrite-tag-filter (= 2.4.0)
   fluent-plugin-tag-normaliser (= 0.1.3)
   fluent-plugin-throttle (= 0.0.5)
