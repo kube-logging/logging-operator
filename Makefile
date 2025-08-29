@@ -192,11 +192,11 @@ run: codegen fmt vet ## Run against the configured Kubernetes cluster in ~/.kube
 
 .PHONY: test
 test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run tests
-	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
-	cd pkg/sdk/extensions && go test ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
+	cd pkg/sdk/logging && ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./... -coverprofile ${TEST_COV_DIR}/cover_logging.out
+	cd pkg/sdk/extensions && go test -v ./... -coverprofile  ${TEST_COV_DIR}/cover_extensions.out
 	cd pkg/sdk/logging/model/syslogng/config && go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
-	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
+	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
 
 .PHONY: generate-test-coverage
 generate-test-coverage: test
