@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/go-logr/zapr"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -47,32 +48,36 @@ func TestAPIs(t *testing.T) {
 	RunSpecs(t, "v1beta1 Suite")
 }
 
-var _ = BeforeSuite(func(done Done) {
-	zapLog, err := zap.NewDevelopment(zap.ErrorOutput(zapcore.AddSync(GinkgoWriter)))
-	if err != nil {
-		panic(fmt.Sprintf("who watches the watchmen (%v)?", err))
-	}
-	log.SetLogger(zapr.NewLogger(zapLog))
+var _ = BeforeSuite(func() {
+	done := make(chan interface{})
+	go func() {
+		zapLog, err := zap.NewDevelopment(zap.ErrorOutput(zapcore.AddSync(GinkgoWriter)))
+		if err != nil {
+			panic(fmt.Sprintf("who watches the watchmen (%v)?", err))
+		}
+		log.SetLogger(zapr.NewLogger(zapLog))
 
-	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "..", "..", "config", "crd", "bases")},
-		BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
-	}
+		By("bootstrapping test environment")
+		testEnv = &envtest.Environment{
+			CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "..", "..", "config", "crd", "bases")},
+			BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
+		}
 
-	err = v1beta1.SchemeBuilder.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
+		err = v1beta1.SchemeBuilder.AddToScheme(scheme.Scheme)
+		Expect(err).NotTo(HaveOccurred())
 
-	cfg, err = testEnv.Start()
-	Expect(err).ToNot(HaveOccurred())
-	Expect(cfg).ToNot(BeNil())
+		cfg, err = testEnv.Start()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(cfg).ToNot(BeNil())
 
-	K8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
-	Expect(err).ToNot(HaveOccurred())
-	Expect(K8sClient).ToNot(BeNil())
+		K8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(K8sClient).ToNot(BeNil())
 
-	close(done)
-}, 60)
+		close(done)
+	}()
+	Eventually(done, 60*time.Second).Should(BeClosed())
+})
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")

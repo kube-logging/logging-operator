@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	loggingextensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	. "github.com/onsi/ginkgo"
@@ -42,33 +43,36 @@ func TestAPIs(t *testing.T) {
 	RunSpecs(t, "Controller Suite")
 }
 
-var _ = BeforeSuite(func(done Done) {
+var _ = BeforeSuite(func() {
+	done := make(chan interface{})
+	go func() {
+		By("bootstrapping test environment")
+		testEnv = &envtest.Environment{
+			CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
+			BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
+		}
 
-	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		BinaryAssetsDirectory: os.Getenv("ENVTEST_BINARY_ASSETS"),
-	}
+		var err error
+		cfg, err = testEnv.Start()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(cfg).ToNot(BeNil())
 
-	var err error
-	cfg, err = testEnv.Start()
-	Expect(err).ToNot(HaveOccurred())
-	Expect(cfg).ToNot(BeNil())
+		err = loggingextensionsv1alpha1.AddToScheme(scheme.Scheme)
+		Expect(err).NotTo(HaveOccurred())
 
-	err = loggingextensionsv1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
+		err = loggingextensionsv1alpha1.AddToScheme(scheme.Scheme)
+		Expect(err).NotTo(HaveOccurred())
 
-	err = loggingextensionsv1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
+		// +kubebuilder:scaffold:scheme
 
-	// +kubebuilder:scaffold:scheme
+		k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(k8sClient).ToNot(BeNil())
 
-	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
-	Expect(err).ToNot(HaveOccurred())
-	Expect(k8sClient).ToNot(BeNil())
-
-	close(done)
-}, 60)
+		close(done)
+	}()
+	Eventually(done, 60*time.Second).Should(BeClosed())
+})
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
