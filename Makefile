@@ -5,7 +5,7 @@
 ####
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools versioning=semver
-CONTROLLER_GEN_VERSION := 0.18.0
+CONTROLLER_GEN_VERSION := 0.19.0
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
 GOLANGCI_LINT_VERSION := 2.4.0
@@ -20,7 +20,7 @@ HELM_DOCS_VERSION = 1.14.2
 KIND_VERSION ?= 0.29.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
-KUBEBUILDER_VERSION = 4.7.1
+KUBEBUILDER_VERSION = 4.8.0
 
 # renovate: datasource=go depName=github.com/goph/licensei versioning=semver
 LICENSEI_VERSION = 0.9.0
