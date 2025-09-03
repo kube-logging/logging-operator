@@ -26,6 +26,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && gem install fluentd -v 1.18.0 \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
+ && fluent-gem install snappy -v 0.0.15 \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
  && apk del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
