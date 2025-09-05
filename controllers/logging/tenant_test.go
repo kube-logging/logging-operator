@@ -20,7 +20,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -31,23 +32,23 @@ func TestFindTenants(t *testing.T) {
 
 	currentLoggingName := "current"
 
-	testData := []struct {
+	tests := []struct {
 		name     string
-		target   v1.LabelSelector
+		target   metav1.LabelSelector
 		loggings []*v1beta1.Logging
 		wantErr  bool
 		satisfy  func([]fluentbit.Tenant) bool
 	}{
 		{
 			name: "static logging target with a static watch namespace list",
-			target: v1.LabelSelector{
+			target: metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"name": "a",
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "a",
 						Labels: map[string]string{
 							"name": "a",
@@ -69,14 +70,14 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "watching all namespaces will result in an empty namespace list, with the allNamespaces flag set to true",
-			target: v1.LabelSelector{
+			target: metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"name": "a",
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "a",
 						Labels: map[string]string{
 							"name": "a",
@@ -98,14 +99,14 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "static logging target with an empty watch namespace will be omitted",
-			target: v1.LabelSelector{
+			target: metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"name": currentLoggingName,
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "a",
 						Labels: map[string]string{
 							"name": "a",
@@ -119,17 +120,17 @@ func TestFindTenants(t *testing.T) {
 		},
 		{
 			name: "dynamic logging targets with a static watch namespace list",
-			target: v1.LabelSelector{
-				MatchExpressions: []v1.LabelSelectorRequirement{
+			target: metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
 					{
 						Key:      "tenant",
-						Operator: v1.LabelSelectorOpExists,
+						Operator: metav1.LabelSelectorOpExists,
 					},
 				},
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "b",
 						Labels: map[string]string{
 							"tenant": "x",
@@ -140,7 +141,7 @@ func TestFindTenants(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "c",
 						Labels: map[string]string{
 							"tenant": "y",
@@ -167,16 +168,46 @@ func TestFindTenants(t *testing.T) {
 		},
 	}
 
-	for _, td := range testData {
-		td := td
-		deferred := ensureCreatedAll(t, td.loggings)
+	for _, tt := range tests {
+		ttp := tt
+
+		var namespacesToCleanup []func()
+		for _, ns := range collectNamespaces(ttp.loggings) {
+			namespacesToCleanup = append(namespacesToCleanup, ensureCreated(t, ns))
+		}
+		loggingCleanup := ensureCreatedAll(t, ttp.loggings)
+
+		time.Sleep(500 * time.Millisecond)
+
 		assert.Eventually(t, func() bool {
-			tenants, err := fluentbit.FindTenants(context.TODO(), td.target, mgr.GetClient())
-			if td.wantErr {
-				assert.NoError(t, err)
+			tenants, err := fluentbit.FindTenants(context.TODO(), ttp.target, mgr.GetClient())
+			if ttp.wantErr {
+				return assert.Error(t, err)
 			}
-			return td.satisfy(tenants)
-		}, time.Second, 100*time.Millisecond, td.name)
-		deferred()
+			if !assert.NoError(t, err) {
+				return false
+			}
+			return ttp.satisfy(tenants)
+		}, 10*time.Second, 200*time.Millisecond, ttp.name)
+
+		loggingCleanup()
+		for _, f := range namespacesToCleanup {
+			f()
+		}
 	}
+}
+
+func collectNamespaces(loggings []*v1beta1.Logging) []*corev1.Namespace {
+	var namespaces []*corev1.Namespace
+	for _, l := range loggings {
+		for _, ns := range l.Spec.WatchNamespaces {
+			if ns != "" && ns != testNamespace && ns != controlNamespace {
+				nsObj := &corev1.Namespace{
+					ObjectMeta: metav1.ObjectMeta{Name: ns},
+				}
+				namespaces = append(namespaces, nsObj)
+			}
+		}
+	}
+	return namespaces
 }
