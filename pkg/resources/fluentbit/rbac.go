@@ -55,7 +55,7 @@ func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, 
 				{
 					Kind:      rbacv1.ServiceAccountKind,
 					Name:      r.getServiceAccount(),
-					Namespace: r.Logging.Spec.ControlNamespace,
+					Namespace: r.Logging.Spec.NodeAgentNamespace,
 				},
 			},
 		}, reconciler.StatePresent, nil
@@ -100,7 +100,7 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 				{
 					Kind:      rbacv1.ServiceAccountKind,
 					Name:      r.getServiceAccount(),
-					Namespace: r.Logging.Spec.ControlNamespace,
+					Namespace: r.Logging.Spec.NodeAgentNamespace,
 				},
 			},
 		}, reconciler.StatePresent, nil

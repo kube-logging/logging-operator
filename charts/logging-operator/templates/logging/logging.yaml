@@ -45,6 +45,9 @@ spec:
   {{- end }}
   clusterDomain: {{ .Values.logging.clusterDomain }}
   controlNamespace: {{ .Values.logging.controlNamespace | default .Release.Namespace }}
+  {{- if .Values.logging.nodeAgentNamespace }}
+  nodeAgentNamespace: {{ .Values.logging.nodeAgentNamespace }}
+  {{- end }}
   {{- with .Values.logging.allowClusterResourcesFromAllNamespaces }}
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}

@@ -7799,6 +7799,8 @@ spec:
                 type: array
               loggingRef:
                 type: string
+              nodeAgentNamespace:
+                type: string
               routeConfig:
                 properties:
                   disableLoggingRoute:
@@ -16210,6 +16212,7 @@ spec:
                 type: array
             required:
             - controlNamespace
+            - nodeAgentNamespace
             type: object
           status:
             properties:

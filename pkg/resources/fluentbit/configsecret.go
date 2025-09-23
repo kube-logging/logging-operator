@@ -229,7 +229,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		ForceHotReloadAfterGrace: r.fluentbitSpec.ForceHotReloadAfterGrace,
 		LogLevel:                 r.fluentbitSpec.LogLevel,
 		CoroStackSize:            r.fluentbitSpec.CoroStackSize,
-		Namespace:                r.Logging.Spec.ControlNamespace,
+		Namespace:                r.Logging.Spec.NodeAgentNamespace,
 		DisableKubernetesFilter:  disableKubernetesFilter,
 		FilterModify:             r.fluentbitSpec.FilterModify,
 		HealthCheck:              r.fluentbitSpec.HealthCheck,

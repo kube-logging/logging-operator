@@ -79,6 +79,11 @@ Global filters to apply on logs before any match or filter mechanism.
 Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset. 
 
 
+### nodeAgentNamespace (string, required) {#loggingspec-nodeagentnamespace}
+
+Namespace to deploy Fluent Bit resources (DaemonSet, Service, ServiceAccount, config Secret, ServiceMonitors). If unset, it defaults to `controlNamespace` to preserve backward compatibility. 
+
+
 ### routeConfig (*RouteConfig, optional) {#loggingspec-routeconfig}
 
 RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource that can be managed by the Telemetry Controller. 

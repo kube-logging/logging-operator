@@ -80,6 +80,9 @@ type LoggingSpec struct {
 	// Resources like fluentbit and fluentd will run in this namespace as well.
 	ControlNamespace string `json:"controlNamespace"`
 
+	// Namespace to deploy Fluent Bit resources (DaemonSet, Service, ServiceAccount, config Secret, ServiceMonitors). If unset, it defaults to `controlNamespace` to preserve backward compatibility.
+	NodeAgentNamespace string `json:"nodeAgentNamespace"`
+
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
 
 	// Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
@@ -223,6 +226,10 @@ func (l *Logging) SetDefaults() error {
 	}
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
+	}
+	// Default/compatibility mapping for node agents namespace
+	if l.Spec.NodeAgentNamespace == "" {
+		l.Spec.NodeAgentNamespace = l.Spec.ControlNamespace
 	}
 	if len(l.Status.FluentdConfigName) == 0 {
 		if err := l.Spec.FluentdSpec.SetDefaults(); err != nil {
