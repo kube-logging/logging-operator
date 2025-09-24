@@ -203,8 +203,8 @@ logging:
   # -- Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well.
   controlNamespace: ""
 
-  # -- Namespace to deploy Fluent Bit resources into. If empty, defaults to controlNamespace for backward compatibility.
-  nodeAgentNamespace: ""
+  # -- Namespace to deploy FluentBit resources into. If empty, defaults to controlNamespace for backward compatibility.
+  fluentBitAgentNamespace: ""
 
   # -- Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources
   allowClusterResourcesFromAllNamespaces: false

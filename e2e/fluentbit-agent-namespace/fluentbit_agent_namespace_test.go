@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fluentbit_nodeagents_namespace
+package fluentbit_agent_namespace
 
 import (
 	"context"
@@ -69,15 +69,15 @@ var producerLabels = map[string]string{
 	"my-unique-label": "log-producer",
 }
 
-// Verifies that Fluent Bit node agents are deployed to a dedicated namespace when
-// logging.spec.nodeAgentNamespace is set, while the aggregator stays in the control namespace.
-func TestFluentbitNodeAgentsDedicatedNamespace(t *testing.T) {
+// Verifies that Fluentbit agents are deployed to a dedicated namespace when
+// logging.spec.fluentBitAgentNamespace is set, while the aggregator stays in the control namespace.
+func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 	common.Initialize(t)
 
 	nsControl := "logging"
-	nsAgents := "logging-node-agents"
-	release := "fluentbit-nodeagents-namespace"
-	tag := "tag_nodeagents"
+	nsAgents := "logging-fluentbit-agents"
+	release := "fluentbit-agents-namespace"
+	tag := "tag_fluentbit_agents"
 
 	common.WithCluster(release, t, func(t *testing.T, c common.Cluster) {
 		// Install logging-operator Helm chart with test-receiver in control namespace
@@ -88,7 +88,7 @@ func TestFluentbitNodeAgentsDedicatedNamespace(t *testing.T) {
 
 		ctx := context.Background()
 
-		// Ensure node agents namespace exists
+		// Ensure fluentbit agent namespace exists
 		common.RequireNoError(t, c.GetClient().Create(ctx, &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: nsAgents,
@@ -134,7 +134,7 @@ func TestFluentbitNodeAgentsDedicatedNamespace(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &clusterFlow))
 
-		// Create Fluent Bit agent (standalone) bound to the same loggingRef
+		// Create FluentBit agent (standalone) bound to the same loggingRef
 		agent := v1beta1.FluentbitAgent{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "infra",
@@ -149,13 +149,13 @@ func TestFluentbitNodeAgentsDedicatedNamespace(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &agent))
 
-		// Create Logging with control namespace and dedicated nodeAgentNamespace
+		// Create Logging with control namespace and dedicated FluentbitAgentNamespace
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{Name: "infra"},
 			Spec: v1beta1.LoggingSpec{
-				LoggingRef:         "infra",
-				ControlNamespace:   nsControl,
-				NodeAgentNamespace: nsAgents,
+				LoggingRef:              "infra",
+				ControlNamespace:        nsControl,
+				FluentbitAgentNamespace: nsAgents,
 				FluentdSpec: &v1beta1.FluentdSpec{
 					Image:               v1beta1.ImageSpec{Repository: common.FluentdImageRepo, Tag: common.FluentdImageTag},
 					ConfigReloaderImage: v1beta1.ImageSpec{Repository: common.ConfigReloaderRepo, Tag: common.ConfigReloaderTag},
@@ -201,7 +201,7 @@ func TestFluentbitNodeAgentsDedicatedNamespace(t *testing.T) {
 				return false
 			}
 			if fluentbitRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(fluentBitLabels), client.InNamespace(nsAgents)); !fluentbitRunning() {
-				t.Log("waiting for the fluentbit daemonset in node agents namespace")
+				t.Log("waiting for the fluentbit daemonset in fluentbit agent namespace")
 				return false
 			}
 

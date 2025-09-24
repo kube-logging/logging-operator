@@ -885,6 +885,8 @@ spec:
                 type: boolean
               flowConfigOverride:
                 type: string
+              fluentBitAgentNamespace:
+                type: string
               fluentbit:
                 properties:
                   HostNetwork:
@@ -7798,8 +7800,6 @@ spec:
                   type: object
                 type: array
               loggingRef:
-                type: string
-              nodeAgentNamespace:
                 type: string
               routeConfig:
                 properties:
@@ -16212,7 +16212,6 @@ spec:
                 type: array
             required:
             - controlNamespace
-            - nodeAgentNamespace
             type: object
           status:
             properties:

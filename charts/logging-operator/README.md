@@ -90,7 +90,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.watchNamespaceSelector | object | `{}` | Limit namespaces to watch Flow and Output custom resources. |
 | logging.clusterDomain | string | `"cluster.local."` | Cluster domain name to be used when templating URLs to services |
 | logging.controlNamespace | string | `""` | Namespace for cluster wide configuration resources like ClusterFlow and ClusterOutput. This should be a protected namespace from regular users. Resources like fluentbit and fluentd will run in this namespace as well. |
-| logging.nodeAgentNamespace | string | `""` | Namespace to deploy Fluent Bit resources into. If empty, defaults to controlNamespace for backward compatibility. |
+| logging.fluentBitAgentNamespace | string | `""` | Namespace to deploy FluentBit resources into. If empty, defaults to controlNamespace for backward compatibility. |
 | logging.allowClusterResourcesFromAllNamespaces | bool | `false` | Allow configuration of cluster resources from any namespace. Mutually exclusive with ControlNamespace restriction of Cluster resources |
 | logging.configCheck | object | `{}` | configCheck provides possibility for timeout-based configuration checks https://kube-logging.dev/docs/whats-new/#timeout-based-configuration-checks |
 | logging.enableRecreateWorkloadOnImmutableFieldChange | bool | `false` | EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn’t be managed with a simple update. |

@@ -59,6 +59,11 @@ Disable configuration check before applying new fluentd or syslogng configuratio
 Override generated config. This is a *raw* configuration string for troubleshooting purposes. 
 
 
+### fluentBitAgentNamespace (string, optional) {#loggingspec-fluentbitagentnamespace}
+
+Namespace to deploy Fluent Bit resources (DaemonSet, Service, ServiceAccount, config Secret, ServiceMonitors). If unset, it defaults to `controlNamespace` to preserve backward compatibility. 
+
+
 ### fluentbit (*FluentbitSpec, optional) {#loggingspec-fluentbit}
 
 FluentbitAgent daemonset configuration. DEPRECATED: Migrate to the standalone FluentBitAgent resource 
@@ -77,11 +82,6 @@ Global filters to apply on logs before any match or filter mechanism.
 ### loggingRef (string, optional) {#loggingspec-loggingref}
 
 Reference to the logging system. Each of the `loggingRef`s can manage a fluentbit daemonset and a fluentd statefulset. 
-
-
-### nodeAgentNamespace (string, required) {#loggingspec-nodeagentnamespace}
-
-Namespace to deploy Fluent Bit resources (DaemonSet, Service, ServiceAccount, config Secret, ServiceMonitors). If unset, it defaults to `controlNamespace` to preserve backward compatibility. 
 
 
 ### routeConfig (*RouteConfig, optional) {#loggingspec-routeconfig}
