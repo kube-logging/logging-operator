@@ -60,7 +60,7 @@ var fluentdInputTemplate = `
     @type prometheus
     {{- if .Monitor.EnabledIPv6 }}
     @id in_prometheus6
-    bind "::"
+    bind "[::]"
     {{- else }}
     bind "0.0.0.0"
     {{- end }}
