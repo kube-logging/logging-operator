@@ -882,6 +882,8 @@ spec:
                 type: boolean
               flowConfigOverride:
                 type: string
+              fluentBitAgentNamespace:
+                type: string
               fluentbit:
                 properties:
                   HostNetwork:

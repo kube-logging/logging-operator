@@ -22,7 +22,7 @@ import (
 func (r *Reconciler) FluentbitObjectMeta(name string) metav1.ObjectMeta {
 	o := metav1.ObjectMeta{
 		Name:      r.nameProvider.ComponentName(name),
-		Namespace: r.Logging.Spec.ControlNamespace,
+		Namespace: r.Logging.Spec.FluentbitAgentNamespace,
 		Labels:    r.getFluentBitLabels(),
 		OwnerReferences: []metav1.OwnerReference{
 			r.nameProvider.OwnerRef(),
