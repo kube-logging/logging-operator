@@ -37,41 +37,70 @@ type _metaRabbitMQ interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type RabbitMQOutputConfig struct {
-	Host                             string         `json:"host,omitempty"`
-	Hosts                            []string       `json:"hosts,omitempty"`
-	Port                             int            `json:"port,omitempty"`
-	User                             *secret.Secret `json:"user,omitempty"`
-	Pass                             *secret.Secret `json:"pass,omitempty"`
-	VHost                            string         `json:"vhost,omitempty"`
-	ConnectionTimeoutInSeconds       int            `json:"connection_timeout,omitempty"`
-	NetworkRecoveryIntervalInSeconds int            `json:"network_recovery_interval,omitempty"`
-	ContinuationTimeoutInSeconds     int            `json:"continuation_timeout,omitempty"`
-	RecoveryAttempts                 int            `json:"recovery_attempts,omitempty"`
-	AutomaticallyRecover             bool           `json:"automatically_recover,omitempty"`
-	HeartbeatIntervalInSeconds       int            `json:"heartbeat,omitempty"`
-	FrameMax                         int            `json:"frame_max,omitempty"`
-
-	TLS               bool     `json:"tls,omitempty"`
-	TLSCert           string   `json:"tls_cert,omitempty"`
-	TLSKey            string   `json:"tls_key,omitempty"`
+	// Host
+	Host string `json:"host,omitempty"`
+	// Hosts
+	Hosts []string `json:"hosts,omitempty"`
+	// Port
+	Port int `json:"port,omitempty"`
+	// User
+	User *secret.Secret `json:"user,omitempty"`
+	// Pass
+	Pass *secret.Secret `json:"pass,omitempty"`
+	// VHost
+	VHost string `json:"vhost,omitempty"`
+	// Connection Timeout in seconds
+	ConnectionTimeoutInSeconds int `json:"connection_timeout,omitempty"`
+	// Network Recovery Interval in seconds
+	NetworkRecoveryIntervalInSeconds int `json:"network_recovery_interval,omitempty"`
+	// Continuation Timeout in seconds
+	ContinuationTimeoutInSeconds int `json:"continuation_timeout,omitempty"`
+	// Recovery Attempts
+	RecoveryAttempts int `json:"recovery_attempts,omitempty"`
+	// Automatic network failure recovery
+	AutomaticallyRecover bool `json:"automatically_recover,omitempty"`
+	// Heartbeat Timeout in seconds
+	HeartbeatIntervalInSeconds int `json:"heartbeat,omitempty"`
+	// Maximum permissible size of a frame
+	FrameMax int `json:"frame_max,omitempty"`
+	// Enable TLS or not
+	TLS bool `json:"tls,omitempty"`
+	// Path to TLS certificate file
+	TLSCert string `json:"tls_cert,omitempty"`
+	// Path to TLS key file
+	TLSKey string `json:"tls_key,omitempty"`
+	// Path to TLS CA certificates files
 	TLSCACertificates []string `json:"tls_ca_certificates,omitempty"`
-	VerifyPeer        bool     `json:"verify_peer,omitempty"`
-
-	Exchange          string `json:"exchange"`
-	ExchangeType      string `json:"exchange_type"`
-	ExchangeDurable   string `json:"exchange_durable,omitempty"`
+	// Verify Peer or not
+	VerifyPeer bool `json:"verify_peer,omitempty"`
+	// Name of the exchange
+	Exchange string `json:"exchange"`
+	// Type of the exchange
+	ExchangeType string `json:"exchange_type"`
+	// Exchange durability
+	ExchangeDurable bool `json:"exchange_durable,omitempty"`
+	// Weather to declare exchange or not
 	ExchangeNoDeclare string `json:"exchange_no_declare,omitempty"`
-
-	RoutingKey      string `json:"routing_key,omitempty"`
-	IdKey           string `json:"id_key,omitempty"`
-	Timestamp       string `json:"timestamp,omitempty"`
-	ContentType     string `json:"content_type,omitempty"`
+	// Routing key to route messages
+	RoutingKey string `json:"routing_key,omitempty"`
+	// Id to specify message_id
+	IdKey string `json:"id_key,omitempty"`
+	// Messages are persistent to disk
+	Persistent bool `json:"persistent,omitempty"`
+	// Time of record is used as timestamp in AMQP message
+	Timestamp bool `json:"timestamp,omitempty"`
+	// Message content type
+	ContentType string `json:"content_type,omitempty"`
+	// Message content encoding
 	ContentEncoding string `json:"content_encoding,omitempty"`
-	Expiration      int    `json:"expiration,omitempty"`
-	MessageType     string `json:"message_type,omitempty"`
-	Priority        int    `json:"priority,omitempty"`
-	AppId           int    `json:"app_id,omitempty"`
-	Persistent      bool   `json:"persistent,omitempty"`
+	// Message message time-to-live in seconds
+	ExpirationInSeconds int `json:"expiration,omitempty"`
+	// Message type
+	MessageType string `json:"message_type,omitempty"`
+	// Message priority
+	Priority int `json:"priority,omitempty"`
+	// Application Id
+	AppId int `json:"app_id,omitempty"`
 
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`

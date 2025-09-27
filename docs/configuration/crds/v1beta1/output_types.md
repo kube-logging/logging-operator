@@ -77,6 +77,9 @@ OutputSpec defines the desired state of Output
 ### opensearch (*output.OpenSearchOutput, optional) {#outputspec-opensearch}
 
 
+### rabbitmq (*output.RabbitMQOutputConfig, optional) {#outputspec-rabbitmq}
+
+
 ### redis (*output.RedisOutputConfig, optional) {#outputspec-redis}
 
 

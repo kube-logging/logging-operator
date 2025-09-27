@@ -2510,6 +2510,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.AwsElasticsearchOutputConfig)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.RabbitMQOutputConfig != nil {
+		in, out := &in.RabbitMQOutputConfig, &out.RabbitMQOutputConfig
+		*out = new(output.RabbitMQOutputConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.RedisOutputConfig != nil {
 		in, out := &in.RedisOutputConfig, &out.RedisOutputConfig
 		*out = new(output.RedisOutputConfig)
