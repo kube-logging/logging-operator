@@ -1,3 +1,17 @@
+// Copyright © 2020 Banzai Cloud
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package output
 
 import (
@@ -20,6 +34,9 @@ Sends logs to RabbitMQ Queues. For details, see [https://github.com/nttcom/fluen
 spec:
   rabbitmq:
     host: rabbitmq-master.prod.svc.cluster.local
+		user: test-user
+		pass: test-pass
+		port: 5672
     buffer:
       tags: "[]"
       flush_interval: 10s
@@ -43,26 +60,29 @@ type RabbitMQOutputConfig struct {
 	Hosts []string `json:"hosts,omitempty"`
 	// Port
 	Port int `json:"port,omitempty"`
-	// User
-	User *secret.Secret `json:"user,omitempty"`
-	// Pass
-	Pass *secret.Secret `json:"pass,omitempty"`
+	// Username
+	Username *secret.Secret `json:"user,omitempty"`
+	// Password
+	Password *secret.Secret `json:"pass,omitempty"`
 	// VHost
 	VHost string `json:"vhost,omitempty"`
 	// Connection Timeout in seconds
 	ConnectionTimeoutInSeconds int `json:"connection_timeout,omitempty"`
-	// Network Recovery Interval in seconds
-	NetworkRecoveryIntervalInSeconds int `json:"network_recovery_interval,omitempty"`
 	// Continuation Timeout in seconds
 	ContinuationTimeoutInSeconds int `json:"continuation_timeout,omitempty"`
-	// Recovery Attempts
-	RecoveryAttempts int `json:"recovery_attempts,omitempty"`
 	// Automatic network failure recovery
 	AutomaticallyRecover bool `json:"automatically_recover,omitempty"`
+	// Network Recovery Interval in seconds
+	NetworkRecoveryIntervalInSeconds int `json:"network_recovery_interval,omitempty"`
+	// Recovery Attempts
+	RecoveryAttempts int `json:"recovery_attempts,omitempty"`
+	// Auth Mechanism
+	AuthMechanism string `json:"auth_mechanism,omitempty"`
 	// Heartbeat Timeout in seconds
 	HeartbeatIntervalInSeconds int `json:"heartbeat,omitempty"`
 	// Maximum permissible size of a frame
 	FrameMax int `json:"frame_max,omitempty"`
+
 	// Enable TLS or not
 	TLS bool `json:"tls,omitempty"`
 	// Path to TLS certificate file
@@ -73,6 +93,7 @@ type RabbitMQOutputConfig struct {
 	TLSCACertificates []string `json:"tls_ca_certificates,omitempty"`
 	// Verify Peer or not
 	VerifyPeer bool `json:"verify_peer,omitempty"`
+
 	// Name of the exchange
 	Exchange string `json:"exchange"`
 	// Type of the exchange
@@ -81,12 +102,13 @@ type RabbitMQOutputConfig struct {
 	ExchangeDurable bool `json:"exchange_durable,omitempty"`
 	// Weather to declare exchange or not
 	ExchangeNoDeclare string `json:"exchange_no_declare,omitempty"`
+
+	// Messages are persistent to disk
+	Persistent bool `json:"persistent,omitempty"`
 	// Routing key to route messages
 	RoutingKey string `json:"routing_key,omitempty"`
 	// Id to specify message_id
 	IdKey string `json:"id_key,omitempty"`
-	// Messages are persistent to disk
-	Persistent bool `json:"persistent,omitempty"`
 	// Time of record is used as timestamp in AMQP message
 	Timestamp bool `json:"timestamp,omitempty"`
 	// Message content type
@@ -100,7 +122,7 @@ type RabbitMQOutputConfig struct {
 	// Message priority
 	Priority int `json:"priority,omitempty"`
 	// Application Id
-	AppId int `json:"app_id,omitempty"`
+	AppId string `json:"app_id,omitempty"`
 
 	// +docLink:"Format,../format/"
 	Format *Format `json:"format,omitempty"`

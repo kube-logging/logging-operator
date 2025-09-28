@@ -15,6 +15,9 @@ Sends logs to RabbitMQ Queues. For details, see [https://github.com/nttcom/fluen
 spec:
   rabbitmq:
     host: rabbitmq-master.prod.svc.cluster.local
+		user: test-user
+		pass: test-pass
+		port: 5672
     buffer:
       tags: "[]"
       flush_interval: 10s
@@ -24,9 +27,14 @@ spec:
 ## Configuration
 ## Output Config
 
-### app_id (int, optional) {#output config-app_id}
+### app_id (string, optional) {#output config-app_id}
 
 Application Id 
+
+
+### auth_mechanism (string, optional) {#output config-auth_mechanism}
+
+Auth Mechanism 
 
 
 ### automatically_recover (bool, optional) {#output config-automatically_recover}
@@ -126,7 +134,7 @@ Network Recovery Interval in seconds
 
 ### pass (*secret.Secret, optional) {#output config-pass}
 
-Pass 
+Password 
 
 
 ### persistent (bool, optional) {#output config-persistent}
@@ -181,7 +189,7 @@ Time of record is used as timestamp in AMQP message
 
 ### user (*secret.Secret, optional) {#output config-user}
 
-User 
+Username 
 
 
 ### vhost (string, optional) {#output config-vhost}

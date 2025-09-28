@@ -6084,7 +6084,9 @@ spec:
               rabbitmq:
                 properties:
                   app_id:
-                    type: integer
+                    type: string
+                  auth_mechanism:
+                    type: string
                   automatically_recover:
                     type: boolean
                   buffer:
@@ -13985,7 +13987,9 @@ spec:
               rabbitmq:
                 properties:
                   app_id:
-                    type: integer
+                    type: string
+                  auth_mechanism:
+                    type: string
                   automatically_recover:
                     type: boolean
                   buffer:
