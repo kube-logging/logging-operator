@@ -13,14 +13,15 @@ Sends logs to RabbitMQ Queues. For details, see [https://github.com/nttcom/fluen
 
 ```yaml
 spec:
-  rabbitmq:
+	rabbitmq:
 		host: rabbitmq-master.namespace.svc.cluster.local
 		user: test-user
 		pass: test-pass
 		port: 5672
 		buffer:
-			tags: "[]"
-			flush_interval: 10s
+			timekey: 10m
+			timekey_wait: 30s
+			timekey_use_utc: true
 ```
 
 
