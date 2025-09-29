@@ -81,6 +81,7 @@ type LoggingSpec struct {
 	ControlNamespace string `json:"controlNamespace"`
 
 	// Namespace to deploy Fluent Bit resources (DaemonSet, Service, ServiceAccount, config Secret, ServiceMonitors). If unset, it defaults to `controlNamespace` to preserve backward compatibility.
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"
 	FluentbitAgentNamespace string `json:"fluentBitAgentNamespace,omitempty"`
 
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable, please recreate the resource"

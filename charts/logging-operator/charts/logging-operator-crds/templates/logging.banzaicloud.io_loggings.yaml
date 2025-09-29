@@ -887,6 +887,9 @@ spec:
                 type: string
               fluentBitAgentNamespace:
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable, please recreate the resource
+                  rule: self == oldSelf
               fluentbit:
                 properties:
                   HostNetwork:
