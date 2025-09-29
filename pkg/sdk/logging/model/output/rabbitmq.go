@@ -95,9 +95,9 @@ type RabbitMQOutputConfig struct {
 	VerifyPeer bool `json:"verify_peer,omitempty"`
 
 	// Name of the exchange
-	Exchange string `json:"exchange"`
+	Exchange string `json:"exchange" plugin:"required"`
 	// Type of the exchange
-	ExchangeType string `json:"exchange_type"`
+	ExchangeType string `json:"exchange_type" plugin:"required"`
 	// Exchange durability
 	ExchangeDurable bool `json:"exchange_durable,omitempty"`
 	// Weather to declare exchange or not
@@ -131,8 +131,8 @@ type RabbitMQOutputConfig struct {
 }
 
 func (c *RabbitMQOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
-	const pluginType = "rabbitMQ"
-	rabbitMQ := &types.OutputPlugin{
+	const pluginType = "rabbitmq"
+	rabbitmq := &types.OutputPlugin{
 		PluginMeta: types.PluginMeta{
 			Type:      pluginType,
 			Directive: "match",
@@ -143,7 +143,7 @@ func (c *RabbitMQOutputConfig) ToDirective(secretLoader secret.SecretLoader, id 
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
 		return nil, err
 	} else {
-		rabbitMQ.Params = params
+		rabbitmq.Params = params
 	}
 
 	if c.Buffer == nil {
@@ -153,16 +153,16 @@ func (c *RabbitMQOutputConfig) ToDirective(secretLoader secret.SecretLoader, id 
 	if buffer, err := c.Buffer.ToDirective(secretLoader, id); err != nil {
 		return nil, err
 	} else {
-		rabbitMQ.SubDirectives = append(rabbitMQ.SubDirectives, buffer)
+		rabbitmq.SubDirectives = append(rabbitmq.SubDirectives, buffer)
 	}
 
 	if c.Format != nil {
 		if format, err := c.Format.ToDirective(secretLoader, ""); err != nil {
 			return nil, err
 		} else {
-			rabbitMQ.SubDirectives = append(rabbitMQ.SubDirectives, format)
+			rabbitmq.SubDirectives = append(rabbitmq.SubDirectives, format)
 		}
 	}
 
-	return rabbitMQ, nil
+	return rabbitmq, nil
 }

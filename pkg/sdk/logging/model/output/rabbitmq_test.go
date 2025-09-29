@@ -43,7 +43,7 @@ buffer:
 
 	expected := `
   <match **>
-    @type rabbitMQ
+    @type rabbitmq
     @id test
     exchange test-exchange
     exchange_type fanout
@@ -65,8 +65,8 @@ buffer:
   </match>
 `
 
-	rabbitMQ := &output.RabbitMQOutputConfig{}
-	require.NoError(t, yaml.Unmarshal(CONFIG, rabbitMQ))
-	test := render.NewOutputPluginTest(t, rabbitMQ)
+	rabbitmq := &output.RabbitMQOutputConfig{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, rabbitmq))
+	test := render.NewOutputPluginTest(t, rabbitmq)
 	test.DiffResult(expected)
 }
