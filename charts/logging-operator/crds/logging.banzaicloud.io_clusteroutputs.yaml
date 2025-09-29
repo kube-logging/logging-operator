@@ -6171,7 +6171,7 @@ spec:
                   exchange_durable:
                     type: boolean
                   exchange_no_declare:
-                    type: string
+                    type: boolean
                   exchange_type:
                     type: string
                   expiration:
@@ -6196,7 +6196,7 @@ spec:
                   frame_max:
                     type: integer
                   heartbeat:
-                    type: integer
+                    type: string
                   host:
                     type: string
                   hosts:
@@ -14074,7 +14074,7 @@ spec:
                   exchange_durable:
                     type: boolean
                   exchange_no_declare:
-                    type: string
+                    type: boolean
                   exchange_type:
                     type: string
                   expiration:
@@ -14099,7 +14099,7 @@ spec:
                   frame_max:
                     type: integer
                   heartbeat:
-                    type: integer
+                    type: string
                   host:
                     type: string
                   hosts:

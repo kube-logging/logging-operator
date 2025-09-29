@@ -14,7 +14,7 @@ Sends logs to RabbitMQ Queues. For details, see [https://github.com/nttcom/fluen
 ```yaml
 spec:
   rabbitmq:
-    host: rabbitmq-master.prod.svc.cluster.local
+    host: rabbitmq-master.namespace.svc.cluster.local
 		user: test-user
 		pass: test-pass
 		port: 5672
@@ -49,7 +49,7 @@ Automatic network failure recovery
 
 ### connection_timeout (int, optional) {#output config-connection_timeout}
 
-Connection Timeout in seconds 
+Connection Timeout 
 
 
 ### content_encoding (string, optional) {#output config-content_encoding}
@@ -64,7 +64,7 @@ Message content type
 
 ### continuation_timeout (int, optional) {#output config-continuation_timeout}
 
-Continuation Timeout in seconds 
+Continuation Timeout 
 
 
 ### exchange (string, required) {#output config-exchange}
@@ -77,7 +77,7 @@ Name of the exchange
 Exchange durability 
 
 
-### exchange_no_declare (string, optional) {#output config-exchange_no_declare}
+### exchange_no_declare (bool, optional) {#output config-exchange_no_declare}
 
 Weather to declare exchange or not 
 
@@ -89,7 +89,7 @@ Type of the exchange
 
 ### expiration (int, optional) {#output config-expiration}
 
-Message message time-to-live in seconds 
+Message message time-to-live 
 
 
 ### format (*Format, optional) {#output config-format}
@@ -102,9 +102,9 @@ Message message time-to-live in seconds
 Maximum permissible size of a frame 
 
 
-### heartbeat (int, optional) {#output config-heartbeat}
+### heartbeat (string, optional) {#output config-heartbeat}
 
-Heartbeat Timeout in seconds 
+Heartbeat: integer as seconds or server (interval specified by server) 
 
 
 ### host (string, optional) {#output config-host}
@@ -129,12 +129,12 @@ Message type
 
 ### network_recovery_interval (int, optional) {#output config-network_recovery_interval}
 
-Network Recovery Interval in seconds 
+Network Recovery Interval 
 
 
 ### pass (*secret.Secret, optional) {#output config-pass}
 
-Password 
+Pass 
 
 
 ### persistent (bool, optional) {#output config-persistent}
@@ -189,7 +189,7 @@ Time of record is used as timestamp in AMQP message
 
 ### user (*secret.Secret, optional) {#output config-user}
 
-Username 
+User 
 
 
 ### vhost (string, optional) {#output config-vhost}

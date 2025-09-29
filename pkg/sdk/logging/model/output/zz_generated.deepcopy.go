@@ -1487,13 +1487,13 @@ func (in *RabbitMQOutputConfig) DeepCopyInto(out *RabbitMQOutputConfig) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	if in.Username != nil {
-		in, out := &in.Username, &out.Username
+	if in.User != nil {
+		in, out := &in.User, &out.User
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Password != nil {
-		in, out := &in.Password, &out.Password
+	if in.Pass != nil {
+		in, out := &in.Pass, &out.Pass
 		*out = new(secret.Secret)
 		(*in).DeepCopyInto(*out)
 	}

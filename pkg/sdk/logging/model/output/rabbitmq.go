@@ -33,7 +33,7 @@ Sends logs to RabbitMQ Queues. For details, see [https://github.com/nttcom/fluen
 ```yaml
 spec:
   rabbitmq:
-    host: rabbitmq-master.prod.svc.cluster.local
+    host: rabbitmq-master.namespace.svc.cluster.local
 		user: test-user
 		pass: test-pass
 		port: 5672
@@ -60,26 +60,26 @@ type RabbitMQOutputConfig struct {
 	Hosts []string `json:"hosts,omitempty"`
 	// Port
 	Port int `json:"port,omitempty"`
-	// Username
-	Username *secret.Secret `json:"user,omitempty"`
-	// Password
-	Password *secret.Secret `json:"pass,omitempty"`
+	// User
+	User *secret.Secret `json:"user,omitempty"`
+	// Pass
+	Pass *secret.Secret `json:"pass,omitempty"`
 	// VHost
 	VHost string `json:"vhost,omitempty"`
-	// Connection Timeout in seconds
-	ConnectionTimeoutInSeconds int `json:"connection_timeout,omitempty"`
-	// Continuation Timeout in seconds
-	ContinuationTimeoutInSeconds int `json:"continuation_timeout,omitempty"`
+	// Connection Timeout
+	ConnectionTimeout int `json:"connection_timeout,omitempty"`
+	// Continuation Timeout
+	ContinuationTimeout int `json:"continuation_timeout,omitempty"`
 	// Automatic network failure recovery
 	AutomaticallyRecover bool `json:"automatically_recover,omitempty"`
-	// Network Recovery Interval in seconds
-	NetworkRecoveryIntervalInSeconds int `json:"network_recovery_interval,omitempty"`
+	// Network Recovery Interval
+	NetworkRecoveryInterval int `json:"network_recovery_interval,omitempty"`
 	// Recovery Attempts
 	RecoveryAttempts int `json:"recovery_attempts,omitempty"`
 	// Auth Mechanism
 	AuthMechanism string `json:"auth_mechanism,omitempty"`
-	// Heartbeat Timeout in seconds
-	HeartbeatIntervalInSeconds int `json:"heartbeat,omitempty"`
+	// Heartbeat: integer as seconds or server (interval specified by server)
+	Heartbeat string `json:"heartbeat,omitempty"`
 	// Maximum permissible size of a frame
 	FrameMax int `json:"frame_max,omitempty"`
 
@@ -101,7 +101,7 @@ type RabbitMQOutputConfig struct {
 	// Exchange durability
 	ExchangeDurable bool `json:"exchange_durable,omitempty"`
 	// Weather to declare exchange or not
-	ExchangeNoDeclare string `json:"exchange_no_declare,omitempty"`
+	ExchangeNoDeclare bool `json:"exchange_no_declare,omitempty"`
 
 	// Messages are persistent to disk
 	Persistent bool `json:"persistent,omitempty"`
@@ -115,8 +115,8 @@ type RabbitMQOutputConfig struct {
 	ContentType string `json:"content_type,omitempty"`
 	// Message content encoding
 	ContentEncoding string `json:"content_encoding,omitempty"`
-	// Message message time-to-live in seconds
-	ExpirationInSeconds int `json:"expiration,omitempty"`
+	// Message message time-to-live
+	Expiration int `json:"expiration,omitempty"`
 	// Message type
 	MessageType string `json:"message_type,omitempty"`
 	// Message priority
