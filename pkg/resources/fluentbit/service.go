@@ -75,7 +75,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.GetName())),
 				},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.FluentbitAgentNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
@@ -140,7 +140,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.getFluentBitLabels()},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.FluentbitAgentNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
