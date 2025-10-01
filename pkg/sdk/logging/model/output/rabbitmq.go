@@ -93,7 +93,7 @@ type RabbitMQOutputConfig struct {
 	// Path to TLS CA certificates files
 	TLSCACertificates []string `json:"tls_ca_certificates,omitempty"`
 	// Verify Peer or not
-	VerifyPeer bool `json:"verify_peer,omitempty"`
+	VerifyPeer *bool `json:"verify_peer,omitempty" plugin:"default:true"`
 
 	// Name of the exchange
 	Exchange string `json:"exchange" plugin:"required"`

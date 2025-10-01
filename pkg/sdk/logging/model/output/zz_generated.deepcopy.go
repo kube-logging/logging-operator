@@ -1502,6 +1502,11 @@ func (in *RabbitMQOutputConfig) DeepCopyInto(out *RabbitMQOutputConfig) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.VerifyPeer != nil {
+		in, out := &in.VerifyPeer, &out.VerifyPeer
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Format != nil {
 		in, out := &in.Format, &out.Format
 		*out = new(Format)

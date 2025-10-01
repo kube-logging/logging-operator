@@ -198,9 +198,10 @@ User
 VHost 
 
 
-### verify_peer (bool, optional) {#output config-verify_peer}
+### verify_peer (*bool, optional) {#output config-verify_peer}
 
 Verify Peer or not 
 
+Default: true
 
 
