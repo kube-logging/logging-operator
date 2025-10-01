@@ -51,6 +51,7 @@ buffer:
     pass test-pass
     port 5672
     user test-user
+    verify_peer true
     <buffer tag,time>
       @type file
       path /buffers/test.*.buffer
