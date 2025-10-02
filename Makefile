@@ -52,8 +52,6 @@ OPERATOR_IMG_DEBUG ?= controller:debug
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= crd:maxDescLen=0
 
-VERSION := $(shell git describe --abbrev=0 --tags)
-
 E2E_TEST_TIMEOUT ?= 20m
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
