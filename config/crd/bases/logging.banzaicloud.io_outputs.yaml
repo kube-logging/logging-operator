@@ -12808,6 +12808,238 @@ spec:
                 - bucket
                 - endpoint
                 type: object
+              rabbitmq:
+                properties:
+                  app_id:
+                    type: string
+                  auth_mechanism:
+                    type: string
+                  automatically_recover:
+                    type: boolean
+                  buffer:
+                    properties:
+                      chunk_full_threshold:
+                        type: string
+                      chunk_limit_records:
+                        type: integer
+                      chunk_limit_size:
+                        type: string
+                      compress:
+                        type: string
+                      delayed_commit_timeout:
+                        type: string
+                      disable_chunk_backup:
+                        type: boolean
+                      disabled:
+                        type: boolean
+                      flush_at_shutdown:
+                        type: boolean
+                      flush_interval:
+                        type: string
+                      flush_mode:
+                        type: string
+                      flush_thread_burst_interval:
+                        type: string
+                      flush_thread_count:
+                        type: integer
+                      flush_thread_interval:
+                        type: string
+                      overflow_action:
+                        type: string
+                      path:
+                        type: string
+                      queue_limit_length:
+                        type: integer
+                      queued_chunks_limit_size:
+                        type: integer
+                      retry_exponential_backoff_base:
+                        type: string
+                      retry_forever:
+                        type: boolean
+                      retry_max_interval:
+                        type: string
+                      retry_max_times:
+                        type: integer
+                      retry_randomize:
+                        type: boolean
+                      retry_secondary_threshold:
+                        type: string
+                      retry_timeout:
+                        type: string
+                      retry_type:
+                        type: string
+                      retry_wait:
+                        type: string
+                      tags:
+                        type: string
+                      timekey:
+                        type: string
+                      timekey_use_utc:
+                        type: boolean
+                      timekey_wait:
+                        type: string
+                      timekey_zone:
+                        type: string
+                      total_limit_size:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  connection_timeout:
+                    type: integer
+                  content_encoding:
+                    type: string
+                  content_type:
+                    type: string
+                  continuation_timeout:
+                    type: integer
+                  exchange:
+                    type: string
+                  exchange_durable:
+                    type: boolean
+                  exchange_no_declare:
+                    type: boolean
+                  exchange_type:
+                    type: string
+                  expiration:
+                    type: integer
+                  format:
+                    properties:
+                      add_newline:
+                        type: boolean
+                      message_key:
+                        type: string
+                      type:
+                        enum:
+                        - out_file
+                        - json
+                        - ltsv
+                        - csv
+                        - msgpack
+                        - hash
+                        - single_value
+                        type: string
+                    type: object
+                  frame_max:
+                    type: integer
+                  heartbeat:
+                    type: string
+                  host:
+                    type: string
+                  hosts:
+                    items:
+                      type: string
+                    type: array
+                  id_key:
+                    type: string
+                  message_type:
+                    type: string
+                  network_recovery_interval:
+                    type: integer
+                  pass:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                    type: object
+                  persistent:
+                    type: boolean
+                  port:
+                    type: integer
+                  priority:
+                    type: integer
+                  recovery_attempts:
+                    type: integer
+                  routing_key:
+                    type: string
+                  timestamp:
+                    type: boolean
+                  tls:
+                    type: boolean
+                  tls_ca_certificates:
+                    items:
+                      type: string
+                    type: array
+                  tls_cert:
+                    type: string
+                  tls_key:
+                    type: string
+                  user:
+                    properties:
+                      mountFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          secretKeyRef:
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                default: ""
+                                type: string
+                              optional:
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        type: object
+                    type: object
+                  verify_peer:
+                    type: boolean
+                  vhost:
+                    type: string
+                required:
+                - exchange
+                - exchange_type
+                type: object
               redis:
                 properties:
                   allow_duplicate_key:
