@@ -139,8 +139,12 @@ func LoadDockerImage(images []string, options LoadDockerImageOptions) error {
 	args := []string{"load", "docker-image"}
 	args = options.AppendToArgs(args)
 	args = append(args, images...)
-	_, err := exec.Command(KindPath, args...).Output()
-	return err
+	output, err := exec.Command(KindPath, args...).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("kind load failed: %w\nOutput: %s", err, string(output))
+	}
+
+	return nil
 }
 
 type LoadDockerImageOptions struct {

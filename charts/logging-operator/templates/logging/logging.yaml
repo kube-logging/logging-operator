@@ -45,6 +45,9 @@ spec:
   {{- end }}
   clusterDomain: {{ .Values.logging.clusterDomain }}
   controlNamespace: {{ .Values.logging.controlNamespace | default .Release.Namespace }}
+  {{- if .Values.logging.fluentBitAgentNamespace }}
+  fluentBitAgentNamespace: {{ .Values.logging.fluentBitAgentNamespace }}
+  {{- end }}
   {{- with .Values.logging.allowClusterResourcesFromAllNamespaces }}
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}

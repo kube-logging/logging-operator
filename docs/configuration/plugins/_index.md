@@ -50,6 +50,7 @@ For more information please click on the plugin name
 | **[Null](outputs/null/)** | outputs | Null output plugin just throws away events. | GA | [more info](https://docs.fluentd.org/output/null) |
 | **[OpenSearch](outputs/opensearch/)** | outputs | Send your logs to OpenSearch | GA | [1.0.5](https://github.com/fluent/fluent-plugin-opensearch/releases/tag/v1.0.5) |
 | **[Alibaba Cloud Storage](outputs/oss/)** | outputs | Store logs the Alibaba Cloud Object Storage Service | GA | [0.0.2](https://github.com/aliyun/fluent-plugin-oss) |
+| **[RabbitMQ](outputs/rabbitmq/)** | outputs | Sends logs to RabbitMQ Queues. | GA | [0.1.5](https://github.com/nttcom/fluent-plugin-rabbitmq) |
 | **[Redis](outputs/redis/)** | outputs | Sends logs to Redis endpoints. | GA | [0.3.5](https://github.com/fluent-plugins-nursery/fluent-plugin-redis) |
 | **[Relabel](outputs/relabel/)** | outputs | Relabel output plugin re-labels events. | GA | [more info](https://docs.fluentd.org/output/relabel) |
 | **[Amazon S3](outputs/s3/)** | outputs | Store logs in Amazon S3 | GA | [1.6.1](https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.6.1) |

@@ -53,6 +53,7 @@ type OutputSpec struct {
 	SplunkHecOutput                   *output.SplunkHecOutput                   `json:"splunkHec,omitempty"`
 	HTTPOutput                        *output.HTTPOutputConfig                  `json:"http,omitempty"`
 	AwsElasticsearchOutputConfig      *output.AwsElasticsearchOutputConfig      `json:"awsElasticsearch,omitempty"`
+	RabbitMQOutputConfig              *output.RabbitMQOutputConfig              `json:"rabbitmq,omitempty"`
 	RedisOutputConfig                 *output.RedisOutputConfig                 `json:"redis,omitempty"`
 	SyslogOutputConfig                *output.SyslogOutputConfig                `json:"syslog,omitempty"`
 	GelfOutputConfig                  *output.GelfOutputConfig                  `json:"gelf,omitempty"`
