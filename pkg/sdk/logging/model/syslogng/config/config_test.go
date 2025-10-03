@@ -33,7 +33,7 @@ func TestRenderConfigInto(t *testing.T) {
 	testCases := map[string]struct {
 		input   Input
 		wantOut string
-		wantErr any
+		wantErr bool
 	}{
 		"empty input": {
 			input: Input{
@@ -637,6 +637,7 @@ log {
 				SourcePort:           601,
 				SkipInvalidResources: true,
 			},
+			wantErr: false,
 			wantOut: `@version: current
 
 @include "scl.conf"
@@ -675,6 +676,7 @@ source "main_input" {
 				SourcePort:           601,
 				SkipInvalidResources: true,
 			},
+			wantErr: false,
 			wantOut: `@version: current
 
 @include "scl.conf"
@@ -738,6 +740,7 @@ source "main_input" {
 				SourcePort:           601,
 				SkipInvalidResources: true,
 			},
+			wantErr: false,
 			wantOut: `@version: current
 
 @include "scl.conf"
