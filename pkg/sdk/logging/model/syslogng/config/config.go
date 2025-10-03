@@ -45,15 +45,16 @@ func RenderConfigInto(in Input, out io.Writer) error {
 }
 
 type Input struct {
-	Name                string
-	Namespace           string
-	SyslogNGSpec        *v1beta1.SyslogNGSpec
-	ClusterOutputs      []v1beta1.SyslogNGClusterOutput
-	Outputs             []v1beta1.SyslogNGOutput
-	ClusterFlows        []v1beta1.SyslogNGClusterFlow
-	Flows               []v1beta1.SyslogNGFlow
-	SecretLoaderFactory SecretLoaderFactory
-	SourcePort          int
+	Name                 string
+	Namespace            string
+	SyslogNGSpec         *v1beta1.SyslogNGSpec
+	ClusterOutputs       []v1beta1.SyslogNGClusterOutput
+	Outputs              []v1beta1.SyslogNGOutput
+	ClusterFlows         []v1beta1.SyslogNGClusterFlow
+	Flows                []v1beta1.SyslogNGFlow
+	SecretLoaderFactory  SecretLoaderFactory
+	SourcePort           int
+	SkipInvalidResources bool
 }
 
 type outputInfo struct {
@@ -114,16 +115,28 @@ func configRenderer(in Input) (render.Renderer, error) {
 	logDefs := make([]render.Renderer, 0, len(in.ClusterFlows)+len(in.Flows))
 	for _, cf := range in.ClusterFlows {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs, cf.Kind); err != nil {
+			if in.SkipInvalidResources {
+				// Skip this cluster flow and continue with the next one
+				continue
+			}
 			errs = errors.Append(errs, err)
 		}
 		logDefs = append(logDefs, renderClusterFlow(in.Name, clusterOutputRefs, sourceName, cf, in.SecretLoaderFactory))
 	}
 	for _, f := range in.Flows {
+		var flowErrs error
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.GlobalOutputRefs, f.Kind); err != nil {
-			errs = errors.Append(errs, err)
+			flowErrs = errors.Append(flowErrs, err)
 		}
 		if err := validateOutputs(outputRefs, client.ObjectKeyFromObject(&f).String(), f.Spec.LocalOutputRefs); err != nil {
-			errs = errors.Append(errs, err)
+			flowErrs = errors.Append(flowErrs, err)
+		}
+		if flowErrs != nil {
+			if in.SkipInvalidResources {
+				// Skip this flow and continue with the next one
+				continue
+			}
+			errs = errors.Append(errs, flowErrs)
 		}
 		logDefs = append(logDefs, renderFlow(in.Name, clusterOutputRefs, sourceName, keyDelim(in.SyslogNGSpec.JSONKeyDelimiter), f, in.SecretLoaderFactory))
 	}
