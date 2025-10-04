@@ -21,6 +21,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
+	"github.com/go-logr/logr"
 	"github.com/siliconbrain/go-seqs/seqs"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -55,6 +56,7 @@ type Input struct {
 	SecretLoaderFactory  SecretLoaderFactory
 	SourcePort           int
 	SkipInvalidResources bool
+	Logger               logr.Logger
 }
 
 type outputInfo struct {
@@ -117,6 +119,9 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if err := validateClusterOutputs(clusterOutputRefs, client.ObjectKeyFromObject(&cf).String(), cf.Spec.GlobalOutputRefs, cf.Kind); err != nil {
 			if in.SkipInvalidResources {
 				// Skip this cluster flow and continue with the next one
+				if in.Logger.GetSink() != nil {
+					in.Logger.Error(err, "skipping invalid SyslogNGClusterFlow", "name", cf.Name, "namespace", cf.Namespace)
+				}
 				continue
 			}
 			errs = errors.Append(errs, err)
@@ -134,6 +139,9 @@ func configRenderer(in Input) (render.Renderer, error) {
 		if flowErrs != nil {
 			if in.SkipInvalidResources {
 				// Skip this flow and continue with the next one
+				if in.Logger.GetSink() != nil {
+					in.Logger.Error(flowErrs, "skipping invalid SyslogNGFlow", "name", f.Name, "namespace", f.Namespace)
+				}
 				continue
 			}
 			errs = errors.Append(errs, flowErrs)

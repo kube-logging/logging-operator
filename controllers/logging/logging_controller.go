@@ -471,6 +471,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		SourcePort:           syslogng.ServicePort,
 		SyslogNGSpec:         syslogngSpec,
 		SkipInvalidResources: resources.Logging.Spec.SkipInvalidResources,
+		Logger:               r.Log,
 	}
 	var b strings.Builder
 	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
