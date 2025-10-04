@@ -33,7 +33,7 @@ func TestRenderConfigInto(t *testing.T) {
 	testCases := map[string]struct {
 		input   Input
 		wantOut string
-		wantErr any
+		wantErr bool
 	}{
 		"empty input": {
 			input: Input{
@@ -614,6 +614,163 @@ log {
 				SourcePort:          601,
 			},
 			wantErr: true,
+		},
+		"flow referencing non-existent cluster output with skipInvalidResources": {
+			input: Input{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Name:         "test",
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs:       nil,
+				SecretLoaderFactory:  &TestSecretLoaderFactory{},
+				SourcePort:           601,
+				SkipInvalidResources: true,
+			},
+			wantErr: false,
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+`,
+		},
+		"clusterFlow referencing non-existent cluster output with skipInvalidResources": {
+			input: Input{
+				Name:         "test",
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				ClusterFlows: []v1beta1.SyslogNGClusterFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow",
+						},
+						Spec: v1beta1.SyslogNGClusterFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs:       nil,
+				SecretLoaderFactory:  &TestSecretLoaderFactory{},
+				SourcePort:           601,
+				SkipInvalidResources: true,
+			},
+			wantErr: false,
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+`,
+		},
+		"flow with mixed valid and invalid outputs with skipInvalidResources": {
+			input: Input{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{},
+				Name:         "test",
+				Flows: []v1beta1.SyslogNGFlow{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow-invalid",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							GlobalOutputRefs: []string{
+								"nonexistent",
+							},
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test-flow-valid",
+						},
+						Spec: v1beta1.SyslogNGFlowSpec{
+							GlobalOutputRefs: []string{
+								"clusterout",
+							},
+						},
+					},
+				},
+				ClusterOutputs: []v1beta1.SyslogNGClusterOutput{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "clusterout",
+							Namespace: "logging",
+						},
+						Spec: v1beta1.SyslogNGClusterOutputSpec{
+							SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
+								Syslog: &output.SyslogOutput{
+									Host: "127.0.0.1",
+								},
+							},
+						},
+					},
+				},
+				SecretLoaderFactory:  &TestSecretLoaderFactory{},
+				SourcePort:           601,
+				SkipInvalidResources: true,
+			},
+			wantErr: false,
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+
+destination "clusteroutput_logging_clusterout" {
+    syslog("127.0.0.1" persist_name("clusteroutput_logging_clusterout"));
+};
+
+filter "flow_default_test-flow-valid_ns_filter" {
+    match("default" value("json.kubernetes.namespace_name") type("string"));
+};
+log {
+    source("main_input");
+    filter("flow_default_test-flow-valid_ns_filter");
+    log {
+        destination("clusteroutput_logging_clusterout");
+    };
+};
+`,
 		},
 		"parser": {
 			input: Input{

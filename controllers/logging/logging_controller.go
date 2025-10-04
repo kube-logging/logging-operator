@@ -461,15 +461,17 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 
 	_, syslogngSpec := resources.GetSyslogNGSpec()
 	in := syslogngconfig.Input{
-		Name:                resources.Logging.Name,
-		Namespace:           resources.Logging.Namespace,
-		ClusterOutputs:      resources.SyslogNG.ClusterOutputs,
-		Outputs:             resources.SyslogNG.Outputs,
-		ClusterFlows:        resources.SyslogNG.ClusterFlows,
-		Flows:               resources.SyslogNG.Flows,
-		SecretLoaderFactory: &slf,
-		SourcePort:          syslogng.ServicePort,
-		SyslogNGSpec:        syslogngSpec,
+		Name:                 resources.Logging.Name,
+		Namespace:            resources.Logging.Namespace,
+		ClusterOutputs:       resources.SyslogNG.ClusterOutputs,
+		Outputs:              resources.SyslogNG.Outputs,
+		ClusterFlows:         resources.SyslogNG.ClusterFlows,
+		Flows:                resources.SyslogNG.Flows,
+		SecretLoaderFactory:  &slf,
+		SourcePort:           syslogng.ServicePort,
+		SyslogNGSpec:         syslogngSpec,
+		SkipInvalidResources: resources.Logging.Spec.SkipInvalidResources,
+		Logger:               r.Log,
 	}
 	var b strings.Builder
 	if err := syslogngconfig.RenderConfigInto(in, &b); err != nil {
