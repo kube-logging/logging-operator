@@ -4062,6 +4062,8 @@ spec:
                   tag:
                     type: string
                 type: object
+              enabledIPv6:
+                type: boolean
               globalOptions:
                 properties:
                   log_level:
