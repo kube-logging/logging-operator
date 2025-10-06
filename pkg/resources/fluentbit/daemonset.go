@@ -136,7 +136,7 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 }
 
 func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPort) {
-	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.Port != 0 {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
 			ContainerPort: r.fluentbitSpec.Metrics.Port,
@@ -287,7 +287,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 
 func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
 	port := int32(defaultBufferVolumeMetricsPort)
-	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
 		port = r.fluentbitSpec.BufferVolumeMetrics.Port
 	}
 	return []corev1.ContainerPort{
@@ -300,7 +300,7 @@ func (r *Reconciler) generatePortsBufferVolumeMetrics() []corev1.ContainerPort {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.fluentbitSpec.BufferVolumeMetrics != nil {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentbitSpec.BufferVolumeMetrics.Port

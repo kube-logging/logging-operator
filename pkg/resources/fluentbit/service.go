@@ -25,7 +25,7 @@ import (
 )
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.fluentbitSpec.Metrics != nil {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() {
 		return &corev1.Service{
 			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
 			Spec: corev1.ServiceSpec{
@@ -50,7 +50,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.ServiceMonitor {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
 		if r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
@@ -87,7 +87,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.fluentbitSpec.BufferVolumeMetrics != nil {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentbitSpec.BufferVolumeMetrics.Port
@@ -118,7 +118,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
+	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() && r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
 
 		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)

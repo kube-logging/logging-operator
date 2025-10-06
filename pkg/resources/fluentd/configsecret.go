@@ -72,7 +72,7 @@ func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[
 		input.RootDir = bufferPath
 	}
 
-	if fluentdSpec.Metrics != nil {
+	if fluentdSpec.Metrics != nil && fluentdSpec.Metrics.IsEnabled() {
 		input.Monitor.Enabled = true
 		input.Monitor.Port = fluentdSpec.Metrics.Port
 		input.Monitor.EnabledIPv6 = fluentdSpec.EnabledIPv6

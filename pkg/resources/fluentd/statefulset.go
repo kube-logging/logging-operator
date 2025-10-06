@@ -396,7 +396,7 @@ func (r *Reconciler) volumeMountHackContainer() *corev1.Container {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.fluentdSpec.BufferVolumeMetrics != nil {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentdSpec.BufferVolumeMetrics.Port

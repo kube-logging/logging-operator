@@ -396,7 +396,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		if fluentbitSpec.Security.PodSecurityContext == nil {
 			fluentbitSpec.Security.PodSecurityContext = &corev1.PodSecurityContext{}
 		}
-		if fluentbitSpec.Metrics != nil {
+		if fluentbitSpec.Metrics != nil && fluentbitSpec.Metrics.IsEnabled() {
 			if fluentbitSpec.Metrics.Path == "" {
 				fluentbitSpec.Metrics.Path = "/api/v1/metrics/prometheus"
 			}

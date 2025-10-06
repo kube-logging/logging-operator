@@ -80,7 +80,7 @@ func configRenderer(in Input) (render.Renderer, error) {
 	var errs error
 
 	// TODO: this should happen at the spec level, in something like `SyslogNGSpec.FinalGlobalOptions() GlobalOptions`
-	if in.SyslogNGSpec.Metrics != nil {
+	if in.SyslogNGSpec.Metrics != nil && in.SyslogNGSpec.Metrics.IsEnabled() {
 		setDefault(&in.SyslogNGSpec.GlobalOptions, &v1beta1.GlobalOptions{})
 		if in.SyslogNGSpec.GlobalOptions.StatsFreq != nil ||
 			in.SyslogNGSpec.GlobalOptions.StatsLevel != nil {

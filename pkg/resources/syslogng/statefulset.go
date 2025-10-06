@@ -77,7 +77,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 
 	// HACK: try to _guess_ if user has configured a persistent volume for buffers and move syslog-ng's persist file there
 	buffersVolumeName := "buffers"
-	if r.syslogNGSpec.BufferVolumeMetrics != nil {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() {
 		if name := r.syslogNGSpec.BufferVolumeMetrics.MountName; name != "" {
 			buffersVolumeName = name
 		}
@@ -228,7 +228,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
-	if r.syslogNGSpec.Metrics != nil {
+	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() {
 		return &corev1.Container{
 			Name:            "exporter",
 			ImagePullPolicy: corev1.PullIfNotPresent,
@@ -255,7 +255,7 @@ func (r *Reconciler) syslogNGMetricsSidecarContainer() *corev1.Container {
 }
 
 func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
-	if r.syslogNGSpec.BufferVolumeMetrics != nil {
+	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.syslogNGSpec.BufferVolumeMetrics.Port
