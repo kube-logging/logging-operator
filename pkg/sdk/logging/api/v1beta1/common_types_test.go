@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -181,6 +182,146 @@ func TestListMerge(t *testing.T) {
 
 			if !reflect.DeepEqual(actual, ttp.expectedRules) {
 				t.Fatalf("expected: %v, got: %v", ttp.expectedRules, actual)
+			}
+		})
+	}
+}
+
+func TestMetricsIsEnabled(t *testing.T) {
+	tests := []struct {
+		name     string
+		metrics  *Metrics
+		expected bool
+	}{
+		{
+			name:     "nil metrics should return false",
+			metrics:  nil,
+			expected: false,
+		},
+		{
+			name:     "empty metrics object should return false",
+			metrics:  &Metrics{},
+			expected: false,
+		},
+		{
+			name: "enabled explicitly set to true should return true",
+			metrics: &Metrics{
+				Enabled: utils.BoolPointer(true),
+			},
+			expected: true,
+		},
+		{
+			name: "enabled explicitly set to false should return false",
+			metrics: &Metrics{
+				Enabled: utils.BoolPointer(false),
+			},
+			expected: false,
+		},
+		{
+			name: "enabled false with port set should return false (explicit takes precedence)",
+			metrics: &Metrics{
+				Enabled: utils.BoolPointer(false),
+				Port:    2020,
+			},
+			expected: false,
+		},
+		{
+			name: "enabled true with no port should return true",
+			metrics: &Metrics{
+				Enabled: utils.BoolPointer(true),
+				Port:    0,
+			},
+			expected: true,
+		},
+		{
+			name: "no enabled flag but port set should return true (backward compatibility)",
+			metrics: &Metrics{
+				Port: 2020,
+			},
+			expected: true,
+		},
+		{
+			name: "no enabled flag and no port should return false",
+			metrics: &Metrics{
+				Port: 0,
+			},
+			expected: false,
+		},
+		{
+			name: "enabled true with port should return true",
+			metrics: &Metrics{
+				Enabled: utils.BoolPointer(true),
+				Port:    2020,
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.metrics.IsEnabled()
+			if result != tt.expected {
+				t.Errorf("IsEnabled() = %v, expected %v", result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestBufferMetricsIsEnabled(t *testing.T) {
+	tests := []struct {
+		name     string
+		metrics  *BufferMetrics
+		expected bool
+	}{
+		{
+			name:     "empty buffer metrics object should return false",
+			metrics:  &BufferMetrics{},
+			expected: false,
+		},
+		{
+			name: "enabled explicitly set to true should return true",
+			metrics: &BufferMetrics{
+				Metrics: Metrics{
+					Enabled: utils.BoolPointer(true),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "enabled explicitly set to false should return false",
+			metrics: &BufferMetrics{
+				Metrics: Metrics{
+					Enabled: utils.BoolPointer(false),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "no enabled flag but port set should return true (backward compatibility)",
+			metrics: &BufferMetrics{
+				Metrics: Metrics{
+					Port: 9200,
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "buffer metrics with mount name and port should be enabled",
+			metrics: &BufferMetrics{
+				Metrics: Metrics{
+					Port: 9200,
+				},
+				MountName: "buffers",
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.metrics.IsEnabled()
+			if result != tt.expected {
+				t.Errorf("IsEnabled() = %v, expected %v", result, tt.expected)
 			}
 		})
 	}
