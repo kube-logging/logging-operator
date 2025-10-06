@@ -17,6 +17,7 @@ package syslogng
 import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,9 +49,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 	}
 
 	if r.syslogNGSpec.EnabledIPv6 {
-		ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
-		desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
-		desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+		v1beta1.EnableIPv6Options(&desired.Spec)
 	}
 
 	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
@@ -89,9 +88,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}
 
 		if r.syslogNGSpec.EnabledIPv6 {
-			ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
-			desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
-			desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+			v1beta1.EnableIPv6Options(&desired.Spec)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -164,9 +161,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		if r.syslogNGSpec.EnabledIPv6 {
-			ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
-			desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
-			desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+			v1beta1.EnableIPv6Options(&desired.Spec)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -239,9 +234,7 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 	}
 
 	if r.syslogNGSpec.EnabledIPv6 {
-		ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
-		desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
-		desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+		v1beta1.EnableIPv6Options(&desired.Spec)
 	}
 
 	return desired, reconciler.StatePresent, nil
