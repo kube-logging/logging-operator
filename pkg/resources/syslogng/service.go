@@ -124,7 +124,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() && r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
+		if r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.syslogNGSpec.BufferVolumeMetrics.Port
 		}
 

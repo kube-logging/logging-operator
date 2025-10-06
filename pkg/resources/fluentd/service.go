@@ -125,7 +125,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
+		if r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentdSpec.BufferVolumeMetrics.Port
 		}
 
