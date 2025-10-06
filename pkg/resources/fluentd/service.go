@@ -47,9 +47,19 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 		},
 	}
 
+	if r.fluentdSpec.EnabledIPv6 {
+		ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
+		desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
+		desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+	}
+
 	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
 		if s, ok := current.(*corev1.Service); ok {
 			desired.Spec.ClusterIP = s.Spec.ClusterIP
+			// Preserve ClusterIPs for dual-stack configuration
+			if len(s.Spec.ClusterIPs) > 0 {
+				desired.Spec.ClusterIPs = s.Spec.ClusterIPs
+			}
 		} else {
 			return errors.Errorf("failed to cast service object %+v", current)
 		}
@@ -61,7 +71,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() {
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -76,7 +86,15 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.fluentdSpec.EnabledIPv6 {
+			ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
+			desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
+			desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-monitor", ComponentFluentd),
@@ -129,7 +147,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 			port = r.fluentdSpec.BufferVolumeMetrics.Port
 		}
 
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -144,7 +162,15 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.fluentdSpec.EnabledIPv6 {
+			ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
+			desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
+			desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-monitor", ComponentFluentd),
@@ -214,5 +240,12 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 			ClusterIP: corev1.ClusterIPNone,
 		},
 	}
+
+	if r.fluentdSpec.EnabledIPv6 {
+		ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
+		desired.Spec.IPFamilyPolicy = &ipFamilyPolicy
+		desired.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+	}
+
 	return desired, reconciler.StatePresent, nil
 }
