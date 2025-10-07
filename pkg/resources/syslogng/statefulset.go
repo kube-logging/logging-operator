@@ -266,6 +266,16 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
+		securityContext := &corev1.SecurityContext{
+			RunAsNonRoot:             util.BoolPointer(true),
+			RunAsUser:                util.IntPointer64(65534),
+			RunAsGroup:               util.IntPointer64(65534),
+			AllowPrivilegeEscalation: util.BoolPointer(false),
+			Capabilities: &corev1.Capabilities{
+				Drop: []corev1.Capability{"ALL"},
+			},
+		}
+
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.syslogNGSpec.BufferVolumeMetricsImage.RepositoryWithTag(),
@@ -288,8 +298,9 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 					MountPath: BufferPath,
 				},
 			},
-			Resources:     r.syslogNGSpec.BufferVolumeMetricsResources,
-			LivenessProbe: r.syslogNGSpec.BufferVolumeMetricsLivenessProbe,
+			Resources:       r.syslogNGSpec.BufferVolumeMetricsResources,
+			SecurityContext: securityContext,
+			LivenessProbe:   r.syslogNGSpec.BufferVolumeMetricsLivenessProbe,
 		}
 	}
 	return nil

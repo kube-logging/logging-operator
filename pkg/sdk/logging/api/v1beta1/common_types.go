@@ -159,6 +159,14 @@ type Security struct {
 	CreateOpenShiftSCC      *bool                      `json:"createOpenShiftSCC,omitempty"`
 }
 
+func (s *Security) IsReadOnlyRootFilesystem() bool {
+	if s.SecurityContext.ReadOnlyRootFilesystem != nil {
+		return *s.SecurityContext.ReadOnlyRootFilesystem
+	}
+
+	return false
+}
+
 // ReadinessDefaultCheck Enable default readiness checks
 type ReadinessDefaultCheck struct {
 	// Enable default Readiness check it'll fail if the buffer volume free space exceeds the `readinessDefaultThreshold` percentage (90%).

@@ -281,7 +281,7 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			MountPath: "/fluentd/tls/",
 		})
 	}
-	if isFluentdReadOnlyRootFilesystem(spec) {
+	if spec.Security.IsReadOnlyRootFilesystem() {
 		res = append(res, corev1.VolumeMount{
 			Name:      "tmp",
 			SubPath:   "fluentd",
@@ -311,7 +311,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		},
 	}
 
-	if isFluentdReadOnlyRootFilesystem(r.fluentdSpec) {
+	if r.fluentdSpec.Security.IsReadOnlyRootFilesystem() {
 		v = append(v, corev1.Volume{
 			Name:         "tmp",
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
@@ -359,7 +359,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 }
 
 func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
-	if isFluentdReadOnlyRootFilesystem(r.fluentdSpec) {
+	if r.fluentdSpec.Security.IsReadOnlyRootFilesystem() {
 		return &corev1.Container{
 			Command:         []string{"sh", "-c", "mkdir -p /mnt/tmp/fluentd/; chmod +t /mnt/tmp/fluentd"},
 			Image:           r.fluentdSpec.Image.RepositoryWithTag(),
@@ -412,6 +412,28 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
+		securityContext := &corev1.SecurityContext{
+			RunAsNonRoot:             util.BoolPointer(true),
+			RunAsUser:                util.IntPointer64(65534),
+			RunAsGroup:               util.IntPointer64(65534),
+			AllowPrivilegeEscalation: util.BoolPointer(false),
+			Capabilities: &corev1.Capabilities{
+				Drop: []corev1.Capability{"ALL"},
+			},
+		}
+		// Allow override from fluentdSpec if SecurityContext is explicitly set
+		if r.fluentdSpec.Security.SecurityContext != nil {
+			// Check if RunAsUser or RunAsGroup is explicitly set to something other than the fluentd defaults
+			if r.fluentdSpec.Security.SecurityContext.RunAsUser != nil && *r.fluentdSpec.Security.SecurityContext.RunAsUser != 100 &&
+				r.fluentdSpec.Security.SecurityContext.RunAsGroup != nil && *r.fluentdSpec.Security.SecurityContext.RunAsGroup != 101 {
+				securityContext = r.fluentdSpec.Security.SecurityContext
+			}
+
+			if r.fluentdSpec.Security.IsReadOnlyRootFilesystem() {
+				r.Log.Info("ReadOnlyRootFilesystem is set, buffer-metrics-sidecar could fail!")
+			}
+		}
+
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.fluentdSpec.BufferVolumeImage.RepositoryWithTag(),
@@ -434,7 +456,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 				},
 			},
 			Resources:       r.fluentdSpec.BufferVolumeResources,
-			SecurityContext: r.fluentdSpec.Security.SecurityContext,
+			SecurityContext: securityContext,
 			LivenessProbe:   r.fluentdSpec.BufferVolumeLivenessProbe,
 		}
 	}
@@ -513,12 +535,4 @@ func generateInitContainer(spec v1beta1.FluentdSpec) *corev1.Container {
 		}
 	}
 	return nil
-}
-
-func isFluentdReadOnlyRootFilesystem(spec *v1beta1.FluentdSpec) bool {
-	if spec.Security.SecurityContext.ReadOnlyRootFilesystem != nil {
-		return *spec.Security.SecurityContext.ReadOnlyRootFilesystem
-	}
-
-	return false
 }

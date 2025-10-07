@@ -316,6 +316,16 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
+		securityContext := &corev1.SecurityContext{
+			RunAsNonRoot:             util.BoolPointer(true),
+			RunAsUser:                util.IntPointer64(65534),
+			RunAsGroup:               util.IntPointer64(65534),
+			AllowPrivilegeEscalation: util.BoolPointer(false),
+			Capabilities: &corev1.Capabilities{
+				Drop: []corev1.Capability{"ALL"},
+			},
+		}
+
 		return &corev1.Container{
 			Name:            "buffer-metrics-sidecar",
 			Image:           r.fluentbitSpec.BufferVolumeImage.RepositoryWithTag(),
@@ -338,7 +348,7 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 				},
 			},
 			Resources:       r.fluentbitSpec.BufferVolumeResources,
-			SecurityContext: r.fluentbitSpec.Security.SecurityContext,
+			SecurityContext: securityContext,
 			LivenessProbe:   r.fluentbitSpec.BufferVolumeLivenessProbe,
 		}
 	}
