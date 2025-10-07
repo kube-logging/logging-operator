@@ -34,6 +34,9 @@ Overrides the default logging level configCheck setup. This field is not used di
 ### configReloadImage (*BasicImageSpec, optional) {#syslogngspec-configreloadimage}
 
 
+### enabledIPv6 (bool, optional) {#syslogngspec-enabledipv6}
+
+
 ### globalOptions (*GlobalOptions, optional) {#syslogngspec-globaloptions}
 
 

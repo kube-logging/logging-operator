@@ -196,3 +196,9 @@ type ReadinessDefaultCheck struct {
 	SuccessThreshold         int32 `json:"successThreshold,omitempty"`
 	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
 }
+
+func EnableIPv6Options(serviceSpec *corev1.ServiceSpec) {
+	ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
+	serviceSpec.IPFamilyPolicy = &ipFamilyPolicy
+	serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+}

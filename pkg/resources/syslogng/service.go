@@ -17,6 +17,7 @@ package syslogng
 import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,9 +48,17 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 		},
 	}
 
+	if r.syslogNGSpec.EnabledIPv6 {
+		v1beta1.EnableIPv6Options(&desired.Spec)
+	}
+
 	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
 		if s, ok := current.(*corev1.Service); ok {
 			desired.Spec.ClusterIP = s.Spec.ClusterIP
+			// Preserve ClusterIPs for dual-stack configuration
+			if len(s.Spec.ClusterIPs) > 0 {
+				desired.Spec.ClusterIPs = s.Spec.ClusterIPs
+			}
 		} else {
 			return errors.Errorf("failed to cast service object %+v", current)
 		}
@@ -61,7 +70,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() {
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -76,7 +85,13 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.syslogNGSpec.EnabledIPv6 {
+			v1beta1.EnableIPv6Options(&desired.Spec)
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-monitor", ComponentSyslogNG),
@@ -128,7 +143,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 			port = r.syslogNGSpec.BufferVolumeMetrics.Port
 		}
 
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG),
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -143,7 +158,13 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.syslogNGSpec.EnabledIPv6 {
+			v1beta1.EnableIPv6Options(&desired.Spec)
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-buffer-monitor", ComponentSyslogNG),
@@ -211,5 +232,10 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 			ClusterIP: corev1.ClusterIPNone,
 		},
 	}
+
+	if r.syslogNGSpec.EnabledIPv6 {
+		v1beta1.EnableIPv6Options(&desired.Spec)
+	}
+
 	return desired, reconciler.StatePresent, nil
 }

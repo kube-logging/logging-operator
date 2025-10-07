@@ -54,6 +54,7 @@ type SyslogNGSpec struct {
 	TLS                                 SyslogNGTLS                  `json:"tls,omitempty"`
 	ReadinessDefaultCheck               ReadinessDefaultCheck        `json:"readinessDefaultCheck,omitempty"`
 	SkipRBACCreate                      bool                         `json:"skipRBACCreate,omitempty"`
+	EnabledIPv6                         bool                         `json:"enabledIPv6,omitempty"`
 	StatefulSetOverrides                *typeoverride.StatefulSet    `json:"statefulSet,omitempty"`
 	ServiceOverrides                    *typeoverride.Service        `json:"service,omitempty"`
 	ServiceAccountOverrides             *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
