@@ -5,6 +5,7 @@ go 1.24.1
 require (
 	emperror.dev/errors v0.8.1
 	github.com/cisco-open/operator-tools v0.37.0
+	github.com/go-logr/logr v1.4.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
 	github.com/siliconbrain/go-seqs v0.15.0
 	github.com/stretchr/testify v1.11.0
@@ -22,7 +23,6 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.1 // indirect
