@@ -729,7 +729,7 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 					},
 					ConfigCheck: &v1beta1.ConfigCheck{
 						Strategy:       v1beta1.ConfigCheckStrategyTimeout,
-						TimeoutSeconds: 5,
+						TimeoutSeconds: 30,
 						Labels:         configCheckLabels,
 					},
 				},

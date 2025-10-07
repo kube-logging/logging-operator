@@ -60,7 +60,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.fluentdSpec.Metrics != nil {
+	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() {
 		return &corev1.Service{
 			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 			Spec: corev1.ServiceSpec{
@@ -85,7 +85,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.ServiceMonitor {
+	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
@@ -123,9 +123,9 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	if r.fluentdSpec.BufferVolumeMetrics != nil {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
-		if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
+		if r.fluentdSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentdSpec.BufferVolumeMetrics.Port
 		}
 
@@ -153,7 +153,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
-	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {

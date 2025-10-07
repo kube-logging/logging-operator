@@ -33,6 +33,8 @@ spec:
             properties:
               bufferVolumeMetrics:
                 properties:
+                  enabled:
+                    type: boolean
                   interval:
                     type: string
                   mount_name:
@@ -4089,6 +4091,8 @@ spec:
                 type: integer
               metrics:
                 properties:
+                  enabled:
+                    type: boolean
                   interval:
                     type: string
                   path:

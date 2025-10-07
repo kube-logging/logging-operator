@@ -65,6 +65,9 @@ func RepositoryWithTag(repository, tag string) string {
 
 // Metrics defines the service monitor endpoints
 type Metrics struct {
+	// Enabled controls whether the metrics endpoint should be exposed. Defaults to false.
+	// When false, the metrics HTTP server will not be started and no metrics port will be exposed.
+	Enabled                 *bool                     `json:"enabled,omitempty"`
 	Interval                string                    `json:"interval,omitempty"`
 	Timeout                 string                    `json:"timeout,omitempty"`
 	Port                    int32                     `json:"port,omitempty"`
@@ -74,6 +77,19 @@ type Metrics struct {
 	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
 	PrometheusRulesOverride []PrometheusRulesOverride `json:"prometheusRulesOverride,omitempty"`
+}
+
+func (m *Metrics) IsEnabled() bool {
+	if m == nil {
+		return false
+	}
+
+	if m.Enabled != nil {
+		return *m.Enabled
+	}
+
+	// For backwards compatibility: if Port or Path is set (non-zero) without an explicit Enabled flag, consider it enabled
+	return m.Port != 0 || m.Path != ""
 }
 
 type PrometheusRulesOverride struct {

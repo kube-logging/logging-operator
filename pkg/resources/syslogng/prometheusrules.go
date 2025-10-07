@@ -31,7 +31,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	}
 	state := reconciler.StateAbsent
 
-	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.PrometheusRules {
+	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "syslog-ng"

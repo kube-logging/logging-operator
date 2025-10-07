@@ -62,7 +62,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	}
 
 	router := types.NewRouter("main", types.Params{
-		"metrics": strconv.FormatBool(fluentdSpec.Metrics != nil),
+		"metrics": strconv.FormatBool(fluentdSpec.Metrics != nil && fluentdSpec.Metrics.IsEnabled()),
 	})
 
 	var globalFilters []types.Filter

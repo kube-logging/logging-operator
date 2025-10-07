@@ -30,7 +30,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	}
 	state := reconciler.StateAbsent
 
-	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.PrometheusRules {
+	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentd"

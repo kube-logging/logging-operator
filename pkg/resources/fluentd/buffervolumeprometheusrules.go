@@ -31,7 +31,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 	}
 	state := reconciler.StateAbsent
 
-	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.PrometheusRules {
+	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.PrometheusRules {
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentd-buffervolume"

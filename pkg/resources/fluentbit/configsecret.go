@@ -241,7 +241,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.CustomParsers = fmt.Sprintf("%s/%s", OperatorConfigPath, CustomParsersConfigName)
 	}
 
-	if r.fluentbitSpec.Metrics != nil {
+	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() {
 		input.Monitor.Enabled = true
 		input.Monitor.Port = r.fluentbitSpec.Metrics.Port
 		input.Monitor.EnabledIPv6 = r.fluentbitSpec.EnabledIPv6
