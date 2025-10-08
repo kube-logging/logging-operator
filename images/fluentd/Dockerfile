@@ -23,7 +23,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
         snappy libssl3 libcrypto3 \
  && apk add --no-cache $BUILD_DEPS \
  && echo 'gem: --no-document' >> /etc/gemrc \
- && gem install fluentd -v 1.18.0 \
+ && gem install fluentd -v 1.19.0 \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
