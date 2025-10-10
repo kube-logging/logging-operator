@@ -22,8 +22,10 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
         tini libmaxminddb geoip \
         snappy libssl3 libcrypto3 \
  && apk add --no-cache $BUILD_DEPS \
+ # Remove fortify headers to fix PATH_MAX compilation errors in native gems
+ && rm -rf /usr/include/fortify \
  && echo 'gem: --no-document' >> /etc/gemrc \
- && gem install fluentd -v 1.18.0 \
+ && gem install fluentd -v 1.19.0 \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
@@ -72,6 +74,7 @@ ADD ./outputs/Gemfile.lock /Gemfile.outputs.lock
 USER root
 
 RUN apk add --no-cache $BUILD_DEPS \
+ # Remove fortify headers to fix PATH_MAX compilation errors in native gems
  && rm -rf /usr/include/fortify \
  && touch /etc/gemrc \
  && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-syslog_rfc5424.git --ref 4ab9f7df3757b0e31e4bc209acab05a518efdce3 \
