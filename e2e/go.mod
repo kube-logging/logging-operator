@@ -6,7 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.37.0
-	github.com/kube-logging/logging-operator v0.0.0-20251007182507-34ac4af0e925
+	github.com/kube-logging/logging-operator e7b819c3c174
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.86.0
 	github.com/spf13/cast v1.10.0
@@ -16,7 +16,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.34.1
 	k8s.io/apimachinery v0.34.1
 	k8s.io/client-go v0.34.1
-	sigs.k8s.io/controller-runtime v0.22.2
+	sigs.k8s.io/controller-runtime v0.22.3
 	sigs.k8s.io/e2e-framework v0.6.0
 )
 
