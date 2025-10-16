@@ -84,7 +84,7 @@ func main() {
 	var enableLeaderElection bool
 	var verboseLogging bool
 	var loggingOutputFormat string
-	var enableprofile bool
+	var enableProfile bool
 	var namespace string
 	var loggingRef string
 	var watchLabeledChildren bool
@@ -100,7 +100,7 @@ func main() {
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
 	flag.StringVar(&loggingOutputFormat, "output-format", "", "Logging output format (json, console)")
 	flag.IntVar(&klogLevel, "klogLevel", 0, "Global log level for klog (0-9)")
-	flag.BoolVar(&enableprofile, "pprof", false, "Enable pprof")
+	flag.BoolVar(&enableProfile, "pprof", false, "Enable pprof")
 	flag.StringVar(&namespace, "watch-namespace", "", "Namespace to filter the list of watched objects")
 	flag.StringVar(&loggingRef, "watch-logging-name", "", "Logging resource name to optionally filter the list of watched objects based on which logging they belong to by checking the app.kubernetes.io/managed-by label")
 	flag.BoolVar(&watchLabeledChildren, "watch-labeled-children", false, "Only watch child resources with Logging operator's name label selector: app.kubernetes.io/name: fluentd|fluentbit|syslog-ng")
@@ -173,11 +173,14 @@ func main() {
 		}
 	}
 
-	if enableprofile {
+	if enableProfile {
 		setupLog.Info("enabling pprof")
-		pprofxIndexPath := "/debug/pprof"
 		customMgrOptions.Metrics.ExtraHandlers = map[string]http.Handler{
-			pprofxIndexPath: http.HandlerFunc(pprof.Index),
+			"/debug/pprof/":        http.HandlerFunc(pprof.Index),
+			"/debug/pprof/cmdline": http.HandlerFunc(pprof.Cmdline),
+			"/debug/pprof/profile": http.HandlerFunc(pprof.Profile),
+			"/debug/pprof/symbol":  http.HandlerFunc(pprof.Symbol),
+			"/debug/pprof/trace":   http.HandlerFunc(pprof.Trace),
 		}
 	}
 
