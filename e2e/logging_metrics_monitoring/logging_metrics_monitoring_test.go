@@ -35,8 +35,6 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
@@ -170,12 +168,12 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		common.RequireNoError(t, waitForPodReady(ctx, c.GetClient(), &corev1.Pod{
+		common.RequireNoError(t, common.WaitForPodReady(ctx, c.GetClient(), &corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      logging.Name + "-" + string(syslogNG) + "-0",
 				Namespace: ns,
 			},
-		}))
+		}, pollInterval, pollTimeout))
 		serviceMonitorsSyslogNG := &v1.ServiceMonitorList{}
 		common.RequireNoError(t, c.GetClient().List(ctx, serviceMonitorsSyslogNG))
 
@@ -262,12 +260,12 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &loggingPatch))
-		common.RequireNoError(t, waitForPodReady(ctx, c.GetClient(), &corev1.Pod{
+		common.RequireNoError(t, common.WaitForPodReady(ctx, c.GetClient(), &corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      loggingPatch.Name + "-" + string(fluentd) + "-0",
 				Namespace: ns,
 			},
-		}))
+		}, pollInterval, pollTimeout))
 		serviceMonitorsFluentd := &v1.ServiceMonitorList{}
 		common.RequireNoError(t, c.GetClient().List(ctx, serviceMonitorsFluentd))
 
@@ -348,22 +346,15 @@ func installPrometheusOperator(c common.Cluster) error {
 	return nil
 }
 
-func waitForPodReady(ctx context.Context, c client.Client, pod *corev1.Pod) error {
-	return wait.PollUntilContextTimeout(ctx, pollInterval, pollTimeout, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		var updatedPod corev1.Pod
-		err := c.Get(ctx, client.ObjectKeyFromObject(pod), &updatedPod)
-		if client.IgnoreNotFound(err) != nil {
-			return false, fmt.Errorf("failed to get pod status: %w", err)
-		}
+func setupMetricsTester(ctx context.Context, c common.Cluster, ns string) (metricsTester, error) {
+	pod, err := common.SetupCurlPod(ctx, c.GetClient(), ns, "metrics-tester", pollInterval, pollTimeout)
+	if err != nil {
+		return metricsTester{}, err
+	}
 
-		isReady := updatedPod.Status.Phase == corev1.PodRunning
-		for _, cond := range updatedPod.Status.Conditions {
-			if cond.Type == corev1.PodReady && cond.Status == corev1.ConditionTrue {
-				return true, nil
-			}
-		}
-		return isReady, nil
-	}))
+	return metricsTester{
+		testPod: pod,
+	}, nil
 }
 
 func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
@@ -389,37 +380,6 @@ func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error 
 	}
 
 	return nil
-}
-
-func setupMetricsTester(ctx context.Context, c common.Cluster, ns string) (metricsTester, error) {
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "metrics-tester",
-			Namespace: ns,
-		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "curl",
-					Image:   "curlimages/curl:latest",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-		},
-	}
-	err := c.GetClient().Create(ctx, pod)
-	if err != nil {
-		return metricsTester{}, fmt.Errorf("failed to create metrics tester pod: %w", err)
-	}
-
-	err = waitForPodReady(ctx, c.GetClient(), pod)
-	if err != nil {
-		return metricsTester{}, fmt.Errorf("failed to wait for metrics tester pod to be ready: %w", err)
-	}
-
-	return metricsTester{
-		testPod: pod,
-	}, nil
 }
 
 func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, c common.Cluster, ns string) ([]byte, error) {
