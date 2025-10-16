@@ -175,12 +175,20 @@ func main() {
 
 	if enableProfile {
 		setupLog.Info("enabling pprof")
+		runtime.SetBlockProfileRate(1)
+		runtime.SetMutexProfileRate(1)
 		customMgrOptions.Metrics.ExtraHandlers = map[string]http.Handler{
-			"/debug/pprof/":        http.HandlerFunc(pprof.Index),
-			"/debug/pprof/cmdline": http.HandlerFunc(pprof.Cmdline),
-			"/debug/pprof/profile": http.HandlerFunc(pprof.Profile),
-			"/debug/pprof/symbol":  http.HandlerFunc(pprof.Symbol),
-			"/debug/pprof/trace":   http.HandlerFunc(pprof.Trace),
+			"/debug/pprof/":            http.HandlerFunc(pprof.Index),
+			"/debug/pprof/cmdline":     http.HandlerFunc(pprof.Cmdline),
+			"/debug/pprof/profile":     http.HandlerFunc(pprof.Profile),
+			"/debug/pprof/symbol":      http.HandlerFunc(pprof.Symbol),
+			"/debug/pprof/trace":       http.HandlerFunc(pprof.Trace),
+			"/debug/pprof/heap":        http.HandlerFunc(pprof.Heap),
+			"/debug/pprof/goroutine":   http.HandlerFunc(pprof.Goroutine),
+			"/debug/pprof/threadcreate":http.HandlerFunc(pprof.ThreadCreate),
+    		"/debug/pprof/allocs":      http.HandlerFunc(pprof.Lookup("allocs")),
+		    "/debug/pprof/block":       http.HandlerFunc(pprof.Lookup("block")),
+    		"/debug/pprof/mutex":       http.HandlerFunc(pprof.Lookup("mutex")),
 		}
 	}
 
