@@ -21,6 +21,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -190,4 +191,51 @@ func CheckExcessSyslogNGStatus(t *testing.T, c *common.Cluster, ctx *context.Con
 	}
 
 	return true
+}
+
+// DeploymentAvailable returns a condition function that checks if a deployment
+// is available with all replicas ready.
+func DeploymentAvailable(t *testing.T, c client.Client, ctx *context.Context, namespace, name string) func() bool {
+	return func() bool {
+		deployment := &appsv1.Deployment{}
+		if err := c.Get(*ctx, client.ObjectKey{
+			Name:      name,
+			Namespace: namespace,
+		}, deployment); err != nil {
+			t.Logf("Failed to get deployment %s/%s: %v", namespace, name, err)
+			return false
+		}
+
+		if deployment.Spec.Replicas == nil {
+			return false
+		}
+		desiredReplicas := *deployment.Spec.Replicas
+
+		if deployment.Status.ReadyReplicas != desiredReplicas {
+			t.Logf("Deployment %s/%s: %d/%d replicas ready",
+				namespace, name, deployment.Status.ReadyReplicas, desiredReplicas)
+			return false
+		}
+
+		if deployment.Status.AvailableReplicas != desiredReplicas {
+			t.Logf("Deployment %s/%s: %d/%d replicas available",
+				namespace, name, deployment.Status.AvailableReplicas, desiredReplicas)
+			return false
+		}
+
+		for _, condition := range deployment.Status.Conditions {
+			if condition.Type == appsv1.DeploymentAvailable {
+				if condition.Status == corev1.ConditionTrue {
+					t.Logf("Deployment %s/%s is available", namespace, name)
+					return true
+				}
+				t.Logf("Deployment %s/%s Available condition is %s: %s",
+					namespace, name, condition.Status, condition.Message)
+				return false
+			}
+		}
+
+		t.Logf("Deployment %s/%s has no Available condition", namespace, name)
+		return false
+	}
 }

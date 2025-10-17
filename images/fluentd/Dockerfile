@@ -78,6 +78,7 @@ RUN apk add --no-cache $BUILD_DEPS \
  && rm -rf /usr/include/fortify \
  && touch /etc/gemrc \
  && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-syslog_rfc5424.git --ref 4ab9f7df3757b0e31e4bc209acab05a518efdce3 \
+ && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-elasticsearch.git --ref f711c4322e37852a83caab0385ba4567031eb9ab \
  && fluent-gem install --file /Gemfile.outputs \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
  && apk del $BUILD_DEPS \
