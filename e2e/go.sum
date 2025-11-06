@@ -46,8 +46,8 @@ github.com/cisco-open/k8s-objectmatcher v1.10.0 h1:1TdhMPqVaU+NqECqytAkRF1SFU0QI
 github.com/cisco-open/k8s-objectmatcher v1.10.0/go.mod h1:O/TFG3vW12jbKNQejpc8SGgSfujlaWYIOCZHcXeK514=
 github.com/cisco-open/operator-tools v0.37.0 h1:qAkAbWQA+aeWHZOqpWL8FuiZ42cWWUZ0OmWfr3TBeGw=
 github.com/cisco-open/operator-tools v0.37.0/go.mod h1:SaMi2aMNILC5Wrqw9m92ptN5InMH2Zt3CSKkGlzyqfQ=
-github.com/containerd/containerd v1.7.28 h1:Nsgm1AtcmEh4AHAJ4gGlNSaKgXiNccU270Dnf81FQ3c=
-github.com/containerd/containerd v1.7.28/go.mod h1:azUkWcOvHrWvaiUjSQH0fjzuHIwSPg1WL5PshGP4Szs=
+github.com/containerd/containerd v1.7.29 h1:90fWABQsaN9mJhGkoVnuzEY+o1XDPbg9BTC9QTAHnuE=
+github.com/containerd/containerd v1.7.29/go.mod h1:azUkWcOvHrWvaiUjSQH0fjzuHIwSPg1WL5PshGP4Szs=
 github.com/containerd/errdefs v0.3.0 h1:FSZgGOeK4yuT/+DnF07/Olde/q4KBoMsaamhXxIMDp4=
 github.com/containerd/errdefs v0.3.0/go.mod h1:+YBYIdtsnF4Iw6nWZhJcqGSg/dwvV7tyJ/kCkyJ2k+M=
 github.com/containerd/log v0.1.0 h1:TCJt7ioM2cr/tfR8GPbGf9/VRAX8D2B4PjzCpfX540I=
