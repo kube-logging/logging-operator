@@ -8,10 +8,10 @@
 CONTROLLER_GEN_VERSION := 0.19.0
 
 # renovate: datasource=github-releases depName=golangci/golangci-lint versioning=semver
-GOLANGCI_LINT_VERSION := 2.5.0
+GOLANGCI_LINT_VERSION := 2.6.1
 
 # renovate: datasource=go depName=github.com/vladopajic/go-test-coverage/v2 versioning=semver
-GO_TEST_COVERAGE_VERSION := 2.17.0
+GO_TEST_COVERAGE_VERSION := 2.17.1
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs versioning=semver
 HELM_DOCS_VERSION = 1.14.2
@@ -26,7 +26,7 @@ KUBEBUILDER_VERSION = 4.9.0
 LICENSEI_VERSION = 0.9.0
 
 # renovate: datasource=go depName=github.com/stern/stern versioning=semver
-STERN_VERSION := 1.33.0
+STERN_VERSION := 1.33.1
 
 ENVTEST_K8S_VERSION := 1.34.0
 
