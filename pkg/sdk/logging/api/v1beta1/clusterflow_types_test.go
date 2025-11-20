@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/types"
 
-	"golang.org/x/net/context"
+	"context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
