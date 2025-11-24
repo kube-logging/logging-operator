@@ -91,6 +91,11 @@ func FixQualifiedNameIfInvalid(name string) string {
 	return name
 }
 
+// To returns a reference to the given value
+func To[T any](v T) *T {
+	return &v
+}
+
 // sanitizeName replaces invalid characters with hyphens and converts to lowercase
 func sanitizeName(name string) string {
 	// Trim leading and trailing whitespaces and convert to lowercase
