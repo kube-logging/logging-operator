@@ -7,11 +7,11 @@ require (
 	github.com/cisco-open/operator-tools v0.37.0
 	github.com/go-logr/logr v1.4.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
-	github.com/siliconbrain/go-seqs v0.15.0
+	github.com/siliconbrain/go-seqs v0.16.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9
-	k8s.io/api v0.34.1
-	k8s.io/apimachinery v0.34.1
+	golang.org/x/exp e25ba8c21ef6
+	k8s.io/api v0.34.2
+	k8s.io/apimachinery v0.34.2
 	sigs.k8s.io/controller-runtime v0.22.4
 )
 
