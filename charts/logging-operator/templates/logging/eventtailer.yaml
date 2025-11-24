@@ -1,21 +1,34 @@
+{{- if and $.Values.logging.enabled $.Values.logging.eventTailer.enabled }}
 {{- with $.Values.logging.eventTailer }}
-{{- if and $.Values.logging.enabled .enabled }}
 apiVersion: logging-extensions.banzaicloud.io/v1alpha1
 kind: EventTailer
 metadata:
   name: {{ .name }}
 spec:
   controlNamespace: {{ $.Values.logging.controlNamespace | default $.Release.Namespace }}
-  {{- with .image }}
+  {{- if or .image.repository .image.tag .image.pullPolicy .image.imagePullSecrets }}
   image:
-    {{- toYaml . | nindent 4 }}
+    {{- with .image.repository }}
+    repository: {{ . }}
+    {{- end }}
+    {{- with .image.tag }}
+    tag: {{ . | quote }}
+    {{- end }}
+    {{- with .image.pullPolicy }}
+    pullPolicy: {{ . }}
+    {{- end }}
+    {{- with .image.imagePullSecrets }}
+    imagePullSecrets: {{- toYaml . | nindent 6 }}
+    {{- end }}
   {{- end }}
   {{- with .pvc }}
   {{- if .enabled }}
   positionVolume:
     pvc:
       spec:
-        accessModes: {{ .accessModes }}
+        {{- with .accessModes }}
+        accessModes: {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources:
           requests:
             storage: {{ .storage }}
@@ -23,8 +36,8 @@ spec:
         {{- with .storageClassName }}
         storageClassName: {{ . }}
         {{- end }}
-  {{- end }}{{/* end if enabled */}}
-  {{- end }}{{/* end with pvc */}}
+  {{- end }}
+  {{- end }}
   {{- with .workloadMetaOverrides }}
   workloadMetaOverrides:
     {{- toYaml . | nindent 4 }}
@@ -37,5 +50,5 @@ spec:
   containerOverrides:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-{{- end }}{{/* end if enabled */}}
-{{- end }}{{/* end with event-tailer */}}
+{{- end }}
+{{- end }}
