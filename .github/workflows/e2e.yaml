@@ -8,7 +8,7 @@ on:
   pull_request:
 
 env:
-  KUBECTL_VERSION: 'v1.33.0'
+  KUBECTL_VERSION: 'v1.34.0'
 
 jobs:
   build:
