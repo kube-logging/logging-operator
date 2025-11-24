@@ -53,7 +53,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 			},
 			{
 				Alert: "SyslogNGQueueLength",
-				Expr:  intstr.FromString(fmt.Sprintf("rate(syslog_ng_status_buffer_queue_length{%s}[5m]) > 0.3", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("max(syslogng_memory_queue_events{%s}) / max(syslogng_memory_queue_capacity{%s}) > 0.3", nsJobLabel, nsJobLabel)),
 				For:   prometheus_operator.Duration("1m"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
@@ -62,12 +62,12 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				Annotations: map[string]string{
 					"summary":     `syslog-ng node are failing`,
-					"description": `In the last 5 minutes, syslog-ng queues increased 30%. Current value is "{{ $value }}".`,
+					"description": `Syslog-ng queue usage is above 30%. Current value is "{{ $value }}".`,
 				},
 			},
 			{
 				Alert: "SyslogNGQueueLength",
-				Expr:  intstr.FromString(fmt.Sprintf("rate(syslog_ng_status_buffer_queue_length{%s}[5m]) > 0.5", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("max(syslogng_memory_queue_events{%s}) / max(syslogng_memory_queue_capacity{%s}) > 0.5", nsJobLabel, nsJobLabel)),
 				For:   prometheus_operator.Duration("1m"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
@@ -76,12 +76,12 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 				},
 				Annotations: map[string]string{
 					"summary":     `Syslog-NG nodes buffer queue length are critical`,
-					"description": `In the last 5 minutes, Syslog-NG queues increased 50%. Current value is "{{ $value }}".`,
+					"description": `Syslog-ng queue usage is above 50%. Current value is "{{ $value }}".`,
 				},
 			},
 			{
 				Alert: "SyslogNGRecordsCountsHigh",
-				Expr:  intstr.FromString(fmt.Sprintf("sum(rate(syslog_ng_output_status_emit_records{%[1]s}[5m])) by (job,pod,namespace) > (3 * sum(rate(syslog_ng_output_status_emit_records{%[1]s}[15m])) by (job,pod,namespace))", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("sum(rate(syslogng_output_events_total{%[1]s}[5m])) by (job,pod,namespace) > (3 * sum(rate(syslogng_output_events_total{%[1]s}[15m])) by (job,pod,namespace))", nsJobLabel)),
 				For:   prometheus_operator.Duration("1m"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
@@ -95,7 +95,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 			},
 			{
 				Alert: "SyslogNGRetry",
-				Expr:  intstr.FromString(fmt.Sprintf("increase(syslog_ng_status_retry_count{%s}[10m]) > 0", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("max(syslogng_output_event_retries_total{%s}) > 0", nsJobLabel)),
 				For:   prometheus_operator.Duration("20m"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
@@ -109,7 +109,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 			},
 			{
 				Alert: "SyslogNGOutputError",
-				Expr:  intstr.FromString(fmt.Sprintf("increase(syslog_ng_output_status_num_errors{%s}[10m]) > 0", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("increase(syslogng_output_events_total{%s,result=\"dropped\"}[10m]) > 0", nsJobLabel)),
 				For:   prometheus_operator.Duration("1s"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
@@ -123,7 +123,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 			},
 			{
 				Alert: "SyslogNGPredictedBufferGrowth",
-				Expr:  intstr.FromString(fmt.Sprintf("predict_linear(syslog_ng_output_status_buffer_total_bytes{%[1]s}[10m], 600) > syslog_ng_output_status_buffer_total_bytes{%[1]s}", nsJobLabel)),
+				Expr:  intstr.FromString(fmt.Sprintf("predict_linear(syslogng_memory_queue_memory_usage_bytes{%[1]s}[10m], 600) > syslogng_memory_queue_memory_usage_bytes{%[1]s}", nsJobLabel)),
 				For:   prometheus_operator.Duration("10m"),
 				Labels: map[string]string{
 					"rulegroup": ruleGroupName,
