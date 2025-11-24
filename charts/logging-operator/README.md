@@ -97,20 +97,20 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.enableDockerParserCompatibilityForCRI | bool | `false` | EnableDockerParserCompatibilityForCRI enables Docker log format compatibility for CRI workloads. |
 | logging.clusterFlows | list | `[]` | ClusterFlows to deploy |
 | logging.clusterOutputs | list | `[]` | ClusterOutputs to deploy |
-| logging.eventTailer.enabled | bool | `false` |  |
-| logging.eventTailer.name | string | `"event-tailer"` |  |
-| logging.eventTailer.image.repository | string | `nil` | repository of eventTailer image |
-| logging.eventTailer.image.tag | string | `nil` | tag of eventTailer image |
-| logging.eventTailer.image.pullPolicy | string | `nil` | pullPolicy of eventTailer image |
-| logging.eventTailer.image.imagePullSecrets | list | `[]` | imagePullSecrets of eventTailer image |
-| logging.eventTailer.pvc.enabled | bool | `true` | enable pvc for |
-| logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | storage class for event tailer pvc |
-| logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | storage class for event tailer pvc |
-| logging.eventTailer.pvc.storage | string | `"1Gi"` | storage for event tailer pvc |
-| logging.eventTailer.pvc.storageClassName | string | `nil` | storage class for event tailer pvc |
-| logging.eventTailer.workloadMetaOverrides | string | `nil` | workloadMetaOverrides |
-| logging.eventTailer.workloadOverrides | string | `nil` | workloadOverrides |
-| logging.eventTailer.containerOverrides | string | `nil` | containerOverrides |
+| logging.eventTailer.enabled | bool | `false` | Enable EventTailer |
+| logging.eventTailer.name | string | `"event-tailer"` | Name of the EventTailer resource |
+| logging.eventTailer.image.repository | string | `"ghcr.io/kube-logging/eventrouter"` | Repository of the EventTailer image |
+| logging.eventTailer.image.tag | string | `"0.4.0"` | Tag of the EventTailer image |
+| logging.eventTailer.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the EventTailer image |
+| logging.eventTailer.image.imagePullSecrets | list | `[]` | Image pull secrets for the EventTailer image |
+| logging.eventTailer.pvc.enabled | bool | `true` | Enable PVC for position storage |
+| logging.eventTailer.pvc.accessModes | list | `["ReadWriteOnce"]` | Access modes for the PVC |
+| logging.eventTailer.pvc.volumeMode | string | `"Filesystem"` | Volume mode for the PVC |
+| logging.eventTailer.pvc.storage | string | `"1Gi"` | Storage size for the PVC |
+| logging.eventTailer.pvc.storageClassName | string | `""` | Storage class name for the PVC. If not set, the default storage class will be used |
+| logging.eventTailer.workloadMetaOverrides | object | `{}` | workloadMetaOverrides allows adding labels and annotations to the EventTailer workload |
+| logging.eventTailer.workloadOverrides | object | `{}` | workloadOverrides allows customization of the EventTailer workload (e.g., affinity, tolerations, resources) |
+| logging.eventTailer.containerOverrides | object | `{}` | containerOverrides allows customization of the EventTailer container (e.g., resources, env vars) |
 | logging.hostTailers.enabled | bool | `false` | Enable all hostTailers |
 | logging.hostTailers.instances | list | `[]` | List of hostTailers configurations |
 | testReceiver.enabled | bool | `false` |  |
