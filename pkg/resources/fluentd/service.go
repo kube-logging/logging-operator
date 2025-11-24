@@ -17,6 +17,7 @@ package fluentd
 import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -100,6 +101,11 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+
+	if r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
+		r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+	}
+
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -122,7 +128,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme,
+					Scheme:               kubetool.To(v1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
 					TLSConfig:            r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
@@ -174,6 +180,11 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+
+	if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
+		r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+	}
+
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -195,7 +206,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme,
+					Scheme:               kubetool.To(v1.Scheme(r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
 					TLSConfig:            r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},

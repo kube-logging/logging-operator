@@ -25,7 +25,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  # Remove fortify headers to fix PATH_MAX compilation errors in native gems
  && rm -rf /usr/include/fortify \
  && echo 'gem: --no-document' >> /etc/gemrc \
- && gem install fluentd -v 1.19.0 \
+ && gem install fluentd -v 1.19.1 \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
