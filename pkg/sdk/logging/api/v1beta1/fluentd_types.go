@@ -107,6 +107,7 @@ type FluentdSpec struct {
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
 	FluentOutLogrotate      *FluentOutLogrotate          `json:"fluentOutLogrotate,omitempty"`
 	ForwardInputConfig      *input.ForwardInputConfig    `json:"forwardInputConfig,omitempty"`
+	ServiceOverrides        *typeoverride.Service        `json:"service,omitempty"`
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`

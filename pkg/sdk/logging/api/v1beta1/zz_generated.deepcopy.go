@@ -1788,6 +1788,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = new(input.ForwardInputConfig)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ServiceOverrides != nil {
+		in, out := &in.ServiceOverrides, &out.ServiceOverrides
+		*out = new(typeoverride.Service)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ServiceAccountOverrides != nil {
 		in, out := &in.ServiceAccountOverrides, &out.ServiceAccountOverrides
 		*out = new(typeoverride.ServiceAccount)

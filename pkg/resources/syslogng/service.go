@@ -16,6 +16,7 @@ package syslogng
 
 import (
 	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -47,6 +48,11 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 			Selector: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
 			Type:     corev1.ServiceTypeClusterIP,
 		},
+	}
+
+	err := merge.Merge(desired, r.syslogNGSpec.ServiceOverrides)
+	if err != nil {
+		return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 	}
 
 	if r.syslogNGSpec.EnabledIPv6 {
