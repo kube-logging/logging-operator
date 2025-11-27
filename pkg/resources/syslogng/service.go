@@ -70,9 +70,11 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
+
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() {
 		desired := &corev1.Service{
-			ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -95,19 +97,19 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-monitor", ComponentSyslogNG),
+		ObjectMeta: objectMetadata,
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
 
 	if r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
 		r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
 	}
 
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.ServiceMonitor {
-		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -138,12 +140,14 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
+		ObjectMeta: objectMetadata,
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
+
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
@@ -151,7 +155,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		desired := &corev1.Service{
-			ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG),
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -174,19 +178,19 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-buffer-monitor", ComponentSyslogNG),
+		ObjectMeta: objectMetadata,
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
 
 	if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
 		r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
 	}
 
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() && r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
-		objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -216,7 +220,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG),
+		ObjectMeta: objectMetadata,
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
