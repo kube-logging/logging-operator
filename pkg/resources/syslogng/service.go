@@ -102,20 +102,20 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	var SampleLimit uint64 = 0
 	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG)
 
-	if r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-		r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
-	}
-
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.ServiceMonitor {
+		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
+			r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+		}
+
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
 
+		var SampleLimit uint64 = 0
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
@@ -183,19 +183,20 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	var SampleLimit uint64 = 0
 	objectMetadata := r.SyslogNGObjectMeta(ServiceName+"-buffer-metrics", ComponentSyslogNG)
 
-	if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-		r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
-	}
-
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() && r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
+		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
+			r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+		}
+
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
+
+		var SampleLimit uint64 = 0
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{

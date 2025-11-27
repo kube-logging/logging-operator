@@ -102,20 +102,20 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	var SampleLimit uint64 = 0
 	objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
 
-	if r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-		r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
-	}
-
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.ServiceMonitor {
+		if r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
+			r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+		}
+
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
 
+		var SampleLimit uint64 = 0
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
@@ -183,19 +183,20 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
-	var SampleLimit uint64 = 0
 	objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 
-	if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-		r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
-	}
-
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
+		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
+			r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+		}
+
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
 			}
 		}
+
+		var SampleLimit uint64 = 0
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
