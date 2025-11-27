@@ -26,9 +26,11 @@ import (
 )
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
+
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() {
 		return &corev1.Service{
-			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -45,19 +47,19 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-monitor"),
+		ObjectMeta: objectMetadata,
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+	objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
 
 	if r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
 		r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
 	}
 
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.ServiceMonitor {
-		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
 		if r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -89,12 +91,14 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
+		ObjectMeta: objectMetadata,
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
+
 	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() {
 		port := int32(defaultBufferVolumeMetricsPort)
 		if r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
@@ -102,8 +106,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		return &corev1.Service{
-			ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
-
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -120,20 +123,19 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-monitor"),
+		ObjectMeta: objectMetadata,
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+	objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
 
 	if r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
 		r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
 	}
 
 	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() && r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
-		objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics")
-
 		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
@@ -159,7 +161,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
+		ObjectMeta: objectMetadata,
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
