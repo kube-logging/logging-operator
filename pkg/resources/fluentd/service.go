@@ -70,9 +70,11 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 }
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
+	objectMetadata := r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd)
+
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() {
 		desired := &corev1.Service{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -95,7 +97,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-monitor", ComponentFluentd),
+		ObjectMeta: objectMetadata,
 		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
 }
 
@@ -153,7 +155,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		desired := &corev1.Service{
-			ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
+			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
@@ -182,13 +184,13 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
 	var SampleLimit uint64 = 0
+	objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 
 	if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
 		r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
 	}
 
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
-		objectMetadata := r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd)
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
 			for k, v := range r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
 				objectMetadata.Labels[k] = v
@@ -218,7 +220,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 		}, reconciler.StatePresent, nil
 	}
 	return &v1.ServiceMonitor{
-		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-buffer-metrics", ComponentFluentd),
+		ObjectMeta: objectMetadata,
 		Spec:       v1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
