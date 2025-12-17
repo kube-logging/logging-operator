@@ -137,7 +137,7 @@ jobs:
 #          SHARDS: ${{ matrix.SHARDS }}
 
       - name: Run coverage report
-        uses: vladopajic/go-test-coverage@d9ec07b8799c458a7bc1f9b36d14261746d63529 # v2.18.0
+        uses: vladopajic/go-test-coverage@d35073ff1b8c1a0c4e9b8e03e8617e5dc64c5006 # v2.17.1
         with:
           profile: ./build/_test_coverage/coverage_e2e.out
           source-dir: ./
