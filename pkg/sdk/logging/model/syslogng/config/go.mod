@@ -1,6 +1,6 @@
 module github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config
 
-go 1.25.2
+go 1.25.5
 
 require (
 	emperror.dev/errors v0.8.1
