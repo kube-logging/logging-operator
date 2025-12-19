@@ -733,6 +733,12 @@ API Server end-point.
 
 Default: https://kubernetes.default.svc:443
 
+### Kubelet_Host (string, optional) {#filterkubernetes-kubelet_host}
+
+Kubelet host to use for HTTP requests. This only works when Use_Kubelet is set to On
+
+Default: 127.0.0.1
+
 ### Kubelet_Port (string, optional) {#filterkubernetes-kubelet_port}
 
 kubelet port using for HTTP request, this only works when Use_Kubelet  set to On
