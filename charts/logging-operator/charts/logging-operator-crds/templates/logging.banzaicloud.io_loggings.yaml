@@ -1666,6 +1666,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
@@ -2602,6 +2606,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
@@ -4401,6 +4409,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
@@ -5502,6 +5514,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
@@ -8017,6 +8033,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
@@ -12212,6 +12232,10 @@ spec:
                         type: boolean
                       prometheusRules:
                         type: boolean
+                      prometheusRulesLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
                       prometheusRulesOverride:
                         items:
                           properties:
