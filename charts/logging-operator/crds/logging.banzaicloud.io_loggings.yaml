@@ -2209,6 +2209,8 @@ spec:
                         type: string
                       Kube_meta_preload_cache_dir:
                         type: string
+                      Kubelet_Host:
+                        type: string
                       Kubelet_Port:
                         type: string
                       Labels:

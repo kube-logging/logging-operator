@@ -396,6 +396,8 @@ type FilterKubernetes struct {
 	DNSWaitTime string `json:"DNS_Wait_Time,omitempty"`
 	// This is an optional feature flag to get metadata information from kubelet instead of calling Kube Server API to enhance the log. (default:Off)
 	UseKubelet string `json:"Use_Kubelet,omitempty"`
+	// Kubelet host to use for HTTP requests. This only works when Use_Kubelet is set to On (default: 127.0.0.1)
+	KubeletHost string `json:"Kubelet_Host,omitempty"`
 	// kubelet port using for HTTP request, this only works when Use_Kubelet  set to On (default:10250)
 	KubeletPort string `json:"Kubelet_Port,omitempty"`
 	// Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted. (default:0)

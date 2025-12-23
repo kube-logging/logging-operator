@@ -477,7 +477,8 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		if len(fluentbitSpec.FilterKubernetes.UseKubelet) == 0 {
 			fluentbitSpec.FilterKubernetes.UseKubelet = "Off"
 		}
-		if fluentbitSpec.FilterKubernetes.UseKubelet == "On" {
+		// For backwards compatibility
+		if (fluentbitSpec.FilterKubernetes.UseKubelet == "On") && (fluentbitSpec.FilterKubernetes.KubeletHost == "") {
 			fluentbitSpec.DNSPolicy = "ClusterFirstWithHostNet"
 			fluentbitSpec.HostNetwork = true
 		}
