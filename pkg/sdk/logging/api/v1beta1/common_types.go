@@ -77,6 +77,7 @@ type Metrics struct {
 	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
 	PrometheusRulesOverride []PrometheusRulesOverride `json:"prometheusRulesOverride,omitempty"`
+	PrometheusRulesLabels   map[string]string         `json:"prometheusRulesLabels,omitempty"`
 }
 
 func (m *Metrics) IsEnabled() bool {

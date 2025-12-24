@@ -56,6 +56,9 @@ Enabled controls whether the metrics endpoint should be exposed. Defaults to fal
 ### prometheusRules (bool, optional) {#metrics-prometheusrules}
 
 
+### prometheusRulesLabels (map[string]string, optional) {#metrics-prometheusruleslabels}
+
+
 ### prometheusRulesOverride ([]PrometheusRulesOverride, optional) {#metrics-prometheusrulesoverride}
 
 

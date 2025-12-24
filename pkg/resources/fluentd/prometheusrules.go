@@ -16,6 +16,7 @@ package fluentd
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
@@ -28,6 +29,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 	}
+	maps.Copy(obj.Labels, r.fluentdSpec.Metrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.PrometheusRules {
