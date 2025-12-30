@@ -129,7 +129,7 @@ spec:
 
 The `match` field used to define routing rules has become more powerful by supporting [syslog-ng's *filter expressions*](https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/65#TOPIC-1829159).
 With this solution there are no restrictions on routing, you can filter both on metadata and log content as well.
-The syntax is slightly different though to accomodate for all available options.
+The syntax is slightly different though to accommodate for all available options.
 
 The following example filters for specific Pod labels
 ```yaml
