@@ -16,6 +16,7 @@ package syslogng
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -29,6 +30,7 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
 	}
+	maps.Copy(obj.Labels, r.syslogNGSpec.Metrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.PrometheusRules {

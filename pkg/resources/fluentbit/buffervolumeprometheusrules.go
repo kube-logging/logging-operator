@@ -16,6 +16,7 @@ package fluentbit
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -29,6 +30,7 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
 	}
+	maps.Copy(obj.Labels, r.fluentbitSpec.BufferVolumeMetrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() && r.fluentbitSpec.BufferVolumeMetrics.PrometheusRules {
