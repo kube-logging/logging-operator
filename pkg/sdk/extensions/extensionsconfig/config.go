@@ -77,7 +77,7 @@ var HostTailer = HostTailerConfig{
 
 // EventTailer configuration
 var EventTailer = EventTailerConfig{
-	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:0.4.0",
+	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:0.5.0",
 	TailerAffix:           "event-tailer",
 	ConfigurationFileName: "config.json",
 	PositionVolumeName:    "event-tailer-position",
