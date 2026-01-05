@@ -29,17 +29,27 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 	objectMetadata := r.FluentbitObjectMeta(fluentbitServiceName + "-metrics")
 
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() {
+		ports := []corev1.ServicePort{
+			{
+				Protocol:   corev1.ProtocolTCP,
+				Name:       "http-metrics",
+				Port:       r.fluentbitSpec.Metrics.Port,
+				TargetPort: intstr.IntOrString{IntVal: r.fluentbitSpec.Metrics.Port},
+			},
+		}
+		// Add config-reloader metrics port if hotreload is configured
+		if r.fluentbitSpec.ConfigHotReload != nil {
+			ports = append(ports, corev1.ServicePort{
+				Protocol:   corev1.ProtocolTCP,
+				Name:       "config-reloader-metrics",
+				Port:       9533,
+				TargetPort: intstr.IntOrString{IntVal: 9533},
+			})
+		}
 		return &corev1.Service{
 			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
-				Ports: []corev1.ServicePort{
-					{
-						Protocol:   corev1.ProtocolTCP,
-						Name:       "http-metrics",
-						Port:       r.fluentbitSpec.Metrics.Port,
-						TargetPort: intstr.IntOrString{IntVal: r.fluentbitSpec.Metrics.Port},
-					},
-				},
+				Ports:     ports,
 				Selector:  r.getFluentBitLabels(),
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
@@ -66,23 +76,40 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}
 
 		var SampleLimit uint64 = 0
+		endpoints := []v1.Endpoint{
+			{
+				Port:                 "http-metrics",
+				Path:                 r.fluentbitSpec.Metrics.Path,
+				Interval:             v1.Duration(r.fluentbitSpec.Metrics.Interval),
+				ScrapeTimeout:        v1.Duration(r.fluentbitSpec.Metrics.Timeout),
+				HonorLabels:          r.fluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
+				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+				Scheme:               kubetool.To(v1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
+				TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+			},
+		}
+		// Add config-reloader metrics endpoint if hotreload is configured
+		if r.fluentbitSpec.ConfigHotReload != nil {
+			endpoints = append(endpoints, v1.Endpoint{
+				Port:                 "config-reloader-metrics",
+				Path:                 "/metrics",
+				Interval:             v1.Duration(r.fluentbitSpec.Metrics.Interval),
+				ScrapeTimeout:        v1.Duration(r.fluentbitSpec.Metrics.Timeout),
+				HonorLabels:          r.fluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
+				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
+				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
+				Scheme:               kubetool.To(v1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
+				TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
+			})
+		}
 		return &v1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: v1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{{
-					Port:                 "http-metrics",
-					Path:                 r.fluentbitSpec.Metrics.Path,
-					Interval:             v1.Duration(r.fluentbitSpec.Metrics.Interval),
-					ScrapeTimeout:        v1.Duration(r.fluentbitSpec.Metrics.Timeout),
-					HonorLabels:          r.fluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
-					RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
-					MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(v1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
-					TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-				}},
+				Endpoints:       endpoints,
 				Selector: v12.LabelSelector{
 					MatchLabels: util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels(), generateLoggingRefLabels(r.Logging.GetName())),
 				},
