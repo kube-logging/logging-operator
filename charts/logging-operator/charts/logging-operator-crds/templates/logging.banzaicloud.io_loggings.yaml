@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.20.0
 {{- with .Values.annotations }}
 {{- toYaml . | nindent 4 }}
 {{- end }}
@@ -11996,6 +11996,10 @@ spec:
                                             type: integer
                                           signerName:
                                             type: string
+                                          userAnnotations:
+                                            additionalProperties:
+                                              type: string
+                                            type: object
                                         required:
                                         - keyType
                                         - signerName
@@ -16336,6 +16340,10 @@ spec:
                                                         type: integer
                                                       signerName:
                                                         type: string
+                                                      userAnnotations:
+                                                        additionalProperties:
+                                                          type: string
+                                                        type: object
                                                     required:
                                                     - keyType
                                                     - signerName
