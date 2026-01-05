@@ -9,15 +9,13 @@
 # liveness probe off completely.
 # soiurce https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/fluentd-gcp/fluentd-gcp-ds.yaml#L58
 
-BUFFER_PATH=${BUFFER_PATH};
+BUFFER_PATH=${BUFFER_PATH:-/buffers};
 LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
 
-if [ ! -e ${BUFFER_PATH} ];
-then
+if [ ! -e "${BUFFER_PATH}" ]; then
   exit 1;
 fi;
-touch -d "@$(($(date +%s) - $LIVENESS_THRESHOLD_SECONDS))" /tmp/marker-liveness;
-if [ -z "$(find ${BUFFER_PATH} -type d -newer /tmp/marker-liveness -print -quit)" ];
-then
+MINUTES=$(( (LIVENESS_THRESHOLD_SECONDS + 59) / 60 ));
+if [ -z "$(find "${BUFFER_PATH}" -type d -mmin -"${MINUTES}" -print -quit)" ]; then
   exit 1;
 fi;
