@@ -326,6 +326,9 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 		if fluentbitSpec.InputTail.SkipLongLines == "" {
 			fluentbitSpec.InputTail.SkipLongLines = "On"
 		}
+		if fluentbitSpec.InputTail.FileCacheAdvise == "" {
+			fluentbitSpec.InputTail.FileCacheAdvise = "On"
+		}
 		if fluentbitSpec.InputTail.DB == nil {
 			fluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
 		}

@@ -1598,6 +1598,8 @@ spec:
                     type: string
                   Exclude_Path:
                     type: string
+                  File_Cache_Advise:
+                    type: string
                   Ignore_Older:
                     type: string
                   Key:

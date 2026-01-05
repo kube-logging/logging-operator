@@ -262,6 +262,8 @@ type InputTail struct {
 	RefreshInterval string `json:"Refresh_Interval,omitempty"`
 	// Specify the number of extra time in seconds to monitor a file once is rotated in case some pending data is flushed. (default:5)
 	RotateWait string `json:"Rotate_Wait,omitempty"`
+	// Use posix_fadvise for file access. Advise not to use kernel file cache (Linux only). (default:On)
+	FileCacheAdvise string `json:"File_Cache_Advise,omitempty"`
 	// Ignores files that have been last modified before this time in seconds. Supports m,h,d (minutes, hours,days) syntax. Default behavior is to read all specified files.
 	IgnoreOlder string `json:"Ignore_Older,omitempty"`
 	// When a monitored file reach it buffer capacity due to a very long line (Buffer_Max_Size), the default behavior is to stop monitoring that file. Skip_Long_Lines alter that behavior and instruct Fluent Bit to skip long lines and continue processing other lines that fits into the buffer size. (default:Off)
