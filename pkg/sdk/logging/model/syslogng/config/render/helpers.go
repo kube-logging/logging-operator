@@ -72,11 +72,11 @@ func AllOf(rs ...Renderer) Renderer {
 
 func AllFrom(rs seqs.Seq[Renderer]) Renderer {
 	return func(ctx RenderContext) (err error) {
-		rs.ForEachUntil(func(r Renderer) bool {
+		rs.ForEachWhile(func(r Renderer) bool {
 			if r != nil {
 				err = r(ctx)
 			}
-			return err != nil
+			return err == nil
 		})
 		return
 	}

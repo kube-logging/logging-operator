@@ -36,7 +36,7 @@ const (
 )
 
 func validateOutputs(outputRefs map[string]outputInfo, flow string, localOutputRefs []string) error {
-	return seqs.SeededReduce(seqs.FromSlice(localOutputRefs), nil, func(err error, ref string) error {
+	return seqs.Fold(seqs.FromSlice(localOutputRefs), nil, func(err error, ref string) error {
 		if _, ok := outputRefs[ref]; !ok {
 			return errors.Append(err, errors.Errorf("output reference %s for flow %s cannot be found", ref, flow))
 		}
@@ -45,7 +45,7 @@ func validateOutputs(outputRefs map[string]outputInfo, flow string, localOutputR
 }
 
 func validateClusterOutputs(clusterOutputRefs map[string]clusterOutputInfo, flow string, globalOutputRefs []string, flowKind string) error {
-	return seqs.SeededReduce(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
+	return seqs.Fold(seqs.FromSlice(globalOutputRefs), nil, func(err error, ref string) error {
 		if _, ok := clusterOutputRefs[ref]; !ok {
 			return errors.Append(err, errors.Errorf("cluster output reference %s for flow %s cannot be found", ref, flow))
 		}

@@ -100,7 +100,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.eventTailer.enabled | bool | `false` | Enable EventTailer |
 | logging.eventTailer.name | string | `"event-tailer"` | Name of the EventTailer resource |
 | logging.eventTailer.image.repository | string | `"ghcr.io/kube-logging/eventrouter"` | Repository of the EventTailer image |
-| logging.eventTailer.image.tag | string | `"0.4.0"` | Tag of the EventTailer image |
+| logging.eventTailer.image.tag | string | `"0.5.0"` | Tag of the EventTailer image |
 | logging.eventTailer.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the EventTailer image |
 | logging.eventTailer.image.imagePullSecrets | list | `[]` | Image pull secrets for the EventTailer image |
 | logging.eventTailer.pvc.enabled | bool | `true` | Enable PVC for position storage |

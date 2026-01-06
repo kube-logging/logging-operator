@@ -37,11 +37,11 @@ func fieldsOf(val reflect.Value) []Field {
 		return nil
 	}
 
-	exportedStructFields := seqs.SeqFunc(func(fn func(reflect.StructField) bool) {
+	exportedStructFields := seqs.FromIter(func(fn func(reflect.StructField) bool) {
 		typ := val.Type()
 		for i := 0; i < typ.NumField(); i++ {
 			if f := typ.Field(i); f.IsExported() {
-				if fn(f) {
+				if !fn(f) {
 					return
 				}
 			}
