@@ -23,6 +23,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -139,16 +140,6 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			FailureThreshold:    3,
 		},
 		ReadinessProbe: generateReadinessCheck(spec),
-	}
-}
-
-func generatePortsConfigReloader() []corev1.ContainerPort {
-	return []corev1.ContainerPort{
-		{
-			Name:          configReloaderMetricsPortName,
-			ContainerPort: configReloaderMetricsPort,
-			Protocol:      "TCP",
-		},
 	}
 }
 
@@ -383,7 +374,7 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			"-cfgjson",
 			generateConfigReloaderConfig(configDir),
 		},
-		Ports:        generatePortsConfigReloader(),
+		Ports:        model.GeneratePortsConfigReloader(),
 		VolumeMounts: generateVolumeMounts(spec),
 	}
 

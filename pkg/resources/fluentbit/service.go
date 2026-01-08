@@ -18,6 +18,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,9 +42,9 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		if r.fluentbitSpec.ConfigHotReload != nil {
 			ports = append(ports, corev1.ServicePort{
 				Protocol:   corev1.ProtocolTCP,
-				Name:       configReloaderMetricsPortName,
-				Port:       configReloaderMetricsPort,
-				TargetPort: intstr.IntOrString{IntVal: configReloaderMetricsPort},
+				Name:       model.ConfigReloaderMetricsPortName,
+				Port:       model.ConfigReloaderMetricsPort,
+				TargetPort: intstr.IntOrString{IntVal: model.ConfigReloaderMetricsPort},
 			})
 		}
 		return &corev1.Service{
@@ -92,7 +93,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		// Add config-reloader metrics endpoint if hotreload is configured
 		if r.fluentbitSpec.ConfigHotReload != nil {
 			endpoints = append(endpoints, v1.Endpoint{
-				Port:                 configReloaderMetricsPortName,
+				Port:                 model.ConfigReloaderMetricsPortName,
 				Path:                 "/metrics",
 				Interval:             v1.Duration(r.fluentbitSpec.Metrics.Interval),
 				ScrapeTimeout:        v1.Duration(r.fluentbitSpec.Metrics.Timeout),

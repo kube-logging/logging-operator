@@ -21,6 +21,7 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -222,21 +223,11 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Resources:       spec.ConfigReloaderResources,
 		Args:            args,
 		VolumeMounts:    vm,
-		Ports:           generatePortsConfigReloader(),
+		Ports:           model.GeneratePortsConfigReloader(),
 		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
-}
-
-func generatePortsConfigReloader() []corev1.ContainerPort {
-	return []corev1.ContainerPort{
-		{
-			Name:          configReloaderMetricsPortName,
-			ContainerPort: configReloaderMetricsPort,
-			Protocol:      "TCP",
-		},
-	}
 }
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {

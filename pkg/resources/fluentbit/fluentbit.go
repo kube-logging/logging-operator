@@ -49,9 +49,6 @@ const (
 	fluentbitServiceName           = "fluentbit"
 	containerName                  = "fluent-bit"
 	defaultBufferVolumeMetricsPort = 9200
-
-	configReloaderMetricsPort     = 9533
-	configReloaderMetricsPortName = "config-reloader-metrics"
 )
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {

@@ -64,9 +64,6 @@ const (
 	containerName                  = "fluentd"
 	defaultBufferVolumeMetricsPort = 9200
 	drainerCheckInterval           = "10"
-
-	configReloaderMetricsPort     = 9533
-	configReloaderMetricsPortName = "config-reloader-metrics"
 )
 
 // Reconciler holds info what resource to reconcile

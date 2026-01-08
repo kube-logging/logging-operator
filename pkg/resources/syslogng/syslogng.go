@@ -58,9 +58,6 @@ const (
 	tlsVolumeName                  = "tls"
 	metricsPortNumber              = 9577
 	metricsPortName                = "exporter"
-
-	configReloaderMetricsPort     = 9533
-	configReloaderMetricsPortName = "config-reloader-metrics"
 )
 
 // Reconciler holds info what resource to reconcile
