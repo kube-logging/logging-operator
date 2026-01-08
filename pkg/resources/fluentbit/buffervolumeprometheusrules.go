@@ -30,10 +30,10 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-buffer-metrics"),
 	}
-	maps.Copy(obj.Labels, r.fluentbitSpec.BufferVolumeMetrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() && r.fluentbitSpec.BufferVolumeMetrics.PrometheusRules {
+		maps.Copy(obj.Labels, r.fluentbitSpec.BufferVolumeMetrics.PrometheusRulesLabels)
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentbit-buffervolume"
