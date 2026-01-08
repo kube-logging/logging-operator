@@ -135,6 +135,16 @@ func (r *Reconciler) fluentbitContainer() *corev1.Container {
 	}
 }
 
+func generatePortsConfigReloader() []corev1.ContainerPort {
+	return []corev1.ContainerPort{
+		{
+			Name:          configReloaderMetricsPortName,
+			ContainerPort: configReloaderMetricsPort,
+			Protocol:      "TCP",
+		},
+	}
+}
+
 func (r *Reconciler) generatePortsMetrics() (containerPorts []corev1.ContainerPort) {
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
@@ -166,6 +176,7 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 		Image:           spec.ConfigHotReload.Image.RepositoryWithTag(),
 		Resources:       spec.ConfigHotReload.Resources,
 		Args:            args,
+		Ports:           generatePortsConfigReloader(),
 		VolumeMounts:    vm,
 		SecurityContext: spec.Security.SecurityContext,
 	}

@@ -222,10 +222,21 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Resources:       spec.ConfigReloaderResources,
 		Args:            args,
 		VolumeMounts:    vm,
+		Ports:           generatePortsConfigReloader(),
 		SecurityContext: spec.Security.SecurityContext,
 	}
 
 	return c
+}
+
+func generatePortsConfigReloader() []corev1.ContainerPort {
+	return []corev1.ContainerPort{
+		{
+			Name:          configReloaderMetricsPortName,
+			ContainerPort: configReloaderMetricsPort,
+			Protocol:      "TCP",
+		},
+	}
 }
 
 func generatePortsBufferVolumeMetrics(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {

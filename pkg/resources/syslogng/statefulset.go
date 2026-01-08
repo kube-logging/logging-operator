@@ -142,6 +142,16 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 	}
 }
 
+func generatePortsConfigReloader() []corev1.ContainerPort {
+	return []corev1.ContainerPort{
+		{
+			Name:          configReloaderMetricsPortName,
+			ContainerPort: configReloaderMetricsPort,
+			Protocol:      "TCP",
+		},
+	}
+}
+
 func generatePortsBufferVolumeMetrics(spec *v1beta1.SyslogNGSpec) []corev1.ContainerPort {
 	port := int32(defaultBufferVolumeMetricsPort)
 	if spec.BufferVolumeMetrics.Port != 0 {
@@ -373,6 +383,7 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			"-cfgjson",
 			generateConfigReloaderConfig(configDir),
 		},
+		Ports:        generatePortsConfigReloader(),
 		VolumeMounts: generateVolumeMounts(spec),
 	}
 
