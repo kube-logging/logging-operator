@@ -30,9 +30,9 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.FluentbitObjectMeta(fluentbitServiceName + "-metrics"),
 	}
-	maps.Copy(obj.Labels, r.fluentbitSpec.Metrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.PrometheusRules {
+		maps.Copy(obj.Labels, r.fluentbitSpec.Metrics.PrometheusRulesLabels)
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		builtInRules := []v1.Rule{
 			{

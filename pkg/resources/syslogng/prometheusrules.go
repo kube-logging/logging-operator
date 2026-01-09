@@ -30,10 +30,10 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.SyslogNGObjectMeta(ServiceName+"-metrics", ComponentSyslogNG),
 	}
-	maps.Copy(obj.Labels, r.syslogNGSpec.Metrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.PrometheusRules {
+		maps.Copy(obj.Labels, r.syslogNGSpec.Metrics.PrometheusRulesLabels)
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "syslog-ng"
