@@ -19,6 +19,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -91,9 +92,9 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 					},
 					{
 						Protocol:   corev1.ProtocolTCP,
-						Name:       "config-reloader-metrics",
-						Port:       9533,
-						TargetPort: intstr.IntOrString{IntVal: 9533},
+						Name:       model.ConfigReloaderMetricsPortName,
+						Port:       model.ConfigReloaderMetricsPort,
+						TargetPort: intstr.IntOrString{IntVal: model.ConfigReloaderMetricsPort},
 					},
 				},
 				Selector:  r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
@@ -147,7 +148,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						TLSConfig:            r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 					},
 					{
-						Port:                 "config-reloader-metrics",
+						Port:                 model.ConfigReloaderMetricsPortName,
 						Path:                 "/metrics",
 						Interval:             v1.Duration(r.syslogNGSpec.Metrics.Interval),
 						ScrapeTimeout:        v1.Duration(r.syslogNGSpec.Metrics.Timeout),

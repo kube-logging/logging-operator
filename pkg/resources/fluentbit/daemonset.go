@@ -22,6 +22,7 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/templates"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -166,6 +167,7 @@ func newConfigMapReloader(spec *v1beta1.FluentbitSpec) corev1.Container {
 		Image:           spec.ConfigHotReload.Image.RepositoryWithTag(),
 		Resources:       spec.ConfigHotReload.Resources,
 		Args:            args,
+		Ports:           model.GeneratePortsConfigReloader(),
 		VolumeMounts:    vm,
 		SecurityContext: spec.Security.SecurityContext,
 	}
