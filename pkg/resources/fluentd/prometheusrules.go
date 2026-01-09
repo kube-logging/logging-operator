@@ -29,10 +29,10 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 	obj := &v1.PrometheusRule{
 		ObjectMeta: r.FluentdObjectMeta(ServiceName+"-metrics", ComponentFluentd),
 	}
-	maps.Copy(obj.Labels, r.fluentdSpec.Metrics.PrometheusRulesLabels)
 	state := reconciler.StateAbsent
 
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.PrometheusRules {
+		maps.Copy(obj.Labels, r.fluentdSpec.Metrics.PrometheusRulesLabels)
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentd"
