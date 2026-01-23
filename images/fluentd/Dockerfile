@@ -1,4 +1,4 @@
-FROM ruby:3.4.4-alpine3.20 AS base
+FROM ruby:3.4.8-alpine3.23 AS base
 
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
@@ -18,7 +18,6 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && mkdir -p /buffers && chown -R fluent /buffers \
  && apk add --no-cache \
         ca-certificates \
-        ruby ruby-irb ruby-etc \
         tini libmaxminddb geoip \
         snappy libssl3 libcrypto3 \
  && apk add --no-cache $BUILD_DEPS \
