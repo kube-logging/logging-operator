@@ -1,4 +1,4 @@
-FROM ruby:3.4.7-alpine3.23 AS base
+FROM ruby:3.4.8-alpine3.23 AS base
 
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
