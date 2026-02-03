@@ -50,18 +50,19 @@ func (r *Reconciler) configHash() (string, error) {
 }
 
 func (r *Reconciler) CheckForObjectExistence(ctx context.Context, object client.Object) (*ConfigCheckResult, error) {
-	if err := r.Client.Get(ctx, client.ObjectKeyFromObject(object), object); err != nil {
-		if apierrors.IsNotFound(err) {
-			objNotFoundMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s not found", object.GetName(), object.GetNamespace())
-			r.Log.Info(objNotFoundMsg)
-			err = nil
-		}
-		errMsg := fmt.Sprintf("object %s (kind: secret) in namespace %s is not available", object.GetName(), object.GetNamespace())
-		return &ConfigCheckResult{
-			Ready: false, Valid: false, Message: errMsg,
-		}, err
+	err := r.Client.Get(ctx, client.ObjectKeyFromObject(object), object)
+	if err == nil {
+		return nil, nil
 	}
-	return nil, nil
+
+	return &ConfigCheckResult{
+		Ready: false,
+		Valid: false,
+		Message: fmt.Sprintf("object %s (kind: secret) in namespace %s is not available: %v",
+			object.GetName(),
+			object.GetNamespace(),
+			err),
+	}, nil
 }
 
 func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error) {
