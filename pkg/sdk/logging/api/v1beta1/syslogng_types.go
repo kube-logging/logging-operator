@@ -82,6 +82,9 @@ type SyslogNGSpec struct {
 	// Overrides the default logging level configCheck setup.
 	// This field is not used directly, just copied over the field in the logging resource if defined.
 	ConfigCheck *ConfigCheck `json:"configCheck,omitempty"`
+	// Duration in seconds for graceful pod termination. Set higher than expected cleanup time.
+	// +kubebuilder:validation:Minimum=0
+	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
 }
 
 //

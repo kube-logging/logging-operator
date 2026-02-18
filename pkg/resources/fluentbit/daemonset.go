@@ -74,12 +74,13 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: podMeta,
 				Spec: corev1.PodSpec{
-					ServiceAccountName: r.getServiceAccount(),
-					Volumes:            r.generateVolume(),
-					Tolerations:        r.fluentbitSpec.Tolerations,
-					NodeSelector:       r.fluentbitSpec.NodeSelector,
-					Affinity:           r.fluentbitSpec.Affinity,
-					PriorityClassName:  r.fluentbitSpec.PodPriorityClassName,
+					ServiceAccountName:            r.getServiceAccount(),
+					Volumes:                       r.generateVolume(),
+					Tolerations:                   r.fluentbitSpec.Tolerations,
+					NodeSelector:                  r.fluentbitSpec.NodeSelector,
+					Affinity:                      r.fluentbitSpec.Affinity,
+					PriorityClassName:             r.fluentbitSpec.PodPriorityClassName,
+					TerminationGracePeriodSeconds: r.fluentbitSpec.TerminationGracePeriodSeconds,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:        r.fluentbitSpec.Security.PodSecurityContext.FSGroup,
 						RunAsNonRoot:   r.fluentbitSpec.Security.PodSecurityContext.RunAsNonRoot,

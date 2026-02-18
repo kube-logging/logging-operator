@@ -58,8 +58,9 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 					},
 				},
 				Spec: corev1.PodSpec{
-					Containers: containers,
-					Volumes:    r.generateVolume(),
+					Containers:                    containers,
+					Volumes:                       r.generateVolume(),
+					TerminationGracePeriodSeconds: r.syslogNGSpec.TerminationGracePeriodSeconds,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup: util.IntPointer64(101),
 					},
