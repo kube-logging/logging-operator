@@ -9,7 +9,7 @@ require (
 	github.com/cisco-open/operator-tools v0.37.0
 	github.com/go-logr/logr v1.4.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
-	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0
+	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0-00010101000000-000000000000
 	github.com/kube-logging/telemetry-controller v0.0.0-20260218102359-adcf8e8a7b1e
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.39.1
@@ -25,7 +25,7 @@ require (
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/controller-runtime v0.23.1
+	sigs.k8s.io/controller-runtime v0.22.5
 )
 
 require (
@@ -74,6 +74,7 @@ require (
 	github.com/hashicorp/go-version v1.8.0 // indirect
 	github.com/iancoleman/orderedmap v0.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.1-0.20220621161143-b0104c826a24 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect

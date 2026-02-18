@@ -6,4 +6,5 @@ dependencies:
   repository: oci://ghcr.io/kube-logging/helm-charts
   version: 0.5.0
 digest: sha256:7cca1844ad8123086c20237b0c09dfe76e4a594881ac20bfc554cec1945bea82
-generated: "2026-02-18T11:41:46.592465+01:00"
+generated: "2026-02-18T13:48:37.218016+01:00"
+
