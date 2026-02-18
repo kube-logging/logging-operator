@@ -5,7 +5,8 @@ Fluentd Drain Watch is a monitoring script that ensures proper shutdown of Fluen
 ## Features
 
 - Waits for Fluentd's RPC endpoint to be available before proceeding.
-- Monitors a custom-runner HTTP endpoint.
+- Monitors a custom-runner HTTP endpoint (if available).
+- Handles cases where custom-runner is not deployed (e.g., when buffer metrics sidecar is disabled).
 - Ensures all buffer files are processed before exiting.
 - Triggers termination of custom workers upon completion.
 
@@ -18,4 +19,9 @@ export BUFFER_PATH=/path/to/buffers
 export CHECK_INTERVAL=60  # Optional, default is 60 seconds
 export RPC_ADDRESS=127.0.0.1:24444  # Optional, default is 127.0.0.1:24444
 export CUSTOM_RUNNER_ADDRESS=127.0.0.1:7357  # Optional, default is 127.0.0.1:7357
+export CUSTOM_RUNNER_TIMEOUT=30  # Optional, default is 30 seconds
 ```
+
+## Custom Runner Timeout
+
+The script waits for the custom-runner HTTP endpoint to become available, with a configurable timeout (default: 30 seconds). If the custom-runner is not available after the timeout, the script assumes it is not deployed (e.g., when buffer volume metrics sidecar is disabled) and continues without it. This prevents the drainer pod from hanging indefinitely when the custom-runner sidecar is not present.
