@@ -363,7 +363,7 @@ GEM
     protocol-url (0.4.0)
     public_suffix (6.0.2)
     racc (1.8.1)
-    rack (3.2.3)
+    rack (3.2.5)
     rack-oauth2 (1.21.3)
       activesupport
       attr_required
