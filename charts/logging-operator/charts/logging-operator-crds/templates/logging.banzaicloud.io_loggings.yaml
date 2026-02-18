@@ -3610,6 +3610,10 @@ spec:
                   targetPort:
                     format: int32
                     type: integer
+                  terminationGracePeriodSeconds:
+                    format: int64
+                    minimum: 0
+                    type: integer
                   tls:
                     properties:
                       enabled:
@@ -7128,6 +7132,10 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  terminationGracePeriodSeconds:
+                    format: int64
+                    minimum: 0
+                    type: integer
                   tls:
                     properties:
                       enabled:
@@ -16668,6 +16676,10 @@ spec:
                       tag:
                         type: string
                     type: object
+                  terminationGracePeriodSeconds:
+                    format: int64
+                    minimum: 0
+                    type: integer
                   tls:
                     properties:
                       enabled:

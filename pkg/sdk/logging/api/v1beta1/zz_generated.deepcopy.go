@@ -1397,6 +1397,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = new(v1.Probe)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.TerminationGracePeriodSeconds != nil {
+		in, out := &in.TerminationGracePeriodSeconds, &out.TerminationGracePeriodSeconds
+		*out = new(int64)
+		**out = **in
+	}
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)
@@ -1777,6 +1782,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		in, out := &in.Scaling, &out.Scaling
 		*out = new(FluentdScaling)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.TerminationGracePeriodSeconds != nil {
+		in, out := &in.TerminationGracePeriodSeconds, &out.TerminationGracePeriodSeconds
+		*out = new(int64)
+		**out = **in
 	}
 	if in.FluentOutLogrotate != nil {
 		in, out := &in.FluentOutLogrotate, &out.FluentOutLogrotate
@@ -3674,6 +3684,11 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 		in, out := &in.ConfigCheck, &out.ConfigCheck
 		*out = new(ConfigCheck)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.TerminationGracePeriodSeconds != nil {
+		in, out := &in.TerminationGracePeriodSeconds, &out.TerminationGracePeriodSeconds
+		*out = new(int64)
+		**out = **in
 	}
 }
 
