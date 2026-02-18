@@ -37,39 +37,47 @@ func (r *Reconciler) bufferVolumePrometheusRules() (runtime.Object, reconciler.D
 		nsJobLabel := fmt.Sprintf(`job="%s", namespace="%s"`, obj.Name, obj.Namespace)
 		state = reconciler.StatePresent
 		const ruleGroupName = "fluentbit-buffervolume"
-		obj.Spec.Groups = []v1.RuleGroup{{
-			Name: ruleGroupName,
-			Rules: []v1.Rule{
-				{
-					Alert: "FluentbitBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
-					For:   prometheus_operator.Duration("10m"),
-					Labels: map[string]string{
-						"rulegroup": ruleGroupName,
-						"service":   "fluentbit",
-						"severity":  "warning",
-					},
-					Annotations: map[string]string{
-						"summary":     `Fluentbit buffer free capacity less than 10%.`,
-						"description": `Fluentbit buffer size capacity is {{ $value }}%.`,
-					},
+		builtInRules := []v1.Rule{
+			{
+				Alert: "FluentbitBufferSize",
+				Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 10`, nsJobLabel)),
+				For:   prometheus_operator.Duration("10m"),
+				Labels: map[string]string{
+					"rulegroup": ruleGroupName,
+					"service":   "fluentbit",
+					"severity":  "warning",
 				},
-				{
-					Alert: "FluentbitBufferSize",
-					Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 5`, nsJobLabel)),
-					For:   prometheus_operator.Duration("10m"),
-					Labels: map[string]string{
-						"rulegroup": ruleGroupName,
-						"service":   "fluentbit",
-						"severity":  "critical",
-					},
-					Annotations: map[string]string{
-						"summary":     `Fluentbit buffer free capacity less than 5%.`,
-						"description": `Fluentbit buffer size capacity is {{ $value }}%.`,
-					},
+				Annotations: map[string]string{
+					"summary":     `Fluentbit buffer free capacity less than 10%.`,
+					"description": `Fluentbit buffer size capacity is {{ $value }}%.`,
 				},
 			},
-		},
+			{
+				Alert: "FluentbitBufferSize",
+				Expr:  intstr.FromString(fmt.Sprintf(`node_filesystem_avail_bytes{mountpoint="/buffers", %[1]s} / node_filesystem_size_bytes{mountpoint="/buffers", %[1]s} * 100 < 5`, nsJobLabel)),
+				For:   prometheus_operator.Duration("10m"),
+				Labels: map[string]string{
+					"rulegroup": ruleGroupName,
+					"service":   "fluentbit",
+					"severity":  "critical",
+				},
+				Annotations: map[string]string{
+					"summary":     `Fluentbit buffer free capacity less than 5%.`,
+					"description": `Fluentbit buffer size capacity is {{ $value }}%.`,
+				},
+			},
+		}
+		rules := builtInRules
+		if r.fluentbitSpec.BufferVolumeMetrics.PrometheusRulesOverride != nil {
+			for _, o := range r.fluentbitSpec.BufferVolumeMetrics.PrometheusRulesOverride {
+				rules = o.ListOverride(rules)
+			}
+		}
+		obj.Spec.Groups = []v1.RuleGroup{
+			{
+				Name:  ruleGroupName,
+				Rules: rules,
+			},
 		}
 	}
 	return obj, state, nil
