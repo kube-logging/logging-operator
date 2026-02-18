@@ -117,26 +117,29 @@ type FluentbitSpec struct {
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
-	BufferStorageVolume       volume.KubernetesVolume        `json:"bufferStorageVolume,omitempty"`
-	BufferVolumeMetrics       *Metrics                       `json:"bufferVolumeMetrics,omitempty"`
-	BufferVolumeImage         ImageSpec                      `json:"bufferVolumeImage,omitempty"`
-	BufferVolumeArgs          []string                       `json:"bufferVolumeArgs,omitempty"`
-	BufferVolumeResources     corev1.ResourceRequirements    `json:"bufferVolumeResources,omitempty"`
-	BufferVolumeLivenessProbe *corev1.Probe                  `json:"bufferVolumeLivenessProbe,omitempty"`
-	CustomConfigSecret        string                         `json:"customConfigSecret,omitempty"`
-	PodPriorityClassName      string                         `json:"podPriorityClassName,omitempty"`
-	LivenessProbe             *corev1.Probe                  `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck      bool                           `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe            *corev1.Probe                  `json:"readinessProbe,omitempty"`
-	Network                   *FluentbitNetwork              `json:"network,omitempty"`
-	ForwardOptions            *ForwardOptions                `json:"forwardOptions,omitempty"`
-	EnableUpstream            bool                           `json:"enableUpstream,omitempty"`
-	ServiceAccountOverrides   *typeoverride.ServiceAccount   `json:"serviceAccount,omitempty"`
-	DNSPolicy                 corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
-	DNSConfig                 *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
-	HostNetwork               bool                           `json:"HostNetwork,omitempty"`
-	SyslogNGOutput            *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
-	UpdateStrategy            appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+	BufferStorageVolume       volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`
+	BufferVolumeMetrics       *Metrics                    `json:"bufferVolumeMetrics,omitempty"`
+	BufferVolumeImage         ImageSpec                   `json:"bufferVolumeImage,omitempty"`
+	BufferVolumeArgs          []string                    `json:"bufferVolumeArgs,omitempty"`
+	BufferVolumeResources     corev1.ResourceRequirements `json:"bufferVolumeResources,omitempty"`
+	BufferVolumeLivenessProbe *corev1.Probe               `json:"bufferVolumeLivenessProbe,omitempty"`
+	CustomConfigSecret        string                      `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName      string                      `json:"podPriorityClassName,omitempty"`
+	// Duration in seconds for graceful pod termination. Set higher than expected cleanup time.
+	// +kubebuilder:validation:Minimum=0
+	TerminationGracePeriodSeconds *int64                         `json:"terminationGracePeriodSeconds,omitempty"`
+	LivenessProbe                 *corev1.Probe                  `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck          bool                           `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe                *corev1.Probe                  `json:"readinessProbe,omitempty"`
+	Network                       *FluentbitNetwork              `json:"network,omitempty"`
+	ForwardOptions                *ForwardOptions                `json:"forwardOptions,omitempty"`
+	EnableUpstream                bool                           `json:"enableUpstream,omitempty"`
+	ServiceAccountOverrides       *typeoverride.ServiceAccount   `json:"serviceAccount,omitempty"`
+	DNSPolicy                     corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
+	DNSConfig                     *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
+	HostNetwork                   bool                           `json:"HostNetwork,omitempty"`
+	SyslogNGOutput                *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
+	UpdateStrategy                appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 	// Available in Logging operator version 4.2 and later.
 	// Specify a custom parser file to load in addition to the default parsers file.
 	// It must be a valid key in the configmap specified by customConfig.

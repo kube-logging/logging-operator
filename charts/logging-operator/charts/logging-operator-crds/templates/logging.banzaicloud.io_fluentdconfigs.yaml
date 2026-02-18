@@ -3510,6 +3510,10 @@ spec:
                 additionalProperties:
                   type: string
                 type: object
+              terminationGracePeriodSeconds:
+                format: int64
+                minimum: 0
+                type: integer
               tls:
                 properties:
                   enabled:

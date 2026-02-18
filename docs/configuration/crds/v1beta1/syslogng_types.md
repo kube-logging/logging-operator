@@ -94,6 +94,11 @@ Available in Logging operator version 4.5 and later. Create [custom log metrics 
 ### tls (SyslogNGTLS, optional) {#syslogngspec-tls}
 
 
+### terminationGracePeriodSeconds (*int64, optional) {#syslogngspec-terminationgraceperiodseconds}
+
+Duration in seconds for graceful pod termination. Set higher than expected cleanup time. 
+
+
 
 ## SourceDateParser
 

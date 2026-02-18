@@ -102,6 +102,9 @@ type FluentdSpec struct {
 	// +docLink:"more info, https://docs.fluentd.org/deployment/system-config#enable_msgpack_time_support"
 	EnableMsgpackTimeSupport bool   `json:"enableMsgpackTimeSupport,omitempty"`
 	PodPriorityClassName     string `json:"podPriorityClassName,omitempty"`
+	// Duration in seconds for graceful pod termination. Set higher than expected cleanup time.
+	// +kubebuilder:validation:Minimum=0
+	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it

@@ -241,6 +241,11 @@ Deprecated, use positiondb
 ### targetPort (int32, optional) {#fluentbitspec-targetport}
 
 
+### terminationGracePeriodSeconds (*int64, optional) {#fluentbitspec-terminationgraceperiodseconds}
+
+Duration in seconds for graceful pod termination. Set higher than expected cleanup time. 
+
+
 ### tolerations ([]corev1.Toleration, optional) {#fluentbitspec-tolerations}
 
 

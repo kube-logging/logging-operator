@@ -181,6 +181,11 @@ Available in Logging operator version 4.5 and later. Configure sidecar container
 ### tls (FluentdTLS, optional) {#fluentdspec-tls}
 
 
+### terminationGracePeriodSeconds (*int64, optional) {#fluentdspec-terminationgraceperiodseconds}
+
+Duration in seconds for graceful pod termination. Set higher than expected cleanup time. 
+
+
 ### tolerations ([]corev1.Toleration, optional) {#fluentdspec-tolerations}
 
 
