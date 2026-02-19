@@ -4,6 +4,7 @@ CHECK_INTERVAL="${CHECK_INTERVAL:-60}"
 RPC_ADDRESS="${RPC_ADDRESS:-127.0.0.1:24444}"
 CUSTOM_RUNNER_ADDRESS="${CUSTOM_RUNNER_ADDRESS:-127.0.0.1:7357}"
 CUSTOM_RUNNER_TIMEOUT="${CUSTOM_RUNNER_TIMEOUT:-30}"
+KILL_TIMEOUT="${KILL_TIMEOUT:-300}"
 
 [ -z "$BUFFER_PATH" ] && exit 2
 
@@ -40,23 +41,41 @@ then
 fi
 
 echo '['$(date)']' 'waiting for fluentd to exit' # i.e. stop listening on the RPC address
+WORKERS_KILLED=false
+kill_elapsed=0
+
 while netstat -tln | grep "$RPC_ADDRESS" >/dev/null
 do
   [ -z "$DEBUG" ] && echo '['$(date)']' 'RPC endpoint still listening'
 
+  if [ "$WORKERS_KILLED" = "true" ]
+  then
+    kill_elapsed=$((kill_elapsed + CHECK_INTERVAL))
+    if [ "$kill_elapsed" -ge "$KILL_TIMEOUT" ]
+    then
+      echo '['$(date)']' 'ERROR: fluentd did not shut down within '${KILL_TIMEOUT}'s after killing workers'
+      exit 1
+    fi
+  fi
+
   if [ "$(find $BUFFER_PATH -iname '*.buffer' -or -iname '*.buffer.meta' | wc -l)" = 0 ]
   then
-    if [ "$CUSTOM_RUNNER_AVAILABLE" = "true" ]
+    if [ "$WORKERS_KILLED" = "false" ]
     then
-      echo '['$(date)']' 'exiting node exporter custom runner:' "$(curl --silent --show-error http://$CUSTOM_RUNNER_ADDRESS/exit)"
+      if [ "$CUSTOM_RUNNER_AVAILABLE" = "true" ]
+      then
+        echo '['$(date)']' 'exiting node exporter custom runner:' "$(curl --silent --show-error http://$CUSTOM_RUNNER_ADDRESS/exit)"
+      fi
+      echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl --silent --show-error http://$RPC_ADDRESS/api/processes.killWorkers)"
+      WORKERS_KILLED=true
+      echo '['$(date)']' 'waiting for fluentd to shut down gracefully'
     fi
-    echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl --silent --show-error http://$RPC_ADDRESS/api/processes.killWorkers)"
-    exit 0
   fi
 
   sleep "$CHECK_INTERVAL"
 done
 
+echo '['$(date)']' 'fluentd has stopped listening on RPC endpoint'
 echo '['$(date)']' 'checking for remaining buffers'
 [ "$(find $BUFFER_PATH -iname '*.buffer' -or -iname '*.buffer.meta' | wc -l)" -gt 0 ] && exit 1
 
