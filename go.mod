@@ -9,7 +9,7 @@ require (
 	github.com/cisco-open/operator-tools v0.37.0
 	github.com/go-logr/logr v1.4.3
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
-	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0-00010101000000-000000000000
+	github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config v0.0.0-20260220162738-500bf3fef317
 	github.com/kube-logging/telemetry-controller v0.0.0-20260218102359-adcf8e8a7b1e
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.39.1
@@ -19,13 +19,13 @@ require (
 	github.com/siliconbrain/go-seqs v1.0.0
 	github.com/spf13/cast v1.10.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a
+	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 	k8s.io/api v0.35.1
 	k8s.io/apiextensions-apiserver v0.35.1
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/controller-runtime v0.22.5
+	sigs.k8s.io/controller-runtime v0.23.1
 )
 
 require (
