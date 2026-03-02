@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "companyAnnouncements": [
+    "Welcome to the Logging-operator project!\nPlease make sure to read our contribution guidelines and code of conduct before getting started. If you have any questions or need assistance, feel free to reach out to the maintainers or the community.\nWe are excited to have you on board and look forward to your contributions."
+  ],
+  "model": "sonnet",
+  "availableModels": ["haiku", "sonnet", "opus"],
+  "cleanupPeriodDays": 14,
+  "env": {
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.git/**)",
+      "Read(./secrets/**)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Read(./**/*.pfx)",
+      "Read(./**/*.p12)",
+      "Read(./**/*.jks)",
+      "Read(./**/*.keystore)",
+      "Read(./**/credentials*)",
+      "Read(./**/token*)",
+      "Read(./**/*secret*)",
+      "Read(./**/id_rsa*)",
+      "Read(./**/id_ed25519*)",
+      "Read(./**/.htpasswd)",
+      "Read(./**/*.sqlite)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(git push *)",
+      "Bash(*exec*)",
+      "Bash(sudo *)"
+    ],
+    "ask": [
+      "Bash",
+      "WebFetch"
+    ],
+    "defaultMode": "plan",
+    "disableBypassPermissionsMode": "disable"
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "excludedCommands": [],
+    "allowUnsandboxedCommands": false
+  },
+  "enableAllProjectMcpServers": false,
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  }
+}
