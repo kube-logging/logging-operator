@@ -19,23 +19,22 @@ import (
 	"fmt"
 
 	"emperror.dev/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
-
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/resources"
+	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -52,15 +51,15 @@ const (
 )
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {
-	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+	return map[string]string{types.ManagedByLabel: loggingRef}
 }
 
 func (r *Reconciler) getFluentBitLabels() map[string]string {
 	return util.MergeLabels(
 		r.fluentbitSpec.Labels,
 		map[string]string{
-			"app.kubernetes.io/instance": r.nameProvider.Name(),
-			"app.kubernetes.io/name":     "fluentbit",
+			types.InstanceLabel: r.nameProvider.Name(),
+			types.NameLabel:     "fluentbit",
 		},
 		generateLoggingRefLabels(r.Logging.GetName()))
 }

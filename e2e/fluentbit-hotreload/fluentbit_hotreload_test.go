@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	operatortypes "github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -37,12 +38,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var TestTempDir string
@@ -96,11 +96,11 @@ func TestFluentbitHotReload(t *testing.T) {
 		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			operatortypes.NameLabel:      "fluentd",
+			operatortypes.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": release,
+			operatortypes.NameLabel: release,
 		}
 
 		// start log producer in the tenant namespace
@@ -134,7 +134,7 @@ func TestFluentbitHotReload(t *testing.T) {
 				"logs",
 				"-n", nsInfra,
 				"--tail", "100",
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", release)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", operatortypes.NameLabel, release)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
@@ -151,7 +151,7 @@ func TestFluentbitHotReload(t *testing.T) {
 				"logs",
 				"-n", nsInfra,
 				"--tail", "30",
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", release)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", operatortypes.NameLabel, release)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)

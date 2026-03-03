@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -38,12 +39,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var TestTempDir string
@@ -182,11 +182,11 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
@@ -211,7 +211,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
@@ -371,11 +371,11 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
@@ -590,11 +590,11 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
@@ -778,11 +778,11 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 
 		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
