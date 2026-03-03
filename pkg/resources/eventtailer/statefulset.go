@@ -74,7 +74,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: e.customResource.Spec.WorkloadMetaBase.Merge(metav1.ObjectMeta{
-				Labels: e.selectorLabels(),
+				Labels: e.allLabels(),
 			}),
 			Spec: e.customResource.Spec.WorkloadBase.Override(
 				corev1.PodSpec{

@@ -16,6 +16,7 @@ package eventtailer
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
@@ -66,9 +67,16 @@ func (e *EventTailer) selectorLabels() map[string]string {
 		types.InstanceLabel: e.Name(),
 	}
 	if len(e.CommonSelectorLabels) > 0 {
-		for key, val := range e.CommonSelectorLabels {
-			base[key] = val
-		}
+		maps.Copy(base, e.CommonSelectorLabels)
 	}
 	return base
+}
+
+// allLabels returns selector labels plus component label for pod templates
+func (e *EventTailer) allLabels() map[string]string {
+	labels := make(map[string]string, len(e.selectorLabels())+1)
+	maps.Copy(labels, e.selectorLabels())
+	labels[types.ComponentLabel] = config.EventTailer.TailerAffix
+
+	return labels
 }
