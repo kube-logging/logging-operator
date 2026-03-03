@@ -16,10 +16,12 @@ package fluentd
 
 import (
 	"fmt"
+	"maps"
 	"reflect"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/spf13/cast"
@@ -175,8 +177,13 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 }
 
 func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
+	baseLabels := r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)
+	labels := make(map[string]string, len(baseLabels)+1)
+	maps.Copy(labels, baseLabels)
+	labels[types.InstanceLabel] = r.Logging.GetName()
+
 	meta := metav1.ObjectMeta{
-		Labels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec),
+		Labels: labels,
 	}
 	if r.fluentdSpec.Annotations != nil {
 		meta.Annotations = r.fluentdSpec.Annotations

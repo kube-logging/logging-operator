@@ -586,8 +586,8 @@ func (l *Logging) GetFluentdLabels(component string, f FluentdSpec) map[string]s
 	return util.MergeLabels(
 		f.Labels,
 		map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": component,
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: component,
 		},
 		GenerateLoggingRefLabels(l.GetName()),
 	)
