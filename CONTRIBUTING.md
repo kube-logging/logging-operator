@@ -47,6 +47,17 @@ See the [For developers](https://kube-logging.dev/docs/developers/) page in the 
 
 [^1]: For bigger features please open a new [Feature request issue](https://github.com/kube-logging/logging-operator/issues/new?assignees=&labels=&projects=&template=--feature-request.md&title=) where we can have a discussion about the proposed feature and the suggested test cases.
 
+## Using AI tools
+
+AI-assisted development (GitHub Copilot, Claude, ChatGPT, Cursor, etc.) is welcome, but contributors remain fully responsible for every line they submit. The following guidelines apply:
+
+- **Review everything you submit.** Do not paste AI output directly into a PR without reading and understanding it. You are the author; the model is a tool.
+- **Tests are not optional.** AI-generated code must be covered by tests just like hand-written code. Follow the existing patterns — use the `envtest`-based integration tests and Ginkgo/Gomega style where appropriate.
+- **No filler or hallucinated content.** AI tools sometimes produce plausible-looking but incorrect code, wrong API references, or invented configuration options. Verify against the actual codebase and documentation before submitting.
+- **Keep your changes focused.** Do not submit large AI-generated refactors or reformatting unless that was the explicit goal. Unrelated changes mixed into a PR make reviews harder.
+- **Respect licensing.** Be aware that some AI tools may reproduce code from their training data. If you are uncertain about the origin of a code block, rewrite it yourself.
+- **Run the checks.** `make check` (license, lint, tests) must pass regardless of how the code was produced. AI-generated code is not exempt from project standards.
+
 ### Add yourself to the production adopters list
 
 If you use the Logging operator in a production environment, add yourself to the list of production [adopters](https://github.com/kube-logging/logging-operator/blob/master/ADOPTERS.md).🤘
