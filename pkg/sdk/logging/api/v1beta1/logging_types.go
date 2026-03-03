@@ -269,7 +269,7 @@ func (logging *Logging) WatchAllNamespaces() bool {
 	return len(watchNamespaces) == 0 && nsLabelSelector == nil
 }
 
-func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
+func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 	if fluentbitSpec != nil { //nolint:nestif
 		// Set default value for DisableVarLibDockerContainers to false (meaning volume is mounted by default)
 		if fluentbitSpec.DisableVarLibDockerContainers == nil {

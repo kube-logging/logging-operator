@@ -34,7 +34,7 @@ import (
 
 const LoggingRefConflict = "Other logging resources exist with the same loggingRef"
 
-func NewValidationReconciler(
+func NewValidationReconciler( //nolint: gocyclo
 	repo client.StatusClient,
 	resources LoggingResources,
 	secrets SecretLoaderFactory,

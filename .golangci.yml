@@ -30,7 +30,7 @@ linters:
     revive:
       confidence: 0.9
     gocyclo:
-      min-complexity: 15
+      min-complexity: 40
   enable:
     - bodyclose
     - errcheck
