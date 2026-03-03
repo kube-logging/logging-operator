@@ -15,6 +15,8 @@
 package hosttailer
 
 import (
+	"maps"
+
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
@@ -44,11 +46,17 @@ func (h *HostTailer) selectorLabels() map[string]string {
 		types.InstanceLabel: h.Name(""),
 	}
 	if len(h.CommonSelectorLabels) > 0 {
-		for key, val := range h.CommonSelectorLabels {
-			base[key] = val
-		}
+		maps.Copy(base, h.CommonSelectorLabels)
 	}
 	return base
+}
+
+// allLabels returns selector labels plus component label for pod templates
+func (h *HostTailer) allLabels() map[string]string {
+	labels := make(map[string]string, len(h.selectorLabels())+1)
+	maps.Copy(labels, h.selectorLabels())
+	labels[types.ComponentLabel] = config.HostTailer.TailerAffix
+	return labels
 }
 
 func (h *HostTailer) objectMeta() v1.ObjectMeta {

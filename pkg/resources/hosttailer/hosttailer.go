@@ -166,7 +166,7 @@ func (h *HostTailer) DaemonSet(containers []corev1.Container, volumes []corev1.V
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: h.customResource.Spec.WorkloadMetaBase.Merge(v1.ObjectMeta{
-					Labels: h.selectorLabels(),
+					Labels: h.allLabels(),
 				}),
 				Spec: h.customResource.Spec.WorkloadBase.Override(corev1.PodSpec{
 					Volumes:    volumes,
