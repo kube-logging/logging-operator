@@ -21,9 +21,9 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -119,7 +119,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.ServiceMonitor {
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+			r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -129,24 +129,24 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}
 
 		var SampleLimit uint64 = 0
-		return &v1.ServiceMonitor{
+		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
-			Spec: v1.ServiceMonitorSpec{
+			Spec: monitoringv1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{
+				Endpoints: []monitoringv1.Endpoint{
 					{
 						Port:                 "http-metrics",
 						Path:                 r.fluentdSpec.GetFluentdMetricsPath(),
-						Interval:             v1.Duration(r.fluentdSpec.Metrics.Interval),
-						ScrapeTimeout:        v1.Duration(r.fluentdSpec.Metrics.Timeout),
+						Interval:             monitoringv1.Duration(r.fluentdSpec.Metrics.Interval),
+						ScrapeTimeout:        monitoringv1.Duration(r.fluentdSpec.Metrics.Timeout),
 						HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(v1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+						Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 							},
 						},
@@ -154,28 +154,28 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					{
 						Port:                 model.ConfigReloaderMetricsPortName,
 						Path:                 "/metrics",
-						Interval:             v1.Duration(r.fluentdSpec.Metrics.Interval),
-						ScrapeTimeout:        v1.Duration(r.fluentdSpec.Metrics.Timeout),
+						Interval:             monitoringv1.Duration(r.fluentdSpec.Metrics.Interval),
+						ScrapeTimeout:        monitoringv1.Duration(r.fluentdSpec.Metrics.Timeout),
 						HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(v1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+						Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 							},
 						},
 					},
 				},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
+				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{
+	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: objectMetadata,
-		Spec:       v1.ServiceMonitorSpec{},
+		Spec:       monitoringv1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 
@@ -221,7 +221,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+			r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -231,36 +231,36 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 		}
 
 		var SampleLimit uint64 = 0
-		return &v1.ServiceMonitor{
+		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
-			Spec: v1.ServiceMonitorSpec{
+			Spec: monitoringv1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{{
+				Endpoints: []monitoringv1.Endpoint{{
 					Port:                 "buffer-metrics",
 					Path:                 r.fluentdSpec.BufferVolumeMetrics.Path,
-					Interval:             v1.Duration(r.fluentdSpec.BufferVolumeMetrics.Interval),
-					ScrapeTimeout:        v1.Duration(r.fluentdSpec.BufferVolumeMetrics.Timeout),
+					Interval:             monitoringv1.Duration(r.fluentdSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        monitoringv1.Duration(r.fluentdSpec.BufferVolumeMetrics.Timeout),
 					HonorLabels:          r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(v1.Scheme(r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
-					HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-						HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+					Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
+					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 							TLSConfig: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 						},
 					},
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetFluentdLabels(ComponentFluentd, *r.fluentdSpec)},
+				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{
+	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: objectMetadata,
-		Spec:       v1.ServiceMonitorSpec{},
+		Spec:       monitoringv1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 

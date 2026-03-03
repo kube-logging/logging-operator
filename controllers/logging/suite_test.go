@@ -24,8 +24,8 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/pborman/uuid"
-	v12 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -93,8 +93,8 @@ func beforeSuite() error {
 	}
 
 	for _, ns := range []string{controlNamespace, testNamespace} {
-		err := k8sClient.Create(context.TODO(), &v12.Namespace{
-			ObjectMeta: v1.ObjectMeta{
+		err := k8sClient.Create(context.TODO(), &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
 				Name: ns,
 			},
 		})
