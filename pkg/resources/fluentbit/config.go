@@ -14,13 +14,15 @@
 
 package fluentbit
 
-const BaseConfigName = "fluent-bit.conf"
-const UpstreamConfigName = "upstream.conf"
-const CustomParsersConfigName = "custom-parsers.conf"
-const CRIParserConfigName = "cri-log-parser.conf"
-const StockConfigPath = "/fluent-bit/etc"
-const StockBinPath = "/fluent-bit/bin/fluent-bit"
-const OperatorConfigPath = "/fluent-bit/etc-operator"
+const (
+	BaseConfigName          = "fluent-bit.conf"
+	UpstreamConfigName      = "upstream.conf"
+	CustomParsersConfigName = "custom-parsers.conf"
+	CRIParserConfigName     = "cri-log-parser.conf"
+	StockConfigPath         = "/fluent-bit/etc"
+	StockBinPath            = "/fluent-bit/bin/fluent-bit"
+	OperatorConfigPath      = "/fluent-bit/etc-operator"
+)
 
 var fluentBitConfigTemplate = `
 [SERVICE]

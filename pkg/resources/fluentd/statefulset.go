@@ -23,13 +23,13 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -380,7 +380,8 @@ func (r *Reconciler) tmpDirHackContainer() *corev1.Container {
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      "tmp",
-					MountPath: "/mnt/tmp"},
+					MountPath: "/mnt/tmp",
+				},
 			},
 		}
 	}

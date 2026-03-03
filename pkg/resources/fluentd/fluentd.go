@@ -113,7 +113,8 @@ func (r *Reconciler) getServiceAccount() string {
 }
 
 func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, fluentdConfig *v1beta1.FluentdConfig, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts) *Reconciler {
+	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, fluentdConfig *v1beta1.FluentdConfig, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts,
+) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
 		fluentdSpec:               fluentdSpec,
@@ -463,8 +464,10 @@ func requirementMust(req *labels.Requirement, err error) labels.Requirement {
 	return *req
 }
 
-const drainStatusLabelKey = "logging.banzaicloud.io/drain-status"
-const drainStatusLabelValue = "drained"
+const (
+	drainStatusLabelKey   = "logging.banzaicloud.io/drain-status"
+	drainStatusLabelValue = "drained"
+)
 
 func markedAsDrained(pvc corev1.PersistentVolumeClaim) bool {
 	return pvc.Labels[drainStatusLabelKey] == drainStatusLabelValue

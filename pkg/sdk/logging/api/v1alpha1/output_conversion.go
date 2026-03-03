@@ -17,8 +17,9 @@ package v1alpha1
 import (
 	"errors"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (o *Output) ConvertTo(dstRaw conversion.Hub) error {

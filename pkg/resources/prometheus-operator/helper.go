@@ -14,9 +14,9 @@
 
 package prometheus_operator
 
-import "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+import monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 
-func Duration(duration string) *v1.Duration {
-	d := v1.Duration(duration)
+func Duration(duration string) *monitoringv1.Duration {
+	d := monitoringv1.Duration(duration)
 	return &d
 }

@@ -24,8 +24,9 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 func TestRequired(t *testing.T) {
@@ -183,9 +184,8 @@ func TestIgnoreNestedStructs(t *testing.T) {
 }
 
 func TestEmptyStructStructs(t *testing.T) {
-	type Asd struct {
-	}
-	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(Asd{})
+	type example struct{}
+	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(example{})
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -196,7 +196,7 @@ func TestEmptyStructStructs(t *testing.T) {
 }
 
 func TestConversion(t *testing.T) {
-	type Asd struct {
+	type example struct {
 		Field int `json:"field" plugin:"converter:magic"`
 	}
 
@@ -207,7 +207,7 @@ func TestConversion(t *testing.T) {
 		return "", errors.Errorf("unable to convert %+v to int", f)
 	}
 
-	testStruct := Asd{Field: 2}
+	testStruct := example{Field: 2}
 
 	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).
 		WithConverter("magic", converter).
@@ -223,8 +223,7 @@ func TestConversion(t *testing.T) {
 	}
 }
 
-type FakeLoader struct {
-}
+type FakeLoader struct{}
 
 func (d *FakeLoader) Load(secret *secret.Secret) (string, error) {
 	if secret.Value != "" {

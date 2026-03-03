@@ -19,16 +19,17 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (h *HostTailer) ownerReferences() []v1.OwnerReference {
-	ownerReferences := []v1.OwnerReference{
+func (h *HostTailer) ownerReferences() []metav1.OwnerReference {
+	ownerReferences := []metav1.OwnerReference{
 		{
 			APIVersion: h.customResource.APIVersion,
 			Kind:       h.customResource.Kind,
@@ -59,8 +60,8 @@ func (h *HostTailer) allLabels() map[string]string {
 	return labels
 }
 
-func (h *HostTailer) objectMeta() v1.ObjectMeta {
-	meta := v1.ObjectMeta{
+func (h *HostTailer) objectMeta() metav1.ObjectMeta {
+	meta := metav1.ObjectMeta{
 		Name:            h.Name(""),
 		Namespace:       h.customResource.Namespace,
 		Labels:          h.selectorLabels(),

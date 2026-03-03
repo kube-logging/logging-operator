@@ -24,15 +24,14 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
-
-	"github.com/kube-logging/logging-operator/pkg/resources/templates"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/resources/templates"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -230,7 +229,6 @@ func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {
 func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	if !*r.fluentbitSpec.DisableVarLog {
 		v = append(v, corev1.Volume{
-
 			Name: "varlogs",
 			VolumeSource: corev1.VolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
@@ -258,7 +256,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				HostPath: &corev1.HostPathVolumeSource{
 					Path: vMnt.Source,
 				},
-			}})
+			},
+		})
 	}
 
 	if r.fluentbitSpec.CustomConfigSecret == "" {

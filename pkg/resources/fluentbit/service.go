@@ -17,13 +17,14 @@ package fluentbit
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 )
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
@@ -59,7 +60,8 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
-		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
@@ -161,7 +163,8 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
-		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {

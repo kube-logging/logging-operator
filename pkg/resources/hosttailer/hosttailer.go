@@ -19,22 +19,21 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	v1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-
-	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // HostTailer .
@@ -161,11 +160,11 @@ func (h *HostTailer) DaemonSet(containers []corev1.Container, volumes []corev1.V
 	ds := &appsv1.DaemonSet{
 		ObjectMeta: h.objectMeta(),
 		Spec: appsv1.DaemonSetSpec{
-			Selector: &v1.LabelSelector{
+			Selector: &metav1.LabelSelector{
 				MatchLabels: h.selectorLabels(),
 			},
 			Template: corev1.PodTemplateSpec{
-				ObjectMeta: h.customResource.Spec.WorkloadMetaBase.Merge(v1.ObjectMeta{
+				ObjectMeta: h.customResource.Spec.WorkloadMetaBase.Merge(metav1.ObjectMeta{
 					Labels: h.allLabels(),
 				}),
 				Spec: h.customResource.Spec.WorkloadBase.Override(corev1.PodSpec{

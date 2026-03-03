@@ -105,7 +105,8 @@ func New(client client.Client,
 	fluentbitSpec *v1beta1.FluentbitSpec,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
 	nameProvider NameProvider,
-	loggingResourcesRepo *model.LoggingResourceRepository) *Reconciler {
+	loggingResourcesRepo *model.LoggingResourceRepository,
+) *Reconciler {
 	return &Reconciler{
 		Logging:              logging,
 		logger:               logger,

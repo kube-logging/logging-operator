@@ -20,8 +20,9 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
 // Name .

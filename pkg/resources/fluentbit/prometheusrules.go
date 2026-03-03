@@ -56,10 +56,11 @@ func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState,
 			}
 		}
 		state = reconciler.StatePresent
-		obj.Spec.Groups = []v1.RuleGroup{{
-			Name:  "fluentbit",
-			Rules: rules,
-		},
+		obj.Spec.Groups = []v1.RuleGroup{
+			{
+				Name:  "fluentbit",
+				Rules: rules,
+			},
 		}
 	}
 	return obj, state, nil

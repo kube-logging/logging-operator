@@ -19,10 +19,11 @@ import (
 	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	prometheus_operator "github.com/kube-logging/logging-operator/pkg/resources/prometheus-operator"
 )
 
 func (r *Reconciler) prometheusRules() (runtime.Object, reconciler.DesiredState, error) {

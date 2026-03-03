@@ -19,10 +19,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/volumepath"
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
-	corev1 "k8s.io/api/core/v1"
 )
 
 // Command returns the desired command for the current filetailer

@@ -433,7 +433,8 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 							Port: intstr.IntOrString{
 								IntVal: fluentbitSpec.Metrics.Port,
 							},
-						}},
+						},
+					},
 					InitialDelaySeconds: 10,
 					TimeoutSeconds:      0,
 					PeriodSeconds:       10,
