@@ -17,10 +17,12 @@ package fluentbit
 import (
 	"crypto/sha256"
 	"fmt"
+	"maps"
 	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 
@@ -42,8 +44,13 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	labels := util.MergeLabels(r.fluentbitSpec.Labels, r.getFluentBitLabels())
 	meta := r.FluentbitObjectMeta(fluentbitDaemonSetName)
 	meta.Annotations = util.MergeLabels(meta.Annotations, r.fluentbitSpec.DaemonSetAnnotations)
+
+	podLabels := make(map[string]string, len(labels)+1)
+	maps.Copy(podLabels, labels)
+	podLabels[types.ComponentLabel] = "collector"
+
 	podMeta := metav1.ObjectMeta{
-		Labels:      labels,
+		Labels:      podLabels,
 		Annotations: r.fluentbitSpec.Annotations,
 	}
 	imagePullSecrets := r.fluentbitSpec.Image.ImagePullSecrets
