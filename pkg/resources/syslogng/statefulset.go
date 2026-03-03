@@ -16,12 +16,14 @@ package syslogng
 
 import (
 	"fmt"
+	"maps"
 	"path/filepath"
 	"strings"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	appsv1 "k8s.io/api/apps/v1"
@@ -43,16 +45,21 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 		containers = append(containers, *c)
 	}
 
+	selectorLabels := r.Logging.GetSyslogNGLabels(ComponentSyslogNG)
+	podLabels := make(map[string]string, len(selectorLabels)+1)
+	maps.Copy(podLabels, selectorLabels)
+	podLabels[types.InstanceLabel] = r.Logging.GetName()
+
 	desired := &appsv1.StatefulSet{
 		ObjectMeta: r.Logging.SyslogNGObjectMeta(StatefulSetName, ComponentSyslogNG, r.syslogNGConfig),
 		Spec: appsv1.StatefulSetSpec{
 			PodManagementPolicy: appsv1.OrderedReadyPodManagement,
 			Selector: &metav1.LabelSelector{
-				MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+				MatchLabels: selectorLabels,
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG),
+					Labels: podLabels,
 					Annotations: map[string]string{
 						"fluentbit.io/exclude": "true",
 					},

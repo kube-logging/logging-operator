@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -622,15 +623,15 @@ func (l *Logging) SyslogNGObjectMeta(name, component string, sc *SyslogNGConfig)
 func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 	return util.MergeLabels(
 		map[string]string{
-			"app.kubernetes.io/name":      "syslog-ng",
-			"app.kubernetes.io/component": component,
+			types.NameLabel:      "syslog-ng",
+			types.ComponentLabel: component,
 		},
 		GenerateLoggingRefLabels(l.GetName()),
 	)
 }
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
-	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+	return map[string]string{types.ManagedByLabel: loggingRef}
 }
 
 func (l *Logging) AreMultipleAggregatorsSet() bool {
