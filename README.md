@@ -1,5 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/cncf/landscape/master/hosted_logos/logging-operator.svg" width="260" alt="logging-operator logo"></p>
 <p align="center"><a href="https://goreportcard.com/report/github.com/kube-logging/logging-operator" target="_blank"><img src="https://goreportcard.com/badge/github.com/kube-logging/logging-operator" alt="Go Report Badge"></a> <a href="https://github.com/kube-logging/logging-operator/" target="_blank"><img src="https://img.shields.io/badge/license-Apache%20v2-orange.svg" alt="Apache v2 License Badge"></a> <a href="https://www.bestpractices.dev/projects/7941" target="_blank"><img src="https://www.bestpractices.dev/projects/7941/badge?cache=20231206" alt="Best Practices Badge"></a></p>
+[![Kubernetes Health](https://img.releaserun.com/badge/health/kubernetes.svg)](https://releaserun.com/badges/kubernetes/)
 
 # Logging operator
 
