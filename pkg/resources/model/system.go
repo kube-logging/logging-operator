@@ -71,7 +71,6 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		"globalFilter",
 		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
 		logging.Spec.GlobalFilters)
-
 	if err != nil {
 		return nil, err
 	}

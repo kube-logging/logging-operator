@@ -17,8 +17,9 @@ package v1alpha1
 import (
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/volume"
-	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/tailer"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!

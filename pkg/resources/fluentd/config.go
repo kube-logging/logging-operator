@@ -29,6 +29,7 @@ var fluentdDefaultTemplate = `
 @include /fluentd/etc/devnull.conf
 @include /fluentd/etc/fluentlog.conf
 `
+
 var fluentdInputTemplate = `
 # Enable RPC endpoint (this allows to trigger config reload without restart)
 <system>
@@ -78,6 +79,7 @@ var fluentdInputTemplate = `
 </source>
 {{ end }}
 `
+
 var fluentdOutputTemplate = `
 <match **>
     @type null

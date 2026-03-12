@@ -17,8 +17,9 @@ package fluentbit
 import (
 	"testing"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func TestInvalidFilterGrepConfig(t *testing.T) {

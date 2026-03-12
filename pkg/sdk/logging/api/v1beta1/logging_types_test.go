@@ -15,10 +15,11 @@
 package v1beta1_test
 
 import (
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // These tests are written in BDD-style using Ginkgo framework. Refer to
@@ -37,7 +38,7 @@ var _ = Describe("FluentBitSpec", func() {
 				Expect(err).To(BeNil())
 				Expect(spec.FilterKubernetes.UseKubelet).To(Equal("On"))
 				Expect(spec.FilterKubernetes.KubeletHost).To(Equal(""))
-				Expect(spec.DNSPolicy).To(Equal(v1.DNSClusterFirstWithHostNet))
+				Expect(spec.DNSPolicy).To(Equal(corev1.DNSClusterFirstWithHostNet))
 				Expect(spec.HostNetwork).To(Equal(true))
 			})
 		})
@@ -46,7 +47,7 @@ var _ = Describe("FluentBitSpec", func() {
 			When("Kubelet_Host is defined", func() {
 				spec := &v1beta1.FluentbitSpec{
 					HostNetwork: false,
-					DNSPolicy:   v1.DNSClusterFirst,
+					DNSPolicy:   corev1.DNSClusterFirst,
 					FilterKubernetes: v1beta1.FilterKubernetes{
 						UseKubelet:  "On",
 						KubeletHost: "${HOST_IP}",
@@ -57,7 +58,7 @@ var _ = Describe("FluentBitSpec", func() {
 				Expect(err).To(BeNil())
 				Expect(spec.FilterKubernetes.UseKubelet).To(Equal("On"))
 				Expect(spec.FilterKubernetes.KubeletHost).To(Equal("${HOST_IP}"))
-				Expect(spec.DNSPolicy).To(Equal(v1.DNSClusterFirst))
+				Expect(spec.DNSPolicy).To(Equal(corev1.DNSClusterFirst))
 				Expect(spec.HostNetwork).To(Equal(false))
 			})
 		})

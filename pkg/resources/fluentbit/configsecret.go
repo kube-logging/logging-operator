@@ -207,7 +207,7 @@ func newFluentbitNetwork(network v1beta1.FluentbitNetwork) (result FluentbitNetw
 	return
 }
 
-func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) {
+func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, error) { //nolint: gocyclo
 	ctx := context.TODO()
 	if r.fluentbitSpec.CustomConfigSecret != "" {
 		return &corev1.Secret{

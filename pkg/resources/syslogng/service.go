@@ -18,14 +18,15 @@ import (
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
+
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
-	corev1 "k8s.io/api/core/v1"
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) {
@@ -111,7 +112,8 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
-		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
@@ -119,7 +121,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.ServiceMonitor {
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-			r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+			r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -129,24 +131,24 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 		}
 
 		var SampleLimit uint64 = 0
-		return &v1.ServiceMonitor{
+		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
-			Spec: v1.ServiceMonitorSpec{
+			Spec: monitoringv1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{
+				Endpoints: []monitoringv1.Endpoint{
 					{
 						Port:                 "http-metrics",
 						Path:                 r.syslogNGSpec.Metrics.Path,
-						Interval:             v1.Duration(r.syslogNGSpec.Metrics.Interval),
-						ScrapeTimeout:        v1.Duration(r.syslogNGSpec.Metrics.Timeout),
+						Interval:             monitoringv1.Duration(r.syslogNGSpec.Metrics.Interval),
+						ScrapeTimeout:        monitoringv1.Duration(r.syslogNGSpec.Metrics.Timeout),
 						HonorLabels:          r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(v1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+						Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 							},
 						},
@@ -154,28 +156,28 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 					{
 						Port:                 model.ConfigReloaderMetricsPortName,
 						Path:                 "/metrics",
-						Interval:             v1.Duration(r.syslogNGSpec.Metrics.Interval),
-						ScrapeTimeout:        v1.Duration(r.syslogNGSpec.Metrics.Timeout),
+						Interval:             monitoringv1.Duration(r.syslogNGSpec.Metrics.Interval),
+						ScrapeTimeout:        monitoringv1.Duration(r.syslogNGSpec.Metrics.Timeout),
 						HonorLabels:          r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(v1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+						Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 							},
 						},
 					},
 				},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
+				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{
+	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: objectMetadata,
-		Spec:       v1.ServiceMonitorSpec{},
+		Spec:       monitoringv1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 
@@ -213,7 +215,8 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
-		Spec:       corev1.ServiceSpec{}}, reconciler.StateAbsent, nil
+		Spec:       corev1.ServiceSpec{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.DesiredState, error) {
@@ -221,7 +224,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() && r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-			r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(v1.SchemeHTTP).String()
+			r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
@@ -231,36 +234,36 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 		}
 
 		var SampleLimit uint64 = 0
-		return &v1.ServiceMonitor{
+		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
-			Spec: v1.ServiceMonitorSpec{
+			Spec: monitoringv1.ServiceMonitorSpec{
 				JobLabel:        "",
 				TargetLabels:    nil,
 				PodTargetLabels: nil,
-				Endpoints: []v1.Endpoint{{
+				Endpoints: []monitoringv1.Endpoint{{
 					Port:                 "buffer-metrics",
 					Path:                 r.syslogNGSpec.BufferVolumeMetrics.Path,
-					Interval:             v1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Interval),
-					ScrapeTimeout:        v1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Timeout),
+					Interval:             monitoringv1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Interval),
+					ScrapeTimeout:        monitoringv1.Duration(r.syslogNGSpec.BufferVolumeMetrics.Timeout),
 					HonorLabels:          r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(v1.Scheme(r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
-					HTTPConfigWithProxyAndTLSFiles: v1.HTTPConfigWithProxyAndTLSFiles{
-						HTTPConfigWithTLSFiles: v1.HTTPConfigWithTLSFiles{
+					Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
+					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 							TLSConfig: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 						},
 					},
 				}},
-				Selector:          v12.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
-				NamespaceSelector: v1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
+				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
+				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},
 				SampleLimit:       &SampleLimit,
 			},
 		}, reconciler.StatePresent, nil
 	}
-	return &v1.ServiceMonitor{
+	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: objectMetadata,
-		Spec:       v1.ServiceMonitorSpec{},
+		Spec:       monitoringv1.ServiceMonitorSpec{},
 	}, reconciler.StateAbsent, nil
 }
 

@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -52,7 +53,6 @@ type _metaKinesis interface{} //nolint:deadcode,unused
 // +docName:"KinesisStream"
 // Send your logs to a Kinesis Stream
 type KinesisStreamOutputConfig struct {
-
 	// Name of the stream to put data.
 	StreamName string `json:"stream_name"`
 
@@ -131,6 +131,7 @@ func (o *KinesisStreamProcessCredentials) ToDirective(secretLoader secret.Secret
 		Directive: "process_credentials",
 	}, o, secretLoader)
 }
+
 func (o *KinesisStreamAssumeRoleCredentials) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	return types.NewFlatDirective(types.PluginMeta{
 		Directive: "assume_role_credentials",

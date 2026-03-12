@@ -33,7 +33,7 @@ import (
 )
 
 func TestRenderDirective(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name      string
 		directive types.Directive
 		expected  string
@@ -310,10 +310,13 @@ func TestMultipleOutput(t *testing.T) {
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
-			{Labels: map[string]string{
-				"key1": "val1",
-				"key2": "val2"},
-				Namespaces: []string{"ns-test"}},
+			{
+				Labels: map[string]string{
+					"key1": "val1",
+					"key2": "val2",
+				},
+				Namespaces: []string{"ns-test"},
+			},
 		}, "", "", "", "", util.BoolPointer(true))
 	if err != nil {
 		t.Fatal(err)
@@ -525,10 +528,13 @@ func TestRenderFullFluentConfigWithGlobalFilter(t *testing.T) {
 
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
-			{Labels: map[string]string{
-				"key1": "val1",
-				"key2": "val2"},
-				Namespaces: []string{"ns-test"}},
+			{
+				Labels: map[string]string{
+					"key1": "val1",
+					"key2": "val2",
+				},
+				Namespaces: []string{"ns-test"},
+			},
 		}, "", "", "", "", util.BoolPointer(true))
 	if err != nil {
 		t.Fatal(err)
@@ -733,10 +739,13 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 	}
 	flowObj, err := types.NewFlow(
 		[]types.FlowMatch{
-			{Labels: map[string]string{
-				"key1": "val1",
-				"key2": "val2"},
-				Namespaces: []string{"ns-test"}},
+			{
+				Labels: map[string]string{
+					"key1": "val1",
+					"key2": "val2",
+				},
+				Namespaces: []string{"ns-test"},
+			},
 		}, "", "", "", "", util.BoolPointer(true))
 	if err != nil {
 		return err

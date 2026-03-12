@@ -15,15 +15,15 @@
 package eventtailer
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
-
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
-	loggingextensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	loggingextensionsv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/extensions/api/v1alpha1"
 )
 
 // EventTailer .

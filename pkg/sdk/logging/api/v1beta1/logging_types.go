@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -268,7 +269,7 @@ func (logging *Logging) WatchAllNamespaces() bool {
 	return len(watchNamespaces) == 0 && nsLabelSelector == nil
 }
 
-func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
+func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 	if fluentbitSpec != nil { //nolint:nestif
 		// Set default value for DisableVarLibDockerContainers to false (meaning volume is mounted by default)
 		if fluentbitSpec.DisableVarLibDockerContainers == nil {
@@ -432,7 +433,8 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error {
 							Port: intstr.IntOrString{
 								IntVal: fluentbitSpec.Metrics.Port,
 							},
-						}},
+						},
+					},
 					InitialDelaySeconds: 10,
 					TimeoutSeconds:      0,
 					PeriodSeconds:       10,
@@ -585,8 +587,8 @@ func (l *Logging) GetFluentdLabels(component string, f FluentdSpec) map[string]s
 	return util.MergeLabels(
 		f.Labels,
 		map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": component,
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: component,
 		},
 		GenerateLoggingRefLabels(l.GetName()),
 	)
@@ -622,15 +624,15 @@ func (l *Logging) SyslogNGObjectMeta(name, component string, sc *SyslogNGConfig)
 func (l *Logging) GetSyslogNGLabels(component string) map[string]string {
 	return util.MergeLabels(
 		map[string]string{
-			"app.kubernetes.io/name":      "syslog-ng",
-			"app.kubernetes.io/component": component,
+			types.NameLabel:      "syslog-ng",
+			types.ComponentLabel: component,
 		},
 		GenerateLoggingRefLabels(l.GetName()),
 	)
 }
 
 func GenerateLoggingRefLabels(loggingRef string) map[string]string {
-	return map[string]string{"app.kubernetes.io/managed-by": loggingRef}
+	return map[string]string{types.ManagedByLabel: loggingRef}
 }
 
 func (l *Logging) AreMultipleAggregatorsSet() bool {

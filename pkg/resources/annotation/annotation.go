@@ -84,7 +84,7 @@ func (h *Handler) addTailerDescriptor(tailerDescriptor TailerDescriptor) {
 		return r == h.TailerDescriptorDelimiter
 	})
 
-	var containerName = h.defaultContainerName
+	containerName := h.defaultContainerName
 	switch len(elements) {
 	case 2:
 		_, ok := h.containerPaths[elements[0]]

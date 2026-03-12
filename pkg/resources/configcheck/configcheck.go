@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,8 +51,8 @@ func NewConfigCheckCleaner(c client.Client, component string, logging string) *C
 	return &ConfigCheckCleaner{
 		client: c,
 		labels: client.MatchingLabels{
-			"app.kubernetes.io/component":  component,
-			"app.kubernetes.io/managed-by": logging,
+			types.ComponentLabel: component,
+			types.ManagedByLabel: logging,
 		},
 	}
 }

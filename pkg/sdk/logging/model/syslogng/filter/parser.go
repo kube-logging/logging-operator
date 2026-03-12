@@ -123,5 +123,7 @@ type MetricsProbe struct {
 	Level int `json:"level,omitempty"`
 }
 
-type ArrowMap map[string]string
-type RawArrowMap map[string]string
+type (
+	ArrowMap    map[string]string
+	RawArrowMap map[string]string
+)

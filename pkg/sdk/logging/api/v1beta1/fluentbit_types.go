@@ -150,8 +150,7 @@ type FluentbitSpec struct {
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent
-type FluentbitStatus struct {
-}
+type FluentbitStatus struct{}
 
 // +kubebuilder:object:generate=true
 
@@ -535,6 +534,7 @@ func getOperation(c interface{}) (result Operation) {
 func (c FilterModifyCondition) Operation() (result Operation) {
 	return getOperation(c)
 }
+
 func (r FilterModifyRule) Operation() (result Operation) {
 	return getOperation(r)
 }

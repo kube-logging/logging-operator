@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -56,7 +57,7 @@ type KinesisFirehoseOutputConfig struct {
 	DeliveryStreamName string `json:"delivery_stream_name"`
 
 	// If it is enabled, the plugin adds new line character (\n) to each serialized record.
-	//Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true)
+	// Before appending \n, plugin calls chomp and removes separator from the end of each record as chomp_record is true. Therefore, you don't need to enable chomp_record option when you use kinesis_firehose output with default configuration (append_new_line is true). If you want to set append_new_line false, you can choose chomp_record false (default) or true (compatible format with plugin v2). (Default:true)
 	AppendNewLine *bool `json:"append_new_line,omitempty"`
 
 	// AWS access key id. This parameter is required when your agent is not running on EC2 instance with an IAM Role.

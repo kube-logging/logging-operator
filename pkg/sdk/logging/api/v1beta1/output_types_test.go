@@ -15,13 +15,14 @@
 package v1beta1_test
 
 import (
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"context"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // These tests are written in BDD-style using Ginkgo framework. Refer to
@@ -46,9 +47,7 @@ var _ = Describe("Output", func() {
 	// Avoid adding tests for vanilla CRUD operations because they would
 	// test Kubernetes API server, which isn't the goal here.
 	Context("Create API", func() {
-
 		It("should create an object successfully", func() {
-
 			key = types.NamespacedName{
 				Name:      "foo",
 				Namespace: "default",
@@ -77,7 +76,5 @@ var _ = Describe("Output", func() {
 			Expect(K8sClient.Delete(context.TODO(), created)).To(Succeed())
 			Expect(K8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
 		})
-
 	})
-
 })

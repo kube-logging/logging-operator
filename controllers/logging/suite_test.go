@@ -22,10 +22,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/pborman/uuid"
-	v12 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,17 +33,22 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	//nolint: gci
 	// +kubebuilder:scaffold:imports
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
-var testNamespace = "test-" + uuid.New()[:8]
-var controlNamespace = "control"
+var (
+	cfg              *rest.Config
+	k8sClient        client.Client
+	testEnv          *envtest.Environment
+	testNamespace    = "test-" + uuid.New()[:8]
+	controlNamespace = "control"
+)
 
 func TestMain(m *testing.M) {
 	err := beforeSuite()
@@ -93,8 +97,8 @@ func beforeSuite() error {
 	}
 
 	for _, ns := range []string{controlNamespace, testNamespace} {
-		err := k8sClient.Create(context.TODO(), &v12.Namespace{
-			ObjectMeta: v1.ObjectMeta{
+		err := k8sClient.Create(context.TODO(), &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
 				Name: ns,
 			},
 		})

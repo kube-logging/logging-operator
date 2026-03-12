@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -38,14 +39,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
+	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/common/cond"
+	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
-
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/cond"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 )
 
 var TestTempDir string
@@ -196,11 +196,11 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggergatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "syslog-ng",
-			"app.kubernetes.io/component": "syslog-ng",
+			types.NameLabel:      "syslog-ng",
+			types.ComponentLabel: "syslog-ng",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 		producerLabels := map[string]string{
 			"my-unique-label": "log-producer",
@@ -227,7 +227,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)

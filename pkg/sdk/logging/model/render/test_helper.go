@@ -21,6 +21,7 @@ import (
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"

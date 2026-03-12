@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -35,12 +36,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var TestTempDir string
@@ -95,11 +95,11 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 		common.LoggingRoute(ctx, t, c.GetClient())
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": release,
+			types.NameLabel: release,
 		}
 
 		// start log producer in the tenant namespace
@@ -130,7 +130,7 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 				"logs",
 				"-n", nsInfra,
 				"--tail", "30",
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", release)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, release)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)

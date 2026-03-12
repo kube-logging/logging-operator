@@ -28,6 +28,8 @@ import (
 	"time"
 
 	"emperror.dev/errors"
+	operatortypes "github.com/cisco-open/operator-tools/pkg/types"
+	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
 	prometheusOperator "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
@@ -59,7 +61,7 @@ import (
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
-	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
+	//nolint: gci
 	// +kubebuilder:scaffold:imports
 )
 
@@ -185,7 +187,6 @@ func main() {
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), *customMgrOptions)
-
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
@@ -350,7 +351,7 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 			namespaceSelector = fields.Set{"metadata.namespace": namespace}.AsSelector()
 		}
 		if loggingRef != "" {
-			labelSelector = labels.Set{"app.kubernetes.io/managed-by": loggingRef}.AsSelector()
+			labelSelector = labels.Set{operatortypes.ManagedByLabel: loggingRef}.AsSelector()
 		}
 		if watchLabeledChildren {
 			if labelSelector == nil {
@@ -359,7 +360,7 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 			// It would be much better to watch for a common label, but we don't have that yet.
 			// Adding a new label would recreate statefulsets and daemonsets which would be undesirable.
 			// Let's see how this works in the wild. We can optimize in a subsequent iteration.
-			req, err := labels.NewRequirement("app.kubernetes.io/name", selection.In, []string{"fluentd", "syslog-ng", "fluentbit"})
+			req, err := labels.NewRequirement(operatortypes.NameLabel, selection.In, []string{"fluentd", "syslog-ng", "fluentbit"})
 			if err != nil {
 				return nil, err
 			}

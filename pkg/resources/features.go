@@ -20,8 +20,10 @@ import (
 	"github.com/spf13/cast"
 )
 
-const ServiceMonitorKey = "ServiceMonitor"
-const PrometheusRuleKey = "PrometheusRule"
+const (
+	ServiceMonitorKey = "ServiceMonitor"
+	PrometheusRuleKey = "PrometheusRule"
+)
 
 func IsSupported(ctx context.Context, key string) bool {
 	value := ctx.Value(key)

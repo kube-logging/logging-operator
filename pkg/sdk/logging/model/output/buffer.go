@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 

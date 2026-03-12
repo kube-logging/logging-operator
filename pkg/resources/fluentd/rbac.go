@@ -38,7 +38,8 @@ func (r *Reconciler) role() (runtime.Object, reconciler.DesiredState, error) {
 	}
 	return &rbacv1.Role{
 		ObjectMeta: r.FluentdObjectMeta(roleName, ComponentFluentd),
-		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, error) {
@@ -61,7 +62,8 @@ func (r *Reconciler) roleBinding() (runtime.Object, reconciler.DesiredState, err
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: r.FluentdObjectMeta(roleBindingName, ComponentFluentd),
-		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) sccRole() (runtime.Object, reconciler.DesiredState, error) {
@@ -81,7 +83,8 @@ func (r *Reconciler) sccRole() (runtime.Object, reconciler.DesiredState, error) 
 
 	return &rbacv1.Role{
 		ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
-		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
@@ -104,7 +107,8 @@ func (r *Reconciler) sccRoleBinding() (runtime.Object, reconciler.DesiredState, 
 	}
 	return &rbacv1.RoleBinding{
 		ObjectMeta: r.FluentdObjectMeta(sccRoleName, ComponentFluentd),
-		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, error) {
@@ -123,7 +127,8 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 						"pods",
 					},
 					Verbs: []string{"get", "list", "watch"},
-				}, {
+				},
+				{
 					APIGroups: []string{"apps"},
 					Resources: []string{
 						"daemonsets",
@@ -145,7 +150,8 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 	}
 	return &rbacv1.ClusterRole{
 		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleName, ComponentFluentd),
-		Rules:      []rbacv1.PolicyRule{}}, reconciler.StateAbsent, nil
+		Rules:      []rbacv1.PolicyRule{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredState, error) {
@@ -168,7 +174,8 @@ func (r *Reconciler) clusterRoleBinding() (runtime.Object, reconciler.DesiredSta
 	}
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: r.FluentdObjectMetaClusterScope(clusterRoleBindingName, ComponentFluentd),
-		RoleRef:    rbacv1.RoleRef{}}, reconciler.StateAbsent, nil
+		RoleRef:    rbacv1.RoleRef{},
+	}, reconciler.StateAbsent, nil
 }
 
 func (r *Reconciler) serviceAccount() (runtime.Object, reconciler.DesiredState, error) {

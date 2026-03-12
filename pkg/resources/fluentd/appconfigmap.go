@@ -194,7 +194,7 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		}
 	}
 
-	if err != nil && !apierrors.IsNotFound(err) {
+	if !apierrors.IsNotFound(err) {
 		return nil, errors.WrapIff(err, "failed to get configcheck pod %s:%s", pod.Namespace, pod.Name)
 	}
 
@@ -474,7 +474,8 @@ func (r *Reconciler) initContainerCheckPod(fluentdSpec v1beta1.FluentdSpec) []co
 		VolumeMounts: []corev1.VolumeMount{
 			{
 				Name:      "tmp",
-				MountPath: "/mnt/tmp"},
+				MountPath: "/mnt/tmp",
+			},
 		},
 	})
 

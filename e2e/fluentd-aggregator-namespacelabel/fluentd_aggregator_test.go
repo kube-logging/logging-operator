@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -37,12 +38,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var TestTempDir string
@@ -182,11 +182,11 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
 		aggregatorLabels := map[string]string{
-			"app.kubernetes.io/name":      "fluentd",
-			"app.kubernetes.io/component": "fluentd",
+			types.NameLabel:      "fluentd",
+			types.ComponentLabel: "fluentd",
 		}
 		operatorLabels := map[string]string{
-			"app.kubernetes.io/name": releaseNameOverride,
+			types.NameLabel: releaseNameOverride,
 		}
 		// used to find the producer only, not used to filter logs
 		producerLabels := map[string]string{
@@ -215,7 +215,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("app.kubernetes.io/name=%s-test-receiver", releaseNameOverride)), c)
+				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)

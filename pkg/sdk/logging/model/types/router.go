@@ -64,6 +64,7 @@ func (f FlowMatch) GetPluginMeta() *PluginMeta {
 		Directive: "match",
 	}
 }
+
 func (f FlowMatch) GetParams() Params {
 	params := Params{
 		"negate": strconv.FormatBool(f.Negate),

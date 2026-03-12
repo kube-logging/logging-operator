@@ -17,6 +17,7 @@ package output
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -58,7 +59,6 @@ type _metaAwsElasticsearch interface{} //nolint:deadcode,unused
 // +docName:"Amazon Elasticsearch"
 // Send your logs to a Amazon Elasticsearch Service
 type AwsElasticsearchOutputConfig struct {
-
 	// flush_interval
 	FlushInterval string `json:"flush_interval,omitempty"`
 

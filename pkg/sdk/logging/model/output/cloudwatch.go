@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -63,7 +64,6 @@ type _metaCloudWatch interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
 type CloudWatchOutput struct {
-
 	//  Create log group and stream automatically. (default: false)
 	AutoCreateStream bool `json:"auto_create_stream,omitempty"`
 	// AWS access key id

@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -60,7 +61,7 @@ type DatadogOutput struct {
 	IncludeTagKey bool `json:"include_tag_key,omitempty"`
 	// Where to store the Fluentd tag. (default: "tag")
 	TagKey string `json:"tag_key,omitempty"`
-	//Name of the attribute which will contain timestamp of the log event. If nil, timestamp attribute is not added. (default: "@timestamp")
+	// Name of the attribute which will contain timestamp of the log event. If nil, timestamp attribute is not added. (default: "@timestamp")
 	TimestampKey string `json:"timestamp_key,omitempty"`
 	// If true, the agent initializes a secure connection to Datadog. In clear TCP otherwise.  (default: true)
 	UseSsl bool `json:"use_ssl,omitempty"`

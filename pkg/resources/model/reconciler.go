@@ -28,14 +28,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
-
 	"github.com/kube-logging/logging-operator/pkg/mirror"
+	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
 )
 
 const LoggingRefConflict = "Other logging resources exist with the same loggingRef"
 
-func NewValidationReconciler(
+func NewValidationReconciler( //nolint: gocyclo
 	repo client.StatusClient,
 	resources LoggingResources,
 	secrets SecretLoaderFactory,

@@ -126,13 +126,15 @@ func TestApply(t *testing.T) {
 		args args
 		want *List
 	}{
-		{name: "AllNil",
+		{
+			name: "AllNil",
 			s:    nil,
 			args: args{fn: nil},
 			want: nil,
 		},
-		{name: "nilReceiver",
-			s: nil,
+		{
+			name: "nilReceiver",
+			s:    nil,
 			args: args{
 				fn: ApplyFn(func(strs []string, idx int) *string {
 					result := "foobar"
@@ -141,13 +143,15 @@ func TestApply(t *testing.T) {
 			},
 			want: nil,
 		},
-		{name: "nilFn",
+		{
+			name: "nilFn",
 			s:    Init([]string{"foo", "bar", "baz"}),
 			args: args{fn: nil},
 			want: Init([]string{"foo", "bar", "baz"}),
 		},
-		{name: "ModifyFn",
-			s: Init([]string{"foo", "bar", "baz"}),
+		{
+			name: "ModifyFn",
+			s:    Init([]string{"foo", "bar", "baz"}),
 			args: args{
 				fn: ApplyFn(func(strs []string, idx int) *string {
 					str := strs[idx]
@@ -157,8 +161,9 @@ func TestApply(t *testing.T) {
 			},
 			want: Init([]string{"foo!", "bar!", "baz!"}),
 		},
-		{name: "FilterByString",
-			s: Init([]string{"foo", "bar", "baz"}),
+		{
+			name: "FilterByString",
+			s:    Init([]string{"foo", "bar", "baz"}),
 			args: args{
 				fn: ApplyFn(func(strs []string, idx int) *string {
 					if strs[idx] == "foo" {
@@ -169,8 +174,9 @@ func TestApply(t *testing.T) {
 			},
 			want: Init([]string{"bar", "baz"}),
 		},
-		{name: "FilterByIndex",
-			s: Init([]string{"foo", "bar", "baz"}),
+		{
+			name: "FilterByIndex",
+			s:    Init([]string{"foo", "bar", "baz"}),
 			args: args{
 				fn: ApplyFn(func(strs []string, idx int) *string {
 					if idx%2 == 0 {

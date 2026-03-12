@@ -45,7 +45,8 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 		secretItem := &corev1.Secret{}
 		err := r.Client.Get(context.TODO(), types.NamespacedName{
 			Name:      secret.Name,
-			Namespace: secret.Namespace}, secretItem)
+			Namespace: secret.Namespace,
+		}, secretItem)
 		if err != nil {
 			return nil, reconciler.StatePresent, errors.WrapIfWithDetails(
 				err, "failed to load secret", "secret", secret.Name, "namespace", secret.Namespace)

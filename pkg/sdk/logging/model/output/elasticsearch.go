@@ -16,6 +16,7 @@ package output
 
 import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -155,7 +156,7 @@ type ElasticsearchOutput struct {
 	// You can tune how the elasticsearch-transport host reloading feature works.(default: true)
 	// +kubebuilder:validation:Optional
 	ReloadConnections *bool `json:"reload_connections,omitempty" plugin:"default:true"`
-	//Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request. This can be useful to quickly remove a dead node from the list of addresses.(default: false)
+	// Indicates that the elasticsearch-transport will try to reload the nodes addresses if there is a failure while making the request. This can be useful to quickly remove a dead node from the list of addresses.(default: false)
 	ReloadOnFailure bool `json:"reload_on_failure,omitempty"`
 	// When `reload_connections` is true, this is the integer number of operations after which the plugin will reload the connections. The default value is 10000.
 	ReloadAfter string `json:"reload_after,omitempty"`
@@ -185,7 +186,7 @@ type ElasticsearchOutput struct {
 	WithTransporterLog bool `json:"with_transporter_log,omitempty"`
 	// With content_type application/x-ndjson, elasticsearch plugin adds application/x-ndjson as Content-Profile in payload. (default: application/json)
 	ContentType string `json:"content_type,omitempty"`
-	//With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
+	// With this option set to true, Fluentd manifests the index name in the request URL (rather than in the request body). You can use this option to enforce an URL-based access control.
 	IncludeIndexInUrl bool `json:"include_index_in_url,omitempty"`
 	// With logstash_format true, elasticsearch plugin parses timestamp field for generating index name. If the record has invalid timestamp value, this plugin emits an error event to @ERROR label with time_parse_error_tag configured tag.
 	TimeParseErrorTag string `json:"time_parse_error_tag,omitempty"`

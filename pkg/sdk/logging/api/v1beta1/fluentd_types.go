@@ -146,7 +146,7 @@ func (f *FluentdSpec) GetFluentdMetricsPath() string {
 	return f.Metrics.Path
 }
 
-func (f *FluentdSpec) SetDefaults() error {
+func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 	if f != nil { //nolint:nestif
 		if f.FluentdPvcSpec != nil {
 			return errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")

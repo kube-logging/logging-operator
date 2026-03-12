@@ -47,11 +47,10 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
+	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
-
-	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 const (
@@ -59,8 +58,10 @@ const (
 	FluentdConfigFinalizer  = "fluentdconfig.logging.banzaicloud.io/finalizer"
 )
 
-var fluentbitWarning sync.Once
-var promCrdWarning sync.Once
+var (
+	fluentbitWarning sync.Once
+	promCrdWarning   sync.Once
+)
 
 func init() {
 	fluentbitWarning = sync.Once{}

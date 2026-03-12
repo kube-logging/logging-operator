@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -40,7 +41,7 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 	}
 
 	lbls := map[string]string{
-		"app.kubernetes.io/name": options.Name,
+		types.NameLabel: options.Name,
 	}
 	lbls = utils.MergeLabels(lbls, options.Labels)
 	logProducerDeployment := appsv1.Deployment{

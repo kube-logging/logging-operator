@@ -116,7 +116,7 @@ func UniqueWatchNamespaces(ctx context.Context, reader client.Reader, logging *v
 	nsLabelSelector := logging.Spec.WatchNamespaceSelector
 	if len(watchNamespaces) == 0 || nsLabelSelector != nil {
 		var nsList corev1.NamespaceList
-		var nsListOptions = &client.ListOptions{}
+		nsListOptions := &client.ListOptions{}
 		if nsLabelSelector != nil {
 			selector, err := metav1.LabelSelectorAsSelector(nsLabelSelector)
 			if err != nil {
@@ -315,6 +315,7 @@ func (r LoggingResourceRepository) FluentbitsFor(ctx context.Context, logging v1
 	})
 	return res, nil
 }
+
 func (r LoggingResourceRepository) handleMultipleDetachedFluentdObjects(list []v1beta1.FluentdConfig, logging v1beta1.Logging) []v1beta1.FluentdConfig {
 	r.Logger.Info("multiple detached Fluentd CRDs found")
 
@@ -355,6 +356,7 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		return nil, excessFluentds, nil
 	}
 }
+
 func (r LoggingResourceRepository) handleMultipleDetachedSyslogNGObjects(list []v1beta1.SyslogNGConfig, logging v1beta1.Logging) []v1beta1.SyslogNGConfig {
 	r.Logger.Info("multiple detached SyslogNG CRDs found")
 
@@ -427,7 +429,8 @@ func clusterResourceListOpts(logging v1beta1.Logging) []client.ListOption {
 func lessByNamespacedName(a, b interface {
 	GetNamespace() string
 	GetName() string
-}) bool {
+},
+) bool {
 	if a.GetNamespace() != b.GetNamespace() {
 		return a.GetNamespace() < b.GetNamespace()
 	}
