@@ -6,7 +6,6 @@ ARG BUILD_DEPS=" \
       automake autoconf libtool build-base \
       ruby-dev libc6-compat geoip-dev \
       snappy-dev gnupg bash openssl-dev \
-      ruby-bigdecimal \
       "
 
 RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
@@ -25,6 +24,9 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && rm -rf /usr/include/fortify \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install fluentd -v 1.19.1 \
+ && gem install bigdecimal -v 3.3.1 \
+ && gem install ostruct -v 0.6.3 \
+ && gem install oj -v 3.16.11 \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
