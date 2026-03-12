@@ -74,7 +74,7 @@ ADD ./outputs/Gemfile.lock /Gemfile.outputs.lock
 
 USER root
 
-RUN apk add --no-cache $BUILD_DEPS \
+RUN apk add --no-cache libcurl $BUILD_DEPS \
  # Remove fortify headers to fix PATH_MAX compilation errors in native gems
  && rm -rf /usr/include/fortify \
  && touch /etc/gemrc \
