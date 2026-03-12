@@ -38,7 +38,12 @@
       "Bash(rm -fr *)",
       "Bash(git push *)",
       "Bash(*exec*)",
-      "Bash(sudo *)"
+      "Bash(sudo *)",
+      "Bash(*chmod 777*)",
+      "Bash(*chmod -R 777*)",
+      "Bash(ssh *)",
+      "Bash(* > /dev/*)",
+      "Bash(* >> /dev/*)"
     ],
     "ask": [
       "Bash",
