@@ -162,29 +162,45 @@ jobs:
             verification_succeeded=false
             for tag in ${TAGS[@]}; do
               echo "Checking tag: ${tag}"
-              
-              for version in "${version_array[@]}"; do
-                [[ -z "$version" ]] && continue
-                
-                echo "Attempting verification with version ${version}"
+
+              for branch in "master" "main"; do
+                echo "Attempting verification with refs/heads/${branch}"
                 if cosign verify "${tag}@${DIGEST}" \
                     --rekor-url "https://rekor.sigstore.dev/" \
-                    --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                    --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/heads/${branch}" \
                     --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
-                  echo "✓ Verification succeeded for ${tag} with version ${version}"
+                  echo "✓ Verification succeeded for ${tag} with refs/heads/${branch}"
                   verification_succeeded=true
                   break
                 else
-                  echo "✗ Verification failed for version ${version}"
+                  echo "✗ Verification failed for refs/heads/${branch}"
                 fi
               done
-              
+
+              if ! $verification_succeeded; then
+                for version in "${version_array[@]}"; do
+                  [[ -z "$version" ]] && continue
+
+                  echo "Attempting verification with version ${version}"
+                  if cosign verify "${tag}@${DIGEST}" \
+                      --rekor-url "https://rekor.sigstore.dev/" \
+                      --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                      --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
+                    echo "✓ Verification succeeded for ${tag} with version ${version}"
+                    verification_succeeded=true
+                    break
+                  else
+                    echo "✗ Verification failed for version ${version}"
+                  fi
+                done
+              fi
+
               if ! $verification_succeeded; then
                 echo "❌ No valid signature found for ${tag}"
                 exit 1
               fi
             done
-      
+
             if $verification_succeeded; then
               echo "✅ All verifications completed successfully"
             fi
@@ -326,22 +342,39 @@ jobs:
             
             echo "Checking chart: ${{ steps.oci-chart-name.outputs.value }}"
             verification_succeeded=false
-            for version in "${version_array[@]}"; do
-              [[ -z "$version" ]] && continue
-              
-              echo "Attempting verification with version ${version}"
+
+            for branch in "master" "main"; do
+              echo "Attempting verification with refs/heads/${branch}"
               if cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
                   --rekor-url "https://rekor.sigstore.dev/" \
-                  --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                  --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/heads/${branch}" \
                   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
-                echo "✓ Verification succeeded with version ${version}"
+                echo "✓ Verification succeeded for chart with refs/heads/${branch}"
                 verification_succeeded=true
                 break
               else
-                echo "✗ Verification failed for version ${version}"
+                echo "✗ Verification failed for refs/heads/${branch}"
               fi
             done
-            
+
+            if ! $verification_succeeded; then
+              for version in "${version_array[@]}"; do
+                [[ -z "$version" ]] && continue
+
+                echo "Attempting verification with version ${version}"
+                if cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+                    --rekor-url "https://rekor.sigstore.dev/" \
+                    --certificate-identity "https://github.com/kube-logging/logging-operator/.github/workflows/artifacts.yaml@refs/tags/${version}" \
+                    --certificate-oidc-issuer "https://token.actions.githubusercontent.com" > /dev/null 2>&1; then
+                  echo "✓ Verification succeeded with version ${version}"
+                  verification_succeeded=true
+                  break
+                else
+                  echo "✗ Verification failed for version ${version}"
+                fi
+              done
+            fi
+
             if ! $verification_succeeded; then
               echo "❌ No valid signature found for chart"
               exit 1
