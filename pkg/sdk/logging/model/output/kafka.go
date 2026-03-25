@@ -129,6 +129,8 @@ type KafkaOutputConfig struct {
 	KafkaAggMaxMessages int `json:"kafka_agg_max_messages,omitempty"`
 	// Discard the record where Kafka DeliveryFailed occurred (default: false)
 	DiscardKafkaDeliveryFailed bool `json:"discard_kafka_delivery_failed,omitempty"`
+	// Share Kafka producer between flush threads. This is mainly for reducing kafka operations like kerberos (default: false)
+	ShareProducer bool `json:"share_producer,omitempty"`
 	// System's CA cert store (default: false)
 	SSLCACertsFromSystem *bool `json:"ssl_ca_certs_from_system,omitempty"`
 	// CA certificate
