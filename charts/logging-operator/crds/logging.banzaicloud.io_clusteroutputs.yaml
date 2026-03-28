@@ -3469,6 +3469,8 @@ spec:
                     type: boolean
                   scram_mechanism:
                     type: string
+                  share_producer:
+                    type: boolean
                   slow_flush_log_threshold:
                     type: string
                   ssl_ca_cert:
@@ -11372,6 +11374,8 @@ spec:
                     type: boolean
                   scram_mechanism:
                     type: string
+                  share_producer:
+                    type: boolean
                   slow_flush_log_threshold:
                     type: string
                   ssl_ca_cert:
