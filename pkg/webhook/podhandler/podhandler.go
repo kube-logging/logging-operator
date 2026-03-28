@@ -131,32 +131,54 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 
 func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
 	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
-	for idx, sideCar := range sideCars {
-		sideCar := sideCar
+
+	// Snapshot original container count before appending sidecars.
+	// VolumeMounts must be added only to these containers (the ones that
+	// write the log files), not to the injected sidecars which already
+	// carry their own mounts from Container().
+	originalContainerCount := len(podToModify.Spec.Containers)
+
+	for _, sideCar := range sideCars {
 		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
 			return c.Name == sideCar.Name
 		}) {
 			p.Log.Info(duplicateValuesMsg)
 			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
-		} else {
-			podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
-			podToModify.Spec.Containers[idx].VolumeMounts = append(podToModify.Spec.Containers[idx].VolumeMounts, volumeMounts...)
+		}
+		podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
+	}
+
+	// Add shared volumeMounts to the original containers only.
+	for i := 0; i < originalContainerCount; i++ {
+		for _, vm := range volumeMounts {
+			if !hasVolumeMount(podToModify.Spec.Containers[i].VolumeMounts, vm.MountPath) {
+				podToModify.Spec.Containers[i].VolumeMounts = append(
+					podToModify.Spec.Containers[i].VolumeMounts, vm)
+			}
 		}
 	}
 
 	for _, volume := range volumes {
-		volume := volume
 		if seqs.Any(seqs.FromSlice(podToModify.Spec.Volumes), func(v corev1.Volume) bool {
 			return v.Name == volume.Name
 		}) {
 			p.Log.Info(duplicateValuesMsg)
 			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
-		} else {
-			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
 		}
+		podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
 	}
 
 	return nil
+}
+
+// hasVolumeMount returns true if the given slice already contains a mount at mountPath.
+func hasVolumeMount(mounts []corev1.VolumeMount, mountPath string) bool {
+	for _, m := range mounts {
+		if m.MountPath == mountPath {
+			return true
+		}
+	}
+	return false
 }
