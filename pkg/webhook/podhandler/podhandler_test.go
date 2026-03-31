@@ -26,322 +26,142 @@ func newTestPodHandler() *PodHandler {
 	return &PodHandler{Log: logr.Discard()}
 }
 
-func TestPodHandlerHelper_SingleSidecar(t *testing.T) {
-	p := newTestPodHandler()
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{Name: "main"},
-			},
-		},
+func TestPodHandlerHelper(t *testing.T) {
+	emptyDirVol := func(name string) corev1.Volume {
+		return corev1.Volume{Name: name, VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}}
+	}
+	mount := func(name, path string) corev1.VolumeMount {
+		return corev1.VolumeMount{Name: name, MountPath: path}
+	}
+	sidecar := func(name string, mounts ...corev1.VolumeMount) corev1.Container {
+		return corev1.Container{Name: name, VolumeMounts: mounts}
 	}
 
-	sideCars := []corev1.Container{
+	tests := []struct {
+		name           string
+		containers     []corev1.Container
+		sideCars       []corev1.Container
+		volumes        []corev1.Volume
+		volumeMounts   []corev1.VolumeMount
+		wantDenied     bool
+		wantContainers int
+		wantMounts     map[string]int // container name → expected mount count
+	}{
 		{
-			Name: "sidecar-1",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
-			},
-		},
-	}
-	volumes := []corev1.Volume{
-		{Name: "vol", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-	}
-	volumeMounts := []corev1.VolumeMount{
-		{Name: "vol", MountPath: "/var/log/app"},
-	}
-
-	resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts)
-	if resp != nil {
-		t.Fatalf("unexpected response: %v", resp)
-	}
-
-	if len(pod.Spec.Containers) != 2 {
-		t.Fatalf("expected 2 containers, got %d", len(pod.Spec.Containers))
-	}
-
-	// main container should have the volumeMount
-	mainMounts := pod.Spec.Containers[0].VolumeMounts
-	if len(mainMounts) != 1 {
-		t.Errorf("main container: expected 1 volumeMount, got %d", len(mainMounts))
-	}
-
-	// sidecar should have exactly 1 volumeMount (from creation, not duplicated)
-	sidecarMounts := pod.Spec.Containers[1].VolumeMounts
-	if len(sidecarMounts) != 1 {
-		t.Errorf("sidecar: expected 1 volumeMount, got %d", len(sidecarMounts))
-	}
-}
-
-func TestPodHandlerHelper_TwoSidecarsSameDir(t *testing.T) {
-	p := newTestPodHandler()
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{Name: "main"},
-			},
-		},
-	}
-
-	// Two sidecars tailing two files in the same directory.
-	// Each sidecar already has its own volumeMount from Container().
-	sideCars := []corev1.Container{
-		{
-			Name: "sidecar-file1",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
-			},
+			name:           "single sidecar gets mount added to main",
+			containers:     []corev1.Container{{Name: "main"}},
+			sideCars:       []corev1.Container{sidecar("sidecar-1", mount("vol", "/var/log/app"))},
+			volumes:        []corev1.Volume{emptyDirVol("vol")},
+			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
+			wantContainers: 2,
+			wantMounts:     map[string]int{"main": 1, "sidecar-1": 1},
 		},
 		{
-			Name: "sidecar-file2",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
+			name:       "two sidecars same dir — no duplicate mounts",
+			containers: []corev1.Container{{Name: "main"}},
+			sideCars: []corev1.Container{
+				sidecar("sidecar-file1", mount("vol", "/var/log/app")),
+				sidecar("sidecar-file2", mount("vol", "/var/log/app")),
 			},
-		},
-	}
-	volumes := []corev1.Volume{
-		{Name: "vol", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-	}
-	volumeMounts := []corev1.VolumeMount{
-		{Name: "vol", MountPath: "/var/log/app"},
-	}
-
-	resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts)
-	if resp != nil {
-		t.Fatalf("unexpected response: %v", resp)
-	}
-
-	if len(pod.Spec.Containers) != 3 {
-		t.Fatalf("expected 3 containers (main + 2 sidecars), got %d", len(pod.Spec.Containers))
-	}
-
-	// main container should have the shared volumeMount
-	mainMounts := pod.Spec.Containers[0].VolumeMounts
-	if len(mainMounts) != 1 {
-		t.Errorf("main container: expected 1 volumeMount, got %d", len(mainMounts))
-	}
-
-	// Each sidecar should have exactly 1 volumeMount (no duplicates)
-	for i := 1; i <= 2; i++ {
-		mounts := pod.Spec.Containers[i].VolumeMounts
-		if len(mounts) != 1 {
-			t.Errorf("sidecar %d (%s): expected 1 volumeMount, got %d",
-				i, pod.Spec.Containers[i].Name, len(mounts))
-		}
-	}
-}
-
-func TestPodHandlerHelper_TwoSidecarsDifferentDirs(t *testing.T) {
-	p := newTestPodHandler()
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{Name: "main"},
-			},
-		},
-	}
-
-	sideCars := []corev1.Container{
-		{
-			Name: "sidecar-app",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol-app", MountPath: "/var/log/app"},
-			},
+			volumes:        []corev1.Volume{emptyDirVol("vol")},
+			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
+			wantContainers: 3,
+			wantMounts:     map[string]int{"main": 1, "sidecar-file1": 1, "sidecar-file2": 1},
 		},
 		{
-			Name: "sidecar-sys",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol-sys", MountPath: "/var/log/sys"},
+			name:       "two sidecars different dirs — main gets both mounts",
+			containers: []corev1.Container{{Name: "main"}},
+			sideCars: []corev1.Container{
+				sidecar("sidecar-app", mount("vol-app", "/var/log/app")),
+				sidecar("sidecar-sys", mount("vol-sys", "/var/log/sys")),
 			},
-		},
-	}
-	volumes := []corev1.Volume{
-		{Name: "vol-app", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-		{Name: "vol-sys", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-	}
-	volumeMounts := []corev1.VolumeMount{
-		{Name: "vol-app", MountPath: "/var/log/app"},
-		{Name: "vol-sys", MountPath: "/var/log/sys"},
-	}
-
-	resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts)
-	if resp != nil {
-		t.Fatalf("unexpected response: %v", resp)
-	}
-
-	if len(pod.Spec.Containers) != 3 {
-		t.Fatalf("expected 3 containers, got %d", len(pod.Spec.Containers))
-	}
-
-	// main container should have both volumeMounts
-	mainMounts := pod.Spec.Containers[0].VolumeMounts
-	if len(mainMounts) != 2 {
-		t.Errorf("main container: expected 2 volumeMounts, got %d", len(mainMounts))
-	}
-
-	// Each sidecar should have exactly 1 volumeMount
-	for i := 1; i <= 2; i++ {
-		mounts := pod.Spec.Containers[i].VolumeMounts
-		if len(mounts) != 1 {
-			t.Errorf("sidecar %d (%s): expected 1 volumeMount, got %d",
-				i, pod.Spec.Containers[i].Name, len(mounts))
-		}
-	}
-}
-
-func TestPodHandlerHelper_MultiContainerPod(t *testing.T) {
-	p := newTestPodHandler()
-
-	// Pod with 2 original containers
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{Name: "app"},
-				{Name: "nginx"},
-			},
-		},
-	}
-
-	sideCars := []corev1.Container{
-		{
-			Name: "sidecar-file1",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
-			},
+			volumes:        []corev1.Volume{emptyDirVol("vol-app"), emptyDirVol("vol-sys")},
+			volumeMounts:   []corev1.VolumeMount{mount("vol-app", "/var/log/app"), mount("vol-sys", "/var/log/sys")},
+			wantContainers: 3,
+			wantMounts:     map[string]int{"main": 2, "sidecar-app": 1, "sidecar-sys": 1},
 		},
 		{
-			Name: "sidecar-file2",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
+			name:       "multi-container pod — both originals get mounts",
+			containers: []corev1.Container{{Name: "app"}, {Name: "nginx"}},
+			sideCars: []corev1.Container{
+				sidecar("sidecar-file1", mount("vol", "/var/log/app")),
+				sidecar("sidecar-file2", mount("vol", "/var/log/app")),
 			},
+			volumes:        []corev1.Volume{emptyDirVol("vol")},
+			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
+			wantContainers: 4,
+			wantMounts:     map[string]int{"app": 1, "nginx": 1, "sidecar-file1": 1, "sidecar-file2": 1},
 		},
-	}
-	volumes := []corev1.Volume{
-		{Name: "vol", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-	}
-	volumeMounts := []corev1.VolumeMount{
-		{Name: "vol", MountPath: "/var/log/app"},
-	}
-
-	resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts)
-	if resp != nil {
-		t.Fatalf("unexpected response: %v", resp)
-	}
-
-	if len(pod.Spec.Containers) != 4 {
-		t.Fatalf("expected 4 containers (2 original + 2 sidecars), got %d", len(pod.Spec.Containers))
-	}
-
-	// Both original containers should have the mount
-	for i := 0; i < 2; i++ {
-		mounts := pod.Spec.Containers[i].VolumeMounts
-		if len(mounts) != 1 {
-			t.Errorf("original container %d (%s): expected 1 volumeMount, got %d",
-				i, pod.Spec.Containers[i].Name, len(mounts))
-		}
-	}
-
-	// Sidecars should have exactly 1 mount each
-	for i := 2; i < 4; i++ {
-		mounts := pod.Spec.Containers[i].VolumeMounts
-		if len(mounts) != 1 {
-			t.Errorf("sidecar %d (%s): expected 1 volumeMount, got %d",
-				i, pod.Spec.Containers[i].Name, len(mounts))
-		}
-	}
-}
-
-func TestPodHandlerHelper_DuplicateSidecarDenied(t *testing.T) {
-	p := newTestPodHandler()
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{Name: "main"},
-				{Name: "existing-sidecar"}, // already present
-			},
-		},
-	}
-
-	sideCars := []corev1.Container{
-		{Name: "existing-sidecar"}, // name collision
-	}
-
-	resp := p.podHandlerHelper(pod, sideCars, nil, nil)
-	if resp == nil {
-		t.Fatal("expected Denied response for duplicate sidecar name, got nil")
-	}
-}
-
-func TestPodHandlerHelper_ExistingMountNotDuplicated(t *testing.T) {
-	p := newTestPodHandler()
-
-	// main container already has a mount at /var/log/app
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name: "main",
-					VolumeMounts: []corev1.VolumeMount{
-						{Name: "existing", MountPath: "/var/log/app"},
-					},
-				},
-			},
-		},
-	}
-
-	sideCars := []corev1.Container{
 		{
-			Name: "sidecar-1",
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: "vol", MountPath: "/var/log/app"},
+			name:       "duplicate sidecar name is denied",
+			containers: []corev1.Container{{Name: "main"}, {Name: "existing-sidecar"}},
+			sideCars:   []corev1.Container{{Name: "existing-sidecar"}},
+			wantDenied: true,
+		},
+		{
+			name: "existing mount on main is not duplicated",
+			containers: []corev1.Container{
+				{Name: "main", VolumeMounts: []corev1.VolumeMount{mount("existing", "/var/log/app")}},
 			},
+			sideCars:       []corev1.Container{sidecar("sidecar-1", mount("vol", "/var/log/app"))},
+			volumes:        []corev1.Volume{emptyDirVol("vol")},
+			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
+			wantContainers: 2,
+			wantMounts:     map[string]int{"main": 1, "sidecar-1": 1},
 		},
 	}
-	volumes := []corev1.Volume{
-		{Name: "vol", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-	}
-	volumeMounts := []corev1.VolumeMount{
-		{Name: "vol", MountPath: "/var/log/app"},
-	}
 
-	resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts)
-	if resp != nil {
-		t.Fatalf("unexpected response: %v", resp)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := newTestPodHandler()
+			pod := &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
+				Spec:       corev1.PodSpec{Containers: tt.containers},
+			}
 
-	// main should still have exactly 1 mount (not duplicated)
-	mainMounts := pod.Spec.Containers[0].VolumeMounts
-	if len(mainMounts) != 1 {
-		t.Errorf("main container: expected 1 volumeMount (existing), got %d", len(mainMounts))
+			resp := p.podHandlerHelper(pod, tt.sideCars, tt.volumes, tt.volumeMounts)
+
+			if tt.wantDenied {
+				if resp == nil {
+					t.Fatal("expected Denied response, got nil")
+				}
+				return
+			}
+			if resp != nil {
+				t.Fatalf("unexpected Denied response: %v", resp)
+			}
+			if got := len(pod.Spec.Containers); got != tt.wantContainers {
+				t.Fatalf("containers: want %d, got %d", tt.wantContainers, got)
+			}
+			for _, c := range pod.Spec.Containers {
+				if want, ok := tt.wantMounts[c.Name]; ok {
+					if got := len(c.VolumeMounts); got != want {
+						t.Errorf("container %q: want %d volumeMounts, got %d", c.Name, want, got)
+					}
+				}
+			}
+		})
 	}
 }
 
 func TestHasVolumeMount(t *testing.T) {
-	mounts := []corev1.VolumeMount{
-		{Name: "a", MountPath: "/var/log/app"},
-		{Name: "b", MountPath: "/var/log/sys"},
+	tests := []struct {
+		name      string
+		mounts    []corev1.VolumeMount
+		mountPath string
+		want      bool
+	}{
+		{"found", []corev1.VolumeMount{{Name: "a", MountPath: "/var/log/app"}}, "/var/log/app", true},
+		{"not found", []corev1.VolumeMount{{Name: "a", MountPath: "/var/log/app"}}, "/var/log/other", false},
+		{"nil slice", nil, "/var/log/app", false},
+		{"empty slice", []corev1.VolumeMount{}, "/var/log/app", false},
 	}
 
-	if !hasVolumeMount(mounts, "/var/log/app") {
-		t.Error("expected true for /var/log/app")
-	}
-	if !hasVolumeMount(mounts, "/var/log/sys") {
-		t.Error("expected true for /var/log/sys")
-	}
-	if hasVolumeMount(mounts, "/var/log/other") {
-		t.Error("expected false for /var/log/other")
-	}
-	if hasVolumeMount(nil, "/var/log/app") {
-		t.Error("expected false for nil slice")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := hasVolumeMount(tt.mounts, tt.mountPath); got != tt.want {
+				t.Errorf("hasVolumeMount(%v, %q) = %v, want %v", tt.mounts, tt.mountPath, got, tt.want)
+			}
+		})
 	}
 }
