@@ -109,13 +109,19 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	annotationHandler := annotation.NewHandler(containerNames)
 	annotationHandler.AddTailerAnnotation(tailAnnotation)
 
+	// Snapshot original container count before the loop. Each call to
+	// podHandlerHelper appends sidecars to pod.Spec.Containers, so
+	// subsequent calls must not treat previously injected sidecars as
+	// original containers when adding shared volumeMounts.
+	originalContainerCount := len(pod.Spec.Containers)
+
 	for _, container := range pod.Spec.Containers {
 		filePaths := annotationHandler.FilePathsForContainer(container.Name)
 
 		sideCars, volumes, volumeMounts := p.sideCarsForContainer(container.Name, filePaths)
 
 		// Append the new data to the podspec
-		if resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); resp != nil {
+		if resp := p.podHandlerHelper(pod, originalContainerCount, sideCars, volumes, volumeMounts); resp != nil {
 			return *resp
 		}
 	}
@@ -129,14 +135,8 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
 }
 
-func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
+func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, originalContainerCount int, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
 	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
-
-	// Snapshot original container count before appending sidecars.
-	// VolumeMounts must be added only to these containers (the ones that
-	// write the log files), not to the injected sidecars which already
-	// carry their own mounts from Container().
-	originalContainerCount := len(podToModify.Spec.Containers)
 
 	for _, sideCar := range sideCars {
 		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
