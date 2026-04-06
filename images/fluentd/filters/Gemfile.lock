@@ -10,7 +10,7 @@ GEM
     drb (2.2.3)
     fluent-config-regexp-type (1.0.0)
       fluentd (> 1.0.0, < 2)
-    fluent-plugin-concat (2.6.0)
+    fluent-plugin-concat (2.6.1)
       fluentd (>= 0.14.0, < 2)
     fluent-plugin-dedot_filter (1.0.0)
       fluentd (>= 0.14.0, < 2)
@@ -98,7 +98,7 @@ PLATFORMS
 
 DEPENDENCIES
   bigdecimal (= 3.3.1)
-  fluent-plugin-concat (= 2.6.0)
+  fluent-plugin-concat (= 2.6.1)
   fluent-plugin-dedot_filter (= 1.0.0)
   fluent-plugin-detect-exceptions (= 0.0.16)
   fluent-plugin-geoip (= 1.3.2)
