@@ -200,10 +200,22 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerId
 	// must skip rather than deny, because the volume was already added by
 	// the first call.
 	for _, volume := range volumes {
-		if seqs.Any(seqs.FromSlice(podToModify.Spec.Volumes), func(v corev1.Volume) bool {
-			return v.Name == volume.Name
-		}) {
-			p.Log.V(1).Info("volume already exists, skipping", "volume", volume.Name)
+		if existing, found := findVolume(podToModify.Spec.Volumes, volume.Name); found {
+			// A volume with this name already exists. Only skip if it is
+			// compatible (also an EmptyDir). If the existing volume has a
+			// different source type, the sidecar would mount an unexpected
+			// volume and tailing would silently fail.
+			if existing.EmptyDir == nil {
+				msg := fmt.Sprintf(
+					"volume %q already exists with a non-EmptyDir source; "+
+						"the tailer webhook requires an EmptyDir volume at this name",
+					volume.Name,
+				)
+				p.Log.Info(msg)
+				rv := admission.Denied(msg)
+				return &rv
+			}
+			p.Log.V(1).Info("compatible volume already exists, skipping", "volume", volume.Name)
 			continue
 		}
 		podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
@@ -221,4 +233,15 @@ func findVolumeMount(mounts []corev1.VolumeMount, mountPath string) (corev1.Volu
 		}
 	}
 	return corev1.VolumeMount{}, false
+}
+
+// findVolume checks if the given slice contains a volume with the given name.
+// If found, it returns the existing volume and true; otherwise zero value and false.
+func findVolume(volumes []corev1.Volume, name string) (corev1.Volume, bool) {
+	for _, v := range volumes {
+		if v.Name == name {
+			return v, true
+		}
+	}
+	return corev1.Volume{}, false
 }

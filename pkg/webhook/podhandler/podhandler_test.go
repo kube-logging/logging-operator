@@ -307,6 +307,38 @@ func TestPodHandlerHelper_DuplicateVolumeSkipped(t *testing.T) {
 	}
 }
 
+// TestPodHandlerHelper_IncompatibleVolumeSourceDenied verifies that if the pod
+// already has a volume with the same name but a non-EmptyDir source, the
+// mutation is denied rather than silently proceeding.
+func TestPodHandlerHelper_IncompatibleVolumeSourceDenied(t *testing.T) {
+	p := newTestPodHandler()
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{{Name: "main"}},
+			Volumes: []corev1.Volume{
+				{Name: "vol", VolumeSource: corev1.VolumeSource{
+					HostPath: &corev1.HostPathVolumeSource{Path: "/host/logs"},
+				}},
+			},
+		},
+	}
+
+	mount := func(name, path string) corev1.VolumeMount {
+		return corev1.VolumeMount{Name: name, MountPath: path}
+	}
+
+	resp := p.podHandlerHelper(pod, 0,
+		[]corev1.Container{{Name: "sidecar-1", VolumeMounts: []corev1.VolumeMount{mount("vol", "/var/log/app")}}},
+		[]corev1.Volume{{Name: "vol", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}}},
+		[]corev1.VolumeMount{mount("vol", "/var/log/app")},
+	)
+	if resp == nil {
+		t.Fatal("expected Denied for incompatible volume source, got nil")
+	}
+}
+
 func TestFindVolumeMount(t *testing.T) {
 	tests := []struct {
 		name      string
