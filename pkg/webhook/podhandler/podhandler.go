@@ -170,8 +170,7 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerId
 	// files are being tailed), not to all original containers. This prevents
 	// masking filesystem paths in unrelated containers.
 	for _, vm := range volumeMounts {
-		existing, found := findVolumeMount(podToModify.Spec.Containers[targetContainerIdx].VolumeMounts, vm.MountPath)
-		if found {
+		if existing, found := findVolumeMount(podToModify.Spec.Containers[targetContainerIdx].VolumeMounts, vm.MountPath); found {
 			if existing.Name != vm.Name {
 				// Same mountPath but different volume name — the sidecar would
 				// mount the webhook's emptyDir while the app keeps its own volume,
