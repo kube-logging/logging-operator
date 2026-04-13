@@ -110,9 +110,7 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	annotationHandler.AddTailerAnnotation(tailAnnotation)
 
 	// Build a snapshot of original container names and their indices before
-	// the mutation loop. Each podHandlerHelper call appends sidecars to
-	// pod.Spec.Containers; the indices recorded here remain stable because
-	// appends only add to the tail of the slice.
+	// the mutation loop, so the indices recorded here remain stable.
 	type containerRef struct {
 		name string
 		idx  int
