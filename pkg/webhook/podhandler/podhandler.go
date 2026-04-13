@@ -153,6 +153,8 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerId
 		return &rv
 	}
 
+	// Validate all sidecars before mutating the pod to avoid partial
+	// appends when a later sidecar triggers a Denied response.
 	for _, sideCar := range sideCars {
 		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
 			return c.Name == sideCar.Name
@@ -161,8 +163,8 @@ func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerId
 			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
 		}
-		podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
 	}
+	podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCars...)
 
 	// Add shared volumeMounts only to the target container (the one whose
 	// files are being tailed), not to all original containers. This prevents

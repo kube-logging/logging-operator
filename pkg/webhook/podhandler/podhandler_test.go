@@ -46,7 +46,7 @@ func TestPodHandlerHelper(t *testing.T) {
 		volumeMounts   []corev1.VolumeMount
 		wantDenied     bool
 		wantContainers int
-		wantMounts     map[string]int // container name → expected mount count
+		wantMounts     map[string][]string // container name → expected mount paths
 	}{
 		{
 			name:           "single sidecar gets mount added to target",
@@ -56,7 +56,7 @@ func TestPodHandlerHelper(t *testing.T) {
 			volumes:        []corev1.Volume{emptyDirVol("vol")},
 			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
 			wantContainers: 2,
-			wantMounts:     map[string]int{"main": 1, "sidecar-1": 1},
+			wantMounts:     map[string][]string{"main": {"/var/log/app"}, "sidecar-1": {"/var/log/app"}},
 		},
 		{
 			name:       "two sidecars same dir — no duplicate mounts",
@@ -69,7 +69,7 @@ func TestPodHandlerHelper(t *testing.T) {
 			volumes:        []corev1.Volume{emptyDirVol("vol")},
 			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
 			wantContainers: 3,
-			wantMounts:     map[string]int{"main": 1, "sidecar-file1": 1, "sidecar-file2": 1},
+			wantMounts:     map[string][]string{"main": {"/var/log/app"}, "sidecar-file1": {"/var/log/app"}, "sidecar-file2": {"/var/log/app"}},
 		},
 		{
 			name:       "two sidecars different dirs — target gets both mounts",
@@ -82,7 +82,7 @@ func TestPodHandlerHelper(t *testing.T) {
 			volumes:        []corev1.Volume{emptyDirVol("vol-app"), emptyDirVol("vol-sys")},
 			volumeMounts:   []corev1.VolumeMount{mount("vol-app", "/var/log/app"), mount("vol-sys", "/var/log/sys")},
 			wantContainers: 3,
-			wantMounts:     map[string]int{"main": 2, "sidecar-app": 1, "sidecar-sys": 1},
+			wantMounts:     map[string][]string{"main": {"/var/log/app", "/var/log/sys"}, "sidecar-app": {"/var/log/app"}, "sidecar-sys": {"/var/log/sys"}},
 		},
 		{
 			name:       "multi-container pod — only target gets mount",
@@ -94,7 +94,7 @@ func TestPodHandlerHelper(t *testing.T) {
 			volumes:        []corev1.Volume{emptyDirVol("vol")},
 			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
 			wantContainers: 3,
-			wantMounts:     map[string]int{"app": 1, "nginx": 0, "sidecar-file1": 1},
+			wantMounts:     map[string][]string{"app": {"/var/log/app"}, "nginx": {}, "sidecar-file1": {"/var/log/app"}},
 		},
 		{
 			name:       "duplicate sidecar name is denied",
@@ -113,7 +113,7 @@ func TestPodHandlerHelper(t *testing.T) {
 			volumes:        []corev1.Volume{emptyDirVol("vol")},
 			volumeMounts:   []corev1.VolumeMount{mount("vol", "/var/log/app")},
 			wantContainers: 2,
-			wantMounts:     map[string]int{"main": 1, "sidecar-1": 1},
+			wantMounts:     map[string][]string{"main": {"/var/log/app"}, "sidecar-1": {"/var/log/app"}},
 		},
 		{
 			name: "conflicting mount (same path, different volume) is denied",
@@ -158,9 +158,21 @@ func TestPodHandlerHelper(t *testing.T) {
 				t.Fatalf("containers: want %d, got %d", tt.wantContainers, got)
 			}
 			for _, c := range pod.Spec.Containers {
-				if want, ok := tt.wantMounts[c.Name]; ok {
-					if got := len(c.VolumeMounts); got != want {
-						t.Errorf("container %q: want %d volumeMounts, got %d", c.Name, want, got)
+				wantPaths, ok := tt.wantMounts[c.Name]
+				if !ok {
+					continue
+				}
+				gotPaths := make([]string, len(c.VolumeMounts))
+				for i, vm := range c.VolumeMounts {
+					gotPaths[i] = vm.MountPath
+				}
+				if len(gotPaths) != len(wantPaths) {
+					t.Errorf("container %q: want mounts %v, got %v", c.Name, wantPaths, gotPaths)
+					continue
+				}
+				for i := range wantPaths {
+					if gotPaths[i] != wantPaths[i] {
+						t.Errorf("container %q mount[%d]: want path %q, got %q", c.Name, i, wantPaths[i], gotPaths[i])
 					}
 				}
 			}
