@@ -145,7 +145,7 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerIdx int, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
 	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
 
-	// Bounds check: targetContainerIdx must point to a valid original container.
+	// Boundary check
 	if targetContainerIdx < 0 || targetContainerIdx >= len(podToModify.Spec.Containers) {
 		msg := fmt.Sprintf("targetContainerIdx %d is out of range (containers: %d)", targetContainerIdx, len(podToModify.Spec.Containers))
 		p.Log.Info(msg)
