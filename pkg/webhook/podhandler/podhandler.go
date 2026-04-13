@@ -120,8 +120,6 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 		originalContainers[i] = containerRef{name: c.Name, idx: i}
 	}
 
-	// Iterate over the snapshot — not over pod.Spec.Containers directly —
-	// so that appended sidecars are never visited.
 	for _, ref := range originalContainers {
 		filePaths := annotationHandler.FilePathsForContainer(ref.name)
 		if len(filePaths) == 0 {
