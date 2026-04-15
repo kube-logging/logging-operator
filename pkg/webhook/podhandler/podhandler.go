@@ -109,13 +109,26 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	annotationHandler := annotation.NewHandler(containerNames)
 	annotationHandler.AddTailerAnnotation(tailAnnotation)
 
-	for _, container := range pod.Spec.Containers {
-		filePaths := annotationHandler.FilePathsForContainer(container.Name)
+	// Build a snapshot of original container names and their indices before
+	// the mutation loop, so the indices recorded here remain stable.
+	type containerRef struct {
+		name string
+		idx  int
+	}
+	originalContainers := make([]containerRef, len(pod.Spec.Containers))
+	for i, c := range pod.Spec.Containers {
+		originalContainers[i] = containerRef{name: c.Name, idx: i}
+	}
 
-		sideCars, volumes, volumeMounts := p.sideCarsForContainer(container.Name, filePaths)
+	for _, ref := range originalContainers {
+		filePaths := annotationHandler.FilePathsForContainer(ref.name)
+		if len(filePaths) == 0 {
+			continue
+		}
 
-		// Append the new data to the podspec
-		if resp := p.podHandlerHelper(pod, sideCars, volumes, volumeMounts); resp != nil {
+		sideCars, volumes, volumeMounts := p.sideCarsForContainer(ref.name, filePaths)
+
+		if resp := p.podHandlerHelper(pod, ref.idx, sideCars, volumes, volumeMounts); resp != nil {
 			return *resp
 		}
 	}
@@ -129,34 +142,103 @@ func (p *PodHandler) Handle(ctx context.Context, req admission.Request) admissio
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
 }
 
-func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
+func (p *PodHandler) podHandlerHelper(podToModify *corev1.Pod, targetContainerIdx int, sideCars []corev1.Container, volumes []corev1.Volume, volumeMounts []corev1.VolumeMount) *admission.Response {
 	duplicateValuesMsg := "webhook mutation would result in duplicate values, returning"
-	for idx, sideCar := range sideCars {
-		sideCar := sideCar
+
+	// Boundary check
+	if targetContainerIdx < 0 || targetContainerIdx >= len(podToModify.Spec.Containers) {
+		msg := fmt.Sprintf("targetContainerIdx %d is out of range (containers: %d)", targetContainerIdx, len(podToModify.Spec.Containers))
+		p.Log.Info(msg)
+		rv := admission.Denied(msg)
+		return &rv
+	}
+
+	// Validate all sidecars before mutating the pod to avoid partial
+	// appends when a later sidecar triggers a Denied response.
+	for _, sideCar := range sideCars {
 		if seqs.Any(seqs.FromSlice(podToModify.Spec.Containers), func(c corev1.Container) bool {
 			return c.Name == sideCar.Name
 		}) {
 			p.Log.Info(duplicateValuesMsg)
 			rv := admission.Denied(duplicateValuesMsg)
 			return &rv
-		} else {
-			podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCar)
-			podToModify.Spec.Containers[idx].VolumeMounts = append(podToModify.Spec.Containers[idx].VolumeMounts, volumeMounts...)
 		}
 	}
+	podToModify.Spec.Containers = append(podToModify.Spec.Containers, sideCars...)
 
-	for _, volume := range volumes {
-		volume := volume
-		if seqs.Any(seqs.FromSlice(podToModify.Spec.Volumes), func(v corev1.Volume) bool {
-			return v.Name == volume.Name
-		}) {
-			p.Log.Info(duplicateValuesMsg)
-			rv := admission.Denied(duplicateValuesMsg)
-			return &rv
-		} else {
-			podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
+	// Add shared volumeMounts only to the target container (the one whose
+	// files are being tailed), not to all original containers. This prevents
+	// masking filesystem paths in unrelated containers.
+	for _, vm := range volumeMounts {
+		if existing, found := findVolumeMount(podToModify.Spec.Containers[targetContainerIdx].VolumeMounts, vm.MountPath); found {
+			if existing.Name != vm.Name {
+				// Same mountPath but different volume name — the sidecar would
+				// mount the webhook's emptyDir while the app keeps its own volume,
+				// so the tailer would never see the log files. Deny the mutation
+				// to surface the misconfiguration.
+				msg := fmt.Sprintf(
+					"container %q already has mountPath %q with volume %q, but webhook needs volume %q; "+
+						"rename the existing volume to match or remove the conflicting mount",
+					podToModify.Spec.Containers[targetContainerIdx].Name, vm.MountPath, existing.Name, vm.Name,
+				)
+				p.Log.Info(msg)
+				rv := admission.Denied(msg)
+				return &rv
+			}
+			// Same mountPath and same volume name — already correctly mounted, skip.
+			continue
 		}
+		podToModify.Spec.Containers[targetContainerIdx].VolumeMounts = append(
+			podToModify.Spec.Containers[targetContainerIdx].VolumeMounts, vm)
+	}
+
+	// Append volumes. In multi-container pods, two containers tailing files
+	// in the same directory produce the same volume name; the second call
+	// must skip rather than deny, because the volume was already added by
+	// the first call.
+	for _, volume := range volumes {
+		if existing, found := findVolume(podToModify.Spec.Volumes, volume.Name); found {
+			// A volume with this name already exists. Only skip if it is
+			// compatible (also an EmptyDir). If the existing volume has a
+			// different source type, the sidecar would mount an unexpected
+			// volume and tailing would silently fail.
+			if existing.EmptyDir == nil {
+				msg := fmt.Sprintf(
+					"volume %q already exists with a non-EmptyDir source; "+
+						"the tailer webhook requires an EmptyDir volume at this name",
+					volume.Name,
+				)
+				p.Log.Info(msg)
+				rv := admission.Denied(msg)
+				return &rv
+			}
+			p.Log.V(1).Info("compatible volume already exists, skipping", "volume", volume.Name)
+			continue
+		}
+		podToModify.Spec.Volumes = append(podToModify.Spec.Volumes, volume)
 	}
 
 	return nil
+}
+
+// findVolumeMount checks if the given slice contains a mount at mountPath.
+// If found, it returns the existing mount and true; otherwise zero value and false.
+func findVolumeMount(mounts []corev1.VolumeMount, mountPath string) (corev1.VolumeMount, bool) {
+	for _, m := range mounts {
+		if m.MountPath == mountPath {
+			return m, true
+		}
+	}
+	return corev1.VolumeMount{}, false
+}
+
+// findVolume checks if the given slice contains a volume with the given name.
+// If found, it returns the existing volume and true; otherwise zero value and false.
+func findVolume(volumes []corev1.Volume, name string) (corev1.Volume, bool) {
+	for _, v := range volumes {
+		if v.Name == name {
+			return v, true
+		}
+	}
+	return corev1.Volume{}, false
 }
