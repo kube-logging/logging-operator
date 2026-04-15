@@ -197,7 +197,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	loggingReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorderFor("logging-operator"), ctrl.Log.WithName("logging"))
+	loggingReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorder("logging-operator"), ctrl.Log.WithName("logging"))
 
 	if err := (&extensionsControllers.EventTailerReconciler{
 		Client: mgr.GetClient(),

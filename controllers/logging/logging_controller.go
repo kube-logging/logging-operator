@@ -33,7 +33,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -69,7 +69,7 @@ func init() {
 }
 
 // NewLoggingReconciler returns a new LoggingReconciler instance
-func NewLoggingReconciler(client client.Client, eventRecorder record.EventRecorder, log logr.Logger) *LoggingReconciler {
+func NewLoggingReconciler(client client.Client, eventRecorder events.EventRecorder, log logr.Logger) *LoggingReconciler {
 	return &LoggingReconciler{
 		Client:        client,
 		EventRecorder: eventRecorder,
@@ -80,7 +80,7 @@ func NewLoggingReconciler(client client.Client, eventRecorder record.EventRecord
 // LoggingReconciler reconciles a Logging object
 type LoggingReconciler struct {
 	client.Client
-	EventRecorder record.EventRecorder
+	EventRecorder events.EventRecorder
 	Log           logr.Logger
 }
 
@@ -323,7 +323,7 @@ func (r *LoggingReconciler) fluentdConfigFinalizer(ctx context.Context, logging 
 		}
 	} else if externalFluentd != nil {
 		msg := fmt.Sprintf("refused to delete logging resource while fluentdConfig %s exists", client.ObjectKeyFromObject(externalFluentd))
-		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		r.EventRecorder.Eventf(logging, externalFluentd, corev1.EventTypeWarning, "DeletionRefused", "DeletionRefused", "%s", msg)
 		return false, errors.New(msg)
 	}
 
@@ -349,7 +349,7 @@ func (r *LoggingReconciler) syslogNGConfigFinalizer(ctx context.Context, logging
 		}
 	} else if externalSyslogNG != nil {
 		msg := fmt.Sprintf("refused to delete logging resource while syslogNGConfig %s exists", client.ObjectKeyFromObject(externalSyslogNG))
-		r.EventRecorder.Event(logging, corev1.EventTypeWarning, "DeletionRefused", msg)
+		r.EventRecorder.Eventf(logging, externalSyslogNG, corev1.EventTypeWarning, "DeletionRefused", "DeletionRefused", "%s", msg)
 		return false, errors.New(msg)
 	}
 
