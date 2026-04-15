@@ -1,6 +1,6 @@
-FROM ghcr.io/kube-logging/custom-runner:v0.14.0 AS custom-runner
+FROM ghcr.io/kube-logging/custom-runner:v0.16.0 AS custom-runner
 
-FROM quay.io/prometheus/node-exporter:v1.10.2
+FROM quay.io/prometheus/node-exporter:v1.11.1
 
 COPY --from=custom-runner /runner /
 

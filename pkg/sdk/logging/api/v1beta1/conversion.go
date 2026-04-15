@@ -32,8 +32,7 @@ func (c *ClusterFlow) Hub()   {}
 func SetupWebhookWithManager(mgr ctrl.Manager, apiTypes ...runtime.Object) error {
 	for _, apiType := range apiTypes {
 		// register webhook using controller-runtime because of interface checks
-		if err := ctrl.NewWebhookManagedBy(mgr).
-			For(apiType).
+		if err := ctrl.NewWebhookManagedBy(mgr, apiType).
 			Complete(); err != nil {
 			return err
 		}

@@ -1513,7 +1513,7 @@ func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorderFor("logging-operator"), ctrl.Log.WithName("controllers").WithName("Flow"))
+	flowReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorder("logging-operator"), ctrl.Log.WithName("controllers").WithName("Flow"))
 
 	var stopped bool
 	wrappedReconciler := duplicateRequest(t, flowReconciler, &stopped, errors)
