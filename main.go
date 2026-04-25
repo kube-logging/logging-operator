@@ -136,6 +136,13 @@ func main() {
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(klogFlags)
+
+	// Opt into the new klog behavior so that -stderrthreshold is honored even
+	// when -logtostderr=true (the default).
+	// Ref: kubernetes/klog#212, kubernetes/klog#432
+	_ = klogFlags.Set("legacy_stderr_threshold_behavior", "false")
+	_ = klogFlags.Set("stderrthreshold", "INFO")
+
 	err := klogFlags.Set("v", cast.ToString(klogLevel))
 	if err != nil {
 		fmt.Printf("%s - failed to set log level for klog, moving on.\n", err)
