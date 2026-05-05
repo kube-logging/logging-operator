@@ -353,6 +353,19 @@ func (r LoggingResourceRepository) FluentdConfigFor(ctx context.Context, logging
 		return &detachedFluentd, []v1beta1.FluentdConfig{}, err
 	default:
 		excessFluentds := r.handleMultipleDetachedFluentdObjects(res, logging)
+		// Preserve the previously-associated configuration so the aggregator
+		// keeps running while the user resolves the excess CRDs.
+		if name := logging.Status.FluentdConfigName; name != "" {
+			for i := range res {
+				if res[i].Name == name {
+					kept := res[i]
+					if err := kept.Spec.SetDefaults(); err != nil {
+						return nil, excessFluentds, err
+					}
+					return &kept, excessFluentds, nil
+				}
+			}
+		}
 		return nil, excessFluentds, nil
 	}
 }
@@ -396,6 +409,18 @@ func (r LoggingResourceRepository) SyslogNGConfigFor(ctx context.Context, loggin
 		return &detachedSyslogNG, []v1beta1.SyslogNGConfig{}, nil
 	default:
 		excessSyslogNGs := r.handleMultipleDetachedSyslogNGObjects(res, logging)
+		// Preserve the previously-associated configuration so the aggregator
+		// keeps running while the user resolves the excess CRDs.
+		if name := logging.Status.SyslogNGConfigName; name != "" {
+			for i := range res {
+				if res[i].Name == name {
+					kept := res[i]
+					kept.Spec.SetDefaults()
+					r.Logger.Info("preserving previously associated syslog-ng aggregator", "name", kept.Name)
+					return &kept, excessSyslogNGs, nil
+				}
+			}
+		}
 		return nil, excessSyslogNGs, nil
 	}
 }
