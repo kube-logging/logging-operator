@@ -309,8 +309,8 @@ func NewValidationReconciler( //nolint: gocyclo
 				excessSyslogNG.Status.Logging = ""
 
 				if len(resources.Logging.Status.SyslogNGConfigName) == 0 {
-					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "multiple fluentd configurations found, couldn't associate it with logging")
-				} else if resources.Logging.Status.FluentdConfigName != excessSyslogNG.Name {
+					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "multiple syslog-ng configurations found, couldn't associate it with logging")
+				} else if resources.Logging.Status.SyslogNGConfigName != excessSyslogNG.Name {
 					excessSyslogNG.Status.Problems = append(excessSyslogNG.Status.Problems, "logging already has a detached syslog-ng configuration, remove excess configuration objects")
 				}
 				excessSyslogNG.Status.ProblemsCount = len(excessSyslogNG.Status.Problems)
