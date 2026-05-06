@@ -2,7 +2,7 @@ source 'https://index.rubygems.org'
 
 gem 'bigdecimal', '3.3.1'
 gem 'ostruct', '0.6.3'
-gem 'oj', '3.16.17'
+gem 'oj', '3.17.0'
 gem 'fluent-plugin-detect-exceptions', '0.0.16'
 gem 'fluent-plugin-prometheus', '2.2.2'
 gem 'fluent-plugin-dedot_filter', '1.0.0'
