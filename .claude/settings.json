@@ -75,7 +75,6 @@
       "Read(./**/id_ed25519*)",
       "Read(./**/.htpasswd)",
       "Read(./**/*.sqlite)",
-      "Read(./**/.npmrc)",
       "Read(./**/tmp/**)",
       "Bash(rm -rf *)",
       "Bash(rm -fr *)",
@@ -94,9 +93,6 @@
     "defaultMode": "plan"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "axoflow"
-  ],
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,

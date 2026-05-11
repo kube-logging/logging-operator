@@ -79,7 +79,3 @@ type EventTailerList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []EventTailer `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&EventTailer{}, &EventTailerList{})
-}

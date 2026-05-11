@@ -81,7 +81,3 @@ type SyslogNGOutputList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []SyslogNGOutput `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&SyslogNGOutput{}, &SyslogNGOutputList{})
-}

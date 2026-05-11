@@ -43,3 +43,11 @@ linters:
     - unparam
     - unused
     - whitespace
+  exclusions:
+    rules:
+      # The `inline` analyzer (new in golangci-lint v2.12 via go fix tool) emits
+      # false positives on stdlib generic functions (slices.Sort, maps.Clone, etc.)
+      # because type parameter inference is not yet supported by the inliner.
+      - text: "cannot inline: type parameter inference is not yet supported"
+        linters:
+          - govet

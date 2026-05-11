@@ -112,7 +112,3 @@ type FlowList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Flow `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Flow{}, &FlowList{})
-}

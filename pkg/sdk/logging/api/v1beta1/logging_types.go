@@ -200,7 +200,7 @@ var Version string
 
 const (
 	DefaultFluentbitImageRepository               = "ghcr.io/fluent/fluent-bit"
-	DefaultFluentbitImageTag                      = "5.0.3"
+	DefaultFluentbitImageTag                      = "5.0.5"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/logging-operator/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "latest"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
@@ -493,6 +493,12 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		if fluentbitSpec.ForwardOptions.RetryLimit == "" {
 			fluentbitSpec.ForwardOptions.RetryLimit = "False"
 		}
+		// fluent-bit >= 5.0.5 defaults Retain_Metadata_In_Forward_Mode to true, but fluentd does not
+		// understand the metadata-extended format and drops these records as "invalid event".
+		// Default to false so the standard fluent-bit -> fluentd forwarding keeps working.
+		if fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode == nil {
+			fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode = util.BoolPointer(false)
+		}
 		if fluentbitSpec.TLS == nil {
 			fluentbitSpec.TLS = &FluentbitTLS{}
 		}
@@ -545,10 +551,6 @@ func (l *Logging) ClusterDomainAsSuffix() string {
 		return ""
 	}
 	return fmt.Sprintf(".%s", *l.Spec.ClusterDomain)
-}
-
-func init() {
-	SchemeBuilder.Register(&Logging{}, &LoggingList{})
 }
 
 func persistentVolumeModePointer(mode corev1.PersistentVolumeMode) *corev1.PersistentVolumeMode {

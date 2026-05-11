@@ -571,8 +571,9 @@ type ForwardOptions struct {
 	// Available in Logging operator version 4.4 and later.
 	// Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0.
 	Workers *int `json:"Workers,omitempty"`
-}
-
-func init() {
-	SchemeBuilder.Register(&FluentbitAgent{}, &FluentbitAgentList{})
+	// `Retain_Metadata_In_Forward_Mode` controls whether fluent-bit appends log event metadata when forwarding records.
+	// Available since fluent-bit 5.0.4, defaults to `true` in fluent-bit >= 5.0.5 — but fluentd does not understand the
+	// metadata format and drops these records as "invalid event", so the operator defaults it to `false` for Forward mode
+	// targets. Set this to `true` only when forwarding between fluent-bit instances.
+	RetainMetadataInForwardMode *bool `json:"Retain_Metadata_In_Forward_Mode,omitempty"`
 }

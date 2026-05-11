@@ -87,10 +87,6 @@ type AxoSyslogList struct {
 	Items           []AxoSyslog `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&AxoSyslog{}, &AxoSyslogList{})
-}
-
 func (a *AxoSyslog) SetDefaults() error {
 	if a.Spec.LogPaths == nil {
 		a.Spec.LogPaths = []LogPath{}
