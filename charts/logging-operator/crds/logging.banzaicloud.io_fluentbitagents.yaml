@@ -1530,6 +1530,8 @@ spec:
                 properties:
                   Require_ack_response:
                     type: boolean
+                  Retain_Metadata_In_Forward_Mode:
+                    type: boolean
                   Retry_Limit:
                     type: string
                   Send_options:
