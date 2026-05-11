@@ -56,7 +56,3 @@ type FluentdConfigList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []FluentdConfig `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&FluentdConfig{}, &FluentdConfigList{})
-}

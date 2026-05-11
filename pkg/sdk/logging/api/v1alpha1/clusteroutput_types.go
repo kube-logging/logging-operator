@@ -52,7 +52,3 @@ type ClusterOutputList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ClusterOutput `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&ClusterOutput{}, &ClusterOutputList{})
-}

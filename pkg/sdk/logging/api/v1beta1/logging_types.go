@@ -547,10 +547,6 @@ func (l *Logging) ClusterDomainAsSuffix() string {
 	return fmt.Sprintf(".%s", *l.Spec.ClusterDomain)
 }
 
-func init() {
-	SchemeBuilder.Register(&Logging{}, &LoggingList{})
-}
-
 func persistentVolumeModePointer(mode corev1.PersistentVolumeMode) *corev1.PersistentVolumeMode {
 	return &mode
 }

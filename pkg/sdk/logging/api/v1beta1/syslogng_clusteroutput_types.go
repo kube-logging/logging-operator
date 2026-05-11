@@ -59,7 +59,3 @@ type SyslogNGClusterOutputList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []SyslogNGClusterOutput `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&SyslogNGClusterOutput{}, &SyslogNGClusterOutputList{})
-}

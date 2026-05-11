@@ -572,7 +572,3 @@ type ForwardOptions struct {
 	// Enables dedicated thread(s) for this output. Default value (2) is set since version 1.8.13. For previous versions is 0.
 	Workers *int `json:"Workers,omitempty"`
 }
-
-func init() {
-	SchemeBuilder.Register(&FluentbitAgent{}, &FluentbitAgentList{})
-}

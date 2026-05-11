@@ -89,7 +89,3 @@ type OutputList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Output `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Output{}, &OutputList{})
-}

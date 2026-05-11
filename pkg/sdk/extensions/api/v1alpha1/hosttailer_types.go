@@ -115,7 +115,3 @@ type SystemdTailer struct {
 	// Verbose mode
 	Verbose bool `json:"verbose,omitempty"`
 }
-
-func init() {
-	SchemeBuilder.Register(&HostTailer{}, &HostTailerList{})
-}

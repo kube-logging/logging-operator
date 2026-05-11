@@ -54,7 +54,3 @@ type SyslogNGConfigList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []SyslogNGConfig `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&SyslogNGConfig{}, &SyslogNGConfigList{})
-}

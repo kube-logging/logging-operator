@@ -44,7 +44,3 @@ type LoggingList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Logging `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Logging{}, &LoggingList{})
-}
