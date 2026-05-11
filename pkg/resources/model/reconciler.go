@@ -400,7 +400,7 @@ func validateOutputSpec(spec interface{}, secrets secret.SecretLoader) (problems
 	var configuredFields []string
 	it := mirror.StructRange(spec)
 	for it.Next() {
-		if it.Field().Type.Kind() == reflect.Ptr && !it.Value().IsNil() {
+		if it.Field().Type.Kind() == reflect.Pointer && !it.Value().IsNil() {
 			configuredFields = append(configuredFields, jsonFieldName(it.Field()))
 			problems = append(problems, checkSecrets(it.Value().Elem(), secrets)...)
 		}

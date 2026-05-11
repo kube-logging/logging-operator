@@ -118,7 +118,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 	}
 
 	var isPointer, isNil bool
-	if value.Kind() == reflect.Ptr {
+	if value.Kind() == reflect.Pointer {
 		isPointer = true
 		if value.IsNil() {
 			isNil = true
@@ -193,7 +193,7 @@ func strctVal(s interface{}) reflect.Value {
 	v := reflect.ValueOf(s)
 
 	// if pointer get the underlying element≤
-	for v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 

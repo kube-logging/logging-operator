@@ -32,7 +32,7 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	v := reflect.ValueOf(outputSpec)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).Kind() == reflect.Ptr && !v.Field(i).IsNil() {
+		if v.Field(i).Kind() == reflect.Pointer && !v.Field(i).IsNil() {
 			if converter, ok := v.Field(i).Interface().(DirectiveConverter); ok {
 				converters = append(converters, converter)
 			}
@@ -52,7 +52,7 @@ func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLo
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).Kind() == reflect.Ptr && !v.Field(i).IsNil() {
+		if v.Field(i).Kind() == reflect.Pointer && !v.Field(i).IsNil() {
 			if converter, ok := v.Field(i).Interface().(DirectiveConverter); ok {
 				converters = append(converters, converter)
 			}
