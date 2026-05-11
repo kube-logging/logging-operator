@@ -493,6 +493,12 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		if fluentbitSpec.ForwardOptions.RetryLimit == "" {
 			fluentbitSpec.ForwardOptions.RetryLimit = "False"
 		}
+		// fluent-bit >= 5.0.5 defaults Retain_Metadata_In_Forward_Mode to true, but fluentd does not
+		// understand the metadata-extended format and drops these records as "invalid event".
+		// Default to false so the standard fluent-bit -> fluentd forwarding keeps working.
+		if fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode == nil {
+			fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode = util.BoolPointer(false)
+		}
 		if fluentbitSpec.TLS == nil {
 			fluentbitSpec.TLS = &FluentbitTLS{}
 		}
