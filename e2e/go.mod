@@ -1,6 +1,6 @@
 module github.com/kube-logging/logging-operator/e2e
 
-go 1.25.5
+go 1.26.0
 
 require (
 	emperror.dev/errors v0.8.1
