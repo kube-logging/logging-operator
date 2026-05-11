@@ -620,9 +620,41 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		return requests
 	})
 
+	// Trigger reconcile for sibling Logging resources that share the same loggingRef whenever any
+	// Logging changes. This is required for the loggingRef-conflict detection (see
+	// pkg/resources/model/reconciler.go) which compares Status.WatchNamespaces across Logging
+	// resources. Without this cross-trigger, conflict reporting depends on reconcile order:
+	// a sibling reconciled before its peer had a chance to publish its Status.WatchNamespaces
+	// would never observe the conflict.
+	loggingSiblingMapper := handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
+		changed, ok := obj.(*loggingv1beta1.Logging)
+		if !ok {
+			return nil
+		}
+		var loggingList loggingv1beta1.LoggingList
+		if err := mgr.GetCache().List(ctx, &loggingList); err != nil {
+			logger.Error(err, "failed to list logging resources")
+			return nil
+		}
+		requests := make([]reconcile.Request, 0, len(loggingList.Items))
+		for _, l := range loggingList.Items {
+			if l.Name == changed.Name {
+				// the primary For() watch already enqueues the changed object itself
+				continue
+			}
+			if l.Spec.LoggingRef == changed.Spec.LoggingRef {
+				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+					Name: l.Name,
+				}})
+			}
+		}
+		return requests
+	})
+
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&loggingv1beta1.Logging{}).
 		Owns(&corev1.Pod{}).
+		Watches(&loggingv1beta1.Logging{}, loggingSiblingMapper).
 		Watches(&corev1.Namespace{}, namespaceRequestMapper).
 		Watches(&loggingv1beta1.ClusterOutput{}, requestMapper).
 		Watches(&loggingv1beta1.ClusterFlow{}, requestMapper).
