@@ -23,7 +23,6 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
@@ -70,8 +69,8 @@ func TestJsonTagsWithDefaultsAndOmitempty(t *testing.T) {
 	actual, err := types.NewStructToStringMapper(secret.NewSecretLoader(nil, "", "", nil)).StringsMap(
 		Asd{
 			Field1: "value",
-			Field4: utils.StringPointer(""), // looks like empty, but it's not, we expect this to be set
-			Field5: nil,                     // empty for real
+			Field4: new(""), // looks like empty, but it's not, we expect this to be set
+			Field5: nil,     // empty for real
 		})
 	if err != nil {
 		t.Fatalf("%+v", err)

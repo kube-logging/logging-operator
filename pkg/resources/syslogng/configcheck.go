@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"io"
+	"maps"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
@@ -304,9 +305,7 @@ func configCheckResourceName(hash string) string {
 func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
 	objectMeta := r.SyslogNGObjectMeta(name, component)
 
-	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
-		objectMeta.Labels[key] = value
-	}
+	maps.Copy(objectMeta.Labels, r.Logging.Spec.ConfigCheck.Labels)
 
 	return objectMeta
 }

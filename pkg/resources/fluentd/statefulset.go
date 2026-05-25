@@ -23,7 +23,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/spf13/cast"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -138,7 +137,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	if r.fluentdSpec.Scaling.Replicas > 0 {
-		sts.Replicas = util.IntPointer(cast.ToInt32(r.fluentdSpec.Scaling.Replicas))
+		sts.Replicas = new(int32(r.fluentdSpec.Scaling.Replicas))
 	}
 
 	return sts
@@ -424,10 +423,10 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
 		securityContext := &corev1.SecurityContext{
-			RunAsNonRoot:             util.BoolPointer(true),
-			RunAsUser:                util.IntPointer64(65534),
-			RunAsGroup:               util.IntPointer64(65534),
-			AllowPrivilegeEscalation: util.BoolPointer(false),
+			RunAsNonRoot:             new(true),
+			RunAsUser:                new(int64(65534)),
+			RunAsGroup:               new(int64(65534)),
+			AllowPrivilegeEscalation: new(false),
 			Capabilities: &corev1.Capabilities{
 				Drop: []corev1.Capability{"ALL"},
 			},

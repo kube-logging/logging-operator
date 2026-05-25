@@ -85,7 +85,7 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{

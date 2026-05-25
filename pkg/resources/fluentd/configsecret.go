@@ -97,7 +97,7 @@ func (r *Reconciler) secretConfig() (runtime.Object, reconciler.DesiredState, er
 	if err != nil {
 		return nil, nil, err
 	}
-	configMap["fluentlog.conf"] = []byte(fmt.Sprintf(fluentLog, r.fluentdSpec.FluentLogDestination))
+	configMap["fluentlog.conf"] = fmt.Appendf(nil, fluentLog, r.fluentdSpec.FluentLogDestination)
 	meta := r.FluentdObjectMeta(SecretConfigName, ComponentFluentd)
 	meta.Labels = utils.MergeLabels(
 		meta.Labels,

@@ -150,10 +150,10 @@ func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (t
 			l.RemoveKeys = []string{"kubernetes"}
 		}
 		if l.ExtractKubernetesLabels == nil {
-			l.ExtractKubernetesLabels = util.BoolPointer(true)
+			l.ExtractKubernetesLabels = new(true)
 		}
 		if l.IncludeThreadLabel == nil {
-			l.IncludeThreadLabel = util.BoolPointer(true)
+			l.IncludeThreadLabel = new(true)
 		}
 		// Prevent meta configuration from marshaling
 		l.ConfigureKubernetesLabels = nil

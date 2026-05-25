@@ -17,7 +17,6 @@ package eventtailer
 import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,7 +67,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	spec := appsv1.StatefulSetSpec{
-		Replicas: utils.IntPointer(1),
+		Replicas: new(int32(1)),
 		Selector: &metav1.LabelSelector{
 			MatchLabels: e.selectorLabels(),
 		},
@@ -100,9 +99,9 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 						}),
 					},
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup:      utils.IntPointer64(2000),
-						RunAsNonRoot: utils.BoolPointer(true),
-						RunAsUser:    utils.IntPointer64(1000),
+						FSGroup:      new(int64(2000)),
+						RunAsNonRoot: new(true),
+						RunAsUser:    new(int64(1000)),
 					},
 					ServiceAccountName: e.Name(),
 					Volumes: []corev1.Volume{

@@ -18,7 +18,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -206,21 +205,21 @@ func TestMetricsIsEnabled(t *testing.T) {
 		{
 			name: "enabled explicitly set to true should return true",
 			metrics: &Metrics{
-				Enabled: utils.BoolPointer(true),
+				Enabled: new(true),
 			},
 			expected: true,
 		},
 		{
 			name: "enabled explicitly set to false should return false",
 			metrics: &Metrics{
-				Enabled: utils.BoolPointer(false),
+				Enabled: new(false),
 			},
 			expected: false,
 		},
 		{
 			name: "enabled false with port set should return false (explicit takes precedence)",
 			metrics: &Metrics{
-				Enabled: utils.BoolPointer(false),
+				Enabled: new(false),
 				Port:    2020,
 			},
 			expected: false,
@@ -228,7 +227,7 @@ func TestMetricsIsEnabled(t *testing.T) {
 		{
 			name: "enabled true with no port should return true",
 			metrics: &Metrics{
-				Enabled: utils.BoolPointer(true),
+				Enabled: new(true),
 				Port:    0,
 			},
 			expected: true,
@@ -250,7 +249,7 @@ func TestMetricsIsEnabled(t *testing.T) {
 		{
 			name: "enabled true with port should return true",
 			metrics: &Metrics{
-				Enabled: utils.BoolPointer(true),
+				Enabled: new(true),
 				Port:    2020,
 			},
 			expected: true,
@@ -282,7 +281,7 @@ func TestBufferMetricsIsEnabled(t *testing.T) {
 			name: "enabled explicitly set to true should return true",
 			metrics: &BufferMetrics{
 				Metrics: Metrics{
-					Enabled: utils.BoolPointer(true),
+					Enabled: new(true),
 				},
 			},
 			expected: true,
@@ -291,7 +290,7 @@ func TestBufferMetricsIsEnabled(t *testing.T) {
 			name: "enabled explicitly set to false should return false",
 			metrics: &BufferMetrics{
 				Metrics: Metrics{
-					Enabled: utils.BoolPointer(false),
+					Enabled: new(false),
 				},
 			},
 			expected: false,

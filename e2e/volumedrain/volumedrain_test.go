@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -84,7 +83,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -121,7 +120,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 						},
 					},
 					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled: utils.BoolPointer(true),
+						Enabled: new(true),
 					},
 					Scaling: &v1beta1.FluentdScaling{
 						Replicas: 2,
@@ -331,7 +330,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -368,7 +367,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 						},
 					},
 					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled: utils.BoolPointer(true),
+						Enabled: new(true),
 					},
 					Scaling: &v1beta1.FluentdScaling{
 						Replicas: 2,

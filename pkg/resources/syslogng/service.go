@@ -15,6 +15,8 @@
 package syslogng
 
 import (
+	"maps"
+
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -24,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -121,13 +122,11 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 
 	if r.syslogNGSpec.Metrics != nil && r.syslogNGSpec.Metrics.IsEnabled() && r.syslogNGSpec.Metrics.ServiceMonitor {
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-			r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
+			maps.Copy(objectMetadata.Labels, r.syslogNGSpec.Metrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
 		var SampleLimit uint64 = 0
@@ -146,7 +145,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						HonorLabels:          r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
 						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -161,7 +160,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						HonorLabels:          r.syslogNGSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
 						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -224,13 +223,11 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 	if r.syslogNGSpec.BufferVolumeMetrics != nil && r.syslogNGSpec.BufferVolumeMetrics.IsEnabled() && r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitor {
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-			r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
+			maps.Copy(objectMetadata.Labels, r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
 		var SampleLimit uint64 = 0
@@ -248,7 +245,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(monitoringv1.Scheme(r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
+					Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
 					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 							TLSConfig: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,

@@ -15,6 +15,8 @@
 package fluentbit
 
 import (
+	"maps"
+
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -23,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 )
 
@@ -69,13 +70,11 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 
 	if r.fluentbitSpec.Metrics != nil && r.fluentbitSpec.Metrics.IsEnabled() && r.fluentbitSpec.Metrics.ServiceMonitor {
 		if r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
+			maps.Copy(objectMetadata.Labels, r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
 		var SampleLimit uint64 = 0
@@ -88,7 +87,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				HonorLabels:          r.fluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-				Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
+				Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
 				HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 					HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 						TLSConfig: r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -106,7 +105,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				HonorLabels:          r.fluentbitSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-				Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
+				Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
 				HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 					HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 						TLSConfig: r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -172,7 +171,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 	if r.fluentbitSpec.BufferVolumeMetrics != nil && r.fluentbitSpec.BufferVolumeMetrics.IsEnabled() && r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitor {
 		if r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
@@ -192,7 +191,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
+					Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
 					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 							TLSConfig: r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,

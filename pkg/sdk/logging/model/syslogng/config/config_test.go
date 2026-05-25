@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -1112,8 +1111,8 @@ source "main_input" {
 				Name:      "test",
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
 					SourceDateParser: &v1beta1.SourceDateParser{
-						Format:   utils.StringPointer("asd"),
-						Template: utils.StringPointer("bsd"),
+						Format:   new("asd"),
+						Template: new("bsd"),
 					},
 				},
 				SecretLoaderFactory: &TestSecretLoaderFactory{},

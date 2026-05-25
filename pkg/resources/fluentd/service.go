@@ -15,6 +15,8 @@
 package fluentd
 
 import (
+	"maps"
+
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -24,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -121,13 +122,11 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 
 	if r.fluentdSpec.Metrics != nil && r.fluentdSpec.Metrics.IsEnabled() && r.fluentdSpec.Metrics.ServiceMonitor {
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
+			maps.Copy(objectMetadata.Labels, r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
 		var SampleLimit uint64 = 0
@@ -146,7 +145,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						Scheme:               new(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
 						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -161,7 +160,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						HonorLabels:          r.fluentdSpec.Metrics.ServiceMonitorConfig.HonorLabels,
 						RelabelConfigs:       r.fluentdSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.fluentdSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
-						Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
+						Scheme:               new(monitoringv1.Scheme(r.fluentdSpec.Metrics.ServiceMonitorConfig.Scheme)),
 						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 								TLSConfig: r.fluentdSpec.Metrics.ServiceMonitorConfig.TLSConfig,
@@ -224,13 +223,11 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 	if r.fluentdSpec.BufferVolumeMetrics != nil && r.fluentdSpec.BufferVolumeMetrics.IsEnabled() && r.fluentdSpec.BufferVolumeMetrics.ServiceMonitor {
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme == "" {
-			r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = kubetool.To(monitoringv1.SchemeHTTP).String()
+			r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme = new(monitoringv1.SchemeHTTP).String()
 		}
 
 		if r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels != nil {
-			for k, v := range r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels {
-				objectMetadata.Labels[k] = v
-			}
+			maps.Copy(objectMetadata.Labels, r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
 		var SampleLimit uint64 = 0
@@ -248,7 +245,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					HonorLabels:          r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.HonorLabels,
 					RelabelConfigs:       r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
-					Scheme:               kubetool.To(monitoringv1.Scheme(r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
+					Scheme:               new(monitoringv1.Scheme(r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
 					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
 						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
 							TLSConfig: r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,

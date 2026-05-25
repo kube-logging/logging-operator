@@ -190,7 +190,7 @@ func (l *FluentbitNameProvider) OwnerRef() v1.OwnerReference {
 			Kind:       l.logging.Kind,
 			Name:       l.logging.Name,
 			UID:        l.logging.UID,
-			Controller: util.BoolPointer(true),
+			Controller: new(true),
 		}
 	}
 	return v1.OwnerReference{
@@ -198,7 +198,7 @@ func (l *FluentbitNameProvider) OwnerRef() v1.OwnerReference {
 		Kind:       l.fluentbit.Kind,
 		Name:       l.fluentbit.Name,
 		UID:        l.fluentbit.UID,
-		Controller: util.BoolPointer(true),
+		Controller: new(true),
 	}
 }
 

@@ -18,6 +18,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -394,9 +395,7 @@ func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace str
 			&corev1.ConfigMap{}:             {Field: namespaceSelector, Label: labelSelector},
 		}
 
-		for obj, config := range objectsToWatch {
-			mgrOptions.Cache.ByObject[obj] = config
-		}
+		maps.Copy(mgrOptions.Cache.ByObject, objectsToWatch)
 	}
 
 	return mgrOptions, nil

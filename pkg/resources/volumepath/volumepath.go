@@ -40,16 +40,6 @@ func Init(strings []string) *List {
 	return &sl
 }
 
-// Reference makes reference to List
-func Reference(List List) *List {
-	return &List
-}
-
-// StringReference make reference to a String
-func StringReference(str string) *string {
-	return &str
-}
-
 // Apply applies the given ApplyFn function on every element of the list
 func (l *List) Apply(fn ApplyFn) *List {
 	if fn == nil || l == nil {

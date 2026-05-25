@@ -50,7 +50,7 @@ func LogProducer(t *testing.T, c client.Client, opts ...LogProducerOption) {
 			Namespace: options.Namespace,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: utils.IntPointer(int32(options.Replicas)),
+			Replicas: new(int32(options.Replicas)),
 			Selector: metav1.SetAsLabelSelector(labels.Set(lbls)),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{

@@ -86,7 +86,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -277,7 +277,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -487,7 +487,7 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -537,7 +537,7 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 					Workers: 1,
 					Security: &v1beta1.Security{
 						SecurityContext: &corev1.SecurityContext{
-							ReadOnlyRootFilesystem: utils.BoolPointer(true),
+							ReadOnlyRootFilesystem: new(true),
 						},
 					},
 					ConfigCheck: &v1beta1.ConfigCheck{
@@ -674,7 +674,7 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{
@@ -724,7 +724,7 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 					Workers: 1,
 					Security: &v1beta1.Security{
 						SecurityContext: &corev1.SecurityContext{
-							ReadOnlyRootFilesystem: utils.BoolPointer(true),
+							ReadOnlyRootFilesystem: new(true),
 						},
 					},
 					ConfigCheck: &v1beta1.ConfigCheck{

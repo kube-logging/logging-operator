@@ -15,7 +15,6 @@
 package fluentd
 
 import (
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,7 +25,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 		Kind:       r.Logging.Kind,
 		Name:       r.Logging.Name,
 		UID:        r.Logging.UID,
-		Controller: util.BoolPointer(true),
+		Controller: new(true),
 	}
 
 	if r.fluentdConfig != nil {
@@ -35,7 +34,7 @@ func (r *Reconciler) FluentdObjectMeta(name, component string) metav1.ObjectMeta
 			Kind:       r.fluentdConfig.Kind,
 			Name:       r.fluentdConfig.Name,
 			UID:        r.fluentdConfig.UID,
-			Controller: util.BoolPointer(true),
+			Controller: new(true),
 		}
 	}
 
@@ -59,7 +58,7 @@ func (r *Reconciler) FluentdObjectMetaClusterScope(name, component string) metav
 				Kind:       r.Logging.Kind,
 				Name:       r.Logging.Name,
 				UID:        r.Logging.UID,
-				Controller: util.BoolPointer(true),
+				Controller: new(true),
 			},
 		},
 	}

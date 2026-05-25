@@ -19,7 +19,6 @@ import (
 	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
@@ -56,7 +55,7 @@ func (e *EventTailer) ownerReferences() []metav1.OwnerReference {
 			Kind:       e.customResource.Kind,
 			Name:       e.customResource.Name,
 			UID:        e.customResource.UID,
-			Controller: utils.BoolPointer(true),
+			Controller: new(true),
 		},
 	}
 	return ownerReferences
