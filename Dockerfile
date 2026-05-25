@@ -45,7 +45,7 @@ COPY --from=builder /usr/local/bin/manager /manager
 ENTRYPOINT ["/manager"]
 
 
-FROM gcr.io/distroless/static:latest@sha256:47b2d72ff90843eb8a768b5c2f89b40741843b639d065b9b937b07cd59b479c6
+FROM gcr.io/distroless/static:latest@sha256:3592aa8171c77482f62bbc4164e6a2d141c6122554ace66e5cc910cadb961ff0
 
 COPY --from=builder /usr/local/bin/manager /manager
 
