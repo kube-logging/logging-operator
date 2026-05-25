@@ -224,7 +224,7 @@ const (
 // SetDefaults fills empty attributes
 func (l *Logging) SetDefaults() error {
 	if l.Spec.ClusterDomain == nil {
-		l.Spec.ClusterDomain = util.StringPointer("cluster.local.")
+		l.Spec.ClusterDomain = new("cluster.local.")
 	}
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
@@ -273,11 +273,11 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 	if fluentbitSpec != nil { //nolint:nestif
 		// Set default value for DisableVarLibDockerContainers to false (meaning volume is mounted by default)
 		if fluentbitSpec.DisableVarLibDockerContainers == nil {
-			fluentbitSpec.DisableVarLibDockerContainers = util.BoolPointer(false)
+			fluentbitSpec.DisableVarLibDockerContainers = new(false)
 		}
 		// Set default value for DisableVarLog to false (meaning volume is mounted by default)
 		if fluentbitSpec.DisableVarLog == nil {
-			fluentbitSpec.DisableVarLog = util.BoolPointer(false)
+			fluentbitSpec.DisableVarLog = new(false)
 		}
 		if fluentbitSpec.PosisionDBLegacy != nil {
 			return errors.New("`position_db` field is deprecated, use `positiondb`")
@@ -331,10 +331,10 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 			fluentbitSpec.InputTail.FileCacheAdvise = "On"
 		}
 		if fluentbitSpec.InputTail.DB == nil {
-			fluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
+			fluentbitSpec.InputTail.DB = new("/tail-db/tail-containers-state.db")
 		}
 		if fluentbitSpec.InputTail.DBLocking == nil {
-			fluentbitSpec.InputTail.DBLocking = util.BoolPointer(true)
+			fluentbitSpec.InputTail.DBLocking = new(true)
 		}
 		if fluentbitSpec.InputTail.MemBufLimit == "" {
 			fluentbitSpec.InputTail.MemBufLimit = "5MB"
@@ -352,7 +352,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 			fluentbitSpec.Security = &Security{}
 		}
 		if fluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
-			fluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+			fluentbitSpec.Security.RoleBasedAccessControlCreate = new(true)
 		}
 		if fluentbitSpec.BufferVolumeImage.Repository == "" {
 			fluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
@@ -455,28 +455,28 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 				fluentbitSpec.FilterAws.ImdsVersion = "v2"
 			}
 			if fluentbitSpec.FilterAws.AZ == nil {
-				fluentbitSpec.FilterAws.AZ = util.BoolPointer(true)
+				fluentbitSpec.FilterAws.AZ = new(true)
 			}
 			if fluentbitSpec.FilterAws.Ec2InstanceID == nil {
-				fluentbitSpec.FilterAws.Ec2InstanceID = util.BoolPointer(true)
+				fluentbitSpec.FilterAws.Ec2InstanceID = new(true)
 			}
 			if fluentbitSpec.FilterAws.Ec2InstanceType == nil {
-				fluentbitSpec.FilterAws.Ec2InstanceType = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.Ec2InstanceType = new(false)
 			}
 			if fluentbitSpec.FilterAws.PrivateIP == nil {
-				fluentbitSpec.FilterAws.PrivateIP = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.PrivateIP = new(false)
 			}
 			if fluentbitSpec.FilterAws.AmiID == nil {
-				fluentbitSpec.FilterAws.AmiID = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.AmiID = new(false)
 			}
 			if fluentbitSpec.FilterAws.AccountID == nil {
-				fluentbitSpec.FilterAws.AccountID = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.AccountID = new(false)
 			}
 			if fluentbitSpec.FilterAws.Hostname == nil {
-				fluentbitSpec.FilterAws.Hostname = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.Hostname = new(false)
 			}
 			if fluentbitSpec.FilterAws.VpcID == nil {
-				fluentbitSpec.FilterAws.VpcID = util.BoolPointer(false)
+				fluentbitSpec.FilterAws.VpcID = new(false)
 			}
 		}
 		if len(fluentbitSpec.FilterKubernetes.UseKubelet) == 0 {
@@ -497,13 +497,13 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		// understand the metadata-extended format and drops these records as "invalid event".
 		// Default to false so the standard fluent-bit -> fluentd forwarding keeps working.
 		if fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode == nil {
-			fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode = util.BoolPointer(false)
+			fluentbitSpec.ForwardOptions.RetainMetadataInForwardMode = new(false)
 		}
 		if fluentbitSpec.TLS == nil {
 			fluentbitSpec.TLS = &FluentbitTLS{}
 		}
 		if fluentbitSpec.TLS.Enabled == nil {
-			fluentbitSpec.TLS.Enabled = util.BoolPointer(false)
+			fluentbitSpec.TLS.Enabled = new(false)
 		}
 		if fluentbitSpec.ConfigHotReload != nil {
 			if fluentbitSpec.ConfigHotReload.Image.Repository == "" {
@@ -564,7 +564,7 @@ func (l *Logging) FluentdObjectMeta(name, component string, f FluentdSpec, fc *F
 		Kind:       l.Kind,
 		Name:       l.Name,
 		UID:        l.UID,
-		Controller: util.BoolPointer(true),
+		Controller: new(true),
 	}
 
 	if fc != nil {
@@ -573,7 +573,7 @@ func (l *Logging) FluentdObjectMeta(name, component string, f FluentdSpec, fc *F
 			Kind:       fc.Kind,
 			Name:       fc.Name,
 			UID:        fc.UID,
-			Controller: util.BoolPointer(true),
+			Controller: new(true),
 		}
 	}
 	o := metav1.ObjectMeta{
@@ -603,7 +603,7 @@ func (l *Logging) SyslogNGObjectMeta(name, component string, sc *SyslogNGConfig)
 		Kind:       l.Kind,
 		Name:       l.Name,
 		UID:        l.UID,
-		Controller: util.BoolPointer(true),
+		Controller: new(true),
 	}
 	if sc != nil {
 		ownerReference = metav1.OwnerReference{
@@ -611,7 +611,7 @@ func (l *Logging) SyslogNGObjectMeta(name, component string, sc *SyslogNGConfig)
 			Kind:       sc.Kind,
 			Name:       sc.Name,
 			UID:        sc.UID,
-			Controller: util.BoolPointer(true),
+			Controller: new(true),
 		}
 	}
 	o := metav1.ObjectMeta{

@@ -329,7 +329,7 @@ func (r *Reconciler) reconcileDrain(ctx context.Context) (*reconcile.Result, err
 	}
 
 	// mark PVCs required for upscaling as in-use
-	for i := int32(0); i < utils.PointerToInt32(replicaCount); i++ {
+	for i := int32(0); i < utils.DerefOrZero(replicaCount); i++ {
 		pvcsInUse[fmt.Sprintf("%s-%s-%d", bufVolName, r.Logging.QualifiedName(StatefulSetName), i)] = true
 	}
 

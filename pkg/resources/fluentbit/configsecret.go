@@ -375,7 +375,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			return nil, nil, errors.WrapIf(err, "getting replica count for fluentd")
 		}
 
-		if r.fluentbitSpec.Network == nil && utils.PointerToInt32(aggregatorReplicas) > 1 {
+		if r.fluentbitSpec.Network == nil && utils.DerefOrZero(aggregatorReplicas) > 1 {
 			input.FluentForwardOutput.Network.KeepaliveSet = true
 			input.FluentForwardOutput.Network.Keepalive = true
 			input.FluentForwardOutput.Network.KeepaliveIdleTimeoutSet = true
@@ -389,7 +389,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 			input.FluentForwardOutput.Upstream.Enabled = true
 			input.FluentForwardOutput.Upstream.Config.Path = fmt.Sprintf("%s/%s", OperatorConfigPath, UpstreamConfigName)
 			input.FluentForwardOutput.Upstream.Config.Name = "fluentd-upstream"
-			for i := int32(0); i < utils.PointerToInt32(aggregatorReplicas); i++ {
+			for i := int32(0); i < utils.DerefOrZero(aggregatorReplicas); i++ {
 				input.FluentForwardOutput.Upstream.Config.Nodes = append(input.FluentForwardOutput.Upstream.Config.Nodes, r.generateUpstreamNode(i))
 			}
 		}

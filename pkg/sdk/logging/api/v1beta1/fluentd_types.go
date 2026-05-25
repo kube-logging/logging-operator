@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
@@ -171,25 +170,25 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			f.Security = &Security{}
 		}
 		if f.Security.RoleBasedAccessControlCreate == nil {
-			f.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+			f.Security.RoleBasedAccessControlCreate = new(true)
 		}
 		if f.Security.SecurityContext == nil {
 			f.Security.SecurityContext = &corev1.SecurityContext{
-				RunAsUser:    util.IntPointer64(100),
-				RunAsGroup:   util.IntPointer64(101),
-				RunAsNonRoot: util.BoolPointer(true),
+				RunAsUser:    new(int64(100)),
+				RunAsGroup:   new(int64(101)),
+				RunAsNonRoot: new(true),
 			}
 		}
 		if f.Security.PodSecurityContext == nil {
 			f.Security.PodSecurityContext = &corev1.PodSecurityContext{
-				RunAsUser:    util.IntPointer64(100),
-				RunAsGroup:   util.IntPointer64(101),
-				RunAsNonRoot: util.BoolPointer(true),
-				FSGroup:      util.IntPointer64(101),
+				RunAsUser:    new(int64(100)),
+				RunAsGroup:   new(int64(101)),
+				RunAsNonRoot: new(true),
+				FSGroup:      new(int64(101)),
 			}
 		}
 		if f.Security.PodSecurityContext.FSGroup == nil {
-			f.Security.PodSecurityContext.FSGroup = util.IntPointer64(101)
+			f.Security.PodSecurityContext.FSGroup = new(int64(101))
 		}
 		if f.Security.PodSecurityContext.SeccompProfile == nil {
 			f.Security.PodSecurityContext.SeccompProfile = &corev1.SeccompProfile{
@@ -197,7 +196,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			}
 		}
 		if f.Security.CreateOpenShiftSCC == nil {
-			f.Security.CreateOpenShiftSCC = util.BoolPointer(false)
+			f.Security.CreateOpenShiftSCC = new(false)
 		}
 		if f.Workers <= 0 {
 			f.Workers = 1

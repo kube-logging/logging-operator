@@ -135,12 +135,10 @@ func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool, e
 func startTestManager(t *testing.T, mgr manager.Manager) (context.CancelFunc, *sync.WaitGroup) {
 	stop, cf := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := mgr.Start(stop); err != nil {
 			t.Logf("%+v", err)
 		}
-	}()
+	})
 	return cf, wg
 }

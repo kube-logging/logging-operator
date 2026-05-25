@@ -18,13 +18,12 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/go-logr/logr"
-	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -54,11 +53,11 @@ func NewValidationReconciler( //nolint: gocyclo
 			output := &resources.Fluentd.ClusterOutputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Active = new(false)
 			output.Status.Problems = nil
 
 			if output.Name == resources.Logging.Spec.ErrorOutputRef {
-				output.Status.Active = utils.BoolPointer(true)
+				output.Status.Active = new(true)
 			}
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -70,7 +69,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			output := &resources.Fluentd.Outputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Active = new(false)
 			output.Status.Problems = nil
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -82,11 +81,11 @@ func NewValidationReconciler( //nolint: gocyclo
 			output := &resources.SyslogNG.ClusterOutputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Active = new(false)
 			output.Status.Problems = nil
 
 			if output.Name == resources.Logging.Spec.ErrorOutputRef {
-				output.Status.Active = utils.BoolPointer(true)
+				output.Status.Active = new(true)
 			}
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -98,7 +97,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			output := &resources.SyslogNG.Outputs[i]
 			registerForPatching(output)
 
-			output.Status.Active = utils.BoolPointer(false)
+			output.Status.Active = new(false)
 			output.Status.Problems = nil
 
 			output.Status.Problems = append(output.Status.Problems,
@@ -110,7 +109,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			flow := &resources.Fluentd.ClusterFlows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Active = new(false)
 			flow.Status.Problems = nil
 
 			if len(flow.Spec.GlobalOutputRefs) == 0 && len(flow.Spec.OutputRefs) > 0 {
@@ -126,8 +125,8 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
-					flow.Status.Active = utils.BoolPointer(true)
-					output.Status.Active = utils.BoolPointer(true)
+					flow.Status.Active = new(true)
+					output.Status.Active = new(true)
 				}
 			}
 
@@ -138,7 +137,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			flow := &resources.Fluentd.Flows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Active = new(false)
 			flow.Status.Problems = nil
 
 			if len(flow.Spec.LocalOutputRefs)+len(flow.Spec.GlobalOutputRefs) == 0 && len(flow.Spec.OutputRefs) > 0 {
@@ -158,7 +157,7 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
-					output.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = new(true)
 					hasValidOutput = true
 				}
 			}
@@ -172,14 +171,14 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("local output reference: %s has problems", output.Name))
 
 				default:
-					output.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = new(true)
 					hasValidOutput = true
 				}
 			}
 
 			// Check if the flow has become dangling with no valid outputs
 			if hasValidOutput {
-				flow.Status.Active = utils.BoolPointer(true)
+				flow.Status.Active = new(true)
 			} else {
 				flow.Status.Problems = append(flow.Status.Problems, "flow has become dangling with no valid outputs")
 			}
@@ -191,7 +190,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			flow := &resources.SyslogNG.ClusterFlows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Active = new(false)
 			flow.Status.Problems = nil
 
 			for _, ref := range flow.Spec.GlobalOutputRefs {
@@ -203,8 +202,8 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
-					flow.Status.Active = utils.BoolPointer(true)
-					output.Status.Active = utils.BoolPointer(true)
+					flow.Status.Active = new(true)
+					output.Status.Active = new(true)
 				}
 			}
 
@@ -215,7 +214,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			flow := &resources.SyslogNG.Flows[i]
 			registerForPatching(flow)
 
-			flow.Status.Active = utils.BoolPointer(false)
+			flow.Status.Active = new(false)
 			flow.Status.Problems = nil
 
 			hasValidOutput := false
@@ -231,7 +230,7 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("global output reference: %s has problems", output.Name))
 
 				default:
-					output.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = new(true)
 					hasValidOutput = true
 				}
 			}
@@ -245,14 +244,14 @@ func NewValidationReconciler( //nolint: gocyclo
 					flow.Status.Problems = append(flow.Status.Problems, fmt.Sprintf("local output reference: %s has problems", output.Name))
 
 				default:
-					output.Status.Active = utils.BoolPointer(true)
+					output.Status.Active = new(true)
 					hasValidOutput = true
 				}
 			}
 
 			// Check if the flow has become dangling with no valid outputs
 			if hasValidOutput {
-				flow.Status.Active = utils.BoolPointer(true)
+				flow.Status.Active = new(true)
 			} else {
 				flow.Status.Problems = append(flow.Status.Problems, "flow has become dangling with no valid outputs")
 			}
@@ -271,7 +270,7 @@ func NewValidationReconciler( //nolint: gocyclo
 				excessFluentd := &resources.Fluentd.ExcessFluentds[i]
 				registerForPatching(excessFluentd)
 				excessFluentd.Status.Problems = nil
-				excessFluentd.Status.Active = utils.BoolPointer(false)
+				excessFluentd.Status.Active = new(false)
 				excessFluentd.Status.Logging = ""
 
 				if len(resources.Logging.Status.FluentdConfigName) == 0 {
@@ -292,7 +291,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			logger.Info("found detached fluentd aggregator, making association", "name", resources.Fluentd.Configuration.Name)
 			resources.Logging.Status.FluentdConfigName = resources.Fluentd.Configuration.Name
 
-			resources.Fluentd.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.Fluentd.Configuration.Status.Active = new(true)
 			resources.Fluentd.Configuration.Status.Logging = resources.Logging.Name
 		} else {
 			resources.Logging.Status.FluentdConfigName = ""
@@ -305,7 +304,7 @@ func NewValidationReconciler( //nolint: gocyclo
 				excessSyslogNG := &resources.SyslogNG.ExcessSyslogNGs[i]
 				registerForPatching(excessSyslogNG)
 				excessSyslogNG.Status.Problems = nil
-				excessSyslogNG.Status.Active = utils.BoolPointer(false)
+				excessSyslogNG.Status.Active = new(false)
 				excessSyslogNG.Status.Logging = ""
 
 				if len(resources.Logging.Status.SyslogNGConfigName) == 0 {
@@ -327,7 +326,7 @@ func NewValidationReconciler( //nolint: gocyclo
 			logger.Info("found detached syslog-ng aggregator, making association", "name=", resources.SyslogNG.Configuration.Name)
 			resources.Logging.Status.SyslogNGConfigName = resources.SyslogNG.Configuration.Name
 			logger.Info("found detached syslog-ng aggregator, making association, done: ", "name=", resources.Logging.Status.SyslogNGConfigName)
-			resources.SyslogNG.Configuration.Status.Active = utils.BoolPointer(true)
+			resources.SyslogNG.Configuration.Status.Active = new(true)
 			resources.SyslogNG.Configuration.Status.Logging = resources.Logging.Name
 		} else {
 			resources.Logging.Status.SyslogNGConfigName = ""
@@ -396,7 +395,7 @@ func NewValidationReconciler( //nolint: gocyclo
 	}
 }
 
-func validateOutputSpec(spec interface{}, secrets secret.SecretLoader) (problems []string) {
+func validateOutputSpec(spec any, secrets secret.SecretLoader) (problems []string) {
 	var configuredFields []string
 	it := mirror.StructRange(spec)
 	for it.Next() {
@@ -459,10 +458,8 @@ func jsonFieldName(f reflect.StructField) string {
 
 func hasIntersection(a, b []string) bool {
 	for _, i := range a {
-		for _, j := range b {
-			if i == j {
-				return true
-			}
+		if slices.Contains(b, i) {
+			return true
 		}
 	}
 	return false

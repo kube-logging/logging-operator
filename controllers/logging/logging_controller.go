@@ -169,28 +169,28 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		stateMetrics.Reset()
 		problemsMetrics.Reset()
 		for _, ob := range loggingResources.Fluentd.Flows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.ClusterFlows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.Outputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.Fluentd.ClusterOutputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.Flows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.ClusterFlows {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.Outputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 		for _, ob := range loggingResources.SyslogNG.ClusterOutputs {
-			updateResourceStateMetrics(&ob, utils.PointerToBool(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
+			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}
 	}()
 
@@ -276,7 +276,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		l := log.WithName("fluentbit")
 		for _, f := range loggingResources.Fluentbits {
-			f := f
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
@@ -704,18 +703,4 @@ func reconcileRequestsForMatchingControlNamespace(loggings []loggingv1beta1.Logg
 		}
 	}
 	return
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }

@@ -55,7 +55,6 @@ func FindTenants(ctx context.Context, target metav1.LabelSelector, reader client
 		return nil, errors.WrapIf(err, "listing loggings for targetSelector")
 	}
 	for _, l := range loggingList.Items {
-		l := l
 		if l.Spec.RouteConfig != nil && l.Spec.RouteConfig.DisableLoggingRoute {
 			continue
 		}

@@ -24,8 +24,10 @@ type VolumeMountBuilder struct {
 }
 
 // MountPropagationModeRef .
+//
+//go:fix inline
 func MountPropagationModeRef(mountPropagationMode corev1.MountPropagationMode) *corev1.MountPropagationMode {
-	return &mountPropagationMode
+	return new(mountPropagationMode)
 }
 
 // NewVolumeMountBuilder .

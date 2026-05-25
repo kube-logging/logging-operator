@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -82,7 +81,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: utils.BoolPointer(false),
+						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
 						Image: v1beta1.ImageSpec{

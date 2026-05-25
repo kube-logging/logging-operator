@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
@@ -253,7 +252,7 @@ func (c *S3OutputConfig) ToDirective(secretLoader secret.SecretLoader, id string
 		if c.Buffer == nil {
 			c.Buffer = new(Buffer)
 		}
-		c.Buffer.Tags = utils.StringPointer(OneEyeTags)
+		c.Buffer.Tags = new(OneEyeTags)
 		c.Path = fmt.Sprintf(OneEyePathTemplate, clusterName)
 		c.S3ObjectKeyFormat = OneEyeObjectKeyFormat
 	}

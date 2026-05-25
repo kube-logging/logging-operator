@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"maps"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -485,9 +486,7 @@ func (r *Reconciler) initContainerCheckPod(fluentdSpec v1beta1.FluentdSpec) []co
 func (r *Reconciler) configCheckPodObjectMeta(name, component string) metav1.ObjectMeta {
 	objectMeta := r.FluentdObjectMeta(name, component)
 
-	for key, value := range r.Logging.Spec.ConfigCheck.Labels {
-		objectMeta.Labels[key] = value
-	}
+	maps.Copy(objectMeta.Labels, r.Logging.Spec.ConfigCheck.Labels)
 
 	return objectMeta
 }

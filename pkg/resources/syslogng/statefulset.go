@@ -18,13 +18,13 @@ import (
 	"fmt"
 	"maps"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -69,7 +69,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 					Volumes:                       r.generateVolume(),
 					TerminationGracePeriodSeconds: r.syslogNGSpec.TerminationGracePeriodSeconds,
 					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup: util.IntPointer64(101),
+						FSGroup: new(int64(101)),
 					},
 				},
 			},
@@ -276,10 +276,10 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
 		securityContext := &corev1.SecurityContext{
-			RunAsNonRoot:             util.BoolPointer(true),
-			RunAsUser:                util.IntPointer64(65534),
-			RunAsGroup:               util.IntPointer64(65534),
-			AllowPrivilegeEscalation: util.BoolPointer(false),
+			RunAsNonRoot:             new(true),
+			RunAsUser:                new(int64(65534)),
+			RunAsGroup:               new(int64(65534)),
+			AllowPrivilegeEscalation: new(false),
 			Capabilities: &corev1.Capabilities{
 				Drop: []corev1.Capability{"ALL"},
 			},
@@ -415,10 +415,5 @@ func generateConfigReloaderConfig(configDir string) string {
 }
 
 func sliceAny[S ~[]E, E any](s S, fn func(E) bool) bool {
-	for _, e := range s {
-		if fn(e) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(s, fn)
 }

@@ -326,10 +326,10 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		bufferSizeCmd := "buffersize -> /prometheus/buffer-size.sh"
 
 		securityContext := &corev1.SecurityContext{
-			RunAsNonRoot:             util.BoolPointer(true),
-			RunAsUser:                util.IntPointer64(65534),
-			RunAsGroup:               util.IntPointer64(65534),
-			AllowPrivilegeEscalation: util.BoolPointer(false),
+			RunAsNonRoot:             new(true),
+			RunAsUser:                new(int64(65534)),
+			RunAsGroup:               new(int64(65534)),
+			AllowPrivilegeEscalation: new(false),
 			Capabilities: &corev1.Capabilities{
 				Drop: []corev1.Capability{"ALL"},
 			},

@@ -32,7 +32,6 @@ func TestNewVolumeBuilder(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewVolumeBuilder(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewVolumeBuilder() = %v, want %v", got, tt.want)
@@ -65,7 +64,6 @@ func TestVolumeBuilder_WithName(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.WithName(tt.args.name); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("\nVolumeBuilder.WithName() = %v\nwant %v", got, tt.want)
@@ -98,7 +96,6 @@ func TestVolumeBuilder_WithVolumeSource(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.WithVolumeSource(tt.args.volumeSource); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("\nVolumeBuilder.WithVolumeSource() = %v\nwant %v", got, tt.want)
@@ -131,7 +128,6 @@ func TestVolumeBuilder_WithEmptyDir(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.WithEmptyDir(tt.args.emptyDir); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("\nVolumeBuilder.WithEmptyDir() = %v\nwant %v", got, tt.want)
@@ -164,7 +160,6 @@ func TestVolumeBuilder_WithHostPath(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.WithHostPath(tt.args.hostPath); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("\nVolumeBuilder.WithHostPath() = %v\nwant %v", got, tt.want)
@@ -197,7 +192,6 @@ func TestVolumeBuilder_WithHostPathFromPath(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.WithHostPathFromPath(tt.args.path); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("\nVolumeBuilder.WithHostPathFromPath() = %v\nwant %v", got, tt.want)

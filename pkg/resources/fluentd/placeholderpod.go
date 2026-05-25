@@ -17,7 +17,6 @@ package fluentd
 import (
 	"strings"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -37,7 +36,7 @@ func (r *Reconciler) placeholderPodFor(pvc corev1.PersistentVolumeClaim) *corev1
 			Affinity:                      r.fluentdSpec.Affinity,
 			PriorityClassName:             r.fluentdSpec.PodPriorityClassName,
 			RestartPolicy:                 corev1.RestartPolicyNever,
-			TerminationGracePeriodSeconds: utils.IntPointer64(0), // terminate immediately
+			TerminationGracePeriodSeconds: new(int64(0)), // terminate immediately
 		},
 	}
 }

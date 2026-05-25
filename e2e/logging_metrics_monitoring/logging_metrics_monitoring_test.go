@@ -25,7 +25,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -127,11 +126,11 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Metrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
@@ -155,12 +154,12 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						Tag:        common.NodeExporterTag,
 					},
 					Metrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					BufferVolumeMetrics: &v1beta1.BufferMetrics{
 						Metrics: v1beta1.Metrics{
-							Enabled:        utils.BoolPointer(true),
+							Enabled:        new(true),
 							ServiceMonitor: true,
 						},
 					},
@@ -217,11 +216,11 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 				ControlNamespace: ns,
 				FluentbitSpec: &v1beta1.FluentbitSpec{
 					Metrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
@@ -249,11 +248,11 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						Tag:        common.NodeExporterTag,
 					},
 					Metrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        utils.BoolPointer(true),
+						Enabled:        new(true),
 						ServiceMonitor: true,
 					},
 				},

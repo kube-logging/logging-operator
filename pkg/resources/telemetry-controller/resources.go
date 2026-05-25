@@ -17,7 +17,6 @@ package telemetry_controller
 import (
 	"fmt"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	telemetryv1alpha1 "github.com/kube-logging/telemetry-controller/api/telemetry/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -110,7 +109,7 @@ func CreateOutput(logging *v1beta1.Logging) *telemetryv1alpha1.Output {
 						Insecure: true,
 					},
 				},
-				Tag: utils.StringPointer("otelcol"),
+				Tag: new("otelcol"),
 				Kubernetes: &telemetryv1alpha1.KubernetesMetadata{
 					Key:              "kubernetes",
 					IncludePodLabels: true,

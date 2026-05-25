@@ -17,7 +17,6 @@ package test
 import (
 	"testing"
 
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -70,7 +69,7 @@ destination "output_default_test-otlp-out" {
 						Batch: output.Batch{
 							BatchLines: 1,
 						},
-						Compression: utils.BoolPointer(true),
+						Compression: new(true),
 						ChannelArgs: filter.ArrowMap{
 							"a": "b",
 						},

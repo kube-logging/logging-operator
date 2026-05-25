@@ -48,7 +48,6 @@ func TestNewHandler(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewHandler(tt.args.containerNames); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewHandler() = %v, want %v", got, tt.want)
@@ -139,7 +138,6 @@ func TestAddTailerDescriptor(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			tt.h.addTailerDescriptor(tt.args.tailerDescriptor)
 			if !reflect.DeepEqual(tt.h, tt.want) {
@@ -280,7 +278,6 @@ func TestAddTailerAnnotation(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			tt.h.AddTailerAnnotation(tt.args.tailerAnnotation)
 			if !reflect.DeepEqual(tt.h, tt.want) {
@@ -359,7 +356,6 @@ func TestFilePathsForContainer(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			tt.h.AddTailerAnnotation(tt.tailerAnnotation)
 			if got := tt.h.FilePathsForContainer(tt.args.containerName); !reflect.DeepEqual(got, tt.want) {
@@ -420,7 +416,6 @@ func TestAllFilePaths(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			tt.h.AddTailerAnnotation(tt.tailerAnnotation)
 			if got := tt.h.AllFilePaths(); !matchingStringSlicesWithoutOrder(got, tt.want) {

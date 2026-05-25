@@ -38,7 +38,7 @@ import (
 //			v := iter.Value()
 //			...
 //		}
-func StructRange(v interface{}) *StructIter {
+func StructRange(v any) *StructIter {
 	return NewStructIter(reflect.ValueOf(v))
 }
 

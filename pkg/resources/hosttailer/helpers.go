@@ -18,7 +18,6 @@ import (
 	"maps"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -35,7 +34,7 @@ func (h *HostTailer) ownerReferences() []metav1.OwnerReference {
 			Kind:       h.customResource.Kind,
 			Name:       h.customResource.Name,
 			UID:        h.customResource.UID,
-			Controller: utils.BoolPointer(true),
+			Controller: new(true),
 		},
 	}
 	return ownerReferences

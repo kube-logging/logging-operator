@@ -22,7 +22,6 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
@@ -317,7 +316,7 @@ func TestMultipleOutput(t *testing.T) {
 				},
 				Namespaces: []string{"ns-test"},
 			},
-		}, "", "", "", "", util.BoolPointer(true))
+		}, "", "", "", "", new(true))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -403,7 +402,7 @@ func TestRenderFullFluentConfig(t *testing.T) {
 					"ns_label_key": "ns_label_value",
 				},
 			},
-		}, "", "", "", "", util.BoolPointer(true))
+		}, "", "", "", "", new(true))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -535,7 +534,7 @@ func TestRenderFullFluentConfigWithGlobalFilter(t *testing.T) {
 				},
 				Namespaces: []string{"ns-test"},
 			},
-		}, "", "", "", "", util.BoolPointer(true))
+		}, "", "", "", "", new(true))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -614,7 +613,7 @@ func TestRenderS3(t *testing.T) {
 				Path:     "/var/buffer",
 				S3Bucket: "test_bucket",
 				Buffer: &output.Buffer{
-					RetryForever: util.BoolPointer(true),
+					RetryForever: new(true),
 					Path:         "asd",
 				},
 				AssumeRoleCredentials: &output.S3AssumeRoleCredentials{
@@ -746,7 +745,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 				},
 				Namespaces: []string{"ns-test"},
 			},
-		}, "", "", "", "", util.BoolPointer(true))
+		}, "", "", "", "", new(true))
 	if err != nil {
 		return err
 	}
@@ -802,7 +801,7 @@ func ValidateRenderS3(t *testing.T, s3Config plugins.DirectiveConverter, expecte
 }
 
 func newFlowOrPanic(namespace string, labels map[string]string) *types.Flow {
-	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "", "", "", util.BoolPointer(true))
+	flowObj, err := types.NewFlow([]types.FlowMatch{{Labels: labels, Namespaces: []string{namespace}}}, "", "", "", "", new(true))
 	if err != nil {
 		panic(err)
 	}
@@ -820,7 +819,7 @@ func newComplexFlow(namespace string, labels map[string]string, hosts []string, 
 				Negate:         negate,
 			},
 		},
-		"", "", "", "", util.BoolPointer(true))
+		"", "", "", "", new(true))
 	if err != nil {
 		panic(err)
 	}

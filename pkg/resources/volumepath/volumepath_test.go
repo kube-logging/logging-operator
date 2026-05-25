@@ -30,7 +30,6 @@ func TestNew(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := New(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
@@ -56,21 +55,20 @@ func TestInit(t *testing.T) {
 		{
 			name: "empty",
 			args: args{strings: []string{}},
-			want: Reference(List([]string{})),
+			want: new(List([]string{})),
 		},
 		{
 			name: "singleItem",
 			args: args{strings: []string{"foobar"}},
-			want: Reference(List([]string{"foobar"})),
+			want: new(List([]string{"foobar"})),
 		},
 		{
 			name: "multiItem",
 			args: args{strings: []string{"foo", "bar"}},
-			want: Reference(List([]string{"foo", "bar"})),
+			want: new(List([]string{"foo", "bar"})),
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Init(tt.args.strings); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Init() = %v, want %v", got, tt.want)
@@ -107,7 +105,6 @@ func TestUniq(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.Uniq(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.Uniq() = %v, want %v", got, tt.want)
@@ -189,7 +186,6 @@ func TestApply(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.Apply(tt.args.fn); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.Apply() = %v, want %v", got, tt.want)
@@ -217,16 +213,15 @@ func TestFirst(t *testing.T) {
 		{
 			name: "singleString",
 			s:    Init([]string{"foo"}),
-			want: StringReference("foo"),
+			want: new("foo"),
 		},
 		{
 			name: "multiStrings",
 			s:    Init([]string{"foo", "bar", "baz"}),
-			want: StringReference("foo"),
+			want: new("foo"),
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.First(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.First() = %v, want %v", got, tt.want)
@@ -254,16 +249,15 @@ func TestLast(t *testing.T) {
 		{
 			name: "singleString",
 			s:    Init([]string{"foo"}),
-			want: StringReference("foo"),
+			want: new("foo"),
 		},
 		{
 			name: "multiStrings",
 			s:    Init([]string{"foo", "bar", "baz"}),
-			want: StringReference("baz"),
+			want: new("baz"),
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.Last(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.Last() = %v, want %v", got, tt.want)
@@ -315,7 +309,6 @@ func TestTopLevelPathList(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.l.TopLevelPathList(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.TopLevelPathList() = %v, want %v", got, tt.want)
@@ -380,7 +373,6 @@ func TestConvertFilePath(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ConvertFilePath(tt.args.path); got != tt.want {
 				t.Errorf("ConvertFilePath() = %v, want %v", got, tt.want)
@@ -426,7 +418,6 @@ func TestRemoveInvalidPath(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.l.RemoveInvalidPath(tt.args.validatorFn); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("List.RemoveInvalidPath() = %v, want %v", got, tt.want)

@@ -15,7 +15,6 @@
 package syslogng
 
 import (
-	util "github.com/cisco-open/operator-tools/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,7 +25,7 @@ func (r *Reconciler) SyslogNGObjectMeta(name, component string) metav1.ObjectMet
 		Kind:       r.Logging.Kind,
 		Name:       r.Logging.Name,
 		UID:        r.Logging.UID,
-		Controller: util.BoolPointer(true),
+		Controller: new(true),
 	}
 	if r.syslogNGConfig != nil {
 		ownerReference = metav1.OwnerReference{
@@ -34,7 +33,7 @@ func (r *Reconciler) SyslogNGObjectMeta(name, component string) metav1.ObjectMet
 			Kind:       r.syslogNGConfig.Kind,
 			Name:       r.syslogNGConfig.Name,
 			UID:        r.syslogNGConfig.UID,
-			Controller: util.BoolPointer(true),
+			Controller: new(true),
 		}
 	}
 	o := metav1.ObjectMeta{
@@ -57,7 +56,7 @@ func (r *Reconciler) SyslogNGObjectMetaClusterScope(name, component string) meta
 				Kind:       r.Logging.Kind,
 				Name:       r.Logging.Name,
 				UID:        r.Logging.UID,
-				Controller: util.BoolPointer(true),
+				Controller: new(true),
 			},
 		},
 	}

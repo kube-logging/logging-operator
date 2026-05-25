@@ -62,7 +62,6 @@ func (p *PodHandler) Containers(filePaths []string, volumePaths []string, contai
 	vpl := volumepath.Init(volumePaths)
 
 	for _, filePath := range filePaths {
-		filePath := filePath
 		path := vpl.Apply(volumepath.ApplyFn(
 			func(strs []string, idx int) *string {
 				if strings.HasPrefix(filepath.Dir(filePath), strs[idx]) {

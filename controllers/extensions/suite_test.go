@@ -48,7 +48,7 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	done := make(chan interface{})
+	done := make(chan any)
 	go func() {
 		By("bootstrapping test environment")
 		testEnv = &envtest.Environment{

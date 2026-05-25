@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -114,7 +113,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 				},
 			},
 			Spec: appsv1.DeploymentSpec{
-				Replicas: utils.IntPointer(1),
+				Replicas: new(int32(1)),
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						"app": "elasticsearch7",
@@ -236,7 +235,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 				},
 			},
 			Spec: appsv1.DeploymentSpec{
-				Replicas: utils.IntPointer(1),
+				Replicas: new(int32(1)),
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						"app": "elasticsearch8",
@@ -358,7 +357,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 				},
 			},
 			Spec: appsv1.DeploymentSpec{
-				Replicas: utils.IntPointer(1),
+				Replicas: new(int32(1)),
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						"app": "elasticsearch9",
@@ -509,7 +508,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 					Port:                        9200,
 					Scheme:                      "http",
 					DefaultElasticsearchVersion: "7",
-					SuppressTypeName:            utils.BoolPointer(false),
+					SuppressTypeName:            new(false),
 					TypeName:                    "_doc",
 					IndexName:                   "test-logs-es7",
 					LogstashFormat:              true,
@@ -517,9 +516,9 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 					LogstashDateformat:          "%Y.%m.%d",
 					IncludeTimestamp:            true,
 					ReconnectOnError:            true,
-					ReloadConnections:           utils.BoolPointer(false),
+					ReloadConnections:           new(false),
 					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    utils.BoolPointer(false),
+					VerifyEsVersionAtStartup:    new(false),
 					Buffer: &output.Buffer{
 						Type:             "file",
 						Path:             "/buffers/es7",
@@ -548,15 +547,15 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 					Port:                        9200,
 					Scheme:                      "http",
 					DefaultElasticsearchVersion: "8",
-					SuppressTypeName:            utils.BoolPointer(true),
-					DataStreamEnable:            utils.BoolPointer(true),
+					SuppressTypeName:            new(true),
+					DataStreamEnable:            new(true),
 					DataStreamName:              "logs-fluentd-es8",
 					DataStreamTemplateName:      "logs-fluentd-template",
 					IncludeTimestamp:            true,
 					ReconnectOnError:            true,
-					ReloadConnections:           utils.BoolPointer(false),
+					ReloadConnections:           new(false),
 					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    utils.BoolPointer(false),
+					VerifyEsVersionAtStartup:    new(false),
 					Buffer: &output.Buffer{
 						Type:             "file",
 						Path:             "/buffers/es8",
@@ -585,15 +584,15 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 					Port:                        9200,
 					Scheme:                      "http",
 					DefaultElasticsearchVersion: "9",
-					SuppressTypeName:            utils.BoolPointer(true),
-					DataStreamEnable:            utils.BoolPointer(true),
+					SuppressTypeName:            new(true),
+					DataStreamEnable:            new(true),
 					DataStreamName:              "logs-fluentd-es9",
 					DataStreamTemplateName:      "logs-fluentd-template",
 					IncludeTimestamp:            true,
 					ReconnectOnError:            true,
-					ReloadConnections:           utils.BoolPointer(false),
+					ReloadConnections:           new(false),
 					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    utils.BoolPointer(false),
+					VerifyEsVersionAtStartup:    new(false),
 					Buffer: &output.Buffer{
 						Type:             "file",
 						Path:             "/buffers/es9",
