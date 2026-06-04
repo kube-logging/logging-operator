@@ -1,0 +1,17 @@
+{{- if and .Values.logging.enabled (not .Values.logging.fluentdDisabled) -}}
+{{- $fluentdSpec := .Values.logging.fluentd }}
+{{- if .Values.logging.loggingRef }}
+  {{- $fluentdSpec := set .Values.logging.fluentd "loggingRef" (default .Values.logging.loggingRef .Values.logging.fluentd.loggingRef) -}}
+{{- end }}
+
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentdConfig
+metadata:
+  name: {{ include "logging-operator.releasename" . }}
+  labels: {{ include "logging-operator.labels" . | nindent 4 }}
+{{- if $fluentdSpec }}
+spec: {{- toYaml $fluentdSpec | nindent 2 }}
+{{- else }}
+spec: {}
+{{- end }}
+{{- end }}
