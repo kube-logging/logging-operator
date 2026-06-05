@@ -18,7 +18,7 @@ spec:
   {{- with .Values.logging.flowConfigOverride }}
   flowConfigOverride: {{ . }}
   {{- end }}
-  {{- if (not .Values.logging.fluentdDisabled) }}
+  {{- if and (not .Values.logging.fluentdDisabled) (not .Values.logging.fluentdConfig.create) }}
   {{- if .Values.logging.fluentd }}
   fluentd: {{- toYaml .Values.logging.fluentd | nindent 4 }}
   {{- else }}
