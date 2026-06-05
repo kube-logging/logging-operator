@@ -1,4 +1,4 @@
-{{- if and .Values.logging.enabled (not .Values.logging.fluentdDisabled) -}}
+{{- if and .Values.logging.enabled (not .Values.logging.fluentdDisabled) .Values.logging.fluentdConfig.create -}}
 {{- $fluentdSpec := .Values.logging.fluentd }}
 {{- if .Values.logging.loggingRef }}
 {{- $fluentdSpec := .Values.logging.fluentd | default dict -}}
