@@ -1,7 +1,10 @@
 {{- if and .Values.logging.enabled (not .Values.logging.fluentdDisabled) -}}
 {{- $fluentdSpec := .Values.logging.fluentd }}
 {{- if .Values.logging.loggingRef }}
-  {{- $fluentdSpec := set .Values.logging.fluentd "loggingRef" (default .Values.logging.loggingRef .Values.logging.fluentd.loggingRef) -}}
+{{- $fluentdSpec := .Values.logging.fluentd | default dict -}}
+{{- if .Values.logging.loggingRef }}
+  {{- $fluentdSpec = set $fluentdSpec "loggingRef" (default .Values.logging.loggingRef $fluentdSpec.loggingRef) -}}
+{{- end }}
 {{- end }}
 
 apiVersion: logging.banzaicloud.io/v1beta1
