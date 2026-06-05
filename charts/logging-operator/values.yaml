@@ -168,7 +168,7 @@ logging:
   fluentdDisabled: false
   # -- Create a FluentdConfig as a separate custom resource.
   # Default is false, which means that the fluentd configuration will be generated as part of the Logging custom resource if fluentd is enabled.
-  # Setting this to true will create a separate FluentdConfig custom resource with the same name as the Logging resource and reference it in the Logging.fluentd section.
+  # Setting this to true will create a separate FluentdConfig custom resource with the same name as the Logging resource.
   fluentdConfig:
     create: false
   # -- Fluentd configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentd_types/
