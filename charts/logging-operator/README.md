@@ -81,6 +81,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | logging.fluentbitDisabled | bool | `false` | Flag to disable fluentbit completely |
 | logging.fluentbit | object | `{}` | Fluent-bit configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentbit_types/ |
 | logging.fluentdDisabled | bool | `false` | Flag to disable fluentd completely |
+| logging.fluentdConfig | object | `{"create":false}` | Create a FluentdConfig as a separate custom resource. Default is false, which means that the fluentd configuration will be generated as part of the Logging custom resource if fluentd is enabled. Setting this to true will create a separate FluentdConfig custom resource with the same name as the Logging resource. |
 | logging.fluentd | object | `{}` | Fluentd configurations https://kube-logging.github.io/docs/configuration/crds/v1beta1/fluentd_types/ |
 | logging.syslogNG | object | `{}` | Syslog-NG statefulset configuration |
 | logging.defaultFlow | object | `{}` | Default flow for unmatched logs. This Flow configuration collects all logs that didn’t match any other Flow. |
