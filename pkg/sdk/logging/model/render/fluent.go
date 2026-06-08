@@ -44,6 +44,19 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 		if meta.Directive == "" {
 			return fmt.Errorf("directive must have a name %s", meta)
 		}
+		// Structural tokens can't be quoted, so a newline would break out.
+		for _, t := range []struct{ kind, value string }{
+			{"directive name", meta.Directive},
+			{"@type", meta.Type},
+			{"@id", meta.Id},
+			{"@label", meta.Label},
+			{"@log_level", meta.LogLevel},
+			{"tag", meta.Tag},
+		} {
+			if err := validateFluentToken(t.kind, t.value); err != nil {
+				return err
+			}
+		}
 		f.indentedf(indent, "<%s%s>", meta.Directive, tag(meta.Tag))
 		if meta.Type != "" {
 			f.indentedf(indent+f.Indent, "@type %s", meta.Type)
@@ -61,7 +74,10 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 			keys := mapstrstr.Keys(params)
 			sort.Strings(keys)
 			for _, k := range keys {
-				f.indentedf(indent+f.Indent, "%s %s", k, params[k])
+				if err := validateFluentToken("parameter name", k); err != nil {
+					return err
+				}
+				f.indentedf(indent+f.Indent, "%s %s", k, escapeFluentValue(params[k]))
 			}
 		}
 		if sections := d.GetSections(); len(sections) > 0 {
@@ -74,10 +90,10 @@ func (f *FluentRender) RenderDirectives(directives []types.Directive, indent int
 	return nil
 }
 
-func (f *FluentRender) indentedf(indent int, format string, values ...interface{}) {
+func (f *FluentRender) indentedf(indent int, format string, values ...any) {
 	indentString := strings.Repeat(" ", indent)
 	in := fmt.Sprintf(format, values...)
-	for _, line := range strings.Split(in, "\n") {
+	for line := range strings.SplitSeq(in, "\n") {
 		if line != "" {
 			fmt.Fprint(f.Out, indentString+line+"\n") //nolint: errcheck
 		} else {
@@ -91,4 +107,30 @@ func tag(tag string) string {
 		return " " + tag
 	}
 	return tag
+}
+
+func validateFluentToken(kind, value string) error {
+	if strings.ContainsAny(value, "\n\r") {
+		return fmt.Errorf("invalid %s %q: must not contain newline characters", kind, value)
+	}
+	return nil
+}
+
+var fluentEscaper = strings.NewReplacer(
+	`\`, `\\`,
+	`"`, `\"`,
+	"\n", `\n`,
+	"\r", `\r`,
+	"\t", `\t`,
+	`#`, `\#`,
+)
+
+// escapeFluentValue quotes values containing newlines, escaping '#' too so
+// quoting can't enable `#{...}` Ruby interpolation. Plain values are unchanged.
+func escapeFluentValue(value string) string {
+	if !strings.ContainsAny(value, "\n\r") {
+		return value
+	}
+
+	return `"` + fluentEscaper.Replace(value) + `"`
 }
