@@ -25,6 +25,8 @@ import (
 	config "github.com/kube-logging/logging-operator/pkg/sdk/extensions/extensionsconfig"
 )
 
+const eventTailerSink = "stdout"
+
 // Config for configmap json serialization
 type Config struct {
 	Sink                            string `json:"sink"`
@@ -37,23 +39,30 @@ func (e *EventTailer) positionFile() string {
 
 func (e *EventTailer) makeJSONString() (string, error) {
 	c := Config{
-		Sink:                            "stdout",
+		Sink:                            eventTailerSink,
 		LastResourceVersionPositionPath: e.positionFile(),
 	}
 
 	config, err := json.Marshal(c)
+	if err != nil {
+		return "", fmt.Errorf("marshal eventrouter config: %w", err)
+	}
 
-	return string(config), err
+	return string(config), nil
 }
 
-// ConfigMap resource for reconciler
+// ConfigMap resource for reconciler. Eventrouter >= 1.0.0 is configured via environment variables, so the legacy JSON ConfigMap is reconciled away.
 func (e *EventTailer) ConfigMap() (runtime.Object, reconciler.DesiredState, error) {
-	conf, err := e.makeJSONString()
 	configMap := corev1.ConfigMap{
 		ObjectMeta: e.objectMeta(),
-		Data: map[string]string{
-			config.EventTailer.ConfigurationFileName: conf,
-		},
+	}
+	if e.usesEnvConfig() {
+		return &configMap, reconciler.StateAbsent, nil
+	}
+
+	conf, err := e.makeJSONString()
+	configMap.Data = map[string]string{
+		config.EventTailer.ConfigurationFileName: conf,
 	}
 	return &configMap, reconciler.StatePresent, err
 }
