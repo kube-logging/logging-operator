@@ -104,3 +104,30 @@ func TestFluentBitConfigFilePath(t *testing.T) {
 		})
 	}
 }
+
+func TestEventTailerUsesEnvConfig(t *testing.T) {
+	tests := []struct {
+		name  string
+		image string
+		want  bool
+	}{
+		{name: "default", image: EventTailer.ImageWithTag, want: true},
+		{name: "breakingVersion", image: "ghcr.io/kube-logging/eventrouter:1.0.0", want: true},
+		{name: "newerVersion", image: "ghcr.io/kube-logging/eventrouter:1.2.0", want: true},
+		{name: "olderVersion", image: "ghcr.io/kube-logging/eventrouter:0.5.0", want: false},
+		{name: "olderPatch", image: "ghcr.io/kube-logging/eventrouter:0.4.0", want: false},
+		{name: "registryWithPort", image: "localhost:5000/eventrouter:0.5.0", want: false},
+		{name: "latestTag", image: "ghcr.io/kube-logging/eventrouter:latest", want: true},
+		{name: "noTag", image: "ghcr.io/kube-logging/eventrouter", want: true},
+		{name: "digestPin", image: "ghcr.io/kube-logging/eventrouter@sha256:abc123", want: true},
+		{name: "legacyTagWithDigest", image: "ghcr.io/kube-logging/eventrouter:0.5.0@sha256:abc123", want: false},
+		{name: "modernTagWithDigest", image: "ghcr.io/kube-logging/eventrouter:1.0.0@sha256:abc123", want: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := EventTailer.UsesEnvConfig(tt.image); got != tt.want {
+				t.Errorf("UsesEnvConfig(%q) = %v, want %v", tt.image, got, tt.want)
+			}
+		})
+	}
+}
