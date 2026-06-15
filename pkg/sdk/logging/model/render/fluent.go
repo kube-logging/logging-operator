@@ -128,8 +128,9 @@ var fluentEscaper = strings.NewReplacer(
 // escapeFluentValue quotes values containing newlines, escaping '#' too so
 // quoting can't enable `#{...}` Ruby interpolation. Plain values are unchanged.
 func escapeFluentValue(value string) string {
-	if !strings.ContainsAny(value, "\n\r") {
-		return value
+	trimmed := strings.TrimRight(value, "\r\n")
+	if !strings.ContainsAny(trimmed, "\n\r") {
+		return trimmed
 	}
 
 	return `"` + fluentEscaper.Replace(value) + `"`
