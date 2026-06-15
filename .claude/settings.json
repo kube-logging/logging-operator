@@ -3,7 +3,6 @@
   "companyAnnouncements": [
     "Welcome to the Logging-operator project!\nPlease make sure to read our contribution guidelines and code of conduct before getting started. If you have any questions or need assistance, feel free to reach out to the maintainers or the community.\nWe are excited to have you on board and look forward to your contributions."
   ],
-  "model": "sonnet",
   "cleanupPeriodDays": 14,
   "env": {
     "DISABLE_TELEMETRY": "1",
@@ -78,7 +77,6 @@
       "Read(./**/tmp/**)",
       "Bash(rm -rf *)",
       "Bash(rm -fr *)",
-      "Bash(git push *)",
       "Bash(*exec*)",
       "Bash(sudo *)",
       "Bash(*chmod 777*)",
@@ -95,10 +93,7 @@
   "enableAllProjectMcpServers": true,
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "security-guidance@claude-plugins-official": true
   }
 }

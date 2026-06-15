@@ -73,6 +73,42 @@ func TestRenderDirective_Injection(t *testing.T) {
 			contains: []string{"foo bar", `labels {"a":"b"}`},
 		},
 		{
+			name: "trailing newline in value is stripped, not quoted",
+			directive: &types.GenericDirective{
+				PluginMeta: types.PluginMeta{Directive: "match"},
+				Params:     types.Params{"password": "changeme\n"},
+			},
+			contains:    []string{"password changeme\n"},
+			notContains: []string{`password "changeme`},
+		},
+		{
+			name: "trailing CRLF in value is stripped, not quoted",
+			directive: &types.GenericDirective{
+				PluginMeta: types.PluginMeta{Directive: "match"},
+				Params:     types.Params{"password": "changeme\r\n"},
+			},
+			contains:    []string{"password changeme\n"},
+			notContains: []string{`password "changeme`, "\r"},
+		},
+		{
+			name: "trailing CR in value is stripped, not quoted",
+			directive: &types.GenericDirective{
+				PluginMeta: types.PluginMeta{Directive: "match"},
+				Params:     types.Params{"password": "changeme\r"},
+			},
+			contains:    []string{"password changeme\n"},
+			notContains: []string{`password "changeme`, "\r"},
+		},
+		{
+			name: "embedded newline is still escaped even with a trailing newline",
+			directive: &types.GenericDirective{
+				PluginMeta: types.PluginMeta{Directive: "record"},
+				Params:     types.Params{"x": "a\n</record>\n<match **>\n  @type exec\n</match>\n"},
+			},
+			contains:    []string{`x "a\n</record>\n<match **>\n  @type exec\n</match>\n"`},
+			notContains: []string{"\n<match **>\n", "\n  @type exec\n"},
+		},
+		{
 			name: "newline in parameter name is rejected",
 			directive: &types.GenericDirective{
 				PluginMeta: types.PluginMeta{Directive: "record"},
