@@ -66,6 +66,46 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 		imagePullSecrets = e.customResource.Spec.Image.ImagePullSecrets
 	}
 
+	container := corev1.Container{
+		Name:            config.EventTailer.TailerAffix,
+		Image:           config.EventTailer.ImageWithTag,
+		ImagePullPolicy: corev1.PullIfNotPresent,
+		Ports: []corev1.ContainerPort{
+			{
+				Name:          "monitor",
+				ContainerPort: 8080,
+				Protocol:      corev1.ProtocolTCP,
+			},
+		},
+	}
+
+	var volumes []corev1.Volume
+	if e.usesEnvConfig() {
+		container.Env = []corev1.EnvVar{
+			{Name: "EVENTROUTER_SINK", Value: eventTailerSink},
+			{Name: "EVENTROUTER_BOOKMARK_PATH", Value: e.positionFile()},
+			{Name: "EVENTROUTER_LOG_FORMAT", Value: "json"},
+		}
+	} else {
+		container.VolumeMounts = []corev1.VolumeMount{
+			{
+				Name:      "config-volume",
+				ReadOnly:  true,
+				MountPath: "/etc/eventrouter",
+			},
+		}
+		volumes = append(volumes, corev1.Volume{
+			Name: "config-volume",
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: e.Name(),
+					},
+				},
+			},
+		})
+	}
+
 	spec := appsv1.StatefulSetSpec{
 		Replicas: new(int32(1)),
 		Selector: &metav1.LabelSelector{
@@ -78,25 +118,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 			Spec: e.customResource.Spec.WorkloadBase.Override(
 				corev1.PodSpec{
 					Containers: []corev1.Container{
-						e.customResource.Spec.ContainerBase.Override(corev1.Container{
-							Name:            config.EventTailer.TailerAffix,
-							Image:           config.EventTailer.ImageWithTag,
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							Ports: []corev1.ContainerPort{
-								{
-									Name:          "monitor",
-									ContainerPort: 8080,
-									Protocol:      corev1.ProtocolTCP,
-								},
-							},
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "config-volume",
-									ReadOnly:  true,
-									MountPath: "/etc/eventrouter",
-								},
-							},
-						}),
+						e.customResource.Spec.ContainerBase.Override(container),
 					},
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup:      new(int64(2000)),
@@ -104,19 +126,8 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 						RunAsUser:    new(int64(1000)),
 					},
 					ServiceAccountName: e.Name(),
-					Volumes: []corev1.Volume{
-						{
-							Name: "config-volume",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: e.Name(),
-									},
-								},
-							},
-						},
-					},
-					ImagePullSecrets: imagePullSecrets,
+					Volumes:            volumes,
+					ImagePullSecrets:   imagePullSecrets,
 				}),
 		},
 	}

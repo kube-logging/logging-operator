@@ -29,6 +29,22 @@ func (e *EventTailer) Name() string {
 	return fmt.Sprintf("%v-%v", e.customResource.Name, config.EventTailer.TailerAffix)
 }
 
+func (e *EventTailer) image() string {
+	if e.customResource.Spec.Image != nil {
+		if repositoryWithTag := e.customResource.Spec.Image.RepositoryWithTag(); repositoryWithTag != "" {
+			return repositoryWithTag
+		}
+	}
+	if e.customResource.Spec.ContainerBase != nil && e.customResource.Spec.ContainerBase.Image != "" {
+		return e.customResource.Spec.ContainerBase.Image
+	}
+	return config.EventTailer.ImageWithTag
+}
+
+func (e *EventTailer) usesEnvConfig() bool {
+	return config.EventTailer.UsesEnvConfig(e.image())
+}
+
 func (e *EventTailer) objectMeta() metav1.ObjectMeta {
 	meta := metav1.ObjectMeta{
 		Name:            e.Name(),

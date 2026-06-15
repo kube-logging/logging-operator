@@ -77,10 +77,27 @@ var HostTailer = HostTailerConfig{
 
 // EventTailer configuration
 var EventTailer = EventTailerConfig{
-	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:0.5.0",
+	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:1.0.0",
 	TailerAffix:           "event-tailer",
 	ConfigurationFileName: "config.json",
 	PositionVolumeName:    "event-tailer-position",
+}
+
+// EventTailerEnvConfigVersion is the eventrouter release that replaced the JSON config file with environment-variable configuration.
+const EventTailerEnvConfigVersion = "1.0.0"
+
+// UsesEnvConfig reports whether the image is configured via env vars (>= 1.0.0); non-semver tags (e.g. "latest", a bare digest) are treated as modern.
+func (t EventTailerConfig) UsesEnvConfig(image string) bool {
+	ref := image
+	if i := strings.Index(ref, "@"); i != -1 {
+		ref = ref[:i]
+	}
+	tag := ref[strings.LastIndex(ref, ":")+1:]
+	v, err := semver.NewVersion(tag)
+	if err != nil {
+		return true
+	}
+	return !v.LessThan(semver.MustParse(EventTailerEnvConfigVersion))
 }
 
 // TailerWebhook configuration
