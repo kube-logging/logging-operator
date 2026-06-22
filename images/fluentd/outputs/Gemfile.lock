@@ -80,7 +80,7 @@ GEM
     bindata (2.5.1)
     bunny (2.14.4)
       amq-protocol (~> 2.3, >= 2.3.0)
-    concurrent-ruby (1.3.6)
+    concurrent-ruby (1.3.7)
     connection_pool (3.0.2)
     console (1.34.3)
       fiber-annotation
