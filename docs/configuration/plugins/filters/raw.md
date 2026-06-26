@@ -55,7 +55,7 @@ spec:
   filters:
     - raw:
         config: |
-          @type us_parser
+          @type ua_parser
           flatten
           key_name ua_string
   selectors: {}
@@ -67,7 +67,7 @@ Fluentd Config Result
 
 {{< highlight xml >}}
 <filter **>
-  @type us_parser
+  @type ua_parser
   @id test
   flatten
   key_name ua_string
