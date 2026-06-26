@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
+
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
@@ -191,7 +192,7 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool)) (*type
 			}
 
 			if paramName == "@type" {
-				directive.PluginMeta.Type = paramValue
+				directive.Type = paramValue
 			} else {
 				directive.Params[paramName] = paramValue
 			}
