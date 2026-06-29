@@ -29,7 +29,7 @@ GEM
       io-event (~> 1.11)
       metrics (~> 0.12)
       traces (~> 0.18)
-    async-http (0.95.0)
+    async-http (0.95.1)
       async (>= 2.10.2)
       async-pool (~> 0.11)
       io-endpoint (~> 0.14)
@@ -187,7 +187,7 @@ GEM
       fluent-mixin-config-placeholders
       fluentd
       syslog_protocol
-    fluent-plugin-s3 (1.8.4)
+    fluent-plugin-s3 (1.8.5)
       aws-sdk-s3 (~> 1.60)
       aws-sdk-sqs (~> 1.23)
       fluentd (>= 0.14.22, < 2)
@@ -213,7 +213,7 @@ GEM
     fluent-plugin-webhdfs (1.6.0)
       fluentd (>= 0.14.22)
       webhdfs (>= 0.11.0)
-    fluentd (1.19.2)
+    fluentd (1.19.3)
       async-http (~> 0.86)
       base64 (~> 0.2)
       bundler
@@ -320,7 +320,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.27.0)
-    msgpack (1.8.0)
+    msgpack (1.8.3)
     multi_json (1.17.0)
     mutex_m (0.3.0)
     myslog (0.1.1)
@@ -362,7 +362,7 @@ GEM
     prometheus-client (4.2.5)
       base64
     protocol-hpack (1.5.1)
-    protocol-http (0.62.0)
+    protocol-http (0.62.2)
     protocol-http1 (0.39.0)
       protocol-http (~> 0.62)
     protocol-http2 (0.26.0)
@@ -423,7 +423,7 @@ GEM
       ethon (>= 0.18.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    tzinfo-data (1.2026.1)
+    tzinfo-data (1.2026.2)
       tzinfo (>= 1.0.0)
     uber (0.1.0)
     uri (1.1.1)
@@ -465,7 +465,7 @@ DEPENDENCIES
   fluent-plugin-rabbitmq (= 0.1.5)
   fluent-plugin-redis (= 0.3.5)
   fluent-plugin-remote-syslog (= 1.1.0)
-  fluent-plugin-s3 (= 1.8.4)
+  fluent-plugin-s3 (= 1.8.5)
   fluent-plugin-splunk-hec (= 1.3.3)
   fluent-plugin-sqs (= 3.0.0)
   fluent-plugin-vmware-log-intelligence (= 2.0.8)
