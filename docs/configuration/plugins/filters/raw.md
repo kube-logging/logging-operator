@@ -6,7 +6,7 @@ generated_file: true
 
 # Raw
 ## Overview
- Configure custom or unexposed Fluentd filters via raw configuration. This allows you to specify any configuration that is not supported by the operator. The configuration should be in the format of a Fluentd filter configuration.
+ Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved).
 
 ## Example `Raw` filter configurations
 
@@ -56,7 +56,7 @@ spec:
     - raw:
         config: |
           @type ua_parser
-          flatten
+          flatten true
           key_name ua_string
   selectors: {}
   localOutputRefs:
@@ -69,7 +69,7 @@ Fluentd Config Result
 <filter **>
   @type ua_parser
   @id test
-  flatten
+  flatten true
   key_name ua_string
 </filter>
 {{</ highlight >}}
