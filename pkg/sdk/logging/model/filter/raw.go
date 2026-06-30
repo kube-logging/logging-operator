@@ -31,7 +31,7 @@ type _hugoRaw interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Raw"
-// Configure custom or unexposed Fluentd filters via raw configuration. This allows you to specify any configuration that is not supported by the operator. The configuration should be in the format of a Fluentd filter configuration.
+// Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved).
 /*
 ## Example `Raw` filter configurations
 
@@ -81,7 +81,7 @@ spec:
     - raw:
         config: |
           @type ua_parser
-          flatten
+          flatten true
           key_name ua_string
   selectors: {}
   localOutputRefs:
@@ -94,7 +94,7 @@ Fluentd Config Result
 <filter **>
   @type ua_parser
   @id test
-  flatten
+  flatten true
   key_name ua_string
 </filter>
 {{</ highlight >}}
@@ -103,7 +103,7 @@ Fluentd Config Result
 type _docRaw interface{} //nolint:deadcode,unused
 
 // +name:"Raw"
-// +url:"TODO"
+// +url:""
 // +version:""
 // +description:"Configure raw filter."
 // +status:""
@@ -135,21 +135,27 @@ func (r *Raw) ToDirective(secretLoader secret.SecretLoader, id string) (types.Di
 
 func parseRawConfig(config string) (*types.GenericDirective, error) {
 	scanner := bufio.NewScanner(strings.NewReader(config))
+	// Allow reasonably large raw configs (default token limit is 64K).
+	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 
 	// nextLine should return:
-	// line, eof
+	// line, eof, error
 	// eof=true means the end of input
-	nextLine := func() (string, bool) {
+	nextLine := func() (string, bool, error) {
 		if scanner.Scan() {
-			return scanner.Text(), false
+			return scanner.Text(), false, nil
 		}
-		return "", true
+
+		if err := scanner.Err(); err != nil {
+			return "", true, err
+		}
+		return "", true, nil
 	}
 
 	return doParseRawConfig("filter", nextLine)
 }
 
-func doParseRawConfig(sectionName string, nextLine func() (string, bool)) (*types.GenericDirective, error) {
+func doParseRawConfig(sectionName string, nextLine func() (string, bool, error)) (*types.GenericDirective, error) {
 	directive := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Directive: sectionName,
@@ -159,7 +165,10 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool)) (*type
 	}
 
 	for {
-		line, eof := nextLine()
+		line, eof, err := nextLine()
+		if err != nil {
+			return nil, err
+		}
 		if eof {
 			return directive, nil
 		}
@@ -171,10 +180,16 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool)) (*type
 
 		if matches := sectionPattern.FindStringSubmatch(line); matches != nil {
 			subSectionName := matches[1]
+			subSectionTag := strings.TrimSpace(matches[2])
 			subSectionDirective, err := doParseRawConfig(subSectionName, nextLine)
 			if err != nil {
 				return nil, err
 			}
+
+			if subSectionTag != "" {
+				subSectionDirective.Tag = subSectionTag
+			}
+
 			directive.SubDirectives = append(directive.SubDirectives, subSectionDirective)
 			continue
 		}
@@ -185,7 +200,7 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool)) (*type
 
 		if matches := paramPattern.FindStringSubmatch(line); matches != nil {
 			paramName := matches[1]
-			paramValue := matches[2]
+			paramValue := strings.TrimSpace(matches[2])
 
 			if paramName == "@id" {
 				continue // ignore @id parameter, as it is set by the operator

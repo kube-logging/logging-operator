@@ -54,7 +54,7 @@ func TestConfigureUnexposedFilterViaRawConfiguration(t *testing.T) {
 	CONFIG := []byte(`
 config: |
   @type ua_parser
-  flatten
+  flatten true
   key_name ua_string
 `)
 
@@ -62,7 +62,7 @@ config: |
 <filter **>
   @type ua_parser
   @id test
-  flatten
+  flatten true
   key_name ua_string
 </filter>
 `
