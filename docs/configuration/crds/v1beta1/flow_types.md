@@ -107,6 +107,9 @@ Filter definition for FlowSpec
 ### prometheus (*filter.PrometheusConfig, optional) {#filter-prometheus}
 
 
+### raw (*filter.Raw, optional) {#filter-raw}
+
+
 ### record_modifier (*filter.RecordModifier, optional) {#filter-record_modifier}
 
 
