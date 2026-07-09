@@ -143,6 +143,11 @@ SyslogNGTLS defines the TLS configs
 See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level). 
 
 
+### log_msg_size (*int, optional) {#globaloptions-log_msg_size}
+
+The maximum size of a message in bytes. Defaults to syslog-ng's built-in default of 8192 when unset. See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-log-msg-size). 
+
+
 ### stats (*Stats, optional) {#globaloptions-stats}
 
 See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-stats). 

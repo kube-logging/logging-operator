@@ -4216,6 +4216,8 @@ spec:
                 properties:
                   log_level:
                     type: string
+                  log_msg_size:
+                    type: integer
                   stats:
                     properties:
                       freq:
