@@ -210,7 +210,8 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 			paramValue := strings.TrimSpace(matches[2])
 
 			if paramName == "@id" {
-				continue // ignore @id parameter, as it is set by the operator
+				directive.Id = paramValue // top-level id will be overwritten by the operator; nested ids are preserved
+                continue
 			}
 
 			if paramName == "@type" {
@@ -225,3 +226,4 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 	}
 	return directive, nil
 }
+
