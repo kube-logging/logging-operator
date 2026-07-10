@@ -17,6 +17,7 @@ package filter_test
 import (
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 
@@ -30,7 +31,7 @@ config: |
   @type my_filter
   <my_section>
     foo bar
-  	tags ["web", "api", "db"]
+    tags ["web", "api", "db"]
   </my_section>
 `)
 
@@ -39,8 +40,8 @@ config: |
   @type my_filter
   @id test
   <my_section>
-	foo bar
-	tags ["web", "api", "db"]
+    foo bar
+    tags ["web", "api", "db"]
   </my_section>
 </filter>
 `
@@ -70,4 +71,44 @@ config: |
 	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
 	test := render.NewOutputPluginTest(t, parser)
 	test.DiffResult(expected)
+}
+
+type mockSecretLoader struct{}
+
+func (m mockSecretLoader) Load(secret *secret.Secret) (string, error) {
+	return "", nil
+}
+
+func TestRawConfigurationMissingType(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  <my_section>
+    foo bar
+    tags ["web", "api", "db"]
+  </my_section>
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "raw filter config must specify @type", err.Error())
+}
+
+func TestRawConfigurationUnclosedSection(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  @type my_filter
+  <my_section>
+    foo bar
+    tags ["web", "api", "db"]
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "unexpected end of raw config: missing closing tag </my_section>", err.Error())
 }

@@ -24,7 +24,7 @@ spec:
           @type my_filter
           <my_section>
             foo bar
-        	tags ["web", "api", "db"]
+            tags ["web", "api", "db"]
           </my_section>
   selectors: {}
   localOutputRefs:

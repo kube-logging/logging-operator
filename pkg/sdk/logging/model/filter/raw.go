@@ -49,7 +49,7 @@ spec:
           @type my_filter
           <my_section>
             foo bar
-        	tags ["web", "api", "db"]
+            tags ["web", "api", "db"]
           </my_section>
   selectors: {}
   localOutputRefs:
@@ -126,6 +126,10 @@ func (r *Raw) ToDirective(secretLoader secret.SecretLoader, id string) (types.Di
 		return nil, err
 	}
 
+	if raw.Type == "" {
+		return nil, fmt.Errorf("raw filter config must specify @type")
+	}
+
 	raw.Id = id
 	raw.Tag = "**"
 	raw.Directive = "filter"
@@ -170,6 +174,9 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 			return nil, err
 		}
 		if eof {
+			if sectionName != "filter" {
+				return nil, fmt.Errorf("unexpected end of raw config: missing closing tag </%s>", sectionName)
+			}
 			return directive, nil
 		}
 
