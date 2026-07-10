@@ -211,7 +211,7 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 
 			if paramName == "@id" {
 				directive.Id = paramValue // top-level id will be overwritten by the operator; nested ids are preserved
-                continue
+				continue
 			}
 
 			if paramName == "@type" {
@@ -226,4 +226,3 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 	}
 	return directive, nil
 }
-
