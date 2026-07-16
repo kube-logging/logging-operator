@@ -714,6 +714,11 @@ spec:
                             type: object
                           type: array
                       type: object
+                    raw:
+                      properties:
+                        config:
+                          type: string
+                      type: object
                     record_modifier:
                       properties:
                         char_encoding:
@@ -1582,6 +1587,11 @@ spec:
                             - type
                             type: object
                           type: array
+                      type: object
+                    raw:
+                      properties:
+                        config:
+                          type: string
                       type: object
                     record_modifier:
                       properties:
