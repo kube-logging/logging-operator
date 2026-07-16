@@ -120,6 +120,9 @@ type GlobalOptions struct {
 	Stats *Stats `json:"stats,omitempty"`
 	// See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-options-log-level).
 	LogLevel *string `json:"log_level,omitempty"`
+	// The maximum size of a message in bytes. Defaults to syslog-ng's built-in default of 8192 when unset.
+	// See the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-global-options/reference-options/#global-option-log-msg-size).
+	LogMsgSize *int `json:"log_msg_size,omitempty"`
 }
 
 type Stats struct {

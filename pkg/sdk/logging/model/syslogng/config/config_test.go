@@ -370,6 +370,36 @@ source "main_input" {
 };
 `,
 		},
+		"global options log_msg_size": {
+			input: Input{
+				SyslogNGSpec: &v1beta1.SyslogNGSpec{
+					GlobalOptions: &v1beta1.GlobalOptions{
+						LogMsgSize: amp(32768),
+					},
+				},
+				SourcePort:          601,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+			},
+			wantOut: `@version: current
+
+@include "scl.conf"
+
+options {
+    log_msg_size(32768);
+};
+
+source "main_input" {
+    channel {
+        source {
+            network(flags("no-parse") port(601) transport("tcp"));
+        };
+        parser {
+            json-parser(prefix("json."));
+        };
+    };
+};
+`,
+		},
 		"rewrite condition": {
 			input: Input{
 				SyslogNGSpec:        &v1beta1.SyslogNGSpec{},
