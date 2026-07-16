@@ -79,6 +79,7 @@ type Filter struct {
 	Prometheus          *filter.PrometheusConfig          `json:"prometheus,omitempty"`
 	Throttle            *filter.Throttle                  `json:"throttle,omitempty"`
 	KubeEventsTimestamp *filter.KubeEventsTimestampConfig `json:"kube_events_timestamp,omitempty"`
+	Raw                 *filter.Raw                       `json:"raw,omitempty"`
 }
 
 // FlowStatus defines the observed state of Flow

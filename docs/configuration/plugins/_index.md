@@ -19,6 +19,7 @@ For more information please click on the plugin name
 | **[Kubernetes Events Timestamp](filters/kube_events_timestamp/)** | filters | Fluentd Filter plugin to select particular timestamp into an additional field | GA | [0.1.4](https://github.com/kube-logging/fluentd-filter-kube-events-timestamp) |
 | **[Parser](filters/parser/)** | filters | Parses a string field in event records and mutates its event record with the parsed result. | GA | [more info](https://docs.fluentd.org/filter/parser) |
 | **[Prometheus](filters/prometheus/)** | filters | Prometheus Filter Plugin to count Incoming Records | GA | [2.0.2](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin) |
+| **[Raw](filters/raw/)** | filters | Configure raw filter. |  | []() |
 | **[Record Modifier](filters/record_modifier/)** | filters | Modify each event record. | GA | [2.1.0](https://github.com/repeatedly/fluent-plugin-record-modifier) |
 | **[Record Transformer](filters/record_transformer/)** | filters | Mutates/transforms incoming event streams. | GA | [more info](https://docs.fluentd.org/filter/record_transformer) |
 | **[Stdout](filters/stdout/)** | filters | Prints events to stdout | GA | [more info](https://docs.fluentd.org/filter/stdout) |
