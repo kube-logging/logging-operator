@@ -30,6 +30,8 @@ assume_role_credentials:
   role_arn: arn:aws:iam::123456789012:role/logs
 s3_bucket: logging-amazon-s3
 s3_region: eu-central-1
+ssl_ca_bundle: /etc/ssl/certs/private-ca-bundle.pem
+ssl_ca_directory: /etc/ssl/certs/private-ca
 path: logs/${tag}/%Y/%m/%d/
 compress:
   parquet_compression_codec: snappy
@@ -46,6 +48,8 @@ buffer:
     s3_bucket logging-amazon-s3
     s3_object_key_format %{path}%{time_slice}_%{uuid_hash}_%{index}.%{file_extension}
     s3_region eu-central-1
+    ssl_ca_bundle /etc/ssl/certs/private-ca-bundle.pem
+    ssl_ca_directory /etc/ssl/certs/private-ca
     <buffer tag,time>
       @type file
       path /buffers/test.*.buffer
