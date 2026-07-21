@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, error) {
@@ -49,7 +50,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				TargetPort: intstr.IntOrString{IntVal: model.ConfigReloaderMetricsPort},
 			})
 		}
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports:     ports,
@@ -57,7 +58,13 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.fluentbitSpec.EnabledIPv6 {
+			v1beta1.EnableIPv6Options(&desired.Spec)
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
@@ -143,7 +150,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 			port = r.fluentbitSpec.BufferVolumeMetrics.Port
 		}
 
-		return &corev1.Service{
+		desired := &corev1.Service{
 			ObjectMeta: objectMetadata,
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
@@ -158,7 +165,13 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
-		}, reconciler.StatePresent, nil
+		}
+
+		if r.fluentbitSpec.EnabledIPv6 {
+			v1beta1.EnableIPv6Options(&desired.Spec)
+		}
+
+		return desired, reconciler.StatePresent, nil
 	}
 	return &corev1.Service{
 		ObjectMeta: objectMetadata,
