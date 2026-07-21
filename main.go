@@ -61,6 +61,7 @@ import (
 	loggingv1alpha1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1alpha1"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 	"github.com/kube-logging/logging-operator/pkg/webhook/podhandler"
 	//nolint: gci
 	// +kubebuilder:scaffold:imports
@@ -96,6 +97,7 @@ func main() {
 	var enableTelemetryControllerRoute bool
 	var klogLevel int
 	var syncPeriod string
+	var enableRawFilter bool
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
@@ -111,6 +113,7 @@ func main() {
 	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
 	flag.BoolVar(&enableTelemetryControllerRoute, "enable-telemetry-controller-route", false, "Enable the Telemetry Controller route for Logging resources")
 	flag.StringVar(&syncPeriod, "sync-period", "", "SyncPeriod determines the minimum frequency at which watched resources are reconciled. Defaults to 10 hours. Parsed using time.ParseDuration.")
+	flag.BoolVar(&enableRawFilter, "enable-raw-filter", false, "Enable the raw filter for ClusterFlow/Flow")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -204,6 +207,8 @@ func main() {
 		setupLog.Error(err, "failed to detect container runtime")
 		os.Exit(1)
 	}
+
+	plugins.EnableRawFilter = enableRawFilter
 
 	loggingReconciler := controllers.NewLoggingReconciler(mgr.GetClient(), mgr.GetEventRecorder("logging-operator"), ctrl.Log.WithName("logging"))
 

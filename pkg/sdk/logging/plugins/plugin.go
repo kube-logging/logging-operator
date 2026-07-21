@@ -21,8 +21,11 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	modelfilter "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
+
+var EnableRawFilter bool = false
 
 type DirectiveConverter interface {
 	ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error)
@@ -62,8 +65,20 @@ func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLo
 	case 0:
 		return nil, errors.New("no plugin config available for filter")
 	case 1:
+		if err := checkRawFilter(converters); err != nil {
+			return nil, err
+		}
 		return converters[0].ToDirective(secretLoader, id)
 	default:
 		return nil, errors.Errorf("more then one plugin config is not allowed for a filter")
 	}
+}
+
+func checkRawFilter(converters []DirectiveConverter) error {
+	if _, ok := converters[0].(*modelfilter.Raw); ok {
+		if !EnableRawFilter {
+			return errors.New("raw filter is disabled, please enable it with the --enable-raw-filter flag")
+		}
+	}
+	return nil
 }
