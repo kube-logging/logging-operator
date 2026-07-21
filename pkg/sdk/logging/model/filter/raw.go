@@ -31,7 +31,7 @@ type _hugoRaw interface{} //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Raw"
-// Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved).
+// Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved). Disabled by default, need to set option `-enable-raw-filter=true` to enable it.
 /*
 ## Example `Raw` filter configurations
 
