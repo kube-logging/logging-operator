@@ -7,7 +7,7 @@ kind: HostTailer
 metadata:
   name: {{ .name }}
   {{- with .namespace }}
-  namespace: {{ . }}
+  namespace: {{ . | quote }}
   {{- end }}
 spec:
   {{- with .fileTailers }}
