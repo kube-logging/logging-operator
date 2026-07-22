@@ -285,6 +285,8 @@ logging:
     # -- List of hostTailers configurations
     instances: []
     # - name: hosttailer
+      # -- Namespace of the HostTailer resource
+      # namespace: custom-namespace
       # -- Enable hostTailer
       # enabled: true
       # -- workloadMetaOverrides of HostTailer
