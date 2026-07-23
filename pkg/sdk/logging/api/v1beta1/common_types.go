@@ -201,5 +201,5 @@ type ReadinessDefaultCheck struct {
 func EnableIPv6Options(serviceSpec *corev1.ServiceSpec) {
 	ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
 	serviceSpec.IPFamilyPolicy = &ipFamilyPolicy
-	serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+	serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
 }
