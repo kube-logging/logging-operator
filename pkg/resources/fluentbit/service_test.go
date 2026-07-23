@@ -79,5 +79,5 @@ func assertIPFamilies(t *testing.T, object runtime.Object, enabledIPv6 bool) {
 
 	require.NotNil(t, service.Spec.IPFamilyPolicy)
 	require.Equal(t, corev1.IPFamilyPolicyPreferDualStack, *service.Spec.IPFamilyPolicy)
-	require.Equal(t, []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}, service.Spec.IPFamilies)
+	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, service.Spec.IPFamilies)
 }
