@@ -150,10 +150,13 @@ func (s *SyslogNGSpec) SetDefaults() {
 			}
 		}
 		if s.SyslogNGImage == nil {
-			s.SyslogNGImage = &BasicImageSpec{
-				Repository: defaultSyslogngImageRepository,
-				Tag:        defaultSyslogngImageTag,
-			}
+			s.SyslogNGImage = &BasicImageSpec{}
+		}
+		if s.SyslogNGImage.Repository == "" {
+			s.SyslogNGImage.Repository = defaultSyslogngImageRepository
+		}
+		if s.SyslogNGImage.Tag == "" {
+			s.SyslogNGImage.Tag = defaultSyslogngImageTag
 		}
 		if s.ConfigReloadImage == nil {
 			s.ConfigReloadImage = &BasicImageSpec{}
@@ -169,10 +172,13 @@ func (s *SyslogNGSpec) SetDefaults() {
 			}
 		}
 		if s.MetricsExporterImage == nil {
-			s.MetricsExporterImage = &BasicImageSpec{
-				Repository: defaultPrometheusExporterImageRepository,
-				Tag:        defaultPrometheusExporterImageTag,
-			}
+			s.MetricsExporterImage = &BasicImageSpec{}
+		}
+		if s.MetricsExporterImage.Repository == "" {
+			s.MetricsExporterImage.Repository = defaultPrometheusExporterImageRepository
+		}
+		if s.MetricsExporterImage.Tag == "" {
+			s.MetricsExporterImage.Tag = defaultPrometheusExporterImageTag
 		}
 		if s.BufferVolumeMetricsImage == nil {
 			s.BufferVolumeMetricsImage = &BasicImageSpec{}
