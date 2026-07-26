@@ -364,6 +364,12 @@ Default: disabled
 
 BufferStorage is the Service Section Configuration of fluent-bit
 
+### storage.backlog.flush_on_shutdown (string, optional) {#bufferstorage-storage.backlog.flush_on_shutdown}
+
+If enabled, Fluent Bit attempts to flush all backlog filesystem chunks to their destination during the shutdown process. This avoids losing buffered records when a node is drained or a spot instance is reclaimed.
+
+Default: Off
+
 ### storage.backlog.mem_limit (string, optional) {#bufferstorage-storage.backlog.mem_limit}
 
 If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records.

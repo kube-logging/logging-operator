@@ -222,6 +222,8 @@ type BufferStorage struct {
 	StorageDeleteIrrecoverableChunks string `json:"storage.delete_irrecoverable_chunks,omitempty"`
 	// If storage.path is set, Fluent Bit will look for data chunks that were not delivered and are still in the storage layer, these are called backlog data. This option configure a hint of maximum value of memory to use when processing these records. (default:5M)
 	StorageBacklogMemLimit string `json:"storage.backlog.mem_limit,omitempty"`
+	// If enabled, Fluent Bit attempts to flush all backlog filesystem chunks to their destination during the shutdown process. This avoids losing buffered records when a node is drained or a spot instance is reclaimed. (default:Off)
+	StorageBacklogFlushOnShutdown string `json:"storage.backlog.flush_on_shutdown,omitempty"`
 	// Available in Logging operator version 4.4 and later. If the `http_server` option has been enabled in the main Service configuration section, this option registers a new endpoint where internal metrics of the storage layer can be consumed. (default:Off)
 	StorageMetrics string `json:"storage.metrics,omitempty"`
 	// If the input plugin has enabled filesystem storage type, this property sets the maximum number of Chunks that can be up in memory. This is the setting to use to control memory usage when you enable storage.type filesystem. (default: 128)
