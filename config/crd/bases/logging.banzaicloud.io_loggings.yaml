@@ -1336,6 +1336,8 @@ spec:
                     type: object
                   bufferStorage:
                     properties:
+                      storage.backlog.flush_on_shutdown:
+                        type: string
                       storage.backlog.mem_limit:
                         type: string
                       storage.checksum:

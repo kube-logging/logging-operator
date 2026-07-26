@@ -18,8 +18,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 func TestInvalidFilterGrepConfig(t *testing.T) {
@@ -52,4 +54,55 @@ func TestValidFilterGrepConfig(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.EqualValues(t, parserFluentdFilterGrep, expectedFluentFilterGrep)
+}
+
+func TestBufferStorageServiceSection(t *testing.T) {
+	testCases := []struct {
+		name          string
+		bufferStorage v1beta1.BufferStorage
+		expected      []string
+		notExpected   []string
+	}{
+		{
+			name: "flush_on_shutdown enabled",
+			bufferStorage: v1beta1.BufferStorage{
+				StoragePath:                   "/buffers",
+				StorageBacklogFlushOnShutdown: "On",
+			},
+			expected: []string{
+				"storage.path  /buffers",
+				"storage.backlog.flush_on_shutdown  On",
+			},
+		},
+		{
+			name: "flush_on_shutdown disabled explicitly",
+			bufferStorage: v1beta1.BufferStorage{
+				StorageBacklogFlushOnShutdown: "Off",
+			},
+			expected: []string{"storage.backlog.flush_on_shutdown  Off"},
+		},
+		{
+			name:          "flush_on_shutdown unset stays out of the config",
+			bufferStorage: v1beta1.BufferStorage{StoragePath: "/buffers"},
+			expected:      []string{"storage.path  /buffers"},
+			notExpected:   []string{"storage.backlog.flush_on_shutdown"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			mapped, err := types.NewStructToStringMapper(nil).StringsMap(testCase.bufferStorage)
+			require.NoError(t, err)
+
+			rendered, err := generateConfig(fluentBitConfig{BufferStorage: mapped})
+			require.NoError(t, err)
+
+			for _, expected := range testCase.expected {
+				assert.Contains(t, rendered, expected)
+			}
+			for _, notExpected := range testCase.notExpected {
+				assert.NotContains(t, rendered, notExpected)
+			}
+		})
+	}
 }
