@@ -104,6 +104,8 @@ type LoggingSpec struct {
 	// RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource
 	// that can be managed by the Telemetry Controller.
 	RouteConfig *RouteConfig `json:"routeConfig,omitempty"`
+	// EnableRawFluentdFilter enables the use of the Raw filter for fluentd. This allows users to configure custom or unexposed Fluentd filters via raw configuration.
+	EnableRawFluentdFilter bool `json:"enableRawFluentdFilter,omitempty"`
 }
 
 type ConfigCheckStrategy string

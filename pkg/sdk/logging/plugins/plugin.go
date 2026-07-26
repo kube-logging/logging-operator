@@ -77,7 +77,7 @@ func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLo
 func checkRawFilter(converters []DirectiveConverter) error {
 	if _, ok := converters[0].(*modelfilter.Raw); ok {
 		if !EnableRawFilter {
-			return errors.New("raw filter is disabled, please enable it with the --enable-raw-filter flag")
+			return errors.New("raw filter is disabled, need to set Logging.Spec.EnableRawFluentdFilter=true to enable it")
 		}
 	}
 	return nil

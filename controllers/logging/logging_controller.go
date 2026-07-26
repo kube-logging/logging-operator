@@ -51,6 +51,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 const (
@@ -307,6 +308,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if shouldReturn, err := r.syslogNGConfigFinalizer(ctx, &logging, syslogNGExternal); shouldReturn || err != nil {
 		return ctrl.Result{}, err
 	}
+
+	plugins.EnableRawFilter = logging.Spec.EnableRawFluentdFilter
 
 	return ctrl.Result{}, nil
 }

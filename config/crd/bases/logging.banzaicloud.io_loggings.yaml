@@ -879,6 +879,8 @@ spec:
                 type: object
               enableDockerParserCompatibilityForCRI:
                 type: boolean
+              enableRawFluentdFilter:
+                type: boolean
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
               errorOutputRef:
