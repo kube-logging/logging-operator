@@ -769,6 +769,7 @@ spec:
                         raw:
                           properties:
                             config:
+                              maxLength: 65536
                               type: string
                           type: object
                         record_modifier:
@@ -7929,6 +7930,7 @@ spec:
                     raw:
                       properties:
                         config:
+                          maxLength: 65536
                           type: string
                       type: object
                     record_modifier:

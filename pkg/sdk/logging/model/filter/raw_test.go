@@ -15,6 +15,8 @@
 package filter_test
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
@@ -23,6 +25,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
 func TestConfigureCustomFilterViaRawConfiguration(t *testing.T) {
@@ -111,6 +114,61 @@ config: |
 	_, err := parser.ToDirective(mockSecretLoader{}, "test")
 	require.Error(t, err)
 	require.Equal(t, "unexpected end of raw config: missing closing tag </my_section>", err.Error())
+}
+
+func TestRawConfigurationRejectsExcessiveNesting(t *testing.T) {
+	depth := 64
+	parser := &filter.Raw{
+		Config: "@type my_filter\n" +
+			strings.Repeat("<s>\n", depth) +
+			strings.Repeat("</s>\n", depth),
+	}
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "raw config nesting is too deep: exceeds maximum of 32 levels", err.Error())
+}
+
+func TestRawConfigurationAllowsRealisticNesting(t *testing.T) {
+	depth := 32
+	parser := &filter.Raw{
+		Config: "@type my_filter\n" +
+			strings.Repeat("<s>\n", depth) +
+			strings.Repeat("</s>\n", depth),
+	}
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.NoError(t, err)
+}
+
+func TestRawConfigurationRejectsOversizedConfig(t *testing.T) {
+	parser := &filter.Raw{
+		Config: "@type my_filter\n" + strings.Repeat("key value\n", 8*1024),
+	}
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "raw config is too large: 81936 bytes exceeds maximum of 65536", err.Error())
+}
+
+// Rendered size must stay bounded: indentation grows with nesting depth, so an
+// unbounded config could otherwise amplify a small Flow into gigabytes of config.
+func TestRawConfigurationRenderedSizeIsBounded(t *testing.T) {
+	depth := 32
+	body := strings.Repeat("k v\n", 8*1024)
+	parser := &filter.Raw{
+		Config: "@type my_filter\n" +
+			strings.Repeat("<s>\n", depth) + body + strings.Repeat("</s>\n", depth),
+	}
+
+	directive, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	renderer := render.FluentRender{Out: &buf, Indent: 2}
+	require.NoError(t, renderer.RenderDirectives([]types.Directive{directive}, 0))
+
+	require.Less(t, buf.Len(), 4*1024*1024, "rendered raw filter must stay bounded")
 }
 
 func TestConfigureRawFilterWithNestedFilterSection(t *testing.T) {

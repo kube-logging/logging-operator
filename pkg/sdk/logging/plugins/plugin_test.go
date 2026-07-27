@@ -86,6 +86,27 @@ func TestCreateFilterRawGate(t *testing.T) {
 	}
 }
 
+func TestHasRawFilter(t *testing.T) {
+	stdout := v1beta1.Filter{StdOut: &modelfilter.StdOutFilterConfig{OutputType: "json"}}
+
+	tests := []struct {
+		name    string
+		filters []v1beta1.Filter
+		want    bool
+	}{
+		{name: "no filters", filters: nil, want: false},
+		{name: "only non-raw filters", filters: []v1beta1.Filter{stdout}, want: false},
+		{name: "raw filter alone", filters: []v1beta1.Filter{rawFilter()}, want: true},
+		{name: "raw filter among others", filters: []v1beta1.Filter{stdout, rawFilter()}, want: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.want, plugins.HasRawFilter(tt.filters))
+		})
+	}
+}
+
 func TestCreateFilterDefaultsToRawDisabled(t *testing.T) {
 	_, err := plugins.CreateFilter(rawFilter(), "test", nil)
 	require.Error(t, err)

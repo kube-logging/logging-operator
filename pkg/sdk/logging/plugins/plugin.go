@@ -25,8 +25,21 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
+// ErrRawFilterDisabled is returned when a filter uses the raw plugin while the feature is disabled on the Logging resource.
+var ErrRawFilterDisabled = errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
+
 type CreateFilterOptions struct {
 	RawFilterEnabled bool
+}
+
+// HasRawFilter reports whether any of the filters uses the raw plugin.
+func HasRawFilter(filters []v1beta1.Filter) bool {
+	for _, f := range filters {
+		if f.Raw != nil {
+			return true
+		}
+	}
+	return false
 }
 
 type DirectiveConverter interface {
@@ -86,12 +99,8 @@ func checkRawFilter(converters []DirectiveConverter, options *CreateFilterOption
 	}
 
 	if options == nil || !options.RawFilterEnabled {
-		return rawFilterIsDisabledError()
+		return ErrRawFilterDisabled
 	}
 
 	return nil
-}
-
-func rawFilterIsDisabledError() error {
-	return errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
 }

@@ -33,7 +33,9 @@ type _hugoRaw interface{} //nolint:deadcode,unused
 // +docName:"Raw"
 // Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved). Disabled by default, set `logging.spec.enableRawFluentdFilter=true` on the Logging resource to enable it.
 //
-// > **Security warning:** enabling the flag grants **every** user who can create a `Flow` or `ClusterFlow` in the logging domain the ability to inject arbitrary configuration (and thereby run arbitrary code, for example via `exec`-style plugins) in the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys. Treat it as a break-glass setting and enable it only if you trust all Flow authors in the cluster.
+// > **Security warning:** enabling the flag grants **every** user who can create a `Flow` or `ClusterFlow` in the logging domain the ability to inject arbitrary configuration (and thereby run arbitrary code, for example via `exec`-style plugins) in the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys. Treat it as a break-glass setting and enable it only if you trust all Flow authors in the cluster. Setting the flag back to `false` does not retroactively remove already rendered raw configuration: delete the offending `Flow`, then rotate the aggregator's credentials and restart it.
+//
+// The configuration is limited to 64 KiB and 32 levels of nesting.
 /*
 ## Example `Raw` filter configurations
 
@@ -117,9 +119,18 @@ var (
 	paramPattern   = regexp.MustCompile(`^([^\s<]+)\s*(.*)$`)
 )
 
+const (
+	// Rendered output grows with the square of the nesting depth (every level
+	// indents all enclosed lines), so depth must stay bounded to keep a single
+	// Flow from exhausting the operator's memory.
+	maxRawConfigDepth = 32
+	maxRawConfigBytes = 64 * 1024
+)
+
 // +kubebuilder:object:generate=true
 type Raw struct {
 	// Raw configuration for the filter.
+	// +kubebuilder:validation:MaxLength=65536
 	Config string `json:"config,omitempty"`
 }
 
@@ -144,6 +155,10 @@ func (r *Raw) ToDirective(secretLoader secret.SecretLoader, id string) (types.Di
 }
 
 func parseRawConfig(config string) (*types.GenericDirective, error) {
+	if len(config) > maxRawConfigBytes {
+		return nil, fmt.Errorf("raw config is too large: %d bytes exceeds maximum of %d", len(config), maxRawConfigBytes)
+	}
+
 	scanner := bufio.NewScanner(strings.NewReader(config))
 	// Allow reasonably large raw configs (default token limit is 64K).
 	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
@@ -162,10 +177,14 @@ func parseRawConfig(config string) (*types.GenericDirective, error) {
 		return "", true, nil
 	}
 
-	return doParseRawConfig("filter", true, nextLine)
+	return doParseRawConfig("filter", true, 0, nextLine)
 }
 
-func doParseRawConfig(sectionName string, topLevel bool, nextLine func() (string, bool, error)) (*types.GenericDirective, error) {
+func doParseRawConfig(sectionName string, topLevel bool, depth int, nextLine func() (string, bool, error)) (*types.GenericDirective, error) {
+	if depth > maxRawConfigDepth {
+		return nil, fmt.Errorf("raw config nesting is too deep: exceeds maximum of %d levels", maxRawConfigDepth)
+	}
+
 	directive := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Directive: sectionName,
@@ -201,7 +220,7 @@ func doParseRawConfig(sectionName string, topLevel bool, nextLine func() (string
 		if matches := sectionPattern.FindStringSubmatch(line); matches != nil {
 			subSectionName := matches[1]
 			subSectionTag := strings.TrimSpace(matches[2])
-			subSectionDirective, err := doParseRawConfig(subSectionName, false, nextLine)
+			subSectionDirective, err := doParseRawConfig(subSectionName, false, depth+1, nextLine)
 			if err != nil {
 				return nil, err
 			}

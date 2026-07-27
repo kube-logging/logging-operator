@@ -29,6 +29,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/mirror"
 	"github.com/kube-logging/logging-operator/pkg/resources/configcheck"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 const LoggingRefConflict = "Other logging resources exist with the same loggingRef"
@@ -116,6 +117,10 @@ func NewValidationReconciler( //nolint: gocyclo
 				flow.Status.Problems = append(flow.Status.Problems, "\"outputRefs\" field is deprecated, use \"globalOutputRefs\" instead")
 			}
 
+			if !resources.Logging.Spec.EnableRawFluentdFilter && plugins.HasRawFilter(flow.Spec.Filters) {
+				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrRawFilterDisabled.Error())
+			}
+
 			for _, ref := range flow.Spec.GlobalOutputRefs {
 				switch output := resources.Fluentd.ClusterOutputs.FindByName(ref); {
 				case output == nil:
@@ -142,6 +147,10 @@ func NewValidationReconciler( //nolint: gocyclo
 
 			if len(flow.Spec.LocalOutputRefs)+len(flow.Spec.GlobalOutputRefs) == 0 && len(flow.Spec.OutputRefs) > 0 {
 				flow.Status.Problems = append(flow.Status.Problems, "\"outputRefs\" field is deprecated, use \"globalOutputRefs\" and \"localOutputRefs\" instead")
+			}
+
+			if !resources.Logging.Spec.EnableRawFluentdFilter && plugins.HasRawFilter(flow.Spec.Filters) {
+				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrRawFilterDisabled.Error())
 			}
 
 			hasValidOutput := false
