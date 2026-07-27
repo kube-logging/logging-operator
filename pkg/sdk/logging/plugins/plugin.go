@@ -16,7 +16,6 @@ package plugins
 
 import (
 	"reflect"
-	"sync"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
@@ -26,14 +25,8 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
-var enableRawFilterMap sync.Map = sync.Map{}
-
-func EnableRawFilter(loggingRef string, enabled bool) {
-	enableRawFilterMap.Store(loggingRef, enabled)
-}
-
 type CreateFilterOptions struct {
-	LoggingRef string
+	RawFilterEnabled bool
 }
 
 type DirectiveConverter interface {
@@ -92,11 +85,7 @@ func checkRawFilter(converters []DirectiveConverter, options *CreateFilterOption
 		return nil
 	}
 
-	if options == nil {
-		return rawFilterIsDisabledError()
-	}
-
-	if enabled, ok := enableRawFilterMap.Load(options.LoggingRef); !ok || !enabled.(bool) {
+	if options == nil || !options.RawFilterEnabled {
 		return rawFilterIsDisabledError()
 	}
 

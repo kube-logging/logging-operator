@@ -51,7 +51,6 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/render"
 	syslogngconfig "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config"
 	loggingmodeltypes "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 const (
@@ -118,8 +117,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// For additional cleanup logic use finalizers.
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
-
-	plugins.EnableRawFilter(logging.Spec.LoggingRef, logging.Spec.EnableRawFluentdFilter)
 
 	var missingCRDs []string
 

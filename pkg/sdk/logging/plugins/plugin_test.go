@@ -24,9 +24,8 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
-func TestRawFilterIsDisabled(t *testing.T) {
-	plugins.EnableRawFilter("test-logging", false)
-	filter := v1beta1.Filter{
+func rawFilter() v1beta1.Filter {
+	return v1beta1.Filter{
 		Raw: &modelfilter.Raw{
 			Config: `
 @type my_filter
@@ -37,39 +36,58 @@ func TestRawFilterIsDisabled(t *testing.T) {
 			`,
 		},
 	}
-	_, err := plugins.CreateFilter(filter, "test", nil)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "raw filter is disabled")
-
-	_, err = plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "raw filter is disabled")
-
-	filter = v1beta1.Filter{
-		StdOut: &modelfilter.StdOutFilterConfig{
-			OutputType: "json",
-		},
-	}
-	_, err = plugins.CreateFilter(filter, "test", nil)
-	require.NoError(t, err)
-
-	_, err = plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
-	require.NoError(t, err)
 }
 
-func TestRawFilterIsEnabled(t *testing.T) {
-	plugins.EnableRawFilter("test-logging", true)
-	filter := v1beta1.Filter{
-		Raw: &modelfilter.Raw{
-			Config: `
-@type my_filter
-<my_section>
-  foo bar
-  tags ["web", "api", "db"]
-</my_section>
-			`,
+func TestCreateFilterRawGate(t *testing.T) {
+	tests := []struct {
+		name    string
+		filter  v1beta1.Filter
+		options *plugins.CreateFilterOptions
+		wantErr string
+	}{
+		{
+			name:    "raw filter rejected without options",
+			filter:  rawFilter(),
+			options: nil,
+			wantErr: "raw filter is disabled",
+		},
+		{
+			name:    "raw filter rejected when disabled",
+			filter:  rawFilter(),
+			options: &plugins.CreateFilterOptions{RawFilterEnabled: false},
+			wantErr: "raw filter is disabled",
+		},
+		{
+			name:    "raw filter allowed when enabled",
+			filter:  rawFilter(),
+			options: &plugins.CreateFilterOptions{RawFilterEnabled: true},
+		},
+		{
+			name: "non-raw filter unaffected without options",
+			filter: v1beta1.Filter{
+				StdOut: &modelfilter.StdOutFilterConfig{
+					OutputType: "json",
+				},
+			},
+			options: nil,
 		},
 	}
-	_, err := plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
-	require.NoError(t, err)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := plugins.CreateFilterWithOptions(tt.filter, "test", nil, tt.options)
+			if tt.wantErr != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCreateFilterDefaultsToRawDisabled(t *testing.T) {
+	_, err := plugins.CreateFilter(rawFilter(), "test", nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "raw filter is disabled")
 }
