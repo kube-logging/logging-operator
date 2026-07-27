@@ -11,7 +11,7 @@ For more information please click on the plugin name
 | **[Security](common/security/)** | common |  |  | []() |
 | **[Transport](common/transport/)** | common |  |  | []() |
 | **[Concat](filters/concat/)** | filters | Fluentd Filter plugin to concatenate multiline log separated in multiple events. | GA | [2.5.0](https://github.com/fluent-plugins-nursery/fluent-plugin-concat) |
-| **[Dedot](filters/dedot/)** | filters | Concatenate multiline log separated in multiple events | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
+| **[Dedot](filters/dedot/)** | filters | Fluentd Filter plugin to de-dot field name for elasticsearch | GA | [1.0.0](https://github.com/lunardial/fluent-plugin-dedot_filter) |
 | **[Exception Detector](filters/detect_exceptions/)** | filters | Exception Detector | GA | [0.0.14](https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions) |
 | **[ElasticSearch GenId](filters/elasticsearch_genid/)** | filters |  |  | [](TODO) |
 | **[Geo IP](filters/geoip/)** | filters | Fluentd GeoIP filter | GA | [1.3.2](https://github.com/y-ken/fluent-plugin-geoip) |

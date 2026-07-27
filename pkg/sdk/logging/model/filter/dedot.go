@@ -32,7 +32,7 @@ type _docDedot interface{} //nolint:deadcode,unused
 // +name:"Dedot"
 // +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
 // +version:"1.0.0"
-// +description:"Concatenate multiline log separated in multiple events"
+// +description:"Fluentd Filter plugin to de-dot field name for elasticsearch"
 // +status:"GA"
 type _metaDedot interface{} //nolint:deadcode,unused
 
