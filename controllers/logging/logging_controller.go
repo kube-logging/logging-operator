@@ -119,6 +119,8 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, client.IgnoreNotFound(err)
 	}
 
+	plugins.EnableRawFilter(logging.Spec.LoggingRef, logging.Spec.EnableRawFluentdFilter)
+
 	var missingCRDs []string
 
 	if err := r.List(ctx, &v1.ServiceMonitorList{}); err == nil {
@@ -308,8 +310,6 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if shouldReturn, err := r.syslogNGConfigFinalizer(ctx, &logging, syslogNGExternal); shouldReturn || err != nil {
 		return ctrl.Result{}, err
 	}
-
-	plugins.EnableRawFilter(logging.Spec.LoggingRef, logging.Spec.EnableRawFluentdFilter)
 
 	return ctrl.Result{}, nil
 }

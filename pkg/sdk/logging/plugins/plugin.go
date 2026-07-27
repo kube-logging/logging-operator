@@ -16,6 +16,7 @@ package plugins
 
 import (
 	"reflect"
+	"sync"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
@@ -25,10 +26,14 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
-var enableRawFilterMap map[string]bool = make(map[string]bool)
+var enableRawFilterMap sync.Map = sync.Map{}
 
 func EnableRawFilter(loggingRef string, enabled bool) {
-	enableRawFilterMap[loggingRef] = enabled
+	enableRawFilterMap.Store(loggingRef, enabled)
+}
+
+type CreateFilterOptions struct {
+	LoggingRef string
 }
 
 type DirectiveConverter interface {
@@ -55,7 +60,11 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	}
 }
 
-func CreateFilter(filter v1beta1.Filter, id string, loggingRef string, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLoader) (types.Directive, error) {
+	return CreateFilterWithOptions(filter, id, secretLoader, nil)
+}
+
+func CreateFilterWithOptions(filter v1beta1.Filter, id string, secretLoader secret.SecretLoader, options *CreateFilterOptions) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -69,7 +78,7 @@ func CreateFilter(filter v1beta1.Filter, id string, loggingRef string, secretLoa
 	case 0:
 		return nil, errors.New("no plugin config available for filter")
 	case 1:
-		if err := checkRawFilter(converters, loggingRef); err != nil {
+		if err := checkRawFilter(converters, options); err != nil {
 			return nil, err
 		}
 		return converters[0].ToDirective(secretLoader, id)
@@ -78,11 +87,22 @@ func CreateFilter(filter v1beta1.Filter, id string, loggingRef string, secretLoa
 	}
 }
 
-func checkRawFilter(converters []DirectiveConverter, loggingRef string) error {
-	if _, ok := converters[0].(*modelfilter.Raw); ok {
-		if !enableRawFilterMap[loggingRef] {
-			return errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
-		}
+func checkRawFilter(converters []DirectiveConverter, options *CreateFilterOptions) error {
+	if _, ok := converters[0].(*modelfilter.Raw); !ok {
+		return nil
 	}
+
+	if options == nil {
+		return rawFilterIsDisabledError()
+	}
+
+	if enabled, ok := enableRawFilterMap.Load(options.LoggingRef); !ok || !enabled.(bool) {
+		return rawFilterIsDisabledError()
+	}
+
 	return nil
+}
+
+func rawFilterIsDisabledError() error {
+	return errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
 }

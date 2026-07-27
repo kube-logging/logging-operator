@@ -37,7 +37,11 @@ func TestRawFilterIsDisabled(t *testing.T) {
 			`,
 		},
 	}
-	_, err := plugins.CreateFilter(filter, "test", "test-logging", nil)
+	_, err := plugins.CreateFilter(filter, "test", nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "raw filter is disabled")
+
+	_, err = plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "raw filter is disabled")
 
@@ -46,7 +50,10 @@ func TestRawFilterIsDisabled(t *testing.T) {
 			OutputType: "json",
 		},
 	}
-	_, err = plugins.CreateFilter(filter, "test", "test-logging", nil)
+	_, err = plugins.CreateFilter(filter, "test", nil)
+	require.NoError(t, err)
+
+	_, err = plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
 	require.NoError(t, err)
 }
 
@@ -63,6 +70,6 @@ func TestRawFilterIsEnabled(t *testing.T) {
 			`,
 		},
 	}
-	_, err := plugins.CreateFilter(filter, "test", "test-logging", nil)
+	_, err := plugins.CreateFilterWithOptions(filter, "test", nil, &plugins.CreateFilterOptions{LoggingRef: "test-logging"})
 	require.NoError(t, err)
 }

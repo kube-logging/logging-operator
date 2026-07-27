@@ -185,7 +185,7 @@ func filtersForFilters(flowID string, flowName string, loggingRef string, secret
 	)
 	for i, f := range filters {
 		id := fmt.Sprintf("%s:%d", flowID, i)
-		filter, err := plugins.CreateFilter(f, id, loggingRef, secretLoader)
+		filter, err := plugins.CreateFilterWithOptions(f, id, secretLoader, &plugins.CreateFilterOptions{LoggingRef: loggingRef})
 		if err != nil {
 			errs = errors.Append(errs, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowName))
 			continue
