@@ -99,7 +99,8 @@ func checkRawFilter(converters []DirectiveConverter, options *CreateFilterOption
 	}
 
 	if options == nil || !options.RawFilterEnabled {
-		return ErrRawFilterDisabled
+		// WithStack so the reported stack points at the caller instead of this package's init.
+		return errors.WithStack(ErrRawFilterDisabled)
 	}
 
 	return nil

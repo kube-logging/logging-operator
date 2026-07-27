@@ -110,5 +110,5 @@ func TestHasRawFilter(t *testing.T) {
 func TestCreateFilterDefaultsToRawDisabled(t *testing.T) {
 	_, err := plugins.CreateFilter(rawFilter(), "test", nil)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "raw filter is disabled")
+	require.ErrorIs(t, err, plugins.ErrRawFilterDisabled)
 }
