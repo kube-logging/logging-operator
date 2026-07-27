@@ -32,6 +32,8 @@ type _hugoRaw interface{} //nolint:deadcode,unused
 // +kubebuilder:object:generate=true
 // +docName:"Raw"
 // Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved). Disabled by default, set `logging.spec.enableRawFluentdFilter=true` on the Logging resource to enable it.
+//
+// > **Security warning:** enabling the flag grants **every** user who can create a `Flow` or `ClusterFlow` in the logging domain the ability to inject arbitrary configuration (and thereby run arbitrary code, for example via `exec`-style plugins) in the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys. Treat it as a break-glass setting and enable it only if you trust all Flow authors in the cluster.
 /*
 ## Example `Raw` filter configurations
 
@@ -111,6 +113,7 @@ type _metaRaw interface{} //nolint:deadcode,unused
 
 var (
 	sectionPattern = regexp.MustCompile(`^<([^\s>/]+)\s*([^>]*)>$`)
+	closingPattern = regexp.MustCompile(`^</([^\s>/]+)>$`)
 	paramPattern   = regexp.MustCompile(`^([^\s<]+)\s*(.*)$`)
 )
 
@@ -127,6 +130,9 @@ func (r *Raw) ToDirective(secretLoader secret.SecretLoader, id string) (types.Di
 	}
 
 	if raw.Type == "" {
+		if len(raw.SubDirectives) == 1 && raw.SubDirectives[0].GetPluginMeta().Directive == "filter" {
+			return nil, fmt.Errorf("raw filter config must not include the enclosing <filter> tags, provide only the filter body")
+		}
 		return nil, fmt.Errorf("raw filter config must specify @type")
 	}
 
@@ -156,10 +162,10 @@ func parseRawConfig(config string) (*types.GenericDirective, error) {
 		return "", true, nil
 	}
 
-	return doParseRawConfig("filter", nextLine)
+	return doParseRawConfig("filter", true, nextLine)
 }
 
-func doParseRawConfig(sectionName string, nextLine func() (string, bool, error)) (*types.GenericDirective, error) {
+func doParseRawConfig(sectionName string, topLevel bool, nextLine func() (string, bool, error)) (*types.GenericDirective, error) {
 	directive := &types.GenericDirective{
 		PluginMeta: types.PluginMeta{
 			Directive: sectionName,
@@ -174,7 +180,7 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 			return nil, err
 		}
 		if eof {
-			if sectionName != "filter" {
+			if !topLevel {
 				return nil, fmt.Errorf("unexpected end of raw config: missing closing tag </%s>", sectionName)
 			}
 			return directive, nil
@@ -185,10 +191,17 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 			continue
 		}
 
+		if matches := closingPattern.FindStringSubmatch(line); matches != nil {
+			if topLevel || matches[1] != sectionName {
+				return nil, fmt.Errorf("unexpected closing tag in raw config: %s", line)
+			}
+			break
+		}
+
 		if matches := sectionPattern.FindStringSubmatch(line); matches != nil {
 			subSectionName := matches[1]
 			subSectionTag := strings.TrimSpace(matches[2])
-			subSectionDirective, err := doParseRawConfig(subSectionName, nextLine)
+			subSectionDirective, err := doParseRawConfig(subSectionName, false, nextLine)
 			if err != nil {
 				return nil, err
 			}
@@ -199,10 +212,6 @@ func doParseRawConfig(sectionName string, nextLine func() (string, bool, error))
 
 			directive.SubDirectives = append(directive.SubDirectives, subSectionDirective)
 			continue
-		}
-
-		if line == "</"+sectionName+">" {
-			break
 		}
 
 		if matches := paramPattern.FindStringSubmatch(line); matches != nil {

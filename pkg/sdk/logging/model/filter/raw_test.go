@@ -112,3 +112,94 @@ config: |
 	require.Error(t, err)
 	require.Equal(t, "unexpected end of raw config: missing closing tag </my_section>", err.Error())
 }
+
+func TestConfigureRawFilterWithNestedFilterSection(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  @type my_filter
+  <filter mytag>
+    key value
+  </filter>
+`)
+
+	expected := `
+<filter **>
+  @type my_filter
+  @id test
+  <filter mytag>
+    key value
+  </filter>
+</filter>
+`
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+	test := render.NewOutputPluginTest(t, parser)
+	test.DiffResult(expected)
+}
+
+func TestRawConfigurationUnclosedNestedFilterSection(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  @type my_filter
+  <filter>
+    key value
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "unexpected end of raw config: missing closing tag </filter>", err.Error())
+}
+
+func TestRawConfigurationStrayTopLevelClosingTag(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  @type my_filter
+  key1 val1
+  </filter>
+  key2 val2
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "unexpected closing tag in raw config: </filter>", err.Error())
+}
+
+func TestRawConfigurationMismatchedClosingTag(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  @type my_filter
+  <my_section>
+    foo bar
+  </other_section>
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "unexpected closing tag in raw config: </other_section>", err.Error())
+}
+
+func TestRawConfigurationWrappedInFilterTags(t *testing.T) {
+	CONFIG := []byte(`
+config: |
+  <filter **>
+    @type my_filter
+    key1 val1
+  </filter>
+`)
+
+	parser := &filter.Raw{}
+	require.NoError(t, yaml.Unmarshal(CONFIG, parser))
+
+	_, err := parser.ToDirective(mockSecretLoader{}, "test")
+	require.Error(t, err)
+	require.Equal(t, "raw filter config must not include the enclosing <filter> tags, provide only the filter body", err.Error())
+}
