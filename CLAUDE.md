@@ -81,14 +81,20 @@ make test
 
 # Run a single test
 cd pkg/sdk && go test -run TestName -v ./logging/...
-# or for controller tests:
-go test -run TestName -v ./controllers/logging/...
+# or for controller tests (envtest binaries are only on the PATH that make sets up,
+# so pass them explicitly when invoking go test directly):
+ENVTEST_BINARY_ASSETS=$(pwd)/bin/envtest/bin go test -run TestName -v ./controllers/logging/...
 
 # Check test coverage meets threshold
 make check-coverage
 
 # Run e2e tests on KIND cluster
 make test-e2e
+
+# Manual verification loop against the current kubectl context (e.g. a local KIND cluster):
+# install the CRDs, then run the operator out-of-cluster
+make install
+make run
 
 # Run all checks (license + lint + test)
 make check

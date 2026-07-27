@@ -766,6 +766,12 @@ spec:
                                 type: object
                               type: array
                           type: object
+                        raw:
+                          properties:
+                            config:
+                              maxLength: 65536
+                              type: string
+                          type: object
                         record_modifier:
                           properties:
                             char_encoding:
@@ -873,6 +879,8 @@ spec:
                     type: array
                 type: object
               enableDockerParserCompatibilityForCRI:
+                type: boolean
+              enableRawFluentdFilter:
                 type: boolean
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
@@ -7918,6 +7926,12 @@ spec:
                             - type
                             type: object
                           type: array
+                      type: object
+                    raw:
+                      properties:
+                        config:
+                          maxLength: 65536
+                          type: string
                       type: object
                     record_modifier:
                       properties:

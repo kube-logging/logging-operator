@@ -39,6 +39,11 @@ Default flow for unmatched logs. This Flow configuration collects all logs that 
 EnableDockerParserCompatibilityForCRI enables a log parser that is compatible with the docker parser. This has the following benefits: - automatic json log parsing using the Merge_Log feature - downstream parsers can use the `log` field instead of `message` as they did with the docker runtime - the `concat` and `parser` filters are automatically set back to use the `log` field 
 
 
+### enableRawFluentdFilter (bool, optional) {#loggingspec-enablerawfluentdfilter}
+
+EnableRawFluentdFilter enables the use of the Raw filter for fluentd. This allows users to configure custom or unexposed Fluentd filters via raw configuration. Break-glass setting: enabling it lets every user who can create a Flow or ClusterFlow in this logging domain inject arbitrary configuration (and thereby run arbitrary code) into the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys. Enable it only if you trust all Flow authors. Disabling it again does not retroactively remove already rendered raw configuration: delete the offending Flow, rotate the aggregator's credentials and restart it. 
+
+
 ### enableRecreateWorkloadOnImmutableFieldChange (bool, optional) {#loggingspec-enablerecreateworkloadonimmutablefieldchange}
 
 EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the fluentbit daemonset and the fluentd statefulset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 

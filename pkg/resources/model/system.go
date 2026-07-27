@@ -69,6 +69,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	globalFilters, err = filtersForFilters(
 		"globalFilter",
 		"globalFilter",
+		logging.Spec.EnableRawFluentdFilter,
 		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
 		logging.Spec.GlobalFilters)
 	if err != nil {
@@ -78,7 +79,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	builder := types.NewSystemBuilder(rootInput, globalFilters, router)
 
 	for _, flowCr := range resources.Fluentd.Flows {
-		flow, err := FlowForFlow(flowCr, resources.Fluentd.ClusterOutputs, resources.Fluentd.Outputs, secrets)
+		flow, err := FlowForFlow(flowCr, resources.Fluentd.ClusterOutputs, resources.Fluentd.Outputs, secrets, logging.Spec.EnableRawFluentdFilter)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
 				logger.Error(err, "Flow contains errors, skipping.")
@@ -93,7 +94,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 	}
 	for _, flowCr := range resources.Fluentd.ClusterFlows {
-		flow, err := FlowForClusterFlow(flowCr, resources.Fluentd.ClusterOutputs, secrets)
+		flow, err := FlowForClusterFlow(flowCr, resources.Fluentd.ClusterOutputs, secrets, logging.Spec.EnableRawFluentdFilter)
 		if err != nil {
 			if logging.Spec.SkipInvalidResources {
 				logger.Error(err, "ClusterFlow contains errors, skipping.")
@@ -177,14 +178,14 @@ type SecretLoaderFactory interface {
 	OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
-func filtersForFilters(flowID string, flowName string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
+func filtersForFilters(flowID string, flowName string, rawFilterEnabled bool, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
 	var (
 		result []types.Filter
 		errs   error
 	)
 	for i, f := range filters {
 		id := fmt.Sprintf("%s:%d", flowID, i)
-		filter, err := plugins.CreateFilter(f, id, secretLoader)
+		filter, err := plugins.CreateFilterWithOptions(f, id, secretLoader, &plugins.CreateFilterOptions{RawFilterEnabled: rawFilterEnabled})
 		if err != nil {
 			errs = errors.Append(errs, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowName))
 			continue
@@ -214,7 +215,7 @@ func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets Secre
 	return nil, errors.Errorf("there is no ClusterOutput named %s", outputRef)
 }
 
-func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outputs, secrets SecretLoaderFactory) (*types.Flow, error) {
+func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outputs, secrets SecretLoaderFactory, rawFilterEnabled bool) (*types.Flow, error) {
 	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
 		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for flow %s",
 			utils.ObjectKeyFromObjectMeta(&flow).String())
@@ -299,14 +300,14 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 	}
 	result.WithOutputs(allOutputs...)
 
-	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, rawFilterEnabled, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
 	return result, errs
 }
 
-func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
+func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory, rawFilterEnabled bool) (*types.Flow, error) {
 	if flow.Spec.Match != nil && flow.Spec.Selectors != nil {
 		return nil, errors.Errorf("match and selectors cannot be defined simultaneously for clusterflow %s",
 			utils.ObjectKeyFromObjectMeta(&flow).String())
@@ -378,7 +379,7 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, rawFilterEnabled, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
@@ -415,7 +416,7 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := filtersForFilters(flowID, logging.Name, secrets.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
+	filters, err := filtersForFilters(flowID, logging.Name, logging.Spec.EnableRawFluentdFilter, secrets.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 

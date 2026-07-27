@@ -104,6 +104,12 @@ type LoggingSpec struct {
 	// RouteConfig determines whether to use loggingRoutes or to create resources based on the logging resource
 	// that can be managed by the Telemetry Controller.
 	RouteConfig *RouteConfig `json:"routeConfig,omitempty"`
+	// EnableRawFluentdFilter enables the use of the Raw filter for fluentd. This allows users to configure custom or unexposed Fluentd filters via raw configuration.
+	// Break-glass setting: enabling it lets every user who can create a Flow or ClusterFlow in this logging domain inject arbitrary
+	// configuration (and thereby run arbitrary code) into the shared Fluentd aggregator, which processes all tenants' logs and mounts
+	// output credentials and TLS keys. Enable it only if you trust all Flow authors. Disabling it again does not retroactively remove
+	// already rendered raw configuration: delete the offending Flow, rotate the aggregator's credentials and restart it.
+	EnableRawFluentdFilter bool `json:"enableRawFluentdFilter,omitempty"`
 }
 
 type ConfigCheckStrategy string
