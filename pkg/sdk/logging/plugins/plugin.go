@@ -25,7 +25,11 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/types"
 )
 
-var EnableRawFilter bool = false
+var enableRawFilterMap map[string]bool = make(map[string]bool)
+
+func EnableRawFilter(loggingRef string, enabled bool) {
+	enableRawFilterMap[loggingRef] = enabled
+}
 
 type DirectiveConverter interface {
 	ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error)
@@ -51,7 +55,7 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	}
 }
 
-func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLoader) (types.Directive, error) {
+func CreateFilter(filter v1beta1.Filter, id string, loggingRef string, secretLoader secret.SecretLoader) (types.Directive, error) {
 	v := reflect.ValueOf(filter)
 	var converters []DirectiveConverter
 	for i := 0; i < v.NumField(); i++ {
@@ -65,7 +69,7 @@ func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLo
 	case 0:
 		return nil, errors.New("no plugin config available for filter")
 	case 1:
-		if err := checkRawFilter(converters); err != nil {
+		if err := checkRawFilter(converters, loggingRef); err != nil {
 			return nil, err
 		}
 		return converters[0].ToDirective(secretLoader, id)
@@ -74,10 +78,10 @@ func CreateFilter(filter v1beta1.Filter, id string, secretLoader secret.SecretLo
 	}
 }
 
-func checkRawFilter(converters []DirectiveConverter) error {
+func checkRawFilter(converters []DirectiveConverter, loggingRef string) error {
 	if _, ok := converters[0].(*modelfilter.Raw); ok {
-		if !EnableRawFilter {
-			return errors.New("raw filter is disabled, need to set Logging.Spec.EnableRawFluentdFilter=true to enable it")
+		if !enableRawFilterMap[loggingRef] {
+			return errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
 		}
 	}
 	return nil

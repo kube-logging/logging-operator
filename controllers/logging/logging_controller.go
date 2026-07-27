@@ -309,7 +309,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	plugins.EnableRawFilter = logging.Spec.EnableRawFluentdFilter
+	plugins.EnableRawFilter(logging.Spec.LoggingRef, logging.Spec.EnableRawFluentdFilter)
 
 	return ctrl.Result{}, nil
 }

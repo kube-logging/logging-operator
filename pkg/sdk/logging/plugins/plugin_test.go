@@ -25,7 +25,7 @@ import (
 )
 
 func TestRawFilterIsDisabled(t *testing.T) {
-	plugins.EnableRawFilter = false
+	plugins.EnableRawFilter("test-logging", false)
 	filter := v1beta1.Filter{
 		Raw: &modelfilter.Raw{
 			Config: `
@@ -37,7 +37,7 @@ func TestRawFilterIsDisabled(t *testing.T) {
 			`,
 		},
 	}
-	_, err := plugins.CreateFilter(filter, "test", nil)
+	_, err := plugins.CreateFilter(filter, "test", "test-logging", nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "raw filter is disabled")
 
@@ -46,12 +46,12 @@ func TestRawFilterIsDisabled(t *testing.T) {
 			OutputType: "json",
 		},
 	}
-	_, err = plugins.CreateFilter(filter, "test", nil)
+	_, err = plugins.CreateFilter(filter, "test", "test-logging", nil)
 	require.NoError(t, err)
 }
 
 func TestRawFilterIsEnabled(t *testing.T) {
-	plugins.EnableRawFilter = true
+	plugins.EnableRawFilter("test-logging", true)
 	filter := v1beta1.Filter{
 		Raw: &modelfilter.Raw{
 			Config: `
@@ -63,6 +63,6 @@ func TestRawFilterIsEnabled(t *testing.T) {
 			`,
 		},
 	}
-	_, err := plugins.CreateFilter(filter, "test", nil)
+	_, err := plugins.CreateFilter(filter, "test", "test-logging", nil)
 	require.NoError(t, err)
 }

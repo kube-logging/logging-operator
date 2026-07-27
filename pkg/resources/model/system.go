@@ -69,6 +69,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	globalFilters, err = filtersForFilters(
 		"globalFilter",
 		"globalFilter",
+		logging.Spec.LoggingRef,
 		secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace),
 		logging.Spec.GlobalFilters)
 	if err != nil {
@@ -177,14 +178,14 @@ type SecretLoaderFactory interface {
 	OutputSecretLoaderForNamespace(namespace string) secret.SecretLoader
 }
 
-func filtersForFilters(flowID string, flowName string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
+func filtersForFilters(flowID string, flowName string, loggingRef string, secretLoader secret.SecretLoader, filters []v1beta1.Filter) ([]types.Filter, error) {
 	var (
 		result []types.Filter
 		errs   error
 	)
 	for i, f := range filters {
 		id := fmt.Sprintf("%s:%d", flowID, i)
-		filter, err := plugins.CreateFilter(f, id, secretLoader)
+		filter, err := plugins.CreateFilter(f, id, loggingRef, secretLoader)
 		if err != nil {
 			errs = errors.Append(errs, errors.WrapIff(err, "failed to create filter with index %d for flow %s", i, flowName))
 			continue
@@ -299,7 +300,7 @@ func FlowForFlow(flow v1beta1.Flow, clusterOutputs ClusterOutputs, outputs Outpu
 	}
 	result.WithOutputs(allOutputs...)
 
-	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, flow.Spec.LoggingRef, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
@@ -378,7 +379,7 @@ func FlowForClusterFlow(flow v1beta1.ClusterFlow, clusterOutputs ClusterOutputs,
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := filtersForFilters(flowID, flow.Name, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
+	filters, err := filtersForFilters(flowID, flow.Name, flow.Spec.LoggingRef, secrets.OutputSecretLoaderForNamespace(flow.Namespace), flow.Spec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 
@@ -415,7 +416,7 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 	}
 	result.WithOutputs(outputs...)
 
-	filters, err := filtersForFilters(flowID, logging.Name, secrets.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
+	filters, err := filtersForFilters(flowID, logging.Name, logging.Spec.LoggingRef, secrets.OutputSecretLoaderForNamespace(logging.Namespace), logging.Spec.DefaultFlowSpec.Filters)
 	errs = errors.Append(errs, err)
 	result.WithFilters(filters...)
 

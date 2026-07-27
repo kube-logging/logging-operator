@@ -6,7 +6,7 @@ generated_file: true
 
 # Raw
 ## Overview
- Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved). Disabled by default, need to set `Logging.Spec.EnableRawFluentdFilter=true` to enable it.
+ Configure custom or unexposed Fluentd filters via raw configuration. The configuration is parsed and rendered by the operator (parameter ordering and duplicate keys are not preserved). Disabled by default, set `logging.spec.enableRawFluentdFilter=true` on the Logging resource to enable it.
 
 ## Example `Raw` filter configurations
 
