@@ -110,8 +110,8 @@ type _docRaw interface{} //nolint:deadcode,unused
 type _metaRaw interface{} //nolint:deadcode,unused
 
 var (
-	sectionPattern = regexp.MustCompile(`^<([a-zA-Z0-9_]+)\s*(.+?)?>$`)
-	paramPattern   = regexp.MustCompile(`^([a-zA-Z0-9_@]+)\s*(.*)$`)
+	sectionPattern = regexp.MustCompile(`^<([^\s>/]+)\s*([^>]*)>$`)
+	paramPattern   = regexp.MustCompile(`^([^\s<]+)\s*(.*)$`)
 )
 
 // +kubebuilder:object:generate=true
