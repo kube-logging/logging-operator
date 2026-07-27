@@ -80,7 +80,7 @@ type SyslogNGSpec struct {
 	// Create [custom log metrics for sources and outputs]({{< relref "/docs/examples/custom-syslog-ng-metrics.md" >}}).
 	SourceMetrics []filter.MetricsProbe `json:"sourceMetrics,omitempty"`
 	// Overrides the default logging level configCheck setup.
-	// This field is not used directly, just copied over the field in the logging resource if defined.
+	// This field is not used directly, its fields are copied over the ones in the logging resource, field by field, so setting one field here does not discard the others set on the logging resource.
 	ConfigCheck *ConfigCheck `json:"configCheck,omitempty"`
 	// Duration in seconds for graceful pod termination. Set higher than expected cleanup time.
 	// +kubebuilder:validation:Minimum=0
