@@ -165,6 +165,34 @@ func TestCreateClusterReportsKindErrorsUnchanged(t *testing.T) {
 	assert.Contains(t, err.Error(), "node(s) already exist for a cluster with the name")
 }
 
+// kind writes nothing to stderr when the failure is that it never started, so
+// the stderr buffer alone would make an error with an empty message.
+func TestCreateClusterReportsTheExecErrorWhenKindWritesNothing(t *testing.T) {
+	installFakeKind(t)
+	withTimeouts(t, time.Minute, time.Minute)
+	KindPath = filepath.Join(t.TempDir(), "kind-is-not-installed-here")
+
+	err := CreateCluster(CreateClusterOptions{Name: "cluster"})
+
+	require.Error(t, err)
+	assert.NotEmpty(t, err.Error(), "the error must say something")
+	assert.Contains(t, err.Error(), "kind-is-not-installed-here")
+}
+
+// The counterpart: when kind does explain itself, that explanation is what
+// callers get. common.isClusterAlreadyExistsError matches on this text.
+func TestCreateClusterPrefersKindsStderrWhenThereIsAny(t *testing.T) {
+	installFakeKind(t)
+	withTimeouts(t, time.Minute, time.Minute)
+	t.Setenv("FAKE_KIND_EXIT", "1")
+	t.Setenv("FAKE_KIND_STDERR", "ERROR: failed to create cluster: node(s) already exist for a cluster with the name")
+
+	err := CreateCluster(CreateClusterOptions{Name: "existing"})
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to create cluster: node(s) already exist for a cluster with the name")
+}
+
 func TestCreateClusterReportsAFailedCleanup(t *testing.T) {
 	installFakeKind(t)
 	withTimeouts(t, 200*time.Millisecond, 200*time.Millisecond)
@@ -245,6 +273,11 @@ func TestResolveCommandTimeout(t *testing.T) {
 		"a duration is honored":           {raw: "90s", expected: 90 * time.Second},
 		"a bare number is not a duration": {raw: "600", expected: fallback},
 		"nonsense keeps the default":      {raw: "soon", expected: fallback},
+		// A zero deadline is already expired, so honoring these would fail
+		// every kind call instantly instead of disabling the timeout.
+		"zero keeps the default":         {raw: "0", expected: fallback},
+		"zero seconds keeps the default": {raw: "0s", expected: fallback},
+		"negative keeps the default":     {raw: "-1s", expected: fallback},
 	}
 
 	for name, testCase := range testCases {

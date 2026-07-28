@@ -73,8 +73,13 @@ func init() {
 }
 
 // resolveCommandTimeout reads the timeout from raw, keeping fallback when raw
-// is empty or unparseable. A bad value is not worth failing the run over, but
-// it is worth saying out loud.
+// is empty, unparseable, or not positive. A bad value is not worth failing the
+// run over, but it is worth saying out loud.
+//
+// Non-positive is rejected rather than read as "no timeout". A zero deadline
+// is already expired, so KIND_COMMAND_TIMEOUT=0 would fail every kind call
+// instantly — the opposite of what anyone writing that would mean by it. Pass
+// a large duration if you want an effectively unbounded run.
 func resolveCommandTimeout(raw string, fallback time.Duration) time.Duration {
 	if raw == "" {
 		return fallback
@@ -82,6 +87,10 @@ func resolveCommandTimeout(raw string, fallback time.Duration) time.Duration {
 	timeout, err := time.ParseDuration(raw)
 	if err != nil {
 		fmt.Printf("%s=%q is not a valid duration, keeping %s\n", commandTimeoutEnv, raw, fallback)
+		return fallback
+	}
+	if timeout <= 0 {
+		fmt.Printf("%s=%q is not a positive duration, keeping %s\n", commandTimeoutEnv, raw, fallback)
 		return fallback
 	}
 	return timeout
@@ -140,6 +149,14 @@ func CreateCluster(options CreateClusterOptions) error {
 		}
 		return err
 	default:
+		// kind's own diagnosis is on stderr, and isClusterAlreadyExistsError
+		// matches against it, so that is what callers need to see. But stderr
+		// is empty when the failure was starting the process at all — a
+		// KIND_PATH pointing at nothing, say — and an error with an empty
+		// message tells nobody anything.
+		if cmderr.Len() == 0 {
+			return err
+		}
 		return errors.New(cmderr.String())
 	}
 }
