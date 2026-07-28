@@ -11,6 +11,9 @@ image:
   # -- Image tag override for the default value (chart appVersion).
   tag: ""
 
+  # -- Image digest override (format: `sha256:...`). Takes precedence over `image.tag` and the chart appVersion.
+  digest: ""
+
   # -- [Image pull policy](https://kubernetes.io/docs/concepts/containers/images/#updating-images) for updating already existing images on a node.
   pullPolicy: IfNotPresent
 
