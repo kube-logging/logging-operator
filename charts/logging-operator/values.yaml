@@ -223,6 +223,9 @@ logging:
   # -- EnableDockerParserCompatibilityForCRI enables Docker log format compatibility for CRI workloads.
   enableDockerParserCompatibilityForCRI: false
 
+  # -- enableRawFluentdFilter enables the use of the Raw filter for fluentd. This allows users to configure custom or unexposed Fluentd filters via raw configuration.
+  enableRawFluentdFilter: false
+
   # -- ClusterFlows to deploy
   clusterFlows: []
 
@@ -336,3 +339,4 @@ extraManifests: []
   #     name: extra-manifest
   #   data:
   #     extra-data: "value"
+
