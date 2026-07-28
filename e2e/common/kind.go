@@ -20,17 +20,22 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common/kind"
 )
 
+// KindClusterCreationTimeout is passed to `kind create cluster --wait`, which
+// bounds only the last of kind's actions, waiting for control plane readiness.
+// The whole invocation is bounded by Kind.CommandTimeout instead.
 const KindClusterCreationTimeout = "3m"
 
+var kindCLI = kind.New()
+
 func KindClusterKubeconfig(name string) ([]byte, error) {
-	err := kind.CreateCluster(kind.CreateClusterOptions{
+	err := kindCLI.CreateCluster(kind.CreateClusterOptions{
 		Name: name,
 		Wait: KindClusterCreationTimeout,
 	})
 	if err != nil && !isClusterAlreadyExistsError(err) {
 		return nil, err
 	}
-	return kind.GetKubeconfig(kind.GetKubeconfigOptions{
+	return kindCLI.GetKubeconfig(kind.GetKubeconfigOptions{
 		Name: name,
 	})
 }
