@@ -256,9 +256,20 @@ func (l *Logging) SetDefaults() error {
 	return nil
 }
 
+// AggregatorLevelConfigCheck lets the aggregator level configCheck override the
+// logging level one. Each field is overridden on its own, so an aggregator that
+// sets a single field does not discard the rest of the logging level settings.
 func (l *Logging) AggregatorLevelConfigCheck(check *ConfigCheck) {
 	if check != nil {
-		l.Spec.ConfigCheck = *check
+		if check.Strategy != "" {
+			l.Spec.ConfigCheck.Strategy = check.Strategy
+		}
+		if check.TimeoutSeconds != 0 {
+			l.Spec.ConfigCheck.TimeoutSeconds = check.TimeoutSeconds
+		}
+		if check.Labels != nil {
+			l.Spec.ConfigCheck.Labels = check.Labels
+		}
 		l.configCheckDefaults()
 	}
 }

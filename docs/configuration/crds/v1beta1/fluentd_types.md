@@ -39,7 +39,7 @@ BufferStorageVolume is by default configured as PVC using FluentdPvcSpec [volume
 
 ### configCheck (*ConfigCheck, optional) {#fluentdspec-configcheck}
 
-Overrides the default logging level configCheck setup This field is not used directly, just copied over the field in the logging resource if defined 
+Overrides the default logging level configCheck setup. This field is not used directly, its fields are copied over the ones in the logging resource, field by field, so setting one field here does not discard the others set on the logging resource. 
 
 
 ### configCheckAnnotations (map[string]string, optional) {#fluentdspec-configcheckannotations}
