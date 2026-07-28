@@ -16,16 +16,51 @@ package kind
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
-var KindPath string
-var KindImage string
+var (
+	KindPath  string
+	KindImage string
+)
+
+// ErrTimeout is returned when a kind invocation is stopped by its deadline
+// rather than by kind itself.
+var ErrTimeout = errors.New("timed out")
+
+// CommandTimeout bounds a single kind invocation.
+//
+// kind's own --wait only covers the last of its create actions, waiting for
+// control plane readiness. Provisioning the node containers, pulling the node
+// image and `kind load docker-image` are bounded by nothing. When several
+// clusters are built at once on a busy CI runner those phases can stall for
+// longer than the whole test budget, and with no deadline here the only thing
+// that ends the stall is `go test` panicking on its own -timeout. That kills
+// every other test in the package and skips the deferred cluster cleanup, so
+// one stalled cluster takes the rest of the package down with it.
+//
+// The value is deliberately far above anything a healthy run needs, so that
+// it only fires on a genuine stall. Override it with KIND_COMMAND_TIMEOUT.
+var CommandTimeout = 10 * time.Minute
+
+// CleanupTimeout bounds the best-effort delete issued after a command times
+// out. It is much shorter than CommandTimeout: the runner is already
+// struggling by then, and the caller still has to report the failure inside
+// the remaining test budget.
+var CleanupTimeout = 2 * time.Minute
+
+const commandTimeoutEnv = "KIND_COMMAND_TIMEOUT"
+
+// waitDelay is how long Wait may keep waiting on inherited output pipes after
+// the process itself has been killed. A variable so the tests can shorten it.
+var waitDelay = 10 * time.Second
 
 func init() {
 	KindPath = os.Getenv("KIND_PATH")
@@ -34,6 +69,49 @@ func init() {
 		fmt.Println("KIND_PATH is not set, defaulting to ../../bin/kind")
 	}
 	KindImage = os.Getenv("KIND_IMAGE")
+	CommandTimeout = resolveCommandTimeout(os.Getenv(commandTimeoutEnv), CommandTimeout)
+}
+
+// resolveCommandTimeout reads the timeout from raw, keeping fallback when raw
+// is empty or unparseable. A bad value is not worth failing the run over, but
+// it is worth saying out loud.
+func resolveCommandTimeout(raw string, fallback time.Duration) time.Duration {
+	if raw == "" {
+		return fallback
+	}
+	timeout, err := time.ParseDuration(raw)
+	if err != nil {
+		fmt.Printf("%s=%q is not a valid duration, keeping %s\n", commandTimeoutEnv, raw, fallback)
+		return fallback
+	}
+	return timeout
+}
+
+// runKind runs a kind subcommand under the given deadline. configure wires up
+// the command's output and may be nil.
+//
+// When the deadline is what stopped the process, exec only reports
+// "signal: killed", which says nothing about what was stuck. So that case is
+// reported as an error wrapping ErrTimeout and naming the subcommand.
+func runKind(timeout time.Duration, args []string, configure func(*exec.Cmd)) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, KindPath, args...)
+	// kind shells out to docker, and killing kind does not kill its children.
+	// Whenever output is wired to something other than a file, exec pipes it
+	// and Wait blocks until every writer closes that pipe, so a surviving
+	// docker would keep us here well past the deadline. WaitDelay caps that.
+	cmd.WaitDelay = waitDelay
+	if configure != nil {
+		configure(cmd)
+	}
+
+	err := cmd.Run()
+	if err != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return fmt.Errorf("kind %s %w after %s (override with %s)", strings.Join(args, " "), ErrTimeout, timeout, commandTimeoutEnv)
+	}
+	return err
 }
 
 func CreateCluster(options CreateClusterOptions) error {
@@ -42,14 +120,28 @@ func CreateCluster(options CreateClusterOptions) error {
 		options.Image = KindImage
 	}
 	args = options.AppendToArgs(args)
-	cmd := exec.Command(KindPath, args...)
+
 	cmderr := &bytes.Buffer{}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
-	if err := cmd.Run(); err != nil {
+	err := runKind(CommandTimeout, args, func(cmd *exec.Cmd) {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
+	})
+
+	switch {
+	case err == nil:
+		return nil
+	case errors.Is(err, ErrTimeout):
+		// kind removes a half-built cluster when one of its own actions fails,
+		// but not when we kill it, so the leftovers have to go explicitly.
+		// Otherwise the node containers hold their share of the runner for the
+		// rest of the job and make the next cluster likelier to stall too.
+		if deleteErr := deleteCluster(CleanupTimeout, DeleteClusterOptions{Name: options.Name}); deleteErr != nil {
+			return fmt.Errorf("%w; deleting the partial cluster also failed: %w", err, deleteErr)
+		}
+		return err
+	default:
 		return errors.New(cmderr.String())
 	}
-	return nil
 }
 
 type CreateClusterOptions struct {
@@ -86,9 +178,13 @@ func (options CreateClusterOptions) AppendToArgs(args []string) []string {
 }
 
 func DeleteCluster(options DeleteClusterOptions) error {
+	return deleteCluster(CommandTimeout, options)
+}
+
+func deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
 	args := []string{"delete", "cluster"}
 	args = options.AppendToArgs(args)
-	return exec.Command(KindPath, args...).Run()
+	return runKind(timeout, args, nil)
 }
 
 type DeleteClusterOptions struct {
@@ -111,7 +207,13 @@ func (options DeleteClusterOptions) AppendToArgs(args []string) []string {
 func GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {
 	args := []string{"get", "kubeconfig"}
 	args = options.AppendToArgs(args)
-	return exec.Command(KindPath, args...).Output()
+
+	stdout := &bytes.Buffer{}
+	err := runKind(CommandTimeout, args, func(cmd *exec.Cmd) {
+		cmd.Stdout = stdout
+		cmd.Stderr = os.Stderr
+	})
+	return stdout.Bytes(), err
 }
 
 type GetKubeconfigOptions struct {
@@ -139,9 +241,14 @@ func LoadDockerImage(images []string, options LoadDockerImageOptions) error {
 	args := []string{"load", "docker-image"}
 	args = options.AppendToArgs(args)
 	args = append(args, images...)
-	output, err := exec.Command(KindPath, args...).CombinedOutput()
+
+	output := &bytes.Buffer{}
+	err := runKind(CommandTimeout, args, func(cmd *exec.Cmd) {
+		cmd.Stdout = output
+		cmd.Stderr = output
+	})
 	if err != nil {
-		return fmt.Errorf("kind load failed: %w\nOutput: %s", err, string(output))
+		return fmt.Errorf("kind load failed: %w\nOutput: %s", err, output.String())
 	}
 
 	return nil
