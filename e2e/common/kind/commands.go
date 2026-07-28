@@ -28,91 +28,179 @@ import (
 	"time"
 )
 
-var (
-	KindPath  string
-	KindImage string
-)
-
-// ErrTimeout is returned when a kind invocation is stopped by its deadline
-// rather than by kind itself.
+// ErrTimeout reports that an invocation was stopped by its deadline rather than
+// by kind itself.
 var ErrTimeout = errors.New("timed out")
 
-// CommandTimeout bounds a single kind invocation. Zero means it is derived
-// from the test binary's own -timeout on first use; see commandTimeout.
-//
-// kind's own --wait only covers the last of its create actions, waiting for
-// control plane readiness. Provisioning the node containers, pulling the node
-// image and `kind load docker-image` are bounded by nothing. When several
-// clusters are built at once on a busy CI runner those phases can stall for
-// longer than the whole test budget, and with no deadline here the only thing
-// that ends the stall is `go test` panicking on its own -timeout. That kills
-// every other test in the package and skips the deferred cluster cleanup, so
-// one stalled cluster takes the rest of the package down with it.
-//
-// Set it directly, or with KIND_COMMAND_TIMEOUT, to pin a value.
-var CommandTimeout time.Duration
+const (
+	pathEnv           = "KIND_PATH"
+	imageEnv          = "KIND_IMAGE"
+	commandTimeoutEnv = "KIND_COMMAND_TIMEOUT"
 
-// timeoutFraction is how much of the enclosing -timeout a single kind call may
-// consume before we call it stalled.
-//
-// The deadline has to be derived from the budget it sits inside, not guessed
-// from how long a healthy run takes. Healthy timings are the wrong reference:
-// this only fires when the runner is degraded, and that is exactly when every
-// step legitimately takes several times longer than healthy. A cap chosen from
-// healthy numbers ends up inside the range where real work still completes,
-// and then it fails runs that would have passed.
-//
-// Anything still running this late has left too little of the budget for the
-// rest of the test to finish, so cutting it can only replace an anonymous
-// whole-binary panic with a named failure and a cleaned-up cluster. It cannot
-// turn a passing run red.
-const timeoutFraction = 0.8
+	defaultPath = "../../bin/kind"
 
-// fallbackTimeout applies when the enclosing deadline cannot be read, which
-// means the binary was started with -timeout 0 and has no deadline of its own.
-const fallbackTimeout = 15 * time.Minute
+	// timeoutFraction is the share of the enclosing -timeout that one invocation
+	// may consume. The cap is derived from the surrounding budget rather than
+	// from healthy timings because a stall only matters on a degraded runner,
+	// which is exactly when every step legitimately takes several times longer.
+	timeoutFraction = 0.8
 
-// CleanupTimeout bounds the best-effort delete issued after a command times
-// out. It is much shorter than CommandTimeout: the runner is already
-// struggling by then, and the caller still has to report the failure inside
-// the remaining test budget.
-var CleanupTimeout = 2 * time.Minute
+	// fallbackTimeout applies when the binary has no deadline to derive from.
+	fallbackTimeout = 15 * time.Minute
 
-const commandTimeoutEnv = "KIND_COMMAND_TIMEOUT"
+	defaultCleanupTimeout = 2 * time.Minute
+	defaultWaitDelay      = 10 * time.Second
+)
 
-// waitDelay is how long Wait may keep waiting on inherited output pipes after
-// the process itself has been killed. A variable so the tests can shorten it.
-var waitDelay = 10 * time.Second
+// Kind runs kind subcommands against one installation of the binary.
+type Kind struct {
+	Path  string
+	Image string
 
-func init() {
-	KindPath = os.Getenv("KIND_PATH")
-	if KindPath == "" {
-		KindPath = "../../bin/kind"
-		fmt.Println("KIND_PATH is not set, defaulting to ../../bin/kind")
+	// CommandTimeout bounds a single invocation. Zero derives it from the test
+	// binary's own -timeout on first use.
+	CommandTimeout time.Duration
+
+	// CleanupTimeout bounds the delete issued after a timeout. It is short
+	// because the runner is already struggling by then and the caller still has
+	// to report the failure within what is left of the budget.
+	CleanupTimeout time.Duration
+
+	// waitDelay caps how long Wait blocks on inherited pipes after the process
+	// has been killed.
+	waitDelay   time.Duration
+	resolveOnce sync.Once
+}
+
+// New returns a Kind configured from KIND_PATH, KIND_IMAGE and
+// KIND_COMMAND_TIMEOUT.
+func New() *Kind {
+	path := os.Getenv(pathEnv)
+	if path == "" {
+		path = defaultPath
+		fmt.Printf("%s is not set, defaulting to %s\n", pathEnv, defaultPath)
 	}
-	KindImage = os.Getenv("KIND_IMAGE")
-	// Not resolved here: the enclosing -timeout is only readable once the
-	// testing package has parsed flags, which happens after init.
-	CommandTimeout = resolveCommandTimeout(os.Getenv(commandTimeoutEnv), 0)
+
+	return &Kind{
+		Path:  path,
+		Image: os.Getenv(imageEnv),
+		// Left to be derived: the enclosing -timeout only becomes readable once
+		// the testing package has parsed flags, which is after initialisation.
+		CommandTimeout: resolveCommandTimeout(os.Getenv(commandTimeoutEnv), 0),
+		CleanupTimeout: defaultCleanupTimeout,
+		waitDelay:      defaultWaitDelay,
+	}
 }
 
-// commandTimeout is the deadline for one kind call, worked out once.
-func commandTimeout() time.Duration {
-	resolveOnce.Do(func() {
-		if CommandTimeout > 0 {
-			return // pinned by KIND_COMMAND_TIMEOUT or by a caller
-		}
-		CommandTimeout = deriveCommandTimeout(enclosingTestTimeout())
-		fmt.Printf("kind command timeout: %s (override with %s)\n", CommandTimeout, commandTimeoutEnv)
+func (k *Kind) CreateCluster(options CreateClusterOptions) error {
+	if k.Image != "" && options.Image == "" {
+		options.Image = k.Image
+	}
+	args := options.AppendToArgs([]string{"create", "cluster"})
+
+	cmderr := &bytes.Buffer{}
+	err := k.run(k.commandTimeout(), args, func(cmd *exec.Cmd) {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
 	})
-	return CommandTimeout
+
+	switch {
+	case err == nil:
+		return nil
+
+	case errors.Is(err, ErrTimeout):
+		// kind removes a half-built cluster when one of its own actions fails,
+		// but not when we kill it, so the leftovers have to go explicitly.
+		cleanupErr := k.deleteCluster(k.CleanupTimeout, DeleteClusterOptions{Name: options.Name})
+		if cleanupErr != nil {
+			return fmt.Errorf("%w; deleting the partial cluster also failed: %w", err, cleanupErr)
+		}
+		return err
+
+	case cmderr.Len() == 0:
+		// An empty stderr means kind never ran, and the buffer on its own would
+		// produce an error with no message.
+		return err
+
+	default:
+		// common.isClusterAlreadyExistsError matches against kind's own wording.
+		return errors.New(cmderr.String())
+	}
 }
 
-var resolveOnce sync.Once
+func (k *Kind) DeleteCluster(options DeleteClusterOptions) error {
+	return k.deleteCluster(k.commandTimeout(), options)
+}
 
-// deriveCommandTimeout turns the enclosing test deadline into a per-command
-// one. It must always come out strictly below enclosing, so that cutting a
-// command short can never be the reason a package misses its own deadline.
+func (k *Kind) deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
+	return k.run(timeout, options.AppendToArgs([]string{"delete", "cluster"}), nil)
+}
+
+func (k *Kind) GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {
+	args := options.AppendToArgs([]string{"get", "kubeconfig"})
+
+	stdout := &bytes.Buffer{}
+	err := k.run(k.commandTimeout(), args, func(cmd *exec.Cmd) {
+		cmd.Stdout = stdout
+		cmd.Stderr = os.Stderr
+	})
+	return stdout.Bytes(), err
+}
+
+func (k *Kind) LoadDockerImage(images []string, options LoadDockerImageOptions) error {
+	if len(images) == 0 {
+		return nil
+	}
+	args := append(options.AppendToArgs([]string{"load", "docker-image"}), images...)
+
+	output := &bytes.Buffer{}
+	err := k.run(k.commandTimeout(), args, func(cmd *exec.Cmd) {
+		cmd.Stdout = output
+		cmd.Stderr = output
+	})
+	if err != nil {
+		return fmt.Errorf("kind load failed: %w\nOutput: %s", err, output.String())
+	}
+	return nil
+}
+
+// run executes a kind subcommand under the given deadline. configure wires up
+// the command's output and may be nil.
+func (k *Kind) run(timeout time.Duration, args []string, configure func(*exec.Cmd)) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, k.Path, args...)
+	// kind shells out to docker and killing kind does not kill its children, so
+	// without this Wait would block until every writer closed the pipe it
+	// inherited.
+	cmd.WaitDelay = k.waitDelay
+	if configure != nil {
+		configure(cmd)
+	}
+
+	err := cmd.Run()
+	if err != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		// exec reports only "signal: killed", which does not say what stalled.
+		return fmt.Errorf("kind %s %w after %s (override with %s)",
+			strings.Join(args, " "), ErrTimeout, timeout, commandTimeoutEnv)
+	}
+	return err
+}
+
+func (k *Kind) commandTimeout() time.Duration {
+	k.resolveOnce.Do(func() {
+		if k.CommandTimeout > 0 {
+			return
+		}
+		k.CommandTimeout = deriveCommandTimeout(enclosingTestTimeout())
+		fmt.Printf("kind command timeout: %s (override with %s)\n", k.CommandTimeout, commandTimeoutEnv)
+	})
+	return k.CommandTimeout
+}
+
+// deriveCommandTimeout must always return less than enclosing, so that cutting
+// an invocation short can never be why a package misses its own deadline.
 func deriveCommandTimeout(enclosing time.Duration) time.Duration {
 	if enclosing <= 0 {
 		return fallbackTimeout
@@ -120,8 +208,8 @@ func deriveCommandTimeout(enclosing time.Duration) time.Duration {
 	return time.Duration(float64(enclosing) * timeoutFraction)
 }
 
-// enclosingTestTimeout reports the -timeout this test binary was started with,
-// or zero if there is none to read.
+// enclosingTestTimeout reports the -timeout this binary was started with, or
+// zero if there is none to read.
 func enclosingTestTimeout() time.Duration {
 	f := flag.Lookup("test.timeout")
 	if f == nil {
@@ -138,93 +226,34 @@ func enclosingTestTimeout() time.Duration {
 	return timeout
 }
 
-// resolveCommandTimeout reads the timeout from raw, keeping fallback when raw
-// is empty, unparseable, or not positive. A bad value is not worth failing the
-// run over, but it is worth saying out loud.
-//
-// Non-positive is rejected rather than read as "no timeout". A zero deadline
-// is already expired, so KIND_COMMAND_TIMEOUT=0 would fail every kind call
-// instantly — the opposite of what anyone writing that would mean by it. Pass
-// a large duration if you want an effectively unbounded run.
+// resolveCommandTimeout keeps fallback when raw is empty, unparseable or not
+// positive. Non-positive is rejected rather than read as "no timeout" because a
+// zero deadline has already expired, so it would fail every invocation at once.
 func resolveCommandTimeout(raw string, fallback time.Duration) time.Duration {
 	if raw == "" {
 		return fallback
 	}
+
 	timeout, err := time.ParseDuration(raw)
-	if err != nil {
-		fmt.Printf("%s=%q is not a valid duration, keeping %s\n", commandTimeoutEnv, raw, fallback)
-		return fallback
-	}
-	if timeout <= 0 {
-		fmt.Printf("%s=%q is not a positive duration, keeping %s\n", commandTimeoutEnv, raw, fallback)
-		return fallback
-	}
-	return timeout
-}
-
-// runKind runs a kind subcommand under the given deadline. configure wires up
-// the command's output and may be nil.
-//
-// When the deadline is what stopped the process, exec only reports
-// "signal: killed", which says nothing about what was stuck. So that case is
-// reported as an error wrapping ErrTimeout and naming the subcommand.
-func runKind(timeout time.Duration, args []string, configure func(*exec.Cmd)) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, KindPath, args...)
-	// kind shells out to docker, and killing kind does not kill its children.
-	// Whenever output is wired to something other than a file, exec pipes it
-	// and Wait blocks until every writer closes that pipe, so a surviving
-	// docker would keep us here well past the deadline. WaitDelay caps that.
-	cmd.WaitDelay = waitDelay
-	if configure != nil {
-		configure(cmd)
-	}
-
-	err := cmd.Run()
-	if err != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return fmt.Errorf("kind %s %w after %s (override with %s)", strings.Join(args, " "), ErrTimeout, timeout, commandTimeoutEnv)
-	}
-	return err
-}
-
-func CreateCluster(options CreateClusterOptions) error {
-	args := []string{"create", "cluster"}
-	if KindImage != "" && options.Image == "" {
-		options.Image = KindImage
-	}
-	args = options.AppendToArgs(args)
-
-	cmderr := &bytes.Buffer{}
-	err := runKind(commandTimeout(), args, func(cmd *exec.Cmd) {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
-	})
-
 	switch {
-	case err == nil:
-		return nil
-	case errors.Is(err, ErrTimeout):
-		// kind removes a half-built cluster when one of its own actions fails,
-		// but not when we kill it, so the leftovers have to go explicitly.
-		// Otherwise the node containers hold their share of the runner for the
-		// rest of the job and make the next cluster likelier to stall too.
-		if deleteErr := deleteCluster(CleanupTimeout, DeleteClusterOptions{Name: options.Name}); deleteErr != nil {
-			return fmt.Errorf("%w; deleting the partial cluster also failed: %w", err, deleteErr)
-		}
-		return err
+	case err != nil:
+		fmt.Printf("%s=%q is not a valid duration, %s\n", commandTimeoutEnv, raw, keeping(fallback))
+		return fallback
+	case timeout <= 0:
+		fmt.Printf("%s=%q is not a positive duration, %s\n", commandTimeoutEnv, raw, keeping(fallback))
+		return fallback
 	default:
-		// kind's own diagnosis is on stderr, and isClusterAlreadyExistsError
-		// matches against it, so that is what callers need to see. But stderr
-		// is empty when the failure was starting the process at all — a
-		// KIND_PATH pointing at nothing, say — and an error with an empty
-		// message tells nobody anything.
-		if cmderr.Len() == 0 {
-			return err
-		}
-		return errors.New(cmderr.String())
+		return timeout
 	}
+}
+
+// keeping describes what a rejected value falls back to. A zero fallback is not
+// a timeout of 0s, it is the signal to derive one from -timeout later.
+func keeping(fallback time.Duration) string {
+	if fallback <= 0 {
+		return "deriving it from -timeout instead"
+	}
+	return fmt.Sprintf("keeping %s", fallback)
 }
 
 type CreateClusterOptions struct {
@@ -260,16 +289,6 @@ func (options CreateClusterOptions) AppendToArgs(args []string) []string {
 	return args
 }
 
-func DeleteCluster(options DeleteClusterOptions) error {
-	return deleteCluster(commandTimeout(), options)
-}
-
-func deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
-	args := []string{"delete", "cluster"}
-	args = options.AppendToArgs(args)
-	return runKind(timeout, args, nil)
-}
-
 type DeleteClusterOptions struct {
 	GlobalOptions
 	Kubeconfig string
@@ -287,18 +306,6 @@ func (options DeleteClusterOptions) AppendToArgs(args []string) []string {
 	return args
 }
 
-func GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {
-	args := []string{"get", "kubeconfig"}
-	args = options.AppendToArgs(args)
-
-	stdout := &bytes.Buffer{}
-	err := runKind(commandTimeout(), args, func(cmd *exec.Cmd) {
-		cmd.Stdout = stdout
-		cmd.Stderr = os.Stderr
-	})
-	return stdout.Bytes(), err
-}
-
 type GetKubeconfigOptions struct {
 	GlobalOptions
 	Internal bool
@@ -314,27 +321,6 @@ func (options GetKubeconfigOptions) AppendToArgs(args []string) []string {
 		args = append(args, "--name", options.Name)
 	}
 	return args
-}
-
-func LoadDockerImage(images []string, options LoadDockerImageOptions) error {
-	if len(images) == 0 {
-		return nil
-	}
-
-	args := []string{"load", "docker-image"}
-	args = options.AppendToArgs(args)
-	args = append(args, images...)
-
-	output := &bytes.Buffer{}
-	err := runKind(commandTimeout(), args, func(cmd *exec.Cmd) {
-		cmd.Stdout = output
-		cmd.Stderr = output
-	})
-	if err != nil {
-		return fmt.Errorf("kind load failed: %w\nOutput: %s", err, output.String())
-	}
-
-	return nil
 }
 
 type LoadDockerImageOptions struct {

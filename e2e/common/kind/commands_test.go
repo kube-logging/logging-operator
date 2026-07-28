@@ -1,4 +1,4 @@
-// Copyright © 2021 Cisco Systems, Inc. and/or its affiliates
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// fakeKind stands in for the kind binary. It appends every invocation to
-// $FAKE_KIND_LOG and then behaves as the remaining variables ask, which lets
-// these tests exercise the stall path without building a real cluster.
+// fakeKind stands in for the kind binary: it records every invocation and then
+// behaves as the FAKE_KIND_* variables ask, so the stall paths can be exercised
+// without building a cluster.
 //
-// Killing this script leaves its `sleep` running, so the sleep drops the
-// inherited output: otherwise the orphan would hold the test binary's own
-// pipes open and `go test` would sit on them long after the run finished.
+// The sleep drops its inherited output because killing this script leaves the
+// sleep running, and an orphan holding the test binary's pipes would keep
+// `go test` waiting long after the run finished.
 const fakeKind = `#!/bin/sh
 echo "$*" >> "$FAKE_KIND_LOG"
 stall() {
@@ -55,9 +55,12 @@ fi
 exit "${FAKE_KIND_EXIT:-0}"
 `
 
-// installFakeKind points KindPath at the stub for the duration of the test and
-// returns the path of its invocation log.
-func installFakeKind(t *testing.T) string {
+// shortTimeout is the deadline used by the tests that stall the stub.
+const shortTimeout = 200 * time.Millisecond
+
+// newFakeKind returns a Kind pointed at the stub, and the path of its
+// invocation log.
+func newFakeKind(t *testing.T) (*Kind, string) {
 	t.Helper()
 
 	dir := t.TempDir()
@@ -67,25 +70,14 @@ func installFakeKind(t *testing.T) string {
 	logPath := filepath.Join(dir, "invocations.log")
 	t.Setenv("FAKE_KIND_LOG", logPath)
 
-	originalPath, originalImage := KindPath, KindImage
-	// KindImage would otherwise leak into the recorded argument lists.
-	KindPath, KindImage = binary, ""
-	t.Cleanup(func() { KindPath, KindImage = originalPath, originalImage })
-
-	return logPath
-}
-
-// withTimeouts shortens the deadlines so a stall surfaces in test time. The
-// wait delay comes down too: the stub leaves a `sleep` holding the output
-// pipe, so the production 10s would be paid on every stalling test.
-func withTimeouts(t *testing.T, command, cleanup time.Duration) {
-	t.Helper()
-
-	originalCommand, originalCleanup, originalDelay := CommandTimeout, CleanupTimeout, waitDelay
-	CommandTimeout, CleanupTimeout, waitDelay = command, cleanup, 250*time.Millisecond
-	t.Cleanup(func() {
-		CommandTimeout, CleanupTimeout, waitDelay = originalCommand, originalCleanup, originalDelay
-	})
+	return &Kind{
+		Path:           binary,
+		CommandTimeout: time.Minute,
+		CleanupTimeout: time.Minute,
+		// The stub leaves a sleep holding the output pipe, so the production
+		// delay would be paid by every test that stalls.
+		waitDelay: 250 * time.Millisecond,
+	}, logPath
 }
 
 func invocations(t *testing.T, logPath string) []string {
@@ -100,171 +92,250 @@ func invocations(t *testing.T, logPath string) []string {
 	return strings.Split(strings.TrimSpace(string(contents)), "\n")
 }
 
-func TestCreateClusterTimesOut(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_CREATE_SLEEP", "60")
+func TestCommandsTimeOut(t *testing.T) {
+	testCases := map[string]struct {
+		sleepEnv string
+		invoke   func(*Kind) error
+		names    string
+	}{
+		"create cluster": {
+			sleepEnv: "FAKE_KIND_CREATE_SLEEP",
+			invoke:   func(k *Kind) error { return k.CreateCluster(CreateClusterOptions{Name: "stuck"}) },
+			names:    "create cluster --name stuck",
+		},
+		"delete cluster": {
+			sleepEnv: "FAKE_KIND_DELETE_SLEEP",
+			invoke:   func(k *Kind) error { return k.DeleteCluster(DeleteClusterOptions{Name: "stuck"}) },
+			names:    "delete cluster --name stuck",
+		},
+		"load docker-image": {
+			sleepEnv: "FAKE_KIND_LOAD_SLEEP",
+			invoke: func(k *Kind) error {
+				return k.LoadDockerImage([]string{"some/image:latest"}, LoadDockerImageOptions{Name: "stuck"})
+			},
+			names: "load docker-image --name stuck some/image:latest",
+		},
+		"get kubeconfig": {
+			sleepEnv: "FAKE_KIND_GET_SLEEP",
+			invoke: func(k *Kind) error {
+				_, err := k.GetKubeconfig(GetKubeconfigOptions{Name: "stuck"})
+				return err
+			},
+			names: "get kubeconfig --name stuck",
+		},
+	}
 
-	started := time.Now()
-	err := CreateCluster(CreateClusterOptions{Name: "stuck"})
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			k, _ := newFakeKind(t)
+			k.CommandTimeout = shortTimeout
+			t.Setenv(testCase.sleepEnv, "60")
 
-	require.Error(t, err)
-	assert.ErrorIs(t, err, ErrTimeout)
-	// The point of the change: the caller finds out promptly instead of
-	// hanging until `go test` panics on its own -timeout.
-	assert.Less(t, time.Since(started), 30*time.Second)
+			started := time.Now()
+			err := testCase.invoke(k)
+
+			require.Error(t, err)
+			assert.ErrorIs(t, err, ErrTimeout)
+			// "signal: killed" alone would not say what was stuck.
+			assert.Contains(t, err.Error(), testCase.names)
+			assert.Contains(t, err.Error(), commandTimeoutEnv)
+			// The point of the change: the caller finds out promptly instead of
+			// hanging until go test panics on its own -timeout.
+			assert.Less(t, time.Since(started), 30*time.Second)
+		})
+	}
 }
 
-func TestCreateClusterTimeoutNamesTheCommand(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_CREATE_SLEEP", "60")
+func TestCreateClusterErrorReporting(t *testing.T) {
+	const alreadyExists = "ERROR: failed to create cluster: node(s) already exist for a cluster with the name"
 
-	err := CreateCluster(CreateClusterOptions{Name: "stuck"})
+	testCases := map[string]struct {
+		env         map[string]string
+		missingKind bool
+		timeouts    time.Duration
+		isTimeout   bool
+		contains    string
+	}{
+		// Negative control: a failure that is not a stall keeps reporting kind's
+		// own stderr rather than being relabelled as a timeout.
+		"kind's own diagnosis is passed through": {
+			env:      map[string]string{"FAKE_KIND_EXIT": "1", "FAKE_KIND_STDERR": alreadyExists},
+			contains: "failed to create cluster: node(s) already exist for a cluster with the name",
+		},
+		"the exec error stands in when kind writes nothing": {
+			missingKind: true,
+			contains:    "kind-is-not-installed-here",
+		},
+		"a failed cleanup is reported alongside the timeout": {
+			env:       map[string]string{"FAKE_KIND_CREATE_SLEEP": "60", "FAKE_KIND_DELETE_SLEEP": "60"},
+			timeouts:  shortTimeout,
+			isTimeout: true,
+			contains:  "deleting the partial cluster also failed",
+		},
+	}
 
-	require.Error(t, err)
-	// "signal: killed" on its own says nothing about what was stuck.
-	assert.Contains(t, err.Error(), "create cluster")
-	assert.Contains(t, err.Error(), "--name stuck")
-	assert.Contains(t, err.Error(), commandTimeoutEnv)
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			k, _ := newFakeKind(t)
+			if testCase.timeouts > 0 {
+				k.CommandTimeout, k.CleanupTimeout = testCase.timeouts, testCase.timeouts
+			}
+			if testCase.missingKind {
+				k.Path = filepath.Join(t.TempDir(), "kind-is-not-installed-here")
+			}
+			for key, value := range testCase.env {
+				t.Setenv(key, value)
+			}
+
+			err := k.CreateCluster(CreateClusterOptions{Name: "cluster"})
+
+			require.Error(t, err)
+			assert.NotEmpty(t, err.Error(), "the error must say something")
+			assert.Contains(t, err.Error(), testCase.contains)
+			if testCase.isTimeout {
+				assert.ErrorIs(t, err, ErrTimeout)
+			} else {
+				assert.NotErrorIs(t, err, ErrTimeout)
+			}
+		})
+	}
 }
 
-func TestCreateClusterDeletesThePartialClusterOnTimeout(t *testing.T) {
-	logPath := installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_CREATE_SLEEP", "60")
+func TestInvocations(t *testing.T) {
+	testCases := map[string]struct {
+		sleepEnv string
+		timeout  time.Duration
+		invoke   func(*Kind) error
+		wantErr  bool
+		want     []string
+	}{
+		"a successful create is the only call": {
+			invoke:  func(k *Kind) error { return k.CreateCluster(CreateClusterOptions{Name: "fine"}) },
+			timeout: time.Minute,
+			want:    []string{"create cluster --name fine"},
+		},
+		// kind tears down a half-built cluster when one of its own actions
+		// fails, but not when we kill it, so the delete has to be ours.
+		"a stalled create deletes the partial cluster": {
+			sleepEnv: "FAKE_KIND_CREATE_SLEEP",
+			timeout:  shortTimeout,
+			invoke:   func(k *Kind) error { return k.CreateCluster(CreateClusterOptions{Name: "stuck"}) },
+			wantErr:  true,
+			want:     []string{"create cluster --name stuck", "delete cluster --name stuck"},
+		},
+		"an empty image list runs nothing": {
+			invoke:  func(k *Kind) error { return k.LoadDockerImage(nil, LoadDockerImageOptions{Name: "c"}) },
+			timeout: time.Minute,
+			want:    nil,
+		},
+	}
 
-	require.Error(t, CreateCluster(CreateClusterOptions{Name: "stuck"}))
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			k, logPath := newFakeKind(t)
+			k.CommandTimeout = testCase.timeout
+			if testCase.sleepEnv != "" {
+				t.Setenv(testCase.sleepEnv, "60")
+			}
 
-	// kind tears down a half-built cluster when one of its own actions fails,
-	// but not when we kill it, so the delete has to be ours.
-	assert.Contains(t, invocations(t, logPath), "delete cluster --name stuck")
+			err := testCase.invoke(k)
+
+			if testCase.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, testCase.want, invocations(t, logPath))
+		})
+	}
 }
 
-func TestCreateClusterDoesNotDeleteOnSuccess(t *testing.T) {
-	logPath := installFakeKind(t)
-	withTimeouts(t, time.Minute, time.Minute)
+func TestCreateClusterAppliesTheDefaultImage(t *testing.T) {
+	testCases := map[string]struct {
+		image        string
+		optionsImage string
+		want         string
+	}{
+		"the default image is applied": {
+			image: "kindest/node:v1.30.0",
+			want:  "create cluster --image kindest/node:v1.30.0 --name c",
+		},
+		"an explicit image wins": {
+			image:        "kindest/node:v1.30.0",
+			optionsImage: "kindest/node:v1.31.0",
+			want:         "create cluster --image kindest/node:v1.31.0 --name c",
+		},
+		"no image is passed when none is set": {
+			want: "create cluster --name c",
+		},
+	}
 
-	require.NoError(t, CreateCluster(CreateClusterOptions{Name: "fine"}))
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			k, logPath := newFakeKind(t)
+			k.Image = testCase.image
 
-	assert.Equal(t, []string{"create cluster --name fine"}, invocations(t, logPath))
-}
+			require.NoError(t, k.CreateCluster(CreateClusterOptions{Name: "c", Image: testCase.optionsImage}))
 
-// Negative control: a kind failure that is not a stall must keep reporting
-// kind's own stderr, not be relabelled as a timeout.
-func TestCreateClusterReportsKindErrorsUnchanged(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, time.Minute, time.Minute)
-	t.Setenv("FAKE_KIND_EXIT", "1")
-	t.Setenv("FAKE_KIND_STDERR", "ERROR: node(s) already exist for a cluster with the name")
-
-	err := CreateCluster(CreateClusterOptions{Name: "existing"})
-
-	require.Error(t, err)
-	assert.NotErrorIs(t, err, ErrTimeout)
-	assert.Contains(t, err.Error(), "node(s) already exist for a cluster with the name")
-}
-
-// kind writes nothing to stderr when the failure is that it never started, so
-// the stderr buffer alone would make an error with an empty message.
-func TestCreateClusterReportsTheExecErrorWhenKindWritesNothing(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, time.Minute, time.Minute)
-	KindPath = filepath.Join(t.TempDir(), "kind-is-not-installed-here")
-
-	err := CreateCluster(CreateClusterOptions{Name: "cluster"})
-
-	require.Error(t, err)
-	assert.NotEmpty(t, err.Error(), "the error must say something")
-	assert.Contains(t, err.Error(), "kind-is-not-installed-here")
-}
-
-// The counterpart: when kind does explain itself, that explanation is what
-// callers get. common.isClusterAlreadyExistsError matches on this text.
-func TestCreateClusterPrefersKindsStderrWhenThereIsAny(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, time.Minute, time.Minute)
-	t.Setenv("FAKE_KIND_EXIT", "1")
-	t.Setenv("FAKE_KIND_STDERR", "ERROR: failed to create cluster: node(s) already exist for a cluster with the name")
-
-	err := CreateCluster(CreateClusterOptions{Name: "existing"})
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to create cluster: node(s) already exist for a cluster with the name")
-}
-
-func TestCreateClusterReportsAFailedCleanup(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, 200*time.Millisecond)
-	t.Setenv("FAKE_KIND_CREATE_SLEEP", "60")
-	t.Setenv("FAKE_KIND_DELETE_SLEEP", "60")
-
-	err := CreateCluster(CreateClusterOptions{Name: "stuck"})
-
-	require.Error(t, err)
-	// The original stall is still the headline; the failed cleanup is extra.
-	assert.ErrorIs(t, err, ErrTimeout)
-	assert.Contains(t, err.Error(), "deleting the partial cluster also failed")
-}
-
-func TestLoadDockerImageTimesOut(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_LOAD_SLEEP", "60")
-
-	err := LoadDockerImage([]string{"some/image:latest"}, LoadDockerImageOptions{Name: "cluster"})
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, ErrTimeout)
-	assert.Contains(t, err.Error(), "load docker-image")
-}
-
-func TestLoadDockerImageSkipsAnEmptyList(t *testing.T) {
-	logPath := installFakeKind(t)
-
-	require.NoError(t, LoadDockerImage(nil, LoadDockerImageOptions{Name: "cluster"}))
-
-	assert.Empty(t, invocations(t, logPath))
+			assert.Equal(t, []string{testCase.want}, invocations(t, logPath))
+		})
+	}
 }
 
 func TestGetKubeconfigReturnsStdout(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, time.Minute, time.Minute)
+	k, _ := newFakeKind(t)
 	t.Setenv("FAKE_KIND_KUBECONFIG", "apiVersion: v1")
 
-	kubeconfig, err := GetKubeconfig(GetKubeconfigOptions{Name: "cluster"})
+	kubeconfig, err := k.GetKubeconfig(GetKubeconfigOptions{Name: "cluster"})
 
 	require.NoError(t, err)
 	assert.Equal(t, "apiVersion: v1", string(kubeconfig))
 }
 
-func TestGetKubeconfigTimesOut(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_GET_SLEEP", "60")
+func TestCommandTimeoutIsResolvedOnce(t *testing.T) {
+	t.Run("an explicit value is kept", func(t *testing.T) {
+		k := &Kind{CommandTimeout: 42 * time.Second}
 
-	_, err := GetKubeconfig(GetKubeconfigOptions{Name: "cluster"})
+		assert.Equal(t, 42*time.Second, k.commandTimeout())
+		assert.Equal(t, 42*time.Second, k.commandTimeout(), "resolving twice must not change it")
+	})
 
-	require.Error(t, err)
-	assert.ErrorIs(t, err, ErrTimeout)
-	assert.Contains(t, err.Error(), "get kubeconfig")
+	t.Run("zero is derived from the enclosing deadline", func(t *testing.T) {
+		k := &Kind{}
+		enclosing := enclosingTestTimeout()
+		require.Positive(t, enclosing)
+
+		resolved := k.commandTimeout()
+
+		assert.Positive(t, resolved)
+		assert.Less(t, resolved, enclosing)
+		assert.Equal(t, resolved, k.commandTimeout(), "resolving twice must not change it")
+	})
 }
 
-func TestDeleteClusterTimesOut(t *testing.T) {
-	installFakeKind(t)
-	withTimeouts(t, 200*time.Millisecond, time.Minute)
-	t.Setenv("FAKE_KIND_DELETE_SLEEP", "60")
+func TestDeriveCommandTimeout(t *testing.T) {
+	testCases := map[string]struct {
+		enclosing time.Duration
+		expected  time.Duration
+	}{
+		"the suite's own 20m budget": {enclosing: 20 * time.Minute, expected: 16 * time.Minute},
+		"a short budget":             {enclosing: 30 * time.Second, expected: 24 * time.Second},
+		// -timeout 0 means the binary has no deadline, so there is nothing to
+		// derive from and a fixed backstop is all that is left.
+		"no deadline falls back": {enclosing: 0, expected: fallbackTimeout},
+		"a negative one too":     {enclosing: -1, expected: fallbackTimeout},
+	}
 
-	err := DeleteCluster(DeleteClusterOptions{Name: "cluster"})
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, ErrTimeout)
-	assert.Contains(t, err.Error(), "delete cluster")
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, testCase.expected, deriveCommandTimeout(testCase.enclosing))
+		})
+	}
 }
 
-// The invariant that matters. A per-command deadline at or above the deadline
-// it sits inside would cut off work that still had time to finish, and turn
-// runs that would have passed into failures.
+// The invariant that matters. A per-command deadline at or above the deadline it
+// sits inside would cut off work that still had time to finish, turning runs
+// that would have passed into failures.
 func TestDerivedTimeoutStaysBelowTheEnclosingDeadline(t *testing.T) {
 	for _, enclosing := range []time.Duration{
 		30 * time.Second, 2 * time.Minute, 10 * time.Minute,
@@ -274,18 +345,6 @@ func TestDerivedTimeoutStaysBelowTheEnclosingDeadline(t *testing.T) {
 		assert.Less(t, derived, enclosing, "a %s budget derived %s", enclosing, derived)
 		assert.Positive(t, derived)
 	}
-}
-
-func TestDerivedTimeoutLeavesRoomForTheRestOfTheTest(t *testing.T) {
-	// The suite runs at -timeout 20m, so this is the value that will apply.
-	assert.Equal(t, 16*time.Minute, deriveCommandTimeout(20*time.Minute))
-}
-
-// -timeout 0 means the binary has no deadline, so there is nothing to derive
-// from and a fixed backstop is all that is left.
-func TestDerivedTimeoutFallsBackWithoutAnEnclosingDeadline(t *testing.T) {
-	assert.Equal(t, fallbackTimeout, deriveCommandTimeout(0))
-	assert.Equal(t, fallbackTimeout, deriveCommandTimeout(-1))
 }
 
 // Guards the plumbing: the value really does come from this binary's -timeout.
@@ -306,8 +365,8 @@ func TestResolveCommandTimeout(t *testing.T) {
 		"a duration is honored":           {raw: "90s", expected: 90 * time.Second},
 		"a bare number is not a duration": {raw: "600", expected: fallback},
 		"nonsense keeps the default":      {raw: "soon", expected: fallback},
-		// A zero deadline is already expired, so honoring these would fail
-		// every kind call instantly instead of disabling the timeout.
+		// A zero deadline has already expired, so honoring these would fail
+		// every invocation instantly instead of disabling the timeout.
 		"zero keeps the default":         {raw: "0", expected: fallback},
 		"zero seconds keeps the default": {raw: "0s", expected: fallback},
 		"negative keeps the default":     {raw: "-1s", expected: fallback},

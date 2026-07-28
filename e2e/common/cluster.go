@@ -113,7 +113,7 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 }
 
 func DeleteTestCluster(clusterName string) error {
-	return errors.WrapIfWithDetails(kind.DeleteCluster(kind.DeleteClusterOptions{
+	return errors.WrapIfWithDetails(kindCLI.DeleteCluster(kind.DeleteClusterOptions{
 		Name: clusterName,
 	}), "deleting kind cluster", "clusterName", clusterName)
 }
@@ -169,7 +169,7 @@ func (c kindCluster) Cleanup() error {
 }
 
 func (c kindCluster) LoadImages(images ...string) error {
-	return kind.LoadDockerImage(images, kind.LoadDockerImageOptions{
+	return kindCLI.LoadDockerImage(images, kind.LoadDockerImageOptions{
 		Name: c.clusterName,
 	})
 }
