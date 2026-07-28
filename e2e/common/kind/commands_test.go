@@ -55,8 +55,15 @@ fi
 exit "${FAKE_KIND_EXIT:-0}"
 `
 
-// shortTimeout is the deadline used by the tests that stall the stub.
-const shortTimeout = 200 * time.Millisecond
+const (
+	// shortTimeout is the deadline used by the tests that stall the stub.
+	shortTimeout = 200 * time.Millisecond
+
+	// stubStall is how long the stub sleeps when a test wants it to hang. It
+	// only has to outlast shortTimeout: the sleep is orphaned when the stub is
+	// killed, so a longer one would just linger on the runner.
+	stubStall = "5"
+)
 
 // newFakeKind returns a Kind pointed at the stub, and the path of its
 // invocation log.
@@ -129,7 +136,7 @@ func TestCommandsTimeOut(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			k, _ := newFakeKind(t)
 			k.CommandTimeout = shortTimeout
-			t.Setenv(testCase.sleepEnv, "60")
+			t.Setenv(testCase.sleepEnv, stubStall)
 
 			started := time.Now()
 			err := testCase.invoke(k)
@@ -167,7 +174,7 @@ func TestCreateClusterErrorReporting(t *testing.T) {
 			contains:    "kind-is-not-installed-here",
 		},
 		"a failed cleanup is reported alongside the timeout": {
-			env:       map[string]string{"FAKE_KIND_CREATE_SLEEP": "60", "FAKE_KIND_DELETE_SLEEP": "60"},
+			env:       map[string]string{"FAKE_KIND_CREATE_SLEEP": stubStall, "FAKE_KIND_DELETE_SLEEP": stubStall},
 			timeouts:  shortTimeout,
 			isTimeout: true,
 			contains:  "deleting the partial cluster also failed",
@@ -235,7 +242,7 @@ func TestInvocations(t *testing.T) {
 			k, logPath := newFakeKind(t)
 			k.CommandTimeout = testCase.timeout
 			if testCase.sleepEnv != "" {
-				t.Setenv(testCase.sleepEnv, "60")
+				t.Setenv(testCase.sleepEnv, stubStall)
 			}
 
 			err := testCase.invoke(k)
@@ -333,9 +340,9 @@ func TestDeriveCommandTimeout(t *testing.T) {
 	}
 }
 
-// The invariant that matters. A per-command deadline at or above the deadline it
-// sits inside would cut off work that still had time to finish, turning runs
-// that would have passed into failures.
+// The invariant that matters. A cap at or above the deadline it sits inside
+// would never fire in time to be useful: the binary would panic on its own
+// deadline first, with nothing named and no cluster cleaned up.
 func TestDerivedTimeoutStaysBelowTheEnclosingDeadline(t *testing.T) {
 	for _, enclosing := range []time.Duration{
 		30 * time.Second, 2 * time.Minute, 10 * time.Minute,

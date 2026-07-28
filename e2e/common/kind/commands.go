@@ -199,8 +199,10 @@ func (k *Kind) commandTimeout() time.Duration {
 	return k.CommandTimeout
 }
 
-// deriveCommandTimeout must always return less than enclosing, so that cutting
-// an invocation short can never be why a package misses its own deadline.
+// deriveCommandTimeout returns a cap strictly below enclosing, so a stall is
+// cut while there is still budget left to clean up and name it. It does not
+// bound the package as a whole: several invocations can each stay under the cap
+// and still add up past the enclosing deadline.
 func deriveCommandTimeout(enclosing time.Duration) time.Duration {
 	if enclosing <= 0 {
 		return fallbackTimeout
