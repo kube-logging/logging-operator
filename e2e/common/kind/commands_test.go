@@ -262,6 +262,39 @@ func TestDeleteClusterTimesOut(t *testing.T) {
 	assert.Contains(t, err.Error(), "delete cluster")
 }
 
+// The invariant that matters. A per-command deadline at or above the deadline
+// it sits inside would cut off work that still had time to finish, and turn
+// runs that would have passed into failures.
+func TestDerivedTimeoutStaysBelowTheEnclosingDeadline(t *testing.T) {
+	for _, enclosing := range []time.Duration{
+		30 * time.Second, 2 * time.Minute, 10 * time.Minute,
+		20 * time.Minute, time.Hour,
+	} {
+		derived := deriveCommandTimeout(enclosing)
+		assert.Less(t, derived, enclosing, "a %s budget derived %s", enclosing, derived)
+		assert.Positive(t, derived)
+	}
+}
+
+func TestDerivedTimeoutLeavesRoomForTheRestOfTheTest(t *testing.T) {
+	// The suite runs at -timeout 20m, so this is the value that will apply.
+	assert.Equal(t, 16*time.Minute, deriveCommandTimeout(20*time.Minute))
+}
+
+// -timeout 0 means the binary has no deadline, so there is nothing to derive
+// from and a fixed backstop is all that is left.
+func TestDerivedTimeoutFallsBackWithoutAnEnclosingDeadline(t *testing.T) {
+	assert.Equal(t, fallbackTimeout, deriveCommandTimeout(0))
+	assert.Equal(t, fallbackTimeout, deriveCommandTimeout(-1))
+}
+
+// Guards the plumbing: the value really does come from this binary's -timeout.
+func TestEnclosingTestTimeoutIsReadable(t *testing.T) {
+	enclosing := enclosingTestTimeout()
+	t.Logf("this binary was started with -timeout %s", enclosing)
+	assert.Positive(t, enclosing, "go test always sets a deadline unless -timeout 0")
+}
+
 func TestResolveCommandTimeout(t *testing.T) {
 	fallback := 10 * time.Minute
 
