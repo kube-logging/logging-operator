@@ -60,4 +60,8 @@ spec:
   {{- with .Values.logging.configCheck }}
   configCheck: {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- with .Values.logging.enableRawFluentdFilter }}
+  enableRawFluentdFilter: {{ . }}
+  {{- end }}
 {{- end }}
+
