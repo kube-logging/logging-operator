@@ -54,18 +54,21 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
 }
 
-var tags = "time"
-var realTimeBuffer = &output.Buffer{
-	Tags:        &tags,
-	Timekey:     "1s",
-	TimekeyWait: "0s",
-}
+var (
+	tags           = "time"
+	realTimeBuffer = &output.Buffer{
+		Tags:        &tags,
+		Timekey:     "1s",
+		TimekeyWait: "0s",
+	}
+)
+
 var producerLabels = map[string]string{
 	"my-unique-label": "log-producer",
 }
@@ -169,7 +172,6 @@ func TestFluentbitHotReload(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, int64(1), ds.Generation, "generation should not be incremented for a reloadable agent")
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)

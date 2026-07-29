@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -37,7 +38,6 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/stretchr/testify/require"
 )
 
 var TestTempDir string
@@ -49,7 +49,7 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -171,7 +171,6 @@ func TestWatchSelectors(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(unmanagedSecret), secret))
 		secretOwnerRefMeta = metav1.GetControllerOf(secret)
 		require.Nil(t, secretOwnerRefMeta)
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
@@ -191,7 +190,6 @@ func TestWatchSelectors(t *testing.T) {
 			t.Logf("Failed collecting coverage files: %s", err)
 		}
 		return err
-
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()

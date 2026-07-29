@@ -48,6 +48,8 @@ import (
 
 var TestTempDir string
 
+var configCheckFailure = regexp.MustCompile(`^Configuration with checksum (.+) has failed. .*`)
+
 func init() {
 	var ok bool
 	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
@@ -55,7 +57,7 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -220,7 +222,6 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 			t.Logf("log consumer logs: %s", rawOut)
 			return strings.Contains(string(rawOut), testTag)
 		}, 5*time.Minute, 3*time.Second)
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
@@ -253,6 +254,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }
+
 func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-2"
@@ -408,9 +410,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
-					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
-					common.RequireNoError(t, err)
-					if match {
+					if configCheckFailure.MatchString(problem) {
 						t.Logf("Found the problem in Logging status: %v", logging.Status)
 						return true
 					}
@@ -428,9 +428,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
-					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
-					common.RequireNoError(t, err)
-					if match {
+					if configCheckFailure.MatchString(problem) {
 						t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
 						return false
 					}
@@ -459,6 +457,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }
+
 func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-3"
@@ -646,6 +645,7 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
 	})
 }
+
 func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
 	common.Initialize(t)
 	ns := "testing-3"

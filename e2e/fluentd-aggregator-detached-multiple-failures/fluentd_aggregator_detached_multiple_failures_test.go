@@ -33,12 +33,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
 var TestTempDirUnnamed string
@@ -50,7 +49,7 @@ func init() {
 		TestTempDirUnnamed = "../.."
 	}
 	TestTempDirUnnamed = filepath.Join(TestTempDirUnnamed, "build/_test")
-	err := os.MkdirAll(TestTempDirUnnamed, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDirUnnamed, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -244,7 +243,6 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 			}
 			return true
 		}, 5*time.Minute, 3*time.Second)
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDirUnnamed, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)

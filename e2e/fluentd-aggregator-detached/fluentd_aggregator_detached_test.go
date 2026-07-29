@@ -54,7 +54,7 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -292,7 +292,6 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 			t.Logf("log consumer logs: %s", rawOut)
 			return strings.Contains(string(rawOut), testTag)
 		}, 5*time.Minute, 3*time.Second)
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)

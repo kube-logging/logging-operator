@@ -158,11 +158,13 @@ license-cache: ${LICENSEI} ## Generate license cache
 lint: ${GOLANGCI_LINT} ## Run linter
 	${GOLANGCI_LINT} run ${LINTER_FLAGS}
 	cd pkg/sdk && ${GOLANGCI_LINT} run ${LINTER_FLAGS}
+	cd e2e && ${GOLANGCI_LINT} run ${LINTER_FLAGS}
 
 .PHONY: lint-fix
 lint-fix: ${GOLANGCI_LINT} ## Run linter
 	${GOLANGCI_LINT} run --fix
 	cd pkg/sdk && ${GOLANGCI_LINT} run --fix
+	cd e2e && ${GOLANGCI_LINT} run --fix
 
 .PHONY: list
 list: ## List all make targets

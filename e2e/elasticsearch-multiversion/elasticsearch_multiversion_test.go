@@ -55,7 +55,7 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -727,7 +727,6 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 			t.Logf("ES9 document count: %s", count)
 			return count != "" && count != "0"
 		}, 3*time.Minute, 10*time.Second)
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
@@ -747,7 +746,6 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 			t.Logf("Failed collecting coverage files: %s", err)
 		}
 		return err
-
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
