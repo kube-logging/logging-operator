@@ -156,16 +156,12 @@ func (c kindCluster) PrintLogs(config PrintLogConfig) error {
 	if err != nil {
 		return err
 	}
+	defer func() { _ = f.Close() }()
+
 	cmd.Stdout = f
 	cmd.Stderr = os.Stderr
 
-	// f is the log file stern writes into, so a failed Close means truncated output.
-	if err := cmd.Run(); err != nil {
-		_ = f.Close()
-		return err
-	}
-
-	return f.Close()
+	return cmd.Run()
 }
 
 func (c kindCluster) Cleanup() error {

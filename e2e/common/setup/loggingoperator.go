@@ -90,10 +90,9 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	}
 	actionConfig := new(action.Configuration)
 
-	err = actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...interface{}) {
+	if err := actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...interface{}) {
 		t.Logf(format, v...)
-	})
-	if err != nil {
+	}); err != nil {
 		t.Fatalf("helm action config init: %s", err)
 	}
 
