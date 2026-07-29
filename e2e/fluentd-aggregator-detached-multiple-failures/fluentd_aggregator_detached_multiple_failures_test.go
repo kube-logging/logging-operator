@@ -229,7 +229,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
 
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))

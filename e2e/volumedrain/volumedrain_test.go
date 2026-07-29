@@ -187,7 +187,7 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			types.NameLabel: releaseNameOverride,
 		}
 
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))
@@ -428,7 +428,7 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 
 		fluentdReplicaName := logging.Name + "-fluentd-1"
 
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))

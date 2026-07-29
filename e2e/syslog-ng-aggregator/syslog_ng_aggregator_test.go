@@ -204,7 +204,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		producerLabels := map[string]string{
 			"my-unique-label": "log-producer",
 		}
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))

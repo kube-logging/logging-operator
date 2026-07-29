@@ -174,7 +174,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
 
 		// Start a log producer in the default namespace
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = "default"
 			options.Labels = producerLabels
 		}))
