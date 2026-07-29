@@ -111,7 +111,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		projectDir = "../.."
 	}
 
-	cp, err := installer.ChartPathOptions.LocateChart(fmt.Sprintf("%s/charts/logging-operator", projectDir), cli.New())
+	cp, err := installer.LocateChart(fmt.Sprintf("%s/charts/logging-operator", projectDir), cli.New())
 	if err != nil {
 		t.Fatalf("helm locate chart: %s", err)
 	}

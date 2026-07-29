@@ -48,6 +48,8 @@ import (
 
 var TestTempDir string
 
+var configCheckFailure = regexp.MustCompile(`^Configuration with checksum (.+) has failed. .*`)
+
 func init() {
 	var ok bool
 	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
@@ -408,9 +410,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
-					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
-					common.RequireNoError(t, err)
-					if match {
+					if configCheckFailure.MatchString(problem) {
 						t.Logf("Found the problem in Logging status: %v", logging.Status)
 						return true
 					}
@@ -428,9 +428,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
-					match, err := regexp.MatchString(`^Configuration with checksum (.+) has failed. .*`, problem)
-					common.RequireNoError(t, err)
-					if match {
+					if configCheckFailure.MatchString(problem) {
 						t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
 						return false
 					}
