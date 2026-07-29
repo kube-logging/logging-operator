@@ -189,7 +189,8 @@ func TestWatchSelectors(t *testing.T) {
 		if err != nil {
 			t.Logf("Failed collecting coverage files: %s", err)
 		}
-		return err
+
+		return nil
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
