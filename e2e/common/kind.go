@@ -17,7 +17,7 @@ package common
 import (
 	"strings"
 
-	"github.com/kube-logging/logging-operator/e2e/common/kind"
+	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
 
 // KindClusterCreationTimeout is passed to `kind create cluster --wait`, which

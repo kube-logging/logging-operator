@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/kube-logging/logging-operator/e2e/common/kind"
+	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
 
 type Cluster interface {

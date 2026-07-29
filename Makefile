@@ -197,7 +197,7 @@ test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run t
 	cd pkg/sdk/logging/model/syslogng/config && go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
-	cd e2e && go test -v ./common/...
+	cd e2e && go test -v ./common/... ./internal/...
 
 .PHONY: generate-test-coverage
 generate-test-coverage: test
