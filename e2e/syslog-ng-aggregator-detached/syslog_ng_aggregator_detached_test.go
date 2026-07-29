@@ -40,8 +40,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
@@ -280,15 +280,15 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
 				t.Log("waiting for the operator")
 				return false
 			}
-			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
 				t.Log("waiting for the producer")
 				return false
 			}
-			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
 				return false
 			}
@@ -298,7 +298,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				return false
 			}
 
-			if isValid := cond.CheckSyslogNGStatus(t, &c, &ctx, &syslogNG, logging.Name); !isValid {
+			if isValid := wait.CheckSyslogNGStatus(t, c.GetClient(), ctx, &syslogNG, logging.Name); !isValid {
 				t.Log("checking detached SyslogNG status")
 				return false
 			}
@@ -309,7 +309,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				common.RequireNoError(t, c.GetClient().Create(ctx, &excessSyslogNG))
 				t.Log("creating excess detached syslog-ng")
 				return false
-			} else if isValid := cond.CheckExcessSyslogNGStatus(t, &c, &ctx, &excessSyslogNG); !isValid && len(detachedSyslogNGs.Items) == 2 {
+			} else if isValid := wait.CheckExcessSyslogNGStatus(t, c.GetClient(), ctx, &excessSyslogNG); !isValid && len(detachedSyslogNGs.Items) == 2 {
 				t.Log("checking excess detached SyslogNG status")
 				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessSyslogNG), &excessSyslogNG))
 				return false

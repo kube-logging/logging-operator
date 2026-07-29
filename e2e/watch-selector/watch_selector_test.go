@@ -35,8 +35,8 @@ import (
 	"sigs.k8s.io/e2e-framework/third_party/helm"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -124,12 +124,12 @@ func TestWatchSelectors(t *testing.T) {
 		common.RequireNoError(t, c.GetClient().Create(ctx, unmanagedSecret))
 
 		require.Eventually(t, func() bool {
-			if isManagedFluentdPodRunning := cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: logging.Name + "-fluentd-0"}); !isManagedFluentdPodRunning() {
+			if isManagedFluentdPodRunning := wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: logging.Name + "-fluentd-0"}); !isManagedFluentdPodRunning() {
 				t.Logf("managed fluentd pod is not running")
 				return false
 			}
 
-			if isUnmanagedFluentdPodRunning := cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: "fluentd", Name: "fluentd-0"}); !isUnmanagedFluentdPodRunning() {
+			if isUnmanagedFluentdPodRunning := wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: "fluentd", Name: "fluentd-0"}); !isUnmanagedFluentdPodRunning() {
 				t.Logf("unmanaged fluentd pod is not running")
 				return false
 			}
