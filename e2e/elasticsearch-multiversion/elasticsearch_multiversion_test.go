@@ -46,6 +46,15 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
+const (
+	// esReadyFallback applies when the binary has no deadline to derive from.
+	esReadyFallback = 15 * time.Minute
+
+	// esReadyMargin is the room left before the deadline for the wait to report
+	// its own failure. It does not cover teardown, which can outlast it.
+	esReadyMargin = 30 * time.Second
+)
+
 var TestTempDir string
 
 func init() {
@@ -58,6 +67,44 @@ func init() {
 	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
+	}
+}
+
+// esReadyBudget caps a wait strictly below the enclosing -timeout, so an
+// Elasticsearch deployment that never becomes ready fails by name instead of
+// letting the package binary panic and report only a goroutine dump.
+func esReadyBudget(t *testing.T) time.Duration {
+	deadline, ok := t.Deadline()
+	if !ok {
+		return esReadyFallback
+	}
+	return budgetWithin(time.Until(deadline))
+}
+
+// budgetWithin never returns a non-positive duration: require.Eventually treats
+// one as already expired, which would fail every run instead of only stalled ones.
+func budgetWithin(remaining time.Duration) time.Duration {
+	if budget := remaining - esReadyMargin; budget > 0 {
+		return budget
+	}
+	return time.Second
+}
+
+func TestBudgetWithin(t *testing.T) {
+	for _, c := range []struct {
+		name      string
+		remaining time.Duration
+		want      time.Duration
+	}{
+		{"ample", 20 * time.Minute, 20*time.Minute - esReadyMargin},
+		{"just above the margin", esReadyMargin + time.Second, time.Second},
+		{"exactly the margin", esReadyMargin, time.Second},
+		{"already past the deadline", -time.Minute, time.Second},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			require.Equal(t, c.want, budgetWithin(c.remaining))
+			require.Positive(t, budgetWithin(c.remaining))
+		})
 	}
 }
 
@@ -442,17 +489,17 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 		t.Log("Waiting for Elasticsearch 7 deployment to be ready...")
 		require.Eventually(t, func() bool {
 			return cond.DeploymentAvailable(t, c.GetClient(), &ctx, ns, "elasticsearch7")()
-		}, 30*time.Minute, 10*time.Second)
+		}, esReadyBudget(t), 10*time.Second)
 
 		t.Log("Waiting for Elasticsearch 8 deployment to be ready...")
 		require.Eventually(t, func() bool {
 			return cond.DeploymentAvailable(t, c.GetClient(), &ctx, ns, "elasticsearch8")()
-		}, 30*time.Minute, 10*time.Second)
+		}, esReadyBudget(t), 10*time.Second)
 
 		t.Log("Waiting for Elasticsearch 9 deployment to be ready...")
 		require.Eventually(t, func() bool {
 			return cond.DeploymentAvailable(t, c.GetClient(), &ctx, ns, "elasticsearch9")()
-		}, 30*time.Minute, 10*time.Second)
+		}, esReadyBudget(t), 10*time.Second)
 
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
