@@ -24,6 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func scheme(t *testing.T) *runtime.Scheme {
@@ -31,6 +33,7 @@ func scheme(t *testing.T) *runtime.Scheme {
 	s := runtime.NewScheme()
 	require.NoError(t, corev1.AddToScheme(s))
 	require.NoError(t, appsv1.AddToScheme(s))
+	require.NoError(t, v1beta1.AddToScheme(s))
 	return s
 }
 
@@ -165,5 +168,46 @@ func TestRefreshToleratesAMissingObject(t *testing.T) {
 	cl := fake.NewClientBuilder().WithScheme(scheme(t)).Build()
 	require.NotPanics(t, func() {
 		refresh(t, cl, t.Context(), pod("gone", corev1.PodRunning, nil))
+	})
+}
+
+func TestActiveIs(t *testing.T) {
+	yes, no := true, false
+	require.True(t, activeIs(&yes, true))
+	require.False(t, activeIs(&yes, false))
+	require.True(t, activeIs(&no, false))
+	require.False(t, activeIs(&no, true))
+
+	// Unset is neither: both callers must keep polling rather than pass.
+	require.False(t, activeIs(nil, true))
+	require.False(t, activeIs(nil, false))
+
+	require.Equal(t, "true", activeState(&yes))
+	require.Equal(t, "false", activeState(&no))
+	require.Equal(t, "unset", activeState(nil))
+}
+
+// Status.Active is optional, so it is nil until the controller writes it.
+// Dereferencing it would panic on testify's condition goroutine and take the
+// whole package binary down, so every status check must survive it.
+func TestStatusChecksSurviveUnsetActive(t *testing.T) {
+	cl := fake.NewClientBuilder().WithScheme(scheme(t)).Build()
+
+	fluentd := v1beta1.FluentdConfig{
+		ObjectMeta: metav1.ObjectMeta{Name: "f", Namespace: "ns"},
+		Status:     v1beta1.FluentdConfigStatus{Problems: []string{"boom"}},
+	}
+	syslogNG := v1beta1.SyslogNGConfig{
+		ObjectMeta: metav1.ObjectMeta{Name: "s", Namespace: "ns"},
+		Status:     v1beta1.SyslogNGConfigStatus{Problems: []string{"boom"}},
+	}
+	require.Nil(t, fluentd.Status.Active)
+	require.Nil(t, syslogNG.Status.Active)
+
+	require.NotPanics(t, func() {
+		require.False(t, CheckFluentdStatus(t, cl, t.Context(), &fluentd, "lg"))
+		require.False(t, CheckExcessFluentdStatus(t, cl, t.Context(), &fluentd))
+		require.False(t, CheckSyslogNGStatus(t, cl, t.Context(), &syslogNG, "lg"))
+		require.False(t, CheckExcessSyslogNGStatus(t, cl, t.Context(), &syslogNG))
 	})
 }
