@@ -19,7 +19,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -76,8 +75,6 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	opt := &LoggingOperatorOptions{
 		Namespace:    "default",
 		NameOverride: "logging-operator",
-		PollInterval: time.Second * 3,
-		Timeout:      time.Minute,
 	}
 
 	for _, o := range opts {
@@ -191,7 +188,5 @@ func (fn LoggingOperatorOptionFunc) ApplyToLoggingOperatorOptions(options *Loggi
 type LoggingOperatorOptions struct {
 	Namespace    string
 	NameOverride string
-	PollInterval time.Duration
-	Timeout      time.Duration
 	Args         []string
 }
