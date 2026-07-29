@@ -39,8 +39,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/cond"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
@@ -193,15 +193,15 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
 				t.Log("waiting for the operator")
 				return false
 			}
-			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
 				t.Log("waiting for the producer")
 				return false
 			}
-			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
 				return false
 			}
@@ -248,11 +248,11 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 		drainerJobName := fluentdReplicaName + "-drainer"
 		require.Eventually(t, func() bool {
 			var job batchv1.Job
-			present := cond.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
+			present := wait.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
 			return present && job.Status.Active > 0
 		}, 1*time.Minute, 3*time.Second)
 
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
+		require.Eventually(t, wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
 		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
 			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
@@ -260,9 +260,9 @@ func TestVolumeDrain_Downscale(t *testing.T) {
 			"--replicas", "1"), c)
 		common.RequireNoError(t, cmd.Run())
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
+		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second)
+		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second)
 
 		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
 		common.RequireNoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
@@ -434,15 +434,15 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		}))
 
 		require.Eventually(t, func() bool {
-			if operatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
+			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
 				t.Log("waiting for the operator")
 				return false
 			}
-			if producerRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
+			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
 				t.Log("waiting for the producer")
 				return false
 			}
-			if aggregatorRunning := cond.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
+			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
 				t.Log("waiting for the aggregator")
 				return false
 			}
@@ -483,11 +483,11 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 		drainerJobName := fluentdReplicaName + "-drainer"
 		require.Eventually(t, func() bool {
 			var job batchv1.Job
-			present := cond.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
+			present := wait.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
 			return present && job.Status.Active > 0
 		}, 2*time.Minute, 1*time.Second)
 
-		require.Eventually(t, cond.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
+		require.Eventually(t, wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
 
 		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
 			fmt.Sprintf("deployment/%s-test-receiver", releaseNameOverride),
@@ -495,11 +495,11 @@ func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
 			"--replicas", "1"), c)
 		common.RequireNoError(t, cmd.Run())
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
+		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
+		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
 
-		require.Eventually(t, cond.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
+		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
