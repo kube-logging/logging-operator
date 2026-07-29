@@ -171,22 +171,6 @@ func TestRefreshToleratesAMissingObject(t *testing.T) {
 	})
 }
 
-func TestActiveIs(t *testing.T) {
-	yes, no := true, false
-	require.True(t, activeIs(&yes, true))
-	require.False(t, activeIs(&yes, false))
-	require.True(t, activeIs(&no, false))
-	require.False(t, activeIs(&no, true))
-
-	// Unset is neither: both callers must keep polling rather than pass.
-	require.False(t, activeIs(nil, true))
-	require.False(t, activeIs(nil, false))
-
-	require.Equal(t, "true", activeState(&yes))
-	require.Equal(t, "false", activeState(&no))
-	require.Equal(t, "unset", activeState(nil))
-}
-
 // Status.Active is optional, so it is nil until the controller writes it.
 // Dereferencing it would panic on testify's condition goroutine and take the
 // whole package binary down, so every status check must survive it.
@@ -210,4 +194,48 @@ func TestStatusChecksSurviveUnsetActive(t *testing.T) {
 		require.False(t, CheckSyslogNGStatus(t, cl, t.Context(), &syslogNG, "lg"))
 		require.False(t, CheckExcessSyslogNGStatus(t, cl, t.Context(), &syslogNG))
 	})
+}
+
+// ptr.Deref's default has to be chosen per call site: false where the check
+// wants Active true, true where it wants Active false. Both make an unset field
+// unsatisfied so the caller polls again. Getting one backwards would either
+// pass on an unreconciled object or never pass at all, so cover all three states.
+func TestStatusChecksAcrossEveryActiveState(t *testing.T) {
+	cl := fake.NewClientBuilder().WithScheme(scheme(t)).Build()
+	yes, no := true, false
+
+	for _, c := range []struct {
+		name   string
+		active *bool
+		ready  bool // CheckFluentdStatus / CheckSyslogNGStatus
+		excess bool // CheckExcessFluentdStatus / CheckExcessSyslogNGStatus
+	}{
+		{"active true", &yes, true, false},
+		{"active false", &no, false, true},
+		{"active unset", nil, false, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			fReady := v1beta1.FluentdConfig{
+				ObjectMeta: metav1.ObjectMeta{Name: "f", Namespace: "ns"},
+				Status:     v1beta1.FluentdConfigStatus{Logging: "lg", Active: c.active},
+			}
+			sReady := v1beta1.SyslogNGConfig{
+				ObjectMeta: metav1.ObjectMeta{Name: "s", Namespace: "ns"},
+				Status:     v1beta1.SyslogNGConfigStatus{Logging: "lg", Active: c.active},
+			}
+			require.Equal(t, c.ready, CheckFluentdStatus(t, cl, t.Context(), &fReady, "lg"))
+			require.Equal(t, c.ready, CheckSyslogNGStatus(t, cl, t.Context(), &sReady, "lg"))
+
+			fExcess := v1beta1.FluentdConfig{
+				ObjectMeta: metav1.ObjectMeta{Name: "f", Namespace: "ns"},
+				Status:     v1beta1.FluentdConfigStatus{Problems: []string{"x"}, Active: c.active},
+			}
+			sExcess := v1beta1.SyslogNGConfig{
+				ObjectMeta: metav1.ObjectMeta{Name: "s", Namespace: "ns"},
+				Status:     v1beta1.SyslogNGConfigStatus{Problems: []string{"x"}, Active: c.active},
+			}
+			require.Equal(t, c.excess, CheckExcessFluentdStatus(t, cl, t.Context(), &fExcess))
+			require.Equal(t, c.excess, CheckExcessSyslogNGStatus(t, cl, t.Context(), &sExcess))
+		})
+	}
 }

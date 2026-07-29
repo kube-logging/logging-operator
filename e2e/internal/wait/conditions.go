@@ -16,12 +16,12 @@ package wait
 
 import (
 	"context"
-	"strconv"
 	"testing"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -102,22 +102,6 @@ func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) 
 	}
 }
 
-// activeIs reports whether Status.Active has been written and equals want. The
-// field is optional, so a nil pointer means the controller has not set it yet:
-// neither true nor false, and the caller should keep polling. Dereferencing it
-// blindly would panic on testify's condition goroutine and take the whole
-// package binary down with it.
-func activeIs(v *bool, want bool) bool { return v != nil && *v == want }
-
-// activeState renders Status.Active for logs, keeping "not written yet"
-// distinguishable from an explicit false.
-func activeState(v *bool) string {
-	if v == nil {
-		return "unset"
-	}
-	return strconv.FormatBool(*v)
-}
-
 // refresh re-reads obj so the next poll sees current status. A failed read is
 // logged and ignored on purpose: the caller is about to return false and be
 // retried, and these conditions run on testify's own goroutine, where failing
@@ -141,9 +125,9 @@ func CheckFluentdStatus(t *testing.T, cl client.Client, ctx context.Context, flu
 		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", fluentdInstanceName, fluentd.Status.Logging, loggingName)
 		return false
 	}
-	if !activeIs(fluentd.Status.Active, true) {
+	if !ptr.Deref(fluentd.Status.Active, false) {
 		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's active field set as true, found: %v", fluentdInstanceName, activeState(fluentd.Status.Active))
+		t.Logf("%s should have it's active field set as true", fluentdInstanceName)
 		return false
 	}
 
@@ -163,9 +147,9 @@ func CheckExcessFluentdStatus(t *testing.T, cl client.Client, ctx context.Contex
 		t.Logf("%s should have it's logging field empty, found: %s", fluentdInstanceName, fluentd.Status.Logging)
 		return false
 	}
-	if !activeIs(fluentd.Status.Active, false) {
+	if ptr.Deref(fluentd.Status.Active, true) {
 		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's active field set as false, found: %v", fluentdInstanceName, activeState(fluentd.Status.Active))
+		t.Logf("%s should have it's active field set as false", fluentdInstanceName)
 		return false
 	}
 
@@ -185,9 +169,9 @@ func CheckSyslogNGStatus(t *testing.T, cl client.Client, ctx context.Context, sy
 		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", instanceName, syslogNG.Status.Logging, loggingName)
 		return false
 	}
-	if !activeIs(syslogNG.Status.Active, true) {
+	if !ptr.Deref(syslogNG.Status.Active, false) {
 		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's active field set as true, found: %v", instanceName, activeState(syslogNG.Status.Active))
+		t.Logf("%s should have it's active field set as true", instanceName)
 		return false
 	}
 
@@ -207,9 +191,9 @@ func CheckExcessSyslogNGStatus(t *testing.T, cl client.Client, ctx context.Conte
 		t.Logf("%s should have it's logging field empty, found: %s", instanceName, syslogNG.Status.Logging)
 		return false
 	}
-	if !activeIs(syslogNG.Status.Active, false) {
+	if ptr.Deref(syslogNG.Status.Active, true) {
 		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's active field set as false, found: %v", instanceName, activeState(syslogNG.Status.Active))
+		t.Logf("%s should have it's active field set as false", instanceName)
 		return false
 	}
 
