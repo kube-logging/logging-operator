@@ -77,8 +77,8 @@ func LoggingInfra(
 	release string,
 	tag string,
 	buffer *output.Buffer,
-	producerLabels map[string]string) {
-
+	producerLabels map[string]string,
+) {
 	output := v1beta1.ClusterOutput{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "http",
@@ -181,7 +181,8 @@ func LoggingTenant(
 	release,
 	tag string,
 	buffer *output.Buffer,
-	producerLabels map[string]string) {
+	producerLabels map[string]string,
+) {
 	output := v1beta1.Output{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "http",

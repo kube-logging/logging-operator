@@ -29,40 +29,38 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
-var (
-	defaultImages = []e2eImage{
-		{
-			lookupEnv:  "LOGGING_OPERATOR_IMAGE",
-			repository: "controller",
-			tag:        "local",
-		},
-		{
-			lookupEnv:  "CONFIG_RELOADER_IMAGE",
-			repository: "config-reloader",
-			tag:        "local",
-		},
-		{
-			lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
-			repository: "syslogng-reload",
-			tag:        "local",
-		},
-		{
-			lookupEnv:  "FLUENTD_DRAIN_WATCH_IMAGE",
-			repository: "fluentd-drain-watch",
-			tag:        "local",
-		},
-		{
-			lookupEnv:  "NODE_EXPORTER_IMAGE",
-			repository: "node-exporter",
-			tag:        "local",
-		},
-		{
-			lookupEnv:  "FLUENTD_IMAGE",
-			repository: "fluentd-full",
-			tag:        "local",
-		},
-	}
-)
+var defaultImages = []e2eImage{
+	{
+		lookupEnv:  "LOGGING_OPERATOR_IMAGE",
+		repository: "controller",
+		tag:        "local",
+	},
+	{
+		lookupEnv:  "CONFIG_RELOADER_IMAGE",
+		repository: "config-reloader",
+		tag:        "local",
+	},
+	{
+		lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
+		repository: "syslogng-reload",
+		tag:        "local",
+	},
+	{
+		lookupEnv:  "FLUENTD_DRAIN_WATCH_IMAGE",
+		repository: "fluentd-drain-watch",
+		tag:        "local",
+	},
+	{
+		lookupEnv:  "NODE_EXPORTER_IMAGE",
+		repository: "node-exporter",
+		tag:        "local",
+	},
+	{
+		lookupEnv:  "FLUENTD_IMAGE",
+		repository: "fluentd-full",
+		tag:        "local",
+	},
+}
 
 type e2eImage struct {
 	lookupEnv  string
@@ -75,7 +73,6 @@ func (i e2eImage) Format() string {
 }
 
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
-
 	opt := &LoggingOperatorOptions{
 		Namespace:    "default",
 		NameOverride: "logging-operator",

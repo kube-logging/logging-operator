@@ -35,11 +35,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
+	"sigs.k8s.io/e2e-framework/third_party/helm"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	"sigs.k8s.io/e2e-framework/third_party/helm"
 )
 
 type metricsTester struct {
@@ -97,7 +97,7 @@ func init() {
 		TestTempDir = "../.."
 	}
 	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0755))
+	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
 	if err != nil {
 		panic(err)
 	}
@@ -283,7 +283,6 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 
 		serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
 		common.RequireNoError(t, checkServiceMonitorAvailability(serviceMonitors))
-
 	}, func(t *testing.T, c common.Cluster) error {
 		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
 		t.Logf("Printing cluster logs to %s", path)
@@ -303,7 +302,6 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 			t.Logf("Failed collecting coverage files: %s", err)
 		}
 		return err
-
 	}, func(o *cluster.Options) {
 		if o.Scheme == nil {
 			o.Scheme = runtime.NewScheme()
@@ -361,7 +359,7 @@ func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error 
 		return errors.New("no service monitors found")
 	}
 
-	var expectedServiceMonitors = map[string]bool{
+	expectedServiceMonitors := map[string]bool{
 		fluentbitServiceName:              false,
 		fluentbitBufferMetricsServiceName: false,
 		syslogNGServiceName:               false,

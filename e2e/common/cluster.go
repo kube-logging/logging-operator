@@ -92,7 +92,7 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "unable to create temp file for kubeconfig", "clusterName", clusterName)
 	}
-	err = os.WriteFile(kubeconfigFile.Name(), kubeconfig, os.FileMode(0600))
+	err = os.WriteFile(kubeconfigFile.Name(), kubeconfig, os.FileMode(0o600))
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "failed to write kubeconfig", "clusterName", clusterName, "path", kubeconfigFile.Name())
 	}

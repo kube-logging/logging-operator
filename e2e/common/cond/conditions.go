@@ -19,12 +19,13 @@ import (
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func PodShouldBeRunning(t *testing.T, cl client.Reader, key client.ObjectKey) func() bool {
@@ -101,6 +102,7 @@ func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) 
 		return false
 	}
 }
+
 func CheckFluentdStatus(t *testing.T, c *common.Cluster, ctx *context.Context, fluentd *v1beta1.FluentdConfig, loggingName string) bool {
 	fluentdInstanceName := fluentd.Name
 	cluster := *c
