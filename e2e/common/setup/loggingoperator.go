@@ -41,7 +41,7 @@ var defaultImages = []e2eImage{
 	},
 	{
 		lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
-		repository: "syslogng-reload",
+		repository: "syslog-ng-reloader",
 		tag:        "local",
 	},
 	{
