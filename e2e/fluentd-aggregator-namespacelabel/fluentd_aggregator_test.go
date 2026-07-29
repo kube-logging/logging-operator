@@ -192,7 +192,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 			"my-unique-label": "log-producer",
 		}
 
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = labeledNamespaceName
 			options.Labels = producerLabels
 		}))

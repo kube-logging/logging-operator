@@ -707,7 +707,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 			types.NameLabel: releaseNameOverride,
 		}
 
-		go setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
 			options.Namespace = ns
 			options.Labels = producerLabels
 		}))
