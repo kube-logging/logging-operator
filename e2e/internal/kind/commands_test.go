@@ -235,6 +235,14 @@ func TestInvocations(t *testing.T) {
 			timeout: time.Minute,
 			want:    nil,
 		},
+		// One call for every image, so docker save writes shared layers once.
+		"several images load in a single call": {
+			invoke: func(k *Kind) error {
+				return k.LoadDockerImage([]string{"a:local", "b:local", "c:local"}, LoadDockerImageOptions{Name: "c"})
+			},
+			timeout: time.Minute,
+			want:    []string{"load docker-image --name c a:local b:local c:local"},
+		},
 	}
 
 	for name, testCase := range testCases {
