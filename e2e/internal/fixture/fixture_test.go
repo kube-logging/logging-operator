@@ -49,8 +49,8 @@ func TestLoggingDefaults(t *testing.T) {
 	l := Logging("ns", "lg")
 
 	require.Equal(t, "lg", l.Name)
-	require.Equal(t, "ns", l.Namespace)
 	require.Equal(t, "ns", l.Spec.ControlNamespace)
+	require.Empty(t, l.Namespace, "Logging is cluster-scoped")
 	require.True(t, l.Spec.EnableRecreateWorkloadOnImmutableFieldChange)
 
 	// Neither half is present until asked for: suites that want only an agent
@@ -138,11 +138,11 @@ func TestHTTPOutputAndFlow(t *testing.T) {
 func TestBuilderReproducesTheMultiWorkerLiteral(t *testing.T) {
 	const ns = "testing-1"
 
+	// The Logging fluentd-aggregator's MultiWorker test writes by hand, minus the
+	// ObjectMeta.Namespace it sets: the API server clears that field for a
+	// cluster-scoped kind, so the builder does not set it.
 	want := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "fluentd-aggregator-multiworker-test",
-			Namespace: ns,
-		},
+		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-aggregator-multiworker-test"},
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,

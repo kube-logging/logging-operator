@@ -35,12 +35,14 @@ type LoggingOption func(*v1beta1.Logging)
 
 // Logging builds the Logging every suite starts from: recreate-on-immutable
 // enabled, control namespace set, and no agent or aggregator until asked.
-func Logging(namespace, name string, opts ...LoggingOption) *v1beta1.Logging {
+// Logging is cluster-scoped, so controlNamespace sets Spec.ControlNamespace and
+// no ObjectMeta.Namespace.
+func Logging(controlNamespace, name string, opts ...LoggingOption) *v1beta1.Logging {
 	l := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+		ObjectMeta: metav1.ObjectMeta{Name: name},
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
-			ControlNamespace: namespace,
+			ControlNamespace: controlNamespace,
 		},
 	}
 	for _, o := range opts {
