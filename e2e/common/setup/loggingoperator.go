@@ -114,15 +114,19 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	}
 
 	var loggingOperatorImage e2eImage
+	images := make([]string, 0, len(defaultImages))
 	for _, image := range defaultImages {
 		if image.lookupEnv == "LOGGING_OPERATOR_IMAGE" {
 			loggingOperatorImage = image
 		}
 
-		err := c.LoadImages(processImage(t, image))
-		if err != nil {
-			t.Fatalf("kind load image: %s", err)
-		}
+		images = append(images, processImage(t, image))
+	}
+
+	// One invocation, so docker save writes shared layers once instead of once
+	// per image.
+	if err := c.LoadImages(images...); err != nil {
+		t.Fatalf("kind load images: %s", err)
 	}
 
 	_, err = installer.Run(chartReq, map[string]interface{}{
