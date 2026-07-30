@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,16 +74,12 @@ func TestLoggingTenantShape(t *testing.T) {
 	lg := objs[2].(*v1beta1.Logging)
 	require.Equal(t, TenantRef, lg.Spec.LoggingRef)
 	require.Equal(t, "tenant-ns", lg.Spec.ControlNamespace)
-	// The aggregator has to watch the namespace the Flow and Output were created
-	// in. "tenant-ns" differs from TenantRef on purpose: were the two equal, this
-	// assertion would pass against a hard-coded ref and prove nothing.
+	// "tenant-ns" differs from TenantRef on purpose: were the two equal, the
+	// assertion below would also pass against a hard-coded ref.
 	require.NotEqual(t, TenantRef, flow.Namespace)
 	require.Equal(t, []string{flow.Namespace}, lg.Spec.WatchNamespaces)
 }
 
-// Both tenancy aggregators diverge from the single-tenant default: PVC off and
-// requests-only 50m/50M. A default that absorbed this would silently give them
-// the larger 500m/200M pair and a PVC.
 func TestTenancyAggregatorDivergesFromTheDefault(t *testing.T) {
 	infra := LoggingInfra("i", "e2e", "t", Buffer("time"), nil)[3].(*v1beta1.Logging)
 	tenant := LoggingTenant("t", "i", "e2e", "t", Buffer("time"), nil)[2].(*v1beta1.Logging)
@@ -94,7 +90,7 @@ func TestTenancyAggregatorDivergesFromTheDefault(t *testing.T) {
 		require.Equal(t, resource.MustParse("50m"), fd.Resources.Requests[corev1.ResourceCPU])
 		require.Equal(t, resource.MustParse("50M"), fd.Resources.Requests[corev1.ResourceMemory])
 		require.Empty(t, fd.Resources.Limits, "the tenancy specs set no limits")
-		require.Zero(t, fd.Workers, "tenancy does not set Workers; the single-tenant default is 2")
+		require.Zero(t, fd.Workers, "tenancy does not set Workers")
 		require.Nil(t, fd.Scaling)
 	}
 

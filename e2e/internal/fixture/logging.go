@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,21 +22,15 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-// Defaults are the value most call sites already use, counted across the
-// suites rather than chosen. Anything that diverges passes an option; a
-// default must never absorb a divergence.
-const (
-	// DefaultWorkers is 2, used by four call sites against three using 1.
-	DefaultWorkers = 2
-)
+// DefaultWorkers is the worker count most suites use. Others pass Workers.
+const DefaultWorkers = 2
 
 // LoggingOption modifies a Logging under construction.
 type LoggingOption func(*v1beta1.Logging)
 
-// Logging builds the Logging every suite starts from: recreate-on-immutable
-// enabled, control namespace set, and no agent or aggregator until asked.
-// Logging is cluster-scoped, so controlNamespace sets Spec.ControlNamespace and
-// no ObjectMeta.Namespace.
+// Logging builds the Logging the suites start from, with no agent or aggregator
+// until asked for one. Logging is cluster-scoped, so controlNamespace sets only
+// Spec.ControlNamespace and no ObjectMeta.Namespace.
 func Logging(controlNamespace, name string, opts ...LoggingOption) *v1beta1.Logging {
 	l := &v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{Name: name},
@@ -51,8 +45,7 @@ func Logging(controlNamespace, name string, opts ...LoggingOption) *v1beta1.Logg
 	return l
 }
 
-// WithFluentbit adds the agent spec the suites share: keepalive off, hot
-// reload and buffer volume on the local images.
+// WithFluentbit adds the agent spec the suites share.
 func WithFluentbit(opts ...func(*v1beta1.FluentbitSpec)) LoggingOption {
 	return func(l *v1beta1.Logging) {
 		s := &v1beta1.FluentbitSpec{
@@ -74,8 +67,8 @@ func WithFluentd(opts ...FluentdOption) LoggingOption {
 	}
 }
 
-// FluentdOption modifies a FluentdSpec under construction. It is exported so
-// the same options serve Logging.FluentdSpec and a detached FluentdConfig.
+// FluentdOption modifies a FluentdSpec under construction. It is exported so the
+// same options serve Logging.FluentdSpec and a detached FluentdConfig.
 type FluentdOption func(*v1beta1.FluentdSpec)
 
 // FluentdSpec builds the aggregator spec shared by the Logging-embedded and
@@ -95,12 +88,12 @@ func FluentdSpec(opts ...FluentdOption) *v1beta1.FluentdSpec {
 	return s
 }
 
-// Workers overrides the worker count. Three call sites use 1.
+// Workers overrides the worker count.
 func Workers(n int32) FluentdOption {
 	return func(s *v1beta1.FluentdSpec) { s.Workers = n }
 }
 
-// Drain enables buffer draining on downscale, with one replica.
+// Drain enables buffer draining on downscale.
 func Drain() FluentdOption {
 	return func(s *v1beta1.FluentdSpec) {
 		s.Scaling = &v1beta1.FluentdScaling{
@@ -113,9 +106,6 @@ func Drain() FluentdOption {
 	}
 }
 
-// defaultResources is the limits/requests pair used by twelve of the CR call
-// sites. LoggingInfra and the syslog-ng overrides use different values and set
-// them explicitly.
 func defaultResources() corev1.ResourceRequirements {
 	return corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{

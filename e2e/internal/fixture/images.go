@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@ package fixture
 
 import "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
-// The locally built images the suites load into each cluster. These are
-// duplicated from common while both exist; images_test.go asserts they stay
-// equal, so the two cannot drift the way the syslog-ng reloader name did.
+// Duplicated from common rather than imported, for as long as both packages
+// exist. TestImageNamesMatchCommon asserts they stay equal.
 const (
 	FluentdImageRepo      = "fluentd-full"
 	ConfigReloaderRepo    = "config-reloader"

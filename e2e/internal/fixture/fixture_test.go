@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,10 +26,6 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-// The package deliberately does not import common, so the constants are
-// duplicated while both exist. This is the guard against them drifting:
-// setup.defaultImages and common disagreed on the syslog-ng reloader name for
-// as long as the Makefile happened to mask it.
 func TestImageNamesMatchCommon(t *testing.T) {
 	require.Equal(t, common.FluentdImageRepo, FluentdImageRepo)
 	require.Equal(t, common.ConfigReloaderRepo, ConfigReloaderRepo)
@@ -52,9 +48,6 @@ func TestLoggingDefaults(t *testing.T) {
 	require.Equal(t, "ns", l.Spec.ControlNamespace)
 	require.Empty(t, l.Namespace, "Logging is cluster-scoped")
 	require.True(t, l.Spec.EnableRecreateWorkloadOnImmutableFieldChange)
-
-	// Neither half is present until asked for: suites that want only an agent
-	// must not silently get an aggregator.
 	require.Nil(t, l.Spec.FluentbitSpec)
 	require.Nil(t, l.Spec.FluentdSpec)
 }
@@ -75,7 +68,7 @@ func TestWithFluentdDefaults(t *testing.T) {
 	fd := l.Spec.FluentdSpec
 
 	require.NotNil(t, fd)
-	require.EqualValues(t, 2, fd.Workers, "the counted majority is 2, not 1")
+	require.EqualValues(t, 2, fd.Workers)
 	require.Equal(t, FluentdImageRepo, fd.Image.Repository)
 	require.Equal(t, ConfigReloaderRepo, fd.ConfigReloaderImage.Repository)
 	require.Equal(t, NodeExporterRepo, fd.BufferVolumeImage.Repository)
@@ -85,9 +78,7 @@ func TestWithFluentdDefaults(t *testing.T) {
 	require.Equal(t, resource.MustParse("200M"), fd.Resources.Limits[corev1.ResourceMemory])
 	require.Equal(t, resource.MustParse("250m"), fd.Resources.Requests[corev1.ResourceCPU])
 	require.Equal(t, resource.MustParse("50M"), fd.Resources.Requests[corev1.ResourceMemory])
-
-	// Draining is opt-in: it is absent unless Drain() is passed.
-	require.Nil(t, fd.Scaling)
+	require.Nil(t, fd.Scaling, "draining is opt-in")
 }
 
 func TestFluentdOptions(t *testing.T) {
@@ -104,10 +95,10 @@ func TestBufferDefaultsAndOverrides(t *testing.T) {
 	b := Buffer("time")
 	require.Equal(t, "file", b.Type)
 	require.Equal(t, "time", *b.Tags)
-	// Literals, not the constants: asserting a constant against itself proves
-	// nothing, and these two are not pinned by the literal test below.
-	require.Equal(t, "1s", b.Timekey, "counted majority: 1s at eight sites")
-	require.Equal(t, "0s", b.TimekeyWait, "counted majority: 0s at nine sites")
+	// Literals, not the constants: a constant asserted against itself proves
+	// nothing, and neither value is pinned by the literal test below.
+	require.Equal(t, "1s", b.Timekey)
+	require.Equal(t, "0s", b.TimekeyWait)
 
 	o := Buffer("time", Timekey("1m"), TimekeyWait("10s"))
 	require.Equal(t, "1m", o.Timekey)
@@ -131,10 +122,6 @@ func TestHTTPOutputAndFlow(t *testing.T) {
 	require.Equal(t, []string{"test-output"}, f.Spec.LocalOutputRefs)
 }
 
-// The §6 safety net: build the Logging that fluentd-aggregator's MultiWorker
-// test writes by hand and assert the builder produces exactly it. A default
-// that quietly absorbed a divergence would show up here rather than after a
-// twenty minute cluster run.
 func TestBuilderReproducesTheMultiWorkerLiteral(t *testing.T) {
 	const ns = "testing-1"
 

@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,9 +38,8 @@ func TenantReceiverURL(release, nsInfra, tag string) string {
 	return fmt.Sprintf("http://%s-test-receiver.%s:8080/%s", release, nsInfra, tag)
 }
 
-// LoggingInfra builds the infra-side objects: a ClusterOutput and ClusterFlow
-// carrying the infra loggingRef, a FluentbitAgent, and the aggregator Logging.
-// Returned in creation order; the caller creates them.
+// LoggingInfra builds the infra-side ClusterOutput, ClusterFlow, FluentbitAgent
+// and Logging, in creation order. The caller creates them.
 func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.ClusterOutput{
 		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsInfra},
@@ -88,9 +87,8 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 	return []client.Object{out, flow, agent, logging}
 }
 
-// LoggingTenant builds the tenant-side objects: a namespaced Output and Flow
-// carrying the tenant loggingRef, and the aggregator Logging watching the
-// tenant namespace. Returned in creation order.
+// LoggingTenant builds the tenant-side Output, Flow and Logging, in creation
+// order.
 func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.Output{
 		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsTenant},
@@ -115,10 +113,8 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 		},
 	}
 
-	// WatchNamespaces is a namespace list, not a loggingRef: it has to name the
+	// WatchNamespaces takes namespaces, not loggingRefs: it must name the
 	// namespace the Flow and Output above live in, or they are never picked up.
-	// The two only coincide today because the suites name that namespace
-	// "tenant", the same string as TenantRef.
 	logging := &v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{Name: TenantRef, Labels: map[string]string{"tenant": TenantRef}},
 		Spec: v1beta1.LoggingSpec{
@@ -132,8 +128,8 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 	return []client.Object{out, flow, logging}
 }
 
-// LoggingRoute builds the route connecting the infra collectors to every
-// aggregator carrying a tenant label.
+// LoggingRoute connects the infra collectors to every aggregator carrying a
+// tenant label.
 func LoggingRoute() *v1beta1.LoggingRoute {
 	return &v1beta1.LoggingRoute{
 		ObjectMeta: metav1.ObjectMeta{Name: "tenants"},
@@ -149,8 +145,7 @@ func LoggingRoute() *v1beta1.LoggingRoute {
 }
 
 // tenancyFluentdSpec is deliberately not FluentdSpec(): both tenancy
-// aggregators disable the PVC and request 50m/50M, where the twelve
-// single-tenant call sites use the larger limits and requests pair.
+// aggregators disable the PVC and request less than the single-tenant suites.
 func tenancyFluentdSpec() *v1beta1.FluentdSpec {
 	return &v1beta1.FluentdSpec{
 		Image:               image(FluentdImageRepo),

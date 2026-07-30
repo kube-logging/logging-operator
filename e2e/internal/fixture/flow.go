@@ -1,4 +1,4 @@
-// Copyright © 2025 Kube logging authors
+// Copyright © 2026 Kube logging authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,16 +23,13 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-// Buffer defaults, counted across the suites: Timekey "1s" at eight sites
-// against "1m" at three and "10s" at one; TimekeyWait "0s" at nine against
-// "10s" at three.
+// Buffer defaults. Suites that need other values pass Timekey or TimekeyWait.
 const (
 	DefaultTimekey     = "1s"
 	DefaultTimekeyWait = "0s"
 )
 
-// ReceiverURL is the endpoint the test receiver serves, built the same way at
-// nine call sites.
+// ReceiverURL is the endpoint the test receiver serves.
 func ReceiverURL(release, tag string) string {
 	return fmt.Sprintf("http://%s-test-receiver:8080/%s", release, tag)
 }
