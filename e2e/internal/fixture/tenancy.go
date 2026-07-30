@@ -115,12 +115,16 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 		},
 	}
 
+	// WatchNamespaces is a namespace list, not a loggingRef: it has to name the
+	// namespace the Flow and Output above live in, or they are never picked up.
+	// The two only coincide today because the suites name that namespace
+	// "tenant", the same string as TenantRef.
 	logging := &v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{Name: TenantRef, Labels: map[string]string{"tenant": TenantRef}},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       TenantRef,
 			ControlNamespace: nsTenant,
-			WatchNamespaces:  []string{TenantRef},
+			WatchNamespaces:  []string{nsTenant},
 			FluentdSpec:      tenancyFluentdSpec(),
 		},
 	}

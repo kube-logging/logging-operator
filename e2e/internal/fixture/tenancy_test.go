@@ -74,7 +74,11 @@ func TestLoggingTenantShape(t *testing.T) {
 	lg := objs[2].(*v1beta1.Logging)
 	require.Equal(t, TenantRef, lg.Spec.LoggingRef)
 	require.Equal(t, "tenant-ns", lg.Spec.ControlNamespace)
-	require.Equal(t, []string{TenantRef}, lg.Spec.WatchNamespaces)
+	// The aggregator has to watch the namespace the Flow and Output were created
+	// in. "tenant-ns" differs from TenantRef on purpose: were the two equal, this
+	// assertion would pass against a hard-coded ref and prove nothing.
+	require.NotEqual(t, TenantRef, flow.Namespace)
+	require.Equal(t, []string{flow.Namespace}, lg.Spec.WatchNamespaces)
 }
 
 // Both tenancy aggregators diverge from the single-tenant default: PVC off and
