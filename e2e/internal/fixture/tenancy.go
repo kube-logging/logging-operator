@@ -26,20 +26,15 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-// The two loggingRef values the multi-tenant suites route between.
 const (
 	InfraRef  = "infra"
 	TenantRef = "tenant"
 )
 
-// TenantReceiverURL is the cross-namespace form the tenant output posts to,
-// where the receiver lives in the infra namespace.
 func TenantReceiverURL(release, nsInfra, tag string) string {
 	return fmt.Sprintf("http://%s-test-receiver.%s:8080/%s", release, nsInfra, tag)
 }
 
-// LoggingInfra builds the infra-side ClusterOutput, ClusterFlow, FluentbitAgent
-// and Logging, in creation order. The caller creates them.
 func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.ClusterOutput{
 		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsInfra},
@@ -87,8 +82,6 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 	return []client.Object{out, flow, agent, logging}
 }
 
-// LoggingTenant builds the tenant-side Output, Flow and Logging, in creation
-// order.
 func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.Output{
 		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsTenant},
@@ -128,8 +121,6 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 	return []client.Object{out, flow, logging}
 }
 
-// LoggingRoute connects the infra collectors to every aggregator carrying a
-// tenant label.
 func LoggingRoute() *v1beta1.LoggingRoute {
 	return &v1beta1.LoggingRoute{
 		ObjectMeta: metav1.ObjectMeta{Name: "tenants"},
@@ -144,8 +135,7 @@ func LoggingRoute() *v1beta1.LoggingRoute {
 	}
 }
 
-// tenancyFluentdSpec is deliberately not FluentdSpec(): both tenancy
-// aggregators disable the PVC and request less than the single-tenant suites.
+// Not FluentdSpec(): tenancy disables the PVC and requests less.
 func tenancyFluentdSpec() *v1beta1.FluentdSpec {
 	return &v1beta1.FluentdSpec{
 		Image:               image(FluentdImageRepo),

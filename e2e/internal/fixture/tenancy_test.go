@@ -64,7 +64,6 @@ func TestLoggingTenantShape(t *testing.T) {
 
 	out := objs[0].(*v1beta1.Output)
 	require.Equal(t, TenantRef, out.Spec.LoggingRef)
-	// Cross-namespace: the receiver lives in the infra namespace.
 	require.Equal(t, "http://e2e-test-receiver.infra-ns:8080/test.tag", out.Spec.HTTPOutput.Endpoint)
 
 	flow := objs[1].(*v1beta1.Flow)
@@ -74,8 +73,8 @@ func TestLoggingTenantShape(t *testing.T) {
 	lg := objs[2].(*v1beta1.Logging)
 	require.Equal(t, TenantRef, lg.Spec.LoggingRef)
 	require.Equal(t, "tenant-ns", lg.Spec.ControlNamespace)
-	// "tenant-ns" differs from TenantRef on purpose: were the two equal, the
-	// assertion below would also pass against a hard-coded ref.
+	// Differs from TenantRef on purpose: were they equal the assertion would also
+	// pass against a hard-coded ref.
 	require.NotEqual(t, TenantRef, flow.Namespace)
 	require.Equal(t, []string{flow.Namespace}, lg.Spec.WatchNamespaces)
 }
@@ -94,7 +93,6 @@ func TestTenancyAggregatorDivergesFromTheDefault(t *testing.T) {
 		require.Nil(t, fd.Scaling)
 	}
 
-	// The single-tenant builder must still carry its own, different values.
 	def := FluentdSpec()
 	require.False(t, def.DisablePvc)
 	require.Equal(t, resource.MustParse("500m"), def.Resources.Limits[corev1.ResourceCPU])

@@ -22,15 +22,11 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-// DefaultWorkers is the worker count most suites use. Others pass Workers.
 const DefaultWorkers = 2
 
-// LoggingOption modifies a Logging under construction.
 type LoggingOption func(*v1beta1.Logging)
 
-// Logging builds the Logging the suites start from, with no agent or aggregator
-// until asked for one. Logging is cluster-scoped, so controlNamespace sets only
-// Spec.ControlNamespace and no ObjectMeta.Namespace.
+// Logging is cluster-scoped: controlNamespace sets Spec.ControlNamespace only.
 func Logging(controlNamespace, name string, opts ...LoggingOption) *v1beta1.Logging {
 	l := &v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{Name: name},
@@ -45,7 +41,6 @@ func Logging(controlNamespace, name string, opts ...LoggingOption) *v1beta1.Logg
 	return l
 }
 
-// WithFluentbit adds the agent spec the suites share.
 func WithFluentbit(opts ...func(*v1beta1.FluentbitSpec)) LoggingOption {
 	return func(l *v1beta1.Logging) {
 		s := &v1beta1.FluentbitSpec{
@@ -60,19 +55,15 @@ func WithFluentbit(opts ...func(*v1beta1.FluentbitSpec)) LoggingOption {
 	}
 }
 
-// WithFluentd adds the aggregator spec the suites share.
 func WithFluentd(opts ...FluentdOption) LoggingOption {
 	return func(l *v1beta1.Logging) {
 		l.Spec.FluentdSpec = FluentdSpec(opts...)
 	}
 }
 
-// FluentdOption modifies a FluentdSpec under construction. It is exported so the
-// same options serve Logging.FluentdSpec and a detached FluentdConfig.
+// Exported so the same options serve Logging.FluentdSpec and a detached FluentdConfig.
 type FluentdOption func(*v1beta1.FluentdSpec)
 
-// FluentdSpec builds the aggregator spec shared by the Logging-embedded and
-// detached forms.
 func FluentdSpec(opts ...FluentdOption) *v1beta1.FluentdSpec {
 	s := &v1beta1.FluentdSpec{
 		Image:               image(FluentdImageRepo),
@@ -88,12 +79,10 @@ func FluentdSpec(opts ...FluentdOption) *v1beta1.FluentdSpec {
 	return s
 }
 
-// Workers overrides the worker count.
 func Workers(n int32) FluentdOption {
 	return func(s *v1beta1.FluentdSpec) { s.Workers = n }
 }
 
-// Drain enables buffer draining on downscale.
 func Drain() FluentdOption {
 	return func(s *v1beta1.FluentdSpec) {
 		s.Scaling = &v1beta1.FluentdScaling{

@@ -23,21 +23,17 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-// Buffer defaults. Suites that need other values pass Timekey or TimekeyWait.
 const (
 	DefaultTimekey     = "1s"
 	DefaultTimekeyWait = "0s"
 )
 
-// ReceiverURL is the endpoint the test receiver serves.
 func ReceiverURL(release, tag string) string {
 	return fmt.Sprintf("http://%s-test-receiver:8080/%s", release, tag)
 }
 
-// BufferOption modifies a Buffer under construction.
 type BufferOption func(*output.Buffer)
 
-// Buffer builds the file buffer the HTTP outputs share.
 func Buffer(tags string, opts ...BufferOption) *output.Buffer {
 	b := &output.Buffer{
 		Type:        "file",
@@ -51,17 +47,14 @@ func Buffer(tags string, opts ...BufferOption) *output.Buffer {
 	return b
 }
 
-// Timekey overrides the buffer flush interval.
 func Timekey(v string) BufferOption {
 	return func(b *output.Buffer) { b.Timekey = v }
 }
 
-// TimekeyWait overrides the buffer flush delay.
 func TimekeyWait(v string) BufferOption {
 	return func(b *output.Buffer) { b.TimekeyWait = v }
 }
 
-// HTTPOutput builds a namespaced Output posting JSON to the test receiver.
 func HTTPOutput(namespace, name, endpoint string, buffer *output.Buffer) *v1beta1.Output {
 	return &v1beta1.Output{
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
@@ -75,8 +68,6 @@ func HTTPOutput(namespace, name, endpoint string, buffer *output.Buffer) *v1beta
 	}
 }
 
-// Flow builds a namespaced Flow selecting pods by label and routing to the
-// named local outputs.
 func Flow(namespace, name string, selector map[string]string, outputRefs ...string) *v1beta1.Flow {
 	return &v1beta1.Flow{
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},

@@ -95,8 +95,7 @@ func TestBufferDefaultsAndOverrides(t *testing.T) {
 	b := Buffer("time")
 	require.Equal(t, "file", b.Type)
 	require.Equal(t, "time", *b.Tags)
-	// Literals, not the constants: a constant asserted against itself proves
-	// nothing, and neither value is pinned by the literal test below.
+	// Literals, not the constants: a constant asserted against itself proves nothing.
 	require.Equal(t, "1s", b.Timekey)
 	require.Equal(t, "0s", b.TimekeyWait)
 
@@ -125,9 +124,8 @@ func TestHTTPOutputAndFlow(t *testing.T) {
 func TestBuilderReproducesTheMultiWorkerLiteral(t *testing.T) {
 	const ns = "testing-1"
 
-	// The Logging fluentd-aggregator's MultiWorker test writes by hand, minus the
-	// ObjectMeta.Namespace it sets: the API server clears that field for a
-	// cluster-scoped kind, so the builder does not set it.
+	// The literal fluentd-aggregator writes by hand, minus the ObjectMeta.Namespace
+	// the API server clears for a cluster-scoped kind.
 	want := &v1beta1.Logging{
 		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-aggregator-multiworker-test"},
 		Spec: v1beta1.LoggingSpec{

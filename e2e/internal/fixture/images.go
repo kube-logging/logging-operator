@@ -16,8 +16,7 @@ package fixture
 
 import "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
-// Duplicated from common rather than imported, for as long as both packages
-// exist. TestImageNamesMatchCommon asserts they stay equal.
+// Duplicated from common while both exist; TestImageNamesMatchCommon pins them equal.
 const (
 	FluentdImageRepo      = "fluentd-full"
 	ConfigReloaderRepo    = "config-reloader"
