@@ -407,7 +407,10 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		output.Spec.FileOutput.Path = "/tmp/zzz"
 		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
 		require.Eventually(t, func() bool {
-			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+			if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
+				t.Logf("reading the Logging failed, retrying: %v", err)
+				return false
+			}
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
 					if configCheckFailure.MatchString(problem) {
@@ -425,7 +428,10 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 		output.Spec.FileOutput.Path = "/tmp/logs/${tag}/%Y/%m/%d.%H.%M"
 		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
 		require.Eventually(t, func() bool {
-			common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+			if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
+				t.Logf("reading the Logging failed, retrying: %v", err)
+				return false
+			}
 			if logging.Status.ProblemsCount > 0 {
 				for _, problem := range logging.Status.Problems {
 					if configCheckFailure.MatchString(problem) {
