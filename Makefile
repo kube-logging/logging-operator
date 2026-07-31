@@ -53,6 +53,11 @@ OPERATOR_IMG_DEBUG ?= controller:debug
 CRD_OPTIONS ?= crd:maxDescLen=0
 
 E2E_TEST_TIMEOUT ?= 20m
+
+# Clusters one suite binary builds at once. Caps peak concurrency, which
+# otherwise follows the core count and starves the aggregators.
+E2E_SUITE_PARALLEL ?= 2
+
 TEST_COV_DIR := $(shell mkdir -p build/_test_coverage && realpath build/_test_coverage)
 
 CONTROLLER_GEN := ${BIN}/controller-gen
@@ -242,7 +247,7 @@ test-e2e-nodeps:
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
-		go test -count=1 -v -timeout ${E2E_TEST_TIMEOUT} $$(go list ./${E2E_TEST}/... | grep -vE '/e2e/(common|internal)(/|$$)')
+		go test -count=1 -v -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} $$(go list ./${E2E_TEST}/... | grep -vE '/e2e/(common|internal)(/|$$)')
 		go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
 	@echo "--- E2E test coverage report"
 	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles
