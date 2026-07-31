@@ -210,20 +210,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
@@ -332,20 +324,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
@@ -454,20 +438,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
