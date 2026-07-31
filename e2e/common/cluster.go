@@ -59,6 +59,11 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 	ctrl.SetLogger(zapLogger)
 
 	cluster, err := GetTestCluster(name, opts...)
+	if err != nil {
+		// The cluster is created before the client can fail, and the deferred
+		// teardown below is not registered yet.
+		assert.NoError(t, DeleteTestCluster(name))
+	}
 	RequireNoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
