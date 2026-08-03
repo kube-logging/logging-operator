@@ -15,13 +15,7 @@
 package fluentbit_multitenant
 
 import (
-	"strings"
 	"testing"
-	"time"
-
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
@@ -48,12 +42,12 @@ func realTimeBuffer() *output.Buffer {
 }
 
 func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
-	env := harness.Start(t, harness.Config{
-		Cluster:          release,
-		Release:          release,
-		ControlNamespace: nsInfra,
-		Namespaces:       []string{nsTenant},
-	})
+	env := harness.New(t).
+		WithCluster(release).
+		WithRelease(release).
+		WithControlNamespace(nsInfra).
+		WithNamespaces(nsTenant).
+		Start()
 
 	buffer := realTimeBuffer()
 	env.Create(fixture.LoggingInfra(nsInfra, release, tagInfra, buffer, producerLabels)...)
@@ -62,32 +56,11 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 
 	env.StartLogProducer(nsTenant, producerLabels)
 
-	aggregator := client.MatchingLabels{types.NameLabel: "fluentd", types.ComponentLabel: "fluentd"}
-	running := []struct {
-		what string
-		cond func() bool
-	}{
-		{"the operator", wait.AnyPodShouldBeRunning(t, env.Client, client.MatchingLabels{types.NameLabel: release})},
-		{"the producer", wait.AnyPodShouldBeRunning(t, env.Client, client.MatchingLabels(producerLabels))},
-		{"the infra aggregator", wait.AnyPodShouldBeRunning(t, env.Client, aggregator, client.InNamespace(nsInfra))},
-		{"the tenant aggregator", wait.AnyPodShouldBeRunning(t, env.Client, aggregator, client.InNamespace(nsTenant))},
-	}
-
-	require.Eventually(t, func() bool {
-		for _, step := range running {
-			if !step.cond() {
-				t.Logf("waiting for %s", step.what)
-				return false
-			}
-		}
-
-		logs, err := env.ReceiverLogs(30)
-		if err != nil {
-			t.Logf("failed to get log consumer logs: %v", err)
-			return false
-		}
-		t.Logf("log consumer logs: %s", logs)
-
-		return strings.Contains(logs, tagTenant) && strings.Contains(logs, tagInfra)
-	}, 5*time.Minute, 3*time.Second)
+	env.WaitForRunning(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.Aggregator(nsInfra),
+		wait.Aggregator(nsTenant),
+	)
+	env.WaitForReceiverLogs(tagInfra, tagTenant)
 }

@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
+	"time"
 
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/assert"
@@ -106,7 +107,6 @@ func TestBuildScheme(t *testing.T) {
 		assert.True(t, scheme.Recognizes(mustGVK(t, scheme, &v1beta1.Logging{})), "the shared set stays")
 	})
 
-	// Concat, not append: a caller's slice must not gain the extras.
 	t.Run("the default set is not mutated by extras", func(t *testing.T) {
 		before := len(defaultSchemeBuilders)
 		_, err := buildScheme([]func(*runtime.Scheme) error{monitoringv1.AddToScheme})
@@ -126,21 +126,21 @@ func TestBuildScheme(t *testing.T) {
 
 func TestDumpNamespaces(t *testing.T) {
 	testCases := map[string]struct {
-		config Config
+		config config
 		want   []string
 	}{
 		"control namespace first, default last": {
-			config: Config{ControlNamespace: "infra", Namespaces: []string{"tenant"}},
+			config: config{controlNamespace: "infra", namespaces: []string{"tenant"}},
 			want:   []string{"infra", "tenant", "default"},
 		},
 		// A suite that runs in default, or names it explicitly, would otherwise
 		// have stern dump it twice.
 		"repeats are dropped": {
-			config: Config{ControlNamespace: "default", Namespaces: []string{"tenant", "tenant"}},
+			config: config{controlNamespace: "default", namespaces: []string{"tenant", "tenant"}},
 			want:   []string{"default", "tenant"},
 		},
 		"an unset control namespace is skipped": {
-			config: Config{Namespaces: []string{"tenant"}},
+			config: config{namespaces: []string{"tenant"}},
 			want:   []string{"tenant", "default"},
 		},
 	}
@@ -149,6 +149,20 @@ func TestDumpNamespaces(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			assert.Equal(t, testCase.want, dumpNamespaces(testCase.config))
 		})
+	}
+}
+
+// The cap is what the suites spend by hand today; the deadline is what stops
+// one wait taking the whole package budget with it.
+func TestWaitBudgetStaysUnderTheCapAndTheDeadline(t *testing.T) {
+	env := &Env{T: t}
+
+	budget := env.waitBudget()
+
+	assert.Positive(t, budget)
+	assert.LessOrEqual(t, budget, waitBudget)
+	if deadline, ok := t.Deadline(); ok {
+		assert.Less(t, budget, time.Until(deadline), "a wait must not outlive the binary")
 	}
 }
 
