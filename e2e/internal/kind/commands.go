@@ -111,7 +111,10 @@ func (k *Kind) CreateCluster(options CreateClusterOptions) error {
 	case errors.Is(err, ErrTimeout):
 		// kind removes a half-built cluster when one of its own actions fails,
 		// but not when we kill it, so the leftovers have to go explicitly.
-		cleanupErr := k.deleteCluster(k.CleanupTimeout, DeleteClusterOptions{Name: options.Name})
+		cleanupErr := k.deleteCluster(k.CleanupTimeout, DeleteClusterOptions{
+			Name:       options.Name,
+			Kubeconfig: options.Kubeconfig,
+		})
 		if cleanupErr != nil {
 			return fmt.Errorf("%w; deleting the partial cluster also failed: %w", err, cleanupErr)
 		}
@@ -133,7 +136,14 @@ func (k *Kind) DeleteCluster(options DeleteClusterOptions) error {
 }
 
 func (k *Kind) deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
-	return k.run(timeout, options.AppendToArgs([]string{"delete", "cluster"}), nil)
+	cmderr := &bytes.Buffer{}
+	err := k.run(timeout, options.AppendToArgs([]string{"delete", "cluster"}), func(cmd *exec.Cmd) {
+		cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
+	})
+	if err != nil && cmderr.Len() > 0 {
+		return fmt.Errorf("%w: %s", err, strings.TrimSpace(cmderr.String()))
+	}
+	return err
 }
 
 func (k *Kind) GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {

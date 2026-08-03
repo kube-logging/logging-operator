@@ -1,0 +1,93 @@
+// Copyright © 2026 Kube logging authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package common
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestClusterKubeconfigPath(t *testing.T) {
+	alpha, err := clusterKubeconfigPath("alpha")
+	require.NoError(t, err)
+	beta, err := clusterKubeconfigPath("beta")
+	require.NoError(t, err)
+
+	require.NotEqual(t, alpha, beta)
+	require.Equal(t, filepath.Dir(alpha), filepath.Dir(beta))
+
+	again, err := clusterKubeconfigPath("alpha")
+	require.NoError(t, err)
+	require.Equal(t, alpha, again, "create and delete have to name the same file")
+
+	dir := filepath.Dir(alpha)
+	require.NotEqual(t, os.TempDir(), dir, "a path in the shared temp directory is guessable")
+
+	info, err := os.Stat(dir)
+	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0o700), info.Mode().Perm())
+}
+
+func TestRemoveClusterKubeconfig(t *testing.T) {
+	path := stubKubeconfig(t, "gamma")
+	lock := path + ".lock"
+	require.NoError(t, os.WriteFile(lock, nil, 0o600))
+
+	require.NoError(t, removeClusterKubeconfig("gamma"))
+
+	require.NoFileExists(t, path)
+	require.NoFileExists(t, lock)
+}
+
+func TestRemoveClusterKubeconfigToleratesMissingFiles(t *testing.T) {
+	require.NoError(t, removeClusterKubeconfig("never-created"))
+}
+
+// kind recreates a missing parent directory itself, at 0755, so a lookup after
+// anything has taken the directory away has to put the 0700 back. Putting a
+// 0755 directory in place is the state that needs fixing: removing it instead
+// would only prove that MkdirAll creates a fresh one at the mode it is given.
+func TestClusterKubeconfigPathRestoresTheDirectory(t *testing.T) {
+	dir := filepath.Dir(mustPath(t, "first"))
+	require.NoError(t, os.RemoveAll(dir))
+	require.NoError(t, os.MkdirAll(dir, 0o755))
+
+	path := stubKubeconfig(t, "second")
+	require.FileExists(t, path)
+
+	info, err := os.Stat(filepath.Dir(path))
+	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0o700), info.Mode().Perm())
+}
+
+func mustPath(t *testing.T, name string) string {
+	t.Helper()
+
+	path, err := clusterKubeconfigPath(name)
+	require.NoError(t, err)
+	return path
+}
+
+func stubKubeconfig(t *testing.T, name string) string {
+	t.Helper()
+
+	path, err := clusterKubeconfigPath(name)
+	require.NoError(t, err)
+	require.NoError(t, os.WriteFile(path, nil, 0o600))
+	return path
+}

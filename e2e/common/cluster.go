@@ -22,6 +22,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"emperror.dev/errors"
 	"github.com/spf13/cast"
@@ -34,6 +35,9 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
+
+// clusterStopTimeout bounds the wait for cluster.Start to return after cancel.
+const clusterStopTimeout = time.Minute
 
 type Cluster interface {
 	cluster.Cluster
@@ -68,15 +72,25 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 	RequireNoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
+	startErr := make(chan error, 1)
 	go func() {
-		RequireNoError(t, cluster.Start(ctx))
+		startErr <- cluster.Start(ctx)
 	}()
 
 	defer func() {
 		assert.NoError(t, beforeCleanup(t, cluster))
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
-		RequireNoError(t, DeleteTestCluster(name))
+
+		// Checked here, not in the goroutine: FailNow is undefined off the test one.
+		select {
+		case err := <-startErr:
+			assert.NoError(t, err, "starting the cluster")
+		case <-time.After(clusterStopTimeout):
+			assert.Fail(t, "cluster.Start did not return after cancellation")
+		}
+
+		assert.NoError(t, DeleteTestCluster(name))
 	}()
 
 	fn(t, cluster)
@@ -119,9 +133,17 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 }
 
 func DeleteTestCluster(clusterName string) error {
-	return errors.WrapIfWithDetails(kindCLI.DeleteCluster(kind.DeleteClusterOptions{
-		Name: clusterName,
-	}), "deleting kind cluster", "clusterName", clusterName)
+	kubeconfig, err := clusterKubeconfigPath(clusterName)
+	if err != nil {
+		return err
+	}
+	if err := kindCLI.DeleteCluster(kind.DeleteClusterOptions{
+		Name:       clusterName,
+		Kubeconfig: kubeconfig,
+	}); err != nil {
+		return errors.WrapIfWithDetails(err, "deleting kind cluster", "clusterName", clusterName)
+	}
+	return removeClusterKubeconfig(clusterName)
 }
 
 func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {

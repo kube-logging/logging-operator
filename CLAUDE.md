@@ -155,7 +155,7 @@ v1alpha1 is the legacy API; conversion functions exist to v1beta1 (which is the 
 
 - Unit/integration tests use `envtest` (embedded Kubernetes API server + etcd); no cluster needed
 - E2E tests in `e2e/` use KIND: one directory per suite, each its own Go package and test binary, provisioning its own KIND cluster. Run a single suite with `make test-e2e E2E_TEST=<suite-dir>`. Shared helpers live in `e2e/common/` and `e2e/internal/` and are excluded from suite selection
-- E2E knobs (all `make` overrides): `E2E_TEST_TIMEOUT` (per suite binary, default 20m), `E2E_SUITE_PARALLEL` (clusters one suite binary builds at once, default 2 — raising it starves the aggregators on a 4-vCPU runner), `KIND_COMMAND_TIMEOUT` (per kind invocation; derived from `E2E_TEST_TIMEOUT` when unset)
+- E2E knobs (all `make` overrides): `E2E_TEST_TIMEOUT` (per suite binary, default 20m), `E2E_SUITE_PARALLEL` (clusters one suite binary builds at once, default 2 — raising it starves the aggregators on a 4-vCPU runner), `E2E_CLUSTERS` (suite binaries at once, default 4; holds peak clusters at 5, which otherwise follows the core count), `KIND_COMMAND_TIMEOUT` (per kind invocation; derived from `E2E_TEST_TIMEOUT` when unset)
 - Coverage profile config in `.testcoverage.yml`; tool: `go-test-coverage`
 - Test framework: Ginkgo + Gomega for BDD-style tests; testify for unit tests
 
