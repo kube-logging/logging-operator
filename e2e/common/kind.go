@@ -15,7 +15,10 @@
 package common
 
 import (
+	"fmt"
 	"strings"
+
+	"emperror.dev/errors"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
@@ -28,13 +31,24 @@ const KindClusterCreationTimeout = "3m"
 var kindCLI = kind.New()
 
 func KindClusterKubeconfig(name string) ([]byte, error) {
-	err := kindCLI.CreateCluster(kind.CreateClusterOptions{
+	create := kind.CreateClusterOptions{
 		Name: name,
 		Wait: KindClusterCreationTimeout,
-	})
-	if err != nil && !isClusterAlreadyExistsError(err) {
+	}
+
+	err := kindCLI.CreateCluster(create)
+	if err != nil && isClusterAlreadyExistsError(err) {
+		// Adopting a leftover would hand the suite an unknown operator and data.
+		fmt.Printf("kind cluster %q already exists, recreating it\n", name)
+		if err := kindCLI.DeleteCluster(kind.DeleteClusterOptions{Name: name}); err != nil {
+			return nil, errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
+		}
+		err = kindCLI.CreateCluster(create)
+	}
+	if err != nil {
 		return nil, err
 	}
+
 	return kindCLI.GetKubeconfig(kind.GetKubeconfigOptions{
 		Name: name,
 	})

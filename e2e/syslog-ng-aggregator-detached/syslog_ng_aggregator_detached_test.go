@@ -294,7 +294,9 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 			}
 			if logging.Status.SyslogNGConfigName != syslogNG.Name {
 				t.Logf("logging should use the detached SyslogNG configuration (name=%s), found: %v", syslogNG.Name, logging.Status.SyslogNGConfigName)
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
+					t.Logf("reading the Logging failed, retrying: %v", err)
+				}
 				return false
 			}
 
@@ -303,15 +305,24 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				return false
 			}
 			var detachedSyslogNGs v1beta1.SyslogNGConfigList
-			common.RequireNoError(t, c.GetClient().List(ctx, &detachedSyslogNGs))
+			if err := c.GetClient().List(ctx, &detachedSyslogNGs); err != nil {
+				t.Logf("listing the detached syslog-ng configurations failed, retrying: %v", err)
+				return false
+			}
 			if len(detachedSyslogNGs.Items) != 2 {
-				// Add a new detached syslogng that is not going to be used
-				common.RequireNoError(t, c.GetClient().Create(ctx, &excessSyslogNG))
+				// Add a new detached syslogng that is not going to be used.
+				// AlreadyExists is tolerated: the list above can be stale on a retry.
+				if err := client.IgnoreAlreadyExists(c.GetClient().Create(ctx, &excessSyslogNG)); err != nil {
+					t.Logf("creating the excess detached syslog-ng failed, retrying: %v", err)
+					return false
+				}
 				t.Log("creating excess detached syslog-ng")
 				return false
 			} else if isValid := wait.CheckExcessSyslogNGStatus(t, c.GetClient(), ctx, &excessSyslogNG); !isValid && len(detachedSyslogNGs.Items) == 2 {
 				t.Log("checking excess detached SyslogNG status")
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessSyslogNG), &excessSyslogNG))
+				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessSyslogNG), &excessSyslogNG); err != nil {
+					t.Logf("reading the excess detached syslog-ng failed, retrying: %v", err)
+				}
 				return false
 			}
 

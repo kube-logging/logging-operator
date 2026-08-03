@@ -259,7 +259,10 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 				return false
 			}
 			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
+				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
+					t.Logf("reading the Logging failed, retrying: %v", err)
+					return false
+				}
 				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
 				return false
 			}
@@ -268,15 +271,25 @@ func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
 				return false
 			}
 			var detachedFluentds v1beta1.FluentdConfigList
-			common.RequireNoError(t, c.GetClient().List(ctx, &detachedFluentds))
+			if err := c.GetClient().List(ctx, &detachedFluentds); err != nil {
+				t.Logf("listing the detached fluentd configurations failed, retrying: %v", err)
+				return false
+			}
 			if len(detachedFluentds.Items) != 2 {
-				// Add a new detached fluentd that is not going to be used
-				common.RequireNoError(t, c.GetClient().Create(ctx, &excessFluentd))
+				// Add a new detached fluentd that is not going to be used.
+				// AlreadyExists is tolerated: the list above can be stale on a retry.
+				if err := client.IgnoreAlreadyExists(c.GetClient().Create(ctx, &excessFluentd)); err != nil {
+					t.Logf("creating the excess detached fluentd failed, retrying: %v", err)
+					return false
+				}
 				t.Log("creating excess detached fluentd")
 				return false
 			} else if isValid := wait.CheckExcessFluentdStatus(t, c.GetClient(), ctx, &excessFluentd); !isValid && len(detachedFluentds.Items) == 2 {
 				t.Log("checking excess detached fluentd status")
-				common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessFluentd), &excessFluentd))
+				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessFluentd), &excessFluentd); err != nil {
+					t.Logf("reading the excess detached fluentd failed, retrying: %v", err)
+					return false
+				}
 				return false
 			}
 

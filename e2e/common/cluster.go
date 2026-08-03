@@ -15,6 +15,7 @@
 package common
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -59,6 +60,11 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 	ctrl.SetLogger(zapLogger)
 
 	cluster, err := GetTestCluster(name, opts...)
+	if err != nil {
+		// The cluster is created before the client can fail, and the deferred
+		// teardown below is not registered yet.
+		assert.NoError(t, DeleteTestCluster(name))
+	}
 	RequireNoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -134,12 +140,18 @@ func (c kindCluster) CollectTestCoverageFiles(ns string, loggingOperatorName str
 		return errors.WrapIfWithDetails(err, "Error in sending signal to logging-operator", cmdOut)
 	}
 	testCovDir := os.Getenv("E2E_TEST_COV_DIR")
-	cmd = exec.Command("sh", "-c", fmt.Sprintf(
-		"kubectl --kubeconfig %s -n %s exec deployment/%s -- tar -cf - /covdatafiles | tar -xf - -C %s",
-		c.KubeConfigFilePath(), ns, loggingOperatorName, testCovDir))
-	cmdOut, err = cmd.Output()
+	archive := CmdEnv(exec.Command("kubectl", "-n", ns,
+		"exec", fmt.Sprintf("deployment/%s", loggingOperatorName), "--",
+		"tar", "-cf", "-", "/covdatafiles"), c)
+	tarball, err := archive.Output()
 	if err != nil {
-		return errors.WrapIfWithDetails(err, "Error in collecting test coverage files", cmdOut)
+		return errors.WrapIfWithDetails(err, "Error in reading test coverage files", tarball)
+	}
+
+	extract := exec.Command("tar", "-xf", "-", "-C", testCovDir)
+	extract.Stdin = bytes.NewReader(tarball)
+	if cmdOut, err := extract.CombinedOutput(); err != nil {
+		return errors.WrapIfWithDetails(err, "Error in extracting test coverage files", cmdOut)
 	}
 	return nil
 }

@@ -70,6 +70,29 @@ func init() {
 	}
 }
 
+// logContainerRestarts names a restart loop while a readiness wait is still
+// running, so it is a reported number rather than an unexplained stall.
+func logContainerRestarts(t *testing.T, c common.Cluster, ctx context.Context, ns, app string) {
+	var pods corev1.PodList
+	if err := c.GetClient().List(ctx, &pods, client.InNamespace(ns), client.MatchingLabels{"app": app}); err != nil {
+		t.Logf("listing %s pods failed: %v", app, err)
+		return
+	}
+
+	for _, pod := range pods.Items {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.RestartCount == 0 {
+				continue
+			}
+			reason := "unknown"
+			if terminated := status.LastTerminationState.Terminated; terminated != nil {
+				reason = fmt.Sprintf("%s, exit %d", terminated.Reason, terminated.ExitCode)
+			}
+			t.Logf("%s/%s restarted %d times, last termination: %s", pod.Name, status.Name, status.RestartCount, reason)
+		}
+	}
+}
+
 // esReadyBudget caps a wait strictly below the enclosing -timeout, so an
 // Elasticsearch deployment that never becomes ready fails by name instead of
 // letting the package binary panic and report only a goroutine dump.
@@ -210,20 +233,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
@@ -332,20 +347,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
@@ -454,20 +461,12 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 										corev1.ResourceCPU:    resource.MustParse("500m"),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
+										corev1.ResourceMemory: resource.MustParse("1536Mi"),
 										corev1.ResourceCPU:    resource.MustParse("1000m"),
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 60,
-									PeriodSeconds:       10,
-								},
+								// No liveness probe: readiness already gates the wait, and a
+								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 								ReadinessProbe: &corev1.Probe{
 									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
@@ -486,20 +485,16 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, es9Deployment))
 
-		t.Log("Waiting for Elasticsearch 7 deployment to be ready...")
-		require.Eventually(t, func() bool {
-			return wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, "elasticsearch7")()
-		}, esReadyBudget(t), 10*time.Second)
-
-		t.Log("Waiting for Elasticsearch 8 deployment to be ready...")
-		require.Eventually(t, func() bool {
-			return wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, "elasticsearch8")()
-		}, esReadyBudget(t), 10*time.Second)
-
-		t.Log("Waiting for Elasticsearch 9 deployment to be ready...")
-		require.Eventually(t, func() bool {
-			return wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, "elasticsearch9")()
-		}, esReadyBudget(t), 10*time.Second)
+		for _, name := range []string{"elasticsearch7", "elasticsearch8", "elasticsearch9"} {
+			t.Logf("Waiting for %s deployment to be ready...", name)
+			require.Eventually(t, func() bool {
+				if wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, name)() {
+					return true
+				}
+				logContainerRestarts(t, c, ctx, ns, name)
+				return false
+			}, esReadyBudget(t), 10*time.Second)
+		}
 
 		logging := v1beta1.Logging{
 			ObjectMeta: metav1.ObjectMeta{
