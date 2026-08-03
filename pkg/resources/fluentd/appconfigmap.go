@@ -430,6 +430,10 @@ func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1
 		},
 	}
 
+	if len(fluentdSpec.SidecarContainers) != 0 {
+		container = append(container, fluentdSpec.SidecarContainers...)
+	}
+
 	return container
 }
 
