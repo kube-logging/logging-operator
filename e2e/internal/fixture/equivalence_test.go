@@ -39,8 +39,11 @@ func (r *recorder) Create(_ context.Context, obj client.Object, _ ...client.Crea
 
 // The builders have to keep producing what common creates today, object for
 // object and in the same order, or a suite that moves onto them stops testing
-// what it used to. Nothing else pins that: the shape tests above assert the
-// fields this package chose, not that the choice matches the live path.
+// what it used to. Nothing else pins that: the shape tests assert the fields
+// this package chose, not that the choice matches the live path.
+//
+// Scaffolding, not a fixture: it makes common the oracle, so common cannot be
+// deleted while it stands. It goes with the last suite that still uses common.
 func TestBuildersMatchCommon(t *testing.T) {
 	const (
 		nsInfra  = "infra"
