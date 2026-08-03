@@ -28,7 +28,7 @@ func TestClusterKubeconfigPath(t *testing.T) {
 	beta, err := ClusterKubeconfigPath("beta")
 	require.NoError(t, err)
 
-	require.NotEqual(t, alpha, beta, "two clusters sharing one file is the lock contention")
+	require.NotEqual(t, alpha, beta)
 	require.Equal(t, filepath.Dir(alpha), filepath.Dir(beta))
 
 	again, err := ClusterKubeconfigPath("alpha")
@@ -36,7 +36,7 @@ func TestClusterKubeconfigPath(t *testing.T) {
 	require.Equal(t, alpha, again, "create and delete have to name the same file")
 
 	dir := filepath.Dir(alpha)
-	require.NotEqual(t, os.TempDir(), dir, "a path directly in the shared temp directory is guessable")
+	require.NotEqual(t, os.TempDir(), dir, "a path in the shared temp directory is guessable")
 
 	info, err := os.Stat(dir)
 	require.NoError(t, err)
@@ -51,15 +51,14 @@ func TestRemoveClusterKubeconfig(t *testing.T) {
 	require.NoError(t, RemoveClusterKubeconfig("gamma"))
 
 	require.NoFileExists(t, path)
-	require.NoFileExists(t, lock, "kind leaves the lock behind when it is killed mid-write")
+	require.NoFileExists(t, lock)
 }
 
 func TestRemoveClusterKubeconfigToleratesMissingFiles(t *testing.T) {
 	require.NoError(t, RemoveClusterKubeconfig("never-created"))
 }
 
-// stubKubeconfig recreates the per-run directory when an earlier case has
-// already taken it away, so the cases here do not depend on their order.
+// stubKubeconfig recreates the directory a previous case may have removed.
 func stubKubeconfig(t *testing.T, name string) string {
 	t.Helper()
 

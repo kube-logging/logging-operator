@@ -36,9 +36,7 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
 
-// clusterStopTimeout bounds the wait for cluster.Start to return once the
-// context is canceled, so a runnable that will not stop is named here instead
-// of running the whole binary out of its -timeout.
+// clusterStopTimeout bounds the wait for cluster.Start to return after cancel.
 const clusterStopTimeout = time.Minute
 
 type Cluster interface {
@@ -84,9 +82,7 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 		assert.NoError(t, cluster.Cleanup())
 		cancel()
 
-		// Start's error is checked here rather than in the goroutine: FailNow is
-		// undefined off the test goroutine, so a cluster that never started used
-		// to be dropped and resurface as an unrelated Eventually timeout.
+		// Checked here, not in the goroutine: FailNow is undefined off the test one.
 		select {
 		case err := <-startErr:
 			assert.NoError(t, err, "starting the cluster")
@@ -94,8 +90,6 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 			assert.Fail(t, "cluster.Start did not return after cancellation")
 		}
 
-		// A cluster that came down cleanly must not fail the test on kind's own
-		// kubeconfig bookkeeping, so this matches the assertions above.
 		assert.NoError(t, DeleteTestCluster(name))
 	}()
 

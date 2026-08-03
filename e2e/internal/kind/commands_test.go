@@ -266,9 +266,7 @@ func TestInvocations(t *testing.T) {
 			want:    []string{"create cluster --name fine"},
 		},
 		// kind tears down a half-built cluster when one of its own actions
-		// fails, but not when we kill it, so the delete has to be ours. It has
-		// to name the create's kubeconfig too: this is the delete that runs while
-		// several creates are timing out together.
+		// fails, but not when we kill it, so the delete has to be ours.
 		"a stalled create deletes the partial cluster": {
 			sleepEnv: "FAKE_KIND_CREATE_SLEEP",
 			timeout:  shortTimeout,

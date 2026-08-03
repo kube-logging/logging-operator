@@ -33,9 +33,7 @@ const KindClusterCreationTimeout = "3m"
 
 var kindCLI = kind.New()
 
-// kubeconfigDir is one directory per run, created 0700 by MkdirTemp. The file
-// names inside it are predictable, the directory is not, so nothing planted at a
-// guessable path in the shared temp directory can be written through.
+// kubeconfigDir is one 0700 directory per run, so the paths in it are unguessable.
 var kubeconfigDir = sync.OnceValues(func() (string, error) {
 	return os.MkdirTemp("", "e2e-kubeconfig-*")
 })
@@ -51,11 +49,8 @@ func ClusterKubeconfigPath(name string) (string, error) {
 	return filepath.Join(dir, "kind-"+name+".kubeconfig"), nil
 }
 
-// RemoveClusterKubeconfig drops the file and the lock kind leaves beside it.
-// kind rewrites the kubeconfig rather than unlinking it, so without this a run
-// that was killed hands its leftovers to the next one. The directory goes with
-// the last cluster of the binary; until then it is not empty and Remove is a
-// no-op on it.
+// RemoveClusterKubeconfig drops the file and the lock kind leaves beside it,
+// which kind itself does not. The directory goes with the binary's last cluster.
 func RemoveClusterKubeconfig(name string) error {
 	path, err := ClusterKubeconfigPath(name)
 	if err != nil {
