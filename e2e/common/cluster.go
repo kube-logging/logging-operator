@@ -120,7 +120,8 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 
 func DeleteTestCluster(clusterName string) error {
 	return errors.WrapIfWithDetails(kindCLI.DeleteCluster(kind.DeleteClusterOptions{
-		Name: clusterName,
+		Name:       clusterName,
+		Kubeconfig: ClusterKubeconfigPath(clusterName),
 	}), "deleting kind cluster", "clusterName", clusterName)
 }
 

@@ -16,6 +16,8 @@ package common
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"emperror.dev/errors"
@@ -30,17 +32,29 @@ const KindClusterCreationTimeout = "3m"
 
 var kindCLI = kind.New()
 
+// ClusterKubeconfigPath keeps each cluster's kind bookkeeping in its own file.
+// kind locks the kubeconfig it updates and the lock is non-blocking, so
+// clusters sharing one fail outright rather than wait. Cluster names are
+// already restricted to what kind accepts, which is safe in a path.
+func ClusterKubeconfigPath(name string) string {
+	return filepath.Join(os.TempDir(), "kind-"+name+".kubeconfig")
+}
+
 func KindClusterKubeconfig(name string) ([]byte, error) {
 	create := kind.CreateClusterOptions{
-		Name: name,
-		Wait: KindClusterCreationTimeout,
+		Name:       name,
+		Wait:       KindClusterCreationTimeout,
+		Kubeconfig: ClusterKubeconfigPath(name),
 	}
 
 	err := kindCLI.CreateCluster(create)
 	if err != nil && isClusterAlreadyExistsError(err) {
 		// Adopting a leftover would hand the suite an unknown operator and data.
 		fmt.Printf("kind cluster %q already exists, recreating it\n", name)
-		if err := kindCLI.DeleteCluster(kind.DeleteClusterOptions{Name: name}); err != nil {
+		if err := kindCLI.DeleteCluster(kind.DeleteClusterOptions{
+			Name:       name,
+			Kubeconfig: ClusterKubeconfigPath(name),
+		}); err != nil {
 			return nil, errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
 		}
 		err = kindCLI.CreateCluster(create)

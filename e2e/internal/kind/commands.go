@@ -133,7 +133,14 @@ func (k *Kind) DeleteCluster(options DeleteClusterOptions) error {
 }
 
 func (k *Kind) deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
-	return k.run(timeout, options.AppendToArgs([]string{"delete", "cluster"}), nil)
+	cmderr := &bytes.Buffer{}
+	err := k.run(timeout, options.AppendToArgs([]string{"delete", "cluster"}), func(cmd *exec.Cmd) {
+		cmd.Stderr = io.MultiWriter(os.Stderr, cmderr)
+	})
+	if err != nil && cmderr.Len() > 0 {
+		return fmt.Errorf("%w: %s", err, strings.TrimSpace(cmderr.String()))
+	}
+	return err
 }
 
 func (k *Kind) GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {

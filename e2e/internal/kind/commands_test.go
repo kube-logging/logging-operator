@@ -208,6 +208,50 @@ func TestCreateClusterErrorReporting(t *testing.T) {
 	}
 }
 
+func TestDeleteClusterErrorReporting(t *testing.T) {
+	const lockHeld = `ERROR: failed to delete cluster "c": failed to lock config file: open /tmp/kind-c.kubeconfig.lock: file exists`
+
+	testCases := map[string]struct {
+		env       map[string]string
+		timeout   time.Duration
+		isTimeout bool
+		contains  string
+	}{
+		"kind's own diagnosis reaches the caller": {
+			env:      map[string]string{"FAKE_KIND_EXIT": "1", "FAKE_KIND_STDERR": lockHeld},
+			contains: "failed to lock config file",
+		},
+		"a stall is still reported as a timeout": {
+			env:       map[string]string{"FAKE_KIND_DELETE_SLEEP": stubStall},
+			timeout:   shortTimeout,
+			isTimeout: true,
+			contains:  "timed out",
+		},
+	}
+
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			k, _ := newFakeKind(t)
+			if testCase.timeout > 0 {
+				k.CommandTimeout = testCase.timeout
+			}
+			for key, value := range testCase.env {
+				t.Setenv(key, value)
+			}
+
+			err := k.DeleteCluster(DeleteClusterOptions{Name: "c"})
+
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), testCase.contains)
+			if testCase.isTimeout {
+				assert.ErrorIs(t, err, ErrTimeout)
+			} else {
+				assert.NotErrorIs(t, err, ErrTimeout)
+			}
+		})
+	}
+}
+
 func TestInvocations(t *testing.T) {
 	testCases := map[string]struct {
 		sleepEnv string
@@ -234,6 +278,21 @@ func TestInvocations(t *testing.T) {
 			invoke:  func(k *Kind) error { return k.LoadDockerImage(nil, LoadDockerImageOptions{Name: "c"}) },
 			timeout: time.Minute,
 			want:    nil,
+		},
+		// kind's kubeconfig lock is non-blocking, so clusters that share one
+		// fail instead of waiting. Create and delete must name the same file.
+		"create and delete address their own kubeconfig": {
+			invoke: func(k *Kind) error {
+				if err := k.CreateCluster(CreateClusterOptions{Name: "c", Kubeconfig: "/tmp/kind-c.kubeconfig"}); err != nil {
+					return err
+				}
+				return k.DeleteCluster(DeleteClusterOptions{Name: "c", Kubeconfig: "/tmp/kind-c.kubeconfig"})
+			},
+			timeout: time.Minute,
+			want: []string{
+				"create cluster --kubeconfig /tmp/kind-c.kubeconfig --name c",
+				"delete cluster --kubeconfig /tmp/kind-c.kubeconfig --name c",
+			},
 		},
 		// One call for every image, so docker save writes shared layers once.
 		"several images load in a single call": {
