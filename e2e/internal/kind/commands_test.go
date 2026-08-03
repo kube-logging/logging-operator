@@ -266,13 +266,20 @@ func TestInvocations(t *testing.T) {
 			want:    []string{"create cluster --name fine"},
 		},
 		// kind tears down a half-built cluster when one of its own actions
-		// fails, but not when we kill it, so the delete has to be ours.
+		// fails, but not when we kill it, so the delete has to be ours. It has
+		// to name the create's kubeconfig too: this is the delete that runs while
+		// several creates are timing out together.
 		"a stalled create deletes the partial cluster": {
 			sleepEnv: "FAKE_KIND_CREATE_SLEEP",
 			timeout:  shortTimeout,
-			invoke:   func(k *Kind) error { return k.CreateCluster(CreateClusterOptions{Name: "stuck"}) },
-			wantErr:  true,
-			want:     []string{"create cluster --name stuck", "delete cluster --name stuck"},
+			invoke: func(k *Kind) error {
+				return k.CreateCluster(CreateClusterOptions{Name: "stuck", Kubeconfig: "/tmp/kind-stuck.kubeconfig"})
+			},
+			wantErr: true,
+			want: []string{
+				"create cluster --kubeconfig /tmp/kind-stuck.kubeconfig --name stuck",
+				"delete cluster --kubeconfig /tmp/kind-stuck.kubeconfig --name stuck",
+			},
 		},
 		"an empty image list runs nothing": {
 			invoke:  func(k *Kind) error { return k.LoadDockerImage(nil, LoadDockerImageOptions{Name: "c"}) },

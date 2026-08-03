@@ -110,8 +110,13 @@ func (k *Kind) CreateCluster(options CreateClusterOptions) error {
 
 	case errors.Is(err, ErrTimeout):
 		// kind removes a half-built cluster when one of its own actions fails,
-		// but not when we kill it, so the leftovers have to go explicitly.
-		cleanupErr := k.deleteCluster(k.CleanupTimeout, DeleteClusterOptions{Name: options.Name})
+		// but not when we kill it, so the leftovers have to go explicitly. The
+		// kubeconfig has to come along: this delete runs when creates are timing
+		// out together, which is when a shared one loses the lock.
+		cleanupErr := k.deleteCluster(k.CleanupTimeout, DeleteClusterOptions{
+			Name:       options.Name,
+			Kubeconfig: options.Kubeconfig,
+		})
 		if cleanupErr != nil {
 			return fmt.Errorf("%w; deleting the partial cluster also failed: %w", err, cleanupErr)
 		}
