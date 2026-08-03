@@ -46,8 +46,8 @@ func clusterKubeconfigPath(name string) (string, error) {
 	if err != nil {
 		return "", errors.WrapIf(err, "creating the kubeconfig directory")
 	}
-	// The path is cached for the whole run, so anything that clears the directory
-	// in between must not strand it.
+	// Reasserted on every lookup, not left to MkdirTemp: kind recreates a missing
+	// parent itself, at 0755, so a directory that goes away comes back readable.
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", errors.WrapIfWithDetails(err, "creating the kubeconfig directory", "path", dir)
 	}
@@ -55,9 +55,8 @@ func clusterKubeconfigPath(name string) (string, error) {
 }
 
 // removeClusterKubeconfig drops the file and the lock kind leaves beside it,
-// which kind itself does not. The directory stays for the run: kind writes the
-// kubeconfig only once a cluster is up, so removing it here would pull it out
-// from under any create still in flight.
+// which kind itself does not. The directory stays for the run: removing it with
+// one cluster only let kind recreate it at 0755 for the next.
 func removeClusterKubeconfig(name string) error {
 	path, err := clusterKubeconfigPath(name)
 	if err != nil {

@@ -58,15 +58,17 @@ func TestRemoveClusterKubeconfigToleratesMissingFiles(t *testing.T) {
 	require.NoError(t, removeClusterKubeconfig("never-created"))
 }
 
-// Tearing one cluster down must leave the next one a usable path, whatever has
-// happened to the directory in between.
-func TestClusterKubeconfigPathOutlivesTheDirectory(t *testing.T) {
-	stubKubeconfig(t, "first")
-	require.NoError(t, removeClusterKubeconfig("first"))
+// kind recreates a missing parent directory itself, at 0755, so a lookup after
+// anything has taken the directory away has to put the 0700 back.
+func TestClusterKubeconfigPathRestoresTheDirectory(t *testing.T) {
 	require.NoError(t, os.RemoveAll(filepath.Dir(mustPath(t, "first"))))
 
 	path := stubKubeconfig(t, "second")
 	require.FileExists(t, path)
+
+	info, err := os.Stat(filepath.Dir(path))
+	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0o700), info.Mode().Perm())
 }
 
 func mustPath(t *testing.T, name string) string {
