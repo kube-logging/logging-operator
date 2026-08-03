@@ -1485,15 +1485,18 @@ func TestWatchNamespaces(t *testing.T) {
 			continue
 		}
 
-		g.Eventually(func() ReturnVal {
+		// The expectation is recomputed on every poll rather than passed in as an
+		// argument, which Go would evaluate once before polling starts. The "full
+		// list" case reads the live namespace set, and envtest never finishes
+		// deleting a namespace, so a value snapshotted up front goes stale as the
+		// rest of the package creates more and the poll can never match it.
+		g.Eventually(func(poll gomega.Gomega) {
 			n, e := model.UniqueWatchNamespaces(context.TODO(), mgr.GetClient(), c.logging)
-			return ReturnVal{
+			poll.Expect(ReturnVal{
 				namespaces: n,
 				err:        e,
-			}
-		}, timeout).Should(gomega.Equal(
-			c.expectedResult(),
-		))
+			}).To(gomega.Equal(c.expectedResult()))
+		}, timeout).Should(gomega.Succeed())
 	}
 }
 
