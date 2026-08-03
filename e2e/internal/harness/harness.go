@@ -125,21 +125,14 @@ func Start(t *testing.T, cfg Config) *Env {
 		ControlNamespace: cfg.ControlNamespace,
 	}
 
-	// t.Cleanup is LIFO and the order below is load-bearing, so these are
-	// registered back to front: artifacts, kubeconfig, cancel, delete.
-	t.Cleanup(func() { assert.NoError(t, common.DeleteTestCluster(cfg.Cluster)) })
-	t.Cleanup(func() {
-		cancel()
-		// Checked here, not in the goroutine: FailNow is undefined off the test one.
-		select {
-		case err := <-startErr:
-			assert.NoError(t, err, "starting the cluster")
-		case <-time.After(clusterStopTimeout):
-			assert.Fail(t, "cluster.Start did not return after cancellation")
-		}
-	})
-	t.Cleanup(func() { assert.NoError(t, c.Cleanup()) })
-	t.Cleanup(func() { env.collectArtifacts(cfg) })
+	registerTeardown(t.Cleanup,
+		func(step string, v any) { assert.Fail(t, fmt.Sprintf("teardown step %q panicked: %v", step, v)) },
+		teardownSteps(
+			func() { env.collectArtifacts(cfg) },
+			func() { assert.NoError(t, c.Cleanup()) },
+			func() { stopCluster(t, cancel, startErr) },
+			func() { assert.NoError(t, common.DeleteTestCluster(cfg.Cluster)) },
+		))
 
 	setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(o *setup.LoggingOperatorOptions) {
 		o.Namespace = cfg.ControlNamespace
@@ -200,6 +193,50 @@ func (e *Env) collectArtifacts(cfg Config) {
 	if err := e.Cluster.CollectTestCoverageFiles(e.ControlNamespace, operator); err != nil {
 		// Logged, never fatal: the run's coverage is not the suite's verdict.
 		e.T.Logf("Failed collecting coverage files: %s", err)
+	}
+}
+
+type teardownStep struct {
+	name string
+	run  func()
+}
+
+// teardownSteps lists them in the order they have to run. This order is what
+// kept clusters from leaking before it moved here, so it is one list rather
+// than four Cleanup calls in reverse.
+func teardownSteps(artifacts, kubeconfig, stop, deleteCluster func()) []teardownStep {
+	return []teardownStep{
+		{"artifacts", artifacts},
+		{"kubeconfig", kubeconfig},
+		{"stop", stop},
+		{"delete", deleteCluster},
+	}
+}
+
+// registerTeardown hands the steps over back to front, because Cleanup is LIFO,
+// and isolates each one: Go abandons the remaining cleanups at the first panic,
+// which would strand the cluster.
+func registerTeardown(cleanup func(func()), onPanic func(step string, v any), steps []teardownStep) {
+	for _, step := range slices.Backward(steps) {
+		cleanup(func() {
+			defer func() {
+				if v := recover(); v != nil {
+					onPanic(step.name, v)
+				}
+			}()
+			step.run()
+		})
+	}
+}
+
+func stopCluster(t *testing.T, cancel context.CancelFunc, startErr <-chan error) {
+	cancel()
+	// Checked here, not in the goroutine: FailNow is undefined off the test one.
+	select {
+	case err := <-startErr:
+		assert.NoError(t, err, "starting the cluster")
+	case <-time.After(clusterStopTimeout):
+		assert.Fail(t, "cluster.Start did not return after cancellation")
 	}
 }
 

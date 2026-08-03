@@ -18,6 +18,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -29,6 +30,61 @@ import (
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
+
+// cleanupRecorder stands in for testing.T's Cleanup, so the order the steps end
+// up running in can be asserted without a cluster.
+type cleanupRecorder struct {
+	registered []func()
+}
+
+func (c *cleanupRecorder) Cleanup(fn func()) {
+	c.registered = append(c.registered, fn)
+}
+
+// run does what testing does at the end of a test: LIFO.
+func (c *cleanupRecorder) run() {
+	for _, fn := range slices.Backward(c.registered) {
+		fn()
+	}
+}
+
+// The order here is what kept clusters from leaking: the log dump needs the
+// cache and the kubeconfig, both of which the later steps take away.
+func TestTeardownRunsInDeclaredOrder(t *testing.T) {
+	var ran []string
+	record := func(name string) func() { return func() { ran = append(ran, name) } }
+
+	recorder := &cleanupRecorder{}
+	registerTeardown(recorder.Cleanup, failOnPanic(t), teardownSteps(
+		record("artifacts"), record("kubeconfig"), record("stop"), record("delete"),
+	))
+	recorder.run()
+
+	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
+}
+
+// Go abandons the remaining cleanups at the first panic, so without the recover
+// in registerTeardown a panicking log dump would leave the cluster running.
+func TestTeardownDeletesTheClusterAfterAnEarlierPanic(t *testing.T) {
+	var ran, panicked []string
+	record := func(name string) func() { return func() { ran = append(ran, name) } }
+
+	recorder := &cleanupRecorder{}
+	registerTeardown(recorder.Cleanup,
+		func(step string, _ any) { panicked = append(panicked, step) },
+		teardownSteps(
+			func() { ran = append(ran, "artifacts"); panic("boom") },
+			record("kubeconfig"), record("stop"), record("delete"),
+		))
+	recorder.run()
+
+	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
+	assert.Equal(t, []string{"artifacts"}, panicked, "the panic is reported, not swallowed")
+}
+
+func failOnPanic(t *testing.T) func(string, any) {
+	return func(step string, v any) { assert.Fail(t, "unexpected panic", "%s: %v", step, v) }
+}
 
 func TestBuildScheme(t *testing.T) {
 	t.Run("the default set covers what the suites register", func(t *testing.T) {
