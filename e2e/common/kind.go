@@ -48,8 +48,13 @@ func clusterKubeconfigPath(name string) (string, error) {
 	}
 	// Reasserted on every lookup, not left to MkdirTemp: kind recreates a missing
 	// parent itself, at 0755, so a directory that goes away comes back readable.
+	// MkdirAll returns nil without touching the mode of a directory that already
+	// exists, so the Chmod is what actually puts the 0700 back.
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", errors.WrapIfWithDetails(err, "creating the kubeconfig directory", "path", dir)
+	}
+	if err := os.Chmod(dir, 0o700); err != nil {
+		return "", errors.WrapIfWithDetails(err, "restoring the kubeconfig directory mode", "path", dir)
 	}
 	return filepath.Join(dir, "kind-"+name+".kubeconfig"), nil
 }

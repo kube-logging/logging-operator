@@ -59,9 +59,13 @@ func TestRemoveClusterKubeconfigToleratesMissingFiles(t *testing.T) {
 }
 
 // kind recreates a missing parent directory itself, at 0755, so a lookup after
-// anything has taken the directory away has to put the 0700 back.
+// anything has taken the directory away has to put the 0700 back. Putting a
+// 0755 directory in place is the state that needs fixing: removing it instead
+// would only prove that MkdirAll creates a fresh one at the mode it is given.
 func TestClusterKubeconfigPathRestoresTheDirectory(t *testing.T) {
-	require.NoError(t, os.RemoveAll(filepath.Dir(mustPath(t, "first"))))
+	dir := filepath.Dir(mustPath(t, "first"))
+	require.NoError(t, os.RemoveAll(dir))
+	require.NoError(t, os.MkdirAll(dir, 0o755))
 
 	path := stubKubeconfig(t, "second")
 	require.FileExists(t, path)
