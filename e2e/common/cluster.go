@@ -133,7 +133,7 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 }
 
 func DeleteTestCluster(clusterName string) error {
-	kubeconfig, err := ClusterKubeconfigPath(clusterName)
+	kubeconfig, err := clusterKubeconfigPath(clusterName)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func DeleteTestCluster(clusterName string) error {
 	}); err != nil {
 		return errors.WrapIfWithDetails(err, "deleting kind cluster", "clusterName", clusterName)
 	}
-	return RemoveClusterKubeconfig(clusterName)
+	return removeClusterKubeconfig(clusterName)
 }
 
 func CmdEnv(cmd *exec.Cmd, c Cluster) *exec.Cmd {

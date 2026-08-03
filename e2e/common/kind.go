@@ -38,32 +38,35 @@ var kubeconfigDir = sync.OnceValues(func() (string, error) {
 	return os.MkdirTemp("", "e2e-kubeconfig-*")
 })
 
-// ClusterKubeconfigPath keeps each cluster's kind bookkeeping in its own file.
+// clusterKubeconfigPath keeps each cluster's kind bookkeeping in its own file.
 // kind locks the kubeconfig it updates and the lock is non-blocking, so
 // clusters sharing one fail outright rather than wait.
-func ClusterKubeconfigPath(name string) (string, error) {
+func clusterKubeconfigPath(name string) (string, error) {
 	dir, err := kubeconfigDir()
 	if err != nil {
 		return "", errors.WrapIf(err, "creating the kubeconfig directory")
 	}
+	// The path is cached for the whole run, so anything that clears the directory
+	// in between must not strand it.
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return "", errors.WrapIfWithDetails(err, "creating the kubeconfig directory", "path", dir)
+	}
 	return filepath.Join(dir, "kind-"+name+".kubeconfig"), nil
 }
 
-// RemoveClusterKubeconfig drops the file and the lock kind leaves beside it,
-// which kind itself does not. The directory goes with the binary's last cluster.
-func RemoveClusterKubeconfig(name string) error {
-	path, err := ClusterKubeconfigPath(name)
+// removeClusterKubeconfig drops the file and the lock kind leaves beside it,
+// which kind itself does not. The directory stays for the run: kind writes the
+// kubeconfig only once a cluster is up, so removing it here would pull it out
+// from under any create still in flight.
+func removeClusterKubeconfig(name string) error {
+	path, err := clusterKubeconfigPath(name)
 	if err != nil {
 		return err
 	}
 	if err := removeIfExists(path); err != nil {
 		return err
 	}
-	if err := removeIfExists(path + ".lock"); err != nil {
-		return err
-	}
-	_ = os.Remove(filepath.Dir(path))
-	return nil
+	return removeIfExists(path + ".lock")
 }
 
 func removeIfExists(path string) error {
@@ -74,7 +77,7 @@ func removeIfExists(path string) error {
 }
 
 func KindClusterKubeconfig(name string) ([]byte, error) {
-	kubeconfig, err := ClusterKubeconfigPath(name)
+	kubeconfig, err := clusterKubeconfigPath(name)
 	if err != nil {
 		return nil, err
 	}

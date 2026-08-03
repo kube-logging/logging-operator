@@ -23,15 +23,15 @@ import (
 )
 
 func TestClusterKubeconfigPath(t *testing.T) {
-	alpha, err := ClusterKubeconfigPath("alpha")
+	alpha, err := clusterKubeconfigPath("alpha")
 	require.NoError(t, err)
-	beta, err := ClusterKubeconfigPath("beta")
+	beta, err := clusterKubeconfigPath("beta")
 	require.NoError(t, err)
 
 	require.NotEqual(t, alpha, beta)
 	require.Equal(t, filepath.Dir(alpha), filepath.Dir(beta))
 
-	again, err := ClusterKubeconfigPath("alpha")
+	again, err := clusterKubeconfigPath("alpha")
 	require.NoError(t, err)
 	require.Equal(t, alpha, again, "create and delete have to name the same file")
 
@@ -48,23 +48,40 @@ func TestRemoveClusterKubeconfig(t *testing.T) {
 	lock := path + ".lock"
 	require.NoError(t, os.WriteFile(lock, nil, 0o600))
 
-	require.NoError(t, RemoveClusterKubeconfig("gamma"))
+	require.NoError(t, removeClusterKubeconfig("gamma"))
 
 	require.NoFileExists(t, path)
 	require.NoFileExists(t, lock)
 }
 
 func TestRemoveClusterKubeconfigToleratesMissingFiles(t *testing.T) {
-	require.NoError(t, RemoveClusterKubeconfig("never-created"))
+	require.NoError(t, removeClusterKubeconfig("never-created"))
 }
 
-// stubKubeconfig recreates the directory a previous case may have removed.
+// Tearing one cluster down must leave the next one a usable path, whatever has
+// happened to the directory in between.
+func TestClusterKubeconfigPathOutlivesTheDirectory(t *testing.T) {
+	stubKubeconfig(t, "first")
+	require.NoError(t, removeClusterKubeconfig("first"))
+	require.NoError(t, os.RemoveAll(filepath.Dir(mustPath(t, "first"))))
+
+	path := stubKubeconfig(t, "second")
+	require.FileExists(t, path)
+}
+
+func mustPath(t *testing.T, name string) string {
+	t.Helper()
+
+	path, err := clusterKubeconfigPath(name)
+	require.NoError(t, err)
+	return path
+}
+
 func stubKubeconfig(t *testing.T, name string) string {
 	t.Helper()
 
-	path, err := ClusterKubeconfigPath(name)
+	path, err := clusterKubeconfigPath(name)
 	require.NoError(t, err)
-	require.NoError(t, os.MkdirAll(filepath.Dir(path), 0o700))
 	require.NoError(t, os.WriteFile(path, nil, 0o600))
 	return path
 }
