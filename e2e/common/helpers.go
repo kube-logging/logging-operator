@@ -215,7 +215,7 @@ func LoggingTenant(
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       "tenant",
 			ControlNamespace: nsTenant,
-			WatchNamespaces:  []string{"tenant"},
+			WatchNamespaces:  []string{nsTenant},
 			FluentdSpec: &v1beta1.FluentdSpec{
 				Image: v1beta1.ImageSpec{
 					Repository: FluentdImageRepo,
