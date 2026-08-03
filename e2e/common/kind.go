@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"emperror.dev/errors"
 
@@ -32,28 +33,70 @@ const KindClusterCreationTimeout = "3m"
 
 var kindCLI = kind.New()
 
+// kubeconfigDir is one directory per run, created 0700 by MkdirTemp. The file
+// names inside it are predictable, the directory is not, so nothing planted at a
+// guessable path in the shared temp directory can be written through.
+var kubeconfigDir = sync.OnceValues(func() (string, error) {
+	return os.MkdirTemp("", "e2e-kubeconfig-*")
+})
+
 // ClusterKubeconfigPath keeps each cluster's kind bookkeeping in its own file.
 // kind locks the kubeconfig it updates and the lock is non-blocking, so
-// clusters sharing one fail outright rather than wait. Cluster names are
-// already restricted to what kind accepts, which is safe in a path.
-func ClusterKubeconfigPath(name string) string {
-	return filepath.Join(os.TempDir(), "kind-"+name+".kubeconfig")
+// clusters sharing one fail outright rather than wait.
+func ClusterKubeconfigPath(name string) (string, error) {
+	dir, err := kubeconfigDir()
+	if err != nil {
+		return "", errors.WrapIf(err, "creating the kubeconfig directory")
+	}
+	return filepath.Join(dir, "kind-"+name+".kubeconfig"), nil
+}
+
+// RemoveClusterKubeconfig drops the file and the lock kind leaves beside it.
+// kind rewrites the kubeconfig rather than unlinking it, so without this a run
+// that was killed hands its leftovers to the next one. The directory goes with
+// the last cluster of the binary; until then it is not empty and Remove is a
+// no-op on it.
+func RemoveClusterKubeconfig(name string) error {
+	path, err := ClusterKubeconfigPath(name)
+	if err != nil {
+		return err
+	}
+	if err := removeIfExists(path); err != nil {
+		return err
+	}
+	if err := removeIfExists(path + ".lock"); err != nil {
+		return err
+	}
+	_ = os.Remove(filepath.Dir(path))
+	return nil
+}
+
+func removeIfExists(path string) error {
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		return errors.WrapIfWithDetails(err, "removing kubeconfig", "path", path)
+	}
+	return nil
 }
 
 func KindClusterKubeconfig(name string) ([]byte, error) {
+	kubeconfig, err := ClusterKubeconfigPath(name)
+	if err != nil {
+		return nil, err
+	}
+
 	create := kind.CreateClusterOptions{
 		Name:       name,
 		Wait:       KindClusterCreationTimeout,
-		Kubeconfig: ClusterKubeconfigPath(name),
+		Kubeconfig: kubeconfig,
 	}
 
-	err := kindCLI.CreateCluster(create)
+	err = kindCLI.CreateCluster(create)
 	if err != nil && isClusterAlreadyExistsError(err) {
 		// Adopting a leftover would hand the suite an unknown operator and data.
 		fmt.Printf("kind cluster %q already exists, recreating it\n", name)
 		if err := kindCLI.DeleteCluster(kind.DeleteClusterOptions{
 			Name:       name,
-			Kubeconfig: ClusterKubeconfigPath(name),
+			Kubeconfig: kubeconfig,
 		}); err != nil {
 			return nil, errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
 		}
