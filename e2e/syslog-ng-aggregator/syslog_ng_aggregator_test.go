@@ -15,31 +15,16 @@
 package syslong_ng_aggregator
 
 import (
-	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -47,223 +32,145 @@ import (
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
 )
 
-var TestTempDir string
+const (
+	ns      = "test"
+	release = "e2e"
+	testTag = "test.tag"
+)
 
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
-	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
-	}
-}
+var producerLabels = map[string]string{"my-unique-label": "log-producer"}
 
 func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
-	common.Initialize(t)
-	ns := "test"
-	releaseNameOverride := "e2e"
-	common.WithCluster("syslog-ng-forwarding", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	env := harness.New(t).
+		WithCluster("syslog-ng-forwarding").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		ctx := context.Background()
-
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "syslog-ng-aggregator-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: v1beta1.ImageSpec{
-							Repository: common.ConfigReloaderRepo,
-							Tag:        common.ConfigReloaderTag,
-						},
-					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
+	logging := &v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "syslog-ng-aggregator-test",
+			Namespace: ns,
+		},
+		Spec: v1beta1.LoggingSpec{
+			EnableRecreateWorkloadOnImmutableFieldChange: true,
+			ControlNamespace: ns,
+			FluentbitSpec: &v1beta1.FluentbitSpec{
+				Network: &v1beta1.FluentbitNetwork{
+					Keepalive: new(false),
+				},
+				ConfigHotReload: &v1beta1.HotReload{
+					Image: v1beta1.ImageSpec{
+						Repository: common.ConfigReloaderRepo,
+						Tag:        common.ConfigReloaderTag,
 					},
 				},
-				SyslogNGSpec: &v1beta1.SyslogNGSpec{
-					ConfigReloadImage: &v1beta1.BasicImageSpec{
-						Repository: common.SyslogNGReloaderRepo,
-						Tag:        common.SyslogNGReloaderTag,
-					},
-					BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
-					StatefulSetOverrides: &typeoverride.StatefulSet{
-						Spec: typeoverride.StatefulSetSpec{
-							Template: typeoverride.PodTemplateSpec{
-								Spec: typeoverride.PodSpec{
-									Containers: []corev1.Container{
-										{
-											Name: syslogng.ContainerName,
-											Resources: corev1.ResourceRequirements{
-												Limits: corev1.ResourceList{
-													corev1.ResourceCPU:    resource.MustParse("100m"),
-													corev1.ResourceMemory: resource.MustParse("100M"),
-												},
-												Requests: corev1.ResourceList{
-													corev1.ResourceCPU:    resource.MustParse("25m"),
-													corev1.ResourceMemory: resource.MustParse("10M"),
-												},
+				BufferVolumeImage: v1beta1.ImageSpec{
+					Repository: common.NodeExporterRepo,
+					Tag:        common.NodeExporterTag,
+				},
+			},
+			SyslogNGSpec: &v1beta1.SyslogNGSpec{
+				ConfigReloadImage: &v1beta1.BasicImageSpec{
+					Repository: common.SyslogNGReloaderRepo,
+					Tag:        common.SyslogNGReloaderTag,
+				},
+				BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
+					Repository: common.NodeExporterRepo,
+					Tag:        common.NodeExporterTag,
+				},
+				StatefulSetOverrides: &typeoverride.StatefulSet{
+					Spec: typeoverride.StatefulSetSpec{
+						Template: typeoverride.PodTemplateSpec{
+							Spec: typeoverride.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: syslogng.ContainerName,
+										Resources: corev1.ResourceRequirements{
+											Limits: corev1.ResourceList{
+												corev1.ResourceCPU:    resource.MustParse("100m"),
+												corev1.ResourceMemory: resource.MustParse("100M"),
 											},
-											VolumeMounts: []corev1.VolumeMount{
-												{
-													Name:      "buffers",
-													MountPath: "/buffers",
-												},
+											Requests: corev1.ResourceList{
+												corev1.ResourceCPU:    resource.MustParse("25m"),
+												corev1.ResourceMemory: resource.MustParse("10M"),
+											},
+										},
+										VolumeMounts: []corev1.VolumeMount{
+											{
+												Name:      "buffers",
+												MountPath: "/buffers",
 											},
 										},
 									},
-									Volumes: []corev1.Volume{
-										{
-											Name: "buffers",
-											VolumeSource: corev1.VolumeSource{
-												EmptyDir: &corev1.EmptyDirVolumeSource{},
-											},
+								},
+								Volumes: []corev1.Volume{
+									{
+										Name: "buffers",
+										VolumeSource: corev1.VolumeSource{
+											EmptyDir: &corev1.EmptyDirVolumeSource{},
 										},
 									},
 								},
 							},
 						},
 					},
-					BufferVolumeMetrics: &v1beta1.BufferMetrics{
-						Metrics: v1beta1.Metrics{
-							Interval: "1s",
-						},
-						MountName: "buffers",
+				},
+				BufferVolumeMetrics: &v1beta1.BufferMetrics{
+					Metrics: v1beta1.Metrics{
+						Interval: "1s",
 					},
+					MountName: "buffers",
 				},
 			},
-		}
-		testTag := "test.tag"
+		},
+	}
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		output := v1beta1.SyslogNGOutput{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.SyslogNGOutputSpec{
-				HTTP: &syslogngoutput.HTTPOutput{
-					URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
-					Headers: []string{
-						"Content-type: application/json",
-					},
-					Method: "POST",
-					DiskBuffer: &syslogngoutput.DiskBuffer{
-						DiskBufSize: 100 * 1024 * 1024,
-						Reliable:    true,
-						Dir:         syslogng.BufferPath,
-					},
+	output := &v1beta1.SyslogNGOutput{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-output",
+			Namespace: ns,
+		},
+		Spec: v1beta1.SyslogNGOutputSpec{
+			HTTP: &syslogngoutput.HTTPOutput{
+				URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", release, testTag),
+				Headers: []string{
+					"Content-type: application/json",
+				},
+				Method: "POST",
+				DiskBuffer: &syslogngoutput.DiskBuffer{
+					DiskBufSize: 100 * 1024 * 1024,
+					Reliable:    true,
+					Dir:         syslogng.BufferPath,
 				},
 			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.SyslogNGFlow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-flow",
-				Namespace: ns,
-			},
-			Spec: v1beta1.SyslogNGFlowSpec{
-				Match: &v1beta1.SyslogNGMatch{
-					Regexp: &filter.RegexpMatchExpr{
-						Pattern: "log-producer",
-						Value:   "json.kubernetes.labels.my-unique-label",
-						Type:    "string",
-					},
+		},
+	}
+
+	flow := &v1beta1.SyslogNGFlow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-flow",
+			Namespace: ns,
+		},
+		Spec: v1beta1.SyslogNGFlowSpec{
+			Match: &v1beta1.SyslogNGMatch{
+				Regexp: &filter.RegexpMatchExpr{
+					Pattern: "log-producer",
+					Value:   "json.kubernetes.labels.my-unique-label",
+					Type:    "string",
 				},
-				LocalOutputRefs: []string{output.Name},
 			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+			LocalOutputRefs: []string{output.Name},
+		},
+	}
 
-		aggergatorLabels := map[string]string{
-			types.NameLabel:      "syslog-ng",
-			types.ComponentLabel: "syslog-ng",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
+	env.Create(logging, output, flow)
+	env.StartLogProducer(ns, producerLabels)
 
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
-		}, 5*time.Minute, 2*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	env.WaitForRunning(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.SyslogNGAggregator(ns),
+	)
+	env.Receiver.MustReceive(testTag)
 }
