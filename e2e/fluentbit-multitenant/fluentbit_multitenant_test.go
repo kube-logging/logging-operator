@@ -15,162 +15,52 @@
 package fluentbit_multitenant
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
-
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-var TestTempDir string
-
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
-	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
-	}
-}
-
-var (
-	tags           = "time"
-	realTimeBuffer = &output.Buffer{
-		Tags:        &tags,
-		Timekey:     "1s",
-		TimekeyWait: "0s",
-	}
+const (
+	release   = "fluentbit-multitenant"
+	nsInfra   = "infra"
+	nsTenant  = "tenant"
+	tagInfra  = "tag_infra"
+	tagTenant = "tag_tenant"
 )
 
-var producerLabels = map[string]string{
-	"my-unique-label": "log-producer",
+var producerLabels = map[string]string{"my-unique-label": "log-producer"}
+
+// This is the one suite whose buffer leaves Type unset, so it is written out
+// rather than taken from fixture.Buffer, whose "file" default would switch the
+// outputs from memory buffering.
+func realTimeBuffer() *output.Buffer {
+	tags := "time"
+	return &output.Buffer{Tags: &tags, Timekey: "1s", TimekeyWait: "0s"}
 }
 
 func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
-	common.Initialize(t)
-	nsInfra := "infra"
-	nsTenant := "tenant"
-	tagInfra := "tag_infra"
-	tagTenant := "tag_tenant"
+	env := harness.New(t).
+		WithCluster(release).
+		WithRelease(release).
+		WithControlNamespace(nsInfra).
+		WithNamespaces(nsTenant).
+		Start()
 
-	release := "fluentbit-multitenant"
-	common.WithCluster(release, t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = nsInfra
-			options.NameOverride = release
-		}))
+	buffer := realTimeBuffer()
+	env.Create(fixture.LoggingInfra(nsInfra, release, tagInfra, buffer, producerLabels)...)
+	env.Create(fixture.LoggingTenant(nsTenant, nsInfra, release, tagTenant, buffer, producerLabels)...)
+	env.Create(fixture.LoggingRoute())
 
-		ctx := context.Background()
+	env.StartLogProducer(nsTenant, producerLabels)
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: nsTenant,
-			},
-		}))
-
-		common.LoggingInfra(ctx, t, c.GetClient(), nsInfra, release, tagInfra, realTimeBuffer, producerLabels)
-		common.LoggingTenant(ctx, t, c.GetClient(), nsTenant, nsInfra, release, tagTenant, realTimeBuffer, producerLabels)
-		common.LoggingRoute(ctx, t, c.GetClient())
-
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: release,
-		}
-
-		// start log producer in the tenant namespace
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = nsTenant
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels), client.InNamespace(nsInfra)); !aggregatorRunning() {
-				t.Log("waiting for the infra aggregator")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels), client.InNamespace(nsTenant)); !aggregatorRunning() {
-				t.Log("waiting for the tenant aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", nsInfra,
-				"--tail", "30",
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, release)), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), tagTenant) && strings.Contains(string(rawOut), tagInfra)
-		}, 5*time.Minute, 3*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{nsInfra, nsTenant, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + release
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", nsInfra, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(nsInfra, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	env.WaitForRunning(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(nsInfra),
+		wait.FluentdAggregator(nsTenant),
+	)
+	env.WaitForReceiverLogs(tagInfra, tagTenant)
 }
