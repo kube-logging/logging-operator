@@ -46,27 +46,23 @@ import (
 )
 
 const (
-	// clusterStopTimeout bounds the wait for cluster.Start to return after the
-	// context is canceled, so a runnable that will not stop is named rather
-	// than running the binary out of its -timeout.
+	// Names a runnable that will not stop, rather than letting it run the
+	// binary out of its -timeout.
 	clusterStopTimeout = time.Minute
 
 	clusterLogLimit = 100 * 1000
-
-	// receiverLogTail is the tail length the suites read from the test receiver.
 	receiverLogTail = 30
 
 	// waitBudget and waitInterval are what the suites spend by hand today.
 	waitBudget   = 5 * time.Minute
 	waitInterval = 3 * time.Second
 
-	// teardownMargin is held back from the budget so a wait that runs to the
-	// end still leaves time to dump logs and delete the cluster.
+	// Leaves a wait that runs to the end time to tear down.
 	teardownMargin = 90 * time.Second
 )
 
-// defaultSchemeBuilders covers every type the suites register today except the
-// prometheus-operator ones, which only logging_metrics_monitoring needs.
+// Everything the suites register except the prometheus-operator types, which
+// only logging_metrics_monitoring needs.
 var defaultSchemeBuilders = []func(*runtime.Scheme) error{
 	v1beta1.AddToScheme,
 	apiextensionsv1.AddToScheme,
@@ -94,27 +90,24 @@ func New(t *testing.T) *Builder {
 	return &Builder{t: t}
 }
 
-// WithCluster names the kind cluster. Named rather than derived from t.Name():
-// kind accepts only [a-z0-9.-] and none of the test names match.
+// WithCluster is named rather than derived from t.Name(): kind accepts only
+// [a-z0-9.-] and none of the test names match.
 func (b *Builder) WithCluster(name string) *Builder {
 	b.cfg.cluster = name
 	return b
 }
 
-// WithRelease names the helm release, and the operator's nameOverride with it.
 func (b *Builder) WithRelease(name string) *Builder {
 	b.cfg.release = name
 	return b
 }
 
-// WithControlNamespace sets where the operator and the test receiver run.
 func (b *Builder) WithControlNamespace(namespace string) *Builder {
 	b.cfg.controlNamespace = namespace
 	return b
 }
 
-// WithNamespaces are created before the test body and dumped at teardown
-// alongside the control namespace and default.
+// WithNamespaces are also dumped at teardown.
 func (b *Builder) WithNamespaces(namespaces ...string) *Builder {
 	b.cfg.namespaces = append(b.cfg.namespaces, namespaces...)
 	return b
@@ -125,7 +118,6 @@ func (b *Builder) WithOperatorArgs(args ...string) *Builder {
 	return b
 }
 
-// WithScheme registers types on top of the shared set.
 func (b *Builder) WithScheme(add ...func(*runtime.Scheme) error) *Builder {
 	b.cfg.schemeBuilders = append(b.cfg.schemeBuilders, add...)
 	return b
@@ -144,8 +136,7 @@ type Env struct {
 	dumpNamespaces []string
 }
 
-// Start brings up the cluster, installs the operator and registers teardown.
-// It marks the test parallel, so it has to be the first call in the test.
+// Start marks the test parallel, so it has to be the first call in the test.
 func (b *Builder) Start() *Env {
 	t := b.t
 	common.Initialize(t)
@@ -204,8 +195,7 @@ func (e *Env) Create(objects ...client.Object) {
 	}
 }
 
-// StartLogProducer runs on the test goroutine: the create errors reach it
-// through RequireNoError, which needs FailNow to be defined.
+// StartLogProducer runs on the test goroutine, where FailNow is defined.
 func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 	e.T.Helper()
 	setup.LogProducer(e.T, e.Client, setup.LogProducerOptionFunc(func(o *setup.LogProducerOptions) {
@@ -214,8 +204,6 @@ func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 	}))
 }
 
-// WaitForRunning blocks until every condition holds, and names the one that
-// did not if it runs out of budget.
 func (e *Env) WaitForRunning(conditions ...wait.Condition) {
 	e.T.Helper()
 
@@ -235,9 +223,8 @@ func (e *Env) WaitForRunning(conditions ...wait.Condition) {
 	}, e.waitBudget(), waitInterval, "still waiting for %s", &outstanding)
 }
 
-// WaitForReceiverLogs blocks until the test receiver has logged every tag, and
-// names the one still missing if it runs out of budget. The tail itself is not
-// echoed each poll: the archived cluster dump already has the receiver's log.
+// WaitForReceiverLogs does not echo the tail each poll: the archived cluster
+// dump already carries the receiver's log.
 func (e *Env) WaitForReceiverLogs(tags ...string) {
 	e.T.Helper()
 
@@ -258,8 +245,6 @@ func (e *Env) WaitForReceiverLogs(tags ...string) {
 	}, e.waitBudget(), waitInterval, "the test receiver never logged %s", &outstanding)
 }
 
-// ReceiverLogs returns the tail of the chart's test receiver, which is where a
-// suite looks to see that its logs arrived.
 func (e *Env) ReceiverLogs(tail int) (string, error) {
 	out, err := common.CmdEnv(exec.Command("kubectl",
 		"logs",
@@ -269,8 +254,8 @@ func (e *Env) ReceiverLogs(tail int) (string, error) {
 	return string(out), err
 }
 
-// waitBudget is what the suites spend today, held under what is left of the
-// binary's deadline so one wait cannot take the package's whole budget with it.
+// waitBudget holds a wait under what is left of the binary's deadline, so one
+// cannot take the package's whole budget with it.
 func (e *Env) waitBudget() time.Duration {
 	deadline, ok := e.T.Deadline()
 	if !ok {
@@ -308,7 +293,6 @@ type step struct {
 
 type teardown []step
 
-// cleanupT is the part of testing.T register needs.
 type cleanupT interface {
 	Cleanup(func())
 	Errorf(format string, args ...any)
@@ -356,7 +340,7 @@ func (e *Env) collectArtifacts() {
 	operator := "logging-operator-" + e.Release
 	e.T.Logf("Collecting coverage files from logging-operator: %s/%s", e.ControlNamespace, operator)
 	if err := e.Cluster.CollectTestCoverageFiles(e.ControlNamespace, operator); err != nil {
-		// Logged, never fatal: the run's coverage is not the suite's verdict.
+		// Logged, never fatal: coverage is not the suite's verdict.
 		e.T.Logf("Failed collecting coverage files: %s", err)
 	}
 }
@@ -371,11 +355,11 @@ func buildScheme(extra []func(*runtime.Scheme) error) (*runtime.Scheme, error) {
 	return scheme, nil
 }
 
-// dumpNamespaces is the control namespace, the configured ones and default,
-// without repeats, so a suite that names one does not dump it twice.
 func dumpNamespaces(cfg config) []string {
 	out := make([]string, 0, len(cfg.namespaces)+2)
 	seen := map[string]bool{}
+	// Concat, not append: appending to cfg.namespaces could write into the
+	// caller's backing array.
 	for _, ns := range slices.Concat([]string{cfg.controlNamespace}, cfg.namespaces, []string{"default"}) {
 		if ns != "" && !seen[ns] {
 			seen[ns] = true
@@ -385,8 +369,6 @@ func dumpNamespaces(cfg config) []string {
 	return out
 }
 
-// artifactPath is build/_test under PROJECT_DIR, the directory every suite
-// used to build for itself in an init().
 func artifactPath(name string) (string, error) {
 	root, ok := os.LookupEnv("PROJECT_DIR")
 	if !ok {
