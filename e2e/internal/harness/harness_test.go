@@ -16,6 +16,7 @@ package harness
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -32,59 +33,53 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
-// cleanupRecorder stands in for testing.T's Cleanup, so the order the steps end
-// up running in can be asserted without a cluster.
-type cleanupRecorder struct {
-	registered []func()
+// Registered in a subtest so the order comes from testing's own LIFO rather
+// than a stand-in for it.
+func TestTeardownRunsInDeclaredOrder(t *testing.T) {
+	var ran []string
+	record := func(name string) step { return step{name, func() { ran = append(ran, name) }} }
+
+	t.Run("teardown", func(t *testing.T) {
+		teardown{record("artifacts"), record("kubeconfig"), record("stop"), record("delete")}.register(t)
+	})
+
+	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
 }
 
-func (c *cleanupRecorder) Cleanup(fn func()) {
-	c.registered = append(c.registered, fn)
+// A real subtest cannot be used here: register reports the panic, which would
+// fail the subtest and this test with it.
+type reportingT struct {
+	cleanups []func()
+	reported []string
 }
 
-// run does what testing does at the end of a test: LIFO.
-func (c *cleanupRecorder) run() {
-	for _, fn := range slices.Backward(c.registered) {
+func (r *reportingT) Cleanup(fn func()) { r.cleanups = append(r.cleanups, fn) }
+func (r *reportingT) Errorf(format string, args ...any) {
+	r.reported = append(r.reported, fmt.Sprintf(format, args...))
+}
+
+func (r *reportingT) runCleanups() {
+	for _, fn := range slices.Backward(r.cleanups) {
 		fn()
 	}
 }
 
-// The order here is what kept clusters from leaking: the log dump needs the
-// cache and the kubeconfig, both of which the later steps take away.
-func TestTeardownRunsInDeclaredOrder(t *testing.T) {
-	var ran []string
-	record := func(name string) func() { return func() { ran = append(ran, name) } }
-
-	recorder := &cleanupRecorder{}
-	registerTeardown(recorder.Cleanup, failOnPanic(t), teardownSteps(
-		record("artifacts"), record("kubeconfig"), record("stop"), record("delete"),
-	))
-	recorder.run()
-
-	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
-}
-
 // Go abandons the remaining cleanups at the first panic, so without the recover
-// in registerTeardown a panicking log dump would leave the cluster running.
+// a panicking log dump would leave the cluster running.
 func TestTeardownDeletesTheClusterAfterAnEarlierPanic(t *testing.T) {
-	var ran, panicked []string
-	record := func(name string) func() { return func() { ran = append(ran, name) } }
+	var ran []string
+	record := func(name string) step { return step{name, func() { ran = append(ran, name) }} }
 
-	recorder := &cleanupRecorder{}
-	registerTeardown(recorder.Cleanup,
-		func(step string, _ any) { panicked = append(panicked, step) },
-		teardownSteps(
-			func() { ran = append(ran, "artifacts"); panic("boom") },
-			record("kubeconfig"), record("stop"), record("delete"),
-		))
-	recorder.run()
+	recorder := &reportingT{}
+	teardown{
+		{"artifacts", func() { ran = append(ran, "artifacts"); panic("boom") }},
+		record("kubeconfig"), record("stop"), record("delete"),
+	}.register(recorder)
+	recorder.runCleanups()
 
 	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
-	assert.Equal(t, []string{"artifacts"}, panicked, "the panic is reported, not swallowed")
-}
-
-func failOnPanic(t *testing.T) func(string, any) {
-	return func(step string, v any) { assert.Fail(t, "unexpected panic", "%s: %v", step, v) }
+	assert.Len(t, recorder.reported, 1, "the panic is reported, not swallowed")
+	assert.Contains(t, recorder.reported[0], `"artifacts" panicked`)
 }
 
 func TestBuildScheme(t *testing.T) {
@@ -133,8 +128,6 @@ func TestDumpNamespaces(t *testing.T) {
 			config: config{controlNamespace: "infra", namespaces: []string{"tenant"}},
 			want:   []string{"infra", "tenant", "default"},
 		},
-		// A suite that runs in default, or names it explicitly, would otherwise
-		// have stern dump it twice.
 		"repeats are dropped": {
 			config: config{controlNamespace: "default", namespaces: []string{"tenant", "tenant"}},
 			want:   []string{"default", "tenant"},
@@ -152,12 +145,8 @@ func TestDumpNamespaces(t *testing.T) {
 	}
 }
 
-// The cap is what the suites spend by hand today; the deadline is what stops
-// one wait taking the whole package budget with it.
 func TestWaitBudgetStaysUnderTheCapAndTheDeadline(t *testing.T) {
-	env := &Env{T: t}
-
-	budget := env.waitBudget()
+	budget := (&Env{T: t}).waitBudget()
 
 	assert.Positive(t, budget)
 	assert.LessOrEqual(t, budget, waitBudget)
@@ -174,7 +163,6 @@ func TestArtifactPath(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, filepath.Join(root, "build/_test", "cluster-TestSomething.log"), path)
-	// The directory each suite used to build in its own init().
 	info, err := os.Stat(filepath.Dir(path))
 	require.NoError(t, err)
 	assert.True(t, info.IsDir())

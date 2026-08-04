@@ -177,14 +177,12 @@ func (b *Builder) Start() *Env {
 		dumpNamespaces:   dumpNamespaces(b.cfg),
 	}
 
-	registerTeardown(t.Cleanup,
-		func(step string, v any) { assert.Fail(t, fmt.Sprintf("teardown step %q panicked: %v", step, v)) },
-		teardownSteps(
-			env.collectArtifacts,
-			func() { assert.NoError(t, c.Cleanup()) },
-			func() { stopCluster(t, cancel, startErr) },
-			func() { assert.NoError(t, common.DeleteTestCluster(b.cfg.cluster)) },
-		))
+	teardown{
+		{"artifacts", env.collectArtifacts},
+		{"kubeconfig", func() { assert.NoError(t, c.Cleanup()) }},
+		{"stop", func() { stopCluster(t, cancel, startErr) }},
+		{"delete", func() { assert.NoError(t, common.DeleteTestCluster(b.cfg.cluster)) }},
+	}.register(t)
 
 	setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(o *setup.LoggingOperatorOptions) {
 		o.Namespace = b.cfg.controlNamespace
@@ -303,35 +301,30 @@ func (p *pending) String() string {
 	return p.name
 }
 
-type teardownStep struct {
+type step struct {
 	name string
 	run  func()
 }
 
-// teardownSteps lists them in the order they have to run. This order is what
-// kept clusters from leaking before it moved here, so it is one list rather
-// than four Cleanup calls in reverse.
-func teardownSteps(artifacts, kubeconfig, stop, deleteCluster func()) []teardownStep {
-	return []teardownStep{
-		{"artifacts", artifacts},
-		{"kubeconfig", kubeconfig},
-		{"stop", stop},
-		{"delete", deleteCluster},
-	}
+type teardown []step
+
+// cleanupT is the part of testing.T register needs.
+type cleanupT interface {
+	Cleanup(func())
+	Errorf(format string, args ...any)
 }
 
-// registerTeardown hands the steps over back to front, because Cleanup is LIFO,
-// and isolates each one: Go abandons the remaining cleanups at the first panic,
-// which would strand the cluster.
-func registerTeardown(cleanup func(func()), onPanic func(step string, v any), steps []teardownStep) {
-	for _, step := range slices.Backward(steps) {
-		cleanup(func() {
+// register goes back to front because Cleanup is LIFO, and isolates each step:
+// Go abandons the rest at the first panic, which would strand the cluster.
+func (td teardown) register(t cleanupT) {
+	for _, s := range slices.Backward(td) {
+		t.Cleanup(func() {
 			defer func() {
 				if v := recover(); v != nil {
-					onPanic(step.name, v)
+					assert.Fail(t, fmt.Sprintf("teardown step %q panicked: %v", s.name, v))
 				}
 			}()
-			step.run()
+			s.run()
 		})
 	}
 }
