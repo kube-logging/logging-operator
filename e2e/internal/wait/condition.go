@@ -22,14 +22,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// Condition is a named thing to wait for. It carries no testing.T and no
-// client, so a suite can name one without assembling it: whoever evaluates it
-// supplies both. Name is what a failed wait reports.
+// Condition carries no testing.T and no client, so a suite can name one without
+// assembling it and whoever evaluates it supplies both.
 type Condition struct {
 	Name string
 	Met  func(context.Context, client.Reader) (bool, error)
 }
 
+// PodRunning is the escape hatch; the constructors below carry their own name
+// and selector so a call site passes only what varies.
 func PodRunning(name string, opts ...client.ListOption) Condition {
 	return Condition{
 		Name: name,
@@ -49,17 +50,23 @@ func PodRunning(name string, opts ...client.ListOption) Condition {
 }
 
 func Operator(release string) Condition {
-	return PodRunning("the operator", client.MatchingLabels{types.NameLabel: release})
+	return PodRunning("operator", client.MatchingLabels{types.NameLabel: release})
 }
 
 func Producer(labels map[string]string) Condition {
-	return PodRunning("the producer", client.MatchingLabels(labels))
+	return PodRunning("producer", client.MatchingLabels(labels))
 }
 
-// Aggregator matches the fluentd statefulset's pods in one namespace, which is
-// what a multi-tenant suite waits on per tenant.
-func Aggregator(namespace string) Condition {
-	return PodRunning("the aggregator in "+namespace,
-		client.MatchingLabels{types.NameLabel: "fluentd", types.ComponentLabel: "fluentd"},
+func FluentdAggregator(namespace string) Condition {
+	return aggregator("fluentd", namespace)
+}
+
+func SyslogNGAggregator(namespace string) Condition {
+	return aggregator("syslog-ng", namespace)
+}
+
+func aggregator(kind, namespace string) Condition {
+	return PodRunning(kind+" aggregator in "+namespace,
+		client.MatchingLabels{types.NameLabel: kind, types.ComponentLabel: kind},
 		client.InNamespace(namespace))
 }
