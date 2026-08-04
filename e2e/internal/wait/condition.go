@@ -49,6 +49,20 @@ func PodRunning(name string, opts ...client.ListOption) Condition {
 	}
 }
 
+func Pod(namespace, name string) Condition {
+	key := client.ObjectKey{Namespace: namespace, Name: name}
+	return Condition{
+		Name: "pod " + namespace + "/" + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var pod corev1.Pod
+			if err := cl.Get(ctx, key, &pod); err != nil {
+				return false, client.IgnoreNotFound(err)
+			}
+			return pod.Status.Phase == corev1.PodRunning, nil
+		},
+	}
+}
+
 func Operator(release string) Condition {
 	return PodRunning("operator", client.MatchingLabels{types.NameLabel: release})
 }
