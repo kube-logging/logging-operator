@@ -41,6 +41,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -88,15 +89,9 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: v1beta1.ImageSpec{
-							Repository: common.ConfigReloaderRepo,
-							Tag:        common.ConfigReloaderTag,
-						},
+						Image: fixture.ConfigReloaderImage(),
 					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					BufferVolumeImage: fixture.NodeExporterImage(),
 				},
 			},
 		}
@@ -108,14 +103,8 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
-				ConfigReloadImage: &v1beta1.BasicImageSpec{
-					Repository: common.SyslogNGReloaderRepo,
-					Tag:        common.SyslogNGReloaderTag,
-				},
-				BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
+				BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{
@@ -169,14 +158,8 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
-				ConfigReloadImage: &v1beta1.BasicImageSpec{
-					Repository: common.SyslogNGReloaderRepo,
-					Tag:        common.SyslogNGReloaderTag,
-				},
-				BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
+				BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{

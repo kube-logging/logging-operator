@@ -39,6 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
@@ -96,33 +97,18 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: v1beta1.ImageSpec{
-							Repository: common.ConfigReloaderRepo,
-							Tag:        common.ConfigReloaderTag,
-						},
+						Image: fixture.ConfigReloaderImage(),
 					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
-					FilterKubernetes: v1beta1.FilterKubernetes{
+					BufferVolumeImage: fixture.NodeExporterImage(),
+					FilterKubernetes:  v1beta1.FilterKubernetes{
 						// Namespace labels enrichment is enabled by default starting with version 4.9
 						// NamespaceLabels: "On",
 					},
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image: v1beta1.ImageSpec{
-						Repository: common.FluentdImageRepo,
-						Tag:        common.FluentdImageTag,
-					},
-					ConfigReloaderImage: v1beta1.ImageSpec{
-						Repository: common.ConfigReloaderRepo,
-						Tag:        common.ConfigReloaderTag,
-					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					Image:               fixture.FluentdImage(),
+					ConfigReloaderImage: fixture.ConfigReloaderImage(),
+					BufferVolumeImage:   fixture.NodeExporterImage(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),
