@@ -62,5 +62,5 @@ func TestFluentbitSingleTenantPlusInfra(t *testing.T) {
 		wait.FluentdAggregator(nsInfra),
 		wait.FluentdAggregator(nsTenant),
 	)
-	env.WaitForReceiverLogs(tagInfra, tagTenant)
+	env.Receiver.MustReceive(tagInfra, tagTenant)
 }
