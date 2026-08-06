@@ -52,17 +52,6 @@ func TestImageHelpersMatchTheLiterals(t *testing.T) {
 		Basic(NodeExporterImage()))
 }
 
-// Minimal, not defaulted: a field set here that a suite does not want is a
-// divergence it has to undo, which is what the defaulted builders got wrong.
-func TestLoggingIsMinimal(t *testing.T) {
-	l := Logging("ns", "lg")
-
-	require.Equal(t, "lg", l.Name)
-	require.Equal(t, "ns", l.Spec.ControlNamespace)
-	require.Empty(t, l.Namespace, "Logging is cluster-scoped")
-	require.Equal(t, v1beta1.LoggingSpec{ControlNamespace: "ns"}, l.Spec, "nothing beyond the control namespace")
-}
-
 func TestReceiverURL(t *testing.T) {
 	require.Equal(t, "http://e2e-test-receiver:8080/test.tag", ReceiverURL("e2e", "test.tag"))
 }

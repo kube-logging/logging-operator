@@ -16,7 +16,10 @@ package fixture
 
 import "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 
-// Duplicated from common while both exist; TestImageNamesMatchCommon pins them equal.
+// Duplicated from common while the unmigrated suites still reference its copies,
+// with TestImageNamesMatchCommon holding the two equal in the meantime. Both the
+// duplicates and that test go when the last suite stops using common's, leaving
+// this the only source.
 const (
 	FluentdImageRepo      = "fluentd-full"
 	ConfigReloaderRepo    = "config-reloader"
