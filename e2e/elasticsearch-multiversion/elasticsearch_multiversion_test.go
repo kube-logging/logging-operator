@@ -106,10 +106,12 @@ func esReadyBudget(t *testing.T, waitsLeft int) time.Duration {
 	return budgetWithin(time.Until(deadline), waitsLeft)
 }
 
-// budgetWithin never returns a non-positive duration: require.Eventually treats
-// one as already expired, which would fail every run instead of only stalled ones.
+// budgetWithin floors after dividing, not before. A third of a second is
+// positive but expires on the first tick, so flooring on the undivided
+// remainder would put the misattribution this split removes back at the
+// boundary: elasticsearch7 blamed for a package that had already run out.
 func budgetWithin(remaining time.Duration, waitsLeft int) time.Duration {
-	if budget := (remaining - esReadyMargin) / time.Duration(waitsLeft); budget > 0 {
+	if budget := (remaining - esReadyMargin) / time.Duration(waitsLeft); budget > time.Second {
 		return budget
 	}
 	return time.Second
@@ -124,6 +126,9 @@ func TestBudgetWithin(t *testing.T) {
 	}{
 		{"shared between the waits still to come", 20 * time.Minute, 3, (20*time.Minute - esReadyMargin) / 3},
 		{"the last wait gets what is left", 20 * time.Minute, 1, 20*time.Minute - esReadyMargin},
+		// The floor is a second per wait, not a second shared between them.
+		{"just above the margin", esReadyMargin + time.Second, 3, time.Second},
+		{"a slice under a second", esReadyMargin + 2*time.Second, 3, time.Second},
 		{"exactly the margin", esReadyMargin, 3, time.Second},
 		{"already past the deadline", -time.Minute, 3, time.Second},
 	} {
