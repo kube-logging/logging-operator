@@ -182,6 +182,13 @@ func configRenderer(in Input) (render.Renderer, error) {
 		}, nil))
 	}
 
+	// syslog-ng defaults to ip(0.0.0.0) ip-protocol(4), so an IPv6-primary Service would route to a
+	// port nothing is listening on. "::" still accepts IPv4-mapped clients where bindv6only is off.
+	sourceIP, sourceIPProtocol := "", 0
+	if in.SyslogNGSpec.EnabledIPv6 {
+		sourceIP, sourceIPProtocol = "::", 6
+	}
+
 	return render.AllFrom(seqs.Intersperse(
 		seqs.Filter(
 			seqs.Concat(
@@ -194,6 +201,8 @@ func configRenderer(in Input) (render.Renderer, error) {
 							sourceDefStmt("", renderDriver(Field{
 								Value: reflect.ValueOf(NetworkSourceDriver{
 									Transport:      "tcp",
+									IP:             sourceIP,
+									IPProtocol:     sourceIPProtocol,
 									Port:           uint16(in.SourcePort),
 									MaxConnections: in.SyslogNGSpec.MaxConnections,
 									LogIWSize:      logIWSizeCalculator(in),

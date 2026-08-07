@@ -22,6 +22,7 @@ type NetworkSourceDriver struct {
 	__meta         struct{} `syslog-ng:"name=network"` //lint:ignore U1000 field used for adding tag to the type
 	Flags          []string `syslog-ng:"name=flags,optional"`
 	IP             string   `syslog-ng:"name=ip,optional"`
+	IPProtocol     int      `syslog-ng:"name=ip-protocol,optional"`
 	Port           uint16   `syslog-ng:"name=port,optional"`
 	Transport      string   `syslog-ng:"name=transport,optional"`
 	MaxConnections int      `syslog-ng:"name=max-connections,optional"`
