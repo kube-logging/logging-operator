@@ -30,6 +30,8 @@ spec:
             properties:
               bufferVolumeMetrics:
                 properties:
+                  bind:
+                    type: string
                   enabled:
                     type: boolean
                   interval:
@@ -4237,6 +4239,8 @@ spec:
                 type: integer
               metrics:
                 properties:
+                  bind:
+                    type: string
                   enabled:
                     type: boolean
                   interval:

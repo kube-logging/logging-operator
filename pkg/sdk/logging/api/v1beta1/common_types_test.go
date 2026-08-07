@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -322,6 +323,36 @@ func TestBufferMetricsIsEnabled(t *testing.T) {
 			if result != tt.expected {
 				t.Errorf("IsEnabled() = %v, expected %v", result, tt.expected)
 			}
+		})
+	}
+}
+
+func TestMetricsBindAddress(t *testing.T) {
+	tests := map[string]struct {
+		metrics     *Metrics
+		enabledIPv6 bool
+		expected    string
+	}{
+		"unset metrics listen on every IPv4 address": {expected: "0.0.0.0"},
+		"enabledIPv6 switches the default to the IPv6 wildcard": {
+			metrics:     &Metrics{},
+			enabledIPv6: true,
+			expected:    "[::]",
+		},
+		"an explicit bind wins over the IPv6 default": {
+			metrics:     &Metrics{Bind: "127.0.0.1"},
+			enabledIPv6: true,
+			expected:    "127.0.0.1",
+		},
+		"an explicit bind is kept without IPv6": {
+			metrics:  &Metrics{Bind: "[::1]"},
+			expected: "[::1]",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, test.expected, test.metrics.BindAddress(test.enabledIPv6))
 		})
 	}
 }
