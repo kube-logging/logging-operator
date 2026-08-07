@@ -31,7 +31,8 @@ func TestServiceKeepsExistingPrimaryIPFamily(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{Name: "test"},
 			Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
 		},
-		syslogNGSpec: &v1beta1.SyslogNGSpec{EnabledIPv6: true},
+		syslogNGSpec:   &v1beta1.SyslogNGSpec{EnabledIPv6: true},
+		clusterHasIPv6: true,
 	}
 
 	object, state, err := r.service()

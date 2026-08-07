@@ -95,6 +95,7 @@ type Reconciler struct {
 	loggingDataProvider  loggingdataprovider.LoggingDataProvider
 	nameProvider         NameProvider
 	loggingResourcesRepo *model.LoggingResourceRepository
+	clusterHasIPv6       bool
 }
 
 // NewReconciler creates a new FluentbitAgent reconciler
@@ -106,6 +107,7 @@ func New(client client.Client,
 	loggingDataProvider loggingdataprovider.LoggingDataProvider,
 	nameProvider NameProvider,
 	loggingResourcesRepo *model.LoggingResourceRepository,
+	clusterHasIPv6 bool,
 ) *Reconciler {
 	return &Reconciler{
 		Logging:              logging,
@@ -115,6 +117,7 @@ func New(client client.Client,
 		loggingDataProvider:  loggingDataProvider,
 		nameProvider:         nameProvider,
 		loggingResourcesRepo: loggingResourcesRepo,
+		clusterHasIPv6:       clusterHasIPv6,
 	}
 }
 

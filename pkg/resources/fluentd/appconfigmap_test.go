@@ -47,7 +47,7 @@ func newCheckPodReconciler(t *testing.T, fluentdSpec *v1beta1.FluentdSpec, c cli
 
 	config := "<system>\n</system>\n"
 
-	return New(c, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{})
+	return New(c, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{}, false)
 }
 
 // newFakeClient returns a client backed by an empty in-memory store for the

@@ -198,10 +198,14 @@ type ReadinessDefaultCheck struct {
 	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
 }
 
-func EnableIPv6Options(serviceSpec *corev1.ServiceSpec) {
+// EnableIPv6Options prefers dual-stack, naming IPv6 as the primary family only where the cluster
+// can allocate it: the API server rejects a family it has no range for, with no recovery path.
+func EnableIPv6Options(serviceSpec *corev1.ServiceSpec, clusterHasIPv6 bool) {
 	ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
 	serviceSpec.IPFamilyPolicy = &ipFamilyPolicy
-	serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
+	if clusterHasIPv6 {
+		serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
+	}
 }
 
 // PreserveAllocatedIPFamilies pins ipFamilies and ipFamilyPolicy to what the API server allocated.

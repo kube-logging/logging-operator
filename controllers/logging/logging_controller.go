@@ -44,6 +44,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/ipfamily"
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
@@ -74,6 +75,7 @@ func NewLoggingReconciler(client client.Client, eventRecorder events.EventRecord
 		Client:        client,
 		EventRecorder: eventRecorder,
 		Log:           log,
+		ipFamilies:    ipfamily.NewDetector(client, log.WithName("ipfamily")),
 	}
 }
 
@@ -82,6 +84,15 @@ type LoggingReconciler struct {
 	client.Client
 	EventRecorder events.EventRecorder
 	Log           logr.Logger
+	ipFamilies    *ipfamily.Detector
+}
+
+// clusterSupportsIPv6 probes lazily, so a cluster that never enables IPv6 never pays for it.
+func (r *LoggingReconciler) clusterSupportsIPv6(ctx context.Context, logging *loggingv1beta1.Logging, enabledIPv6 bool) bool {
+	if !enabledIPv6 {
+		return false
+	}
+	return r.ipFamilies.SupportsIPv6(ctx, logging.Spec.ControlNamespace)
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -227,7 +238,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Info("flow configuration", "config", fluentdConfig)
 			}
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts, r.clusterSupportsIPv6(ctx, &logging, fluentdSpec.EnabledIPv6)).Reconcile)
 		}
 		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)
 	}
@@ -246,7 +257,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Info("flow configuration", "config", syslogNGConfig)
 			}
 
-			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts, r.clusterSupportsIPv6(ctx, &logging, syslogNGSpec.EnabledIPv6)).Reconcile)
 		}
 		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging, syslogNGExternal)
 	}
@@ -268,6 +279,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				loggingDataProvider,
 				nameProvider,
 				loggingResourceRepo,
+				r.clusterSupportsIPv6(ctx, &logging, logging.Spec.FluentbitSpec.EnabledIPv6),
 			).Reconcile)
 		}
 	default:
@@ -285,6 +297,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				loggingDataProvider,
 				fluentbit.NewStandaloneFluentbitNameProvider(&f),
 				loggingResourceRepo,
+				r.clusterSupportsIPv6(ctx, &logging, f.Spec.EnabledIPv6),
 			).Reconcile)
 		}
 	}
