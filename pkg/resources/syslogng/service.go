@@ -59,7 +59,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 	}
 
 	if r.syslogNGSpec.EnabledIPv6 {
-		v1beta1.EnableIPv6Options(&desired.Spec)
+		v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
 	}
 
 	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
@@ -107,7 +107,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}
 
 		if r.syslogNGSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -208,7 +208,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		if r.syslogNGSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -290,7 +290,7 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 	}
 
 	if r.syslogNGSpec.EnabledIPv6 {
-		v1beta1.EnableIPv6Options(&desired.Spec)
+		v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
 	}
 
 	return desired, reconciler.StatePresent, nil
