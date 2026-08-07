@@ -67,17 +67,31 @@ func RepositoryWithTag(repository, tag string) string {
 type Metrics struct {
 	// Enabled controls whether the metrics endpoint should be exposed. Defaults to false.
 	// When false, the metrics HTTP server will not be started and no metrics port will be exposed.
-	Enabled                 *bool                     `json:"enabled,omitempty"`
-	Interval                string                    `json:"interval,omitempty"`
-	Timeout                 string                    `json:"timeout,omitempty"`
-	Port                    int32                     `json:"port,omitempty"`
-	Path                    string                    `json:"path,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Interval string `json:"interval,omitempty"`
+	Timeout  string `json:"timeout,omitempty"`
+	Port     int32  `json:"port,omitempty"`
+	Path     string `json:"path,omitempty"`
+	// Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set.
+	Bind                    string                    `json:"bind,omitempty"`
 	ServiceMonitor          bool                      `json:"serviceMonitor,omitempty"`
 	ServiceMonitorConfig    ServiceMonitorConfig      `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
 	PrometheusRulesOverride []PrometheusRulesOverride `json:"prometheusRulesOverride,omitempty"`
 	PrometheusRulesLabels   map[string]string         `json:"prometheusRulesLabels,omitempty"`
+}
+
+// BindAddress resolves the metrics listen address. enabledIPv6 only picks the default, so a cluster
+// that needs a specific address can still name one.
+func (m *Metrics) BindAddress(enabledIPv6 bool) string {
+	if m != nil && m.Bind != "" {
+		return m.Bind
+	}
+	if enabledIPv6 {
+		return "[::]"
+	}
+	return "0.0.0.0"
 }
 
 func (m *Metrics) IsEnabled() bool {

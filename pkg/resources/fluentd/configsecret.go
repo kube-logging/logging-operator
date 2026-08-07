@@ -35,6 +35,7 @@ type fluentdConfig struct {
 		Enabled     bool
 		Port        int32
 		EnabledIPv6 bool
+		Bind        string
 		Path        string
 	}
 	IgnoreSameLogInterval     string
@@ -76,6 +77,7 @@ func (r *Reconciler) generateConfigSecret(fluentdSpec v1beta1.FluentdSpec) (map[
 		input.Monitor.Enabled = true
 		input.Monitor.Port = fluentdSpec.Metrics.Port
 		input.Monitor.EnabledIPv6 = fluentdSpec.EnabledIPv6
+		input.Monitor.Bind = fluentdSpec.Metrics.BindAddress(fluentdSpec.EnabledIPv6)
 		input.Monitor.Path = fluentdSpec.Metrics.Path
 	}
 

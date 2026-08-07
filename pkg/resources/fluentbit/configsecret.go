@@ -63,6 +63,7 @@ type fluentBitConfig struct {
 		Enabled     bool
 		Port        int32
 		EnabledIPv6 bool
+		Bind        string
 		Path        string
 	}
 	Flush                    int32
@@ -245,6 +246,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		input.Monitor.Enabled = true
 		input.Monitor.Port = r.fluentbitSpec.Metrics.Port
 		input.Monitor.EnabledIPv6 = r.fluentbitSpec.EnabledIPv6
+		input.Monitor.Bind = r.fluentbitSpec.Metrics.BindAddress(r.fluentbitSpec.EnabledIPv6)
 		input.Monitor.Path = r.fluentbitSpec.Metrics.Path
 	}
 
