@@ -72,9 +72,9 @@ type Reconciler struct {
 	fluentdSpec   *v1beta1.FluentdSpec
 	fluentdConfig *v1beta1.FluentdConfig
 	*reconciler.GenericResourceReconciler
-	config         *string
-	secrets        *secret.MountSecrets
-	clusterHasIPv6 bool
+	config          *string
+	secrets         *secret.MountSecrets
+	clusterFamilies []corev1.IPFamily
 }
 
 type Desire struct {
@@ -114,7 +114,7 @@ func (r *Reconciler) getServiceAccount() string {
 }
 
 func New(client client.Client, log logr.Logger,
-	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, fluentdConfig *v1beta1.FluentdConfig, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts, clusterHasIPv6 bool,
+	logging *v1beta1.Logging, fluentdSpec *v1beta1.FluentdSpec, fluentdConfig *v1beta1.FluentdConfig, config *string, secrets *secret.MountSecrets, opts reconciler.ReconcilerOpts, clusterFamilies []corev1.IPFamily,
 ) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
@@ -123,7 +123,7 @@ func New(client client.Client, log logr.Logger,
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
-		clusterHasIPv6:            clusterHasIPv6,
+		clusterFamilies:           clusterFamilies,
 	}
 }
 

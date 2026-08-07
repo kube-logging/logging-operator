@@ -27,41 +27,36 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-func TestSupportsIPv6(t *testing.T) {
+func TestFamilies(t *testing.T) {
 	tests := []struct {
 		name     string
 		results  map[corev1.IPFamily]error
-		expected bool
+		expected []corev1.IPFamily
 		resolved bool
 	}{
 		{
-			name:     "dual-stack cluster accepts the IPv6 probe",
-			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: nil},
-			expected: true,
+			name:     "a dual-stack cluster is named IPv6 first",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: nil, corev1.IPv4Protocol: nil},
+			expected: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
 			resolved: true,
 		},
 		{
-			name: "single-stack cluster rejects IPv6 but accepts the IPv4 control",
-			results: map[corev1.IPFamily]error{
-				corev1.IPv6Protocol: invalidFamilyErr(),
-				corev1.IPv4Protocol: nil,
-			},
-			expected: false,
+			// Naming IPv4 here is rejected exactly as naming IPv6 is on an IPv4-only cluster.
+			name:     "an IPv6-only cluster is never told about IPv4",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: nil, corev1.IPv4Protocol: invalidFamilyErr()},
+			expected: []corev1.IPFamily{corev1.IPv6Protocol},
 			resolved: true,
 		},
 		{
-			name: "a webhook rejecting every service leaves the answer unknown",
-			results: map[corev1.IPFamily]error{
-				corev1.IPv6Protocol: invalidFamilyErr(),
-				corev1.IPv4Protocol: invalidFamilyErr(),
-			},
-			expected: false,
-			resolved: false,
+			name:     "an IPv4-only cluster is left to choose for itself",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: invalidFamilyErr(), corev1.IPv4Protocol: nil},
+			expected: nil,
+			resolved: true,
 		},
 		{
 			name:     "a denied probe leaves the answer unknown",
 			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, "probe", errors.New("nope"))},
-			expected: false,
+			expected: nil,
 			resolved: false,
 		},
 	}
@@ -77,10 +72,10 @@ func TestSupportsIPv6(t *testing.T) {
 				},
 			}
 
-			require.Equal(t, test.expected, d.SupportsIPv6(context.Background(), "default"))
+			require.Equal(t, test.expected, d.Families(context.Background(), "default"))
 
 			before := calls
-			require.Equal(t, test.expected, d.SupportsIPv6(context.Background(), "default"))
+			require.Equal(t, test.expected, d.Families(context.Background(), "default"))
 			if test.resolved {
 				require.Equal(t, before, calls, "a resolved answer must not re-probe")
 			} else {
@@ -91,7 +86,7 @@ func TestSupportsIPv6(t *testing.T) {
 }
 
 // A cluster that gains an IPv6 range must be picked up without restarting the operator.
-func TestSupportsIPv6RecoversAfterATransientFailure(t *testing.T) {
+func TestFamiliesRecoverAfterATransientFailure(t *testing.T) {
 	failing := true
 	d := &Detector{
 		log: logr.Discard(),
@@ -103,10 +98,10 @@ func TestSupportsIPv6RecoversAfterATransientFailure(t *testing.T) {
 		},
 	}
 
-	require.False(t, d.SupportsIPv6(context.Background(), "default"))
+	require.Nil(t, d.Families(context.Background(), "default"))
 
 	failing = false
-	require.True(t, d.SupportsIPv6(context.Background(), "default"))
+	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, d.Families(context.Background(), "default"))
 }
 
 func invalidFamilyErr() error {

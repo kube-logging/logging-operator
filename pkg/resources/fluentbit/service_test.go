@@ -28,17 +28,17 @@ import (
 func TestMetricsServicesIPFamilies(t *testing.T) {
 	metricsEnabled := true
 	tests := []struct {
-		name           string
-		enabledIPv6    bool
-		clusterHasIPv6 bool
-		expected       []corev1.IPFamily
+		name            string
+		enabledIPv6     bool
+		clusterFamilies []corev1.IPFamily
+		expected        []corev1.IPFamily
 	}{
 		{name: "ipv6 not requested"},
 		{
-			name:           "requested on a cluster that has IPv6",
-			enabledIPv6:    true,
-			clusterHasIPv6: true,
-			expected:       []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+			name:            "requested on a cluster that has IPv6",
+			enabledIPv6:     true,
+			clusterFamilies: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+			expected:        []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
 		},
 		{
 			// Naming IPv6 here would be rejected at create, and a create rejection has no recovery path.
@@ -63,8 +63,8 @@ func TestMetricsServicesIPFamilies(t *testing.T) {
 						Port:    9200,
 					},
 				},
-				nameProvider:   NewLegacyFluentbitNameProvider(logging),
-				clusterHasIPv6: test.clusterHasIPv6,
+				nameProvider:    NewLegacyFluentbitNameProvider(logging),
+				clusterFamilies: test.clusterFamilies,
 			}
 
 			metricsService, _, err := r.serviceMetrics()

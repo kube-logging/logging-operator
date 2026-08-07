@@ -180,9 +180,9 @@ func ipv6Reconciler() *Reconciler {
 		Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
 	}
 	return &Reconciler{
-		Logging:        logging,
-		fluentdSpec:    &v1beta1.FluentdSpec{EnabledIPv6: true},
-		clusterHasIPv6: true,
+		Logging:         logging,
+		fluentdSpec:     &v1beta1.FluentdSpec{EnabledIPv6: true},
+		clusterFamilies: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
 	}
 }
 

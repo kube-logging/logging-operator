@@ -61,7 +61,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}
 
 		if r.fluentbitSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -168,7 +168,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		if r.fluentbitSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 		}
 
 		return desired, reconciler.StatePresent, nil
