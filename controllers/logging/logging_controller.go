@@ -246,7 +246,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	syslogNGExternal, syslogNGSpec := loggingResources.GetSyslogNGSpec()
 	if syslogNGSpec != nil {
 		logging.AggregatorLevelConfigCheck(syslogNGSPec.ConfigCheck)
-		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
+		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(ctx, loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
 			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
@@ -461,7 +461,7 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	return output.String(), &slf.Secrets, nil
 }
 
-func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(ctx context.Context, resources model.LoggingResources) (string, *secret.MountSecrets, error) {
 	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
 		return cfg, nil, nil
 	}
@@ -482,6 +482,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Flows:                resources.SyslogNG.Flows,
 		SecretLoaderFactory:  &slf,
 		SourcePort:           syslogng.ServicePort,
+		ClusterHasIPv6:       len(r.clusterIPFamilies(ctx, &resources.Logging, syslogngSpec.EnabledIPv6)) > 0,
 		SyslogNGSpec:         syslogngSpec,
 		SkipInvalidResources: resources.Logging.Spec.SkipInvalidResources,
 		Logger:               r.Log,

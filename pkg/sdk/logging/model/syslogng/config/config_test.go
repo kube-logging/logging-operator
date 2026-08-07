@@ -1202,10 +1202,26 @@ func TestRenderConfigIntoBindsTheSourceForIPv6(t *testing.T) {
 				Name:                "test",
 				Namespace:           "config-test",
 				SyslogNGSpec:        &v1beta1.SyslogNGSpec{EnabledIPv6: test.enabledIPv6},
+				ClusterHasIPv6:      true,
 				SecretLoaderFactory: &TestSecretLoaderFactory{},
 			}, &buf)
 			require.NoError(t, err)
 			require.Contains(t, buf.String(), test.wantSource)
 		})
 	}
+}
+
+// Binding IPv6 only reaches IPv4 clients through v4-mapped addresses, which bindv6only disables.
+func TestRenderConfigIntoKeepsIPv4WhenTheClusterHasNoIPv6(t *testing.T) {
+	var buf strings.Builder
+	err := RenderConfigInto(Input{
+		SourcePort:          601,
+		Name:                "test",
+		Namespace:           "config-test",
+		SyslogNGSpec:        &v1beta1.SyslogNGSpec{EnabledIPv6: true},
+		ClusterHasIPv6:      false,
+		SecretLoaderFactory: &TestSecretLoaderFactory{},
+	}, &buf)
+	require.NoError(t, err)
+	require.Contains(t, buf.String(), `network(flags("no-parse") port(601) transport("tcp"));`)
 }
