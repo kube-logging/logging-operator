@@ -63,6 +63,13 @@ func (d *Detector) Families(ctx context.Context, namespace string) []corev1.IPFa
 		return nil
 	}
 
+	// No cluster serves neither family, so something rejects every Service and the answer is not
+	// ours to cache. An admission webhook doing that would otherwise pin nil until a restart.
+	if !hasIPv6 && !hasIPv4 {
+		d.log.Info("every IP family probe was rejected, leaving the IP families to the cluster for now")
+		return nil
+	}
+
 	switch {
 	case hasIPv6 && hasIPv4:
 		d.families = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
@@ -75,8 +82,6 @@ func (d *Detector) Families(ctx context.Context, namespace string) []corev1.IPFa
 	return d.families
 }
 
-// An admission webhook that rejects every Service is indistinguishable from a missing range, so an
-// error here leaves the answer unresolved rather than caching a guess.
 func (d *Detector) allocatable(ctx context.Context, namespace string, family corev1.IPFamily) (bool, error) {
 	err := d.dryRun(ctx, namespace, family)
 	if err == nil {
