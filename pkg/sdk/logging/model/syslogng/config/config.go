@@ -55,6 +55,7 @@ type Input struct {
 	Flows                []v1beta1.SyslogNGFlow
 	SecretLoaderFactory  SecretLoaderFactory
 	SourcePort           int
+	ClusterHasIPv6       bool
 	SkipInvalidResources bool
 	Logger               logr.Logger
 }
@@ -182,6 +183,15 @@ func configRenderer(in Input) (render.Renderer, error) {
 		}, nil))
 	}
 
+	// syslog-ng defaults to ip(0.0.0.0) ip-protocol(4), so an IPv6-primary Service would route to a
+	// port nothing is listening on. "::" still accepts IPv4-mapped clients where bindv6only is off.
+	sourceIP, sourceIPProtocol := "", 0
+	// Binding IPv6 only reaches IPv4 clients through v4-mapped addresses, which net.ipv6.bindv6only
+	// turns off. A cluster without IPv6 gives the source an IPv4 Service, so leave it on IPv4 there.
+	if in.SyslogNGSpec.EnabledIPv6 && in.ClusterHasIPv6 {
+		sourceIP, sourceIPProtocol = "::", 6
+	}
+
 	return render.AllFrom(seqs.Intersperse(
 		seqs.Filter(
 			seqs.Concat(
@@ -194,6 +204,8 @@ func configRenderer(in Input) (render.Renderer, error) {
 							sourceDefStmt("", renderDriver(Field{
 								Value: reflect.ValueOf(NetworkSourceDriver{
 									Transport:      "tcp",
+									IP:             sourceIP,
+									IPProtocol:     sourceIPProtocol,
 									Port:           uint16(in.SourcePort),
 									MaxConnections: in.SyslogNGSpec.MaxConnections,
 									LogIWSize:      logIWSizeCalculator(in),

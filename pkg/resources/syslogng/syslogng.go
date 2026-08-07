@@ -66,8 +66,9 @@ type Reconciler struct {
 	syslogNGSpec   *v1beta1.SyslogNGSpec
 	syslogNGConfig *v1beta1.SyslogNGConfig
 	*reconciler.GenericResourceReconciler
-	config  string
-	secrets *secret.MountSecrets
+	config          string
+	secrets         *secret.MountSecrets
+	clusterFamilies []corev1.IPFamily
 }
 
 type Desire struct {
@@ -87,6 +88,7 @@ func New(
 	config string,
 	secrets *secret.MountSecrets,
 	opts reconciler.ReconcilerOpts,
+	clusterFamilies []corev1.IPFamily,
 ) *Reconciler {
 	return &Reconciler{
 		Logging:                   logging,
@@ -95,6 +97,7 @@ func New(
 		GenericResourceReconciler: reconciler.NewGenericReconciler(client, log, opts),
 		config:                    config,
 		secrets:                   secrets,
+		clusterFamilies:           clusterFamilies,
 	}
 }
 

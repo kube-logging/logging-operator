@@ -40,7 +40,7 @@ func newCheckPodReconciler(t *testing.T, fluentdSpec *v1beta1.FluentdSpec) *Reco
 
 	config := "<system>\n</system>\n"
 
-	return New(nil, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{})
+	return New(nil, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{}, nil)
 }
 
 func TestNewCheckPodDNSSettings(t *testing.T) {

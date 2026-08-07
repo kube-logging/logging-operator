@@ -15,6 +15,8 @@
 package v1beta1
 
 import (
+	"slices"
+
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -67,17 +69,31 @@ func RepositoryWithTag(repository, tag string) string {
 type Metrics struct {
 	// Enabled controls whether the metrics endpoint should be exposed. Defaults to false.
 	// When false, the metrics HTTP server will not be started and no metrics port will be exposed.
-	Enabled                 *bool                     `json:"enabled,omitempty"`
-	Interval                string                    `json:"interval,omitempty"`
-	Timeout                 string                    `json:"timeout,omitempty"`
-	Port                    int32                     `json:"port,omitempty"`
-	Path                    string                    `json:"path,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Interval string `json:"interval,omitempty"`
+	Timeout  string `json:"timeout,omitempty"`
+	Port     int32  `json:"port,omitempty"`
+	Path     string `json:"path,omitempty"`
+	// Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set.
+	Bind                    string                    `json:"bind,omitempty"`
 	ServiceMonitor          bool                      `json:"serviceMonitor,omitempty"`
 	ServiceMonitorConfig    ServiceMonitorConfig      `json:"serviceMonitorConfig,omitempty"`
 	PrometheusAnnotations   bool                      `json:"prometheusAnnotations,omitempty"`
 	PrometheusRules         bool                      `json:"prometheusRules,omitempty"`
 	PrometheusRulesOverride []PrometheusRulesOverride `json:"prometheusRulesOverride,omitempty"`
 	PrometheusRulesLabels   map[string]string         `json:"prometheusRulesLabels,omitempty"`
+}
+
+// BindAddress resolves the metrics listen address. enabledIPv6 only picks the default, so a cluster
+// that needs a specific address can still name one.
+func (m *Metrics) BindAddress(enabledIPv6 bool) string {
+	if m != nil && m.Bind != "" {
+		return m.Bind
+	}
+	if enabledIPv6 {
+		return "[::]"
+	}
+	return "0.0.0.0"
 }
 
 func (m *Metrics) IsEnabled() bool {
@@ -198,8 +214,34 @@ type ReadinessDefaultCheck struct {
 	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
 }
 
-func EnableIPv6Options(serviceSpec *corev1.ServiceSpec) {
+// EnableIPv6Options prefers dual-stack and names only the families the cluster can allocate, since
+// the API server rejects one it has no range for and the create has no recovery path.
+func EnableIPv6Options(serviceSpec *corev1.ServiceSpec, clusterFamilies []corev1.IPFamily) {
 	ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
 	serviceSpec.IPFamilyPolicy = &ipFamilyPolicy
-	serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
+	if len(clusterFamilies) > 0 {
+		// The caller memoizes its slice and every Service would otherwise alias the same array.
+		serviceSpec.IPFamilies = slices.Clone(clusterFamilies)
+	}
+}
+
+// PreserveAllocatedIPFamilies pins ipFamilies and ipFamilyPolicy to what the API server allocated.
+// A change to an existing Service's primary family is rejected as invalid, not as immutable, so the
+// recreate fallback never fires. It reports whether it overrode a single-stack policy the caller
+// asked for, so the caller can say that the request was not carried out.
+func PreserveAllocatedIPFamilies(desired *corev1.ServiceSpec, current corev1.ServiceSpec) bool {
+	allocated := len(current.ClusterIPs) > 0 && current.ClusterIPs[0] != corev1.ClusterIPNone
+	if len(current.IPFamilies) == 0 || !allocated {
+		return false
+	}
+	desired.IPFamilies = current.IPFamilies
+
+	narrowsToSingleStack := desired.IPFamilyPolicy != nil && *desired.IPFamilyPolicy == corev1.IPFamilyPolicySingleStack
+	wouldDropAFamily := len(current.IPFamilies) > 1 && current.IPFamilyPolicy != nil
+	// The API server truncates the restored families to the policy, releasing the dropped address.
+	if narrowsToSingleStack && wouldDropAFamily {
+		desired.IPFamilyPolicy = current.IPFamilyPolicy
+		return true
+	}
+	return false
 }
