@@ -20,6 +20,7 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -180,9 +181,10 @@ func ipv6Reconciler() *Reconciler {
 		Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
 	}
 	return &Reconciler{
-		Logging:         logging,
-		fluentdSpec:     &v1beta1.FluentdSpec{EnabledIPv6: true},
-		clusterFamilies: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		Logging:                   logging,
+		fluentdSpec:               &v1beta1.FluentdSpec{EnabledIPv6: true},
+		clusterFamilies:           []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		GenericResourceReconciler: reconciler.NewGenericReconciler(nil, logr.Discard(), reconciler.ReconcilerOpts{}),
 	}
 }
 
@@ -192,4 +194,22 @@ func existingService(families []corev1.IPFamily, clusterIPs ...string) *corev1.S
 		spec.ClusterIP = clusterIPs[0]
 	}
 	return &corev1.Service{Spec: spec}
+}
+
+// A discarded single-stack request must be reported, otherwise the user sees no sign that the
+// operator did not carry it out.
+func TestPreserveAllocatedIPFamiliesReportsADiscardedPolicy(t *testing.T) {
+	singleStack := corev1.IPFamilyPolicySingleStack
+	preferDualStack := corev1.IPFamilyPolicyPreferDualStack
+	dualStack := existingService(
+		[]corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		"fd00:10:96::989d", "10.96.35.208",
+	)
+	dualStack.Spec.IPFamilyPolicy = &preferDualStack
+
+	desired := corev1.ServiceSpec{IPFamilyPolicy: &singleStack}
+	require.True(t, v1beta1.PreserveAllocatedIPFamilies(&desired, dualStack.Spec))
+
+	untouched := corev1.ServiceSpec{IPFamilyPolicy: &preferDualStack}
+	require.False(t, v1beta1.PreserveAllocatedIPFamilies(&untouched, dualStack.Spec))
 }

@@ -227,11 +227,12 @@ func EnableIPv6Options(serviceSpec *corev1.ServiceSpec, clusterFamilies []corev1
 
 // PreserveAllocatedIPFamilies pins ipFamilies and ipFamilyPolicy to what the API server allocated.
 // A change to an existing Service's primary family is rejected as invalid, not as immutable, so the
-// recreate fallback never fires.
-func PreserveAllocatedIPFamilies(desired *corev1.ServiceSpec, current corev1.ServiceSpec) {
+// recreate fallback never fires. It reports whether it overrode a single-stack policy the caller
+// asked for, which the caller should surface: the request is silently not carried out.
+func PreserveAllocatedIPFamilies(desired *corev1.ServiceSpec, current corev1.ServiceSpec) (overrodePolicy bool) {
 	allocated := len(current.ClusterIPs) > 0 && current.ClusterIPs[0] != corev1.ClusterIPNone
 	if len(current.IPFamilies) == 0 || !allocated {
-		return
+		return false
 	}
 	desired.IPFamilies = current.IPFamilies
 
@@ -240,5 +241,7 @@ func PreserveAllocatedIPFamilies(desired *corev1.ServiceSpec, current corev1.Ser
 	// The API server truncates the restored families to the policy, releasing the dropped address.
 	if narrowsToSingleStack && wouldDropAFamily {
 		desired.IPFamilyPolicy = current.IPFamilyPolicy
+		return true
 	}
+	return false
 }
