@@ -106,6 +106,10 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 			},
 		}
 
+		if err := merge.Merge(desired, r.syslogNGSpec.MetricsServiceOverrides); err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
+		}
+
 		if r.syslogNGSpec.EnabledIPv6 {
 			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterHasIPv6)
 		}
@@ -205,6 +209,10 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: corev1.ClusterIPNone,
 			},
+		}
+
+		if err := merge.Merge(desired, r.syslogNGSpec.BufferVolumeMetricsServiceOverrides); err != nil {
+			return desired, reconciler.StatePresent, errors.WrapIf(err, "unable to merge overrides to base object")
 		}
 
 		if r.syslogNGSpec.EnabledIPv6 {

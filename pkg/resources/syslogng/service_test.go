@@ -15,13 +15,16 @@
 package syslogng
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
+	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -49,4 +52,41 @@ func TestServiceKeepsExistingPrimaryIPFamily(t *testing.T) {
 	service, ok := object.(*corev1.Service)
 	require.True(t, ok)
 	require.Equal(t, []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}, service.Spec.IPFamilies)
+}
+
+// The metrics service overrides were declared on the CRD but never read, so anything a user set
+// under spec.syslogNG.metricsService was silently dropped.
+func TestMetricsServiceOverridesAreApplied(t *testing.T) {
+	metricsEnabled := true
+	r := &Reconciler{
+		Logging: &v1beta1.Logging{
+			ObjectMeta: metav1.ObjectMeta{Name: "test"},
+			Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
+		},
+		syslogNGSpec: &v1beta1.SyslogNGSpec{
+			Metrics:             &v1beta1.Metrics{Enabled: &metricsEnabled, Port: 9577},
+			BufferVolumeMetrics: &v1beta1.BufferMetrics{Metrics: v1beta1.Metrics{Enabled: &metricsEnabled, Port: 9578}},
+			MetricsServiceOverrides: &typeoverride.Service{
+				ObjectMeta: typeoverride.ObjectMeta{Annotations: map[string]string{"metrics": "yes"}},
+			},
+			BufferVolumeMetricsServiceOverrides: &typeoverride.Service{
+				ObjectMeta: typeoverride.ObjectMeta{Annotations: map[string]string{"buffer": "yes"}},
+			},
+		},
+	}
+
+	metrics, _, err := r.serviceMetrics()
+	require.NoError(t, err)
+	require.Equal(t, "yes", metrics.(*corev1.Service).Annotations["metrics"])
+
+	buffer, _, err := r.serviceBufferMetrics()
+	require.NoError(t, err)
+	require.Equal(t, "yes", buffer.(*corev1.Service).Annotations["buffer"])
+}
+
+// The reloader binary defaults to its own port, which is not the one the ServiceMonitor scrapes.
+func TestConfigReloaderListensOnTheScrapedPort(t *testing.T) {
+	container := configReloadContainer(&v1beta1.SyslogNGSpec{ConfigReloadImage: &v1beta1.BasicImageSpec{}})
+	require.Contains(t, container.Args, "-port")
+	require.Contains(t, container.Args, fmt.Sprint(model.ConfigReloaderMetricsPort))
 }
