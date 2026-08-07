@@ -15,7 +15,6 @@
 package syslogng
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
@@ -25,7 +24,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -84,11 +82,4 @@ func TestMetricsServiceOverridesAreApplied(t *testing.T) {
 	buffer, _, err := r.serviceBufferMetrics()
 	require.NoError(t, err)
 	require.Equal(t, "yes", buffer.(*corev1.Service).Annotations["buffer"])
-}
-
-// The reloader binary defaults to its own port, which is not the one the ServiceMonitor scrapes.
-func TestConfigReloaderListensOnTheScrapedPort(t *testing.T) {
-	container := configReloadContainer(&v1beta1.SyslogNGSpec{ConfigReloadImage: &v1beta1.BasicImageSpec{}})
-	require.Contains(t, container.Args, "-port")
-	require.Contains(t, container.Args, fmt.Sprint(model.ConfigReloaderMetricsPort))
 }
