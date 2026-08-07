@@ -20,6 +20,7 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
+	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,8 +35,9 @@ func TestServiceKeepsExistingPrimaryIPFamily(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{Name: "test"},
 			Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
 		},
-		syslogNGSpec:    &v1beta1.SyslogNGSpec{EnabledIPv6: true},
-		clusterFamilies: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		syslogNGSpec:              &v1beta1.SyslogNGSpec{EnabledIPv6: true},
+		clusterFamilies:           []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		GenericResourceReconciler: reconciler.NewGenericReconciler(nil, logr.Discard(), reconciler.ReconcilerOpts{}),
 	}
 
 	object, state, err := r.service()
