@@ -50,9 +50,10 @@ const (
 	// esReadyFallback applies when the binary has no deadline to derive from.
 	esReadyFallback = 15 * time.Minute
 
-	// esReadyMargin is the room left before the deadline for the wait to report
-	// its own failure. It does not cover teardown, which can outlast it.
-	esReadyMargin = 30 * time.Second
+	// esReadyMargin is the room left before the deadline. 30s covered the wait
+	// reporting its own failure but not teardown, which is a stern dump, a
+	// kubectl exec plus tar for coverage, and a kind delete.
+	esReadyMargin = 90 * time.Second
 )
 
 var TestTempDir string
@@ -93,21 +94,24 @@ func logContainerRestarts(t *testing.T, c common.Cluster, ctx context.Context, n
 	}
 }
 
-// esReadyBudget caps a wait strictly below the enclosing -timeout, so an
-// Elasticsearch deployment that never becomes ready fails by name instead of
-// letting the package binary panic and report only a goroutine dump.
-func esReadyBudget(t *testing.T) time.Duration {
+// esReadyBudget shares what is left of the -timeout between the deployments
+// still to check. Handing it all to the first let a slow one spend the
+// package's budget, leaving the rest to fail instantly under the wrong name.
+// The fallback is already per-wait, so it is not divided.
+func esReadyBudget(t *testing.T, waitsLeft int) time.Duration {
 	deadline, ok := t.Deadline()
 	if !ok {
 		return esReadyFallback
 	}
-	return budgetWithin(time.Until(deadline))
+	return budgetWithin(time.Until(deadline), waitsLeft)
 }
 
-// budgetWithin never returns a non-positive duration: require.Eventually treats
-// one as already expired, which would fail every run instead of only stalled ones.
-func budgetWithin(remaining time.Duration) time.Duration {
-	if budget := remaining - esReadyMargin; budget > 0 {
+// budgetWithin floors after dividing, not before. A third of a second is
+// positive but expires on the first tick, so flooring on the undivided
+// remainder would put the misattribution this split removes back at the
+// boundary: elasticsearch7 blamed for a package that had already run out.
+func budgetWithin(remaining time.Duration, waitsLeft int) time.Duration {
+	if budget := (remaining - esReadyMargin) / time.Duration(waitsLeft); budget > time.Second {
 		return budget
 	}
 	return time.Second
@@ -117,18 +121,33 @@ func TestBudgetWithin(t *testing.T) {
 	for _, c := range []struct {
 		name      string
 		remaining time.Duration
+		waitsLeft int
 		want      time.Duration
 	}{
-		{"ample", 20 * time.Minute, 20*time.Minute - esReadyMargin},
-		{"just above the margin", esReadyMargin + time.Second, time.Second},
-		{"exactly the margin", esReadyMargin, time.Second},
-		{"already past the deadline", -time.Minute, time.Second},
+		{"shared between the waits still to come", 20 * time.Minute, 3, (20*time.Minute - esReadyMargin) / 3},
+		{"the last wait gets what is left", 20 * time.Minute, 1, 20*time.Minute - esReadyMargin},
+		// The floor is a second per wait, not a second shared between them.
+		{"just above the margin", esReadyMargin + time.Second, 3, time.Second},
+		{"a slice under a second", esReadyMargin + 2*time.Second, 3, time.Second},
+		{"exactly the margin", esReadyMargin, 3, time.Second},
+		{"already past the deadline", -time.Minute, 3, time.Second},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			require.Equal(t, c.want, budgetWithin(c.remaining))
-			require.Positive(t, budgetWithin(c.remaining))
+			require.Equal(t, c.want, budgetWithin(c.remaining, c.waitsLeft))
+			require.Positive(t, budgetWithin(c.remaining, c.waitsLeft))
 		})
 	}
+}
+
+// The whole point of the split: no single wait may take the budget the others
+// still need.
+func TestBudgetLeavesRoomForTheRemainingWaits(t *testing.T) {
+	const remaining = 20 * time.Minute
+
+	first := budgetWithin(remaining, 3)
+
+	require.Less(t, first, remaining-esReadyMargin)
+	require.LessOrEqual(t, 3*first, remaining-esReadyMargin)
 }
 
 func TestElasticsearch_MultiVersion(t *testing.T) {
@@ -485,15 +504,16 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, es9Deployment))
 
-		for _, name := range []string{"elasticsearch7", "elasticsearch8", "elasticsearch9"} {
+		deployments := []string{"elasticsearch7", "elasticsearch8", "elasticsearch9"}
+		for i, name := range deployments {
 			t.Logf("Waiting for %s deployment to be ready...", name)
-			require.Eventually(t, func() bool {
+			require.Eventuallyf(t, func() bool {
 				if wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, name)() {
 					return true
 				}
 				logContainerRestarts(t, c, ctx, ns, name)
 				return false
-			}, esReadyBudget(t), 10*time.Second)
+			}, esReadyBudget(t, len(deployments)-i), 10*time.Second, "%s never became ready", name)
 		}
 
 		logging := v1beta1.Logging{
