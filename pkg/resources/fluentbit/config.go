@@ -46,7 +46,7 @@ var fluentBitConfigTemplate = `
     {{- if .Monitor.EnabledIPv6 }}
     HTTP_Listen  [::]
     {{- else }}
-    Listen 0.0.0.0
+    HTTP_Listen  0.0.0.0
     {{- end }}
     HTTP_Port    {{ .Monitor.Port }}
     {{- end }}
