@@ -122,3 +122,23 @@ func TestNewCheckPodDNSSettingsMatchStatefulSet(t *testing.T) {
 	assert.Equal(t, sts.Spec.Template.Spec.DNSPolicy, checkPod.Spec.DNSPolicy)
 	assert.Equal(t, sts.Spec.Template.Spec.DNSConfig, checkPod.Spec.DNSConfig)
 }
+
+// TestNewCheckPodSidecarContainers pins the configcheck pod to carry the same
+// sidecarContainers as the aggregator StatefulSet, since a sidecar that only
+// mutates shared config (e.g. refreshing a GeoIP database via extraVolumes)
+// needs to run before the check as well, or the check validates against stale
+// input.
+func TestNewCheckPodSidecarContainers(t *testing.T) {
+	sidecar := corev1.Container{
+		Name:  "fluentd-sidecar",
+		Image: "busybox:1.37",
+	}
+	spec := &v1beta1.FluentdSpec{
+		SidecarContainers: []corev1.Container{sidecar},
+	}
+	r := newCheckPodReconciler(t, spec)
+
+	checkPod := r.newCheckPod("deadbeef", *r.fluentdSpec)
+
+	assert.Contains(t, checkPod.Spec.Containers, sidecar)
+}
