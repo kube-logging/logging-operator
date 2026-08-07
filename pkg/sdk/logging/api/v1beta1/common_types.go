@@ -15,6 +15,8 @@
 package v1beta1
 
 import (
+	"slices"
+
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -212,13 +214,14 @@ type ReadinessDefaultCheck struct {
 	FailureThreshold         int32 `json:"failureThreshold,omitempty"`
 }
 
-// EnableIPv6Options prefers dual-stack, naming IPv6 as the primary family only where the cluster
-// can allocate it: the API server rejects a family it has no range for, with no recovery path.
-func EnableIPv6Options(serviceSpec *corev1.ServiceSpec, clusterHasIPv6 bool) {
+// EnableIPv6Options prefers dual-stack and names only the families the cluster can allocate, since
+// the API server rejects one it has no range for and the create has no recovery path.
+func EnableIPv6Options(serviceSpec *corev1.ServiceSpec, clusterFamilies []corev1.IPFamily) {
 	ipFamilyPolicy := corev1.IPFamilyPolicyPreferDualStack
 	serviceSpec.IPFamilyPolicy = &ipFamilyPolicy
-	if clusterHasIPv6 {
-		serviceSpec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
+	if len(clusterFamilies) > 0 {
+		// The caller memoizes its slice and every Service would otherwise alias the same array.
+		serviceSpec.IPFamilies = slices.Clone(clusterFamilies)
 	}
 }
 

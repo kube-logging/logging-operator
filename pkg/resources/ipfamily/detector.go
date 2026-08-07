@@ -28,51 +28,65 @@ import (
 // dryRunner reports whether the API server would accept a Service pinned to the given family.
 type dryRunner func(ctx context.Context, namespace string, family corev1.IPFamily) error
 
-// Detector answers whether the cluster can allocate IPv6 Service addresses. Naming a family the
-// cluster has no range for is rejected at create with no recovery path, so the answer has to come
-// from the API server rather than from the user's intent.
+// Detector reports which Service IP families the cluster can allocate. Naming a family the cluster
+// has no range for is rejected at create with no recovery path, so the answer has to come from the
+// API server rather than from the user's intent.
 type Detector struct {
 	dryRun dryRunner
 	log    logr.Logger
 
 	mu       sync.Mutex
 	resolved bool
-	ipv6     bool
+	families []corev1.IPFamily
 }
 
 func NewDetector(c client.Client, log logr.Logger) *Detector {
 	return &Detector{dryRun: dryRunService(c), log: log}
 }
 
-// SupportsIPv6 defaults to false while the answer is unknown: a needless IPv4 primary costs a
-// metrics scrape, whereas an IPv6 primary the cluster cannot allocate is unrecoverable.
-func (d *Detector) SupportsIPv6(ctx context.Context, namespace string) bool {
+// Families lists the allocatable families, IPv6 first. It returns nil while the answer is unknown,
+// and nil for a plain IPv4 cluster, so the caller leaves the choice to the API server.
+func (d *Detector) Families(ctx context.Context, namespace string) []corev1.IPFamily {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
 	if d.resolved {
-		return d.ipv6
+		return d.families
 	}
 
-	err := d.dryRun(ctx, namespace, corev1.IPv6Protocol)
+	hasIPv6, err := d.allocatable(ctx, namespace, corev1.IPv6Protocol)
+	if err != nil {
+		return nil
+	}
+	hasIPv4, err := d.allocatable(ctx, namespace, corev1.IPv4Protocol)
+	if err != nil {
+		return nil
+	}
+
+	switch {
+	case hasIPv6 && hasIPv4:
+		d.families = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
+	case hasIPv6:
+		d.families = []corev1.IPFamily{corev1.IPv6Protocol}
+	default:
+		d.log.Info("cluster has no IPv6 service range, leaving the IP families to the cluster")
+	}
+	d.resolved = true
+	return d.families
+}
+
+// An admission webhook that rejects every Service is indistinguishable from a missing range, so an
+// error here leaves the answer unresolved rather than caching a guess.
+func (d *Detector) allocatable(ctx context.Context, namespace string, family corev1.IPFamily) (bool, error) {
+	err := d.dryRun(ctx, namespace, family)
 	if err == nil {
-		d.resolved, d.ipv6 = true, true
-		return true
+		return true, nil
 	}
-	if !apierrors.IsInvalid(err) {
-		d.log.Error(err, "could not determine cluster IPv6 support, assuming none for now")
-		return false
+	if apierrors.IsInvalid(err) {
+		return false, nil
 	}
-
-	// An admission webhook rejecting every Service looks identical to a missing IPv6 range.
-	if controlErr := d.dryRun(ctx, namespace, corev1.IPv4Protocol); controlErr != nil {
-		d.log.Error(controlErr, "cluster rejects the IP family probe outright, assuming no IPv6 for now")
-		return false
-	}
-
-	d.log.Info("cluster has no IPv6 service range, leaving the IP families to the cluster")
-	d.resolved, d.ipv6 = true, false
-	return false
+	d.log.Error(err, "could not probe the cluster IP families, leaving them to the cluster for now", "family", family)
+	return false, err
 }
 
 func dryRunService(c client.Client) dryRunner {
