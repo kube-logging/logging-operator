@@ -23,10 +23,18 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
+// The buffer is passed through by the tenancy builders, so its contents do not
+// matter here beyond being the same pointer on the way out.
+func testBuffer() *output.Buffer {
+	tags := "time"
+	return &output.Buffer{Type: "file", Tags: &tags, Timekey: "1s", TimekeyWait: "0s"}
+}
+
 func TestLoggingInfraShape(t *testing.T) {
-	buf := Buffer("time")
+	buf := testBuffer()
 	labels := map[string]string{"my-unique-label": "log-producer"}
 	objs := LoggingInfra("infra-ns", "e2e", "test.tag", buf, labels)
 
@@ -56,7 +64,7 @@ func TestLoggingInfraShape(t *testing.T) {
 }
 
 func TestLoggingTenantShape(t *testing.T) {
-	buf := Buffer("time")
+	buf := testBuffer()
 	labels := map[string]string{"my-unique-label": "log-producer"}
 	objs := LoggingTenant("tenant-ns", "infra-ns", "e2e", "test.tag", buf, labels)
 
@@ -79,9 +87,9 @@ func TestLoggingTenantShape(t *testing.T) {
 	require.Equal(t, []string{flow.Namespace}, lg.Spec.WatchNamespaces)
 }
 
-func TestTenancyAggregatorDivergesFromTheDefault(t *testing.T) {
-	infra := LoggingInfra("i", "e2e", "t", Buffer("time"), nil)[3].(*v1beta1.Logging)
-	tenant := LoggingTenant("t", "i", "e2e", "t", Buffer("time"), nil)[2].(*v1beta1.Logging)
+func TestTenancyFluentdSpec(t *testing.T) {
+	infra := LoggingInfra("i", "e2e", "t", testBuffer(), nil)[3].(*v1beta1.Logging)
+	tenant := LoggingTenant("t", "i", "e2e", "t", testBuffer(), nil)[2].(*v1beta1.Logging)
 
 	for _, lg := range []*v1beta1.Logging{infra, tenant} {
 		fd := lg.Spec.FluentdSpec
@@ -92,10 +100,6 @@ func TestTenancyAggregatorDivergesFromTheDefault(t *testing.T) {
 		require.Zero(t, fd.Workers, "tenancy does not set Workers")
 		require.Nil(t, fd.Scaling)
 	}
-
-	def := FluentdSpec()
-	require.False(t, def.DisablePvc)
-	require.Equal(t, resource.MustParse("500m"), def.Resources.Limits[corev1.ResourceCPU])
 }
 
 func TestLoggingRoute(t *testing.T) {

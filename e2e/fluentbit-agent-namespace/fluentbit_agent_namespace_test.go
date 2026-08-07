@@ -39,6 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	v1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
@@ -145,9 +146,9 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 			Spec: v1beta1.FluentbitSpec{
 				LoggingRef: "infra",
 				ConfigHotReload: &v1beta1.HotReload{
-					Image: v1beta1.ImageSpec{Repository: common.ConfigReloaderRepo, Tag: common.ConfigReloaderTag},
+					Image: fixture.ConfigReloaderImage(),
 				},
-				BufferVolumeImage: v1beta1.ImageSpec{Repository: common.NodeExporterRepo, Tag: common.NodeExporterTag},
+				BufferVolumeImage: fixture.NodeExporterImage(),
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &agent))
@@ -160,9 +161,9 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				ControlNamespace:        nsControl,
 				FluentbitAgentNamespace: nsAgents,
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               v1beta1.ImageSpec{Repository: common.FluentdImageRepo, Tag: common.FluentdImageTag},
-					ConfigReloaderImage: v1beta1.ImageSpec{Repository: common.ConfigReloaderRepo, Tag: common.ConfigReloaderTag},
-					BufferVolumeImage:   v1beta1.ImageSpec{Repository: common.NodeExporterRepo, Tag: common.NodeExporterTag},
+					Image:               fixture.FluentdImage(),
+					ConfigReloaderImage: fixture.ConfigReloaderImage(),
+					BufferVolumeImage:   fixture.NodeExporterImage(),
 					DisablePvc:          true,
 					Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    apiresource.MustParse("50m"),
