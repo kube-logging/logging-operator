@@ -54,6 +54,15 @@ func TestFamilies(t *testing.T) {
 			resolved: true,
 		},
 		{
+			name: "a webhook rejecting every service leaves the answer unknown",
+			results: map[corev1.IPFamily]error{
+				corev1.IPv6Protocol: invalidFamilyErr(),
+				corev1.IPv4Protocol: invalidFamilyErr(),
+			},
+			expected: nil,
+			resolved: false,
+		},
+		{
 			name:     "a denied probe leaves the answer unknown",
 			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, "probe", errors.New("nope"))},
 			expected: nil,
