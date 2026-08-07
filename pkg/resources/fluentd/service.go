@@ -69,6 +69,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 			if len(s.Spec.ClusterIPs) > 0 {
 				desired.Spec.ClusterIPs = s.Spec.ClusterIPs
 			}
+			v1beta1.PreserveAllocatedIPFamilies(&desired.Spec, s.Spec)
 		} else {
 			return errors.Errorf("failed to cast service object %+v", current)
 		}
