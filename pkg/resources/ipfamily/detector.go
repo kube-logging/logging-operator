@@ -70,13 +70,15 @@ func (d *Detector) Families(ctx context.Context, namespace string) []corev1.IPFa
 		return nil
 	}
 
-	switch {
-	case hasIPv6 && hasIPv4:
-		d.families = []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}
-	case hasIPv6:
-		d.families = []corev1.IPFamily{corev1.IPv6Protocol}
-	default:
-		d.log.Info("cluster has no IPv6 service range, leaving the IP families to the cluster")
+	if !hasIPv6 {
+		// Re-probed every time, so a range added to a running cluster is picked up without a restart.
+		d.log.V(1).Info("cluster has no IPv6 service range, leaving the IP families to the cluster")
+		return nil
+	}
+
+	d.families = []corev1.IPFamily{corev1.IPv6Protocol}
+	if hasIPv4 {
+		d.families = append(d.families, corev1.IPv4Protocol)
 	}
 	d.resolved = true
 	return d.families

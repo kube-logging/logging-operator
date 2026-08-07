@@ -48,10 +48,10 @@ func TestFamilies(t *testing.T) {
 			resolved: true,
 		},
 		{
-			name:     "an IPv4-only cluster is left to choose for itself",
+			name:     "an IPv4-only cluster is left to choose for itself, and re-probed",
 			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: invalidFamilyErr(), corev1.IPv4Protocol: nil},
 			expected: nil,
-			resolved: true,
+			resolved: false,
 		},
 		{
 			name: "a webhook rejecting every service leaves the answer unknown",

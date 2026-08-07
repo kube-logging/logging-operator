@@ -314,7 +314,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		if r.fluentbitSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.fluentbitSpec.BufferVolumeMetrics.Port
 		}
-		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
+		// An unset bind keeps the wildcard address, which listens on both families.
+		portParam := fmt.Sprintf("--web.listen-address=%s:%d", r.fluentbitSpec.BufferVolumeMetrics.Bind, port)
 		args := []string{portParam}
 		if len(r.fluentbitSpec.BufferVolumeArgs) != 0 {
 			args = append(args, r.fluentbitSpec.BufferVolumeArgs...)
