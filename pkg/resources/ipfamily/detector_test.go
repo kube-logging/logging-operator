@@ -33,6 +33,7 @@ func TestFamilies(t *testing.T) {
 		results  map[corev1.IPFamily]error
 		expected []corev1.IPFamily
 		resolved bool
+		wantErr  bool
 	}{
 		{
 			name:     "a dual-stack cluster is named IPv6 first",
@@ -54,7 +55,8 @@ func TestFamilies(t *testing.T) {
 			resolved: false,
 		},
 		{
-			name: "a webhook rejecting every service leaves the answer unknown",
+			name:    "a webhook rejecting every service is an error, not an IPv4 cluster",
+			wantErr: true,
 			results: map[corev1.IPFamily]error{
 				corev1.IPv6Protocol: invalidFamilyErr(),
 				corev1.IPv4Protocol: invalidFamilyErr(),
@@ -63,10 +65,11 @@ func TestFamilies(t *testing.T) {
 			resolved: false,
 		},
 		{
-			name:     "a denied probe leaves the answer unknown",
+			name:     "a denied probe is an error, not an IPv4 cluster",
 			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, "probe", errors.New("nope"))},
 			expected: nil,
 			resolved: false,
+			wantErr:  true,
 		},
 	}
 
@@ -81,10 +84,13 @@ func TestFamilies(t *testing.T) {
 				},
 			}
 
-			require.Equal(t, test.expected, d.Families(context.Background(), "default"))
+			got, err := d.Families(context.Background(), "default")
+			require.Equal(t, test.wantErr, err != nil)
+			require.Equal(t, test.expected, got)
 
 			before := calls
-			require.Equal(t, test.expected, d.Families(context.Background(), "default"))
+			got, _ = d.Families(context.Background(), "default")
+			require.Equal(t, test.expected, got)
 			if test.resolved {
 				require.Equal(t, before, calls, "a resolved answer must not re-probe")
 			} else {
@@ -107,10 +113,13 @@ func TestFamiliesRecoverAfterATransientFailure(t *testing.T) {
 		},
 	}
 
-	require.Nil(t, d.Families(context.Background(), "default"))
+	_, err := d.Families(context.Background(), "default")
+	require.Error(t, err)
 
 	failing = false
-	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, d.Families(context.Background(), "default"))
+	got, err := d.Families(context.Background(), "default")
+	require.NoError(t, err)
+	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, got)
 }
 
 func invalidFamilyErr() error {
