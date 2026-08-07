@@ -51,7 +51,10 @@ const (
 	clusterStopTimeout = time.Minute
 
 	clusterLogLimit = 100 * 1000
-	receiverLogTail = 30
+
+	// Generous on purpose: more lines makes a tag easier to find and its
+	// absence harder to claim.
+	receiverLogTail = 100
 
 	// waitBudget and waitInterval are what the suites spend by hand today.
 	waitBudget   = 5 * time.Minute
@@ -132,6 +135,7 @@ type Env struct {
 
 	Release          string
 	ControlNamespace string
+	Receiver         Receiver
 
 	dumpNamespaces []string
 }
@@ -167,6 +171,7 @@ func (b *Builder) Start() *Env {
 		ControlNamespace: b.cfg.controlNamespace,
 		dumpNamespaces:   dumpNamespaces(b.cfg),
 	}
+	env.Receiver = Receiver{env: env}
 
 	teardown{
 		{"artifacts", env.collectArtifacts},
@@ -223,16 +228,22 @@ func (e *Env) WaitForRunning(conditions ...wait.Condition) {
 	}, e.waitBudget(), waitInterval, "still waiting for %s", &outstanding)
 }
 
-// WaitForReceiverLogs does not echo the tail each poll: the archived cluster
-// dump already carries the receiver's log.
-func (e *Env) WaitForReceiverLogs(tags ...string) {
-	e.T.Helper()
+// Receiver is the test receiver the chart installs, where a suite looks to see
+// which logs arrived.
+type Receiver struct {
+	env *Env
+}
+
+// MustReceive does not echo the tail each poll: the archived cluster dump
+// already carries the receiver's log.
+func (r Receiver) MustReceive(tags ...string) {
+	r.env.T.Helper()
 
 	var outstanding pending
-	require.Eventuallyf(e.T, func() bool {
-		logs, err := e.ReceiverLogs(receiverLogTail)
+	require.Eventuallyf(r.env.T, func() bool {
+		logs, err := r.Logs()
 		if err != nil {
-			e.T.Logf("reading the test receiver: %v", err)
+			r.env.T.Logf("reading the test receiver: %v", err)
 			return false
 		}
 		for _, tag := range tags {
@@ -242,15 +253,27 @@ func (e *Env) WaitForReceiverLogs(tags ...string) {
 			}
 		}
 		return true
-	}, e.waitBudget(), waitInterval, "the test receiver never logged %s", &outstanding)
+	}, r.env.waitBudget(), waitInterval, "the test receiver never logged %s", &outstanding)
 }
 
-func (e *Env) ReceiverLogs(tail int) (string, error) {
+// MustNotReceive is a point-in-time check, since an absence cannot be waited
+// for. It belongs after whatever wait establishes that the pipeline is running.
+func (r Receiver) MustNotReceive(tags ...string) {
+	r.env.T.Helper()
+
+	logs, err := r.Logs()
+	require.NoError(r.env.T, err)
+	for _, tag := range tags {
+		assert.NotContains(r.env.T, logs, tag)
+	}
+}
+
+func (r Receiver) Logs() (string, error) {
 	out, err := common.CmdEnv(exec.Command("kubectl",
 		"logs",
-		"-n", e.ControlNamespace,
-		"--tail", fmt.Sprint(tail),
-		"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, e.Release)), e.Cluster).Output()
+		"-n", r.env.ControlNamespace,
+		"--tail", fmt.Sprint(receiverLogTail),
+		"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, r.env.Release)), r.env.Cluster).Output()
 	return string(out), err
 }
 
