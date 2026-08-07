@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
@@ -388,7 +389,19 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 			"-cfgjson",
 			generateConfigReloaderConfig(configDir),
 		},
-		Ports:        model.GeneratePortsConfigReloader(),
+		Ports: model.GeneratePortsConfigReloader(),
+		// A watch that fails to register leaves this container Running while it
+		// silently never reloads again. readyz is 503 in that state.
+		ReadinessProbe: &corev1.Probe{
+			ProbeHandler: corev1.ProbeHandler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path: "/readyz",
+					Port: intstr.FromString(model.ConfigReloaderMetricsPortName),
+				},
+			},
+			PeriodSeconds:    10,
+			FailureThreshold: 3,
+		},
 		VolumeMounts: generateVolumeMounts(spec),
 	}
 
