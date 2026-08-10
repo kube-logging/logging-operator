@@ -21,6 +21,7 @@ import (
 	"maps"
 
 	"emperror.dev/errors"
+	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/spf13/cast"
@@ -70,8 +71,10 @@ func (r *Reconciler) configHash() (string, error) {
 }
 
 func (r *Reconciler) hasConfigCheckPod(ctx context.Context, hashKey string, fluentdSpec v1beta1.FluentdSpec) (bool, error) {
-	var err error
-	pod := r.newCheckPod(hashKey, fluentdSpec)
+	pod, err := r.newCheckPod(hashKey, fluentdSpec)
+	if err != nil {
+		return false, err
+	}
 
 	p := &corev1.Pod{}
 	err = r.Client.Get(ctx, client.ObjectKeyFromObject(pod), p)
@@ -143,7 +146,10 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		return res, errors.WrapIf(err, "failed to find output secret for fluentd configcheck")
 	}
 
-	pod := r.newCheckPod(hashKey, *r.fluentdSpec)
+	pod, err := r.newCheckPod(hashKey, *r.fluentdSpec)
+	if err != nil {
+		return nil, err
+	}
 	configcheck.WithHashLabel(pod, hashKey)
 
 	existingPods := &corev1.PodList{}
@@ -184,6 +190,17 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		case corev1.PodRunning:
 			return &ConfigCheckResult{}, nil
 		case corev1.PodFailed:
+			if pod.Status.Reason == "DeadlineExceeded" {
+				// the check ran past configCheckPod.activeDeadlineSeconds, not a config
+				// validation failure; delete the pod so a fresh one is created and retried
+				if err := client.IgnoreNotFound(r.Client.Delete(ctx, pod)); err != nil {
+					return nil, errors.WrapIf(err, "failed to delete configcheck pod that exceeded its active deadline")
+				}
+				return &ConfigCheckResult{
+					Ready:   false,
+					Message: "configcheck pod exceeded its active deadline and was deleted, will retry",
+				}, nil
+			}
 			return &ConfigCheckResult{
 				Ready: true,
 				Valid: false,
@@ -262,7 +279,7 @@ func (r *Reconciler) newCheckOutputSecret(hashKey string) (*corev1.Secret, error
 	return nil, errors.New("output secret is invalid, unable to create output secret for config check")
 }
 
-func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) *corev1.Pod {
+func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Pod, error) {
 	volumes := r.volumesCheckPod(hashKey, fluentdSpec)
 	container := r.containerCheckPod(fluentdSpec)
 	initContainer := r.initContainerCheckPod(fluentdSpec)
@@ -314,7 +331,15 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 		}
 	}
 
-	return pod
+	if fluentdSpec.ConfigCheckPod != nil {
+		if err := merge.Merge(&pod.Spec, fluentdSpec.ConfigCheckPod); err != nil {
+			return nil, errors.WrapIf(err, "failed to merge configCheckPod overrides into the configcheck pod")
+		}
+		// the merge must not be able to turn the check pod into a long-lived one
+		pod.Spec.RestartPolicy = corev1.RestartPolicyNever
+	}
+
+	return pod, nil
 }
 
 func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec) (v []corev1.Volume) {
@@ -428,10 +453,6 @@ func (r *Reconciler) containerCheckPod(fluentdSpec v1beta1.FluentdSpec) []corev1
 			SecurityContext: fluentdSpec.Security.SecurityContext,
 			Resources:       fluentdSpec.ConfigCheckResources,
 		},
-	}
-
-	if len(fluentdSpec.SidecarContainers) != 0 {
-		container = append(container, fluentdSpec.SidecarContainers...)
 	}
 
 	return container

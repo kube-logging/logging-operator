@@ -90,7 +90,8 @@ func TestNewCheckPodDNSSettings(t *testing.T) {
 			}
 			r := newCheckPodReconciler(t, spec)
 
-			pod := r.newCheckPod("deadbeef", *r.fluentdSpec)
+			pod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.expectedDNSPolicy, pod.Spec.DNSPolicy)
 			assert.Equal(t, tt.dnsConfig, pod.Spec.DNSConfig)
@@ -112,7 +113,8 @@ func TestNewCheckPodDNSSettingsMatchStatefulSet(t *testing.T) {
 	}
 	r := newCheckPodReconciler(t, spec)
 
-	checkPod := r.newCheckPod("deadbeef", *r.fluentdSpec)
+	checkPod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
+	require.NoError(t, err)
 
 	obj, _, err := r.statefulset()
 	require.NoError(t, err)
@@ -123,22 +125,38 @@ func TestNewCheckPodDNSSettingsMatchStatefulSet(t *testing.T) {
 	assert.Equal(t, sts.Spec.Template.Spec.DNSConfig, checkPod.Spec.DNSConfig)
 }
 
-// TestNewCheckPodSidecarContainers pins the configcheck pod to carry the same
-// sidecarContainers as the aggregator StatefulSet, since a sidecar that only
-// mutates shared config (e.g. refreshing a GeoIP database via extraVolumes)
-// needs to run before the check as well, or the check validates against stale
-// input.
-func TestNewCheckPodSidecarContainers(t *testing.T) {
+// TestNewCheckPodConfigCheckPodOverrides pins configCheckPod.{initContainers,
+// volumes,activeDeadlineSeconds} to land on the generated configcheck pod, and
+// the pod to stay run-to-completion (RestartPolicy: Never) even though a merged
+// init container may declare RestartPolicy: Always (a native sidecar).
+func TestNewCheckPodConfigCheckPodOverrides(t *testing.T) {
+	restartAlways := corev1.ContainerRestartPolicyAlways
 	sidecar := corev1.Container{
-		Name:  "fluentd-sidecar",
-		Image: "busybox:1.37",
+		Name:          "geoip-refresh",
+		Image:         "busybox:1.37",
+		RestartPolicy: &restartAlways,
 	}
+	extraVolume := corev1.Volume{
+		Name: "geoip-db",
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
+		},
+	}
+	deadline := int64(120)
 	spec := &v1beta1.FluentdSpec{
-		SidecarContainers: []corev1.Container{sidecar},
+		ConfigCheckPod: &v1beta1.ConfigCheckPodOverrides{
+			InitContainers:        []corev1.Container{sidecar},
+			Volumes:               []corev1.Volume{extraVolume},
+			ActiveDeadlineSeconds: &deadline,
+		},
 	}
 	r := newCheckPodReconciler(t, spec)
 
-	checkPod := r.newCheckPod("deadbeef", *r.fluentdSpec)
+	checkPod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
+	require.NoError(t, err)
 
-	assert.Contains(t, checkPod.Spec.Containers, sidecar)
+	assert.Contains(t, checkPod.Spec.InitContainers, sidecar)
+	assert.Contains(t, checkPod.Spec.Volumes, extraVolume)
+	assert.Equal(t, &deadline, checkPod.Spec.ActiveDeadlineSeconds)
+	assert.Equal(t, corev1.RestartPolicyNever, checkPod.Spec.RestartPolicy)
 }
