@@ -103,7 +103,7 @@ GEM
     io-endpoint (0.17.2)
     io-event (1.17.0)
     io-stream (0.13.1)
-    json (2.20.0)
+    json (2.21.2)
     logfmt (0.0.10)
     logger (1.7.0)
     lru_redux (1.1.0)
