@@ -449,6 +449,9 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Image:           r.fluentdSpec.BufferVolumeImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullPolicy(r.fluentdSpec.BufferVolumeImage.PullPolicy),
 			Args: []string{
+				// This pod already has something on the runner's default metrics
+				// port, and the runner's own metrics are not scraped here.
+				"--metrics-port", "0",
 				"--exec", nodeExporterCmd,
 				"--exec", bufferSizeCmd,
 			},

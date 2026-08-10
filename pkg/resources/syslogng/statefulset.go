@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/kubetool"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
@@ -290,6 +291,9 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 			Image:           r.syslogNGSpec.BufferVolumeMetricsImage.RepositoryWithTag(),
 			ImagePullPolicy: corev1.PullIfNotPresent,
 			Args: []string{
+				// This pod already has something on the runner's default metrics
+				// port, and the runner's own metrics are not scraped here.
+				"--metrics-port", "0",
 				"--port", "7358",
 				"--exec", nodeExporterCmd,
 				"--exec", bufferSizeCmd,
@@ -379,10 +383,25 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		Image:           spec.ConfigReloadImage.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Args: []string{
+			// Metrics land on the port the Service exposes and the ServiceMonitor
+			// scrapes. The command API keeps its own default and stays on loopback.
+			"-metrics-port", fmt.Sprint(model.ConfigReloaderMetricsPort),
 			"-cfgjson",
 			generateConfigReloaderConfig(configDir),
 		},
-		Ports:        model.GeneratePortsConfigReloader(),
+		Ports: model.GeneratePortsConfigReloader(),
+		// A watch that fails to register leaves this container Running while it
+		// silently never reloads again. readyz is 503 in that state.
+		ReadinessProbe: &corev1.Probe{
+			ProbeHandler: corev1.ProbeHandler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path: "/readyz",
+					Port: intstr.FromString(model.ConfigReloaderMetricsPortName),
+				},
+			},
+			PeriodSeconds:    10,
+			FailureThreshold: 3,
+		},
 		VolumeMounts: generateVolumeMounts(spec),
 	}
 

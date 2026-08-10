@@ -64,7 +64,7 @@ do
     then
       if [ "$CUSTOM_RUNNER_AVAILABLE" = "true" ]
       then
-        echo '['$(date)']' 'exiting node exporter custom runner:' "$(curl --silent --show-error http://$CUSTOM_RUNNER_ADDRESS/exit)"
+        echo '['$(date)']' 'exiting node exporter custom runner:' "$(curl --silent --show-error -X POST http://$CUSTOM_RUNNER_ADDRESS/exit)"
       fi
       echo '['$(date)']' 'no buffers left, terminating workers:' "$(curl --silent --show-error http://$RPC_ADDRESS/api/processes.killWorkers)"
       WORKERS_KILLED=true
