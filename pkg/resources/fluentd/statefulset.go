@@ -23,6 +23,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -57,7 +58,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 			r.Log.Info("volume definition missing from extraVolume, ignoring", "path", n.Path, "containerName", n.ContainerName, "volumeName", n.VolumeName)
 			continue
 		}
-		if n.Volume.PersistentVolumeClaim == nil || isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
+		if !isPVCBacked(n.Volume) {
 			if err := n.ApplyVolumeForPodSpec(&spec.Template.Spec); err != nil {
 				return nil, reconciler.StatePresent, err
 			}
@@ -83,6 +84,13 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 func isPersistentVolumeClaimSpecEmpty(pvcSpec corev1.PersistentVolumeClaimSpec) bool {
 	empty := corev1.PersistentVolumeClaimSpec{}
 	return reflect.DeepEqual(pvcSpec, empty)
+}
+
+// isPVCBacked reports whether an extraVolume is realized as a volumeClaimTemplate on the
+// StatefulSet, which is what makes it unusable as-is on the one-shot configcheck pod.
+func isPVCBacked(v *volume.KubernetesVolume) bool {
+	return v != nil && v.PersistentVolumeClaim != nil &&
+		!isPersistentVolumeClaimSpecEmpty(v.PersistentVolumeClaim.PersistentVolumeClaimSpec)
 }
 
 func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
