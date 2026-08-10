@@ -270,7 +270,8 @@ func (r *Reconciler) bufferMetricsSidecarContainer() *corev1.Container {
 		if r.syslogNGSpec.BufferVolumeMetrics.Port != 0 {
 			port = r.syslogNGSpec.BufferVolumeMetrics.Port
 		}
-		portParam := fmt.Sprintf("--web.listen-address=:%d", port)
+		// An unset bind keeps the wildcard address, which listens on both families.
+		portParam := fmt.Sprintf("--web.listen-address=%s:%d", r.syslogNGSpec.BufferVolumeMetrics.Bind, port)
 		args := []string{portParam, "--collector.disable-defaults", "--collector.filesystem", "--collector.textfile", "--collector.textfile.directory=/prometheus/node_exporter/textfile_collector/"}
 
 		nodeExporterCmd := fmt.Sprintf("nodeexporter -> ./bin/node_exporter %v", strings.Join(args, " "))

@@ -36,6 +36,11 @@ ImageSpec struct hold information about image specification
 
 Metrics defines the service monitor endpoints
 
+### bind (string, optional) {#metrics-bind}
+
+Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set. The syslog-ng metrics exporter has no listen address option, so it ignores this field. 
+
+
 ### enabled (*bool, optional) {#metrics-enabled}
 
 Enabled controls whether the metrics endpoint should be exposed. Defaults to false. When false, the metrics HTTP server will not be started and no metrics port will be exposed. 

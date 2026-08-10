@@ -28,11 +28,23 @@ import (
 func TestMetricsServicesIPFamilies(t *testing.T) {
 	metricsEnabled := true
 	tests := []struct {
-		name        string
-		enabledIPv6 bool
+		name            string
+		enabledIPv6     bool
+		clusterFamilies []corev1.IPFamily
+		expected        []corev1.IPFamily
 	}{
-		{name: "single-stack"},
-		{name: "dual-stack", enabledIPv6: true},
+		{name: "ipv6 not requested"},
+		{
+			name:            "requested on a cluster that has IPv6",
+			enabledIPv6:     true,
+			clusterFamilies: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+			expected:        []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+		},
+		{
+			// Naming IPv6 here would be rejected at create, and a create rejection has no recovery path.
+			name:        "requested on a cluster without an IPv6 range",
+			enabledIPv6: true,
+		},
 	}
 
 	for _, test := range tests {
@@ -51,7 +63,8 @@ func TestMetricsServicesIPFamilies(t *testing.T) {
 						Port:    9200,
 					},
 				},
-				nameProvider: NewLegacyFluentbitNameProvider(logging),
+				nameProvider:    NewLegacyFluentbitNameProvider(logging),
+				clusterFamilies: test.clusterFamilies,
 			}
 
 			metricsService, _, err := r.serviceMetrics()
@@ -59,13 +72,13 @@ func TestMetricsServicesIPFamilies(t *testing.T) {
 			bufferMetricsService, _, err := r.serviceBufferMetrics()
 			require.NoError(t, err)
 
-			assertIPFamilies(t, metricsService, test.enabledIPv6)
-			assertIPFamilies(t, bufferMetricsService, test.enabledIPv6)
+			assertIPFamilies(t, metricsService, test.enabledIPv6, test.expected)
+			assertIPFamilies(t, bufferMetricsService, test.enabledIPv6, test.expected)
 		})
 	}
 }
 
-func assertIPFamilies(t *testing.T, object runtime.Object, enabledIPv6 bool) {
+func assertIPFamilies(t *testing.T, object runtime.Object, enabledIPv6 bool, expected []corev1.IPFamily) {
 	t.Helper()
 
 	service, ok := object.(*corev1.Service)
@@ -79,5 +92,5 @@ func assertIPFamilies(t *testing.T, object runtime.Object, enabledIPv6 bool) {
 
 	require.NotNil(t, service.Spec.IPFamilyPolicy)
 	require.Equal(t, corev1.IPFamilyPolicyPreferDualStack, *service.Spec.IPFamilyPolicy)
-	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, service.Spec.IPFamilies)
+	require.Equal(t, expected, service.Spec.IPFamilies)
 }

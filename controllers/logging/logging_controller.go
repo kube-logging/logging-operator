@@ -44,6 +44,7 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentbit"
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
+	"github.com/kube-logging/logging-operator/pkg/resources/ipfamily"
 	"github.com/kube-logging/logging-operator/pkg/resources/loggingdataprovider"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
@@ -74,6 +75,7 @@ func NewLoggingReconciler(client client.Client, eventRecorder events.EventRecord
 		Client:        client,
 		EventRecorder: eventRecorder,
 		Log:           log,
+		ipFamilies:    ipfamily.NewDetector(client, log.WithName("ipfamily")),
 	}
 }
 
@@ -82,6 +84,15 @@ type LoggingReconciler struct {
 	client.Client
 	EventRecorder events.EventRecorder
 	Log           logr.Logger
+	ipFamilies    *ipfamily.Detector
+}
+
+// clusterIPFamilies probes lazily, so a cluster that never enables IPv6 never pays for it.
+func (r *LoggingReconciler) clusterIPFamilies(ctx context.Context, logging *loggingv1beta1.Logging, enabledIPv6 bool) ([]corev1.IPFamily, error) {
+	if !enabledIPv6 {
+		return nil, nil
+	}
+	return r.ipFamilies.Families(ctx, logging.Spec.ControlNamespace)
 }
 
 // +kubebuilder:rbac:groups=logging.banzaicloud.io,resources=loggings;fluentbitagents;flows;clusterflows;outputs;clusteroutputs;fluentdconfigs;syslogngconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -227,7 +238,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Info("flow configuration", "config", fluentdConfig)
 			}
 
-			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts).Reconcile)
+			families, err := r.clusterIPFamilies(ctx, &logging, fluentdSpec.EnabledIPv6)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			reconcilers = append(reconcilers, fluentd.New(r.Client, r.Log, &logging, fluentdSpec, fluentdExternal, &fluentdConfig, secretList, reconcilerOpts, families).Reconcile)
 		}
 		loggingDataProvider = fluentd.NewDataProvider(r.Client, &logging, fluentdSpec, fluentdExternal)
 	}
@@ -235,7 +250,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	syslogNGExternal, syslogNGSpec := loggingResources.GetSyslogNGSpec()
 	if syslogNGSpec != nil {
 		logging.AggregatorLevelConfigCheck(syslogNGSPec.ConfigCheck)
-		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(loggingResources)
+		syslogNGConfig, secretList, err := r.clusterConfigurationSyslogNG(ctx, loggingResources)
 		if err != nil {
 			// TODO: move config generation into Syslog-NG reconciler
 			reconcilers = append(reconcilers, func(ctx context.Context) (*reconcile.Result, error) {
@@ -246,7 +261,11 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				log.Info("flow configuration", "config", syslogNGConfig)
 			}
 
-			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts).Reconcile)
+			families, err := r.clusterIPFamilies(ctx, &logging, syslogNGSpec.EnabledIPv6)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			reconcilers = append(reconcilers, syslogng.New(r.Client, r.Log, &logging, syslogNGSpec, syslogNGExternal, syslogNGConfig, secretList, reconcilerOpts, families).Reconcile)
 		}
 		loggingDataProvider = syslogng.NewDataProvider(r.Client, &logging, syslogNGExternal)
 	}
@@ -258,6 +277,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			fluentbitWarning.Do(func() {
 				log.Info("WARNING fluentbit definition inside the Logging resource is deprecated and will be removed in the next major release")
 			})
+			legacyFamilies, err := r.clusterIPFamilies(ctx, &logging, logging.Spec.FluentbitSpec.EnabledIPv6)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
 			nameProvider := fluentbit.NewLegacyFluentbitNameProvider(&logging)
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
@@ -268,6 +291,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				loggingDataProvider,
 				nameProvider,
 				loggingResourceRepo,
+				legacyFamilies,
 			).Reconcile)
 		}
 	default:
@@ -276,6 +300,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		l := log.WithName("fluentbit")
 		for _, f := range loggingResources.Fluentbits {
+			agentFamilies, err := r.clusterIPFamilies(ctx, &logging, f.Spec.EnabledIPv6)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
 			reconcilers = append(reconcilers, fluentbit.New(
 				r.Client,
 				l.WithValues("fluentbitagent", f.Name),
@@ -285,6 +313,7 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				loggingDataProvider,
 				fluentbit.NewStandaloneFluentbitNameProvider(&f),
 				loggingResourceRepo,
+				agentFamilies,
 			).Reconcile)
 		}
 	}
@@ -448,7 +477,7 @@ func (r *LoggingReconciler) clusterConfigurationFluentd(resources model.LoggingR
 	return output.String(), &slf.Secrets, nil
 }
 
-func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.LoggingResources) (string, *secret.MountSecrets, error) {
+func (r *LoggingReconciler) clusterConfigurationSyslogNG(ctx context.Context, resources model.LoggingResources) (string, *secret.MountSecrets, error) {
 	if cfg := resources.Logging.Spec.FlowConfigOverride; cfg != "" {
 		return cfg, nil, nil
 	}
@@ -460,6 +489,10 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 	}
 
 	_, syslogngSpec := resources.GetSyslogNGSpec()
+	syslogNGFamilies, err := r.clusterIPFamilies(ctx, &resources.Logging, syslogngSpec.EnabledIPv6)
+	if err != nil {
+		return "", nil, err
+	}
 	in := syslogngconfig.Input{
 		Name:                 resources.Logging.Name,
 		Namespace:            resources.Logging.Namespace,
@@ -469,6 +502,7 @@ func (r *LoggingReconciler) clusterConfigurationSyslogNG(resources model.Logging
 		Flows:                resources.SyslogNG.Flows,
 		SecretLoaderFactory:  &slf,
 		SourcePort:           syslogng.ServicePort,
+		ClusterHasIPv6:       len(syslogNGFamilies) > 0,
 		SyslogNGSpec:         syslogngSpec,
 		SkipInvalidResources: resources.Logging.Spec.SkipInvalidResources,
 		Logger:               r.Log,

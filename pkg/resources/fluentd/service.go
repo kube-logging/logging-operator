@@ -59,7 +59,7 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 	}
 
 	if r.fluentdSpec.EnabledIPv6 {
-		v1beta1.EnableIPv6Options(&desired.Spec)
+		v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 	}
 
 	beforeUpdateHook := reconciler.DesiredStateHook(func(current runtime.Object) error {
@@ -68,6 +68,10 @@ func (r *Reconciler) service() (runtime.Object, reconciler.DesiredState, error) 
 			// Preserve ClusterIPs for dual-stack configuration
 			if len(s.Spec.ClusterIPs) > 0 {
 				desired.Spec.ClusterIPs = s.Spec.ClusterIPs
+			}
+			if v1beta1.PreserveAllocatedIPFamilies(&desired.Spec, s.Spec) {
+				r.Log.Info("ignoring the requested single-stack policy, the service already has both IP families allocated",
+					"service", desired.Name)
 			}
 		} else {
 			return errors.Errorf("failed to cast service object %+v", current)
@@ -106,7 +110,7 @@ func (r *Reconciler) serviceMetrics() (runtime.Object, reconciler.DesiredState, 
 		}
 
 		if r.fluentdSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -207,7 +211,7 @@ func (r *Reconciler) serviceBufferMetrics() (runtime.Object, reconciler.DesiredS
 		}
 
 		if r.fluentdSpec.EnabledIPv6 {
-			v1beta1.EnableIPv6Options(&desired.Spec)
+			v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 		}
 
 		return desired, reconciler.StatePresent, nil
@@ -291,7 +295,7 @@ func (r *Reconciler) headlessService() (runtime.Object, reconciler.DesiredState,
 	}
 
 	if r.fluentdSpec.EnabledIPv6 {
-		v1beta1.EnableIPv6Options(&desired.Spec)
+		v1beta1.EnableIPv6Options(&desired.Spec, r.clusterFamilies)
 	}
 
 	return desired, reconciler.StatePresent, nil

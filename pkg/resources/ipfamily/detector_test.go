@@ -1,0 +1,135 @@
+// Copyright © 2026 Kube logging authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package ipfamily
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/go-logr/logr"
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+)
+
+func TestFamilies(t *testing.T) {
+	tests := []struct {
+		name     string
+		results  map[corev1.IPFamily]error
+		expected []corev1.IPFamily
+		resolved bool
+		wantErr  bool
+	}{
+		{
+			name:     "a dual-stack cluster is named IPv6 first",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: nil, corev1.IPv4Protocol: nil},
+			expected: []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
+			resolved: true,
+		},
+		{
+			// Naming IPv4 here is rejected exactly as naming IPv6 is on an IPv4-only cluster.
+			name:     "an IPv6-only cluster is never told about IPv4",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: nil, corev1.IPv4Protocol: invalidFamilyErr()},
+			expected: []corev1.IPFamily{corev1.IPv6Protocol},
+			resolved: true,
+		},
+		{
+			name:     "an IPv4-only cluster is left to choose for itself, and re-probed",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: invalidFamilyErr(), corev1.IPv4Protocol: nil},
+			expected: nil,
+			resolved: false,
+		},
+		{
+			name:    "a webhook rejecting every service is an error, not an IPv4 cluster",
+			wantErr: true,
+			results: map[corev1.IPFamily]error{
+				corev1.IPv6Protocol: invalidFamilyErr(),
+				corev1.IPv4Protocol: invalidFamilyErr(),
+			},
+			expected: nil,
+			resolved: false,
+		},
+		{
+			name:     "a denied probe is an error, not an IPv4 cluster",
+			results:  map[corev1.IPFamily]error{corev1.IPv6Protocol: apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, "probe", errors.New("nope"))},
+			expected: nil,
+			resolved: false,
+			wantErr:  true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			calls := 0
+			d := &Detector{
+				log: logr.Discard(),
+				dryRun: func(_ context.Context, _ string, family corev1.IPFamily) error {
+					calls++
+					return test.results[family]
+				},
+			}
+
+			got, err := d.Families(context.Background(), "default")
+			require.Equal(t, test.wantErr, err != nil)
+			require.Equal(t, test.expected, got)
+
+			before := calls
+			got, _ = d.Families(context.Background(), "default")
+			require.Equal(t, test.expected, got)
+			if test.resolved {
+				require.Equal(t, before, calls, "a resolved answer must not re-probe")
+			} else {
+				require.Greater(t, calls, before, "an unresolved answer must be retried")
+			}
+		})
+	}
+}
+
+// A cluster that gains an IPv6 range must be picked up without restarting the operator.
+func TestFamiliesRecoverAfterATransientFailure(t *testing.T) {
+	failing := true
+	d := &Detector{
+		log: logr.Discard(),
+		dryRun: func(_ context.Context, _ string, _ corev1.IPFamily) error {
+			if failing {
+				return apierrors.NewServiceUnavailable("apiserver is having a moment")
+			}
+			return nil
+		},
+	}
+
+	_, err := d.Families(context.Background(), "default")
+	require.Error(t, err)
+
+	failing = false
+	got, err := d.Families(context.Background(), "default")
+	require.NoError(t, err)
+	require.Equal(t, []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol}, got)
+}
+
+func invalidFamilyErr() error {
+	return apierrors.NewInvalid(
+		schema.GroupKind{Kind: "Service"},
+		"probe",
+		field.ErrorList{field.Invalid(
+			field.NewPath("spec", "ipFamilies").Index(0),
+			"IPv6",
+			"not configured on this cluster",
+		)},
+	)
+}

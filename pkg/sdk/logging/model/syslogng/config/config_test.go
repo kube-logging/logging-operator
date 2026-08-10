@@ -1176,3 +1176,52 @@ source "main_input" {
 		})
 	}
 }
+
+// syslog-ng binds ip(0.0.0.0) ip-protocol(4) by default, so an IPv6-primary Service would send
+// Fluent Bit to a port with no listener behind it.
+func TestRenderConfigIntoBindsTheSourceForIPv6(t *testing.T) {
+	for _, test := range []struct {
+		name        string
+		enabledIPv6 bool
+		wantSource  string
+	}{
+		{
+			name:       "default stays on the syslog-ng default bind",
+			wantSource: `network(flags("no-parse") port(601) transport("tcp"));`,
+		},
+		{
+			name:        "enabledIPv6 binds the wildcard address",
+			enabledIPv6: true,
+			wantSource:  `network(flags("no-parse") ip("::") ip-protocol(6) port(601) transport("tcp"));`,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var buf strings.Builder
+			err := RenderConfigInto(Input{
+				SourcePort:          601,
+				Name:                "test",
+				Namespace:           "config-test",
+				SyslogNGSpec:        &v1beta1.SyslogNGSpec{EnabledIPv6: test.enabledIPv6},
+				ClusterHasIPv6:      true,
+				SecretLoaderFactory: &TestSecretLoaderFactory{},
+			}, &buf)
+			require.NoError(t, err)
+			require.Contains(t, buf.String(), test.wantSource)
+		})
+	}
+}
+
+// Binding IPv6 only reaches IPv4 clients through v4-mapped addresses, which bindv6only disables.
+func TestRenderConfigIntoKeepsIPv4WhenTheClusterHasNoIPv6(t *testing.T) {
+	var buf strings.Builder
+	err := RenderConfigInto(Input{
+		SourcePort:          601,
+		Name:                "test",
+		Namespace:           "config-test",
+		SyslogNGSpec:        &v1beta1.SyslogNGSpec{EnabledIPv6: true},
+		ClusterHasIPv6:      false,
+		SecretLoaderFactory: &TestSecretLoaderFactory{},
+	}, &buf)
+	require.NoError(t, err)
+	require.Contains(t, buf.String(), `network(flags("no-parse") port(601) transport("tcp"));`)
+}

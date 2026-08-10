@@ -151,6 +151,8 @@ v1alpha1 is the legacy API; conversion functions exist to v1beta1 (which is the 
 
 **Immutable fields**: `controlNamespace`, `FluentbitAgentNamespace`, and `AllowClusterResourcesFromAllNamespaces` are CRD-enforced immutable on `Logging` resources (via `XValidation`). Changing them requires deleting and recreating the resource.
 
+**Server-allocated Service fields**: `clusterIP`, `clusterIPs` and `ipFamilies` are assigned by the API server, so reconcilers pin them to the live object in a `beforeUpdateHook` (`v1beta1.PreserveAllocatedIPFamilies`) instead of asserting a desired value. Changing an existing Service's primary IP family is rejected as *invalid* rather than *immutable*, so `MatchImmutableErrorMessages` does not match it and the recreate fallback never fires — the reconcile fails permanently. Naming an IP family the cluster has no range for is rejected the same way, on create.
+
 ## Testing
 
 - Unit/integration tests use `envtest` (embedded Kubernetes API server + etcd); no cluster needed
