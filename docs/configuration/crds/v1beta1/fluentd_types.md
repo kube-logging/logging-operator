@@ -45,6 +45,11 @@ Overrides the default logging level configCheck setup. This field is not used di
 ### configCheckAnnotations (map[string]string, optional) {#fluentdspec-configcheckannotations}
 
 
+### configCheckPod (*ConfigCheckPodOverrides, optional) {#fluentdspec-configcheckpod}
+
+ConfigCheckPod adds helper init containers and volumes to the transient configcheck pod; contents must exit on their own, or set restartPolicy: Always for a long-running helper. Takes effect on the next config change. 
+
+
 ### configCheckResources (corev1.ResourceRequirements, optional) {#fluentdspec-configcheckresources}
 
 
@@ -199,6 +204,27 @@ Duration in seconds for graceful pod termination. Set higher than expected clean
 
 
 ### workers (int32, optional) {#fluentdspec-workers}
+
+
+
+## ConfigCheckPodOverrides
+
+ConfigCheckPodOverrides adds helper containers, volumes and a deadline to the
+transient fluentd configcheck pod, merged onto the generated pod spec last.
+
+### activeDeadlineSeconds (*int64, optional) {#configcheckpodoverrides-activedeadlineseconds}
+
+ActiveDeadlineSeconds bounds how long the configcheck pod may run before it is treated as failed and deleted so a new one can be created and retried. Without it, a helper container that never terminates leaves the pod running indefinitely and blocks config rollout, with no timeout. 
+
+
+### initContainers ([]corev1.Container, optional) {#configcheckpodoverrides-initcontainers}
+
+InitContainers to add to the configcheck pod. Plain init containers run to completion, in order, before the dry-run container starts - the merge prepends these ahead of the operator's own init containers, so they run first. A long-running helper must instead be a native sidecar (restartPolicy: Always, k8s 1.29+): the kubelet ends it once the dry-run container exits, letting the pod reach Succeeded/Failed. 
+
+
+### volumes ([]corev1.Volume, optional) {#configcheckpodoverrides-volumes}
+
+Volumes available to the configcheck pod only. FluentdSpec.ExtraVolumes is already mounted here too, but a PersistentVolumeClaim-backed entry is downgraded to an emptyDir on the check pod; give a same-named entry here to override that. An entry whose name matches an operator-managed volume field-merges into it (volumes use retainKeys, so the whole VolumeSource is replaced, not deep-merged). 
 
 
 
