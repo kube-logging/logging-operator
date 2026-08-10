@@ -38,7 +38,7 @@ Metrics defines the service monitor endpoints
 
 ### bind (string, optional) {#metrics-bind}
 
-Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set. 
+Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set. The syslog-ng metrics exporter has no listen address option, so it ignores this field. 
 
 
 ### enabled (*bool, optional) {#metrics-enabled}

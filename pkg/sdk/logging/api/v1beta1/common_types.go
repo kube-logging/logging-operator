@@ -75,6 +75,7 @@ type Metrics struct {
 	Port     int32  `json:"port,omitempty"`
 	Path     string `json:"path,omitempty"`
 	// Bind is the address the metrics endpoint listens on. Defaults to 0.0.0.0, or to [::] when enabledIPv6 is set.
+	// The syslog-ng metrics exporter has no listen address option, so it ignores this field.
 	Bind                    string                    `json:"bind,omitempty"`
 	ServiceMonitor          bool                      `json:"serviceMonitor,omitempty"`
 	ServiceMonitorConfig    ServiceMonitorConfig      `json:"serviceMonitorConfig,omitempty"`
