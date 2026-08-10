@@ -4719,6 +4719,7 @@ spec:
                     properties:
                       activeDeadlineSeconds:
                         format: int64
+                        minimum: 1
                         type: integer
                       initContainers:
                         items:

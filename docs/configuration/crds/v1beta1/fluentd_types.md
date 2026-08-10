@@ -47,7 +47,7 @@ Overrides the default logging level configCheck setup. This field is not used di
 
 ### configCheckPod (*ConfigCheckPodOverrides, optional) {#fluentdspec-configcheckpod}
 
-ConfigCheckPod lets you add helper containers and volumes to the transient configcheck pod, which runs `fluentd --dry-run` once and must exit on its own. Long-running helpers must be declared as native sidecars (initContainers with restartPolicy: Always, k8s 1.29+), otherwise the pod never completes and config rollout stops. This is a narrower counterpart to SyslogNGSpec.ConfigCheckPodOverrides: the Fluentd check pod already inherits nodeSelector/tolerations/affinity/priorityClassName/securityContext/ imagePullSecrets/dnsPolicy/dnsConfig/serviceAccount from FluentdSpec, so only extra containers, check-pod-only volumes and a deadline are exposed here. Note: the check pod is named after a hash of the rendered config and is only ever created, never updated, so changing configCheckPod alone does not re-run the check against the current pod - it takes effect on the next config change, or after manually deleting the existing check pod. 
+ConfigCheckPod adds helper init containers and volumes to the transient configcheck pod; contents must exit on their own, or set restartPolicy: Always for a long-running helper. Takes effect on the next config change. 
 
 
 ### configCheckResources (corev1.ResourceRequirements, optional) {#fluentdspec-configcheckresources}
@@ -219,12 +219,12 @@ ActiveDeadlineSeconds bounds how long the configcheck pod may run before it is t
 
 ### initContainers ([]corev1.Container, optional) {#configcheckpodoverrides-initcontainers}
 
-InitContainers to add to the configcheck pod. A plain init container is only guaranteed to have started, not to have finished, before the dry-run container starts, so it does not order a preparation step against the check - it can race it. A long-running helper must instead set restartPolicy: Always (a native sidecar, k8s 1.29+); the kubelet then terminates it once the dry-run container exits, letting the pod reach Succeeded/Failed. 
+InitContainers to add to the configcheck pod. Plain init containers run to completion, in order, before the dry-run container starts - the merge prepends these ahead of the operator's own init containers, so they run first. A long-running helper must instead be a native sidecar (restartPolicy: Always, k8s 1.29+): the kubelet ends it once the dry-run container exits, letting the pod reach Succeeded/Failed. 
 
 
 ### volumes ([]corev1.Volume, optional) {#configcheckpodoverrides-volumes}
 
-Volumes available to the configcheck pod only. This is the check-pod counterpart to FluentdSpec.ExtraVolumes, which is not mounted on the check pod, e.g. for a volume an InitContainers entry above needs. 
+Volumes available to the configcheck pod only. FluentdSpec.ExtraVolumes is already mounted here too, but a PersistentVolumeClaim-backed entry is downgraded to an emptyDir on the check pod; give a same-named entry here to override that. An entry whose name matches an operator-managed volume field-merges into it (volumes use retainKeys, so the whole VolumeSource is replaced, not deep-merged). 
 
 
 

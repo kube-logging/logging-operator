@@ -24,6 +24,7 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/merge"
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/cisco-open/operator-tools/pkg/utils"
+	"github.com/cisco-open/operator-tools/pkg/volume"
 	"github.com/spf13/cast"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -190,15 +191,23 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		case corev1.PodRunning:
 			return &ConfigCheckResult{}, nil
 		case corev1.PodFailed:
-			if pod.Status.Reason == "DeadlineExceeded" {
-				// the check ran past configCheckPod.activeDeadlineSeconds, not a config
-				// validation failure; delete the pod so a fresh one is created and retried
+			if pod.Status.Reason != "" {
+				// A pod that fails with a Reason (DeadlineExceeded, Evicted, Shutdown,
+				// NodeAffinity, ...) didn't fail because of an invalid config - a real
+				// config validation failure leaves Status.Reason empty. Delete it so a
+				// fresh one is created and retried instead of latching a false
+				// "config is invalid" verdict.
+				r.Log.Info("configcheck pod did not complete normally, deleting it to retry",
+					"pod", pod.Name,
+					"reason", pod.Status.Reason,
+					"activeDeadlineSeconds", pod.Spec.ActiveDeadlineSeconds,
+					"runningContainer", stillRunningContainer(pod))
 				if err := client.IgnoreNotFound(r.Client.Delete(ctx, pod)); err != nil {
-					return nil, errors.WrapIf(err, "failed to delete configcheck pod that exceeded its active deadline")
+					return nil, errors.WrapIf(err, "failed to delete configcheck pod that did not complete normally")
 				}
 				return &ConfigCheckResult{
 					Ready:   false,
-					Message: "configcheck pod exceeded its active deadline and was deleted, will retry",
+					Message: fmt.Sprintf("configcheck pod %s did not complete normally (reason: %s), deleted for retry", pod.Name, pod.Status.Reason),
 				}, nil
 			}
 			return &ConfigCheckResult{
@@ -222,6 +231,24 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	}
 
 	return &ConfigCheckResult{}, nil
+}
+
+// stillRunningContainer returns the name of the container that was still
+// running when its pod stopped, if any - useful for diagnosing why a
+// configcheck pod with a helper container (e.g. a native sidecar) didn't
+// complete in time.
+func stillRunningContainer(pod *corev1.Pod) string {
+	for _, cs := range pod.Status.InitContainerStatuses {
+		if cs.State.Running != nil {
+			return cs.Name
+		}
+	}
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Running != nil {
+			return cs.Name
+		}
+	}
+	return ""
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
@@ -304,7 +331,11 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 	}
 	if fluentdSpec.Affinity != nil && fluentdSpec.Affinity.PodAntiAffinity != nil {
 		r.Log.Info("pod anti-affinity has been disabled to avoid blocking configcheck pods accidentally")
-		pod.Spec.Affinity.PodAntiAffinity = nil
+		// deep-copy before clearing PodAntiAffinity: pod.Spec.Affinity is the same
+		// pointer as fluentdSpec.Affinity, shared with the StatefulSet's pod spec
+		affinity := fluentdSpec.Affinity.DeepCopy()
+		affinity.PodAntiAffinity = nil
+		pod.Spec.Affinity = affinity
 	}
 	if fluentdSpec.ConfigCheckAnnotations != nil {
 		pod.Annotations = fluentdSpec.ConfigCheckAnnotations
@@ -326,6 +357,17 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
 	for _, n := range fluentdSpec.ExtraVolumes {
+		// The check pod is a plain, one-shot Pod, not part of the StatefulSet, so a
+		// PVC-backed extraVolume meant to be provisioned via volumeClaimTemplates
+		// (statefulset.go) never has a matching PVC here; mount an emptyDir instead
+		// - the dry-run only needs the mount path to resolve, not real data.
+		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil && !isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
+			emptyDirVolume := volume.KubernetesVolume{EmptyDir: &corev1.EmptyDirVolumeSource{}}
+			if err := emptyDirVolume.ApplyVolumeForPodSpec(n.VolumeName, n.ContainerName, n.Path, &pod.Spec); err != nil {
+				r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
+			}
+			continue
+		}
 		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
 			r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
 		}
@@ -335,8 +377,6 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 		if err := merge.Merge(&pod.Spec, fluentdSpec.ConfigCheckPod); err != nil {
 			return nil, errors.WrapIf(err, "failed to merge configCheckPod overrides into the configcheck pod")
 		}
-		// the merge must not be able to turn the check pod into a long-lived one
-		pod.Spec.RestartPolicy = corev1.RestartPolicyNever
 	}
 
 	return pod, nil
