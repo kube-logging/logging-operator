@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -34,7 +35,8 @@ import (
 
 // newCheckPodReconciler builds a Reconciler that is just complete enough for
 // newCheckPod, which only needs the logging resource and the fluentd spec.
-func newCheckPodReconciler(t *testing.T, fluentdSpec *v1beta1.FluentdSpec) *Reconciler {
+// Pass a client only for the paths that talk to the API server, e.g. configCheck.
+func newCheckPodReconciler(t *testing.T, fluentdSpec *v1beta1.FluentdSpec, c client.Client) *Reconciler {
 	t.Helper()
 
 	logging := &v1beta1.Logging{}
@@ -45,7 +47,18 @@ func newCheckPodReconciler(t *testing.T, fluentdSpec *v1beta1.FluentdSpec) *Reco
 
 	config := "<system>\n</system>\n"
 
-	return New(nil, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{})
+	return New(c, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{})
+}
+
+// newFakeClient returns a client backed by an empty in-memory store for the
+// configcheck paths that create and delete pods.
+func newFakeClient(t *testing.T) client.Client {
+	t.Helper()
+
+	scheme := runtime.NewScheme()
+	require.NoError(t, corev1.AddToScheme(scheme))
+
+	return fake.NewClientBuilder().WithScheme(scheme).Build()
 }
 
 func TestNewCheckPodDNSSettings(t *testing.T) {
@@ -93,7 +106,7 @@ func TestNewCheckPodDNSSettings(t *testing.T) {
 				DNSPolicy: tt.dnsPolicy,
 				DNSConfig: tt.dnsConfig,
 			}
-			r := newCheckPodReconciler(t, spec)
+			r := newCheckPodReconciler(t, spec, nil)
 
 			pod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
 			require.NoError(t, err)
@@ -116,7 +129,7 @@ func TestNewCheckPodDNSSettingsMatchStatefulSet(t *testing.T) {
 			Options:     []corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndots}},
 		},
 	}
-	r := newCheckPodReconciler(t, spec)
+	r := newCheckPodReconciler(t, spec, nil)
 
 	checkPod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
 	require.NoError(t, err)
@@ -145,7 +158,7 @@ func TestNewCheckPodDoesNotMutateSharedAffinity(t *testing.T) {
 			},
 		},
 	}
-	r := newCheckPodReconciler(t, spec)
+	r := newCheckPodReconciler(t, spec, nil)
 
 	checkPod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
 	require.NoError(t, err)
@@ -184,7 +197,7 @@ func TestNewCheckPodConfigCheckPodOverrides(t *testing.T) {
 			ActiveDeadlineSeconds: &deadline,
 		},
 	}
-	r := newCheckPodReconciler(t, spec)
+	r := newCheckPodReconciler(t, spec, nil)
 
 	checkPod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
 	require.NoError(t, err)
@@ -216,11 +229,12 @@ func TestNewCheckPodConfigCheckPodOverridesAreAdditive(t *testing.T) {
 		compressConfigFile bool
 		tlsEnabled         bool
 		configCheckPod     *v1beta1.ConfigCheckPodOverrides
+		expectNoOp         bool
 	}{
-		{name: "NilOverride"},
+		{name: "NilOverride", expectNoOp: true},
+		{name: "EmptyOverride", configCheckPod: &v1beta1.ConfigCheckPodOverrides{}, expectNoOp: true},
 		{name: "WithOverride", configCheckPod: overrides},
-		{name: "WithOverrideAndCompress", compressConfigFile: true, configCheckPod: overrides},
-		{name: "WithOverrideAndTLS", tlsEnabled: true, configCheckPod: overrides},
+		{name: "WithOverrideCompressAndTLS", compressConfigFile: true, tlsEnabled: true, configCheckPod: overrides},
 	}
 
 	for _, tt := range tests {
@@ -229,16 +243,23 @@ func TestNewCheckPodConfigCheckPodOverridesAreAdditive(t *testing.T) {
 			if tt.tlsEnabled {
 				baseSpec.TLS = v1beta1.FluentdTLS{Enabled: true, SecretName: "fluentd-tls-secret"}
 			}
-			baseReconciler := newCheckPodReconciler(t, baseSpec)
+			baseReconciler := newCheckPodReconciler(t, baseSpec, nil)
 			basePod, err := baseReconciler.newCheckPod("deadbeef", *baseReconciler.fluentdSpec)
 			require.NoError(t, err)
 
 			spec := baseSpec.DeepCopy()
 			spec.ConfigCheckPod = tt.configCheckPod
-			r := newCheckPodReconciler(t, spec)
+			r := newCheckPodReconciler(t, spec, nil)
 
 			pod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
 			require.NoError(t, err)
+
+			if tt.expectNoOp {
+				// Nothing to merge must mean nothing changed: this is the whole
+				// backwards-compatibility claim of the configCheckPod field.
+				assert.Equal(t, basePod.Spec, pod.Spec, "an empty configCheckPod must leave the pod spec untouched")
+				return
+			}
 
 			for _, c := range basePod.Spec.InitContainers {
 				assert.Contains(t, pod.Spec.InitContainers, c, "configCheckPod must not drop the operator's own init containers")
@@ -246,11 +267,8 @@ func TestNewCheckPodConfigCheckPodOverridesAreAdditive(t *testing.T) {
 			for _, v := range basePod.Spec.Volumes {
 				assert.Contains(t, pod.Spec.Volumes, v, "configCheckPod must not drop the operator's own volumes")
 			}
-
-			if tt.configCheckPod != nil {
-				assert.Contains(t, pod.Spec.InitContainers, overrideInitContainer)
-				assert.Contains(t, pod.Spec.Volumes, overrideVolume)
-			}
+			assert.Contains(t, pod.Spec.InitContainers, overrideInitContainer)
+			assert.Contains(t, pod.Spec.Volumes, overrideVolume)
 		})
 	}
 }
@@ -258,84 +276,131 @@ func TestNewCheckPodConfigCheckPodOverridesAreAdditive(t *testing.T) {
 // TestConfigCheckDeadlineExceededIsRetried pins that a configcheck pod failed
 // by activeDeadlineSeconds (Status.Reason == "DeadlineExceeded") is deleted
 // and reported not-ready for retry, rather than latched as an invalid config.
-func TestConfigCheckDeadlineExceededIsRetried(t *testing.T) {
-	scheme := runtime.NewScheme()
-	require.NoError(t, corev1.AddToScheme(scheme))
+func TestConfigCheckFailedPodVerdict(t *testing.T) {
+	tests := []struct {
+		name        string
+		reason      string
+		expectRetry bool
+	}{
+		{name: "InvalidConfig", reason: ""},
+		{name: "DeadlineExceeded", reason: "DeadlineExceeded", expectRetry: true},
+		{name: "Evicted", reason: "Evicted", expectRetry: true},
+		{name: "NodeAffinity", reason: "NodeAffinity", expectRetry: true},
+		{name: "Shutdown", reason: "Shutdown", expectRetry: true},
+	}
 
-	logging := &v1beta1.Logging{}
-	logging.Name = "test"
-	logging.Spec.ControlNamespace = "logging"
-	logging.Spec.FluentdSpec = &v1beta1.FluentdSpec{}
-	require.NoError(t, logging.SetDefaults())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := newFakeClient(t)
+			r := newCheckPodReconciler(t, &v1beta1.FluentdSpec{}, fakeClient)
+			ctx := context.Background()
 
-	config := "<system>\n</system>\n"
-	fakeClient := fake.NewClientBuilder().WithScheme(scheme).Build()
-	r := New(fakeClient, log.Log, logging, logging.Spec.FluentdSpec, nil, &config, nil, reconciler.ReconcilerOpts{})
-	ctx := context.Background()
+			_, err := r.configCheck(ctx)
+			require.NoError(t, err)
 
-	// first pass creates the configcheck pod
-	_, err := r.configCheck(ctx)
-	require.NoError(t, err)
+			pods := &corev1.PodList{}
+			require.NoError(t, fakeClient.List(ctx, pods))
+			require.Len(t, pods.Items, 1)
 
-	pods := &corev1.PodList{}
-	require.NoError(t, fakeClient.List(ctx, pods))
-	require.Len(t, pods.Items, 1)
-	pod := &pods.Items[0]
+			pod := &pods.Items[0]
+			pod.Status.Phase = corev1.PodFailed
+			pod.Status.Reason = tt.reason
+			require.NoError(t, fakeClient.Status().Update(ctx, pod))
 
-	pod.Status.Phase = corev1.PodFailed
-	pod.Status.Reason = "DeadlineExceeded"
-	require.NoError(t, fakeClient.Status().Update(ctx, pod))
+			result, err := r.configCheck(ctx)
+			require.NoError(t, err)
 
-	result, err := r.configCheck(ctx)
-	require.NoError(t, err)
-	assert.False(t, result.Ready)
-	assert.False(t, result.Valid)
-	assert.Contains(t, result.Message, "DeadlineExceeded")
+			remaining := &corev1.PodList{}
+			require.NoError(t, fakeClient.List(ctx, remaining))
 
-	remaining := &corev1.PodList{}
-	require.NoError(t, fakeClient.List(ctx, remaining))
-	assert.Empty(t, remaining.Items, "the pod that exceeded its deadline should have been deleted so a fresh one can be created")
+			if !tt.expectRetry {
+				assert.True(t, result.Ready, "an invalid config is a final verdict, not something to retry")
+				assert.False(t, result.Valid)
+				assert.Len(t, remaining.Items, 1, "the pod that proved the config invalid must be kept for diagnosis")
+				return
+			}
+
+			assert.False(t, result.Ready, "a pod killed around the check says nothing about the config")
+			assert.False(t, result.Valid)
+			assert.Contains(t, result.Message, tt.reason)
+			assert.Empty(t, remaining.Items, "the pod must be deleted so a fresh check can be created")
+		})
+	}
 }
 
-// TestNewCheckPodPVCBackedExtraVolumeBecomesEmptyDir pins that a PVC-backed
-// extraVolume (one whose PersistentVolumeClaimSpec is set, meaning it is only
-// ever realized via volumeClaimTemplates on the StatefulSet) is downgraded to
-// an emptyDir on the check pod, since the check pod is a plain Pod with no
-// matching PVC - referencing the claim name outright would make the pod
-// permanently uncreatable.
-func TestNewCheckPodPVCBackedExtraVolumeBecomesEmptyDir(t *testing.T) {
-	spec := &v1beta1.FluentdSpec{
-		ExtraVolumes: []v1beta1.ExtraVolume{
-			{
-				VolumeName:    "geoip-data",
-				ContainerName: "fluentd",
-				Path:          "/geoip",
-				Volume: &volume.KubernetesVolume{
-					PersistentVolumeClaim: &volume.PersistentVolumeClaim{
-						PersistentVolumeClaimSpec: corev1.PersistentVolumeClaimSpec{
-							AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
-							Resources: corev1.VolumeResourceRequirements{
-								Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse("1Gi")},
-							},
-						},
-						PersistentVolumeSource: corev1.PersistentVolumeClaimVolumeSource{ClaimName: "geoip-data"},
-					},
-				},
-			},
+// TestNewCheckPodExtraVolumeClaims pins which extraVolumes the check pod can mount as-is. A spec
+// is only ever realized as a volumeClaimTemplate on the StatefulSet, so on a plain Pod it names a
+// claim that never exists and must become an emptyDir; a bare claimName refers to a claim the user
+// brought themselves, which does exist and must be left alone.
+func TestNewCheckPodExtraVolumeClaims(t *testing.T) {
+	pvcSpec := corev1.PersistentVolumeClaimSpec{
+		AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
+		Resources: corev1.VolumeResourceRequirements{
+			Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse("1Gi")},
 		},
 	}
-	r := newCheckPodReconciler(t, spec)
 
-	pod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
-	require.NoError(t, err)
-
-	var got *corev1.Volume
-	for i := range pod.Spec.Volumes {
-		if pod.Spec.Volumes[i].Name == "geoip-data" {
-			got = &pod.Spec.Volumes[i]
-		}
+	tests := []struct {
+		name            string
+		claim           *volume.PersistentVolumeClaim
+		expectEmptyDir  bool
+		expectClaimName string
+	}{
+		{
+			name: "TemplatedClaimBecomesEmptyDir",
+			claim: &volume.PersistentVolumeClaim{
+				PersistentVolumeClaimSpec: pvcSpec,
+				PersistentVolumeSource:    corev1.PersistentVolumeClaimVolumeSource{ClaimName: "geoip-data"},
+			},
+			expectEmptyDir: true,
+		},
+		{
+			name: "ExistingClaimIsKept",
+			claim: &volume.PersistentVolumeClaim{
+				PersistentVolumeSource: corev1.PersistentVolumeClaimVolumeSource{ClaimName: "geoip-data"},
+			},
+			expectClaimName: "geoip-data",
+		},
 	}
-	require.NotNil(t, got, "extraVolume must still be attached to the check pod")
-	assert.NotNil(t, got.EmptyDir, "a PVC meant for volumeClaimTemplates has no matching PVC on a plain Pod, so the check pod must fall back to an emptyDir")
-	assert.Nil(t, got.PersistentVolumeClaim, "must not reference a claim name that will never exist for the check pod")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			spec := &v1beta1.FluentdSpec{
+				ExtraVolumes: []v1beta1.ExtraVolume{
+					{
+						VolumeName:    "geoip-data",
+						ContainerName: "fluentd",
+						Path:          "/geoip",
+						Volume:        &volume.KubernetesVolume{PersistentVolumeClaim: tt.claim},
+					},
+				},
+			}
+			r := newCheckPodReconciler(t, spec, nil)
+
+			pod, err := r.newCheckPod("deadbeef", *r.fluentdSpec)
+			require.NoError(t, err)
+
+			var got *corev1.Volume
+			for i := range pod.Spec.Volumes {
+				if pod.Spec.Volumes[i].Name == "geoip-data" {
+					got = &pod.Spec.Volumes[i]
+				}
+			}
+			require.NotNil(t, got, "extraVolume must still be attached to the check pod")
+
+			if tt.expectEmptyDir {
+				assert.NotNil(t, got.EmptyDir)
+				assert.Nil(t, got.PersistentVolumeClaim, "must not reference a claim that will never exist for the check pod")
+			} else {
+				require.NotNil(t, got.PersistentVolumeClaim, "a claim the user brought themselves must be mounted as-is")
+				assert.Equal(t, tt.expectClaimName, got.PersistentVolumeClaim.ClaimName)
+			}
+
+			// The substitution must not lose the mount it exists for.
+			assert.Contains(t, pod.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
+				Name:      "geoip-data",
+				MountPath: "/geoip",
+			})
+		})
+	}
 }
