@@ -330,18 +330,18 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
 	for _, n := range fluentdSpec.ExtraVolumes {
-		// The check pod is a plain, one-shot Pod, not part of the StatefulSet, so a
-		// PVC-backed extraVolume meant to be provisioned via volumeClaimTemplates
-		// (statefulset.go) never has a matching PVC here; mount an emptyDir instead
-		// - the dry-run only needs the mount path to resolve, not real data.
-		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil && !isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
-			emptyDirVolume := volume.KubernetesVolume{EmptyDir: &corev1.EmptyDirVolumeSource{}}
-			if err := emptyDirVolume.ApplyVolumeForPodSpec(n.VolumeName, n.ContainerName, n.Path, &pod.Spec); err != nil {
-				r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
-			}
-			continue
+		checkVolume := n.Volume
+		// The check pod is a plain, one-shot Pod, so a PVC-backed extraVolume - which the
+		// StatefulSet only ever gets through volumeClaimTemplates - has no claim to bind to
+		// here. The dry-run needs the mount path to resolve, not the data behind it.
+		if isPVCBacked(n.Volume) {
+			r.Log.Info("extraVolume is PVC-backed, mounting an empty dir on the configcheck pod instead",
+				"volume", n.VolumeName,
+				"path", n.Path,
+				"hint", "set fluentd.configCheckPod.volumes with the same name if the check needs its contents")
+			checkVolume = &volume.KubernetesVolume{EmptyDir: &corev1.EmptyDirVolumeSource{}}
 		}
-		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
+		if err := checkVolume.ApplyVolumeForPodSpec(n.VolumeName, n.ContainerName, n.Path, &pod.Spec); err != nil {
 			r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
 		}
 	}
