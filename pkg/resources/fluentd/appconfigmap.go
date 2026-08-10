@@ -191,23 +191,14 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		case corev1.PodRunning:
 			return &ConfigCheckResult{}, nil
 		case corev1.PodFailed:
-			if pod.Status.Reason != "" {
-				// A pod that fails with a Reason (DeadlineExceeded, Evicted, Shutdown,
-				// NodeAffinity, ...) didn't fail because of an invalid config - a real
-				// config validation failure leaves Status.Reason empty. Delete it so a
-				// fresh one is created and retried instead of latching a false
-				// "config is invalid" verdict.
-				r.Log.Info("configcheck pod did not complete normally, deleting it to retry",
-					"pod", pod.Name,
-					"reason", pod.Status.Reason,
-					"activeDeadlineSeconds", pod.Spec.ActiveDeadlineSeconds,
-					"runningContainer", stillRunningContainer(pod))
-				if err := client.IgnoreNotFound(r.Client.Delete(ctx, pod)); err != nil {
-					return nil, errors.WrapIf(err, "failed to delete configcheck pod that did not complete normally")
-				}
+			message, err := configcheck.RetryAbnormalFailure(ctx, r.Client, r.Log, pod)
+			if err != nil {
+				return nil, err
+			}
+			if message != "" {
 				return &ConfigCheckResult{
 					Ready:   false,
-					Message: fmt.Sprintf("configcheck pod %s did not complete normally (reason: %s), deleted for retry", pod.Name, pod.Status.Reason),
+					Message: message,
 				}, nil
 			}
 			return &ConfigCheckResult{
@@ -231,24 +222,6 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	}
 
 	return &ConfigCheckResult{}, nil
-}
-
-// stillRunningContainer returns the name of the container that was still
-// running when its pod stopped, if any - useful for diagnosing why a
-// configcheck pod with a helper container (e.g. a native sidecar) didn't
-// complete in time.
-func stillRunningContainer(pod *corev1.Pod) string {
-	for _, cs := range pod.Status.InitContainerStatuses {
-		if cs.State.Running != nil {
-			return cs.Name
-		}
-	}
-	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Running != nil {
-			return cs.Name
-		}
-	}
-	return ""
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
@@ -357,18 +330,18 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 		pod.Spec.Containers[0].VolumeMounts = append(pod.Spec.Containers[0].VolumeMounts, volumeMount)
 	}
 	for _, n := range fluentdSpec.ExtraVolumes {
-		// The check pod is a plain, one-shot Pod, not part of the StatefulSet, so a
-		// PVC-backed extraVolume meant to be provisioned via volumeClaimTemplates
-		// (statefulset.go) never has a matching PVC here; mount an emptyDir instead
-		// - the dry-run only needs the mount path to resolve, not real data.
-		if n.Volume != nil && n.Volume.PersistentVolumeClaim != nil && !isPersistentVolumeClaimSpecEmpty(n.Volume.PersistentVolumeClaim.PersistentVolumeClaimSpec) {
-			emptyDirVolume := volume.KubernetesVolume{EmptyDir: &corev1.EmptyDirVolumeSource{}}
-			if err := emptyDirVolume.ApplyVolumeForPodSpec(n.VolumeName, n.ContainerName, n.Path, &pod.Spec); err != nil {
-				r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
-			}
-			continue
+		checkVolume := n.Volume
+		// The check pod is a plain, one-shot Pod, so a PVC-backed extraVolume - which the
+		// StatefulSet only ever gets through volumeClaimTemplates - has no claim to bind to
+		// here. The dry-run needs the mount path to resolve, not the data behind it.
+		if isPVCBacked(n.Volume) {
+			r.Log.Info("extraVolume is PVC-backed, mounting an empty dir on the configcheck pod instead",
+				"volume", n.VolumeName,
+				"path", n.Path,
+				"hint", "set fluentd.configCheckPod.volumes with the same name if the check needs its contents")
+			checkVolume = &volume.KubernetesVolume{EmptyDir: &corev1.EmptyDirVolumeSource{}}
 		}
-		if err := n.ApplyVolumeForPodSpec(&pod.Spec); err != nil {
+		if err := checkVolume.ApplyVolumeForPodSpec(n.VolumeName, n.ContainerName, n.Path, &pod.Spec); err != nil {
 			r.Log.Error(err, "Fluentd Config check pod extraVolume attachment failed.")
 		}
 	}
