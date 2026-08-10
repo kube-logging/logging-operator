@@ -191,23 +191,14 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 		case corev1.PodRunning:
 			return &ConfigCheckResult{}, nil
 		case corev1.PodFailed:
-			if pod.Status.Reason != "" {
-				// A pod that fails with a Reason (DeadlineExceeded, Evicted, Shutdown,
-				// NodeAffinity, ...) didn't fail because of an invalid config - a real
-				// config validation failure leaves Status.Reason empty. Delete it so a
-				// fresh one is created and retried instead of latching a false
-				// "config is invalid" verdict.
-				r.Log.Info("configcheck pod did not complete normally, deleting it to retry",
-					"pod", pod.Name,
-					"reason", pod.Status.Reason,
-					"activeDeadlineSeconds", pod.Spec.ActiveDeadlineSeconds,
-					"runningContainer", stillRunningContainer(pod))
-				if err := client.IgnoreNotFound(r.Client.Delete(ctx, pod)); err != nil {
-					return nil, errors.WrapIf(err, "failed to delete configcheck pod that did not complete normally")
-				}
+			message, err := configcheck.RetryAbnormalFailure(ctx, r.Client, r.Log, pod)
+			if err != nil {
+				return nil, err
+			}
+			if message != "" {
 				return &ConfigCheckResult{
 					Ready:   false,
-					Message: fmt.Sprintf("configcheck pod %s did not complete normally (reason: %s), deleted for retry", pod.Name, pod.Status.Reason),
+					Message: message,
 				}, nil
 			}
 			return &ConfigCheckResult{
@@ -231,24 +222,6 @@ func (r *Reconciler) configCheck(ctx context.Context) (*ConfigCheckResult, error
 	}
 
 	return &ConfigCheckResult{}, nil
-}
-
-// stillRunningContainer returns the name of the container that was still
-// running when its pod stopped, if any - useful for diagnosing why a
-// configcheck pod with a helper container (e.g. a native sidecar) didn't
-// complete in time.
-func stillRunningContainer(pod *corev1.Pod) string {
-	for _, cs := range pod.Status.InitContainerStatuses {
-		if cs.State.Running != nil {
-			return cs.Name
-		}
-	}
-	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Running != nil {
-			return cs.Name
-		}
-	}
-	return ""
 }
 
 func (r *Reconciler) newCheckSecret(hashKey string, fluentdSpec v1beta1.FluentdSpec) (*corev1.Secret, error) {
