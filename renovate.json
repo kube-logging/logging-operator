@@ -41,6 +41,20 @@
       "description": [
         "setup-envtest can only use Kubernetes versions that have published envtest binaries, which ship as envtest-v* releases of controller-tools."
       ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Makefile$/"
+      ],
+      "matchStrings": [
+        "KIND_IMAGE\\s*\\?*=\\s*kindest/node:(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "kindest/node",
+      "description": [
+        "The KIND node image is not a *_VERSION variable, so the general Makefile manager does not see it."
+      ]
     }
   ],
   "enabled": true,
