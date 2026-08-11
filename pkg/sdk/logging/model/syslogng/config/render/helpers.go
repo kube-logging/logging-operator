@@ -17,12 +17,11 @@ package render
 import (
 	"fmt"
 	"io"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 
 	"github.com/siliconbrain/go-seqs/seqs"
-	"golang.org/x/exp/constraints"
-	"golang.org/x/exp/maps"
 )
 
 type Renderer = func(ctx RenderContext) error
@@ -148,8 +147,7 @@ func StringList(stringList []string) Renderer {
 
 // ArrowMap renders a map as a key=>value style map used at various places of the config grammar
 func ArrowMap(v map[string]string, keyRenderer func(string) Renderer, valueRenderer func(string) Renderer) Renderer {
-	keys := maps.Keys(v)
-	sort.Strings(keys)
+	keys := slices.Sorted(maps.Keys(v))
 	lines := []Renderer{NewLine}
 	for _, key := range keys {
 		lines = append(lines, Line(SpaceSeparated(keyRenderer(key), String("=>"), valueRenderer(v[key]))))
@@ -158,7 +156,10 @@ func ArrowMap(v map[string]string, keyRenderer func(string) Renderer, valueRende
 }
 
 type LiteralTypes interface {
-	bool | string | constraints.Float | constraints.Integer
+	bool | string |
+		~float32 | ~float64 |
+		~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
 func writeString(w io.Writer, s string) error {
