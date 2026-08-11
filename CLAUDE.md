@@ -53,6 +53,9 @@ When running `go` commands targeting SDK code, `cd pkg/sdk` first.
 
 ## Build & Development Commands
 
+Tool versions are pinned as `*_VERSION` variables at the top of the `Makefile`. Each needs a
+`# renovate:` comment above it, otherwise renovate never proposes an update for it.
+
 ```bash
 # Build operator binary
 make manager
