@@ -86,12 +86,6 @@
     },
     {
       "matchUpdateTypes": [
-        "major"
-      ],
-      "enabled": false
-    },
-    {
-      "matchUpdateTypes": [
         "minor"
       ],
       "minimumReleaseAge": "60 days",
