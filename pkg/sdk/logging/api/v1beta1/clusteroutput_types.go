@@ -20,12 +20,12 @@ import (
 
 // +name:"ClusterOutput"
 // +weight:"200"
-type _hugoClusterOutput interface{} //nolint:deadcode,unused
+type _hugoClusterOutput any //nolint:deadcode,unused
 
 // +name:"ClusterOutput"
 // +version:"v1beta1"
 // +description:"ClusterOutput is the Schema for the clusteroutputs API"
-type _metaClusterOutput interface{} //nolint:deadcode,unused
+type _metaClusterOutput any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

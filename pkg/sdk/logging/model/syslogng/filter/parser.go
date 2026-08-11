@@ -16,7 +16,7 @@ package filter
 
 // +name:"Parser"
 // +weight:"200"
-type _hugoParser interface{} //nolint:deadcode,unused
+type _hugoParser any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Parser](https://axoflow.com/docs/axosyslog-core/chapter-parsers/)"
@@ -53,14 +53,14 @@ The syslog parser can parse syslog messages. For details, see the [documentation
       syslog-parser: {}
 {{</ highlight >}}
 */
-type _docParser interface{} //nolint:deadcode,unused
+type _docParser any //nolint:deadcode,unused
 
 // +name:"Syslog-NG Parser"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-parsers/"
 // +version:"more info"
 // +description:"Parse data from records"
 // +status:"GA"
-type _metaParser interface{} //nolint:deadcode,unused
+type _metaParser any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Parser](https://axoflow.com/docs/axosyslog-core/chapter-parsers/)"

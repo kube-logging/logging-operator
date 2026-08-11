@@ -22,7 +22,7 @@ import (
 
 // +name:"Datadog"
 // +weight:"200"
-type _hugoDatadog interface{} //nolint:deadcode,unused
+type _hugoDatadog any //nolint:deadcode,unused
 
 // +docName:"Datadog output plugin for Fluentd"
 /*
@@ -40,14 +40,14 @@ spec:
     dd_sourcecategory: '<YOUR_SOURCE_CATEGORY>'
 ```
 */
-type _docDatadog interface{} //nolint:deadcode,unused
+type _docDatadog any //nolint:deadcode,unused
 
 // +name:"Datadog"
 // +url:"https://github.com/DataDog/fluent-plugin-datadog/releases/tag/v0.14.1"
 // +version:"0.14.1"
 // +description:"Send your logs to Datadog"
 // +status:"Testing"
-type _metaDatadog interface{} //nolint:deadcode,unused
+type _metaDatadog any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

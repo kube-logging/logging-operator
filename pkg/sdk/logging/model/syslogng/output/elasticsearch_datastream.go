@@ -16,7 +16,7 @@ package output
 
 // +name:"Elasticsearch datastream"
 // +weight:"200"
-type _hugoElasticsearchDatastream interface{} //nolint:deadcode,unused
+type _hugoElasticsearchDatastream any //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch datastreams"
 /*
@@ -40,13 +40,13 @@ spec:
           key: password
 {{</ highlight >}}
 */
-type _docSElasticsearchDatastream interface{} //nolint:deadcode,unused
+type _docSElasticsearchDatastream any //nolint:deadcode,unused
 
 // +name:"Elasticsearch datastream"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/"
 // +description:"Sending messages over Elasticsearch datastreams"
 // +status:"Testing"
-type _metaElasticsearchDatastream interface{} //nolint:deadcode,unused
+type _metaElasticsearchDatastream any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ElasticsearchDatastreamOutput struct {

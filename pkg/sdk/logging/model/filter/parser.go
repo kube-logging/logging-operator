@@ -25,19 +25,19 @@ import (
 
 // +name:"Parser"
 // +weight:"200"
-type _hugoParser interface{} //nolint:deadcode,unused
+type _hugoParser any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Parser Filter](https://docs.fluentd.org/filter/parser)"
 // Parses a string field in event records and mutates its event record with the parsed result.
-type _docParser interface{} //nolint:deadcode,unused
+type _docParser any //nolint:deadcode,unused
 
 // +name:"Parser"
 // +url:"https://docs.fluentd.org/filter/parser"
 // +version:"more info"
 // +description:"Parses a string field in event records and mutates its event record with the parsed result."
 // +status:"GA"
-type _metaParser interface{} //nolint:deadcode,unused
+type _metaParser any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ParserConfig struct {
@@ -256,7 +256,7 @@ Fluentd config result:
 </filter>
 {{</ highlight >}}
 */
-type _expParser interface{} //nolint:deadcode,unused
+type _expParser any //nolint:deadcode,unused
 
 func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseSection := &types.GenericDirective{

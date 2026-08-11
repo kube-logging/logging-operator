@@ -20,7 +20,7 @@ import (
 
 // +name:"Redis"
 // +weight:"200"
-type _hugoRedis interface{} //nolint:deadcode,unused
+type _hugoRedis any //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to the Redis server"
 /*
@@ -48,13 +48,13 @@ spec:
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/).
 */
-type _docRedis interface{} //nolint:deadcode,unused
+type _docRedis any //nolint:deadcode,unused
 
 // +name:"Redis Server Destination"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-redis/"
 // +description:"Sending messages from local network to the Redis server"
 // +status:"Testing"
-type _metaRedis interface{} //nolint:deadcode,unused
+type _metaRedis any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RedisOutput struct {

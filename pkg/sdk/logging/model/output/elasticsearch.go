@@ -22,7 +22,7 @@ import (
 
 // +name:"Elasticsearch"
 // +weight:"200"
-type _hugoElasticsearch interface{} //nolint:deadcode,unused
+type _hugoElasticsearch any //nolint:deadcode,unused
 
 // +docName:"Elasticsearch output plugin for Fluentd"
 /* For details, see [https://github.com/uken/fluent-plugin-elasticsearch](https://github.com/uken/fluent-plugin-elasticsearch).
@@ -45,14 +45,14 @@ spec:
       timekey_use_utc: true
 ```
 */
-type _docElasticsearch interface{} //nolint:deadcode,unused
+type _docElasticsearch any //nolint:deadcode,unused
 
 // +name:"Elasticsearch"
 // +url:"https://github.com/uken/fluent-plugin-elasticsearch/releases/tag/v5.1.4"
 // +version:"5.1.1"
 // +description:"Send your logs to Elasticsearch"
 // +status:"GA"
-type _metaElasticsearch interface{} //nolint:deadcode,unused
+type _metaElasticsearch any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Elasticsearch"

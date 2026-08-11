@@ -26,12 +26,12 @@ import (
 
 // +name:"HostTailer"
 // +weight:"200"
-type _hugoHostTailer = interface{} //nolint:deadcode,unused
+type _hugoHostTailer = any //nolint:deadcode,unused
 
 // +name:"HostTailer"
 // +version:"v1alpha1"
 // +description:"HostTailer's main goal is to tail custom files and transmit their changes to stdout. This way the logging-operator is able to process them."
-type _metaHostTailer = interface{} //nolint:deadcode,unused
+type _metaHostTailer = any //nolint:deadcode,unused
 
 // HostTailerSpec defines the desired state of HostTailer
 type HostTailerSpec struct {

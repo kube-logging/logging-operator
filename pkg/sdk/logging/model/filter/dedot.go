@@ -22,19 +22,19 @@ import (
 
 // +name:"Dedot"
 // +weight:"200"
-type _hugoDedot interface{} //nolint:deadcode,unused
+type _hugoDedot any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Dedot Filter](https://github.com/lunardial/fluent-plugin-dedot_filter)"
 // Fluentd Filter plugin to de-dot field name for elasticsearch.
-type _docDedot interface{} //nolint:deadcode,unused
+type _docDedot any //nolint:deadcode,unused
 
 // +name:"Dedot"
 // +url:"https://github.com/lunardial/fluent-plugin-dedot_filter"
 // +version:"1.0.0"
 // +description:"Fluentd Filter plugin to de-dot field name for elasticsearch"
 // +status:"GA"
-type _metaDedot interface{} //nolint:deadcode,unused
+type _metaDedot any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type DedotFilterConfig struct {
@@ -74,7 +74,7 @@ Fluentd config result:
 </filter>
 {{</ highlight >}}
 */
-type _expDedot interface{} //nolint:deadcode,unused
+type _expDedot any //nolint:deadcode,unused
 
 func NewDedotFilterConfig() *DedotFilterConfig {
 	return &DedotFilterConfig{}

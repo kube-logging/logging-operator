@@ -23,14 +23,14 @@ import (
 
 // +name:"Forward"
 // +weight:"200"
-type _hugoForward interface{} //nolint:deadcode,unused
+type _hugoForward any //nolint:deadcode,unused
 
 // +name:"Forward"
 // +url:"https://docs.fluentd.org/output/forward"
 // +version:"more info"
 // +description:"Forwards events to other fluentd nodes."
 // +status:"GA"
-type _metaForward interface{} //nolint:deadcode,unused
+type _metaForward any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ForwardOutput struct {

@@ -22,7 +22,7 @@ import (
 
 // +name:"ElasticSearch GenId"
 // +weight:"200"
-type _hugoElasticsearchGenId interface{} //nolint:deadcode,unused
+type _hugoElasticsearchGenId any //nolint:deadcode,unused
 
 // +docName:"ElasticSearch GenId"
 /*
@@ -52,13 +52,13 @@ Fluentd Config Result
 </filter>
 {{</ highlight >}}
 */
-type _docElasticsearchGenId interface{} //nolint:deadcode,unused
+type _docElasticsearchGenId any //nolint:deadcode,unused
 
 // +name:"ElasticSearch GenId"
 // +url:"TODO"
 // +description:""
 // +status:""
-type _metaElasticsearchGenId interface{} //nolint:deadcode,unused
+type _metaElasticsearchGenId any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ElasticsearchGenId struct {

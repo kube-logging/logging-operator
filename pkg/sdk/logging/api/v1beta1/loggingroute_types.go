@@ -18,12 +18,12 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // +name:"LoggingRouteSpec"
 // +weight:"200"
-type _hugoLoggingRouteSpec interface{} //nolint:deadcode,unused
+type _hugoLoggingRouteSpec any //nolint:deadcode,unused
 
 // +name:"LoggingRouteSpec"
 // +version:"v1beta1"
 // +description:"LoggingRouteSpec defines the desired state of LoggingRoute"
-type _metaLoggingRouteSpec interface{} //nolint:deadcode,unused
+type _metaLoggingRouteSpec any //nolint:deadcode,unused
 
 // LoggingRouteSpec defines the desired state of LoggingRoute
 type LoggingRouteSpec struct {

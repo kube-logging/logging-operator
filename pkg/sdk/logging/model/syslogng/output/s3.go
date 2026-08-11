@@ -20,7 +20,7 @@ import (
 
 // +name:"S3"
 // +weight:"200"
-type _hugoS3 interface{} //nolint:deadcode,unused
+type _hugoS3 any //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to a S3 (compatible) server"
 /*
@@ -53,13 +53,13 @@ spec:
 
 For available macros like `$PROGRAM` and `$HOST`,  see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/).
 */
-type _docS3 interface{} //nolint:deadcode,unused
+type _docS3 any //nolint:deadcode,unused
 
 // +name:"S3 Destination"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-s3/"
 // +description:"Sending messages from a local network to a S3 (compatible) server"
 // +status:"Testing"
-type _metaS3 interface{} //nolint:deadcode,unused
+type _metaS3 any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type S3Output struct {

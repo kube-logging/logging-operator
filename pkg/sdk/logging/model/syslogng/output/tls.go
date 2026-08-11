@@ -18,17 +18,17 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"TLS config for syslog-ng outputs"
 // +weight:"200"
-type _hugoTLS interface{} //nolint:deadcode,unused
+type _hugoTLS any //nolint:deadcode,unused
 
 // +docName:"TLS config for syslog-ng outputs"
 // For details on how TLS configuration works in syslog-ng, see the [AxoSyslog Core documentation](https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/).
-type _docTLS interface{} //nolint:deadcode,unused
+type _docTLS any //nolint:deadcode,unused
 
 // +name:"TLS config for syslog-ng outputs"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-encrypted-transport-tls/"
 // +description:"TLS config for syslog-ng outputs"
 // +status:"Testing"
-type _metaTLS interface{} //nolint:deadcode,unused
+type _metaTLS any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type TLS struct {

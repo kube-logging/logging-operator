@@ -51,7 +51,7 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	done := make(chan interface{})
+	done := make(chan any)
 	go func() {
 		zapLog, err := zap.NewDevelopment(zap.ErrorOutput(zapcore.AddSync(GinkgoWriter)))
 		if err != nil {

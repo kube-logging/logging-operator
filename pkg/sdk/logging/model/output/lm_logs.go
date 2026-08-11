@@ -22,7 +22,7 @@ import (
 
 // +name:"LogicMonitor Logs"
 // +weight:"200"
-type _hugoLMLogs interface{} //nolint:deadcode,unused
+type _hugoLMLogs any //nolint:deadcode,unused
 
 // +docName:"LogicMonitor Logs output plugin for Fluentd"
 /*
@@ -53,14 +53,14 @@ spec:
     debug: false
 ```
 */
-type _docLMLogs interface{} //nolint:deadcode,unused
+type _docLMLogs any //nolint:deadcode,unused
 
 // +name:"LogicMonitorLogs"
 // +url:"https://github.com/logicmonitor/lm-logs-fluentd/releases/tag/v.1.2.5"
 // +version:"v1.2.5"
 // +description:"Send your logs to LogicMonitor Logs"
 // +status:"GA"
-type _metaLMLogs interface{} //nolint:deadcode,unused
+type _metaLMLogs any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"LogicMonitorLogs"

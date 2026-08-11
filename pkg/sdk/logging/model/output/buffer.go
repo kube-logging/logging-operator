@@ -24,14 +24,14 @@ import (
 
 // +name:"Buffer"
 // +weight:"200"
-type _hugoBuffer interface{} //nolint:deadcode,unused
+type _hugoBuffer any //nolint:deadcode,unused
 
 // +name:"Buffer"
 // +url:"https://docs.fluentd.org/configuration/buffer-section"
 // +version:"mode info"
 // +description:"Fluentd event buffer"
 // +status:"GA"
-type _metaBuffer interface{} //nolint:deadcode,unused
+type _metaBuffer any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 

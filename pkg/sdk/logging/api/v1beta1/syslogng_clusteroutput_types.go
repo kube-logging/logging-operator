@@ -20,12 +20,12 @@ import (
 
 // +name:"SyslogNGClusterOutput"
 // +weight:"200"
-type _hugoSyslogNGClusterOutput interface{} //nolint:deadcode,unused
+type _hugoSyslogNGClusterOutput any //nolint:deadcode,unused
 
 // +name:"SyslogNGClusterOutput"
 // +version:"v1beta1"
 // +description:"SyslogNGClusterOutput is the Schema for the syslog-ng clusteroutputs API"
-type _metaSyslogNGClusterOutput interface{} //nolint:deadcode,unused
+type _metaSyslogNGClusterOutput any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

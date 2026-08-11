@@ -16,7 +16,7 @@ package filter
 
 // +name:"Rewrite"
 // +weight:"200"
-type _hugoRewrite interface{} //nolint:deadcode,unused
+type _hugoRewrite any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Rewrite](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/)"
@@ -106,14 +106,14 @@ You can unset macros or fields of the message.
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/modifying-messages/rewrite-unset/).
 */
-type _docRewrite interface{} //nolint:deadcode,unused
+type _docRewrite any //nolint:deadcode,unused
 
 // +name:"Syslog-NG Rewrite"
 // +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/77"
 // +version:"more info"
 // +description:"Rewrite parts of the message"
 // +status:"GA"
-type _metaRewrite interface{} //nolint:deadcode,unused
+type _metaRewrite any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type RewriteConfig struct {

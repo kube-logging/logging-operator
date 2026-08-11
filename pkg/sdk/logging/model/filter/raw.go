@@ -27,7 +27,7 @@ import (
 
 // +name:"Raw"
 // +weight:"200"
-type _hugoRaw interface{} //nolint:deadcode,unused
+type _hugoRaw any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Raw"
@@ -104,14 +104,14 @@ Fluentd Config Result
 {{</ highlight >}}
 
 */
-type _docRaw interface{} //nolint:deadcode,unused
+type _docRaw any //nolint:deadcode,unused
 
 // +name:"Raw"
 // +url:""
 // +version:""
 // +description:"Configure raw filter."
 // +status:""
-type _metaRaw interface{} //nolint:deadcode,unused
+type _metaRaw any //nolint:deadcode,unused
 
 var (
 	sectionPattern = regexp.MustCompile(`^<([^\s>/]+)\s*([^>]*)>$`)

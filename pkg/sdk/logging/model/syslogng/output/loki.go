@@ -20,7 +20,7 @@ import (
 
 // +name:"Loki"
 // +weight:"200"
-type _hugoLoki interface{} //nolint:deadcode,unused
+type _hugoLoki any //nolint:deadcode,unused
 
 // +docName:"Sending messages to Loki over gRPC"
 /*
@@ -53,13 +53,13 @@ spec:
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/). For available macros like `$PROGRAM` and `$HOST` see https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/
 */
-type _docLoki interface{} //nolint:deadcode,unused
+type _docLoki any //nolint:deadcode,unused
 
 // +name:"Loki"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/"
 // +description:"Sending messages to Loki over gRPC"
 // +status:"Testing"
-type _metaLoki interface{} //nolint:deadcode,unused
+type _metaLoki any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type LokiOutput struct {

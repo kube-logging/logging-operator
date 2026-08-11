@@ -22,19 +22,19 @@ import (
 
 // +name:"Concat"
 // +weight:"200"
-type _hugoConcat interface{} //nolint:deadcode,unused
+type _hugoConcat any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Concat Filter](https://github.com/fluent-plugins-nursery/fluent-plugin-concat)"
 // Fluentd Filter plugin to concatenate multiline log separated in multiple events.
-type _docConcat interface{} //nolint:deadcode,unused
+type _docConcat any //nolint:deadcode,unused
 
 // +name:"Concat"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-concat"
 // +version:"2.5.0"
 // +description:"Fluentd Filter plugin to concatenate multiline log separated in multiple events."
 // +status:"GA"
-type _metaConcat interface{} //nolint:deadcode,unused
+type _metaConcat any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type Concat struct {
@@ -111,7 +111,7 @@ Fluentd config result:
 </filter>
 {{</ highlight >}}
 */
-type _expConcat interface{} //nolint:deadcode,unused
+type _expConcat any //nolint:deadcode,unused
 
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "concat"

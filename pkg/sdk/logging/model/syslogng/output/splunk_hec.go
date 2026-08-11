@@ -18,7 +18,7 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"SplunkHEC"
 // +weight:"200"
-type _hugoSplunkHEC interface{} //nolint:deadcode,unused
+type _hugoSplunkHEC any //nolint:deadcode,unused
 
 // +docName:"Sending messages over Splunk HEC"
 /*
@@ -43,13 +43,13 @@ spec:
             key: token
 {{</ highlight >}}
 */
-type _docSplunkHEC interface{} //nolint:deadcode,unused
+type _docSplunkHEC any //nolint:deadcode,unused
 
 // +name:"SplunkHEC"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/syslog-ng-with-splunk/
 // +description:"Sending messages over Splunk HEC"
 // +status:"Testing"
-type _metaSplunkHEC interface{} //nolint:deadcode,unused
+type _metaSplunkHEC any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SplunkHECOutput struct {

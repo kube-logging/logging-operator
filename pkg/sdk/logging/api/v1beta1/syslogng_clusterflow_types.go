@@ -22,12 +22,12 @@ import (
 
 // +name:"SyslogNGClusterFlow"
 // +weight:"200"
-type _hugoSyslogNGClusterFlow interface{} //nolint:deadcode,unused
+type _hugoSyslogNGClusterFlow any //nolint:deadcode,unused
 
 // +name:"SyslogNGClusterFlow"
 // +version:"v1beta1"
 // +description:"SyslogNGClusterFlow is the Schema for the syslog-ng clusterflows API"
-type _metaSyslogNGClusterFlow interface{} //nolint:deadcode,unused
+type _metaSyslogNGClusterFlow any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

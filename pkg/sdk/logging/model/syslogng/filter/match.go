@@ -16,7 +16,7 @@ package filter
 
 // +name:"Match"
 // +weight:"200"
-type _hugoMatch interface{} //nolint:deadcode,unused
+type _hugoMatch any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Match"
@@ -37,14 +37,14 @@ filters:
         type: string
 {{</ highlight >}}
 */
-type _docMatch interface{} //nolint:deadcode,unused
+type _docMatch any //nolint:deadcode,unused
 
 // +name:"Syslog-NG Match"
 // +url:"https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/65#TOPIC-1829159"
 // +version:"more info"
 // +description:"Selectively keep records"
 // +status:"GA"
-type _metaMatch interface{} //nolint:deadcode,unused
+type _metaMatch any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type MatchConfig MatchExpr
@@ -123,4 +123,4 @@ log {
 };
 ```
 */
-type _expRegexpMatch interface{} //nolint:deadcode,unused
+type _expRegexpMatch any //nolint:deadcode,unused

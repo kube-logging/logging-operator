@@ -20,7 +20,7 @@ import (
 
 // +name:"MongoDB"
 // +weight:"200"
-type _hugoMongoDB interface{} //nolint:deadcode,unused
+type _hugoMongoDB any //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to an MongoDB database"
 /*
@@ -45,13 +45,13 @@ spec:
 
 For more information, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/).
 */
-type _docMongoDB interface{} //nolint:deadcode,unused
+type _docMongoDB any //nolint:deadcode,unused
 
 // +name:"MongoDB Destination"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-mongodb/"
 // +description:"Sending messages into MongoDB Server"
 // +status:"Testing"
-type _metaMongoDB interface{} //nolint:deadcode,unused
+type _metaMongoDB any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type MongoDB struct {

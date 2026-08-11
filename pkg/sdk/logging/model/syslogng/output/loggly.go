@@ -18,7 +18,7 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"Loggly output"
 // +weight:"200"
-type _hugoLoggly interface{} //nolint:deadcode,unused
+type _hugoLoggly any //nolint:deadcode,unused
 
 // +docName:"Loggly output plugin for syslog-ng"
 /*
@@ -31,13 +31,13 @@ For details on the available options of the output, see the [documentation of th
 
 You need a Loggly account and your user token to use this output.
 */
-type _docLoggly interface{} //nolint:deadcode,unused
+type _docLoggly any //nolint:deadcode,unused
 
 // +name:"Loggly"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-loggly/"
 // +description:"Send your logs to loggly"
 // +status:"Testing"
-type _metaLoggly interface{} //nolint:deadcode,unused
+type _metaLoggly any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Documentation: https://github.com/syslog-ng/syslog-ng/blob/master/scl/loggly/loggly.conf

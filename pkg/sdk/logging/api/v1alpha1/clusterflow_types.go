@@ -22,12 +22,12 @@ import (
 
 // +name:"ClusterFlow"
 // +weight:"200"
-type _hugoClusterFlow interface{} //nolint:deadcode,unused
+type _hugoClusterFlow any //nolint:deadcode,unused
 
 // +name:"ClusterFlow"
 // +version:"v1alpha1"
 // +description:"ClusterFlow is the Schema for the clusterflows API"
-type _metaClusterFlow interface{} //nolint:deadcode,unused
+type _metaClusterFlow any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

@@ -199,7 +199,7 @@ func TestConversion(t *testing.T) {
 		Field int `json:"field" plugin:"converter:magic"`
 	}
 
-	converter := func(f interface{}) (string, error) {
+	converter := func(f any) (string, error) {
 		if converted, ok := f.(int); ok {
 			return strconv.Itoa(converted), nil
 		}

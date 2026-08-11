@@ -22,7 +22,7 @@ import (
 
 // +name:"Null"
 // +weight:"200"
-type _hugoNull interface{} //nolint:deadcode,unused
+type _hugoNull any //nolint:deadcode,unused
 
 // +docName:"Null output plugin for Fluentd"
 //
@@ -37,14 +37,14 @@ spec:
     never_flush: false
 ```
 */
-type _docNull interface{} //nolint:deadcode,unused
+type _docNull any //nolint:deadcode,unused
 
 // +name:"Null"
 // +url:"https://docs.fluentd.org/output/null"
 // +version:"more info"
 // +description:"Null output plugin just throws away events."
 // +status:"GA"
-type _metaNull interface{} //nolint:deadcode,unused
+type _metaNull any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 

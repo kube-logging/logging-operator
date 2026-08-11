@@ -31,12 +31,12 @@ import (
 
 // +name:"FluentdSpec"
 // +weight:"200"
-type _hugoFluentdSpec interface{} //nolint:deadcode,unused
+type _hugoFluentdSpec any //nolint:deadcode,unused
 
 // +name:"FluentdSpec"
 // +version:"v1beta1"
 // +description:"FluentdSpec defines the desired state of Fluentd"
-type _metaFluentdSpec interface{} //nolint:deadcode,unused
+type _metaFluentdSpec any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 
@@ -268,7 +268,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 				}
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode == nil {
-				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = persistentVolumeModePointer(corev1.PersistentVolumeFilesystem)
+				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeClaimSpec.VolumeMode = new(corev1.PersistentVolumeFilesystem)
 			}
 			if f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName == "" {
 				f.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName = DefaultFluentdBufferStorageVolumeName

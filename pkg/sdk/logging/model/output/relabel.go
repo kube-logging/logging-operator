@@ -22,7 +22,7 @@ import (
 
 // +name:"Relabel"
 // +weight:"200"
-type _hugoRelabel interface{} //nolint:deadcode,unused
+type _hugoRelabel any //nolint:deadcode,unused
 
 // +docName:"Relabel"
 /*
@@ -85,14 +85,14 @@ spec:
 
 Using the relabel output also makes it possible to pass the messages emitted by the {{% xref "/docs/configuration/plugins/filters/concat.md" %}} plugin in case of a timeout. Set the `timeout_label` of the concat plugin to the flowLabel of the flow where you want to send the timeout messages.
 */
-type _docRelabel interface{} //nolint:deadcode,unused
+type _docRelabel any //nolint:deadcode,unused
 
 // +name:"Relabel"
 // +url:"https://docs.fluentd.org/output/relabel"
 // +version:"more info"
 // +description:"Relabel output plugin re-labels events."
 // +status:"GA"
-type _metaRelabel interface{} //nolint:deadcode,unused
+type _metaRelabel any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

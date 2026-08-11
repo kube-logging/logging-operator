@@ -87,7 +87,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	}
 	actionConfig := new(action.Configuration)
 
-	if err := actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...interface{}) {
+	if err := actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...any) {
 		t.Logf(format, v...)
 	}); err != nil {
 		t.Fatalf("helm action config init: %s", err)
@@ -129,29 +129,29 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		t.Fatalf("kind load images: %s", err)
 	}
 
-	_, err = installer.Run(chartReq, map[string]interface{}{
+	_, err = installer.Run(chartReq, map[string]any{
 		"nameOverride": opt.NameOverride,
-		"image": map[string]interface{}{
+		"image": map[string]any{
 			"repository": loggingOperatorImage.repository,
 			"tag":        loggingOperatorImage.tag,
 			"pullPolicy": corev1.PullNever,
 		},
-		"testReceiver": map[string]interface{}{
+		"testReceiver": map[string]any{
 			"enabled": true,
 		},
-		"volumes": []map[string]interface{}{
+		"volumes": []map[string]any{
 			{
 				"name":     "coverage-data",
 				"emptyDir": map[string]string{},
 			},
 		},
-		"volumeMounts": []map[string]interface{}{
+		"volumeMounts": []map[string]any{
 			{
 				"mountPath": "/covdatafiles",
 				"name":      "coverage-data",
 			},
 		},
-		"env": []map[string]interface{}{
+		"env": []map[string]any{
 			{
 				"name":  "GOCOVERDIR",
 				"value": "/covdatafiles",

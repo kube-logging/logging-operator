@@ -22,19 +22,19 @@ import (
 
 // +name:"File"
 // +weight:"200"
-type _hugoFile interface{} //nolint:deadcode,unused
+type _hugoFile any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[File Output](https://docs.fluentd.org/output/file)"
 // This plugin has been designed to output logs or metrics to File.
-type _docFile interface{} //nolint:deadcode,unused
+type _docFile any //nolint:deadcode,unused
 
 // +name:"File"
 // +url:"https://docs.fluentd.org/output/file"
 // +version:"more info"
 // +description:"Output plugin writes events to files"
 // +status:"GA"
-type _metaFile interface{} //nolint:deadcode,unused
+type _metaFile any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type FileOutputConfig struct {
@@ -103,7 +103,7 @@ Fluentd config result:
 </match>
 {{</ highlight >}}
 */
-type _expFile interface{} //nolint:deadcode,unused
+type _expFile any //nolint:deadcode,unused
 
 func (c *FileOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "file"

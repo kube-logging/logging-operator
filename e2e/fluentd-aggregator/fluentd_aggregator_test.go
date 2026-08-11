@@ -21,6 +21,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -412,11 +413,9 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 				return false
 			}
 			if logging.Status.ProblemsCount > 0 {
-				for _, problem := range logging.Status.Problems {
-					if configCheckFailure.MatchString(problem) {
-						t.Logf("Found the problem in Logging status: %v", logging.Status)
-						return true
-					}
+				if slices.ContainsFunc(logging.Status.Problems, configCheckFailure.MatchString) {
+					t.Logf("Found the problem in Logging status: %v", logging.Status)
+					return true
 				}
 			}
 			t.Logf("Waiting for the problem to appear in Logging status: %v", logging.Status.Problems)
@@ -433,11 +432,9 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 				return false
 			}
 			if logging.Status.ProblemsCount > 0 {
-				for _, problem := range logging.Status.Problems {
-					if configCheckFailure.MatchString(problem) {
-						t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
-						return false
-					}
+				if slices.ContainsFunc(logging.Status.Problems, configCheckFailure.MatchString) {
+					t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
+					return false
 				}
 			}
 			t.Logf("Problem cleared in Logging status: %v", logging.Status)

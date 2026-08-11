@@ -22,19 +22,19 @@ import (
 
 // +name:"LogDNA"
 // +weight:"200"
-type _hugoLogDNA interface{} //nolint:deadcode,unused
+type _hugoLogDNA any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[LogDNA Output](https://github.com/logdna/fluent-plugin-logdna)"
 // This plugin has been designed to output logs to LogDNA.
-type _docLogDNA interface{} //nolint:deadcode,unused
+type _docLogDNA any //nolint:deadcode,unused
 
 // +name:"LogDNA"
 // +url:"https://github.com/logdna/fluent-plugin-logdna/releases/tag/v0.4.0"
 // +version:"0.4.0"
 // +description:"Send your logs to LogDNA"
 // +status:"GA"
-type _metaLogDNA interface{} //nolint:deadcode,unused
+type _metaLogDNA any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"LogDNA"
@@ -95,7 +95,7 @@ Fluentd config result:
 </match>
 {{</ highlight >}}
 */
-type _expLogDNA interface{} //nolint:deadcode,unused
+type _expLogDNA any //nolint:deadcode,unused
 
 func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "logdna"

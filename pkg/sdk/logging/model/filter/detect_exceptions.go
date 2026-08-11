@@ -22,7 +22,7 @@ import (
 
 // +name:"Exception Detector"
 // +weight:"200"
-type _hugoExceptionDetector interface{} //nolint:deadcode,unused
+type _hugoExceptionDetector any //nolint:deadcode,unused
 
 // +docName:"Exception Detector"
 /*
@@ -39,14 +39,14 @@ filters:
     multiline_flush_interval: 0.1
 ```
 */
-type _docExceptionDetector interface{} //nolint:deadcode,unused
+type _docExceptionDetector any //nolint:deadcode,unused
 
 // +name:"Exception Detector"
 // +url:"https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions"
 // +version:"0.0.14"
 // +description:"Exception Detector"
 // +status:"GA"
-type _metaDDetectExceptions interface{} //nolint:deadcode,unused
+type _metaDDetectExceptions any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type DetectExceptions struct {
@@ -103,7 +103,7 @@ Fluentd config result:
 </match>
 {{</ highlight >}}
 */
-type _expDetectExceptions interface{} //nolint:deadcode,unused
+type _expDetectExceptions any //nolint:deadcode,unused
 
 func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "detect_exceptions"

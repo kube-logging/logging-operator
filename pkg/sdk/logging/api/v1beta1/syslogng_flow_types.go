@@ -22,12 +22,12 @@ import (
 
 // +name:"SyslogNGFlowSpec"
 // +weight:"200"
-type _hugoSyslogNGFlowSpec interface{} //nolint:deadcode,unused
+type _hugoSyslogNGFlowSpec any //nolint:deadcode,unused
 
 // +name:"SyslogNGFlowSpec"
 // +version:"v1beta1"
 // +description:"SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows"
-type _metaSyslogNGFlowSpec interface{} //nolint:deadcode,unused
+type _metaSyslogNGFlowSpec any //nolint:deadcode,unused
 
 // SyslogNGFlowSpec is the Kubernetes spec for SyslogNGFlows
 type SyslogNGFlowSpec struct {

@@ -22,12 +22,12 @@ import (
 
 // +name:"SyslogNGOutputSpec"
 // +weight:"200"
-type _hugoSyslogNGOutputSpec interface{} //nolint:deadcode,unused
+type _hugoSyslogNGOutputSpec any //nolint:deadcode,unused
 
 // +name:"SyslogNGOutputSpec"
 // +version:"v1beta1"
 // +description:"SyslogNGOutputSpec defines the desired state of SyslogNGOutput"
-type _metaSyslogNGOutputSpec interface{} //nolint:deadcode,unused
+type _metaSyslogNGOutputSpec any //nolint:deadcode,unused
 
 // SyslogNGOutputSpec defines the desired state of SyslogNGOutput
 type SyslogNGOutputSpec struct {

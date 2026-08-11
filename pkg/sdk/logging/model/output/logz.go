@@ -25,7 +25,7 @@ import (
 
 // +name:"LogZ"
 // +weight:"200"
-type _hugoLogZ interface{} //nolint:deadcode,unused
+type _hugoLogZ any //nolint:deadcode,unused
 
 // +docName:"LogZ output plugin for Fluentd"
 /*
@@ -55,14 +55,14 @@ spec:
       queue_limit_length: 4096
 ```
 */
-type _docLogZ interface{} //nolint:deadcode,unused
+type _docLogZ any //nolint:deadcode,unused
 
 // +name:"LogZ"
 // +url:"https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.21"
 // +version:"0.0.21"
 // +description:"Store logs in LogZ.io"
 // +status:"GA"
-type _metaLogZ interface{} //nolint:deadcode,unused
+type _metaLogZ any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Logzio"

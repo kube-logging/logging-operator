@@ -18,7 +18,7 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"LogScale"
 // +weight:"200"
-type _hugoLogScale interface{} //nolint:deadcode,unused
+type _hugoLogScale any //nolint:deadcode,unused
 
 // +docName:"Storing messages in Falcon LogScale"
 // The `LogScale` output sends log records over HTTP to Falcon's LogScale.
@@ -47,13 +47,13 @@ spec:
       reliable: true
 {{</ highlight >}}
 */
-type _docLogScale interface{} //nolint:deadcode,unused
+type _docLogScale any //nolint:deadcode,unused
 
 // +name:"Falcon LogScale"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/crowdstrike-falcon/"
 // +description:"Storing messages in Falcon's LogScale over http"
 // +status:"Testing"
-type _metaLogScale interface{} //nolint:deadcode,unused
+type _metaLogScale any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type LogScaleOutput struct {

@@ -16,18 +16,18 @@ package output
 
 // +name:"Disk buffer"
 // +weight:"200"
-type _hugoDiskBuffer interface{} //nolint:deadcode,unused
+type _hugoDiskBuffer any //nolint:deadcode,unused
 
 // +docName:"Disk buffer configuration"
 // The parameters of the syslog-ng disk buffer. Using a disk buffer on the output helps avoid message loss in case of a system failure on the destination side.
 // For details on how [syslog-ng disk buffers work, see the documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/).
-type _docDiskBuffer interface{} //nolint:deadcode,unused
+type _docDiskBuffer any //nolint:deadcode,unused
 
 // +name:"disk-buffer configuration"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/"
 // +description:"disk-buffer configuration"
 // +status:"Testing"
-type _metaDiskBuffer interface{} //nolint:deadcode,unused
+type _metaDiskBuffer any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Documentation: https://axoflow.com/docs/axosyslog-core/chapter-routing-filters/concepts-diskbuffer/

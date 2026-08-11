@@ -36,6 +36,7 @@ linters:
     - errcheck
     - ineffassign
     - misspell
+    - modernize
     - nolintlint
     - revive
     - gocyclo
