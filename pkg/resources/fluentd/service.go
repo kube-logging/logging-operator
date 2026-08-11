@@ -133,7 +133,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 			maps.Copy(objectMetadata.Labels, r.fluentdSpec.Metrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
-		var SampleLimit uint64 = 0
+		var SampleLimit int64 = 0
 		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -234,7 +234,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 			maps.Copy(objectMetadata.Labels, r.fluentdSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
-		var SampleLimit uint64 = 0
+		var SampleLimit int64 = 0
 		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: monitoringv1.ServiceMonitorSpec{

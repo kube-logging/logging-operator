@@ -84,7 +84,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 			maps.Copy(objectMetadata.Labels, r.fluentbitSpec.Metrics.ServiceMonitorConfig.AdditionalLabels)
 		}
 
-		var SampleLimit uint64 = 0
+		var SampleLimit int64 = 0
 		endpoints := []monitoringv1.Endpoint{
 			{
 				Port:                 "http-metrics",
@@ -189,7 +189,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 
 		objectMetadata.Labels = util.MergeLabels(objectMetadata.Labels, r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.AdditionalLabels)
 
-		var SampleLimit uint64 = 0
+		var SampleLimit int64 = 0
 		return &monitoringv1.ServiceMonitor{
 			ObjectMeta: objectMetadata,
 			Spec: monitoringv1.ServiceMonitorSpec{

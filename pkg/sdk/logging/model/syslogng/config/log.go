@@ -16,11 +16,11 @@ package config
 
 import (
 	"bytes"
+	"maps"
 	"reflect"
 	"text/template"
 
 	"github.com/siliconbrain/go-seqs/seqs"
-	"golang.org/x/exp/maps"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/config/render"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/filter"
