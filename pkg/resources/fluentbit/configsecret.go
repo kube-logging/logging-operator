@@ -327,7 +327,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 	if err != nil {
 		return nil, reconciler.StatePresent, errors.WrapIf(err, "failed to map container tailer config for fluentbit")
 	}
-	input.Input.Values = fluentbitInputValues
+	input.Input.Values = renameInputKeys(fluentbitInputValues)
 
 	if r.fluentbitSpec.FilterGrep != nil {
 		input.FluentdFilterGrep, err = toFluentdFilterGrep(r.fluentbitSpec.FilterGrep)
@@ -554,4 +554,14 @@ func (r *Reconciler) generateUpstreamNode(index int32) upstreamNode {
 			r.Logging.ClusterDomainAsSuffix()),
 		Port: fluentd.ServicePort,
 	}
+}
+
+// The CRD spells this DB_Sync, which fluent-bit does not recognize. Renaming the field would drop
+// the setting for anyone already using it, so only the rendered key is corrected.
+func renameInputKeys(values map[string]string) map[string]string {
+	if v, ok := values["DB_Sync"]; ok {
+		delete(values, "DB_Sync")
+		values["DB.sync"] = v
+	}
+	return values
 }

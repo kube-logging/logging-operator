@@ -17,7 +17,7 @@ GO_TEST_COVERAGE_VERSION := 2.19.0
 HELM_DOCS_VERSION = 1.14.2
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind versioning=semver
-KIND_VERSION ?= 0.31.0
+KIND_VERSION ?= 0.32.0
 
 # renovate: datasource=github-releases depName=kubernetes-sigs/kubebuilder versioning=semver
 KUBEBUILDER_VERSION = 4.15.0

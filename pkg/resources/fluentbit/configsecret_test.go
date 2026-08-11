@@ -106,3 +106,17 @@ func TestBufferStorageServiceSection(t *testing.T) {
 		})
 	}
 }
+
+// The CRD field is DB_Sync, which fluent-bit ignores. Renaming the field would drop the setting for
+// anyone already using it, so the rendered key is corrected instead.
+func TestInputTailRendersTheDBSyncKeyFluentBitUnderstands(t *testing.T) {
+	mapped, err := types.NewStructToStringMapper(nil).StringsMap(v1beta1.InputTail{DBSync: "Normal"})
+	require.NoError(t, err)
+	require.Contains(t, mapped, "DB_Sync")
+
+	rendered, err := generateConfig(fluentBitConfig{Input: fluentbitInputConfig{Values: renameInputKeys(mapped)}})
+	require.NoError(t, err)
+
+	assert.Contains(t, rendered, "DB.sync  Normal")
+	assert.NotContains(t, rendered, "DB_Sync")
+}
