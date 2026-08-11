@@ -22,19 +22,19 @@ import (
 
 // +name:"Prometheus"
 // +weight:"200"
-type _hugoPrometheus interface{} //nolint:deadcode,unused
+type _hugoPrometheus any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Prometheus Filter](https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin)"
 // Prometheus Filter Plugin to count Incoming Records
-type _docPrometheus interface{} //nolint:deadcode,unused
+type _docPrometheus any //nolint:deadcode,unused
 
 // +name:"Prometheus"
 // +url:"https://github.com/fluent/fluent-plugin-prometheus#prometheus-outputfilter-plugin"
 // +version:"2.0.2"
 // +description:"Prometheus Filter Plugin to count Incoming Records"
 // +status:"GA"
-type _metaPrometheus interface{} //nolint:deadcode,unused
+type _metaPrometheus any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
@@ -115,7 +115,7 @@ Fluentd config result:
   </filter>
 {{</ highlight >}}
 */
-type _expPrometheus interface{} //nolint:deadcode,unused
+type _expPrometheus any //nolint:deadcode,unused
 
 type Label map[string]string
 

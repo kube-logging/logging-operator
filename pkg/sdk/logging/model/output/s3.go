@@ -25,7 +25,7 @@ import (
 
 // +name:"Amazon S3"
 // +weight:"200"
-type _hugoS3 interface{} //nolint:deadcode,unused
+type _hugoS3 any //nolint:deadcode,unused
 
 // +docName:"Amazon S3 plugin for Fluentd"
 /*
@@ -57,14 +57,14 @@ spec:
       timekey_use_utc: true
 ```
 */
-type _docS3 interface{} //nolint:deadcode,unused
+type _docS3 any //nolint:deadcode,unused
 
 // +name:"Amazon S3"
 // +url:"https://github.com/fluent/fluent-plugin-s3/releases/tag/v1.6.1"
 // +version:"1.6.1"
 // +description:"Store logs in Amazon S3"
 // +status:"GA"
-type _metaS3 interface{} //nolint:deadcode,unused
+type _metaS3 any //nolint:deadcode,unused
 
 const (
 	OneEyePathTemplate    string = "%v/%%Y/%%m/%%d/${$.kubernetes.namespace_name}/${$.kubernetes.pod_name}/${$.kubernetes.container_name}/"

@@ -30,7 +30,7 @@ import (
 
 // +name:"LoggingSpec"
 // +weight:"200"
-type _hugoLoggingSpec interface{} //nolint:deadcode,unused
+type _hugoLoggingSpec any //nolint:deadcode,unused
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
@@ -38,7 +38,7 @@ type _hugoLoggingSpec interface{} //nolint:deadcode,unused
 // +name:"Logging"
 // +version:"v1beta1"
 // +description:"Logging system configuration"
-type _metaLoggingSpec interface{} //nolint:deadcode,unused
+type _metaLoggingSpec any //nolint:deadcode,unused
 
 // LoggingSpec defines the desired state of Logging
 type LoggingSpec struct {
@@ -568,10 +568,6 @@ func (l *Logging) ClusterDomainAsSuffix() string {
 		return ""
 	}
 	return fmt.Sprintf(".%s", *l.Spec.ClusterDomain)
-}
-
-func persistentVolumeModePointer(mode corev1.PersistentVolumeMode) *corev1.PersistentVolumeMode {
-	return &mode
 }
 
 // FluentdObjectMeta creates an objectMeta for resource fluentd

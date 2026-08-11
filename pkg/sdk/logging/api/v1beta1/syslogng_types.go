@@ -25,12 +25,12 @@ import (
 
 // +name:"SyslogNGSpec"
 // +weight:"200"
-type _hugoSyslogNGSpec interface{} //nolint:deadcode,unused
+type _hugoSyslogNGSpec any //nolint:deadcode,unused
 
 // +name:"SyslogNGSpec"
 // +version:"v1beta1"
 // +description:"SyslogNGSpec defines the desired state of SyslogNG"
-type _metaSyslogNGSpec interface{} //nolint:deadcode,unused
+type _metaSyslogNGSpec any //nolint:deadcode,unused
 
 const (
 	defaultSyslogngImageRepository           = "ghcr.io/axoflow/axosyslog"

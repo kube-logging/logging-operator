@@ -28,12 +28,12 @@ import (
 
 // +name:"FluentbitSpec"
 // +weight:"200"
-type _hugoFluentbitSpec interface{} //nolint:deadcode,unused
+type _hugoFluentbitSpec any //nolint:deadcode,unused
 
 // +name:"FluentbitSpec"
 // +version:"v1beta1"
 // +description:"FluentbitSpec defines the desired state of FluentbitAgent"
-type _metaFluentbitSpec interface{} //nolint:deadcode,unused
+type _metaFluentbitSpec any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
@@ -515,7 +515,7 @@ type Operation struct {
 	Value string `json:"Value,omitempty"`
 }
 
-func getOperation(c interface{}) (result Operation) {
+func getOperation(c any) (result Operation) {
 	vc := reflect.ValueOf(c)
 	for i := 0; i < vc.NumField(); i++ {
 		field := vc.Field(i)

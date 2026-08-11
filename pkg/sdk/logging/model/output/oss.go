@@ -22,7 +22,7 @@ import (
 
 // +name:"Alibaba Cloud"
 // +weight:"200"
-type _hugoOss interface{} //nolint:deadcode,unused
+type _hugoOss any //nolint:deadcode,unused
 
 // +docName:"Aliyun OSS plugin for Fluentd"
 /*
@@ -38,14 +38,14 @@ This plugin uses MNS on the same region of the OSS bucket. We must setup MNS and
 
 This plugin will poll events from MNS queue and extract object keys from these events, and then will read those objects from OSS. For details, see [https://github.com/aliyun/fluent-plugin-oss](https://github.com/aliyun/fluent-plugin-oss).
 */
-type _docOss interface{} //nolint:deadcode,unused
+type _docOss any //nolint:deadcode,unused
 
 // +name:"Alibaba Cloud Storage"
 // +url:"https://github.com/aliyun/fluent-plugin-oss"
 // +version:"0.0.2"
 // +description:"Store logs the Alibaba Cloud Object Storage Service"
 // +status:"GA"
-type _metaOSS interface{} //nolint:deadcode,unused
+type _metaOSS any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

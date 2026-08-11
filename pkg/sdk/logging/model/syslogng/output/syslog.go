@@ -16,7 +16,7 @@ package output
 
 // +name:"Syslog (RFC5424) output"
 // +weight:"200"
-type _hugoSyslogOutput interface{} //nolint:deadcode,unused
+type _hugoSyslogOutput any //nolint:deadcode,unused
 
 // +docName:"Syslog output configuration"
 /*
@@ -91,13 +91,13 @@ spec:
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/).
 */
-type _docSyslogOutput interface{} //nolint:deadcode,unused
+type _docSyslogOutput any //nolint:deadcode,unused
 
 // +name:"Syslog output configuration"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/"
 // +description:"Syslog output configuration"
 // +status:"Testing"
-type _metaSyslogOutput interface{} //nolint:deadcode,unused
+type _metaSyslogOutput any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-syslog/

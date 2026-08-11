@@ -22,7 +22,7 @@ import (
 
 // +name:"Format"
 // +weight:"200"
-type _hugoFormat interface{} //nolint:deadcode,unused
+type _hugoFormat any //nolint:deadcode,unused
 
 // +docName:"Format output records"
 /*
@@ -40,14 +40,14 @@ spec:
       message_key: msg
 ```
 */
-type _docFormat interface{} //nolint:deadcode,unused
+type _docFormat any //nolint:deadcode,unused
 
 // +name:"Format"
 // +url:"https://docs.fluentd.org/configuration/format-section"
 // +version:"more info"
 // +description:"Specify how to format output record."
 // +status:"GA"
-type _metaFormat interface{} //nolint:deadcode,unused
+type _metaFormat any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type Format struct {

@@ -18,7 +18,7 @@ import "fmt"
 
 // +name:"Elasticsearch"
 // +weight:"200"
-type _hugoElasticsearch interface{} //nolint:deadcode,unused
+type _hugoElasticsearch any //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch"
 /*
@@ -44,13 +44,13 @@ spec:
           key: password
 {{</ highlight >}}
 */
-type _docSElasticsearch interface{} //nolint:deadcode,unused
+type _docSElasticsearch any //nolint:deadcode,unused
 
 // +name:"Elasticsearch"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-http/"
 // +description:"Sending messages over Elasticsearch"
 // +status:"Testing"
-type _metaElasticsearch interface{} //nolint:deadcode,unused
+type _metaElasticsearch any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type ElasticsearchOutput struct {

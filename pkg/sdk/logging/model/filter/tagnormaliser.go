@@ -22,7 +22,7 @@ import (
 
 // +name:"Tag Normaliser"
 // +weight:"200"
-type _hugoTagNormaliser interface{} //nolint:deadcode,unused
+type _hugoTagNormaliser any //nolint:deadcode,unused
 
 // +docName:"Fluentd Plugin to re-tag based on log metadata"
 /*
@@ -41,14 +41,14 @@ More info at https://github.com/kube-logging/fluent-plugin-tag-normaliser
 | `${docker_id}` | Docker UUID of the container | 3a38148aa37aa3... |
 
 */
-type _docTagNormaliser interface{} //nolint:deadcode,unused
+type _docTagNormaliser any //nolint:deadcode,unused
 
 // +name:"Tag Normaliser"
 // +url:"https://github.com/kube-logging/fluent-plugin-tag-normaliser"
 // +version:"0.1.1"
 // +description:"Re-tag based on log metadata"
 // +status:"GA"
-type _metaTagNormaliser interface{} //nolint:deadcode,unused
+type _metaTagNormaliser any //nolint:deadcode,unused
 
 // +docName:"Tag Normaliser parameters"
 type TagNormaliser struct {
@@ -86,7 +86,7 @@ Fluentd config result:
 </match>
 {{</ highlight >}}
 */
-type _expTagNormaliser interface{} //nolint:deadcode,unused
+type _expTagNormaliser any //nolint:deadcode,unused
 
 func (t *TagNormaliser) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "tag_normaliser"

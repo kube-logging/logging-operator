@@ -136,7 +136,7 @@ func (p PluginParams) Equals(target PluginParams) error {
 
 type Params = map[string]string
 
-func NewFlatDirective(meta PluginMeta, config interface{}, secretLoader secret.SecretLoader) (Directive, error) {
+func NewFlatDirective(meta PluginMeta, config any, secretLoader secret.SecretLoader) (Directive, error) {
 	directive := &GenericDirective{
 		PluginMeta: meta,
 	}

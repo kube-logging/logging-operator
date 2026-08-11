@@ -22,7 +22,7 @@ import (
 
 // +name:"VMware LogInsight"
 // +weight:"200"
-type _hugoVMwareLogInsight interface{} //nolint:deadcode,unused
+type _hugoVMwareLogInsight any //nolint:deadcode,unused
 
 // +docName:"VMware LogInsight output plugin for Fluentd"
 /*
@@ -45,14 +45,14 @@ spec:
     http_conn_debug: false
 ```
 */
-type _docVMwareLogInsight interface{} //nolint:deadcode,unused
+type _docVMwareLogInsight any //nolint:deadcode,unused
 
 // +name:"VMware LogInsight"
 // +url:"https://github.com/vmware/fluent-plugin-vmware-loginsight/releases/tag/v1.4.2"
 // +version:"1.4.2"
 // +description:"Store logs in VMware LogInsight"
 // +status:"GA"
-type _metaVMwareLogInsight interface{} //nolint:deadcode,unused
+type _metaVMwareLogInsight any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"VMwareLogInsight"

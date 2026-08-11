@@ -22,7 +22,7 @@ import (
 
 // +name:"OpenSearch"
 // +weight:"200"
-type _hugoOpenSearch interface{} //nolint:deadcode,unused
+type _hugoOpenSearch any //nolint:deadcode,unused
 
 // +docName:"OpenSearch output plugin for Fluentd"
 /*
@@ -46,14 +46,14 @@ spec:
       timekey_use_utc: true
 ```
 */
-type _docOpenSearch interface{} //nolint:deadcode,unused
+type _docOpenSearch any //nolint:deadcode,unused
 
 // +name:"OpenSearch"
 // +url:"https://github.com/fluent/fluent-plugin-opensearch/releases/tag/v1.0.5"
 // +version:"1.0.5"
 // +description:"Send your logs to OpenSearch"
 // +status:"GA"
-type _metaOpenSearch interface{} //nolint:deadcode,unused
+type _metaOpenSearch any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"OpenSearch"

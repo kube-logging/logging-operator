@@ -24,12 +24,12 @@ import (
 
 // +name:"Common"
 // +weight:"200"
-type _hugoCommon interface{} //nolint:deadcode,unused
+type _hugoCommon any //nolint:deadcode,unused
 
 // +name:"Common"
 // +version:"v1beta1"
 // +description:"ImageSpec Metrics Security"
-type _metaCommon interface{} //nolint:deadcode,unused
+type _metaCommon any //nolint:deadcode,unused
 
 const (
 	HostPath = "/opt/logging-operator/%s/%s"

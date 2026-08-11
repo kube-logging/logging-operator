@@ -18,7 +18,7 @@ import "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/
 
 // +name:"OpenTelemetry output"
 // +weight:"200"
-type _hugoOpenTelemetry interface{} //nolint:deadcode,unused
+type _hugoOpenTelemetry any //nolint:deadcode,unused
 
 // +docName:"Sending fluent structured messages over OpenTelemetry GRPC"
 /*
@@ -40,13 +40,13 @@ spec:
 {{</ highlight >}}
 
 */
-type _docOpenTelemetry interface{} //nolint:deadcode,unused
+type _docOpenTelemetry any //nolint:deadcode,unused
 
 // +name:"OpenTelemetry"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/opentelemetry/"
 // +description:"Sending messages over OpenTelemetry GRPC"
 // +status:"Testing"
-type _metaOTLP interface{} //nolint:deadcode,unused
+type _metaOTLP any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type OpenTelemetryOutput struct {

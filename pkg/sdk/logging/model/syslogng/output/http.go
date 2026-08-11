@@ -22,7 +22,7 @@ import (
 
 // +name:"HTTP"
 // +weight:"200"
-type _hugoHTTP interface{} //nolint:deadcode,unused
+type _hugoHTTP any //nolint:deadcode,unused
 
 // +docName:"Sending messages over HTTP"
 /*
@@ -80,13 +80,13 @@ spec:
 
 For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/).
 */
-type _docHTTP interface{} //nolint:deadcode,unused
+type _docHTTP any //nolint:deadcode,unused
 
 // +name:"HTTP"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-http-nonjava/"
 // +description:"Sending messages over HTTP"
 // +status:"Testing"
-type _metaHTTP interface{} //nolint:deadcode,unused
+type _metaHTTP any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type HTTPOutput struct {

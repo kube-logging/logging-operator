@@ -14,6 +14,8 @@
 
 package mapstrstr
 
+import "maps"
+
 // Keys returns the keys of a map[string]string
 func Keys(m map[string]string) []string {
 	keys := make([]string, 0, len(m))
@@ -28,9 +30,7 @@ func MergeInto(dst, src map[string]string) map[string]string {
 		if dst == nil {
 			dst = make(map[string]string)
 		}
-		for k, v := range src {
-			dst[k] = v
-		}
+		maps.Copy(dst, src)
 	}
 	return dst
 }

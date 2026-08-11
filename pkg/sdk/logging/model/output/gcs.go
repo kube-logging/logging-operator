@@ -22,7 +22,7 @@ import (
 
 // +name:"Google Cloud Storage"
 // +weight:"200"
-type _hugoGCS interface{} //nolint:deadcode,unused
+type _hugoGCS any //nolint:deadcode,unused
 
 // +docName:"Google Cloud Storage"
 /*
@@ -38,14 +38,14 @@ spec:
     path: logs/${tag}/%Y/%m/%d/
 ```
 */
-type _docGCS interface{} //nolint:deadcode,unused
+type _docGCS any //nolint:deadcode,unused
 
 // +name:"Google Cloud Storage"
 // +url:"https://github.com/kube-logging/fluent-plugin-gcs"
 // +version:"0.4.0"
 // +description:"Store logs in Google Cloud Storage"
 // +status:"GA"
-type _metaGCS interface{} //nolint:deadcode,unused
+type _metaGCS any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GCSOutput struct {

@@ -22,19 +22,19 @@ import (
 
 // +name:"Grep"
 // +weight:"200"
-type _hugoGrep interface{} //nolint:deadcode,unused
+type _hugoGrep any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[Grep Filter](https://docs.fluentd.org/filter/grep)"
 // The grep filter plugin "greps" events by the values of specified fields.
-type _docGrep interface{} //nolint:deadcode,unused
+type _docGrep any //nolint:deadcode,unused
 
 // +name:"Grep"
 // +url:"https://docs.fluentd.org/filter/grep"
 // +version:"more info"
 // +description:"Grep events by the values"
 // +status:"GA"
-type _metaGrep interface{} //nolint:deadcode,unused
+type _metaGrep any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type GrepConfig struct {
@@ -91,7 +91,7 @@ Fluentd config result:
   </filter>
 {{</ highlight >}}
 */
-type _expRegexp interface{} //nolint:deadcode,unused
+type _expRegexp any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Exclude Directive"
@@ -136,7 +136,7 @@ Fluentd config result:
   </filter>
 {{</ highlight >}}
 */
-type _expExclude interface{} //nolint:deadcode,unused
+type _expExclude any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Or Directive"
@@ -187,7 +187,7 @@ Fluentd config result:
 </or>
 {{</ highlight >}}
 */
-type _expOR interface{} //nolint:deadcode,unused
+type _expOR any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"And Directive"
@@ -238,7 +238,7 @@ Fluentd config result:
 	</and>
 {{</ highlight >}}
 */
-type _expAND interface{} //nolint:deadcode,unused
+type _expAND any //nolint:deadcode,unused
 
 func (r *RegexpSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	meta := types.PluginMeta{

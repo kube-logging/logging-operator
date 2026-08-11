@@ -16,16 +16,16 @@ package output
 
 // +name:"Authentication config for syslog-ng outputs"
 // +weight:"200"
-type _hugoAuth interface{} //nolint:deadcode,unused
+type _hugoAuth any //nolint:deadcode,unused
 
 // +docName:"Authentication config for syslog-ng outputs"
 // GRPC-based outputs use this configuration instead of the simple `tls` field found at most HTTP based destinations. For details, see the documentation of a related syslog-ng destination, for example, [Grafana Loki](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-loki/#auth).
-type _docAuth interface{} //nolint:deadcode,unused
+type _docAuth any //nolint:deadcode,unused
 
 // +name:"Authentication config for syslog-ng outputs"
 // +description:"Authentication config for syslog-ng outputs"
 // +status:"Testing"
-type _metaAuth interface{} //nolint:deadcode,unused
+type _metaAuth any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Authentication settings. Only one authentication method can be set. Default: Insecure

@@ -18,7 +18,7 @@ import "github.com/cisco-open/operator-tools/pkg/secret"
 
 // +name:"Sumo Logic HTTP"
 // +weight:"200"
-type _hugoSumologicHTTP interface{} //nolint:deadcode,unused
+type _hugoSumologicHTTP any //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over http"
 // The `sumologic-http` output sends log records over HTTP to Sumo Logic.
@@ -65,13 +65,13 @@ spec:
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-http/).
 */
-type _docSumologicHTTP interface{} //nolint:deadcode,unused
+type _docSumologicHTTP any //nolint:deadcode,unused
 
 // +name:"Sumo Logic HTTP"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-http/"
 // +description:"Storing messages in Sumo Logic over http"
 // +status:"Testing"
-type _metaSumologicHTTP interface{} //nolint:deadcode,unused
+type _metaSumologicHTTP any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SumologicHTTPOutput struct {

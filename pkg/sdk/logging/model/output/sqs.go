@@ -22,19 +22,19 @@ import (
 
 // +name:"SQS"
 // +weight:"200"
-type _hugoSQS interface{} //nolint:deadcode,unused
+type _hugoSQS any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"[SQS Output](https://github.com/ixixi/fluent-plugin-sqs)"
 // Fluentd output plugin for SQS.
-type _docSQS interface{} //nolint:deadcode,unused
+type _docSQS any //nolint:deadcode,unused
 
 // +name:"SQS"
 // +url:"https://github.com/ixixi/fluent-plugin-sqs"
 // +version:"v2.1.0"
 // +description:"Output plugin writes fluent-events as queue messages to Amazon SQS"
 // +status:"Testing"
-type _metaSQS interface{} //nolint:deadcode,unused
+type _metaSQS any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
@@ -95,7 +95,7 @@ Fluentd config result:
 </match>
 ```
 */
-type _expSQS interface{} //nolint:deadcode,unused
+type _expSQS any //nolint:deadcode,unused
 
 func (s *SQSOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "sqs"

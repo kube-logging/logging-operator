@@ -20,12 +20,12 @@ import (
 
 // +name:"SyslogNGConfig"
 // +weight:"200"
-type _hugoSyslogNGConfig interface{} //nolint:deadcode,unused
+type _hugoSyslogNGConfig any //nolint:deadcode,unused
 
 // +name:"SyslogNG"
 // +version:"v1beta1"
 // +description:"SyslogNGConfig is a standalone reference to the desired SyslogNG configuration"
-type _metaSyslogNGConfig interface{} //nolint:deadcode,unused
+type _metaSyslogNGConfig any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

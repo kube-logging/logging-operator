@@ -22,7 +22,7 @@ import (
 
 // +name:"VMware Log Intelligence"
 // +weight:"200"
-type _hugoVMwareLogIntelligence interface{} //nolint:deadcode,unused
+type _hugoVMwareLogIntelligence any //nolint:deadcode,unused
 
 // +docName:"VMware Log Intelligence output plugin for Fluentd"
 /*
@@ -48,14 +48,14 @@ spec:
       retry_max_times: 3
 ```
 */
-type _docVMwareLogIntelligence interface{} //nolint:deadcode,unused
+type _docVMwareLogIntelligence any //nolint:deadcode,unused
 
 // +name:"VMwareLogIntelligence"
 // +url:"https://github.com/vmware/fluent-plugin-vmware-log-intelligence/releases/tag/v2.0.8"
 // +version:"v2.0.8"
 // +description:"Send your logs to VMware Log Intelligence"
 // +status:"GA"
-type _metaVMwareLogIntelligence interface{} //nolint:deadcode,unused
+type _metaVMwareLogIntelligence any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"VMwareLogIntelligence"

@@ -22,19 +22,19 @@ import (
 
 // +name:"User Agent"
 // +weight:"200"
-type _hugoUserAgent interface{} //nolint:deadcode,unused
+type _hugoUserAgent any //nolint:deadcode,unused
 
 // +docName:"Fluentd UserAgent filter"
 // Fluentd Filter plugin to parse user-agent
 // More information at https://github.com/bungoume/fluent-plugin-ua-parser
-type _docUserAgent interface{} //nolint:deadcode,unused
+type _docUserAgent any //nolint:deadcode,unused
 
 // +name:"UserAgent"
 // +url:"https://github.com/bungoume/fluent-plugin-ua-parser"
 // +version:"1.2.0"
 // +description:"Fluentd UserAgent filter"
 // +status:"GA"
-type _metaUserAgent interface{} //nolint:deadcode,unused
+type _metaUserAgent any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type UserAgent struct {
@@ -82,7 +82,7 @@ Fluentd config result:
 </filter>
 {{</ highlight >}}
 */
-type _expUserAgent interface{} //nolint:deadcode,unused
+type _expUserAgent any //nolint:deadcode,unused
 
 func (g *UserAgent) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "ua_parser"

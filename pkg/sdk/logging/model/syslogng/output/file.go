@@ -16,7 +16,7 @@ package output
 
 // +name:"File"
 // +weight:"200"
-type _hugoFile interface{} //nolint:deadcode,unused
+type _hugoFile any //nolint:deadcode,unused
 
 // +docName:"File output plugin for syslog-ng"
 // The `file` output stores log records in a plain text file.
@@ -32,13 +32,13 @@ For details on the available options of the output, see the [documentation of th
 
 For available macros like `${YEAR}/${MONTH}/${DAY}` see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-manipulating-messages/customizing-message-format/reference-macros/).
 */
-type _docFile interface{} //nolint:deadcode,unused
+type _docFile any //nolint:deadcode,unused
 
 // +name:"File"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/"
 // +description:"SStoring messages in plain-text files"
 // +status:"Testing"
-type _metaFile interface{} //nolint:deadcode,unused
+type _metaFile any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // Documentation: https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-file/

@@ -22,7 +22,7 @@ import (
 
 // +name:"Mattermost"
 // +weight:"200"
-type _hugoMattermost interface{} //nolint:deadcode,unused
+type _hugoMattermost any //nolint:deadcode,unused
 
 // +docName:"Mattermost plugin for Fluentd"
 /*
@@ -40,14 +40,14 @@ spec:
     enable_tls: false
 ```
 */
-type _docMattermost interface{} //nolint:deadcode,unused
+type _docMattermost any //nolint:deadcode,unused
 
 // +name:"Mattermost"
 // +url:"https://github.com/levigo-systems/fluent-plugin-mattermost"
 // +version:"0.2.2"
 // +description:"Sends logs to Mattermost via webhooks."
 // +status:"GA"
-type _metaMattermost interface{} //nolint:deadcode,unused
+type _metaMattermost any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

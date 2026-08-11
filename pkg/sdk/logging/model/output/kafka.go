@@ -24,7 +24,7 @@ import (
 
 // +name:"Kafka"
 // +weight:"200"
-type _hugoKafka interface{} //nolint:deadcode,unused
+type _hugoKafka any //nolint:deadcode,unused
 
 // +docName:"Kafka output plugin for Fluentd"
 //
@@ -50,14 +50,14 @@ spec:
       timekey_use_utc: true
 ```
 */
-type _docKafka interface{} //nolint:deadcode,unused
+type _docKafka any //nolint:deadcode,unused
 
 // +name:"Kafka"
 // +url:"https://github.com/fluent/fluent-plugin-kafka/releases/tag/v0.17.5"
 // +version:"0.17.5"
 // +description:"Send your logs to Kafka"
 // +status:"GA"
-type _metaKafka interface{} //nolint:deadcode,unused
+type _metaKafka any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Kafka"

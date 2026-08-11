@@ -22,7 +22,7 @@ import (
 
 // +name:"Gelf"
 // +weight:"200"
-type _hugoGelf interface{} //nolint:deadcode,unused
+type _hugoGelf any //nolint:deadcode,unused
 
 // +docName:"Gelf output plugin for Fluentd"
 /*
@@ -36,14 +36,14 @@ spec:
     port: 12201
 ```
 */
-type _docGelf interface{} //nolint:deadcode,unused
+type _docGelf any //nolint:deadcode,unused
 
 // +name:"Gelf"
 // +url:"https://github.com/bmichalkiewicz/fluent-plugin-gelf-best"
 // +version:"1.3.4"
 // +description:"Output plugin writes logs to Graylog"
 // +status:"Testing"
-type _metaGelf interface{} //nolint:deadcode,unused
+type _metaGelf any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

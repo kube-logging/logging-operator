@@ -16,7 +16,7 @@ package output
 
 // +name:"OpenObserve"
 // +weight:"200"
-type _hugoOpenobserve interface{} //nolint:deadcode,unused
+type _hugoOpenobserve any //nolint:deadcode,unused
 
 // +docName:"Sending messages over OpenObserve"
 /*
@@ -47,13 +47,13 @@ spec:
 
 For details on the available options of the output, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/).
 */
-type _docOpenobserve interface{} //nolint:deadcode,unused
+type _docOpenobserve any //nolint:deadcode,unused
 
 // +name:"OpenObserve"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/openobserve/"
 // +description:"Sending messages over OpenObserve"
 // +status:"Testing"
-type _metaOpenobserve interface{} //nolint:deadcode,unused
+type _metaOpenobserve any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type OpenobserveOutput struct {

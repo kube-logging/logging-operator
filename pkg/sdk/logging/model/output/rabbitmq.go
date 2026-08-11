@@ -22,7 +22,7 @@ import (
 
 // +name:"RabbitMQ"
 // +weight:"200"
-type _hugoRabbitMQ interface{} //nolint:deadcode,unused
+type _hugoRabbitMQ any //nolint:deadcode,unused
 
 // +docName:"RabbitMQ plugin for Fluentd"
 /*
@@ -43,14 +43,14 @@ spec:
 			timekey_use_utc: true
 ```
 */
-type _docRabbitMQ interface{} //nolint:deadcode,unused
+type _docRabbitMQ any //nolint:deadcode,unused
 
 // +name:"RabbitMQ"
 // +url:"https://github.com/nttcom/fluent-plugin-rabbitmq"
 // +version:"0.1.5"
 // +description:"Sends logs to RabbitMQ Queues."
 // +status:"GA"
-type _metaRabbitMQ interface{} //nolint:deadcode,unused
+type _metaRabbitMQ any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

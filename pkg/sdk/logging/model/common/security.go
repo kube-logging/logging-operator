@@ -22,10 +22,10 @@ import (
 
 // +name:"Security"
 // +weight:"200"
-type _hugoSecurity interface{} //nolint:deadcode,unused
+type _hugoSecurity any //nolint:deadcode,unused
 
 // +name:"Security"
-type _metaSecurity interface{} //nolint:deadcode,unused
+type _metaSecurity any //nolint:deadcode,unused
 
 type Security struct {
 	// Hostname

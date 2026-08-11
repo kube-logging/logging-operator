@@ -22,7 +22,7 @@ import (
 
 // +name:"Redis"
 // +weight:"200"
-type _hugoRedis interface{} //nolint:deadcode,unused
+type _hugoRedis any //nolint:deadcode,unused
 
 // +docName:"Redis plugin for Fluentd"
 /*
@@ -39,14 +39,14 @@ spec:
       flush_interval: 10s
 ```
 */
-type _docRedis interface{} //nolint:deadcode,unused
+type _docRedis any //nolint:deadcode,unused
 
 // +name:"Redis"
 // +url:"https://github.com/fluent-plugins-nursery/fluent-plugin-redis"
 // +version:"0.3.5"
 // +description:"Sends logs to Redis endpoints."
 // +status:"GA"
-type _metaRedis interface{} //nolint:deadcode,unused
+type _metaRedis any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"

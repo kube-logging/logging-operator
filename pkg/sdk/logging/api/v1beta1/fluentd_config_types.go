@@ -20,12 +20,12 @@ import (
 
 // +name:"FluentdConfig"
 // +weight:"200"
-type _hugoFluent interface{} //nolint:deadcode,unused
+type _hugoFluent any //nolint:deadcode,unused
 
 // +name:"Fluent"
 // +version:"v1beta1"
 // +description:"FluentdConfig is a reference to the desired Fluentd state"
-type _metaFluentdConfig interface{} //nolint:deadcode,unused
+type _metaFluentdConfig any //nolint:deadcode,unused
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=logging-all

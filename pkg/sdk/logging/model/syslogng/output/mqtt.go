@@ -16,7 +16,7 @@ package output
 
 // +name:"MQTT"
 // +weight:"200"
-type _hugoMQTT interface{} //nolint:deadcode,unused
+type _hugoMQTT any //nolint:deadcode,unused
 
 // +docName:"Sending messages from a local network to an MQTT broker"
 /*
@@ -36,13 +36,13 @@ spec:
     topic: test/demo
 {{</ highlight >}}
 */
-type _docMQTT interface{} //nolint:deadcode,unused
+type _docMQTT any //nolint:deadcode,unused
 
 // +name:"MQTT Destination"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-mqtt-intro/"
 // +description:"Sending messages over MQTT Protocol"
 // +status:"Testing"
-type _metaMQTT interface{} //nolint:deadcode,unused
+type _metaMQTT any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type MQTT struct {

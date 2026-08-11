@@ -15,6 +15,8 @@
 package output
 
 import (
+	"maps"
+
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	util "github.com/cisco-open/operator-tools/pkg/utils"
 
@@ -23,7 +25,7 @@ import (
 
 // +name:"Grafana Loki"
 // +weight:"200"
-type _hugoLoki interface{} //nolint:deadcode,unused
+type _hugoLoki any //nolint:deadcode,unused
 
 // +docName:"Loki output plugin "
 /*
@@ -43,14 +45,14 @@ spec:
       timekey_use_utc: true
 ```
 */
-type _docLoki interface{} //nolint:deadcode,unused
+type _docLoki any //nolint:deadcode,unused
 
 // +name:"Grafana Loki"
 // +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
 // +version:"1.2.19"
 // +description:"Transfer logs to Loki"
 // +status:"GA"
-type _metaLoki interface{} //nolint:deadcode,unused
+type _metaLoki any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 // +docName:"Output Config"
@@ -114,9 +116,7 @@ func (r Label) ToDirective(secretLoader secret.SecretLoader, id string) (types.D
 }
 
 func (r Label) merge(input Label) {
-	for k, v := range input {
-		r[k] = v
-	}
+	maps.Copy(r, input)
 }
 
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {

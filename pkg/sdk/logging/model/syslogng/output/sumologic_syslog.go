@@ -16,7 +16,7 @@ package output
 
 // +name:"Sumo Logic Syslog"
 // +weight:"200"
-type _hugoSumologicSyslog interface{} //nolint:deadcode,unused
+type _hugoSumologicSyslog any //nolint:deadcode,unused
 
 // +docName:"Storing messages in Sumo Logic over syslog"
 /*
@@ -26,13 +26,13 @@ The `sumologic-syslog` output sends log records over HTTP to Sumo Logic. For det
 
 You need a Sumo Logic account to use this output. For details, see the [documentation of the AxoSyslog syslog-ng distribution](https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/).
 */
-type _docSumologicSyslog interface{} //nolint:deadcode,unused
+type _docSumologicSyslog any //nolint:deadcode,unused
 
 // +name:"Sumo Logic Syslog"
 // +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/destination-sumologic-intro/destination-sumologic-syslog/"
 // +description:"Storing messages in Sumo Logic over syslog"
 // +status:"Testing"
-type _metaSumologicSyslog interface{} //nolint:deadcode,unused
+type _metaSumologicSyslog any //nolint:deadcode,unused
 
 // +kubebuilder:object:generate=true
 type SumologicSyslogOutput struct {

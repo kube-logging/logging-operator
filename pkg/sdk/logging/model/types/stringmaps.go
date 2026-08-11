@@ -18,13 +18,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 )
 
-type Converter func(interface{}) (string, error)
+type Converter func(any) (string, error)
 
 type StructToStringMapper struct {
 	TagName         string
@@ -47,7 +48,7 @@ func (s *StructToStringMapper) WithConverter(name string, c Converter) *StructTo
 	return s
 }
 
-func (s *StructToStringMapper) StringsMap(in interface{}) (map[string]string, error) {
+func (s *StructToStringMapper) StringsMap(in any) (map[string]string, error) {
 	out := make(map[string]string)
 	err := s.fillMap(strctVal(in), out)
 	return out, err
@@ -189,7 +190,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 	return nil
 }
 
-func strctVal(s interface{}) reflect.Value {
+func strctVal(s any) reflect.Value {
 	v := reflect.ValueOf(s)
 
 	// if pointer get the underlying element≤
@@ -209,8 +210,7 @@ func (s *StructToStringMapper) structFields(value reflect.Value) []reflect.Struc
 
 	var f []reflect.StructField
 
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
+	for field := range t.Fields() {
 		// we can't access the value of unexported fields
 		if field.PkgPath != "" {
 			continue
@@ -247,13 +247,7 @@ type tagOptions []string
 
 // Has returns true if the given option is available in tagOptions
 func (t tagOptions) Has(opt string) bool {
-	for _, tagOpt := range t {
-		if tagOpt == opt {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(t, opt)
 }
 
 // Has returns true if the given option is available in tagOptions

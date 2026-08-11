@@ -27,12 +27,12 @@ import (
 
 // +name:"EventTailer"
 // +weight:"200"
-type _hugoEventTailer = interface{} //nolint:deadcode,unused
+type _hugoEventTailer = any //nolint:deadcode,unused
 
 // +name:"EventTailer"
 // +version:"v1alpha1"
 // +description:"Eventtailer's main goal is to listen kubernetes events and transmit their changes to stdout. This way the logging-operator is able to process them."
-type _metaEventTailer = interface{} //nolint:deadcode,unused
+type _metaEventTailer = any //nolint:deadcode,unused
 
 // EventTailerSpec defines the desired state of EventTailer
 type EventTailerSpec struct {
