@@ -232,7 +232,7 @@ var fluentbitInputTemplate = `
     {{- end }}
     {{- range $id, $v := .ParserN }}
     {{- if $v }}
-    Parse_{{ $id}} {{$v}}
+    Parser_{{ $id}} {{$v}}
     {{- end }}
     {{- end }}
     {{- if .MultilineParser }}
