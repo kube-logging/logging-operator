@@ -24,6 +24,23 @@
       "description": [
         "Custom dependency manager for updating tools defined in Makefiles."
       ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Makefile$/"
+      ],
+      "matchStrings": [
+        "ENVTEST_K8S_VERSION\\s*:?=\\s*(?<currentValue>.*)\\s"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "envtest",
+      "packageNameTemplate": "kubernetes-sigs/controller-tools",
+      "extractVersionTemplate": "^envtest-v(?<version>.*)$",
+      "versioningTemplate": "semver",
+      "description": [
+        "setup-envtest can only use Kubernetes versions that have published envtest binaries, which ship as envtest-v* releases of controller-tools."
+      ]
     }
   ],
   "enabled": true,
@@ -76,6 +93,9 @@
       "description": [
         "Add build label to PRs which are related to build tools defined in Makefiles.",
         "Group Makefile dependency updates in single PR."
+      ],
+      "matchDepNames": [
+        "!envtest"
       ]
     }
   ],
