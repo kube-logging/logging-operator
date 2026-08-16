@@ -15,7 +15,6 @@
 package syslong_ng_aggregator
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
@@ -121,7 +120,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		},
 		Spec: v1beta1.SyslogNGOutputSpec{
 			HTTP: &syslogngoutput.HTTPOutput{
-				URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", release, testTag),
+				URL: env.Receiver.URL(testTag),
 				Headers: []string{
 					"Content-type: application/json",
 				},

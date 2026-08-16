@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fixture
+package harness
 
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestReceiverURL(t *testing.T) {
+func TestReceiverURLMatchesTheLiteral(t *testing.T) {
 	require.Equal(t, "http://e2e-test-receiver:8080/test.tag", ReceiverURL("e2e", "test.tag"))
+	require.Equal(t, "http://e2e-test-receiver.infra-ns:8080/test.tag", ReceiverURLIn("e2e", "infra-ns", "test.tag"))
+}
+
+func TestReceiverName(t *testing.T) {
+	assert.Equal(t, "e2e-test-receiver", ReceiverName("e2e"))
 }

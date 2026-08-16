@@ -39,6 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	v1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -109,7 +110,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				OutputSpec: v1beta1.OutputSpec{
 					LoggingRef: "infra",
 					HTTPOutput: &output.HTTPOutputConfig{
-						Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", release, tag),
+						Endpoint:    harness.ReceiverURL(release, tag),
 						ContentType: "application/json",
 						Buffer:      realTimeBuffer,
 					},
@@ -213,7 +214,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				"logs",
 				"-n", nsControl,
 				"--tail", "30",
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, release)), c)
+				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(release))), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)

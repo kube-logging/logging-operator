@@ -39,6 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -132,7 +133,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 			Spec: v1beta1.ClusterOutputSpec{
 				OutputSpec: v1beta1.OutputSpec{
 					HTTPOutput: &output.HTTPOutputConfig{
-						Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+						Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
 						ContentType: "application/json",
 						Buffer: &output.Buffer{
 							Type:        "file",
@@ -200,7 +201,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
+				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)
