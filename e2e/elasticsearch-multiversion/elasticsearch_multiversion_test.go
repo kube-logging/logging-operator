@@ -40,6 +40,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
@@ -523,18 +524,9 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 			Spec: v1beta1.LoggingSpec{
 				ControlNamespace: ns,
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image: v1beta1.ImageSpec{
-						Repository: common.FluentdImageRepo,
-						Tag:        common.FluentdImageTag,
-					},
-					ConfigReloaderImage: v1beta1.ImageSpec{
-						Repository: common.ConfigReloaderRepo,
-						Tag:        common.ConfigReloaderTag,
-					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),

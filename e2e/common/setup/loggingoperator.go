@@ -17,7 +17,6 @@ package setup
 import (
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 
 	"helm.sh/helm/v3/pkg/action"
@@ -26,50 +25,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 )
-
-var defaultImages = []e2eImage{
-	{
-		lookupEnv:  "LOGGING_OPERATOR_IMAGE",
-		repository: "controller",
-		tag:        "local",
-	},
-	{
-		lookupEnv:  "CONFIG_RELOADER_IMAGE",
-		repository: "config-reloader",
-		tag:        "local",
-	},
-	{
-		lookupEnv:  "SYSLOG_NG_RELOADER_IMAGE",
-		repository: "syslog-ng-reloader",
-		tag:        "local",
-	},
-	{
-		lookupEnv:  "FLUENTD_DRAIN_WATCH_IMAGE",
-		repository: "fluentd-drain-watch",
-		tag:        "local",
-	},
-	{
-		lookupEnv:  "NODE_EXPORTER_IMAGE",
-		repository: "node-exporter",
-		tag:        "local",
-	},
-	{
-		lookupEnv:  "FLUENTD_IMAGE",
-		repository: "fluentd-full",
-		tag:        "local",
-	},
-}
-
-type e2eImage struct {
-	lookupEnv  string
-	repository string
-	tag        string
-}
-
-func (i e2eImage) Format() string {
-	return fmt.Sprintf("%s:%s", i.repository, i.tag)
-}
 
 func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
 	opt := &LoggingOperatorOptions{
@@ -113,14 +70,11 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		t.Fatalf("helm load chart: %s", err)
 	}
 
-	var loggingOperatorImage e2eImage
-	images := make([]string, 0, len(defaultImages))
-	for _, image := range defaultImages {
-		if image.lookupEnv == "LOGGING_OPERATOR_IMAGE" {
-			loggingOperatorImage = image
-		}
-
-		images = append(images, processImage(t, image))
+	loggingOperatorImage := image.Operator()
+	images := make([]string, 0, len(image.All()))
+	for _, img := range image.All() {
+		t.Logf("%s: loading %s", img.Env, img.Ref())
+		images = append(images, img.Ref())
 	}
 
 	// One invocation, so docker save writes shared layers once instead of once
@@ -132,8 +86,8 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	_, err = installer.Run(chartReq, map[string]any{
 		"nameOverride": opt.NameOverride,
 		"image": map[string]any{
-			"repository": loggingOperatorImage.repository,
-			"tag":        loggingOperatorImage.tag,
+			"repository": loggingOperatorImage.Repository,
+			"tag":        loggingOperatorImage.Tag,
 			"pullPolicy": corev1.PullNever,
 		},
 		"testReceiver": map[string]any{
@@ -162,21 +116,6 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 	if err != nil {
 		t.Fatalf("helm chart install: %s", err)
 	}
-}
-
-func processImage(t *testing.T, image e2eImage) string {
-	imageFromEnv, ok := os.LookupEnv(image.lookupEnv)
-	if ok {
-		if len(strings.Split(imageFromEnv, ":")) < 2 {
-			t.Logf("%s: (%s) is invalid. Using default %s", image.lookupEnv, imageFromEnv, image.Format())
-			return image.Format()
-		}
-
-		return imageFromEnv
-	}
-	t.Logf("%s is undefined. Using default %s", image.lookupEnv, image.Format())
-
-	return image.Format()
 }
 
 type LoggingOperatorOption interface {

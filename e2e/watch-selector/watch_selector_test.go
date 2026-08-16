@@ -25,8 +25,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/e2e-framework/third_party/helm"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -56,29 +56,14 @@ func TestWatchSelectors(t *testing.T) {
 			ControlNamespace: ns,
 			FluentbitSpec: &v1beta1.FluentbitSpec{
 				ConfigHotReload: &v1beta1.HotReload{
-					Image: v1beta1.ImageSpec{
-						Repository: common.ConfigReloaderRepo,
-						Tag:        common.ConfigReloaderTag,
-					},
+					Image: image.ConfigReloader().Spec(),
 				},
-				BufferVolumeImage: v1beta1.ImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				BufferVolumeImage: image.NodeExporter().Spec(),
 			},
 			FluentdSpec: &v1beta1.FluentdSpec{
-				Image: v1beta1.ImageSpec{
-					Repository: common.FluentdImageRepo,
-					Tag:        common.FluentdImageTag,
-				},
-				ConfigReloaderImage: v1beta1.ImageSpec{
-					Repository: common.ConfigReloaderRepo,
-					Tag:        common.ConfigReloaderTag,
-				},
-				BufferVolumeImage: v1beta1.ImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
 			},
 		},
 	}

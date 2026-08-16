@@ -28,21 +28,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
-)
-
-const (
-	FluentdImageRepo      = "fluentd-full"
-	FluentdImageTag       = "local"
-	ConfigReloaderRepo    = "config-reloader"
-	ConfigReloaderTag     = "local"
-	SyslogNGReloaderRepo  = "syslog-ng-reloader"
-	SyslogNGReloaderTag   = "local"
-	FluentdDrainWatchRepo = "fluentd-drain-watch"
-	FluentdDrainWatchTag  = "local"
-	NodeExporterRepo      = "node-exporter"
-	NodeExporterTag       = "local"
 )
 
 func RequireNoError(t *testing.T, err error) {
@@ -110,15 +98,9 @@ func LoggingInfra(
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef: "infra",
 			ConfigHotReload: &v1beta1.HotReload{
-				Image: v1beta1.ImageSpec{
-					Repository: ConfigReloaderRepo,
-					Tag:        ConfigReloaderTag,
-				},
+				Image: image.ConfigReloader().Spec(),
 			},
-			BufferVolumeImage: v1beta1.ImageSpec{
-				Repository: NodeExporterRepo,
-				Tag:        NodeExporterTag,
-			},
+			BufferVolumeImage: image.NodeExporter().Spec(),
 		},
 	}
 	RequireNoError(t, c.Create(ctx, &agent))
@@ -134,19 +116,10 @@ func LoggingInfra(
 			LoggingRef:       "infra",
 			ControlNamespace: nsInfra,
 			FluentdSpec: &v1beta1.FluentdSpec{
-				Image: v1beta1.ImageSpec{
-					Repository: FluentdImageRepo,
-					Tag:        FluentdImageTag,
-				},
-				ConfigReloaderImage: v1beta1.ImageSpec{
-					Repository: ConfigReloaderRepo,
-					Tag:        ConfigReloaderTag,
-				},
-				BufferVolumeImage: v1beta1.ImageSpec{
-					Repository: NodeExporterRepo,
-					Tag:        NodeExporterTag,
-				},
-				DisablePvc: true,
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
+				DisablePvc:          true,
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("50m"),
@@ -217,19 +190,10 @@ func LoggingTenant(
 			ControlNamespace: nsTenant,
 			WatchNamespaces:  []string{nsTenant},
 			FluentdSpec: &v1beta1.FluentdSpec{
-				Image: v1beta1.ImageSpec{
-					Repository: FluentdImageRepo,
-					Tag:        FluentdImageTag,
-				},
-				ConfigReloaderImage: v1beta1.ImageSpec{
-					Repository: ConfigReloaderRepo,
-					Tag:        ConfigReloaderTag,
-				},
-				BufferVolumeImage: v1beta1.ImageSpec{
-					Repository: NodeExporterRepo,
-					Tag:        NodeExporterTag,
-				},
-				DisablePvc: true,
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
+				DisablePvc:          true,
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("50m"),

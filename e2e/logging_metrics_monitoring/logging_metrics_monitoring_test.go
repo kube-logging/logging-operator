@@ -39,7 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
-	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -135,13 +135,13 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
-					ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
-					BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
+					ConfigReloadImage:        image.SyslogNGReloader().Basic(),
+					BufferVolumeMetricsImage: image.NodeExporter().Basic(),
 					Metrics: &v1beta1.Metrics{
 						Enabled:        new(true),
 						ServiceMonitor: true,
@@ -213,14 +213,14 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Metrics: &v1beta1.Metrics{
 						Enabled:        new(true),
 						ServiceMonitor: true,

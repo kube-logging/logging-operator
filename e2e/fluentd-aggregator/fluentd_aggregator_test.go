@@ -42,7 +42,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
-	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
@@ -93,14 +93,14 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -116,7 +116,7 @@ func TestFluentdAggregator_MultiWorker(t *testing.T) {
 						Replicas: 1,
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled: true,
-							Image:   fixture.DrainWatchImage(),
+							Image:   image.DrainWatch().Spec(),
 						},
 					},
 					Workers: 2,
@@ -266,14 +266,14 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -289,7 +289,7 @@ func TestFluentdAggregator_ConfigChecks(t *testing.T) {
 						Replicas: 1,
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled: true,
-							Image:   fixture.DrainWatchImage(),
+							Image:   image.DrainWatch().Spec(),
 						},
 					},
 					Workers: 1,
@@ -469,14 +469,14 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -492,7 +492,7 @@ func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfig
 						Replicas: 1,
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled: true,
-							Image:   fixture.DrainWatchImage(),
+							Image:   image.DrainWatch().Spec(),
 						},
 					},
 					Workers: 1,
@@ -651,14 +651,14 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -674,7 +674,7 @@ func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesyst
 						Replicas: 1,
 						Drain: v1beta1.FluentdDrainConfig{
 							Enabled: true,
-							Image:   fixture.DrainWatchImage(),
+							Image:   image.DrainWatch().Spec(),
 						},
 					},
 					Workers: 1,

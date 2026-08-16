@@ -22,6 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
@@ -65,8 +66,8 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 		ObjectMeta: metav1.ObjectMeta{Name: InfraRef},
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef:        InfraRef,
-			ConfigHotReload:   &v1beta1.HotReload{Image: image(ConfigReloaderRepo)},
-			BufferVolumeImage: image(NodeExporterRepo),
+			ConfigHotReload:   &v1beta1.HotReload{Image: image.ConfigReloader().Spec()},
+			BufferVolumeImage: image.NodeExporter().Spec(),
 		},
 	}
 
@@ -138,9 +139,9 @@ func LoggingRoute() *v1beta1.LoggingRoute {
 // Not FluentdSpec(): tenancy disables the PVC and requests less.
 func tenancyFluentdSpec() *v1beta1.FluentdSpec {
 	return &v1beta1.FluentdSpec{
-		Image:               image(FluentdImageRepo),
-		ConfigReloaderImage: image(ConfigReloaderRepo),
-		BufferVolumeImage:   image(NodeExporterRepo),
+		Image:               image.Fluentd().Spec(),
+		ConfigReloaderImage: image.ConfigReloader().Spec(),
+		BufferVolumeImage:   image.NodeExporter().Spec(),
 		DisablePvc:          true,
 		Resources: corev1.ResourceRequirements{
 			Requests: corev1.ResourceList{
