@@ -67,7 +67,7 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 	if err != nil {
 		// The cluster is created before the client can fail, and the deferred
 		// teardown below is not registered yet.
-		assert.NoError(t, DeleteTestCluster(name))
+		DeleteTestClusterOrLog(t, name)
 	}
 	RequireNoError(t, err)
 
@@ -90,7 +90,7 @@ func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), before
 			assert.Fail(t, "cluster.Start did not return after cancellation")
 		}
 
-		assert.NoError(t, DeleteTestCluster(name))
+		DeleteTestClusterOrLog(t, name)
 	}()
 
 	fn(t, cluster)
@@ -130,6 +130,15 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 		kubeconfigFilePath: kubeconfigFile.Name(),
 		clusterName:        clusterName,
 	}, errors.WrapIfWithDetails(err, "creating cluster with rest config", "cfg", restCfg)
+}
+
+// A delete that fails after the assertions have run is the runner's state, and
+// failing here would not remove the leftover the next run recreates anyway.
+func DeleteTestClusterOrLog(t *testing.T, clusterName string) {
+	t.Helper()
+	if err := DeleteTestCluster(clusterName); err != nil {
+		t.Logf("deleting cluster %q: %v", clusterName, err)
+	}
 }
 
 func DeleteTestCluster(clusterName string) error {

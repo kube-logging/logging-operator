@@ -152,7 +152,7 @@ func (b *Builder) Start() *Env {
 	if err != nil {
 		// The kind cluster is up before the client can fail, and teardown is
 		// not registered yet.
-		assert.NoError(t, common.DeleteTestCluster(b.cfg.cluster))
+		common.DeleteTestClusterOrLog(t, b.cfg.cluster)
 	}
 	common.RequireNoError(t, err)
 
@@ -177,7 +177,7 @@ func (b *Builder) Start() *Env {
 		{"artifacts", env.collectArtifacts},
 		{"kubeconfig", func() { assert.NoError(t, c.Cleanup()) }},
 		{"stop", func() { stopCluster(t, cancel, startErr) }},
-		{"delete", func() { assert.NoError(t, common.DeleteTestCluster(b.cfg.cluster)) }},
+		{"delete", func() { common.DeleteTestClusterOrLog(t, b.cfg.cluster) }},
 	}.register(t)
 
 	setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(o *setup.LoggingOperatorOptions) {
