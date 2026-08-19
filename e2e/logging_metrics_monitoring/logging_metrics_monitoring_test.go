@@ -39,6 +39,7 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -134,25 +135,13 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: v1beta1.ImageSpec{
-							Repository: common.ConfigReloaderRepo,
-							Tag:        common.ConfigReloaderTag,
-						},
+						Image: fixture.ConfigReloaderImage(),
 					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					BufferVolumeImage: fixture.NodeExporterImage(),
 				},
 				SyslogNGSpec: &v1beta1.SyslogNGSpec{
-					ConfigReloadImage: &v1beta1.BasicImageSpec{
-						Repository: common.SyslogNGReloaderRepo,
-						Tag:        common.SyslogNGReloaderTag,
-					},
-					BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
+					BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
 					Metrics: &v1beta1.Metrics{
 						Enabled:        new(true),
 						ServiceMonitor: true,
@@ -224,29 +213,14 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 						ServiceMonitor: true,
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: v1beta1.ImageSpec{
-							Repository: common.ConfigReloaderRepo,
-							Tag:        common.ConfigReloaderTag,
-						},
+						Image: fixture.ConfigReloaderImage(),
 					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					BufferVolumeImage: fixture.NodeExporterImage(),
 				},
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image: v1beta1.ImageSpec{
-						Repository: common.FluentdImageRepo,
-						Tag:        common.FluentdImageTag,
-					},
-					ConfigReloaderImage: v1beta1.ImageSpec{
-						Repository: common.ConfigReloaderRepo,
-						Tag:        common.ConfigReloaderTag,
-					},
-					BufferVolumeImage: v1beta1.ImageSpec{
-						Repository: common.NodeExporterRepo,
-						Tag:        common.NodeExporterTag,
-					},
+					Image:               fixture.FluentdImage(),
+					ConfigReloaderImage: fixture.ConfigReloaderImage(),
+					BufferVolumeImage:   fixture.NodeExporterImage(),
 					Metrics: &v1beta1.Metrics{
 						Enabled:        new(true),
 						ServiceMonitor: true,
