@@ -15,7 +15,6 @@
 package syslong_ng_aggregator
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
@@ -23,8 +22,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -60,25 +59,13 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 					Keepalive: new(false),
 				},
 				ConfigHotReload: &v1beta1.HotReload{
-					Image: v1beta1.ImageSpec{
-						Repository: common.ConfigReloaderRepo,
-						Tag:        common.ConfigReloaderTag,
-					},
+					Image: image.ConfigReloader().Spec(),
 				},
-				BufferVolumeImage: v1beta1.ImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				BufferVolumeImage: image.NodeExporter().Spec(),
 			},
 			SyslogNGSpec: &v1beta1.SyslogNGSpec{
-				ConfigReloadImage: &v1beta1.BasicImageSpec{
-					Repository: common.SyslogNGReloaderRepo,
-					Tag:        common.SyslogNGReloaderTag,
-				},
-				BufferVolumeMetricsImage: &v1beta1.BasicImageSpec{
-					Repository: common.NodeExporterRepo,
-					Tag:        common.NodeExporterTag,
-				},
+				ConfigReloadImage:        image.SyslogNGReloader().Basic(),
+				BufferVolumeMetricsImage: image.NodeExporter().Basic(),
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{
@@ -133,7 +120,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		},
 		Spec: v1beta1.SyslogNGOutputSpec{
 			HTTP: &syslogngoutput.HTTPOutput{
-				URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", release, testTag),
+				URL: env.Receiver.URL(testTag),
 				Headers: []string{
 					"Content-type: application/json",
 				},

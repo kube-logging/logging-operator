@@ -41,7 +41,8 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
-	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/resources/syslogng"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -89,9 +90,9 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 						Keepalive: new(false),
 					},
 					ConfigHotReload: &v1beta1.HotReload{
-						Image: fixture.ConfigReloaderImage(),
+						Image: image.ConfigReloader().Spec(),
 					},
-					BufferVolumeImage: fixture.NodeExporterImage(),
+					BufferVolumeImage: image.NodeExporter().Spec(),
 				},
 			},
 		}
@@ -103,8 +104,8 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
-				ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
-				BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
+				ConfigReloadImage:        image.SyslogNGReloader().Basic(),
+				BufferVolumeMetricsImage: image.NodeExporter().Basic(),
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{
@@ -158,8 +159,8 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 				Namespace: ns,
 			},
 			Spec: v1beta1.SyslogNGSpec{
-				ConfigReloadImage:        fixture.Basic(fixture.SyslogNGReloaderImage()),
-				BufferVolumeMetricsImage: fixture.Basic(fixture.NodeExporterImage()),
+				ConfigReloadImage:        image.SyslogNGReloader().Basic(),
+				BufferVolumeMetricsImage: image.NodeExporter().Basic(),
 				StatefulSetOverrides: &typeoverride.StatefulSet{
 					Spec: typeoverride.StatefulSetSpec{
 						Template: typeoverride.PodTemplateSpec{
@@ -215,7 +216,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 			},
 			Spec: v1beta1.SyslogNGOutputSpec{
 				HTTP: &syslogngoutput.HTTPOutput{
-					URL: fmt.Sprintf("http://%s-test-receiver:8080/%s", releaseNameOverride, testTag),
+					URL: harness.ReceiverURL(releaseNameOverride, testTag),
 					Headers: []string{
 						"Content-type: application/json",
 					},
@@ -312,7 +313,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 			cmd := common.CmdEnv(exec.Command("kubectl",
 				"logs",
 				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, releaseNameOverride)), c)
+				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %+v %s", err, rawOut)

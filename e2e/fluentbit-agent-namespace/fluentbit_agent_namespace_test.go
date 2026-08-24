@@ -39,7 +39,8 @@ import (
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
-	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	v1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
@@ -109,7 +110,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				OutputSpec: v1beta1.OutputSpec{
 					LoggingRef: "infra",
 					HTTPOutput: &output.HTTPOutputConfig{
-						Endpoint:    fmt.Sprintf("http://%s-test-receiver:8080/%s", release, tag),
+						Endpoint:    harness.ReceiverURL(release, tag),
 						ContentType: "application/json",
 						Buffer:      realTimeBuffer,
 					},
@@ -146,9 +147,9 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 			Spec: v1beta1.FluentbitSpec{
 				LoggingRef: "infra",
 				ConfigHotReload: &v1beta1.HotReload{
-					Image: fixture.ConfigReloaderImage(),
+					Image: image.ConfigReloader().Spec(),
 				},
-				BufferVolumeImage: fixture.NodeExporterImage(),
+				BufferVolumeImage: image.NodeExporter().Spec(),
 			},
 		}
 		common.RequireNoError(t, c.GetClient().Create(ctx, &agent))
@@ -161,9 +162,9 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				ControlNamespace:        nsControl,
 				FluentbitAgentNamespace: nsAgents,
 				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               fixture.FluentdImage(),
-					ConfigReloaderImage: fixture.ConfigReloaderImage(),
-					BufferVolumeImage:   fixture.NodeExporterImage(),
+					Image:               image.Fluentd().Spec(),
+					ConfigReloaderImage: image.ConfigReloader().Spec(),
+					BufferVolumeImage:   image.NodeExporter().Spec(),
 					DisablePvc:          true,
 					Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    apiresource.MustParse("50m"),
@@ -213,7 +214,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 				"logs",
 				"-n", nsControl,
 				"--tail", "30",
-				"-l", fmt.Sprintf("%s=%s-test-receiver", types.NameLabel, release)), c)
+				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(release))), c)
 			rawOut, err := cmd.Output()
 			if err != nil {
 				t.Logf("failed to get log consumer logs: %v", err)

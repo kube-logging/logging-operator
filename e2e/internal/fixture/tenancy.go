@@ -15,13 +15,13 @@
 package fixture
 
 import (
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
+	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
@@ -31,10 +31,6 @@ const (
 	TenantRef = "tenant"
 )
 
-func TenantReceiverURL(release, nsInfra, tag string) string {
-	return fmt.Sprintf("http://%s-test-receiver.%s:8080/%s", release, nsInfra, tag)
-}
-
 func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.ClusterOutput{
 		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsInfra},
@@ -42,7 +38,7 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 			OutputSpec: v1beta1.OutputSpec{
 				LoggingRef: InfraRef,
 				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    ReceiverURL(release, tag),
+					Endpoint:    harness.ReceiverURL(release, tag),
 					ContentType: "application/json",
 					Buffer:      buffer,
 				},
@@ -65,8 +61,8 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 		ObjectMeta: metav1.ObjectMeta{Name: InfraRef},
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef:        InfraRef,
-			ConfigHotReload:   &v1beta1.HotReload{Image: image(ConfigReloaderRepo)},
-			BufferVolumeImage: image(NodeExporterRepo),
+			ConfigHotReload:   &v1beta1.HotReload{Image: image.ConfigReloader().Spec()},
+			BufferVolumeImage: image.NodeExporter().Spec(),
 		},
 	}
 
@@ -88,7 +84,7 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 		Spec: v1beta1.OutputSpec{
 			LoggingRef: TenantRef,
 			HTTPOutput: &output.HTTPOutputConfig{
-				Endpoint:    TenantReceiverURL(release, nsInfra, tag),
+				Endpoint:    harness.ReceiverURLIn(release, nsInfra, tag),
 				ContentType: "application/json",
 				Buffer:      buffer,
 			},
@@ -138,9 +134,9 @@ func LoggingRoute() *v1beta1.LoggingRoute {
 // Not FluentdSpec(): tenancy disables the PVC and requests less.
 func tenancyFluentdSpec() *v1beta1.FluentdSpec {
 	return &v1beta1.FluentdSpec{
-		Image:               image(FluentdImageRepo),
-		ConfigReloaderImage: image(ConfigReloaderRepo),
-		BufferVolumeImage:   image(NodeExporterRepo),
+		Image:               image.Fluentd().Spec(),
+		ConfigReloaderImage: image.ConfigReloader().Spec(),
+		BufferVolumeImage:   image.NodeExporter().Spec(),
 		DisablePvc:          true,
 		Resources: corev1.ResourceRequirements{
 			Requests: corev1.ResourceList{
