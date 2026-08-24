@@ -85,7 +85,7 @@ func TestWatchSelectors(t *testing.T) {
 	}
 	env.Create(unmanagedSecret)
 
-	env.WaitForRunning(
+	env.WaitFor(
 		wait.Pod(ns, logging.Name+"-fluentd-0"),
 		wait.Pod(unmanagedNS, "fluentd-0"),
 	)
