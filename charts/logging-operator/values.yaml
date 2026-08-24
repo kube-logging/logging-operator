@@ -37,6 +37,9 @@ namespaceOverride: ""
 # -- Define annotations for logging-operator pods.
 annotations: {}
 
+# -- Define annotations for logging-operator deployment
+deploymentAnnotations: {}
+
 # -- Deploy CRDs used by Logging operator.
 createCustomResource: false
 
@@ -104,8 +107,8 @@ podSecurityContext: {}
 securityContext: {}
 #  allowPrivilegeEscalation: false
 #  readOnlyRootFilesystem: true
-  # capabilities:
-  #   drop: ["ALL"]
+#  capabilities:
+#    drop: ["ALL"]
 
 # -- Operator priorityClassName.
 priorityClassName: ~
@@ -146,7 +149,6 @@ podLabels: {}
 
 # Logging resources configuration.
 logging:
-
   # -- Logging resources are disabled by default
   enabled: false
 
@@ -227,7 +229,7 @@ logging:
   enableDockerParserCompatibilityForCRI: false
 
   # -- enableRawFluentdFilter enables the use of the Raw filter for fluentd. This allows users to configure custom or unexposed Fluentd filters via raw configuration.
-  # Break-glass setting: enabling it lets every user who can create a Flow or ClusterFlow in this logging domain inject arbitrary configuration (and thereby run arbitrary code) into the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys. 
+  # Break-glass setting: enabling it lets every user who can create a Flow or ClusterFlow in this logging domain inject arbitrary configuration (and thereby run arbitrary code) into the shared Fluentd aggregator, which processes all tenants' logs and mounts output credentials and TLS keys.
   # Enable it only if you trust all Flow authors. Disabling it again does not retroactively remove already rendered raw configuration: delete the offending Flow, rotate the aggregator's credentials and restart it.
   enableRawFluentdFilter: false
 
@@ -293,33 +295,33 @@ logging:
     # -- List of hostTailers configurations
     instances: []
     # - name: hosttailer
-      # -- Namespace of the HostTailer resource. Defaults to the Helm release namespace when omitted.
-      # namespace: custom-namespace
-      # -- Enable hostTailer
-      # enabled: true
-      # -- workloadMetaOverrides of HostTailer
-      # workloadMetaOverrides: {}
-      # -- workloadOverrides of HostTailer
-      # workloadOverrides: {}
-      # -- configure fileTailers of HostTailer
-      # fileTailers:
-      # - name: sample-file
-      #   path: /var/log/sample-file
-      #   disabled: false
-      #   buffer_max_size:
-      #   buffer_chunk_size:
-      #   skip_long_lines:
-      #   read_from_head: false
-      #   containerOverrides:
-      #   image:
-      # -- configure systemdTailers of HostTailer
-      # systemdTailers:
-      # - name: system-sample
-      #   disabled: false
-      #   systemdFilter: kubelet.service
-      #   maxEntries: 20
-      #   containerOverrides:
-      #   image:
+    #   # -- Namespace of the HostTailer resource. Defaults to the Helm release namespace when omitted.
+    #   namespace: custom-namespace
+    #   # -- Enable hostTailer
+    #   enabled: true
+    #   # -- workloadMetaOverrides of HostTailer
+    #   workloadMetaOverrides: {}
+    #   # -- workloadOverrides of HostTailer
+    #   workloadOverrides: {}
+    #   # -- configure fileTailers of HostTailer
+    #   fileTailers:
+    #   - name: sample-file
+    #     path: /var/log/sample-file
+    #     disabled: false
+    #     buffer_max_size:
+    #     buffer_chunk_size:
+    #     skip_long_lines:
+    #     read_from_head: false
+    #     containerOverrides:
+    #     image:
+    #   # -- configure systemdTailers of HostTailer
+    #   systemdTailers:
+    #   - name: system-sample
+    #     disabled: false
+    #     systemdFilter: kubelet.service
+    #     maxEntries: 20
+    #     containerOverrides:
+    #     image:
 
 testReceiver:
   enabled: false
@@ -344,4 +346,3 @@ extraManifests: []
   #     name: extra-manifest
   #   data:
   #     extra-data: "value"
-

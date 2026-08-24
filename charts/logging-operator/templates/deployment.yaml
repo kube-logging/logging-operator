@@ -5,6 +5,10 @@ metadata:
   namespace: {{ include "logging-operator.namespace" . }}
   labels:
 {{ include "logging-operator.labels" . | indent 4 }}
+{{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -58,10 +62,10 @@ spec:
         {{- if .Values.securityContext }}
           securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
-        {{- with .Values.volumeMounts }} 
+        {{- with .Values.volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
         {{- end }}
-    {{- with .Values.volumes }} 
+    {{- with .Values.volumes }}
       volumes: {{ toYaml . | nindent 8 }}
     {{- end }}
     {{- if .Values.podSecurityContext }}
