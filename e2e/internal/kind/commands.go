@@ -50,6 +50,11 @@ const (
 
 	defaultCleanupTimeout = 2 * time.Minute
 	defaultWaitDelay      = 10 * time.Second
+
+	// Docker sometimes reports killing the node container without seeing it
+	// exit. That clears on its own.
+	defaultDeleteAttempts = 3
+	defaultDeleteBackoff  = 5 * time.Second
 )
 
 // Kind runs kind subcommands against one installation of the binary.
@@ -65,6 +70,9 @@ type Kind struct {
 	// because the runner is already struggling by then and the caller still has
 	// to report the failure within what is left of the budget.
 	CleanupTimeout time.Duration
+
+	DeleteAttempts int
+	DeleteBackoff  time.Duration
 
 	// waitDelay caps how long Wait blocks on inherited pipes after the process
 	// has been killed.
@@ -88,6 +96,8 @@ func New() *Kind {
 		// the testing package has parsed flags, which is after initialisation.
 		CommandTimeout: resolveCommandTimeout(os.Getenv(commandTimeoutEnv), 0),
 		CleanupTimeout: defaultCleanupTimeout,
+		DeleteAttempts: defaultDeleteAttempts,
+		DeleteBackoff:  defaultDeleteBackoff,
 		waitDelay:      defaultWaitDelay,
 	}
 }
@@ -131,8 +141,31 @@ func (k *Kind) CreateCluster(options CreateClusterOptions) error {
 	}
 }
 
+// Retrying is safe: kind exits 0 deleting a cluster that is already gone. The
+// delete inside CreateCluster does not, being on a failing create's budget.
 func (k *Kind) DeleteCluster(options DeleteClusterOptions) error {
-	return k.deleteCluster(k.commandTimeout(), options)
+	return k.retryDelete(options.Name, func() error {
+		return k.deleteCluster(k.commandTimeout(), options)
+	})
+}
+
+func (k *Kind) retryDelete(name string, do func() error) error {
+	var err error
+	for attempt := 1; attempt <= max(k.DeleteAttempts, 1); attempt++ {
+		if attempt > 1 {
+			fmt.Printf("kind delete cluster %q failed, retrying in %s: %v\n", name, k.DeleteBackoff, err)
+			time.Sleep(k.DeleteBackoff)
+		}
+		if err = do(); err == nil {
+			return nil
+		}
+		// The wedged docker this retries for fails in seconds, while a timeout
+		// has already spent the budget the caller has left to report within.
+		if errors.Is(err, ErrTimeout) {
+			return err
+		}
+	}
+	return err
 }
 
 func (k *Kind) deleteCluster(timeout time.Duration, options DeleteClusterOptions) error {
