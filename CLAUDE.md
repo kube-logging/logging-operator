@@ -15,7 +15,7 @@ Users define `Flow`/`Output` CRDs (or their cluster-scoped equivalents) to route
 ```
 logging-operator/
 ├── .github/                         # GitHub Actions workflows
-├── charts/logging-operator/         # Helm chart (synced with manifests via make manifests)
+├── charts/logging-operator/         # Helm chart (CRDs via make manifests, README via make helm-docs)
 ├── controllers/
 │   ├── logging/                     # Core reconcilers (Logging, LoggingRoute, TelemetryController, AxoSyslog)
 │   └── extensions/                  # EventTailer and HostTailer reconcilers
@@ -66,8 +66,14 @@ make manifests
 # Regenerate Go code (deepcopy, etc.)
 make codegen
 
-# Full generation cycle after any API type change (codegen + fmt + manifests + docs)
+# Full generation cycle after any API type change (codegen + fmt + manifests + docs + helm-docs)
 make generate
+
+# Regenerate the chart README from values.yaml — CI fails `make check-diff` without it
+make helm-docs
+
+# What CI enforces: runs `generate`, then fails if anything is left uncommitted
+make check-diff
 
 # Format all code
 make fmt
