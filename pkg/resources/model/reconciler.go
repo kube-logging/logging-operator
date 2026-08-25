@@ -64,6 +64,11 @@ func NewValidationReconciler( //nolint: gocyclo
 			output.Status.Problems = append(output.Status.Problems,
 				validateOutputSpec(output.Spec.OutputSpec, secrets.OutputSecretLoaderForNamespace(output.Namespace))...)
 			output.Status.ProblemsCount = len(output.Status.Problems)
+
+			// The default flow references cluster outputs from the Logging spec, so the flow loops below never see them
+			if defaultFlow := resources.Logging.Spec.DefaultFlowSpec; defaultFlow != nil && output.Status.ProblemsCount == 0 && slices.Contains(defaultFlow.GlobalOutputRefs, output.Name) {
+				output.Status.Active = new(true)
+			}
 		}
 
 		for i := range resources.Fluentd.Outputs {
