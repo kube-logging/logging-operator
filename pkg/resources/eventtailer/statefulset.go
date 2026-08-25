@@ -128,6 +128,7 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 					ServiceAccountName: e.Name(),
 					Volumes:            volumes,
 					ImagePullSecrets:   imagePullSecrets,
+					EnableServiceLinks: e.customResource.Spec.EnableServiceLinks,
 				}),
 		},
 	}

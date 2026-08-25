@@ -13,6 +13,11 @@ HostTailerSpec defines the desired state of HostTailer
 EnableRecreateWorkloadOnImmutableFieldChange enables the operator to recreate the daemonset (and possibly other resource in the future) in case there is a change in an immutable field that otherwise couldn't be managed with a simple update. 
 
 
+### enableServiceLinks (*bool, optional) {#hosttailerspec-enableservicelinks}
+
+EnableServiceLinks indicates whether information about services should be injected into the pod's environment variables, matching the syntax of Docker links. Defaults to true. 
+
+
 ### fileTailers ([]FileTailer, optional) {#hosttailerspec-filetailers}
 
 List of [file tailers](#filetailer). 

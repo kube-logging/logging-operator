@@ -51,6 +51,9 @@ type EventTailerSpec struct {
 	ContainerBase *types.ContainerBase `json:"containerOverrides,omitempty"`
 	// Override image related fields for the given statefulset, highest precedence
 	Image *tailer.ImageSpec `json:"image,omitempty"`
+	// EnableServiceLinks indicates whether information about services should be injected into the pod's
+	// environment variables, matching the syntax of Docker links. Defaults to true.
+	EnableServiceLinks *bool `json:"enableServiceLinks,omitempty"`
 }
 
 // EventTailerStatus defines the observed state of EventTailer
