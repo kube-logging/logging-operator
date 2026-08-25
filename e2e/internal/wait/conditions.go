@@ -21,10 +21,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 func PodShouldBeRunning(t *testing.T, cl client.Reader, key client.ObjectKey) func() bool {
@@ -100,104 +97,6 @@ func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) 
 		}
 		return false
 	}
-}
-
-// refresh re-reads obj so the next poll sees current status. A failed read is
-// logged and ignored on purpose: the caller is about to return false and be
-// retried, and these conditions run on testify's own goroutine, where failing
-// the test is undefined.
-func refresh(t *testing.T, cl client.Client, ctx context.Context, obj client.Object) {
-	if err := cl.Get(ctx, client.ObjectKeyFromObject(obj), obj); err != nil {
-		t.Logf("could not refresh %s: %v", obj.GetName(), err)
-	}
-}
-
-func CheckFluentdStatus(t *testing.T, cl client.Client, ctx context.Context, fluentd *v1beta1.FluentdConfig, loggingName string) bool {
-	fluentdInstanceName := fluentd.Name
-
-	if len(fluentd.Status.Problems) != 0 {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have 0 problems, problems=%v", fluentdInstanceName, fluentd.Status.Problems)
-		return false
-	}
-	if fluentd.Status.Logging != loggingName {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", fluentdInstanceName, fluentd.Status.Logging, loggingName)
-		return false
-	}
-	if !ptr.Deref(fluentd.Status.Active, false) {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's active field set as true", fluentdInstanceName)
-		return false
-	}
-
-	return true
-}
-
-func CheckExcessFluentdStatus(t *testing.T, cl client.Client, ctx context.Context, fluentd *v1beta1.FluentdConfig) bool {
-	fluentdInstanceName := fluentd.Name
-
-	if len(fluentd.Status.Problems) == 0 {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's problems field filled", fluentdInstanceName)
-		return false
-	}
-	if fluentd.Status.Logging != "" {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's logging field empty, found: %s", fluentdInstanceName, fluentd.Status.Logging)
-		return false
-	}
-	if ptr.Deref(fluentd.Status.Active, true) {
-		refresh(t, cl, ctx, fluentd)
-		t.Logf("%s should have it's active field set as false", fluentdInstanceName)
-		return false
-	}
-
-	return true
-}
-
-func CheckSyslogNGStatus(t *testing.T, cl client.Client, ctx context.Context, syslogNG *v1beta1.SyslogNGConfig, loggingName string) bool {
-	instanceName := syslogNG.Name
-
-	if len(syslogNG.Status.Problems) != 0 {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have 0 problems, problems=%v", instanceName, syslogNG.Status.Problems)
-		return false
-	}
-	if syslogNG.Status.Logging != loggingName {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's logging field filled, found: %s, expect:%s", instanceName, syslogNG.Status.Logging, loggingName)
-		return false
-	}
-	if !ptr.Deref(syslogNG.Status.Active, false) {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's active field set as true", instanceName)
-		return false
-	}
-
-	return true
-}
-
-func CheckExcessSyslogNGStatus(t *testing.T, cl client.Client, ctx context.Context, syslogNG *v1beta1.SyslogNGConfig) bool {
-	instanceName := syslogNG.Name
-
-	if len(syslogNG.Status.Problems) == 0 {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's problems field filled", instanceName)
-		return false
-	}
-	if syslogNG.Status.Logging != "" {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's logging field empty, found: %s", instanceName, syslogNG.Status.Logging)
-		return false
-	}
-	if ptr.Deref(syslogNG.Status.Active, true) {
-		refresh(t, cl, ctx, syslogNG)
-		t.Logf("%s should have it's active field set as false", instanceName)
-		return false
-	}
-
-	return true
 }
 
 // DeploymentAvailable returns a condition function that checks if a deployment
