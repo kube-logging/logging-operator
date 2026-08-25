@@ -96,9 +96,29 @@ func aggregator(kind, namespace string) Condition {
 		client.InNamespace(namespace))
 }
 
-// ExcessFluentd is a FluentdConfig the operator refused because another is
-// already attached to the Logging: it reports problems, names no logging, and
-// is not active.
+// A detached config carries the verdict the Logging wrote back onto it:
+// attached means it owns the aggregator, excess means another already does.
+func attached(problems []string, logging string, active *bool, loggingName string) bool {
+	return len(problems) == 0 && logging == loggingName && ptr.Deref(active, false)
+}
+
+func excess(problems []string, logging string, active *bool) bool {
+	return len(problems) > 0 && logging == "" && !ptr.Deref(active, true)
+}
+
+func AttachedFluentd(namespace, name, loggingName string) Condition {
+	return Condition{
+		Name: "attached FluentdConfig " + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var config v1beta1.FluentdConfig
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &config); err != nil {
+				return false, err
+			}
+			return attached(config.Status.Problems, config.Status.Logging, config.Status.Active, loggingName), nil
+		},
+	}
+}
+
 func ExcessFluentd(namespace, name string) Condition {
 	return Condition{
 		Name: "excess FluentdConfig " + name,
@@ -107,9 +127,61 @@ func ExcessFluentd(namespace, name string) Condition {
 			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &config); err != nil {
 				return false, err
 			}
-			return len(config.Status.Problems) > 0 &&
-				config.Status.Logging == "" &&
-				!ptr.Deref(config.Status.Active, true), nil
+			return excess(config.Status.Problems, config.Status.Logging, config.Status.Active), nil
+		},
+	}
+}
+
+func AttachedSyslogNG(namespace, name, loggingName string) Condition {
+	return Condition{
+		Name: "attached SyslogNGConfig " + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var config v1beta1.SyslogNGConfig
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &config); err != nil {
+				return false, err
+			}
+			return attached(config.Status.Problems, config.Status.Logging, config.Status.Active, loggingName), nil
+		},
+	}
+}
+
+func ExcessSyslogNG(namespace, name string) Condition {
+	return Condition{
+		Name: "excess SyslogNGConfig " + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var config v1beta1.SyslogNGConfig
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &config); err != nil {
+				return false, err
+			}
+			return excess(config.Status.Problems, config.Status.Logging, config.Status.Active), nil
+		},
+	}
+}
+
+// LoggingUsesFluentd is the other direction: the Logging naming the detached
+// config, which it writes before the config's own status settles.
+func LoggingUsesFluentd(name, configName string) Condition {
+	return Condition{
+		Name: "Logging " + name + " using FluentdConfig " + configName,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var logging v1beta1.Logging
+			if err := cl.Get(ctx, client.ObjectKey{Name: name}, &logging); err != nil {
+				return false, err
+			}
+			return logging.Status.FluentdConfigName == configName, nil
+		},
+	}
+}
+
+func LoggingUsesSyslogNG(name, configName string) Condition {
+	return Condition{
+		Name: "Logging " + name + " using SyslogNGConfig " + configName,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var logging v1beta1.Logging
+			if err := cl.Get(ctx, client.ObjectKey{Name: name}, &logging); err != nil {
+				return false, err
+			}
+			return logging.Status.SyslogNGConfigName == configName, nil
 		},
 	}
 }
