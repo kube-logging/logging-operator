@@ -15,31 +15,12 @@
 package fluentd_aggregator
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
-	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -47,265 +28,118 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-var TestTempDir string
+const (
+	clusterName = "fluentd-detached"
+	release     = "e2e"
+	ns          = "testing-1"
+	loggingName = "fluentd-aggregator-multiworker-test"
+	attachedFd  = "detached-fluentd"
+	excessFd    = "excess-fluentd"
+	testTag     = "test.fluentd_aggregator_multiworker_detached"
+)
 
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
-	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
+var producerLabels = map[string]string{"my-unique-label": "log-producer"}
+
+// The two configs differ only in Workers, which is what the attached one is
+// here to exercise; the excess one leaves it unset.
+func detachedFluentd(name string, workers int32) *v1beta1.FluentdConfig {
+	return &v1beta1.FluentdConfig{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns},
+		Spec: v1beta1.FluentdSpec{
+			Image:               image.Fluentd().Spec(),
+			ConfigReloaderImage: image.ConfigReloader().Spec(),
+			BufferVolumeImage:   image.NodeExporter().Spec(),
+			Resources: corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("500m"),
+					corev1.ResourceMemory: resource.MustParse("200M"),
+				},
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("250m"),
+					corev1.ResourceMemory: resource.MustParse("50M"),
+				},
+			},
+			BufferVolumeMetrics: &v1beta1.Metrics{},
+			Scaling: &v1beta1.FluentdScaling{
+				Replicas: 1,
+				Drain: v1beta1.FluentdDrainConfig{
+					Enabled: true,
+					Image:   image.DrainWatch().Spec(),
+				},
+			},
+			Workers: workers,
+		},
 	}
 }
 
 func TestFluentdAggregator_detached_MultiWorker(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-1"
-	releaseNameOverride := "e2e"
-	testTag := "test.fluentd_aggregator_multiworker_detached"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-detached", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	env := harness.New(t).
+		WithCluster(clusterName).
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		ctx := context.Background()
-
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-multiworker-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
+	env.Create(&v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			EnableRecreateWorkloadOnImmutableFieldChange: true,
+			ControlNamespace: ns,
+			FluentbitSpec: &v1beta1.FluentbitSpec{
+				Network: &v1beta1.FluentbitNetwork{
+					Keepalive: new(false),
 				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-
-		fluentd := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "detached-fluentd",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Image:               image.Fluentd().Spec(),
-				ConfigReloaderImage: image.ConfigReloader().Spec(),
-				BufferVolumeImage:   image.NodeExporter().Spec(),
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
+				ConfigHotReload: &v1beta1.HotReload{
+					Image: image.ConfigReloader().Spec(),
 				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-						Image:   image.DrainWatch().Spec(),
-					},
-				},
-				Workers: 2,
+				BufferVolumeImage: image.NodeExporter().Spec(),
 			},
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd))
-		t.Logf("fluentd is: %v", fluentd)
-
-		excessFluentd := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "excess-fluentd",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Image:               image.Fluentd().Spec(),
-				ConfigReloaderImage: image.ConfigReloader().Spec(),
-				BufferVolumeImage:   image.NodeExporter().Spec(),
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-						Image:   image.DrainWatch().Spec(),
-					},
-				},
-			},
-		}
-		tags := "time"
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "1s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
-
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
-
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-			if len(logging.Status.FluentdConfigName) == 0 || logging.Status.FluentdConfigName != fluentd.Name {
-				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
-					t.Logf("reading the Logging failed, retrying: %v", err)
-					return false
-				}
-				t.Logf("logging should use the detached fluentd configuration (name=%s), found: %v", fluentd.Name, logging.Status.FluentdConfigName)
-				return false
-			}
-			if isValid := wait.CheckFluentdStatus(t, c.GetClient(), ctx, &fluentd, logging.Name); !isValid {
-				t.Log("checking detached fluentd status")
-				return false
-			}
-			var detachedFluentds v1beta1.FluentdConfigList
-			if err := c.GetClient().List(ctx, &detachedFluentds); err != nil {
-				t.Logf("listing the detached fluentd configurations failed, retrying: %v", err)
-				return false
-			}
-			if len(detachedFluentds.Items) != 2 {
-				// Add a new detached fluentd that is not going to be used.
-				// AlreadyExists is tolerated: the list above can be stale on a retry.
-				if err := client.IgnoreAlreadyExists(c.GetClient().Create(ctx, &excessFluentd)); err != nil {
-					t.Logf("creating the excess detached fluentd failed, retrying: %v", err)
-					return false
-				}
-				t.Log("creating excess detached fluentd")
-				return false
-			} else if isValid := wait.CheckExcessFluentdStatus(t, c.GetClient(), ctx, &excessFluentd); !isValid && len(detachedFluentds.Items) == 2 {
-				t.Log("checking excess detached fluentd status")
-				if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&excessFluentd), &excessFluentd); err != nil {
-					t.Logf("reading the excess detached fluentd failed, retrying: %v", err)
-					return false
-				}
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
-		}, 5*time.Minute, 3*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
+		},
 	})
+	env.Create(detachedFluentd(attachedFd, 2))
+
+	tags := "time"
+	out := &v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Spec: v1beta1.OutputSpec{
+			HTTPOutput: &output.HTTPOutputConfig{
+				Endpoint:    env.Receiver.URL(testTag),
+				ContentType: "application/json",
+				Buffer: &output.Buffer{
+					Type:        "file",
+					Tags:        &tags,
+					Timekey:     "1s",
+					TimekeyWait: "0s",
+				},
+			},
+		},
+	}
+	env.Create(out)
+
+	env.Create(&v1beta1.Flow{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{Select: &v1beta1.Select{Labels: producerLabels}},
+			},
+			LocalOutputRefs: []string{out.Name},
+		},
+	})
+
+	env.StartLogProducer(ns, producerLabels)
+
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+		wait.LoggingUsesFluentd(loggingName, attachedFd),
+		wait.AttachedFluentd(ns, attachedFd, loggingName),
+	)
+
+	// Created only now, so there is something for the operator to reject it
+	// against. The original issued this inside the poll and tolerated
+	// AlreadyExists to survive the retries.
+	env.Create(detachedFluentd(excessFd, 0))
+	env.WaitFor(wait.ExcessFluentd(ns, excessFd))
+
+	env.Receiver.MustReceive(testTag)
 }
