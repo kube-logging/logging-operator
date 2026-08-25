@@ -34,6 +34,11 @@ Overrides the default logging level configCheck setup. This field is not used di
 ### configReloadImage (*BasicImageSpec, optional) {#syslogngspec-configreloadimage}
 
 
+### enableServiceLinks (*bool, optional) {#syslogngspec-enableservicelinks}
+
+EnableServiceLinks indicates whether information about services should be injected into the pod's environment variables, matching the syntax of Docker links. Defaults to true. 
+
+
 ### enabledIPv6 (bool, optional) {#syslogngspec-enabledipv6}
 
 

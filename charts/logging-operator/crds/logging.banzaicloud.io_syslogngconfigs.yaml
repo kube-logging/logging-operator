@@ -4211,6 +4211,8 @@ spec:
                   tag:
                     type: string
                 type: object
+              enableServiceLinks:
+                type: boolean
               enabledIPv6:
                 type: boolean
               globalOptions:

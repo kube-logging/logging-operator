@@ -69,6 +69,7 @@ func (r *Reconciler) statefulset() (runtime.Object, reconciler.DesiredState, err
 					Containers:                    containers,
 					Volumes:                       r.generateVolume(),
 					TerminationGracePeriodSeconds: r.syslogNGSpec.TerminationGracePeriodSeconds,
+					EnableServiceLinks:            r.syslogNGSpec.EnableServiceLinks,
 					SecurityContext: &corev1.PodSecurityContext{
 						FSGroup: new(int64(101)),
 					},

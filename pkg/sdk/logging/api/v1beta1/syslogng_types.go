@@ -85,6 +85,9 @@ type SyslogNGSpec struct {
 	// Duration in seconds for graceful pod termination. Set higher than expected cleanup time.
 	// +kubebuilder:validation:Minimum=0
 	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
+	// EnableServiceLinks indicates whether information about services should be injected into the pod's
+	// environment variables, matching the syntax of Docker links. Defaults to true.
+	EnableServiceLinks *bool `json:"enableServiceLinks,omitempty"`
 }
 
 //
