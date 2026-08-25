@@ -19,7 +19,10 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // Condition carries no testing.T and no client, so a suite can name one without
@@ -71,6 +74,14 @@ func Producer(labels map[string]string) Condition {
 	return PodRunning("producer", client.MatchingLabels(labels))
 }
 
+// Fluentbit is the agent daemonset, which a suite naming a
+// fluentBitAgentNamespace expects somewhere other than the control namespace.
+func Fluentbit(namespace string) Condition {
+	return PodRunning("fluentbit in "+namespace,
+		client.MatchingLabels{types.NameLabel: "fluentbit"},
+		client.InNamespace(namespace))
+}
+
 func FluentdAggregator(namespace string) Condition {
 	return aggregator("fluentd", namespace)
 }
@@ -83,4 +94,22 @@ func aggregator(kind, namespace string) Condition {
 	return PodRunning(kind+" aggregator in "+namespace,
 		client.MatchingLabels{types.NameLabel: kind, types.ComponentLabel: kind},
 		client.InNamespace(namespace))
+}
+
+// ExcessFluentd is a FluentdConfig the operator refused because another is
+// already attached to the Logging: it reports problems, names no logging, and
+// is not active.
+func ExcessFluentd(namespace, name string) Condition {
+	return Condition{
+		Name: "excess FluentdConfig " + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var config v1beta1.FluentdConfig
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &config); err != nil {
+				return false, err
+			}
+			return len(config.Status.Problems) > 0 &&
+				config.Status.Logging == "" &&
+				!ptr.Deref(config.Status.Active, true), nil
+		},
+	}
 }

@@ -58,7 +58,7 @@ func TestFluentbitHotReload(t *testing.T) {
 
 	env.StartLogProducer(nsTenant, producerLabels)
 
-	env.WaitForRunning(
+	env.WaitFor(
 		wait.Operator(release),
 		wait.Producer(producerLabels),
 		wait.FluentdAggregator(nsInfra),

@@ -15,26 +15,12 @@
 package fluentd_aggregator
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
-	"time"
 
-	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -42,208 +28,105 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-var TestTempDirUnnamed string
+const (
+	clusterName = "fluentd-detached-unnamed"
+	release     = "e2e"
+	ns          = "testing-1"
+	testTag     = "test.fluentd_aggregator_multiworker_multiple_detached_failure"
+)
 
-func init() {
-	var ok bool
-	TestTempDirUnnamed, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDirUnnamed = "../.."
-	}
-	TestTempDirUnnamed = filepath.Join(TestTempDirUnnamed, "build/_test")
-	err := os.MkdirAll(TestTempDirUnnamed, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
+var producerLabels = map[string]string{"my-unique-label": "log-producer"}
+
+// detachedFluentd is the spec both excess configs carry: identical on purpose,
+// so neither can be the one the Logging picks.
+func detachedFluentd(name string) *v1beta1.FluentdConfig {
+	return &v1beta1.FluentdConfig{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns},
+		Spec: v1beta1.FluentdSpec{
+			Image:               image.Fluentd().Spec(),
+			ConfigReloaderImage: image.ConfigReloader().Spec(),
+			BufferVolumeImage:   image.NodeExporter().Spec(),
+			Resources: corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("500m"),
+					corev1.ResourceMemory: resource.MustParse("200M"),
+				},
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("250m"),
+					corev1.ResourceMemory: resource.MustParse("50M"),
+				},
+			},
+			BufferVolumeMetrics: &v1beta1.Metrics{},
+			Scaling: &v1beta1.FluentdScaling{
+				Replicas: 1,
+				Drain: v1beta1.FluentdDrainConfig{
+					Enabled: true,
+					Image:   image.DrainWatch().Spec(),
+				},
+			},
+			Workers: 2,
+		},
 	}
 }
 
 func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-1"
-	releaseNameOverride := "e2e"
-	testTag := "test.fluentd_aggregator_multiworker_multiple_detached_failure"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-detached-unnamed", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	env := harness.New(t).
+		WithCluster(clusterName).
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		ctx := context.Background()
-
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-multiworker-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
+	env.Create(&v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-aggregator-multiworker-test", Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			EnableRecreateWorkloadOnImmutableFieldChange: true,
+			ControlNamespace: ns,
+			FluentbitSpec: &v1beta1.FluentbitSpec{
+				Network: &v1beta1.FluentbitNetwork{
+					Keepalive: new(false),
 				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-
-		fluentd1 := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "not-to-be-used-fluentd-1",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Image:               image.Fluentd().Spec(),
-				ConfigReloaderImage: image.ConfigReloader().Spec(),
-				BufferVolumeImage:   image.NodeExporter().Spec(),
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
+				ConfigHotReload: &v1beta1.HotReload{
+					Image: image.ConfigReloader().Spec(),
 				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-						Image:   image.DrainWatch().Spec(),
-					},
-				},
-				Workers: 2,
+				BufferVolumeImage: image.NodeExporter().Spec(),
 			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd1))
-
-		fluentd2 := v1beta1.FluentdConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "not-to-be-used-fluentd-2",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FluentdSpec{
-				Image:               image.Fluentd().Spec(),
-				ConfigReloaderImage: image.ConfigReloader().Spec(),
-				BufferVolumeImage:   image.NodeExporter().Spec(),
-				Resources: corev1.ResourceRequirements{
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("500m"),
-						corev1.ResourceMemory: resource.MustParse("200M"),
-					},
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("250m"),
-						corev1.ResourceMemory: resource.MustParse("50M"),
-					},
-				},
-				BufferVolumeMetrics: &v1beta1.Metrics{},
-				Scaling: &v1beta1.FluentdScaling{
-					Replicas: 1,
-					Drain: v1beta1.FluentdDrainConfig{
-						Enabled: true,
-						Image:   image.DrainWatch().Spec(),
-					},
-				},
-				Workers: 2,
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &fluentd2))
-
-		t.Logf("fluentd is: %v", fluentd1)
-		tags := "time"
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "1s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
-
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if rv := wait.CheckExcessFluentdStatus(t, c.GetClient(), ctx, &fluentd1); !rv {
-				return false
-			}
-			if rv := wait.CheckExcessFluentdStatus(t, c.GetClient(), ctx, &fluentd2); !rv {
-				return false
-			}
-			return true
-		}, 5*time.Minute, 3*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDirUnnamed, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
+		},
 	})
+
+	first, second := "not-to-be-used-fluentd-1", "not-to-be-used-fluentd-2"
+	env.Create(detachedFluentd(first), detachedFluentd(second))
+
+	tags := "time"
+	out := &v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Spec: v1beta1.OutputSpec{
+			HTTPOutput: &output.HTTPOutputConfig{
+				Endpoint:    env.Receiver.URL(testTag),
+				ContentType: "application/json",
+				Buffer: &output.Buffer{
+					Type:        "file",
+					Tags:        &tags,
+					Timekey:     "1s",
+					TimekeyWait: "0s",
+				},
+			},
+		},
+	}
+	env.Create(out)
+
+	env.Create(&v1beta1.Flow{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{Select: &v1beta1.Select{Labels: producerLabels}},
+			},
+			LocalOutputRefs: []string{out.Name},
+		},
+	})
+
+	env.StartLogProducer(ns, producerLabels)
+
+	// Neither config attaches, so nothing aggregates and no tag arrives; the
+	// verdict is the status the operator writes back onto both.
+	env.WaitFor(wait.ExcessFluentd(ns, first), wait.ExcessFluentd(ns, second))
 }

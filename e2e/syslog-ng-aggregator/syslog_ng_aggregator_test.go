@@ -154,7 +154,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	env.Create(logging, output, flow)
 	env.StartLogProducer(ns, producerLabels)
 
-	env.WaitForRunning(
+	env.WaitFor(
 		wait.Operator(release),
 		wait.Producer(producerLabels),
 		wait.SyslogNGAggregator(ns),

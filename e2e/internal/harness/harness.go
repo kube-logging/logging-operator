@@ -202,7 +202,7 @@ func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 	}))
 }
 
-func (e *Env) WaitForRunning(conditions ...wait.Condition) {
+func (e *Env) WaitFor(conditions ...wait.Condition) {
 	e.T.Helper()
 
 	var outstanding pending
