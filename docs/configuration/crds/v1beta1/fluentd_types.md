@@ -76,6 +76,9 @@ ConfigCheckPod adds helper init containers and volumes to the transient configch
 Allows Time object in buffer's MessagePack serde [more info]( https://docs.fluentd.org/deployment/system-config#enable_msgpack_time_support) 
 
 
+### enableServiceLinks (*bool, optional) {#fluentdspec-enableservicelinks}
+
+
 ### enabledIPv6 (bool, optional) {#fluentdspec-enabledipv6}
 
 

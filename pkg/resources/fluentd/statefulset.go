@@ -138,6 +138,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 				TerminationGracePeriodSeconds: r.fluentdSpec.TerminationGracePeriodSeconds,
 				DNSPolicy:                     r.fluentdSpec.DNSPolicy,
 				DNSConfig:                     r.fluentdSpec.DNSConfig,
+				EnableServiceLinks:            r.fluentdSpec.EnableServiceLinks,
 				SecurityContext:               r.fluentdSpec.Security.PodSecurityContext,
 			},
 		},

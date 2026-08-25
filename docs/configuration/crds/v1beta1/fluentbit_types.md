@@ -109,6 +109,9 @@ DisableVarLibDockerContainers controls whether the /var/lib/docker/containers vo
 DisableVarLog controls whether the /var/log volume is mounted. If true, the volume is NOT mounted. If false (default), the volume is mounted. 
 
 
+### enableServiceLinks (*bool, optional) {#fluentbitspec-enableservicelinks}
+
+
 ### enableUpstream (bool, optional) {#fluentbitspec-enableupstream}
 
 
