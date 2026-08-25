@@ -168,8 +168,9 @@ func (h *HostTailer) DaemonSet(containers []corev1.Container, volumes []corev1.V
 					Labels: h.allLabels(),
 				}),
 				Spec: h.customResource.Spec.WorkloadBase.Override(corev1.PodSpec{
-					Volumes:    volumes,
-					Containers: containers,
+					Volumes:            volumes,
+					Containers:         containers,
+					EnableServiceLinks: h.customResource.Spec.EnableServiceLinks,
 				}),
 			},
 		},

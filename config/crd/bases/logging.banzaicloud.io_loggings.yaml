@@ -2045,6 +2045,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   enableUpstream:
                     type: boolean
                   enabledIPv6:
@@ -6374,6 +6376,8 @@ spec:
                   dnsPolicy:
                     type: string
                   enableMsgpackTimeSupport:
+                    type: boolean
+                  enableServiceLinks:
                     type: boolean
                   enabledIPv6:
                     type: boolean
@@ -13775,6 +13779,8 @@ spec:
                       tag:
                         type: string
                     type: object
+                  enableServiceLinks:
+                    type: boolean
                   enabledIPv6:
                     type: boolean
                   globalOptions:

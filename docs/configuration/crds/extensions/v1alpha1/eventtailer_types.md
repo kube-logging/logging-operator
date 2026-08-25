@@ -18,6 +18,11 @@ Override container fields for the given statefulset
 The resources of EventTailer will be placed into this namespace 
 
 
+### enableServiceLinks (*bool, optional) {#eventtailerspec-enableservicelinks}
+
+EnableServiceLinks indicates whether information about services should be injected into the pod's environment variables, matching the syntax of Docker links. Defaults to true. 
+
+
 ### image (*tailer.ImageSpec, optional) {#eventtailerspec-image}
 
 Override image related fields for the given statefulset, highest precedence 

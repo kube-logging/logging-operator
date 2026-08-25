@@ -28,6 +28,8 @@ spec:
             properties:
               enableRecreateWorkloadOnImmutableFieldChange:
                 type: boolean
+              enableServiceLinks:
+                type: boolean
               fileTailers:
                 items:
                   properties:

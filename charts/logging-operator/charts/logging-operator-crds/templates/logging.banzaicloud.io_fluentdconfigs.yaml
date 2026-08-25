@@ -2736,6 +2736,8 @@ spec:
                 type: string
               enableMsgpackTimeSupport:
                 type: boolean
+              enableServiceLinks:
+                type: boolean
               enabledIPv6:
                 type: boolean
               envVars:

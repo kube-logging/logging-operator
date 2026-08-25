@@ -47,6 +47,9 @@ type HostTailerSpec struct {
 	WorkloadMetaBase *types.MetaBase `json:"workloadMetaOverrides,omitempty"`
 	// Override podSpec fields for the given daemonset
 	WorkloadBase *types.PodSpecBase `json:"workloadOverrides,omitempty"`
+	// EnableServiceLinks indicates whether information about services should be injected into the pod's
+	// environment variables, matching the syntax of Docker links. Defaults to true.
+	EnableServiceLinks *bool `json:"enableServiceLinks,omitempty"`
 }
 
 // HostTailerStatus defines the observed state of [HostTailer](#hosttailer).

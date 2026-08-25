@@ -138,6 +138,7 @@ type FluentbitSpec struct {
 	DNSPolicy                     corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
 	DNSConfig                     *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
 	HostNetwork                   bool                           `json:"HostNetwork,omitempty"`
+	EnableServiceLinks            *bool                          `json:"enableServiceLinks,omitempty"`
 	SyslogNGOutput                *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
 	UpdateStrategy                appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
 	// Available in Logging operator version 4.2 and later.

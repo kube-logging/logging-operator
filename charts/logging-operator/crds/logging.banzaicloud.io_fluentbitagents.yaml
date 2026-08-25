@@ -1176,6 +1176,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               enableUpstream:
                 type: boolean
               enabledIPv6:

@@ -336,6 +336,8 @@ spec:
                 x-kubernetes-validations:
                 - message: Value is immutable, please recreate the resource
                   rule: self == oldSelf
+              enableServiceLinks:
+                type: boolean
               image:
                 properties:
                   imagePullSecrets:

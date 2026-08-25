@@ -1471,6 +1471,11 @@ func (in *FluentbitSpec) DeepCopyInto(out *FluentbitSpec) {
 		*out = new(v1.PodDNSConfig)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.EnableServiceLinks != nil {
+		in, out := &in.EnableServiceLinks, &out.EnableServiceLinks
+		*out = new(bool)
+		**out = **in
+	}
 	if in.SyslogNGOutput != nil {
 		in, out := &in.SyslogNGOutput, &out.SyslogNGOutput
 		*out = new(FluentbitTCPOutput)
@@ -1851,6 +1856,11 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		in, out := &in.DNSConfig, &out.DNSConfig
 		*out = new(v1.PodDNSConfig)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.EnableServiceLinks != nil {
+		in, out := &in.EnableServiceLinks, &out.EnableServiceLinks
+		*out = new(bool)
+		**out = **in
 	}
 	if in.ExtraArgs != nil {
 		in, out := &in.ExtraArgs, &out.ExtraArgs
@@ -3742,6 +3752,11 @@ func (in *SyslogNGSpec) DeepCopyInto(out *SyslogNGSpec) {
 	if in.TerminationGracePeriodSeconds != nil {
 		in, out := &in.TerminationGracePeriodSeconds, &out.TerminationGracePeriodSeconds
 		*out = new(int64)
+		**out = **in
+	}
+	if in.EnableServiceLinks != nil {
+		in, out := &in.EnableServiceLinks, &out.EnableServiceLinks
+		*out = new(bool)
 		**out = **in
 	}
 }
