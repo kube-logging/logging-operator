@@ -15,33 +15,15 @@
 package fluentd_aggregator
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"regexp"
-	"slices"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/types"
-	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -49,757 +31,235 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-var TestTempDir string
+const release = "e2e"
 
-var configCheckFailure = regexp.MustCompile(`^Configuration with checksum (.+) has failed. .*`)
+var (
+	producerLabels    = map[string]string{"my-unique-label": "log-producer"}
+	configCheckLabels = map[string]string{"my-unique-label": "configcheck"}
 
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
+	// The checksum in the message is the config that failed, so the problem can
+	// only be matched by shape.
+	configCheckFailure = regexp.MustCompile(`^Configuration with checksum (.+) has failed. .*`)
+)
+
+func fluentbitSpec() *v1beta1.FluentbitSpec {
+	return &v1beta1.FluentbitSpec{
+		Network: &v1beta1.FluentbitNetwork{
+			Keepalive: new(false),
+		},
+		ConfigHotReload: &v1beta1.HotReload{
+			Image: image.ConfigReloader().Spec(),
+		},
+		BufferVolumeImage: image.NodeExporter().Spec(),
 	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
+}
+
+// Workers is the field the multiworker test exists to exercise, so it stays a
+// parameter rather than a default.
+func fluentdSpec(workers int32) *v1beta1.FluentdSpec {
+	return &v1beta1.FluentdSpec{
+		Image:               image.Fluentd().Spec(),
+		ConfigReloaderImage: image.ConfigReloader().Spec(),
+		BufferVolumeImage:   image.NodeExporter().Spec(),
+		Resources: corev1.ResourceRequirements{
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("200M"),
+			},
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("250m"),
+				corev1.ResourceMemory: resource.MustParse("50M"),
+			},
+		},
+		BufferVolumeMetrics: &v1beta1.Metrics{},
+		Scaling: &v1beta1.FluentdScaling{
+			Replicas: 1,
+			Drain: v1beta1.FluentdDrainConfig{
+				Enabled: true,
+				Image:   image.DrainWatch().Spec(),
+			},
+		},
+		Workers: workers,
+	}
+}
+
+// readOnlyRootFilesystem is what the two config-check tests are about: the
+// check has nowhere to write, so the strategy has to cope.
+func readOnlyRootFilesystem() *v1beta1.Security {
+	return &v1beta1.Security{
+		SecurityContext: &corev1.SecurityContext{
+			ReadOnlyRootFilesystem: new(true),
+		},
+	}
+}
+
+func logging(name, ns string, fluentd *v1beta1.FluentdSpec) *v1beta1.Logging {
+	return &v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			EnableRecreateWorkloadOnImmutableFieldChange: true,
+			ControlNamespace: ns,
+			FluentbitSpec:    fluentbitSpec(),
+			FluentdSpec:      fluentd,
+		},
+	}
+}
+
+// The three config-check tests route to a file rather than the receiver: what
+// they assert is the Logging status, not delivery.
+func fileOutput(ns string) *v1beta1.Output {
+	return &v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Spec: v1beta1.OutputSpec{
+			FileOutput: &output.FileOutputConfig{
+				Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
+				Append: true,
+				Buffer: &output.Buffer{
+					Type:        "file",
+					Timekey:     "1m",
+					TimekeyWait: "10s",
+				},
+			},
+		},
+	}
+}
+
+func flowTo(ns, outputName string) *v1beta1.Flow {
+	return &v1beta1.Flow{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{Select: &v1beta1.Select{Labels: producerLabels}},
+			},
+			LocalOutputRefs: []string{outputName},
+		},
 	}
 }
 
 func TestFluentdAggregator_MultiWorker(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-1"
-	releaseNameOverride := "e2e"
+	const ns = "testing-1"
 	testTag := "test.fluentd_aggregator_multiworker"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-multiworker", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
 
-		ctx := context.Background()
+	env := harness.New(t).
+		WithCluster("fluentd-multiworker").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-multiworker-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 1,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled: true,
-							Image:   image.DrainWatch().Spec(),
-						},
-					},
-					Workers: 2,
+	env.Create(logging("fluentd-aggregator-multiworker-test", ns, fluentdSpec(2)))
+
+	tags := "time"
+	out := &v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Spec: v1beta1.OutputSpec{
+			HTTPOutput: &output.HTTPOutputConfig{
+				Endpoint:    env.Receiver.URL(testTag),
+				ContentType: "application/json",
+				Buffer: &output.Buffer{
+					Type:        "file",
+					Tags:        &tags,
+					Timekey:     "1s",
+					TimekeyWait: "0s",
 				},
 			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		tags := "time"
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "1s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
+		},
+	}
+	env.Create(out, flowTo(ns, out.Name))
+	env.StartLogProducer(ns, producerLabels)
 
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+	)
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
-
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
-		}, 5*time.Minute, 3*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	env.Receiver.MustReceive(testTag)
 }
 
 func TestFluentdAggregator_ConfigChecks(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-2"
-	releaseNameOverride := "e2e"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	const ns = "testing-2"
+	const loggingName = "fluentd-aggregator-configchecks-test"
 
-		ctx := context.Background()
+	env := harness.New(t).
+		WithCluster("fluentd-configcheck").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-configchecks-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 1,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled: true,
-							Image:   image.DrainWatch().Spec(),
-						},
-					},
-					Workers: 1,
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				FileOutput: &output.FileOutputConfig{
-					Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
-					Append: true,
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Timekey:     "1m",
-						TimekeyWait: "10s",
-					},
-				},
-			},
-		}
+	env.Create(logging(loggingName, ns, fluentdSpec(1)))
 
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
+	out := fileOutput(ns)
+	env.Create(out, flowTo(ns, out.Name))
+	env.StartLogProducer(ns, producerLabels)
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+		wait.LoggingHealthy(loggingName),
+	)
 
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
+	t.Log("breaking the file output with an invalid config")
+	patch := client.MergeFrom(out.DeepCopy())
+	out.Spec.FileOutput.Path = "/tmp/zzz"
+	require.NoError(t, env.Client.Patch(env.Ctx, out, patch))
+	env.WaitFor(wait.LoggingProblem(loggingName, configCheckFailure.MatchString))
 
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			return logging.Status.ProblemsCount == 0
-		}, 5*time.Minute, 3*time.Second)
-
-		t.Logf("Breaking File Output with an invalid config")
-		patch := client.MergeFrom(output.DeepCopy())
-		output.Spec.FileOutput.Path = "/tmp/zzz"
-		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
-		require.Eventually(t, func() bool {
-			if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
-				t.Logf("reading the Logging failed, retrying: %v", err)
-				return false
-			}
-			if logging.Status.ProblemsCount > 0 {
-				if slices.ContainsFunc(logging.Status.Problems, configCheckFailure.MatchString) {
-					t.Logf("Found the problem in Logging status: %v", logging.Status)
-					return true
-				}
-			}
-			t.Logf("Waiting for the problem to appear in Logging status: %v", logging.Status.Problems)
-			return false
-		}, 5*time.Minute, 3*time.Second)
-
-		t.Logf("Fixing Output")
-		patch = client.MergeFrom(output.DeepCopy())
-		output.Spec.FileOutput.Path = "/tmp/logs/${tag}/%Y/%m/%d.%H.%M"
-		common.RequireNoError(t, c.GetClient().Patch(ctx, &output, patch))
-		require.Eventually(t, func() bool {
-			if err := c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging); err != nil {
-				t.Logf("reading the Logging failed, retrying: %v", err)
-				return false
-			}
-			if logging.Status.ProblemsCount > 0 {
-				if slices.ContainsFunc(logging.Status.Problems, configCheckFailure.MatchString) {
-					t.Logf("Waiting for the problem to be cleared in Logging status: %v", logging.Status.Problems)
-					return false
-				}
-			}
-			t.Logf("Problem cleared in Logging status: %v", logging.Status)
-			return true
-		}, 5*time.Minute, 3*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	t.Log("fixing it again")
+	patch = client.MergeFrom(out.DeepCopy())
+	out.Spec.FileOutput.Path = "/tmp/logs/${tag}/%Y/%m/%d.%H.%M"
+	require.NoError(t, env.Client.Patch(env.Ctx, out, patch))
+	env.WaitFor(wait.LoggingProblemCleared(loggingName, configCheckFailure.MatchString))
 }
 
-func TestFluentdAggregator_ConfigChecks_DryRunWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-3"
-	releaseNameOverride := "e2e"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck-dry-run-readonly-rootfs", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+// The two differ only in the strategy: both want the check to finish and leave
+// the Logging without problems, on a filesystem it cannot write to.
+func TestFluentdAggregator_ConfigChecks_ReadOnlyRootFilesystem(t *testing.T) {
+	for _, c := range []struct {
+		name, cluster string
+		check         v1beta1.ConfigCheck
+	}{
+		{
+			"dry run",
+			"fluentd-configcheck-dry-run-readonly-rootfs",
+			v1beta1.ConfigCheck{Strategy: v1beta1.ConfigCheckStrategyDryRun, Labels: configCheckLabels},
+		},
+		{
+			"start timeout",
+			"fluentd-configcheck-start-timeout-readonly-rootfs",
+			v1beta1.ConfigCheck{Strategy: v1beta1.ConfigCheckStrategyTimeout, TimeoutSeconds: 30, Labels: configCheckLabels},
+		},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			const ns = "testing-3"
+			loggingName := "fluentd-aggregator-configchecks-ro-rootfs-test"
 
-		ctx := context.Background()
+			spec := fluentdSpec(1)
+			spec.Security = readOnlyRootFilesystem()
+			spec.ConfigCheck = &c.check
 
-		configCheckLabels := map[string]string{
-			"my-unique-label": "configcheck",
-		}
+			env := harness.New(t).
+				WithCluster(c.cluster).
+				WithRelease(release).
+				WithControlNamespace(ns).
+				Start()
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-configchecks-dry-run-ro-rootfs-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 1,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled: true,
-							Image:   image.DrainWatch().Spec(),
-						},
-					},
-					Workers: 1,
-					Security: &v1beta1.Security{
-						SecurityContext: &corev1.SecurityContext{
-							ReadOnlyRootFilesystem: new(true),
-						},
-					},
-					ConfigCheck: &v1beta1.ConfigCheck{
-						Strategy: v1beta1.ConfigCheckStrategyDryRun,
-						Labels:   configCheckLabels,
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				FileOutput: &output.FileOutputConfig{
-					Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
-					Append: true,
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Timekey:     "1m",
-						TimekeyWait: "10s",
-					},
-				},
-			},
-		}
+			env.Create(logging(loggingName, ns, spec))
 
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
+			out := fileOutput(ns)
+			env.Create(out, flowTo(ns, out.Name))
+			env.StartLogProducer(ns, producerLabels)
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+			env.WaitFor(
+				wait.Operator(release),
+				wait.Producer(producerLabels),
+				wait.ConfigCheck(configCheckLabels),
+				wait.FluentdAggregator(ns),
+			)
 
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if configCheckFinished := wait.AnyPodShouldBeFinished(t, c.GetClient(), client.MatchingLabels(configCheckLabels)); !configCheckFinished() {
-				t.Log("waiting for the config check")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			return true
-		}, 5*time.Minute, 3*time.Second)
-
-		common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-
-		require.Equal(t, 0, logging.Status.ProblemsCount)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
+			var deployed v1beta1.Logging
+			require.NoError(t, env.Client.Get(env.Ctx, client.ObjectKey{Name: loggingName}, &deployed))
+			require.Equal(t, 0, deployed.Status.ProblemsCount)
 		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
-}
-
-func TestFluentdAggregator_ConfigChecks_StartWithTimeoutWhenReadOnlyRootFilesystemIsConfigured(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-3"
-	releaseNameOverride := "e2e"
-	outputName := "test-output"
-	flowName := "test-flow"
-	common.WithCluster("fluentd-configcheck-start-timeout-readonly-rootfs", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
-
-		ctx := context.Background()
-
-		configCheckLabels := map[string]string{
-			"my-unique-label": "configcheck",
-		}
-
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "fluentd-aggregator-configchecks-start-timeout-ro-rootfs-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 1,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled: true,
-							Image:   image.DrainWatch().Spec(),
-						},
-					},
-					Workers: 1,
-					Security: &v1beta1.Security{
-						SecurityContext: &corev1.SecurityContext{
-							ReadOnlyRootFilesystem: new(true),
-						},
-					},
-					ConfigCheck: &v1beta1.ConfigCheck{
-						Strategy:       v1beta1.ConfigCheckStrategyTimeout,
-						TimeoutSeconds: 30,
-						Labels:         configCheckLabels,
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      outputName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				FileOutput: &output.FileOutputConfig{
-					Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
-					Append: true,
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Timekey:     "1m",
-						TimekeyWait: "10s",
-					},
-				},
-			},
-		}
-
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      flowName,
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
-
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if configCheckFinished := wait.AnyPodShouldBeFinished(t, c.GetClient(), client.MatchingLabels(configCheckLabels)); !configCheckFinished() {
-				t.Log("waiting for the config check")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			return true
-		}, 5*time.Minute, 3*time.Second)
-
-		common.RequireNoError(t, c.GetClient().Get(ctx, utils.ObjectKeyFromObjectMeta(&logging), &logging))
-
-		require.Equal(t, 0, logging.Status.ProblemsCount)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	}
 }
