@@ -15,31 +15,23 @@
 package logging_metrics_monitoring_test
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/e2e-framework/third_party/helm"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
+	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
@@ -56,6 +48,10 @@ type metricsEndpoint struct {
 type loggingResourceName string
 
 const (
+	ns          = "test"
+	release     = "e2e"
+	loggingName = "metrics-monitoring-test"
+
 	pollInterval = 5 * time.Second
 	pollTimeout  = 5 * time.Minute
 
@@ -63,12 +59,12 @@ const (
 	syslogNG  loggingResourceName = "syslog-ng"
 	fluentd   loggingResourceName = "fluentd"
 
-	fluentbitServiceName              = "metrics-monitoring-test-" + string(fluentbit) + "-metrics"
-	fluentbitBufferMetricsServiceName = "metrics-monitoring-test-" + string(fluentbit) + "-buffer-metrics"
-	syslogNGServiceName               = "metrics-monitoring-test-" + string(syslogNG) + "-metrics"
-	syslogNGBufferMetricsServiceName  = "metrics-monitoring-test-" + string(syslogNG) + "-buffer-metrics"
-	fluentdServiceName                = "metrics-monitoring-test-" + string(fluentd) + "-metrics"
-	fluentdBufferMetricsServiceName   = "metrics-monitoring-test-" + string(fluentd) + "-buffer-metrics"
+	fluentbitServiceName              = loggingName + "-" + string(fluentbit) + "-metrics"
+	fluentbitBufferMetricsServiceName = loggingName + "-" + string(fluentbit) + "-buffer-metrics"
+	syslogNGServiceName               = loggingName + "-" + string(syslogNG) + "-metrics"
+	syslogNGBufferMetricsServiceName  = loggingName + "-" + string(syslogNG) + "-buffer-metrics"
+	fluentdServiceName                = loggingName + "-" + string(fluentd) + "-metrics"
+	fluentdBufferMetricsServiceName   = loggingName + "-" + string(fluentd) + "-buffer-metrics"
 )
 
 var metricServices = map[loggingResourceName]metricsEndpoint{
@@ -89,210 +85,99 @@ var metricServices = map[loggingResourceName]metricsEndpoint{
 	},
 }
 
-var TestTempDir string
+func metricsEnabled() *v1beta1.Metrics {
+	return &v1beta1.Metrics{Enabled: new(true), ServiceMonitor: true}
+}
 
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
+func fluentbitWithMetrics() *v1beta1.FluentbitSpec {
+	return &v1beta1.FluentbitSpec{
+		Metrics:             metricsEnabled(),
+		BufferVolumeMetrics: metricsEnabled(),
+		ConfigHotReload:     &v1beta1.HotReload{Image: image.ConfigReloader().Spec()},
+		BufferVolumeImage:   image.NodeExporter().Spec(),
 	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
+}
+
+// The suite runs syslog-ng and fluentd in turn rather than together, since a
+// Logging carries one aggregator at a time. Fluent Bit is in both halves
+// because its metrics have to survive the aggregator being replaced.
+func syslogNGLogging() *v1beta1.Logging {
+	return &v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: ns,
+			FluentbitSpec:    fluentbitWithMetrics(),
+			SyslogNGSpec: &v1beta1.SyslogNGSpec{
+				ConfigReloadImage:        image.SyslogNGReloader().Basic(),
+				BufferVolumeMetricsImage: image.NodeExporter().Basic(),
+				Metrics:                  metricsEnabled(),
+				BufferVolumeMetrics:      &v1beta1.BufferMetrics{Metrics: *metricsEnabled()},
+			},
+		},
+	}
+}
+
+func fluentdLogging() *v1beta1.Logging {
+	return &v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: ns,
+			FluentbitSpec:    fluentbitWithMetrics(),
+			FluentdSpec: &v1beta1.FluentdSpec{
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
+				Metrics:             metricsEnabled(),
+				BufferVolumeMetrics: metricsEnabled(),
+			},
+		},
 	}
 }
 
 func TestLoggingMetrics_Monitoring(t *testing.T) {
-	common.Initialize(t)
-	ns := "test"
-	releaseNameOverride := "e2e"
-	common.WithCluster("logging-metrics-monitoring", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	env := harness.New(t).
+		WithCluster("logging-metrics-monitoring").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		// Only this suite installs the prometheus-operator CRDs, so only it
+		// registers their types.
+		WithScheme(v1.AddToScheme).
+		Start()
 
-		ctx := context.Background()
+	require.NoError(t, installPrometheusOperator(env))
 
-		common.RequireNoError(t, installPrometheusOperator(c))
+	logging := syslogNGLogging()
+	env.Create(logging)
+	env.WaitFor(wait.Pod(ns, loggingName+"-"+string(syslogNG)+"-0"))
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "metrics-monitoring-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Metrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				SyslogNGSpec: &v1beta1.SyslogNGSpec{
-					ConfigReloadImage:        image.SyslogNGReloader().Basic(),
-					BufferVolumeMetricsImage: image.NodeExporter().Basic(),
-					Metrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					BufferVolumeMetrics: &v1beta1.BufferMetrics{
-						Metrics: v1beta1.Metrics{
-							Enabled:        new(true),
-							ServiceMonitor: true,
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		common.RequireNoError(t, common.WaitForPodReady(ctx, c.GetClient(), &corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      logging.Name + "-" + string(syslogNG) + "-0",
-				Namespace: ns,
-			},
-		}, pollInterval, pollTimeout))
-		serviceMonitorsSyslogNG := &v1.ServiceMonitorList{}
-		common.RequireNoError(t, c.GetClient().List(ctx, serviceMonitorsSyslogNG))
+	serviceMonitorsSyslogNG := &v1.ServiceMonitorList{}
+	require.NoError(t, env.Client.List(env.Ctx, serviceMonitorsSyslogNG))
 
-		mt, err := setupMetricsTester(ctx, c, ns)
-		common.RequireNoError(t, err)
+	mt, err := setupMetricsTester(env)
+	require.NoError(t, err)
 
-		require.Eventually(t, func() bool {
-			rawOut, err := mt.getMetrics(metricServices[fluentbit], c, ns)
-			if err != nil {
-				t.Log(err)
-				return false
-			}
-			if err := mt.validateMetrics(rawOut, fluentbit); err != nil {
-				t.Log(err)
-				return false
-			}
-			return true
-		}, pollTimeout, pollInterval)
+	mt.mustServe(env, fluentbit)
+	mt.mustServe(env, syslogNG)
 
-		require.Eventually(t, func() bool {
-			rawOut, err := mt.getMetrics(metricServices[syslogNG], c, ns)
-			if err != nil {
-				t.Log(err)
-				return false
-			}
-			if err := mt.validateMetrics(rawOut, syslogNG); err != nil {
-				t.Log(err)
-				return false
-			}
-			return true
-		}, pollTimeout, pollInterval)
+	require.NoError(t, env.Client.Delete(env.Ctx, logging))
 
-		common.RequireNoError(t, c.GetClient().Delete(ctx, &logging))
+	env.Create(fluentdLogging())
+	env.WaitFor(wait.Pod(ns, loggingName+"-"+string(fluentd)+"-0"))
 
-		loggingPatch := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "metrics-monitoring-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Metrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Metrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled:        new(true),
-						ServiceMonitor: true,
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &loggingPatch))
-		common.RequireNoError(t, common.WaitForPodReady(ctx, c.GetClient(), &corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      loggingPatch.Name + "-" + string(fluentd) + "-0",
-				Namespace: ns,
-			},
-		}, pollInterval, pollTimeout))
-		serviceMonitorsFluentd := &v1.ServiceMonitorList{}
-		common.RequireNoError(t, c.GetClient().List(ctx, serviceMonitorsFluentd))
+	serviceMonitorsFluentd := &v1.ServiceMonitorList{}
+	require.NoError(t, env.Client.List(env.Ctx, serviceMonitorsFluentd))
 
-		require.Eventually(t, func() bool {
-			rawOut, err := mt.getMetrics(metricServices[fluentd], c, ns)
-			if err != nil {
-				t.Log(err)
-				return false
-			}
-			if err := mt.validateMetrics(rawOut, fluentd); err != nil {
-				t.Log(err)
-				return false
-			}
-			return true
-		}, pollTimeout, pollInterval)
+	mt.mustServe(env, fluentd)
 
-		serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
-		common.RequireNoError(t, checkServiceMonitorAvailability(serviceMonitors))
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, v1.AddToScheme(o.Scheme))
-	})
+	serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
+	require.NoError(t, checkServiceMonitorAvailability(serviceMonitors))
 }
 
-func installPrometheusOperator(c common.Cluster) error {
-	manager := helm.New(c.KubeConfigFilePath())
+// installPrometheusOperator keeps the chart install rather than a manifest: the
+// stack is what the ServiceMonitors are read by, and pinning our own copy of it
+// would be a second thing to keep current.
+func installPrometheusOperator(env *harness.Env) error {
+	manager := helm.New(env.Cluster.KubeConfigFilePath())
 
 	if err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts")); err != nil {
 		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
@@ -318,15 +203,13 @@ func installPrometheusOperator(c common.Cluster) error {
 	return nil
 }
 
-func setupMetricsTester(ctx context.Context, c common.Cluster, ns string) (metricsTester, error) {
-	pod, err := common.SetupCurlPod(ctx, c.GetClient(), ns, "metrics-tester", pollInterval, pollTimeout)
+func setupMetricsTester(env *harness.Env) (metricsTester, error) {
+	pod, err := common.SetupCurlPod(env.Ctx, env.Client, ns, "metrics-tester", pollInterval, pollTimeout)
 	if err != nil {
 		return metricsTester{}, err
 	}
 
-	return metricsTester{
-		testPod: pod,
-	}, nil
+	return metricsTester{testPod: pod}, nil
 }
 
 func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
@@ -354,14 +237,35 @@ func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error 
 	return nil
 }
 
-func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, c common.Cluster, ns string) ([]byte, error) {
+// mustServe polls rather than waits once: the endpoint answers before the first
+// scrape has populated it, so an empty body is a retry and not a failure. It
+// stays a suite-local poll because reading it means curling from inside a pod,
+// which a read-only Condition cannot do.
+func (mt *metricsTester) mustServe(env *harness.Env, subject loggingResourceName) {
+	env.T.Helper()
+
+	require.Eventuallyf(env.T, func() bool {
+		rawOut, err := mt.getMetrics(metricServices[subject], env)
+		if err != nil {
+			env.T.Log(err)
+			return false
+		}
+		if err := mt.validateMetrics(rawOut, subject); err != nil {
+			env.T.Log(err)
+			return false
+		}
+		return true
+	}, pollTimeout, pollInterval, "%s never served its key metrics", subject)
+}
+
+func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, env *harness.Env) ([]byte, error) {
 	serviceURL := fmt.Sprintf("http://%s.%s.svc:%d%s",
 		endpoint.serviceName,
 		ns,
 		endpoint.port,
 		endpoint.path,
 	)
-	cmd := common.CmdEnv(exec.Command("kubectl", "exec", mt.testPod.Name, "-n", ns, "--", "curl", serviceURL), c)
+	cmd := common.CmdEnv(exec.Command("kubectl", "exec", mt.testPod.Name, "-n", ns, "--", "curl", serviceURL), env.Cluster)
 	rawOut, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
