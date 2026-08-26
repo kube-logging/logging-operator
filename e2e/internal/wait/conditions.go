@@ -20,28 +20,8 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-func PodShouldBeRunning(t *testing.T, cl client.Reader, key client.ObjectKey) func() bool {
-	return func() bool {
-		var pod corev1.Pod
-		err := cl.Get(context.Background(), key, &pod)
-
-		if pod.Status.Phase == corev1.PodRunning {
-			return true
-		}
-
-		if err == nil {
-			t.Logf("pod %s is in phase %s", key, pod.Status.Phase)
-		} else if !apierrors.IsNotFound(err) {
-			t.Logf("an error occurred while getting pod %s: %v", key, err)
-		}
-
-		return false
-	}
-}
 
 func AnyPodShouldBeRunning(t *testing.T, cl client.Reader, opts ...client.ListOption) func() bool {
 	return func() bool {
@@ -53,32 +33,6 @@ func AnyPodShouldBeRunning(t *testing.T, cl client.Reader, opts ...client.ListOp
 			if pod.Status.Phase == corev1.PodRunning {
 				return true
 			}
-		}
-		return false
-	}
-}
-
-func ResourceShouldBeAbsent(t *testing.T, cl client.Reader, obj client.Object) func() bool {
-	return func() bool {
-		err := cl.Get(context.Background(), client.ObjectKeyFromObject(obj), obj)
-		if apierrors.IsNotFound(err) {
-			return true
-		}
-		if err != nil {
-			t.Logf("an error occurred while getting %q resource: %v", obj.GetObjectKind().GroupVersionKind(), err)
-		}
-		return false
-	}
-}
-
-func ResourceShouldBePresent(t *testing.T, cl client.Reader, obj client.Object) func() bool {
-	return func() bool {
-		err := cl.Get(context.Background(), client.ObjectKeyFromObject(obj), obj)
-		if err == nil {
-			return true
-		}
-		if !apierrors.IsNotFound(err) {
-			t.Logf("an error occurred while getting %q resource: %v", obj.GetObjectKind().GroupVersionKind(), err)
 		}
 		return false
 	}

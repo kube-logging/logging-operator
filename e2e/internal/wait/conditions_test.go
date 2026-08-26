@@ -62,24 +62,6 @@ func available(status corev1.ConditionStatus) *appsv1.DeploymentCondition {
 	return &appsv1.DeploymentCondition{Type: appsv1.DeploymentAvailable, Status: status}
 }
 
-func TestPodShouldBeRunning(t *testing.T) {
-	for _, c := range []struct {
-		name    string
-		objects []client.Object
-		want    bool
-	}{
-		{"running", []client.Object{pod("p", corev1.PodRunning, nil)}, true},
-		{"pending", []client.Object{pod("p", corev1.PodPending, nil)}, false},
-		{"absent", nil, false},
-	} {
-		t.Run(c.name, func(t *testing.T) {
-			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(c.objects...).Build()
-			got := PodShouldBeRunning(t, cl, client.ObjectKey{Namespace: "ns", Name: "p"})()
-			require.Equal(t, c.want, got)
-		})
-	}
-}
-
 func TestAnyPodShouldBeRunning(t *testing.T) {
 	lbl := map[string]string{"app": "x"}
 	for _, c := range []struct {
@@ -104,19 +86,6 @@ func TestAnyPodShouldBeRunning(t *testing.T) {
 			require.Equal(t, c.want, got)
 		})
 	}
-}
-
-func TestResourceShouldBeAbsentAndPresent(t *testing.T) {
-	existing := pod("p", corev1.PodRunning, nil)
-
-	withPod := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(existing).Build()
-	empty := fake.NewClientBuilder().WithScheme(scheme(t)).Build()
-
-	require.False(t, ResourceShouldBeAbsent(t, withPod, pod("p", corev1.PodRunning, nil))())
-	require.True(t, ResourceShouldBeAbsent(t, empty, pod("p", corev1.PodRunning, nil))())
-
-	require.True(t, ResourceShouldBePresent(t, withPod, pod("p", corev1.PodRunning, nil))())
-	require.False(t, ResourceShouldBePresent(t, empty, pod("p", corev1.PodRunning, nil))())
 }
 
 func TestDeploymentAvailable(t *testing.T) {
