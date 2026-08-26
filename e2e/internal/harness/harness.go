@@ -205,6 +205,14 @@ func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 
 func (e *Env) WaitFor(conditions ...wait.Condition) {
 	e.T.Helper()
+	e.WaitWithin(e.waitBudget(), waitInterval, conditions...)
+}
+
+// WaitWithin is WaitFor with the suite's own budget, for an assertion where how
+// long it takes is part of what is being tested: settling within thirty seconds
+// and settling within the shared five minutes are different claims.
+func (e *Env) WaitWithin(budget, interval time.Duration, conditions ...wait.Condition) {
+	e.T.Helper()
 
 	var outstanding pending
 	require.Eventuallyf(e.T, func() bool {
@@ -219,7 +227,7 @@ func (e *Env) WaitFor(conditions ...wait.Condition) {
 			}
 		}
 		return true
-	}, e.waitBudget(), waitInterval, "still waiting for %s", &outstanding)
+	}, budget, interval, "still waiting for %s", &outstanding)
 }
 
 // waitBudget holds a wait under what is left of the binary's deadline, so one

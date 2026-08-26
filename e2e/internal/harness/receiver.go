@@ -17,6 +17,7 @@ package harness
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
@@ -86,6 +87,16 @@ func (r Receiver) MustNotReceive(tags ...string) {
 	for _, tag := range tags {
 		assert.NotContains(r.env.T, logs, tag)
 	}
+}
+
+// Scale takes the receiver away and brings it back, which is how a drain test
+// makes the aggregator buffer instead of deliver.
+func (r Receiver) Scale(replicas int) {
+	r.env.T.Helper()
+	require.NoError(r.env.T, common.CmdEnv(exec.Command("kubectl",
+		"scale", "deployment/"+ReceiverName(r.env.Release),
+		"-n", r.env.ControlNamespace,
+		"--replicas", strconv.Itoa(replicas)), r.env.Cluster).Run())
 }
 
 func (r Receiver) Logs() (string, error) {
