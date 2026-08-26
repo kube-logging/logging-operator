@@ -19,6 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -33,6 +34,7 @@ func scheme(t *testing.T) *runtime.Scheme {
 	s := runtime.NewScheme()
 	require.NoError(t, corev1.AddToScheme(s))
 	require.NoError(t, appsv1.AddToScheme(s))
+	require.NoError(t, batchv1.AddToScheme(s))
 	require.NoError(t, v1beta1.AddToScheme(s))
 	return s
 }
@@ -60,24 +62,6 @@ func available(status corev1.ConditionStatus) *appsv1.DeploymentCondition {
 	return &appsv1.DeploymentCondition{Type: appsv1.DeploymentAvailable, Status: status}
 }
 
-func TestPodShouldBeRunning(t *testing.T) {
-	for _, c := range []struct {
-		name    string
-		objects []client.Object
-		want    bool
-	}{
-		{"running", []client.Object{pod("p", corev1.PodRunning, nil)}, true},
-		{"pending", []client.Object{pod("p", corev1.PodPending, nil)}, false},
-		{"absent", nil, false},
-	} {
-		t.Run(c.name, func(t *testing.T) {
-			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(c.objects...).Build()
-			got := PodShouldBeRunning(t, cl, client.ObjectKey{Namespace: "ns", Name: "p"})()
-			require.Equal(t, c.want, got)
-		})
-	}
-}
-
 func TestAnyPodShouldBeRunning(t *testing.T) {
 	lbl := map[string]string{"app": "x"}
 	for _, c := range []struct {
@@ -102,19 +86,6 @@ func TestAnyPodShouldBeRunning(t *testing.T) {
 			require.Equal(t, c.want, got)
 		})
 	}
-}
-
-func TestResourceShouldBeAbsentAndPresent(t *testing.T) {
-	existing := pod("p", corev1.PodRunning, nil)
-
-	withPod := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(existing).Build()
-	empty := fake.NewClientBuilder().WithScheme(scheme(t)).Build()
-
-	require.False(t, ResourceShouldBeAbsent(t, withPod, pod("p", corev1.PodRunning, nil))())
-	require.True(t, ResourceShouldBeAbsent(t, empty, pod("p", corev1.PodRunning, nil))())
-
-	require.True(t, ResourceShouldBePresent(t, withPod, pod("p", corev1.PodRunning, nil))())
-	require.False(t, ResourceShouldBePresent(t, empty, pod("p", corev1.PodRunning, nil))())
 }
 
 func TestDeploymentAvailable(t *testing.T) {

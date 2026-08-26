@@ -19,7 +19,9 @@ import (
 	"slices"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -240,4 +242,49 @@ func loggingProblems(ctx context.Context, cl client.Reader, name string) ([]stri
 		return nil, err
 	}
 	return logging.Status.Problems, nil
+}
+
+// JobStarted is the drainer the operator creates when an aggregator replica
+// goes away. Presence is not enough, since the Job exists before it runs, but
+// Active alone would be a race: a Job that finishes between two polls is never
+// seen active. Counting the terminal states too makes any observation after it
+// started sufficient.
+func JobStarted(namespace, name string) Condition {
+	return Condition{
+		Name: "drainer Job " + name + " started",
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var job batchv1.Job
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &job); err != nil {
+				return false, err
+			}
+			return job.Status.Active+job.Status.Succeeded+job.Status.Failed > 0, nil
+		},
+	}
+}
+
+// gone reports the object having been collected. NotFound is the answer rather
+// than an error, and any other failure leaves the caller polling.
+func gone(kind, namespace, name string, obj client.Object) Condition {
+	return Condition{
+		Name: kind + " " + name + " gone",
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, obj)
+			if apierrors.IsNotFound(err) {
+				return true, nil
+			}
+			return false, err
+		},
+	}
+}
+
+func JobGone(namespace, name string) Condition {
+	return gone("Job", namespace, name, &batchv1.Job{})
+}
+
+func PodGone(namespace, name string) Condition {
+	return gone("Pod", namespace, name, &corev1.Pod{})
+}
+
+func PVCGone(namespace, name string) Condition {
+	return gone("PersistentVolumeClaim", namespace, name, &corev1.PersistentVolumeClaim{})
 }

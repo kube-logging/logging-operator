@@ -20,6 +20,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -121,6 +122,32 @@ func TestLoggingProblemConditions(t *testing.T) {
 			cleared, err := LoggingProblemCleared("lg", failure.MatchString).Met(t.Context(), cl)
 			require.NoError(t, err)
 			assert.Equal(t, c.cleared, cleared)
+		})
+	}
+}
+
+// Active alone would be a race: a drainer that finishes between two polls is
+// never seen active, and the wait then burns its budget on a Job that did run.
+func TestJobStartedCountsTerminalStatesToo(t *testing.T) {
+	for _, c := range []struct {
+		name   string
+		status batchv1.JobStatus
+		want   bool
+	}{
+		{"created but not started", batchv1.JobStatus{}, false},
+		{"running", batchv1.JobStatus{Active: 1}, true},
+		{"already succeeded", batchv1.JobStatus{Succeeded: 1}, true},
+		{"already failed", batchv1.JobStatus{Failed: 1}, true},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&batchv1.Job{
+				ObjectMeta: metav1.ObjectMeta{Name: "d", Namespace: "ns"},
+				Status:     c.status,
+			}).Build()
+
+			met, err := JobStarted("ns", "d").Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.want, met)
 		})
 	}
 }
