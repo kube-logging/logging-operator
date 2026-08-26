@@ -16,6 +16,7 @@ package wait
 
 import (
 	"context"
+	"slices"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	corev1 "k8s.io/api/core/v1"
@@ -32,9 +33,7 @@ type Condition struct {
 	Met  func(context.Context, client.Reader) (bool, error)
 }
 
-// PodRunning is the escape hatch; the constructors below carry their own name
-// and selector so a call site passes only what varies.
-func PodRunning(name string, opts ...client.ListOption) Condition {
+func podInPhase(name string, phases []corev1.PodPhase, opts ...client.ListOption) Condition {
 	return Condition{
 		Name: name,
 		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
@@ -43,13 +42,19 @@ func PodRunning(name string, opts ...client.ListOption) Condition {
 				return false, err
 			}
 			for _, pod := range pods.Items {
-				if pod.Status.Phase == corev1.PodRunning {
+				if slices.Contains(phases, pod.Status.Phase) {
 					return true, nil
 				}
 			}
 			return false, nil
 		},
 	}
+}
+
+// PodRunning is the escape hatch; the constructors below carry their own name
+// and selector so a call site passes only what varies.
+func PodRunning(name string, opts ...client.ListOption) Condition {
+	return podInPhase(name, []corev1.PodPhase{corev1.PodRunning}, opts...)
 }
 
 func Pod(namespace, name string) Condition {
@@ -64,6 +69,16 @@ func Pod(namespace, name string) Condition {
 			return pod.Status.Phase == corev1.PodRunning, nil
 		},
 	}
+}
+
+// PodFinished is the counterpart of PodRunning: a config check reports by
+// running to completion rather than by staying up.
+func PodFinished(name string, opts ...client.ListOption) Condition {
+	return podInPhase(name, []corev1.PodPhase{corev1.PodSucceeded, corev1.PodFailed}, opts...)
+}
+
+func ConfigCheck(labels map[string]string) Condition {
+	return PodFinished("config check", client.MatchingLabels(labels))
 }
 
 func Operator(release string) Condition {
@@ -184,4 +199,45 @@ func LoggingUsesSyslogNG(name, configName string) Condition {
 			return logging.Status.SyslogNGConfigName == configName, nil
 		},
 	}
+}
+
+// LoggingHealthy is a Logging the operator has found nothing wrong with.
+func LoggingHealthy(name string) Condition {
+	return Condition{
+		Name: "Logging " + name + " without problems",
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			problems, err := loggingProblems(ctx, cl, name)
+			return err == nil && len(problems) == 0, err
+		},
+	}
+}
+
+// LoggingProblem and LoggingProblemCleared take a matcher rather than a string
+// because a failing config check names the checksum in the message.
+func LoggingProblem(name string, match func(string) bool) Condition {
+	return Condition{
+		Name: "Logging " + name + " reporting the problem",
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			problems, err := loggingProblems(ctx, cl, name)
+			return err == nil && slices.ContainsFunc(problems, match), err
+		},
+	}
+}
+
+func LoggingProblemCleared(name string, match func(string) bool) Condition {
+	return Condition{
+		Name: "Logging " + name + " clearing the problem",
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			problems, err := loggingProblems(ctx, cl, name)
+			return err == nil && !slices.ContainsFunc(problems, match), err
+		},
+	}
+}
+
+func loggingProblems(ctx context.Context, cl client.Reader, name string) ([]string, error) {
+	var logging v1beta1.Logging
+	if err := cl.Get(ctx, client.ObjectKey{Name: name}, &logging); err != nil {
+		return nil, err
+	}
+	return logging.Status.Problems, nil
 }

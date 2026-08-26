@@ -15,9 +15,16 @@
 package wait
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
 
 // The ptr.Deref default is chosen per direction: false where Active must be
@@ -55,4 +62,65 @@ func TestAttachedAndExcessNeedEveryField(t *testing.T) {
 	assert.False(t, excess(nil, "", &no), "no problems reported")
 	assert.False(t, excess([]string{"boom"}, "lg", &no), "still naming a Logging")
 	assert.True(t, excess([]string{"boom"}, "", &no))
+}
+
+// A config check reports by exiting, so both terminal phases count and neither
+// live one does.
+func TestConfigCheckFinished(t *testing.T) {
+	lbl := map[string]string{"my-unique-label": "configcheck"}
+
+	for _, c := range []struct {
+		name  string
+		phase corev1.PodPhase
+		want  bool
+	}{
+		{"succeeded counts as finished", corev1.PodSucceeded, true},
+		{"failed counts as finished", corev1.PodFailed, true},
+		{"running does not", corev1.PodRunning, false},
+		{"pending does not", corev1.PodPending, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			cl := fake.NewClientBuilder().WithScheme(scheme(t)).
+				WithObjects(pod("a", c.phase, lbl)).Build()
+
+			met, err := ConfigCheck(lbl).Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.want, met)
+		})
+	}
+}
+
+// Cleared is not the negation of healthy: an unrelated problem leaves the
+// config check's own one cleared while the Logging is still unhealthy.
+func TestLoggingProblemConditions(t *testing.T) {
+	failure := regexp.MustCompile(`^Configuration with checksum (.+) has failed. .*`)
+
+	for _, c := range []struct {
+		name                       string
+		problems                   []string
+		healthy, reported, cleared bool
+	}{
+		{"no problems", nil, true, false, true},
+		{"the config check failed", []string{"Configuration with checksum abc has failed. boom"}, false, true, false},
+		{"some other problem", []string{"unrelated"}, false, false, true},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&v1beta1.Logging{
+				ObjectMeta: metav1.ObjectMeta{Name: "lg"},
+				Status:     v1beta1.LoggingStatus{Problems: c.problems, ProblemsCount: len(c.problems)},
+			}).Build()
+
+			healthy, err := LoggingHealthy("lg").Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.healthy, healthy)
+
+			reported, err := LoggingProblem("lg", failure.MatchString).Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.reported, reported)
+
+			cleared, err := LoggingProblemCleared("lg", failure.MatchString).Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.cleared, cleared)
+		})
+	}
 }

@@ -175,3 +175,17 @@ func mustGVK(t *testing.T, scheme *runtime.Scheme, obj runtime.Object) schema.Gr
 	require.NotEmpty(t, gvks)
 	return gvks[0]
 }
+
+// A table-driven suite names its subtests with a slash, and the dump has to
+// land in build/_test rather than in a directory nothing created.
+func TestArtifactPathFlattensASubtestName(t *testing.T) {
+	t.Setenv("PROJECT_DIR", t.TempDir())
+
+	path, err := artifactPath("TestConfigChecks/dry_run")
+	require.NoError(t, err)
+	assert.Equal(t, "cluster-TestConfigChecks_dry_run.log", filepath.Base(path))
+
+	f, err := os.Create(path)
+	require.NoError(t, err, "the dump has to be creatable")
+	require.NoError(t, f.Close())
+}

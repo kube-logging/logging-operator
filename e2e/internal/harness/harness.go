@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -345,5 +346,7 @@ func artifactPath(name string) (string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, fmt.Sprintf("cluster-%s.log", name)), nil
+	// A subtest's name carries a slash, which Join would read as a directory
+	// that nothing creates, so the dump would fail to open.
+	return filepath.Join(dir, fmt.Sprintf("cluster-%s.log", strings.ReplaceAll(name, "/", "_"))), nil
 }
