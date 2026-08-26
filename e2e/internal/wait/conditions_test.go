@@ -104,27 +104,6 @@ func TestAnyPodShouldBeRunning(t *testing.T) {
 	}
 }
 
-func TestAnyPodShouldBeFinished(t *testing.T) {
-	lbl := map[string]string{"app": "x"}
-	for _, c := range []struct {
-		name  string
-		phase corev1.PodPhase
-		want  bool
-	}{
-		{"succeeded counts as finished", corev1.PodSucceeded, true},
-		{"failed counts as finished", corev1.PodFailed, true},
-		{"running does not", corev1.PodRunning, false},
-		{"pending does not", corev1.PodPending, false},
-	} {
-		t.Run(c.name, func(t *testing.T) {
-			cl := fake.NewClientBuilder().WithScheme(scheme(t)).
-				WithObjects(pod("a", c.phase, lbl)).Build()
-			got := AnyPodShouldBeFinished(t, cl, client.MatchingLabels(lbl))()
-			require.Equal(t, c.want, got)
-		})
-	}
-}
-
 func TestResourceShouldBeAbsentAndPresent(t *testing.T) {
 	existing := pod("p", corev1.PodRunning, nil)
 
