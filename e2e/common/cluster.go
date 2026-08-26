@@ -16,28 +16,20 @@ package common
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
-	"time"
 
 	"emperror.dev/errors"
 	"github.com/spf13/cast"
-	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
-
-// clusterStopTimeout bounds the wait for cluster.Start to return after cancel.
-const clusterStopTimeout = time.Minute
 
 type Cluster interface {
 	cluster.Cluster
@@ -52,48 +44,6 @@ type PrintLogConfig struct {
 	Namespaces []string
 	FilePath   string
 	Limit      int
-}
-
-func WithCluster(name string, t *testing.T, fn func(*testing.T, Cluster), beforeCleanup func(*testing.T, Cluster) error, opts ...cluster.Option) {
-	zapLogger := zap.New(func(o *zap.Options) {
-		o.Development = true
-		encoder := zap.ConsoleEncoder()
-		encoder(o)
-	})
-
-	ctrl.SetLogger(zapLogger)
-
-	cluster, err := GetTestCluster(name, opts...)
-	if err != nil {
-		// The cluster is created before the client can fail, and the deferred
-		// teardown below is not registered yet.
-		DeleteTestClusterOrLog(t, name)
-	}
-	RequireNoError(t, err)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	startErr := make(chan error, 1)
-	go func() {
-		startErr <- cluster.Start(ctx)
-	}()
-
-	defer func() {
-		assert.NoError(t, beforeCleanup(t, cluster))
-		assert.NoError(t, cluster.Cleanup())
-		cancel()
-
-		// Checked here, not in the goroutine: FailNow is undefined off the test one.
-		select {
-		case err := <-startErr:
-			assert.NoError(t, err, "starting the cluster")
-		case <-time.After(clusterStopTimeout):
-			assert.Fail(t, "cluster.Start did not return after cancellation")
-		}
-
-		DeleteTestClusterOrLog(t, name)
-	}()
-
-	fn(t, cluster)
 }
 
 func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error) {

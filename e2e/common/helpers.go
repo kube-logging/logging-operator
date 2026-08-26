@@ -226,8 +226,10 @@ func LoggingRoute(ctx context.Context, t *testing.T, c client.Client) {
 	RequireNoError(t, c.Create(ctx, &ap))
 }
 
-// WaitForPodReady waits for a pod to be in Running phase and Ready condition
-func WaitForPodReady(ctx context.Context, c client.Client, pod *corev1.Pod, pollInterval, pollTimeout time.Duration) error {
+// waitForPodReady is satisfied by the Ready condition, or by Running when the
+// pod does not carry one yet. SetupCurlPod is the only caller left; suites wait
+// through internal/wait.
+func waitForPodReady(ctx context.Context, c client.Client, pod *corev1.Pod, pollInterval, pollTimeout time.Duration) error {
 	return wait.PollUntilContextTimeout(ctx, pollInterval, pollTimeout, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
 		var updatedPod corev1.Pod
 		err := c.Get(ctx, client.ObjectKeyFromObject(pod), &updatedPod)
@@ -267,7 +269,7 @@ func SetupCurlPod(ctx context.Context, c client.Client, namespace, name string, 
 		return nil, fmt.Errorf("failed to create curl pod: %w", err)
 	}
 
-	if err := WaitForPodReady(ctx, c, pod, pollInterval, pollTimeout); err != nil {
+	if err := waitForPodReady(ctx, c, pod, pollInterval, pollTimeout); err != nil {
 		return nil, fmt.Errorf("failed to wait for curl pod to be ready: %w", err)
 	}
 
