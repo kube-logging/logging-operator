@@ -15,31 +15,19 @@
 package volumedrain
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -47,454 +35,210 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 )
 
-var TestTempDir string
+const (
+	release     = "volumedrain"
+	loggingName = "drainer-test"
+	testTag     = "test.volumedrain"
 
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
+	// The replica the Logging drops to one, so the drainer runs against it.
+	drainedReplica = loggingName + "-fluentd-1"
+	drainerJob     = drainedReplica + "-drainer"
+	drainedPVC     = loggingName + "-fluentd-buffer-" + drainedReplica
+)
+
+var producerLabels = map[string]string{"my-unique-label": "log-producer"}
+
+// deleteVolume is what separates the two tests: whether the drained claim is
+// kept and labeled, or removed with the replica.
+func drainingLogging(ns string, deleteVolume bool) *v1beta1.Logging {
+	return &v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Spec: v1beta1.LoggingSpec{
+			EnableRecreateWorkloadOnImmutableFieldChange: true,
+			ControlNamespace: ns,
+			FluentbitSpec: &v1beta1.FluentbitSpec{
+				Network: &v1beta1.FluentbitNetwork{
+					Keepalive: new(false),
+				},
+				ConfigHotReload: &v1beta1.HotReload{
+					Image: image.ConfigReloader().Spec(),
+				},
+				BufferVolumeImage: image.NodeExporter().Spec(),
+			},
+			FluentdSpec: &v1beta1.FluentdSpec{
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
+				Resources: corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("500m"),
+						corev1.ResourceMemory: resource.MustParse("200M"),
+					},
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("250m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+				BufferVolumeMetrics: &v1beta1.Metrics{Enabled: new(true)},
+				Scaling: &v1beta1.FluentdScaling{
+					Replicas: 2,
+					Drain: v1beta1.FluentdDrainConfig{
+						Enabled:      true,
+						DeleteVolume: deleteVolume,
+						Image:        image.DrainWatch().Spec(),
+					},
+				},
+			},
+		},
 	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
+}
+
+func httpOutput(env *harness.Env, ns, timekey string) *v1beta1.Output {
+	tags := "time"
+	return &v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Spec: v1beta1.OutputSpec{
+			HTTPOutput: &output.HTTPOutputConfig{
+				Endpoint:    env.Receiver.URL(testTag),
+				ContentType: "application/json",
+				Buffer: &output.Buffer{
+					Type:        "file",
+					Tags:        &tags,
+					Timekey:     timekey,
+					TimekeyWait: "0s",
+				},
+			},
+		},
+	}
+}
+
+func flowToOutput(ns, outputName string) *v1beta1.Flow {
+	return &v1beta1.Flow{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Spec: v1beta1.FlowSpec{
+			Match: []v1beta1.Match{
+				{Select: &v1beta1.Select{Labels: producerLabels}},
+			},
+			LocalOutputRefs: []string{outputName},
+		},
+	}
+}
+
+// bufferFiles counts what the aggregator has queued. This is still a shell-out:
+// reading a path inside a container is the kubectl exec seam tracked in #2325,
+// which the receiver helpers do not cover.
+func bufferFiles(env *harness.Env, ns string) (int, error) {
+	out, err := common.CmdEnv(exec.Command("kubectl",
+		"-n", ns, "exec", drainedReplica, "-c", "fluentd", "--", "ls", "-1", "/buffers"), env.Cluster).Output()
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
+	return strings.Count(string(out), "\n"), nil
+}
+
+// How long each step of the arc is allowed. They are the suite's own numbers:
+// settling within thirty seconds and settling within the shared five minutes
+// are different claims, and the second would not catch a drain-speed
+// regression.
+type drainBudget struct {
+	buffered, bufferedTick time.Duration
+	started, startedTick   time.Duration
+	podGoneTick            time.Duration
+}
+
+// drainOneReplica is the shared arc: fill the buffers with the receiver away,
+// drop to one replica, and let the drainer finish once it is back.
+func drainOneReplica(t *testing.T, env *harness.Env, ns string, logging *v1beta1.Logging, b drainBudget) {
+	t.Helper()
+
+	env.Receiver.Scale(0)
+
+	require.Eventually(t, func() bool {
+		n, err := bufferFiles(env, ns)
+		if err != nil {
+			t.Logf("listing the buffer directory: %v", err)
+			return false
+		}
+		return n > 2
+	}, b.buffered, b.bufferedTick, "the aggregator never buffered anything")
+
+	patch := client.MergeFrom(logging.DeepCopy())
+	logging.Spec.FluentdSpec.Scaling.Replicas = 1
+	require.NoError(t, env.Client.Patch(env.Ctx, logging, patch))
+
+	env.WaitWithin(b.started, b.startedTick, wait.JobStarted(ns, drainerJob))
+	env.WaitWithin(30*time.Second, time.Second/2, wait.Pod(ns, drainedReplica))
+
+	env.Receiver.Scale(1)
+
+	env.WaitWithin(3*time.Minute, 3*time.Second, wait.JobGone(ns, drainerJob))
+	env.WaitWithin(30*time.Second, b.podGoneTick, wait.PodGone(ns, drainedReplica))
 }
 
 func TestVolumeDrain_Downscale(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-1"
-	releaseNameOverride := "volumedrain"
-	testTag := "test.volumedrain"
-	common.WithCluster("drain", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	const ns = "testing-1"
 
-		ctx := context.Background()
+	env := harness.New(t).
+		WithCluster("drain").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "drainer-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled: new(true),
-					},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 2,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled: true,
-							Image:   image.DrainWatch().Spec(),
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		tags := "time"
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "1s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
+	logging := drainingLogging(ns, false)
+	env.Create(logging)
 
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
+	out := httpOutput(env, ns, "1s")
+	env.Create(out, flowToOutput(ns, out.Name))
+	env.StartLogProducer(ns, producerLabels)
 
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-flow",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+	)
+	env.Receiver.MustReceive(testTag)
 
-		aggergatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
-		}, 5*time.Minute, 3*time.Second)
-
-		cmd := common.CmdEnv(exec.Command("kubectl", "scale",
-			"deployment/"+harness.ReceiverName(releaseNameOverride),
-			"-n", ns,
-			"--replicas", "0"), c)
-		common.RequireNoError(t, cmd.Run())
-
-		fluentdReplicaName := logging.Name + "-fluentd-1"
-
-		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"exec",
-				"-n", ns, fluentdReplicaName,
-				"-c", "fluentd",
-				"--", "ls", "-1", "/buffers"), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to list buffer directory: %v", err)
-				return false
-			}
-			return strings.Count(string(rawOut), "\n") > 2
-		}, 1*time.Minute, 3*time.Second)
-
-		patch := client.MergeFrom(logging.DeepCopy())
-		logging.Spec.FluentdSpec.Scaling.Replicas = 1
-		common.RequireNoError(t, c.GetClient().Patch(ctx, &logging, patch))
-
-		drainerJobName := fluentdReplicaName + "-drainer"
-		require.Eventually(t, func() bool {
-			var job batchv1.Job
-			present := wait.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
-			return present && job.Status.Active > 0
-		}, 1*time.Minute, 3*time.Second)
-
-		require.Eventually(t, wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
-
-		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
-			"deployment/"+harness.ReceiverName(releaseNameOverride),
-			"-n", ns,
-			"--replicas", "1"), c)
-		common.RequireNoError(t, cmd.Run())
-
-		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
-
-		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second)
-
-		pvc := common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)
-		common.RequireNoError(t, c.GetClient().Get(ctx, client.ObjectKeyFromObject(pvc), pvc))
-		assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
+	drainOneReplica(t, env, ns, logging, drainBudget{
+		buffered: time.Minute, bufferedTick: 3 * time.Second,
+		started: time.Minute, startedTick: 3 * time.Second,
+		podGoneTick: time.Second,
 	})
+
+	// The claim outlives the replica, carrying the operator's verdict.
+	var pvc corev1.PersistentVolumeClaim
+	require.NoError(t, env.Client.Get(env.Ctx, client.ObjectKey{Namespace: ns, Name: drainedPVC}, &pvc))
+	assert.Equal(t, "drained", pvc.GetLabels()["logging.banzaicloud.io/drain-status"])
 }
 
 func TestVolumeDrain_Downscale_DeleteVolume(t *testing.T) {
-	common.Initialize(t)
-	ns := "testing-2"
-	releaseNameOverride := "volumedrain"
-	testTag := "test.volumedrain"
-	common.WithCluster("drain-2", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	const ns = "testing-2"
 
-		ctx := context.Background()
-		aggergatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
+	env := harness.New(t).
+		WithCluster("drain-2").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "drainer-test",
-				Namespace: ns,
-			},
-			Spec: v1beta1.LoggingSpec{
-				EnableRecreateWorkloadOnImmutableFieldChange: true,
-				ControlNamespace: ns,
-				FluentbitSpec: &v1beta1.FluentbitSpec{
-					Network: &v1beta1.FluentbitNetwork{
-						Keepalive: new(false),
-					},
-					ConfigHotReload: &v1beta1.HotReload{
-						Image: image.ConfigReloader().Spec(),
-					},
-					BufferVolumeImage: image.NodeExporter().Spec(),
-				},
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					BufferVolumeMetrics: &v1beta1.Metrics{
-						Enabled: new(true),
-					},
-					Scaling: &v1beta1.FluentdScaling{
-						Replicas: 2,
-						Drain: v1beta1.FluentdDrainConfig{
-							Enabled:      true,
-							DeleteVolume: true,
-							Image:        image.DrainWatch().Spec(),
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-		tags := "time"
-		output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				HTTPOutput: &output.HTTPOutputConfig{
-					Endpoint:    harness.ReceiverURL(releaseNameOverride, testTag),
-					ContentType: "application/json",
-					Buffer: &output.Buffer{
-						Type:        "file",
-						Tags:        &tags,
-						Timekey:     "10s",
-						TimekeyWait: "0s",
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &output))
+	logging := drainingLogging(ns, true)
+	env.Create(logging)
 
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "test-flow",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{
-							Labels: producerLabels,
-						},
-					},
-				},
-				LocalOutputRefs: []string{output.Name},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
+	out := httpOutput(env, ns, "10s")
+	env.Create(out, flowToOutput(ns, out.Name))
+	env.StartLogProducer(ns, producerLabels)
 
-		fluentdReplicaName := logging.Name + "-fluentd-1"
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+	)
+	env.Receiver.MustReceive(testTag)
 
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
-			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggergatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-
-			cmd := common.CmdEnv(exec.Command("kubectl",
-				"logs",
-				"-n", ns,
-				"-l", fmt.Sprintf("%s=%s", types.NameLabel, harness.ReceiverName(releaseNameOverride))), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to get log consumer logs: %v", err)
-				return false
-			}
-			t.Logf("log consumer logs: %s", rawOut)
-			return strings.Contains(string(rawOut), testTag)
-		}, 5*time.Minute, 2*time.Second)
-
-		cmd := common.CmdEnv(exec.Command("kubectl", "scale",
-			"deployment/"+harness.ReceiverName(releaseNameOverride),
-			"-n", ns,
-			"--replicas", "0"), c)
-		common.RequireNoError(t, cmd.Run())
-
-		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "-n", ns, "exec", fluentdReplicaName, "-c", "fluentd", "--", "ls", "-1", "/buffers"), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("failed to list buffer directory: %v", err)
-				return false
-			}
-			return strings.Count(string(rawOut), "\n") > 2
-		}, 3*time.Minute, 10*time.Second)
-
-		patch := client.MergeFrom(logging.DeepCopy())
-		logging.Spec.FluentdSpec.Scaling.Replicas = 1
-		common.RequireNoError(t, c.GetClient().Patch(ctx, &logging, patch))
-
-		drainerJobName := fluentdReplicaName + "-drainer"
-		require.Eventually(t, func() bool {
-			var job batchv1.Job
-			present := wait.ResourceShouldBePresent(t, c.GetClient(), common.Resource(&job, ns, drainerJobName))()
-			return present && job.Status.Active > 0
-		}, 2*time.Minute, 1*time.Second)
-
-		require.Eventually(t, wait.PodShouldBeRunning(t, c.GetClient(), client.ObjectKey{Namespace: ns, Name: fluentdReplicaName}), 30*time.Second, time.Second/2)
-
-		cmd = common.CmdEnv(exec.Command("kubectl", "scale",
-			"deployment/"+harness.ReceiverName(releaseNameOverride),
-			"-n", ns,
-			"--replicas", "1"), c)
-		common.RequireNoError(t, cmd.Run())
-
-		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(batchv1.Job), ns, drainerJobName)), 3*time.Minute, 3*time.Second)
-
-		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.Pod), ns, fluentdReplicaName)), 30*time.Second, time.Second/2)
-
-		require.Eventually(t, wait.ResourceShouldBeAbsent(t, c.GetClient(), common.Resource(new(corev1.PersistentVolumeClaim), ns, logging.Name+"-fluentd-buffer-"+fluentdReplicaName)), 30*time.Second, time.Second/2)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
-
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
-
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
+	drainOneReplica(t, env, ns, logging, drainBudget{
+		buffered: 3 * time.Minute, bufferedTick: 10 * time.Second,
+		started: 2 * time.Minute, startedTick: time.Second,
+		podGoneTick: time.Second / 2,
 	})
+
+	// deleteVolume, so the claim goes with the replica rather than being kept.
+	env.WaitWithin(30*time.Second, time.Second/2, wait.PVCGone(ns, drainedPVC))
 }
