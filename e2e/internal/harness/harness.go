@@ -211,6 +211,13 @@ func (e *Env) WaitFor(conditions ...wait.Condition) {
 // WaitWithin is WaitFor with the suite's own budget, for an assertion where how
 // long it takes is part of what is being tested: settling within thirty seconds
 // and settling within the shared five minutes are different claims.
+//
+// What neither takes is a diagnostic on each failed poll, since a Condition is
+// read-only by construction and cannot log. A suite that needs one drives the
+// Condition from its own require.Eventually instead, as
+// elasticsearch-multiversion does to report container restarts while it waits.
+// That is the one escape hatch the thirteen suites have needed; widen the
+// Condition contract only if a second suite wants the same thing.
 func (e *Env) WaitWithin(budget, interval time.Duration, conditions ...wait.Condition) {
 	e.T.Helper()
 
