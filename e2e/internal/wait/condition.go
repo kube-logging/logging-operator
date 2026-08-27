@@ -19,6 +19,7 @@ import (
 	"slices"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
+	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -287,4 +288,33 @@ func PodGone(namespace, name string) Condition {
 
 func PVCGone(namespace, name string) Condition {
 	return gone("PersistentVolumeClaim", namespace, name, &corev1.PersistentVolumeClaim{})
+}
+
+// Deployment is ready when every replica it wants is ready, available, and the
+// Available condition agrees. Ready alone can hold while the condition still
+// reports the old rollout.
+//
+// Wanting no replicas is deliberately never ready: the old helper bailed on a
+// nil Spec.Replicas, and taking it as zero would otherwise let a Deployment
+// scaled to nothing satisfy a readiness wait with a stale Available condition.
+func Deployment(namespace, name string) Condition {
+	return Condition{
+		Name: "Deployment " + name,
+		Met: func(ctx context.Context, cl client.Reader) (bool, error) {
+			var deployment appsv1.Deployment
+			if err := cl.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, &deployment); err != nil {
+				return false, err
+			}
+			want := ptr.Deref(deployment.Spec.Replicas, 0)
+			if want == 0 || deployment.Status.ReadyReplicas != want || deployment.Status.AvailableReplicas != want {
+				return false, nil
+			}
+			for _, c := range deployment.Status.Conditions {
+				if c.Type == appsv1.DeploymentAvailable {
+					return c.Status == corev1.ConditionTrue, nil
+				}
+			}
+			return false, nil
+		},
+	}
 }

@@ -20,6 +20,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -146,6 +147,67 @@ func TestJobStartedCountsTerminalStatesToo(t *testing.T) {
 			}).Build()
 
 			met, err := JobStarted("ns", "d").Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.Equal(t, c.want, met)
+		})
+	}
+}
+
+// A Deployment wanting no replicas would otherwise read as ready: nothing is
+// unready, and the Available condition can still be True from before it was
+// scaled down.
+func TestDeploymentWantingNoReplicasIsNeverReady(t *testing.T) {
+	zero := int32(0)
+	for _, c := range []struct {
+		name     string
+		replicas *int32
+	}{
+		{"replicas unset", nil},
+		{"explicitly zero", &zero},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&appsv1.Deployment{
+				ObjectMeta: metav1.ObjectMeta{Name: "es", Namespace: "ns"},
+				Spec:       appsv1.DeploymentSpec{Replicas: c.replicas},
+				Status: appsv1.DeploymentStatus{Conditions: []appsv1.DeploymentCondition{
+					{Type: appsv1.DeploymentAvailable, Status: corev1.ConditionTrue},
+				}},
+			}).Build()
+
+			met, err := Deployment("ns", "es").Met(t.Context(), cl)
+			require.NoError(t, err)
+			assert.False(t, met)
+		})
+	}
+}
+
+// Ready alone can hold while the Available condition still reports the old
+// rollout, so all three have to agree.
+func TestDeploymentNeedsEveryReplicaAndTheCondition(t *testing.T) {
+	two := int32(2)
+	availableCond := func(s corev1.ConditionStatus) []appsv1.DeploymentCondition {
+		return []appsv1.DeploymentCondition{{Type: appsv1.DeploymentAvailable, Status: s}}
+	}
+
+	for _, c := range []struct {
+		name   string
+		status appsv1.DeploymentStatus
+		want   bool
+	}{
+		{"all ready and available", appsv1.DeploymentStatus{ReadyReplicas: 2, AvailableReplicas: 2, Conditions: availableCond(corev1.ConditionTrue)}, true},
+		{"not all ready", appsv1.DeploymentStatus{ReadyReplicas: 1, AvailableReplicas: 2, Conditions: availableCond(corev1.ConditionTrue)}, false},
+		{"not all available", appsv1.DeploymentStatus{ReadyReplicas: 2, AvailableReplicas: 1, Conditions: availableCond(corev1.ConditionTrue)}, false},
+		{"condition still false", appsv1.DeploymentStatus{ReadyReplicas: 2, AvailableReplicas: 2, Conditions: availableCond(corev1.ConditionFalse)}, false},
+		{"no condition yet", appsv1.DeploymentStatus{ReadyReplicas: 2, AvailableReplicas: 2}, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&appsv1.Deployment{
+				ObjectMeta: metav1.ObjectMeta{Name: "es", Namespace: "ns"},
+				Spec:       appsv1.DeploymentSpec{Replicas: &two},
+				Status:     c.status,
+			}).Build()
+
+			met, err := Deployment("ns", "es").Met(t.Context(), cl)
 			require.NoError(t, err)
 			assert.Equal(t, c.want, met)
 		})
