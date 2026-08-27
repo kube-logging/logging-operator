@@ -24,10 +24,28 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
+
+func scheme(t *testing.T) *runtime.Scheme {
+	t.Helper()
+	s := runtime.NewScheme()
+	require.NoError(t, corev1.AddToScheme(s))
+	require.NoError(t, appsv1.AddToScheme(s))
+	require.NoError(t, batchv1.AddToScheme(s))
+	require.NoError(t, v1beta1.AddToScheme(s))
+	return s
+}
+
+func pod(name string, phase corev1.PodPhase, labels map[string]string) *corev1.Pod {
+	return &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "ns", Labels: labels},
+		Status:     corev1.PodStatus{Phase: phase},
+	}
+}
 
 // The ptr.Deref default is chosen per direction: false where Active must be
 // true, true where it must be false. Both leave an unset Active unsatisfied so
